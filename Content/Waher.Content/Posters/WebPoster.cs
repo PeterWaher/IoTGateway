@@ -54,12 +54,15 @@ namespace Waher.Content.Posters
 		/// <param name="EncodedData">Encoded data to be posted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
+			params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate);
+			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
@@ -69,7 +72,7 @@ namespace Waher.Content.Posters
 				{
 					RequestUri = Uri,
 					Method = HttpMethod.Post, 
-					Content = new ByteArrayContent(EncodedData)
+					Content = new ByteArrayContent(EncodedData),
 				})
 				{
 					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);

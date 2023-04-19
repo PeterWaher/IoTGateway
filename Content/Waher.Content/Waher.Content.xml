@@ -682,21 +682,23 @@
             <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
             <returns>If the deleter can delete to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
@@ -724,12 +726,13 @@
             <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
             <returns>If the deleter can delete to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Deleters.WebDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Deleters.WebDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -982,21 +985,23 @@
             <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
             <returns>If the getter can get a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
@@ -1009,21 +1014,23 @@
             <returns>Decoded Data URI</returns>
             <exception cref="T:System.ArgumentException">If URI is invalid.</exception>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
@@ -1036,21 +1043,23 @@
             <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
             <returns>If the header can get the headers of a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
@@ -1119,21 +1128,23 @@
             <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
             <returns>If the getter can get a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
@@ -1144,12 +1155,24 @@
             </summary>
             <returns>Http Client Handler</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetClientHandler(System.Security.Cryptography.X509Certificates.X509Certificate)">
+        <member name="M:Waher.Content.Getters.WebGetter.GetClientHandler(System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler)">
             <summary>
             Gets a HTTP Client handler
             </summary>
             <param name="Certificate">Optional Client certificate</param>
+            <param name="RemoteCertificateValidator">Optional validator.</param>
             <returns>Http Client Handler</returns>
+        </member>
+        <member name="T:Waher.Content.Getters.WebGetter.RemoteCertificateValidator">
+            <summary>
+            Validator of remote certificate.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.RemoteCertificateValidator.#ctor(Waher.Content.RemoteCertificateEventHandler)">
+            <summary>
+            Validator of remote certificate.
+            </summary>
+            <param name="Callback">Optional callback method.</param>
         </member>
         <member name="M:Waher.Content.Getters.WebGetter.ProcessResponse(System.Net.Http.HttpResponseMessage,System.Uri)">
             <summary>
@@ -1161,21 +1184,23 @@
             <returns>Decoded response, if success.</returns>
             <exception cref="T:Waher.Content.Getters.WebException">If response does not indicate a success.</exception>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
@@ -1188,21 +1213,23 @@
             <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
             <returns>If the header can get the headers of a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
@@ -1280,21 +1307,23 @@
             <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
             <returns>If the deleter can delete to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
@@ -1343,40 +1372,44 @@
             <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
             <returns>If the getter can get a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
@@ -1400,21 +1433,23 @@
             <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
             <returns>If the header can get the headers of a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
         </member>
-        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
@@ -1438,28 +1473,30 @@
             <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
             <returns>If the poster can post to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to post.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to post.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -1467,10 +1504,11 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -1478,6 +1516,7 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -1501,28 +1540,30 @@
             <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
             <returns>If the putter can put to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to put.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to put.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -1530,10 +1571,11 @@
             <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
-        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -1541,6 +1583,7 @@
             <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -1834,6 +1877,16 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.GetAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a resource, given its URI.
@@ -1849,6 +1902,17 @@
             </summary>
             <param name="Uri">Uniform resource identifier.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
@@ -1870,6 +1934,16 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.GetTempStreamAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, given its URI.
@@ -1885,6 +1959,17 @@
             </summary>
             <param name="Uri">Uniform resource identifier.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
@@ -1927,6 +2012,17 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to post.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Object,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
@@ -1944,6 +2040,18 @@
             <param name="Uri">URI</param>
             <param name="Data">Data to post.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to post.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
@@ -1969,6 +2077,18 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Byte[],System.String,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
@@ -1988,6 +2108,19 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -2030,6 +2163,17 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
@@ -2047,6 +2191,18 @@
             <param name="Uri">URI</param>
             <param name="Data">Data to put.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
@@ -2072,6 +2228,18 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
@@ -2091,6 +2259,19 @@
             <param name="EncodedData">Encoded data to be putted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -2131,6 +2312,16 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Deletes a resource, using a Uniform Resource Identifier (or Locator).
@@ -2146,6 +2337,17 @@
             </summary>
             <param name="Uri">URI</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
@@ -2186,6 +2388,16 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
         </member>
+        <member name="M:Waher.Content.InternetContent.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Heads a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
         <member name="M:Waher.Content.InternetContent.HeadAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Heads a resource, given its URI.
@@ -2201,6 +2413,17 @@
             </summary>
             <param name="Uri">Uniform resource identifier.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Heads a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
@@ -3691,28 +3914,30 @@
             <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
             <returns>If the poster can post to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to post.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to post.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3720,10 +3945,11 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3731,6 +3957,7 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -3758,7 +3985,7 @@
             <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
             <returns>If the poster can post to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Posters.WebPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Posters.WebPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Posts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3766,6 +3993,7 @@
             <param name="EncodedData">Encoded data to be posted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -3803,28 +4031,30 @@
             <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
             <returns>If the putter can put to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to put.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
             <param name="Uri">URI</param>
             <param name="Data">Data to put.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3832,10 +4062,11 @@
             <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
         </member>
-        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3843,6 +4074,7 @@
             <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
@@ -3870,7 +4102,7 @@
             <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
             <returns>If the putter can put to a resource with the indicated URI.</returns>
         </member>
-        <member name="M:Waher.Content.Putters.WebPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Putters.WebPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Content.RemoteCertificateEventHandler,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Puts to a resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -3878,9 +4110,51 @@
             <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
+        </member>
+        <member name="T:Waher.Content.RemoteCertificateEventHandler">
+            <summary>
+            Delegate for remote certificate event handlers.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Content.RemoteCertificateEventArgs">
+            <summary>
+            Remove certificate validation event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.RemoteCertificateEventArgs.#ctor(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Cryptography.X509Certificates.X509Chain,System.Net.Security.SslPolicyErrors)">
+            <summary>
+            Remove certificate validation event arguments.
+            </summary>
+            <param name="Certificate">Remote certificate.</param>
+            <param name="Chain">Certificate chain</param>
+            <param name="SslPolicyErrors">Any SSL policy errors detected.</param>
+        </member>
+        <member name="P:Waher.Content.RemoteCertificateEventArgs.IsValid">
+            <summary>
+            If remote certificate is considered valid or not. null means default
+            validation rules will be applied. Can be set once to a non-null value.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.RemoteCertificateEventArgs.Certificate">
+            <summary>
+            Remote certificate.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.RemoteCertificateEventArgs.Chain">
+            <summary>
+            Certificate chain
+            </summary>
+        </member>
+        <member name="P:Waher.Content.RemoteCertificateEventArgs.SslPolicyErrors">
+            <summary>
+            Any SSL policy errors detected.
+            </summary>
         </member>
         <member name="T:Waher.Content.Resources">
             <summary>

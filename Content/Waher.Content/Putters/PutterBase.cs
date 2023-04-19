@@ -40,11 +40,13 @@ namespace Waher.Content.Putters
 		/// <param name="Uri">URI</param>
 		/// <param name="Data">Data to put.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.PutAsync(Uri, Data, Certificate, 60000, Headers);
+			return this.PutAsync(Uri, Data, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
 
 		/// <summary>
@@ -53,13 +55,17 @@ namespace Waher.Content.Putters
 		/// <param name="Uri">URI</param>
 		/// <param name="Data">Data to put.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual async Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public virtual async Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
-			KeyValuePair<byte[], string> Result = await this.PutAsync(Uri, P.Key, P.Value, Certificate, TimeoutMs, Headers);
+			KeyValuePair<byte[], string> Result = await this.PutAsync(Uri, P.Key, P.Value, Certificate,
+				RemoteCertificateValidator, TimeoutMs, Headers);
+
 			return await InternetContent.DecodeAsync(Result.Value, Result.Key, Uri);
 		}
 
@@ -70,11 +76,13 @@ namespace Waher.Content.Putters
 		/// <param name="EncodedData">Encoded data to be puted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public virtual Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.PutAsync(Uri, EncodedData, ContentType, Certificate, 60000, Headers);
+			return this.PutAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
 
 		/// <summary>
@@ -84,10 +92,12 @@ namespace Waher.Content.Putters
 		/// <param name="EncodedData">Encoded data to be puted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public abstract Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+		public abstract Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
 	}
 }

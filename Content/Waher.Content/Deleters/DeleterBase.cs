@@ -39,11 +39,13 @@ namespace Waher.Content.Deleters
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.DeleteAsync(Uri, Certificate, 60000, Headers);
+			return this.DeleteAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
 
 		/// <summary>
@@ -51,9 +53,11 @@ namespace Waher.Content.Deleters
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public abstract Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+		public abstract Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 	}
 }

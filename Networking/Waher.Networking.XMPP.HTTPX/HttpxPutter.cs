@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Putters;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
@@ -60,6 +61,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="EncodedData">Encoded data to be puted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
@@ -71,7 +73,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
-		public override async Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public override async Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
+			params KeyValuePair<string, string>[] Headers)
 		{
 			HttpxClient HttpxClient;
 			string BareJid;

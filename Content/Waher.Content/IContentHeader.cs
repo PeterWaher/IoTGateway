@@ -33,18 +33,24 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers);
+		Task<object> HeadAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
 		/// Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+		Task<object> HeadAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 	}
 }

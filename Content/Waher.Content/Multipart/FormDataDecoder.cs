@@ -265,14 +265,19 @@ namespace Waher.Content.Multipart
 						throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
 				}
 
-				EmbeddedContent.Decoded = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
+				try
+				{
+					EmbeddedContent.Decoded = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
+				}
+				catch (Exception)
+				{
+					EmbeddedContent.Decoded = Data2;
+				}
 
 				if (!(Form is null))
 				{
 					Form[EmbeddedContent.Name] = EmbeddedContent.Decoded;
-
-					if (!(EmbeddedContent.Decoded is byte[]))
-						Form[EmbeddedContent.Name + "_Binary"] = Data2;
+					Form[EmbeddedContent.Name + "_Binary"] = Data2;
 
 					if (!string.IsNullOrEmpty(EmbeddedContent.ContentType))
 						Form[EmbeddedContent.Name + "_ContentType"] = EmbeddedContent.ContentType;

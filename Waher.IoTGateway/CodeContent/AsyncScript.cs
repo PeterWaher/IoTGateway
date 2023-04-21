@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -9,6 +10,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Operators;
 using Waher.Security;
 
 namespace Waher.IoTGateway.CodeContent
@@ -121,9 +123,12 @@ namespace Waher.IoTGateway.CodeContent
 
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = new Variables();
+			StringBuilder ImplicitPrint = new StringBuilder();
+
+			Variables.ConsoleOut = new StringWriter(ImplicitPrint);
 			Document.Settings.Variables.CopyTo(Variables);
 
-			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, Id));
+			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, ImplicitPrint, Id));
 
 			return Task.FromResult(true);
 		}
@@ -145,7 +150,7 @@ namespace Waher.IoTGateway.CodeContent
 			}
 		}
 
-		private async Task Evaluate(Expression Script, Variables Variables, string Id)
+		private async Task Evaluate(Expression Script, Variables Variables, StringBuilder ImplicitPrint, string Id)
 		{
 			async void Preview(object sender, PreviewEventArgs e)
 			{
@@ -168,6 +173,15 @@ namespace Waher.IoTGateway.CodeContent
 			try
 			{
 				object Result = await this.Evaluate(Script, Variables);
+
+				string Printed = ImplicitPrint.ToString();
+				if (!string.IsNullOrEmpty(Printed))
+				{
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Printed);
+					Doc.AddMetaData("BodyOnly", "1");
+
+					await Doc.GenerateHTML(Html);
+				}
 
 				await InlineScript.GenerateHTML(Result, Html, true, Variables);
 			}

@@ -344,7 +344,43 @@ function LoadContent(Id)
 				if (xhttp.status === 200)
 				{
 					var Div = document.getElementById("id" + Id);
-					Div.innerHTML = xhttp.responseText;
+					if (Div)
+					{
+						var Html = xhttp.responseText;
+						var Script = [];
+						var HtmlLower = Html.toLocaleLowerCase();
+						var i = HtmlLower.indexOf("<script>");
+
+						while (i >= 0)
+						{
+							var j = HtmlLower.indexOf("</script>", i + 8);
+							if (j < 0)
+								break;
+
+							Script.push(Html.substring(i + 8, j));
+
+							Html = Html.substring(0, i) + Html.substring(j + 9);
+							HtmlLower = HtmlLower.substring(0, i) + HtmlLower.substring(j + 9);
+
+							i = HtmlLower.indexOf("<script>", i);
+						}
+
+						Div.innerHTML = Html;
+
+						var c = Script.length;
+
+						for (i = 0; i < c; i++)
+						{
+							try
+							{
+								eval(Script[i]);
+							}
+							catch (e)
+							{
+								console.log(e);
+							}
+						}
+					}
 
 					if (xhttp.getResponseHeader("X-More") === "1")
 					{

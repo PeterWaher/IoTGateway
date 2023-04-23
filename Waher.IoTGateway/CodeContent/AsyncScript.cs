@@ -177,8 +177,16 @@ namespace Waher.IoTGateway.CodeContent
 				string Printed = ImplicitPrint.ToString();
 				if (!string.IsNullOrEmpty(Printed))
 				{
-					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Printed);
-					Doc.AddMetaData("BodyOnly", "1");
+					StringBuilder sb = new StringBuilder();
+					sb.AppendLine("BodyOnly: 1");
+
+					if (this.document.Settings.AllowScriptTag)
+						sb.AppendLine("AllowScriptTag: 1");
+
+					sb.AppendLine();
+					sb.Append(Printed);
+
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
 
 					await Doc.GenerateHTML(Html);
 				}
@@ -213,7 +221,7 @@ namespace Waher.IoTGateway.CodeContent
 			Variables Variables = Document.Settings.Variables;
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript .GeneratePlainText(Result, Output, true);
+			await InlineScript.GeneratePlainText(Result, Output, true);
 
 			return true;
 		}

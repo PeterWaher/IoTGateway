@@ -752,6 +752,12 @@ This is transformed into:
 is available. The library is accessible through the `/Highlight` web folder. You can control the style used for highlighting, by including a
 `CSS: /Highlight/style/STYLE_NAME.css` header at the top of the page, where `STYLE_NAME` refers to the actual style to use on the page.
 
+**Note 2**: If you use back-ticks, you must use the same amount of back-ticks when closing the code block, as you did when opening
+the code block.
+
+**Note 3**: You can embed code-blocks defined using back-ticks in code-blocks defined by back-ticks, if each embedded code-block uses
+fewer back-ticks compared to the parent block.
+
 The IoT Gateway provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in
 different ways. The following subsections illustrate such renderings.
 

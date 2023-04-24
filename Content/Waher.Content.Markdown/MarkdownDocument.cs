@@ -1979,12 +1979,12 @@ namespace Waher.Content.Markdown
 						{
 							if (this.AllowScriptTag && this.settings.AllowScriptTag)
 							{
-								string s = State.UntilToken("</SCRIPT>");
+								Text.Append(State.UntilToken("</SCRIPT>"));
+								Text.Append("</");
+								Text.Append(Url.Substring(1, 6));
+								Text.Append(">");
 
-								if (!string.IsNullOrEmpty(s))
-									Elements.AddLast(new InlineText(this, s));
-
-								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 6) + ">"));
+								Elements.AddLast(new InlineHTML(this, Text.ToString()));
 							}
 							else
 								Elements.AddLast(new InlineCode(this, Url));

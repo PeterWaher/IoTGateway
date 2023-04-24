@@ -686,7 +686,10 @@ namespace Waher.IoTGateway
 						if (!Configuration.Complete)
 						{
 							CurrentConfiguration = Configuration;
-							webServer.ResourceOverride = Configuration.Resource;
+
+							if (!(webServer is null))
+								webServer.ResourceOverride = Configuration.Resource;
+
 							Configuration.SetStaticInstance(Configuration);
 
 							startingServer?.Release();
@@ -695,7 +698,7 @@ namespace Waher.IoTGateway
 
 							await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
-							if (await Configuration.SetupConfiguration(webServer))
+							if (!(webServer is null) && await Configuration.SetupConfiguration(webServer))
 								ReloadConfigurations = true;
 
 							NeedsCleanup = true;
@@ -719,7 +722,7 @@ namespace Waher.IoTGateway
 							}
 						}
 
-						if (NeedsCleanup)
+						if (NeedsCleanup && !(webServer is null))
 							await Configuration.CleanupAfterConfiguration(webServer);
 
 						if (ReloadConfigurations)

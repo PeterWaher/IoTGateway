@@ -1968,25 +1968,35 @@ namespace Waher.Content.Markdown
 						Text.Append(ch2);
 						Url = Text.ToString();
 
-						if ((!this.AllowScriptTag || !this.settings.AllowScriptTag) &&
-							(Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
-							Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase)))
+						if (Url.StartsWith("</"))
 						{
-							Elements.AddLast(new InlineCode(this, Url));
+							if (Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase))
+								Elements.AddLast(new InlineCode(this, Url));
+							else
+								Elements.AddLast(new InlineHTML(this, Url));
 						}
-						else if (Url.StartsWith("</") || Url.IndexOf(' ') >= 0)
+						else if (Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase))
 						{
-							Elements.AddLast(new InlineHTML(this, Url));
-
-							if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+							if (this.AllowScriptTag && this.settings.AllowScriptTag)
 							{
-								string s = State.UntilToken("</TEXTAREA>");
+								string s = State.UntilToken("</SCRIPT>");
 
 								if (!string.IsNullOrEmpty(s))
 									Elements.AddLast(new InlineText(this, s));
 
-								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 6) + ">"));
 							}
+							else
+								Elements.AddLast(new InlineCode(this, Url));
+						}
+						else if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+						{
+							string s = State.UntilToken("</TEXTAREA>");
+
+							if (!string.IsNullOrEmpty(s))
+								Elements.AddLast(new InlineText(this, s));
+
+							Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
 						}
 						else if (Url.IndexOf(':') >= 0)
 							Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));

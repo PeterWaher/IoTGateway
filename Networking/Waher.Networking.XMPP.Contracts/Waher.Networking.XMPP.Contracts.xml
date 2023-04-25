@@ -2470,6 +2470,83 @@
             <param name="RemoteId">ID of Legal ID of remote party</param>
             <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingId(Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
+            <summary>
+            Gets available service providers who can help review an ID application.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingId(System.String,Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
+            <summary>
+            Gets available service providers who can help review an ID application.
+            </summary>
+            <param name="ComponentAddress">Address of component.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingIdAsync">
+            <summary>
+            Gets available service providers who can help review an ID application.
+            </summary>
+            <returns>Peer Review Services available.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingIdAsync(System.String)">
+            <summary>
+            Gets available service providers who can help review an ID application.
+            </summary>
+            <param name="ComponentAddress">Address of component.</param>
+            <returns>Peer Review Services available.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SelectPeerReviewService(System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Selects a service provider for peer review. This needs to be done before requesting the trust provider
+            (given its JID) to peer review an identity application. Such service providers are returned by calling
+            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            </summary>
+            <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+            <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SelectPeerReviewService(System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Selects a service provider for peer review. This needs to be done before requesting the trust provider
+            (given its JID) to peer review an identity application. Such service providers are returned by calling
+            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            </summary>
+            <param name="ComponentAddress">Address of component.</param>
+            <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+            <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SelectPeerReviewServiceAsync(System.String,System.String)">
+            <summary>
+            Selects a service provider for peer review. This needs to be done before requesting the trust provider
+            (given its JID) to peer review an identity application. Such service providers are returned by calling
+            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            </summary>
+            <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+            <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SelectPeerReviewServiceAsync(System.String,System.String,System.String)">
+            <summary>
+            Selects a service provider for peer review. This needs to be done before requesting the trust provider
+            (given its JID) to peer review an identity application. Such service providers are returned by calling
+            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            </summary>
+            <param name="ComponentAddress">Address of component.</param>
+            <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+            <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionClientUrlReceived">
+            <summary>
+            Event raised when a Client URL has been sent to the client as part of a
+            petition process. Such an URL must be opened by the client to complete 
+            the petition.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.DateParameter">
             <summary>
             Date contractual parameter
@@ -4163,6 +4240,60 @@
             If simple Markdown escaping rules apply.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.IServiceProvider">
+            <summary>
+            Interface for information about a service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.Id">
+            <summary>
+            ID of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.Type">
+            <summary>
+            Type of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.Name">
+            <summary>
+            Displayable name of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.IconUrl">
+            <summary>
+            Optional URL to icon of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.IconWidth">
+            <summary>
+            Width of icon, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IServiceProvider.IconHeight">
+            <summary>
+            Height of icon, if available.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.IServiceProvider.Create(System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.IServiceProvider.Create(System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="IconUrl">Optional URL to icon of service provider.</param>
+            <param name="IconWidth">Width of icon, if available.</param>
+            <param name="IconHeight">Height of icon, if available.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityState">
             <summary>
             Lists recognized legal identity states.
@@ -4631,6 +4762,38 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Part.Role">
             <summary>
             Role of the part in the contract
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.PetitionClientUrlEventHandler">
+            <summary>
+            Delegate for client URL events when performing a petition.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.PetitionClientUrlEventArgs">
+            <summary>
+            Event arguments for events where a client URL needs to be displayed
+            when performing a petition.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.PetitionClientUrlEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,System.String,System.String)">
+            <summary>
+            Event arguments for events where a client URL needs to be displayed
+            when reviewing an identity application.
+            </summary>
+            <param name="e">IQ result event arguments.</param>
+            <param name="PetitionId">Petition ID.</param>
+            <param name="ClientUrl">Client URL.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.PetitionClientUrlEventArgs.PetitionId">
+            <summary>
+            ID of peer review petition.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.PetitionClientUrlEventArgs.ClientUrl">
+            <summary>
+            URL client needs to open to complete the peer review.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Property">
@@ -6114,6 +6277,169 @@
             Serializes the signature, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ServiceProvider">
+            <summary>
+            Contains information about a service provider.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProvider.#ctor">
+            <summary>
+            Contains information about a service provider.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProvider.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Contains information about a service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProvider.#ctor(System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Contains information about a service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="IconUrl">Optional URL to icon of service provider.</param>
+            <param name="IconWidth">Width of icon, if available.</param>
+            <param name="IconHeight">Height of icon, if available.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.Id">
+            <summary>
+            ID of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.Type">
+            <summary>
+            Type of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.Name">
+            <summary>
+            Displayable name of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.IconUrl">
+            <summary>
+            Optional URL to icon of service provider.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.IconWidth">
+            <summary>
+            Width of icon, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvider.IconHeight">
+            <summary>
+            Height of icon, if available.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProvider.Create(System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProvider.Create(System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="IconUrl">Optional URL to icon of service provider.</param>
+            <param name="IconWidth">Width of icon, if available.</param>
+            <param name="IconHeight">Height of icon, if available.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler`1">
+            <summary>
+            Delegate for service provider callback methods.
+            </summary>
+            <typeparam name="T">Service-provider type.</typeparam>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ServiceProvidersEventArgs`1">
+            <summary>
+            Event arguments for Service Provider callback methods.
+            </summary>
+            <typeparam name="T">Service-provider type.</typeparam>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProvidersEventArgs`1.ServiceProviders">
+            <summary>
+            Service Providers.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId">
+            <summary>
+            Contains information about a service provider with a legal identity.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.#ctor">
+            <summary>
+            Contains information about a service provider with a legal identity.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.#ctor(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Contains information about a service provider with a legal identity.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="LegalId">Legal Identity</param>
+            <param name="External">If legal identity is external (true) or belongs to the server (false).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.#ctor(System.String,System.String,System.String,System.String,System.Boolean,System.String,System.Int32,System.Int32)">
+            <summary>
+            Contains information about a service provider with a legal identity.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="IconUrl">Optional URL to icon of service provider.</param>
+            <param name="IconWidth">Width of icon, if available.</param>
+            <param name="IconHeight">Height of icon, if available.</param>
+            <param name="LegalId">Legal Identity</param>
+            <param name="External">If legal identity is external (true) or belongs to the server (false).</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.LegalId">
+            <summary>
+            Legal identity
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.External">
+            <summary>
+            If legal identity is external (true) or belongs to the server (false).
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.Create(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="LegalId">Legal Identity</param>
+            <param name="External">If legal identity is external (true) or belongs to the server (false).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId.Create(System.String,System.String,System.String,System.String,System.Boolean,System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a new instance of the service provider.
+            </summary>
+            <param name="Id">ID of service provider.</param>
+            <param name="Type">Type of service provider.</param>
+            <param name="Name">Displayable name of service provider.</param>
+            <param name="IconUrl">Optional URL to icon of service provider.</param>
+            <param name="IconWidth">Width of icon, if available.</param>
+            <param name="IconHeight">Height of icon, if available.</param>
+            <param name="LegalId">Legal Identity</param>
+            <param name="External">If legal identity is external (true) or belongs to the server (false).</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Signature">
             <summary>

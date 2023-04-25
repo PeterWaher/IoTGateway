@@ -114,6 +114,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionClientUrl", NamespaceLegalIdentities, this.PetitionClientUrlEventHandler, false);
 
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.RegisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
@@ -142,6 +143,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionClientUrl", NamespaceLegalIdentities, this.PetitionClientUrlEventHandler, false);
 
 			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.UnregisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
@@ -6476,6 +6478,289 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await Result.Task;
 		}
+
+		#endregion
+
+		#region Peer-review service providers
+
+		/// <summary>
+		/// Gets available service providers who can help review an ID application.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetServiceProvidersForReviewingId(ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
+		{
+			this.GetServiceProvidersForReviewingId(this.componentAddress, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets available service providers who can help review an ID application.
+		/// </summary>
+		/// <param name="ComponentAddress">Address of component.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetServiceProvidersForReviewingId(string ComponentAddress,
+			ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<reviewIdProviders xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				List<ServiceProviderWithLegalId> Providers = null;
+				XmlElement E;
+
+				if (e.Ok &&
+					!((E = e.FirstElement) is null) &&
+					E.LocalName == "providers" &&
+					E.NamespaceURI == NamespaceLegalIdentities)
+				{
+					Providers = new List<ServiceProviderWithLegalId>();
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 &&
+							E2.LocalName == "provider" &&
+							E2.NamespaceURI == NamespaceLegalIdentities)
+						{
+							ServiceProviderWithLegalId Provider = this.ParseServiceProviderWithLegalId(E2);
+
+							if (!(Provider is null))
+								Providers.Add(Provider);
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+				{
+					try
+					{
+						await Callback(this, new ServiceProvidersEventArgs<ServiceProviderWithLegalId>(e, Providers?.ToArray()));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+			}, State);
+		}
+
+		private ServiceProviderWithLegalId ParseServiceProviderWithLegalId(XmlElement Xml)
+		{
+			string Id = null;
+			string Type = null;
+			string Name = null;
+			string IconUrl = null;
+			string LegalId = null;
+			int IconWidth = -1;
+			int IconHeight = -1;
+			bool External = false;
+
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "id":
+						Id = Attr.Value;
+						break;
+
+					case "type":
+						Type = Attr.Value;
+						break;
+
+					case "name":
+						Name = Attr.Value;
+						break;
+
+					case "iconUrl":
+						IconUrl = Attr.Value;
+						break;
+
+					case "iconWidth":
+						if (!int.TryParse(Attr.Value, out IconWidth))
+							return null;
+						break;
+
+					case "iconHeight":
+						if (!int.TryParse(Attr.Value, out IconHeight))
+							return null;
+						break;
+
+					case "legalId":
+						LegalId = Attr.Value;
+						break;
+
+					case "external":
+						if (!CommonTypes.TryParse(Attr.Value, out External))
+							return null;
+						break;
+				}
+			}
+
+			if (Id is null || Type is null || Name is null)
+				return null;
+
+			if (string.IsNullOrEmpty(IconUrl))
+				return new ServiceProviderWithLegalId(Id, Type, Name, LegalId, External);
+			else
+			{
+				if (IconWidth < 0 || IconHeight < 0)
+					return null;
+
+				return new ServiceProviderWithLegalId(Id, Type, Name, LegalId, External, IconUrl, IconWidth, IconHeight);
+			}
+		}
+
+		/// <summary>
+		/// Gets available service providers who can help review an ID application.
+		/// </summary>
+		/// <returns>Peer Review Services available.</returns>
+		public Task<IServiceProvider[]> GetServiceProvidersForReviewingIdAsync()
+		{
+			return this.GetServiceProvidersForReviewingIdAsync(this.componentAddress);
+		}
+
+		/// <summary>
+		/// Gets available service providers who can help review an ID application.
+		/// </summary>
+		/// <param name="ComponentAddress">Address of component.</param>
+		/// <returns>Peer Review Services available.</returns>
+		public Task<IServiceProvider[]> GetServiceProvidersForReviewingIdAsync(string ComponentAddress)
+		{
+			TaskCompletionSource<IServiceProvider[]> Providers = new TaskCompletionSource<IServiceProvider[]>();
+
+			this.GetServiceProvidersForReviewingId(ComponentAddress, (sender, e) =>
+			{
+				if (e.Ok)
+					Providers.TrySetResult(e.ServiceProviders);
+				else
+					Providers.TrySetException(e.StanzaError ?? new Exception("Unable to get service providers."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Providers.Task;
+		}
+
+		#endregion
+
+		#region Select Peer-review service
+
+		/// <summary>
+		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
+		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
+		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// </summary>
+		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SelectPeerReviewService(string Provider, string ServiceId, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.SelectPeerReviewService(this.componentAddress, Provider, ServiceId, Callback, State);
+		}
+
+		/// <summary>
+		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
+		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
+		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// </summary>
+		/// <param name="ComponentAddress">Address of component.</param>
+		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SelectPeerReviewService(string ComponentAddress, string Provider, string ServiceId, 
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<selectReviewService xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' provider='");
+			Xml.Append(XML.Encode(Provider));
+			Xml.Append("' serviceId='");
+			Xml.Append(XML.Encode(ServiceId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(ComponentAddress, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
+		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
+		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// </summary>
+		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+		public Task SelectPeerReviewServiceAsync(string Provider, string ServiceId)
+		{
+			return this.SelectPeerReviewServiceAsync(this.componentAddress, Provider, ServiceId);
+		}
+
+		/// <summary>
+		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
+		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
+		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// </summary>
+		/// <param name="ComponentAddress">Address of component.</param>
+		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
+		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
+		public Task SelectPeerReviewServiceAsync(string ComponentAddress, string Provider, string ServiceId)
+		{
+			TaskCompletionSource<bool> Providers = new TaskCompletionSource<bool>();
+
+			this.SelectPeerReviewService(ComponentAddress, Provider, ServiceId, (sender, e) =>
+			{
+				if (e.Ok)
+					Providers.TrySetResult(true);
+				else
+					Providers.TrySetException(e.StanzaError ?? new Exception("Unable to select peer review service."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Providers.Task;
+		}
+
+		#endregion
+
+		#region Petition Client URL event
+
+		private async Task PetitionClientUrlEventHandler(object Sender, MessageEventArgs e)
+		{
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			string Url = XML.Attribute(e.Content, "url");
+
+			PetitionClientUrlEventHandler h = this.PetitionClientUrlReceived;
+
+			if (!(h is null))
+			{
+				try
+				{
+					await h(this, new PetitionClientUrlEventArgs(e, PetitionId, Url));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a Client URL has been sent to the client as part of a
+		/// petition process. Such an URL must be opened by the client to complete 
+		/// the petition.
+		/// </summary>
+		public event PetitionClientUrlEventHandler PetitionClientUrlReceived;
 
 		#endregion
 	}

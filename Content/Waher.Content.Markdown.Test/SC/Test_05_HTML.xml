@@ -4,15 +4,17 @@
 <paragraph>
 	<text>address@example.com</text>
 </paragraph>
-<text>
+<paragraph>
+	<text>
     </text>
-<text>
+	<text>
         </text>
-<text>Foo</text>
-<text>
+	<text>Foo</text>
+	<text>
     </text>
-<text>
+	<text>
 </text>
+</paragraph>
 <paragraph>
 	<text>This is an example of </text>
 	<text>bold text</text>
@@ -34,4 +36,10 @@
 </paragraph>
 <paragraph>
 	<text>|</text>
+</paragraph>
+<paragraph>
+	<text>This is a test in a SPAN tag.</text>
+</paragraph>
+<paragraph>
+	<text>User Name:</text>
 </paragraph>

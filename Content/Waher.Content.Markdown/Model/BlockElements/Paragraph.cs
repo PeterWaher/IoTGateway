@@ -268,10 +268,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteStartElement("paragraph");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateSmartContractXml(Output, State);
-
+			await base.GenerateSmartContractXml(Output, State);
 			Output.WriteEndElement();
 		}
 

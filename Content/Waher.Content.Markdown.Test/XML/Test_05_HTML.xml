@@ -52,6 +52,16 @@
 		<Paragraph>
 			<HtmlEntityUnicode>124</HtmlEntityUnicode>
 		</Paragraph>
+		<HtmlBlock>
+			<Html><![CDATA[<span class="test">]]></Html>
+			<InlineText>This is a test in a SPAN tag.</InlineText>
+			<Html><![CDATA[</span>]]></Html>
+		</HtmlBlock>
+		<Paragraph>
+			<InlineText>User Name:</InlineText>
+			<LineBreak />
+			<Html><![CDATA[<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />]]></Html>
+		</Paragraph>
 	</elements>
 	<references />
 </parsedMakdown>

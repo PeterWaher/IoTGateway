@@ -1998,22 +1998,27 @@ namespace Waher.Content.Markdown
 
 							Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
 						}
-						else if (Url.IndexOf(':') >= 0)
-							Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
-						else if (Url.IndexOf('@') >= 0)
-							Elements.AddLast(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
 						else
 						{
-							Elements.AddLast(new InlineHTML(this, Url));
+							int i = Url.IndexOf(' ');
 
-							if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+							if ((i < 0 && Url.IndexOf(':') >= 0) || (i > 0 && Url.LastIndexOf(':', i) >= 0))
+								Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
+							else if ((i < 0 && Url.IndexOf('@') >= 0) || (i > 0 && Url.LastIndexOf('@', i) >= 0))
+								Elements.AddLast(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
+							else
 							{
-								string s = State.UntilToken("</TEXTAREA>");
+								Elements.AddLast(new InlineHTML(this, Url));
 
-								if (!string.IsNullOrEmpty(s))
-									Elements.AddLast(new InlineText(this, s));
+								if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+								{
+									string s = State.UntilToken("</TEXTAREA>");
 
-								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+									if (!string.IsNullOrEmpty(s))
+										Elements.AddLast(new InlineText(this, s));
+
+									Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+								}
 							}
 						}
 

@@ -50,4 +50,11 @@
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[&#124;]]></Label>
 	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<span class="test">This is a test in a SPAN tag.</span>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[User Name:<br/>
+<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />]]></Label>
+	</ContentView>
 </StackLayout>

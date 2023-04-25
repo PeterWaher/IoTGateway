@@ -21,3 +21,8 @@ AT&T
 &#124;
 
 &#x7C;
+
+<span class="test">This is a test in a SPAN tag.</span>
+
+User Name:  
+<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />

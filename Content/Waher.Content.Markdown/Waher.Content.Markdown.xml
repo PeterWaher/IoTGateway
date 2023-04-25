@@ -3179,6 +3179,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.GenerateLaTeX(System.Text.StringBuilder)">
             <summary>
             Generates LaTeX for the markdown element.

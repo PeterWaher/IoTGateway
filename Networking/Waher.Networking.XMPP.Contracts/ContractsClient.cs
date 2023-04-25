@@ -6488,9 +6488,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetServiceProvidersForReviewingId(ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
+		public void GetPeerReviewIdServiceProviders(ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
 		{
-			this.GetServiceProvidersForReviewingId(this.componentAddress, Callback, State);
+			this.GetPeerReviewIdServiceProviders(this.componentAddress, Callback, State);
 		}
 
 		/// <summary>
@@ -6499,7 +6499,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetServiceProvidersForReviewingId(string ComponentAddress,
+		public void GetPeerReviewIdServiceProviders(string ComponentAddress,
 			ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -6621,9 +6621,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets available service providers who can help review an ID application.
 		/// </summary>
 		/// <returns>Peer Review Services available.</returns>
-		public Task<IServiceProvider[]> GetServiceProvidersForReviewingIdAsync()
+		public Task<IServiceProvider[]> GetPeerReviewIdServiceProvidersAsync()
 		{
-			return this.GetServiceProvidersForReviewingIdAsync(this.componentAddress);
+			return this.GetPeerReviewIdServiceProvidersAsync(this.componentAddress);
 		}
 
 		/// <summary>
@@ -6631,11 +6631,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <returns>Peer Review Services available.</returns>
-		public Task<IServiceProvider[]> GetServiceProvidersForReviewingIdAsync(string ComponentAddress)
+		public Task<IServiceProvider[]> GetPeerReviewIdServiceProvidersAsync(string ComponentAddress)
 		{
 			TaskCompletionSource<IServiceProvider[]> Providers = new TaskCompletionSource<IServiceProvider[]>();
 
-			this.GetServiceProvidersForReviewingId(ComponentAddress, (sender, e) =>
+			this.GetPeerReviewIdServiceProviders(ComponentAddress, (sender, e) =>
 			{
 				if (e.Ok)
 					Providers.TrySetResult(e.ServiceProviders);
@@ -6656,7 +6656,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
 		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
-		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
 		/// </summary>
 		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
@@ -6670,7 +6670,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
 		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
-		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
 		/// </summary>
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
@@ -6696,7 +6696,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
 		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
-		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
 		/// </summary>
 		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
@@ -6708,7 +6708,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Selects a service provider for peer review. This needs to be done before requesting the trust provider
 		/// (given its JID) to peer review an identity application. Such service providers are returned by calling
-		/// the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+		/// the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
 		/// </summary>
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>

@@ -2470,14 +2470,14 @@
             <param name="RemoteId">ID of Legal ID of remote party</param>
             <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingId(Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetPeerReviewIdServiceProviders(Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
             <summary>
             Gets available service providers who can help review an ID application.
             </summary>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingId(System.String,Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetPeerReviewIdServiceProviders(System.String,Waher.Networking.XMPP.Contracts.ServiceProvidersEventHandler{Waher.Networking.XMPP.Contracts.ServiceProviderWithLegalId},System.Object)">
             <summary>
             Gets available service providers who can help review an ID application.
             </summary>
@@ -2485,13 +2485,13 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingIdAsync">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetPeerReviewIdServiceProvidersAsync">
             <summary>
             Gets available service providers who can help review an ID application.
             </summary>
             <returns>Peer Review Services available.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServiceProvidersForReviewingIdAsync(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetPeerReviewIdServiceProvidersAsync(System.String)">
             <summary>
             Gets available service providers who can help review an ID application.
             </summary>
@@ -2502,7 +2502,7 @@
             <summary>
             Selects a service provider for peer review. This needs to be done before requesting the trust provider
             (given its JID) to peer review an identity application. Such service providers are returned by calling
-            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
             </summary>
             <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
             <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
@@ -2513,7 +2513,7 @@
             <summary>
             Selects a service provider for peer review. This needs to be done before requesting the trust provider
             (given its JID) to peer review an identity application. Such service providers are returned by calling
-            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
             </summary>
             <param name="ComponentAddress">Address of component.</param>
             <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
@@ -2525,7 +2525,7 @@
             <summary>
             Selects a service provider for peer review. This needs to be done before requesting the trust provider
             (given its JID) to peer review an identity application. Such service providers are returned by calling
-            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
             </summary>
             <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
             <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
@@ -2534,7 +2534,7 @@
             <summary>
             Selects a service provider for peer review. This needs to be done before requesting the trust provider
             (given its JID) to peer review an identity application. Such service providers are returned by calling
-            the GetServiceProvidersForReviewingId method (or overloads), looking for results with External=false.
+            the GetPeerReviewIdServiceProviders method (or overloads), looking for results with External=false.
             </summary>
             <param name="ComponentAddress">Address of component.</param>
             <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>

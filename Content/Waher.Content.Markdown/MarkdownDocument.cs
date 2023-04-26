@@ -1991,6 +1991,8 @@ namespace Waher.Content.Markdown
 						}
 						else if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
 						{
+							Elements.AddLast(new InlineHTML(this, Url));
+
 							string s = State.UntilToken("</TEXTAREA>");
 
 							if (!string.IsNullOrEmpty(s))

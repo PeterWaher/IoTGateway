@@ -62,6 +62,11 @@
 			<LineBreak />
 			<Html><![CDATA[<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />]]></Html>
 		</Paragraph>
+		<HtmlBlock>
+			<Html><![CDATA[<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">]]></Html>
+			<InlineText>Command</InlineText>
+			<Html><![CDATA[</textarea>]]></Html>
+		</HtmlBlock>
 	</elements>
 	<references />
 </parsedMakdown>

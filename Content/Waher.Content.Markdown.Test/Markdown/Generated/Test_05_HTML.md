@@ -23,3 +23,4 @@ AT\&T
 User Name\:  
 <input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />
 
+<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">Command</textarea>

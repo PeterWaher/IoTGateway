@@ -20,4 +20,6 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
 		<!--<span class="test">-->This is a test in a SPAN tag.<!--</span>--></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">User Name:<LineBreak /><!--<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />--></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<!--<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">-->Command<!--</textarea>--></TextBlock>
 </StackPanel>

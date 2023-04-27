@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -19,6 +18,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly string petitionId;
 		private readonly byte[] signature;
 		private readonly bool response;
+		private readonly string clientEndpoint;
 
 		/// <summary>
 		/// Event arguments for signature petition responses
@@ -28,14 +28,16 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
 		/// <param name="Signature">Digital Signature petitioned.</param>
 		/// <param name="Response">If accepted (true) or rejected (false).</param>
+		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
 		public SignaturePetitionResponseEventArgs(MessageEventArgs e, LegalIdentity RequestedIdentity, 
-			string PetitionId, byte[] Signature, bool Response)
+			string PetitionId, byte[] Signature, bool Response, string ClientEndpoint)
 			: base(e)
 		{
 			this.requestedIdentity = RequestedIdentity;
 			this.petitionId = PetitionId;
 			this.signature = Signature;
 			this.response = Response;
+			this.clientEndpoint = ClientEndpoint;
 		}
 
 		/// <summary>
@@ -57,5 +59,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// If accepted (true) or rejected (false).
 		/// </summary>
 		public bool Response => this.response;
+
+		/// <summary>
+		/// Remote endpoint of remote party client.
+		/// </summary>
+		public string ClientEndpoint => this.clientEndpoint;
 	}
 }

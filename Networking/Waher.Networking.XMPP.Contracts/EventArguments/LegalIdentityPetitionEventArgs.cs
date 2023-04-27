@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -20,6 +19,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly string requestedIdentityId;
 		private readonly string petitionId;
 		private readonly string purpose;
+		private readonly string clientEndpoint;
 
 		/// <summary>
 		/// Event arguments for legal identity petitions
@@ -30,8 +30,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="RequestedIdentityId">Petition for this legal identity.</param>
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
 		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
+		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
 		public LegalIdentityPetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorFullJid,
-			string RequestedIdentityId, string PetitionId, string Purpose)
+			string RequestedIdentityId, string PetitionId, string Purpose, string ClientEndpoint)
 			: base(e)
 		{
 			this.requestorIdentity = RequestorIdentity;
@@ -39,6 +40,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.requestedIdentityId = RequestedIdentityId;
 			this.petitionId = PetitionId;
 			this.purpose = Purpose;
+			this.clientEndpoint = ClientEndpoint;
 		}
 
 		/// <summary>
@@ -65,5 +67,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Purpose
 		/// </summary>
 		public string Purpose => this.purpose;
+
+		/// <summary>
+		/// Remote endpoint of remote party client.
+		/// </summary>
+		public string ClientEndpoint => this.clientEndpoint;
 	}
 }

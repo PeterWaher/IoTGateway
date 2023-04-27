@@ -1090,7 +1090,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.ScheduleEvent((P) =>
 				{
-					LegalIdentityPetitionResponseEventArgs e = new LegalIdentityPetitionResponseEventArgs(null, null, (string)P, false);
+					LegalIdentityPetitionResponseEventArgs e = new LegalIdentityPetitionResponseEventArgs(null, null, (string)P, false, string.Empty);
 					this.ContractsClient_PetitionedIdentityResponseReceived(Gateway.ContractsClient, e);
 				}, DateTime.Now.Add(Timeout), PetitionId);
 			}
@@ -1162,7 +1162,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.ScheduleEvent((P) =>
 				{
-					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false);
+					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false, string.Empty);
 					this.ContractsClient_PetitionedContractResponseReceived(Gateway.ContractsClient, e);
 				}, DateTime.Now.Add(Timeout), PetitionId);
 			}

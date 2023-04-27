@@ -5086,6 +5086,7 @@ namespace Waher.Networking.XMPP.Contracts
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				string Purpose = XML.Attribute(e.Content, "purpose");
 				string From = XML.Attribute(e.Content, "from");
+				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 				LegalIdentity Identity = null;
 
 				foreach (XmlNode N in e.Content.ChildNodes)
@@ -5115,7 +5116,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						try
 						{
-							await h(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose));
+							await h(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, ClientEndpoint));
 						}
 						catch (Exception ex)
 						{
@@ -5139,6 +5140,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				bool Response = XML.Attribute(e.Content, "response", false);
+				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 				LegalIdentity Identity = null;
 
 				foreach (XmlNode N in e.Content.ChildNodes)
@@ -5154,7 +5156,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					try
 					{
-						await h(this, new LegalIdentityPetitionResponseEventArgs(e, Identity, PetitionId, Response));
+						await h(this, new LegalIdentityPetitionResponseEventArgs(e, Identity, PetitionId, Response, ClientEndpoint));
 					}
 					catch (Exception ex)
 					{
@@ -5309,6 +5311,7 @@ namespace Waher.Networking.XMPP.Contracts
 			string PetitionId = XML.Attribute(e.Content, "pid");
 			string Purpose = XML.Attribute(e.Content, "purpose");
 			string From = XML.Attribute(e.Content, "from");
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 			string ContentStr = string.Empty;
 			byte[] Content = null;
 			LegalIdentity Identity = null;
@@ -5392,7 +5395,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					try
 					{
-						await h(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content));
+						await h(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content, ClientEndpoint));
 					}
 					catch (Exception ex)
 					{
@@ -5411,6 +5414,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			string PetitionId = XML.Attribute(e.Content, "pid");
 			bool Response = XML.Attribute(e.Content, "response", false);
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 			string SignatureStr = string.Empty;
 			byte[] Signature = null;
 			LegalIdentity Identity = null;
@@ -5477,7 +5481,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						this.Client.Information(h.Method.Name);
 
-						await h(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response));
+						await h(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response, ClientEndpoint));
 					}
 					catch (Exception ex)
 					{
@@ -5717,6 +5721,7 @@ namespace Waher.Networking.XMPP.Contracts
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				string Purpose = XML.Attribute(e.Content, "purpose");
 				string From = XML.Attribute(e.Content, "from");
+				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 				int i = ContractId.IndexOf('@');
 				LegalIdentity Identity = null;
 
@@ -5748,7 +5753,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					try
 					{
-						await h(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose));
+						await h(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint));
 					}
 					catch (Exception ex)
 					{
@@ -5771,6 +5776,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				bool Response = XML.Attribute(e.Content, "response", false);
+				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 				Contract Contract = null;
 
 				foreach (XmlNode N in e.Content.ChildNodes)
@@ -5787,7 +5793,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					try
 					{
-						await h(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response));
+						await h(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response, ClientEndpoint));
 					}
 					catch (Exception ex)
 					{

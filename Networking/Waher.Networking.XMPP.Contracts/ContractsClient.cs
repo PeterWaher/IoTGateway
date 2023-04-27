@@ -6621,7 +6621,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets available service providers who can help review an ID application.
 		/// </summary>
 		/// <returns>Peer Review Services available.</returns>
-		public Task<IServiceProvider[]> GetPeerReviewIdServiceProvidersAsync()
+		public Task<ServiceProviderWithLegalId[]> GetPeerReviewIdServiceProvidersAsync()
 		{
 			return this.GetPeerReviewIdServiceProvidersAsync(this.componentAddress);
 		}
@@ -6631,9 +6631,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <returns>Peer Review Services available.</returns>
-		public Task<IServiceProvider[]> GetPeerReviewIdServiceProvidersAsync(string ComponentAddress)
+		public Task<ServiceProviderWithLegalId[]> GetPeerReviewIdServiceProvidersAsync(string ComponentAddress)
 		{
-			TaskCompletionSource<IServiceProvider[]> Providers = new TaskCompletionSource<IServiceProvider[]>();
+			TaskCompletionSource<ServiceProviderWithLegalId[]> Providers = new TaskCompletionSource<ServiceProviderWithLegalId[]>();
 
 			this.GetPeerReviewIdServiceProviders(ComponentAddress, (sender, e) =>
 			{

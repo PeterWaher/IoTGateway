@@ -918,34 +918,35 @@ The following table lists available scalar functions:
 
 The following table lists available string-related functions:
 
-| Function                    | Description | Example |
-|-----------------------------|-------------|---------|
-| `After(s,Delimiter)`        | Returns the part of the string that occurs after the last occurrence of the Delimiter string. | `Port:=Num(After(EP,":"))` |
-| `Before(s,Delimiter)`       | Returns the part of the string that occurs before the first occurrence of the Delimiter string. | `IP:=Before(EP,":")` |
-| `Concat(v[,Delimiter})`     | Concatenates the elements of a vector, optionally delimiting the elements with `Delimiter`. If `v` is not a vector, it is returned, as-is. | `Concat(Elements,",")` |
-| `Contains(s,Substring)`     | Returns `true` if `s` contains `Substring` somewhere, `false` otherwise. | `Contains(s,"Hello")` |
-| `Empty(s)`                  | Alias for `IsEmpty(s)`. | `Empty(s)` |
-| `EndsWith(s,Substring)`     | Returns `true` if `s` ends with `Substring`, `false` otherwise. | `EndsWith(s,"Hello")` |
-| `Eval(s)`                   | Alias for `Evaluate(s)`. | `Evaluate("a+b")` |
-| `Evaluate(s)`               | Parses the string and evaluates it. | `Evaluate("a+b")` |
-| `IndexOf(s,Substring)`      | Returns the zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `IndexOf("Hello","el")` |
-| `IsEmpty(s)`                | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
-| `LastIndexOf(s,Substring)`  | Returns the last zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `LastIndexOf("Hello","el")` |
-| `Left(s,N)`                 | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
-| `Len(s)`                    | Alias for `Length(s)`. | `Len(s)` |
-| `Length(s)`                 | Returns the length of the string. | `Length(s)` |
-| `LowerCase(s)`              | Returns the lower-case version of `s`. | `LowerCase("Hello")` |
-| `Mid(s,Pos,Len)`            | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
-| `PadLeft(s,N)`              | Returns the string `s` padded to the left with space characters, until it contains `N` characters. | `PadLeft("Hello",10)` |
-| `PadRight(s,N)`             | Returns the string `s` padded to the right with space characters, until it contains `N` characters. | `PadRight("Hello",10)` |
-| `Parse(s)`                  | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
-| `Right(s,N)`                | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
-| `Split(s,Substring)`        | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
-| `StartsWith(s,Substring)`   | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
-| `Trim(s)`                   | Returns a trimmed version of `s`. | `Trim(" Hello ")` |
-| `TrimEnd(s)`                | Returns a version of `s` with its end trimmed. | `TrimEnd(" Hello ")` |
-| `TrimStart(s)`              | Returns a version of `s` with its start trimmed. | `TrimStart(" Hello ")` |
-| `UpperCase(s)`              | Returns the upper-case version of `s`. | `UpperCase("Hello")` |
+| Function                          | Description | Example |
+|-----------------------------------|-------------|---------|
+| `After(s,Delimiter)`              | Returns the part of the string that occurs after the last occurrence of the Delimiter string. | `Port:=Num(After(EP,":"))` |
+| `Before(s,Delimiter)`             | Returns the part of the string that occurs before the first occurrence of the Delimiter string. | `IP:=Before(EP,":")` |
+| `Concat(v[,Delimiter})`           | Concatenates the elements of a vector, optionally delimiting the elements with `Delimiter`. If `v` is not a vector, it is returned, as-is. | `Concat(Elements,",")` |
+| `Contains(s,Substring)`           | Returns `true` if `s` contains `Substring` somewhere, `false` otherwise. | `Contains(s,"Hello")` |
+| `Empty(s)`                        | Alias for `IsEmpty(s)`. | `Empty(s)` |
+| `EndsWith(s,Substring)`           | Returns `true` if `s` ends with `Substring`, `false` otherwise. | `EndsWith(s,"Hello")` |
+| `Eval(s)`                         | Alias for `Evaluate(s)`. | `Evaluate("a+b")` |
+| `Evaluate(s)`                     | Parses the string and evaluates it. | `Evaluate("a+b")` |
+| `IndexOf(s,Substring[,From])`     | Returns the zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. If `From` is provided, search starts from this position. | `IndexOf("Hello","el")` |
+| `IsEmpty(s)`                      | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
+| `LastIndexOf(s,Substring[,From])` | Returns the last zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. If `From` is provided, search starts from this position. | `LastIndexOf("Hello","el")` |
+| `Left(s,N)`                       | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
+| `Len(s)`                          | Alias for `Length(s)`. | `Len(s)` |
+| `Length(s)`                       | Returns the length of the string. | `Length(s)` |
+| `LowerCase(s)`                    | Returns the lower-case version of `s`. | `LowerCase("Hello")` |
+| `Mid(s,Pos,Len)`                  | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
+| `PadLeft(s,N)`                    | Returns the string `s` padded to the left with space characters, until it contains `N` characters. | `PadLeft("Hello",10)` |
+| `PadRight(s,N)`                   | Returns the string `s` padded to the right with space characters, until it contains `N` characters. | `PadRight("Hello",10)` |
+| `Parse(s)`                        | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
+| `Replace(s,From,To)`              | Replaces all occurrences of the `From` string in `s` with the `To` string. | `Replace(s,"Hello","Bye")` |
+| `Right(s,N)`                      | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
+| `Split(s,Substring)`              | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
+| `StartsWith(s,Substring)`         | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
+| `Trim(s)`                         | Returns a trimmed version of `s`. | `Trim(" Hello ")` |
+| `TrimEnd(s)`                      | Returns a version of `s` with its end trimmed. | `TrimEnd(" Hello ")` |
+| `TrimStart(s)`                    | Returns a version of `s` with its start trimmed. | `TrimStart(" Hello ")` |
+| `UpperCase(s)`                    | Returns the upper-case version of `s`. | `UpperCase("Hello")` |
 
 ### Date and Time Functions
 
@@ -979,40 +980,40 @@ fit as a 32-bit integer, or the number of 100ns ticks since 0001-01-01 00:00:00.
 
 The following functions operate on vectors:
 
-| Function           | Description | Example |
-|--------------------|-------------|---------|
-| `And(v)`           | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
-| `Avg(v)`           | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
-| `Average(v)`       | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
-| `Contains(v,x)`    | Returns `true` if `v` contains `x` as an element, `false` otherwise. | `Contains(v,1)` |
-| `Count(v)`         | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
-| `Count(v,x)`       | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
-| `IndexOf(v,x)`     | Returns the zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. | `IndexOf(v,1)` |
-| `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
-| `LastIndexOf(v,x)` | Returns the last zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. | `LastIndexOf(v,1)` |
-| `Left(v,N)`        | Returns a vector with the left-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Left(v,3)` |
-| `Max(v)`           | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
-| `Median(v)`        | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
-| `Mid(v,Pos,Len)`   | Returns a vector containing elements from `v`, starting a element `Pos` and continuing `Len` elements. The `Pos` index is zero-based. If the requested vector goes beyond the scope of `v`, the resulting vector gets truncated accordingly. | `Mid(v,5,2)` |
-| `Min(v)`           | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
-| `Nand(v)`          | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
-| `Nor(v)`           | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
-| `Ones(N)`          | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
-| `Or(v)`            | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
-| `Prod(v)`          | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
-| `Product(v)`       | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
-| `Reverse(s)`       | Returns a string with the characters of the string `s` reversed. | `Reverse("Hello World")` |
-| `Reverse(v)`       | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
-| `Right(v,N)`       | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |
-| `Sort(v[,x1[,x2][,x3][,x4][,x5][,x6][,x7][,x8][,x9]])`   | Sorts a vector `v`. `x1`-`x9` are optional, and can be index values, field names or lambda expressions, and determine how to sort the vector `v`. Negative index numbers, or property of field names beginning with a hyphen `-` are sorted in decending order. Index numbers are one-based, as opposed to normal index values that are zero-based. | `Sort(v,"Field")` |
-| `StdDev(v)`        | Alias for `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
-| `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
-| `Sum(v)`           | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
-| `Var(v)`           | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
-| `Variance(v)`      | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
-| `Xnor(v)`          | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
-| `Xor(v)`           | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
-| `Zeroes(N)`        | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
+| Function                                               | Description | Example |
+|--------------------------------------------------------|-------------|---------|
+| `And(v)`                                               | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
+| `Avg(v)`                                               | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
+| `Average(v)`                                           | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
+| `Contains(v,x)`                                        | Returns `true` if `v` contains `x` as an element, `false` otherwise. | `Contains(v,1)` |
+| `Count(v)`                                             | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
+| `Count(v,x)`                                           | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
+| `IndexOf(v,x[,From])`                                  | Returns the zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `IndexOf(v,1)` |
+| `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])`       | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
+| `LastIndexOf(v,x[,From])`                              | Returns the last zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `LastIndexOf(v,1)` |
+| `Left(v,N)`                                            | Returns a vector with the left-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Left(v,3)` |
+| `Max(v)`                                               | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
+| `Median(v)`                                            | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
+| `Mid(v,Pos,Len)`                                       | Returns a vector containing elements from `v`, starting a element `Pos` and continuing `Len` elements. The `Pos` index is zero-based. If the requested vector goes beyond the scope of `v`, the resulting vector gets truncated accordingly. | `Mid(v,5,2)` |
+| `Min(v)`                                               | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
+| `Nand(v)`                                              | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
+| `Nor(v)`                                               | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
+| `Ones(N)`                                              | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
+| `Or(v)`                                                | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
+| `Prod(v)`                                              | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
+| `Product(v)`                                           | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `Reverse(s)`                                           | Returns a string with the characters of the string `s` reversed. | `Reverse("Hello World")` |
+| `Reverse(v)`                                           | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
+| `Right(v,N)`                                           | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |
+| `Sort(v[,x1[,x2][,x3][,x4][,x5][,x6][,x7][,x8][,x9]])` | Sorts a vector `v`. `x1`-`x9` are optional, and can be index values, field names or lambda expressions, and determine how to sort the vector `v`. Negative index numbers, or property of field names beginning with a hyphen `-` are sorted in decending order. Index numbers are one-based, as opposed to normal index values that are zero-based. | `Sort(v,"Field")` |
+| `StdDev(v)`                                            | Alias for `StandardDeviation(v)`  | `StdDev([1,2,3,4,5])` |
+| `StandardDeviation(v)`                                 | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
+| `Sum(v)`                                               | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
+| `Var(v)`                                               | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
+| `Variance(v)`                                          | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
+| `Xnor(v)`                                              | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
+| `Xor(v)`                                               | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
+| `Zeroes(N)`                                            | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
 
 ### Matrix Functions
 

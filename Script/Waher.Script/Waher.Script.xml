@@ -7462,6 +7462,40 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Strings.Replace">
+            <summary>
+            Replace(String,From,To)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Replace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Replaceenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+            <param name="String">String to operate on.</param>
+            <param name="From">Substring to replace.</param>
+            <param name="To">Substrings will be replaced with this.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Replace.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Replace.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Replace.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Strings.Split">
             <summary>
             Split(String,Substring)
@@ -8039,7 +8073,7 @@
         </member>
         <member name="T:Waher.Script.Functions.Vectors.IndexOf">
             <summary>
-            IndexOf(Vector,Item)
+            IndexOf(Vector,Item[,From])
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Vectors.IndexOf.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
@@ -8048,6 +8082,17 @@
             </summary>
             <param name="Vector">Vector.</param>
             <param name="Item">Item</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Vectors.IndexOf.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            IndexOf(Vector,Item,From)
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Item">Item</param>
+            <param name="From">From which element to start search.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -8203,7 +8248,7 @@
         </member>
         <member name="T:Waher.Script.Functions.Vectors.LastIndexOf">
             <summary>
-            LastIndexOf(Vector,Item)
+            LastIndexOf(Vector,Item[,From])
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Vectors.LastIndexOf.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
@@ -8212,6 +8257,17 @@
             </summary>
             <param name="Vector">Vector.</param>
             <param name="Item">Item</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Vectors.LastIndexOf.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            LastIndexOf(Vector,Item,From)
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Item">Item</param>
+            <param name="From">From which element to start search.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>

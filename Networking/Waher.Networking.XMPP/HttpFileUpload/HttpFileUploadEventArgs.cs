@@ -96,7 +96,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			set
 			{
 				if (value <= 0 || value > this.maxChunkSize)
-					throw new ArgumentOutOfRangeException(nameof(MaxChunkSize), "Maximum cannot be negative, or larger than the suggested maximum file size.");
+					throw new ArgumentOutOfRangeException(nameof(this.MaxChunkSize), "Maximum cannot be negative, or larger than the suggested maximum file size.");
 
 				this.maxChunkSize = value;
 			}
@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 						Body.Headers.Add("Content-Type", ContentType);
 						Body.Headers.Add("Content-Range", "bytes " + Pos.ToString() + "-" + (Pos + c - 1).ToString() + "/" + Len.ToString());
 
-						this.LogSent(HttpClient, PutUrl, Body);
+						this.LogSent(HttpClient, this.PutUrl, Body);
 
 						HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Body);
 
@@ -210,7 +210,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 				Content.Headers.Add("Content-Type", ContentType);
 
-				this.LogSent(HttpClient, PutUrl, Content);
+				this.LogSent(HttpClient, this.PutUrl, Content);
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 

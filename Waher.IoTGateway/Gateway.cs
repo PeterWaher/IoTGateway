@@ -75,7 +75,6 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Runtime.Threading;
-using Waher.Networking.HTTP.Vanity;
 using Waher.Content.Markdown.Functions;
 
 namespace Waher.IoTGateway

@@ -114,6 +114,9 @@ namespace Waher.Persistence.Files
 				}
 			}
 
+			if (this.dictionaryFile is null)
+				return false;
+
 			await this.dictionaryFile.BeginRead();
 			try
 			{

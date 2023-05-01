@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Content.QR.Encoding;
 
 namespace Waher.Content.QR.Test.VersionTests.Numeric

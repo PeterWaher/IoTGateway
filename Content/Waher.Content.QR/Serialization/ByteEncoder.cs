@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.QR.Serialization
+﻿namespace Waher.Content.QR.Serialization
 {
 	/// <summary>
 	/// Encodes alphanumeric strings from the ISO 8859-1 character set (by default).
@@ -40,8 +36,8 @@ namespace Waher.Content.QR.Serialization
 		/// <returns>Byte representation.</returns>
 		public byte[] GetBytes(string Text)
 		{
-			byte[] Bin = iso_8859_1.GetBytes(Text);
-			if (iso_8859_1.GetString(Bin) != Text)
+			byte[] Bin = this.iso_8859_1.GetBytes(Text);
+			if (this.iso_8859_1.GetString(Bin) != Text)
 				Bin = System.Text.Encoding.UTF8.GetBytes(Text);
 
 			return Bin;
@@ -63,8 +59,8 @@ namespace Waher.Content.QR.Serialization
 		/// <param name="Text">Text to encode.</param>
 		public void Encode(string Text)
 		{
-			byte[] Bin = iso_8859_1.GetBytes(Text);
-			if (iso_8859_1.GetString(Bin) != Text)
+			byte[] Bin = this.iso_8859_1.GetBytes(Text);
+			if (this.iso_8859_1.GetString(Bin) != Text)
 				Bin = System.Text.Encoding.UTF8.GetBytes(Text);
 
 			this.Encode(Bin);

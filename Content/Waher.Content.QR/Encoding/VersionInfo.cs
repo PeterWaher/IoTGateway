@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.QR.Encoding
+﻿namespace Waher.Content.QR.Encoding
 {
 	/// <summary>
 	/// Contains information about one version of encoding.

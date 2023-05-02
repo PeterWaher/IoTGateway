@@ -20,10 +20,10 @@ namespace Waher.Content.QR.Encoding
 
 			switch (Level)
 			{
-				case CorrectionLevel.L: return Versions.LowVersions[Version - 1];
-				case CorrectionLevel.M: return Versions.MediumVersions[Version - 1];
-				case CorrectionLevel.Q: return Versions.QuartileVersions[Version - 1];
-				case CorrectionLevel.H: return Versions.HighVersions[Version - 1];
+				case CorrectionLevel.L: return LowVersions[Version - 1];
+				case CorrectionLevel.M: return MediumVersions[Version - 1];
+				case CorrectionLevel.Q: return QuartileVersions[Version - 1];
+				case CorrectionLevel.H: return HighVersions[Version - 1];
 				default: throw new ArgumentException("Invalid Error Correction level.", nameof(Level));
 			}
 		}

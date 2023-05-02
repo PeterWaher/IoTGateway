@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.QR.Serialization
+﻿namespace Waher.Content.QR.Serialization
 {
 	/// <summary>
 	/// Encodes numeric strings

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.QR.Serialization
+﻿namespace Waher.Content.QR.Serialization
 {
 	/// <summary>
 	/// Interface for text encoders.

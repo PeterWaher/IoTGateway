@@ -526,5 +526,86 @@ namespace Waher.Content.QR.Test
 			Console.Out.WriteLine(M.ToHalfBlockText());
 		}
 
+		[TestMethod]
+		public void Test_33_Custom_NoScale()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, null, "CustomNoScale.png", CustomColor, false);
+		}
+
+		[TestMethod]
+		public void Test_34_Custom_NoAntiAlias()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 500, "CustomNoAntiAlias.png", CustomColor, false);
+		}
+
+		[TestMethod]
+		public void Test_35_Custom_AntiAlias()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 500, "CustomAntiAlias.png", CustomColor, true);
+		}
+
+		private static uint CustomColor(float CodeX, float CodeY, float DotX, float DotY, DotType Type)
+		{
+			float dx = (CodeX - 0.5f);
+			float dy = (CodeY - 0.5f);
+			float d2 = dx * dx + dy * dy;
+
+			if (d2 < 0.005)
+				return 0xff00ff00;  // green
+
+			if (d2 < 0.01)
+				return 0xffffffff;  // white
+
+			switch (Type)
+			{
+				case DotType.CodeBackground:
+				default:
+					return 0xffffffff;  // white
+
+				case DotType.CodeForeground:
+					dx = (DotX - 0.5f);
+					dy = (DotY - 0.5f);
+					d2 = dx * dx + dy * dy;
+
+					if (d2 <= 0.25f)
+						return 0xff000000;  // black
+					else if (d2 <= 0.27f)
+						return 0xff404040;  // dark gray
+					else if (d2 <= 0.29f)
+						return 0xff808080;  // gray
+					else if (d2 <= 0.30f)
+						return 0xffc0c0c0;  // light
+					else
+						return 0xffffffff;  // white
+
+				case DotType.FinderMarkerBackground:
+					return 0xfff8f8ff;  // light red
+
+				case DotType.FinderMarkerForegroundOuter:
+					return 0xff000080;  // dark red
+
+				case DotType.FinderMarkerForegroundInner:
+					return 0xff000060;  // darker red
+
+				case DotType.AlignmentMarkerBackground:
+					return 0xfffff8f8;  // light blue
+
+				case DotType.AlignmentMarkerForegroundOuter:
+					return 0xff800000;  // dark blue
+
+				case DotType.AlignmentMarkerForegroundInner:
+					return 0xff600000;  // darker blue
+			};
+		}
+
 	}
 }

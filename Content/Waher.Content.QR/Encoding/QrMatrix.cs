@@ -14,11 +14,13 @@ namespace Waher.Content.QR.Encoding
 	/// <summary>
 	/// Delegate for QR-code color functions
 	/// </summary>
-	/// <param name="x">Zero-based X-coordinte.</param>
-	/// <param name="y">Zero-based Y-coordinte.</param>
+	/// <param name="CodeX">Zero-based normalized X-coordinte into code.</param>
+	/// <param name="CodeY">Zero-based normalized Y-coordinte into code.</param>
+	/// <param name="DotX">Zero-based normalized X-coordinte into dot.</param>
+	/// <param name="DotY">Zero-based normalized Y-coordinte into dot.</param>
 	/// <param name="Type">Type of dot to paint.</param>
 	/// <returns>Color of pixel, in RGBA (LSB first, i.e. 0xAABBGGRR format).</returns>
-	public delegate uint ColorFunction(int x, int y, DotType Type);
+	public delegate uint ColorFunction(float CodeX, float CodeY, float DotX, float DotY, DotType Type);
 
 	/// <summary>
 	/// Class used to compute a QR code matrix.
@@ -27,16 +29,17 @@ namespace Waher.Content.QR.Encoding
 	{
 		private static class FinderMarker
 		{
-			private const DotType X = DotType.FinderMarkerForeground;
+			private const DotType X = DotType.FinderMarkerForegroundOuter;
+			private const DotType x = DotType.FinderMarkerForegroundInner;
 			private const DotType _ = DotType.FinderMarkerBackground;
 
 			public static readonly DotType[,] Dots = new DotType[,]
 			{
 				{  X, X, X, X, X, X, X },
 				{  X, _, _, _, _, _, X },
-				{  X, _, X, X, X, _, X },
-				{  X, _, X, X, X, _, X },
-				{  X, _, X, X, X, _, X },
+				{  X, _, x, x, x, _, X },
+				{  X, _, x, x, x, _, X },
+				{  X, _, x, x, x, _, X },
 				{  X, _, _, _, _, _, X },
 				{  X, X, X, X, X, X, X }
 			};
@@ -44,14 +47,15 @@ namespace Waher.Content.QR.Encoding
 
 		private static class AlignmentMarker
 		{
-			private const DotType X = DotType.AlignmentMarkerForeground;
+			private const DotType X = DotType.AlignmentMarkerForegroundOuter;
+			private const DotType x = DotType.AlignmentMarkerForegroundInner;
 			private const DotType _ = DotType.AlignmentMarkerBackground;
 
 			public static readonly DotType[,] Dots = new DotType[,]
 			{
 				{  X, X, X, X, X },
 				{  X, _, _, _, X },
-				{  X, _, X, _, X },
+				{  X, _, x, _, X },
 				{  X, _, _, _, X },
 				{  X, X, X, X, X }
 			};
@@ -165,8 +169,12 @@ namespace Waher.Content.QR.Encoding
 		{
 			while (X1 <= X2)
 			{
-				this.defined[Y, X1] = true;
-				this.dots[Y, X1] = Dot;
+				if (!this.defined[Y, X1])
+				{
+					this.defined[Y, X1] = true;
+					this.dots[Y, X1] = Dot;
+				}
+
 				X1++;
 
 				if (Dotted)
@@ -186,8 +194,12 @@ namespace Waher.Content.QR.Encoding
 		{
 			while (Y1 <= Y2)
 			{
-				this.defined[Y1, X] = true;
-				this.dots[Y1, X] = Dot;
+				if (!this.defined[Y1, X])
+				{
+					this.defined[Y1, X] = true;
+					this.dots[Y1, X] = Dot;
+				}
+
 				Y1++;
 
 				if (Dotted)
@@ -851,6 +863,16 @@ namespace Waher.Content.QR.Encoding
 		/// Converts the matrix to pixels, each pixel represented by 4 bytes
 		/// in the order Red, Green, Blue, Alpha (RGBA).
 		/// </summary>
+		/// <returns>Pixels</returns>
+		public byte[] ToRGBA()
+		{
+			return this.ToRGBA(this.size + 8, this.size + 8);
+		}
+
+		/// <summary>
+		/// Converts the matrix to pixels, each pixel represented by 4 bytes
+		/// in the order Red, Green, Blue, Alpha (RGBA).
+		/// </summary>
 		/// <param name="Width">Width of resulting bitmap image.</param>
 		/// <param name="Height">Height of resulting bitmap image.</param>
 		/// <returns>Pixels</returns>
@@ -936,80 +958,114 @@ namespace Waher.Content.QR.Encoding
 		/// Converts the matrix to pixels, each pixel represented by 4 bytes
 		/// in the order Red, Green, Blue, Alpha (RGBA).
 		/// </summary>
+		/// <param name="Color">Color function used to color dots representing ones.</param>
+		/// <param name="AntiAlias">If anti-aliasing is to be used.</param>
+		/// <returns>Pixels</returns>
+		public byte[] ToRGBA(ColorFunction Color, bool AntiAlias)
+		{
+			return this.ToRGBA(this.size + 8, this.size + 8, Color, AntiAlias);
+		}
+
+		/// <summary>
+		/// Converts the matrix to pixels, each pixel represented by 4 bytes
+		/// in the order Red, Green, Blue, Alpha (RGBA).
+		/// </summary>
 		/// <param name="Width">Width of resulting bitmap image.</param>
 		/// <param name="Height">Height of resulting bitmap image.</param>
 		/// <param name="Color">Color function used to color dots representing ones.</param>
+		/// <param name="AntiAlias">If anti-aliasing is to be used.</param>
 		/// <returns>Pixels</returns>
-		public byte[] ToRGBA(int Width, int Height, ColorFunction Color)
+		public byte[] ToRGBA(int Width, int Height, ColorFunction Color, bool AntiAlias)
 		{
-			byte[] Result = new byte[Width * Height * 4];
-			int SourceSize = this.size + 8;
-			int HalfSourceSize = SourceSize >> 1;
-			int HalfWidth = Width >> 1;
-			int HalfHeight = Height >> 1;
-			int Left = (4 * Width + HalfSourceSize) / SourceSize;
-			int Top = (4 * Height + HalfSourceSize) / SourceSize;
-			int dx = ((SourceSize << 16) + HalfWidth) / Width;
-			int dy = ((SourceSize << 16) + HalfHeight) / Height;
-			int i = 0;
+			int RawLine = 4 * (Width + 1);
+			byte[] Raw = new byte[AntiAlias ? (Width + 1) * (Height + 1) * 4 : Width * Height * 4];
+			byte[] Result = AntiAlias ? new byte[Width * Height * 4] : Raw;
+			int SourceMargin = 4;
+			float SourceSize = this.size + (2 * SourceMargin);
+			float dx = SourceSize / Width;
+			float dy = SourceSize / Height;
+			float x0 = -SourceMargin - 0.5f;
+			float y0 = -SourceMargin - 0.5f;
+			int i, j, k;
 			int imgX, imgY;
 			int srcX, srcY;
-			int x, y;
+			float x, y, scale;
 			uint cl;
+			int v1, v2, v3, v4;
+			float px1, px2;
+			float py1, py2;
+			float f1, f2;
+			DotType Dot;
+			bool yOutside;
 
-			for (imgY = srcY = 0; imgY < Height; imgY++)
+			scale = 1.0f / this.size;
+
+			for (imgY = i = 0, y = y0; imgY < Height; imgY++, y += dy)
 			{
-				y = srcY >> 16;
+				srcY = (int)Math.Floor(y);
+				yOutside = srcY < 0 || srcY >= this.size;
 
-				if (imgY < Top || y >= this.size)
+				for (imgX = 0, x = x0; imgX < Width; imgX++, x += dx)
 				{
-					for (imgX = 0; imgX < Width; imgX++)
+					srcX = (int)Math.Floor(x);
+
+					if (yOutside || srcX < 0 || srcX >= this.size)
+						Dot = DotType.CodeBackground;
+					else
+						Dot = this.dots[srcY, srcX];
+
+					cl = Color(x * scale, y * scale, x - srcX, y - srcY, Dot);
+
+					Raw[i++] = (byte)cl;
+					cl >>= 8;
+					Raw[i++] = (byte)cl;
+					cl >>= 8;
+					Raw[i++] = (byte)cl;
+					cl >>= 8;
+					Raw[i++] = (byte)cl;
+				}
+
+				if (AntiAlias)
+				{
+					for (j = 4; j > 0; j--, i++)
+						Raw[i] = Raw[i - 4];
+				}
+			}
+
+			if (AntiAlias)
+			{
+				for (j = RawLine; j > 0; j--, i++)
+					Raw[i] = Raw[i - RawLine];
+
+				for (imgY = i = k = 0, y = y0; imgY < Height; imgY++, y += dy)
+				{
+					srcY = (int)Math.Floor(y);
+					py1 = y - srcY;
+					py2 = 1 - py1;
+
+					for (imgX = 0, x = x0; imgX < Width; imgX++, x += dx)
 					{
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
+						srcX = (int)Math.Floor(x);
+						px1 = x - srcX;
+						px2 = 1 - px1;
+
+						for (j = 4; j > 0; j--, i++)
+						{
+							v1 = Raw[i];
+							v2 = Raw[i + 4];
+							v3 = Raw[i + RawLine];
+							v4 = Raw[i + RawLine + 4];
+
+							f1 = px2 * v1 + px1 * v2;
+							f2 = px2 * v3 + px1 * v4;
+
+							v1 = (int)(f1 * py1 + f2 * py2 + 0.5f);
+							Result[k++] = (byte)(v1 < 0 ? 0 : v1 > 255 ? 255 : v1);
+						}
 					}
 
-					continue;
+					i += 4;
 				}
-
-				for (imgX = 0; imgX < Left; imgX++)
-				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
-
-				for (srcX = 0; imgX < Width; imgX++)
-				{
-					x = srcX >> 16;
-					if (x >= this.size)
-						break;
-
-					cl = Color(x, y, this.dots[y, x]);
-
-					Result[i++] = (byte)cl;
-					cl >>= 8;
-					Result[i++] = (byte)cl;
-					cl >>= 8;
-					Result[i++] = (byte)cl;
-					cl >>= 8;
-					Result[i++] = (byte)cl;
-
-					srcX += dx;
-				}
-
-				for (; imgX < Width; imgX++)
-				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
-
-				srcY += dy;
 			}
 
 			return Result;

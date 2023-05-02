@@ -56,17 +56,50 @@ namespace Waher.Content.QR.Test.VersionTests
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Half.txt")), M.ToHalfBlockText());
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Quarter.txt")), M.ToQuarterBlockText());
 
+			SaveImage(M, Path.Combine(Path.Combine(Folder, Version.ToString() + ".png")));
+		}
+
+		public static void SaveImage(QrMatrix M, string FileName)
+		{
+			SaveImage(M, FileName, null);
+		}
+
+		public static void SaveImage(QrMatrix M, string FileName, ColorFunction Color)
+		{
+			SaveImage(M, FileName, Color, false);
+		}
+
+		public static void SaveImage(QrMatrix M, string FileName, ColorFunction Color, bool AntiAlias)
+		{
 			int ImgSize = Math.Max(300, M.Size * 3);
-			byte[] RGBA = M.ToRGBA(ImgSize, ImgSize);
+			SaveImage(M, ImgSize, FileName, Color, AntiAlias);
+		}
+
+		public static void SaveImage(QrMatrix M, int? ImgSize, string FileName, ColorFunction Color, bool AntiAlias)
+		{
+			byte[] RGBA;
+			int Size;
+
+			if (ImgSize.HasValue)
+			{
+				Size = ImgSize.Value;
+				RGBA = Color is null ? M.ToRGBA(Size, Size) : M.ToRGBA(Size, Size, Color, AntiAlias);
+			}
+			else
+			{
+				Size = M.Size + 8;
+				RGBA = Color is null ? M.ToRGBA() : M.ToRGBA(Color, AntiAlias);
+			}
+
 			IntPtr Pixels = Marshal.AllocCoTaskMem(RGBA.Length);
 			try
 			{
 				Marshal.Copy(RGBA, 0, Pixels, RGBA.Length);
 
 				using SKData Data = SKData.Create(Pixels, RGBA.Length);
-				using SKImage Result = SKImage.FromPixels(new SKImageInfo(ImgSize, ImgSize, SKColorType.Rgba8888), Data, ImgSize << 2);
+				using SKImage Result = SKImage.FromPixels(new SKImageInfo(Size, Size, SKColorType.Rgba8888), Data, Size << 2);
 				using SKData Data2 = Result.Encode(SKEncodedImageFormat.Png, 100);
-				File.WriteAllBytes(Path.Combine(Path.Combine(Folder, Version.ToString() + ".png")), Data2.ToArray());
+				File.WriteAllBytes(FileName, Data2.ToArray());
 			}
 			finally
 			{

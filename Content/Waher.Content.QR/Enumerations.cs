@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.QR
+﻿namespace Waher.Content.QR
 {
 	/// <summary>
 	/// QR Code correction level.
@@ -82,18 +78,28 @@ namespace Waher.Content.QR
 		FinderMarkerBackground = 2,
 
 		/// <summary>
-		/// Finder Marker foreground color
+		/// Finder Marker foreground color (outer)
 		/// </summary>
-		FinderMarkerForeground = 3,
+		FinderMarkerForegroundOuter = 3,
+
+		/// <summary>
+		/// Finder Marker foreground color (inner)
+		/// </summary>
+		FinderMarkerForegroundInner = 4,
 
 		/// <summary>
 		/// Alignment Marker background color
 		/// </summary>
-		AlignmentMarkerBackground = 4,
+		AlignmentMarkerBackground = 6,
 
 		/// <summary>
-		/// Alignment Marker foreground color
+		/// Alignment Marker foreground color (outer)
 		/// </summary>
-		AlignmentMarkerForeground = 5
+		AlignmentMarkerForegroundOuter = 7,
+
+		/// <summary>
+		/// Alignment Marker foreground color (inner)
+		/// </summary>
+		AlignmentMarkerForegroundInner = 8
 	}
 }

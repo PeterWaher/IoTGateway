@@ -284,14 +284,14 @@ namespace Waher.Content.QR
 
 			// Separators
 
-			M.HLine(0, 7, 7, false, false);
-			M.VLine(7, 0, 6, false, false);
+			M.HLine(0, 7, 7, DotType.CodeBackground, false);
+			M.VLine(7, 0, 6, DotType.CodeBackground, false);
 
-			M.HLine(0, 7, Size - 8, false, false);
-			M.VLine(7, Size - 7, Size - 1, false, false);
+			M.HLine(0, 7, Size - 8, DotType.CodeBackground, false);
+			M.VLine(7, Size - 7, Size - 1, DotType.CodeBackground, false);
 
-			M.HLine(Size - 8, Size - 1, 7, false, false);
-			M.VLine(Size - 8, 0, 6, false, false);
+			M.HLine(Size - 8, Size - 1, 7, DotType.CodeBackground, false);
+			M.VLine(Size - 8, 0, 6, DotType.CodeBackground, false);
 
 			// Alignment patterns
 
@@ -314,23 +314,23 @@ namespace Waher.Content.QR
 
 			// Timing patterns
 
-			M.HLine(8, Size - 9, 6, true, true);
-			M.VLine(6, 8, Size - 9, true, true);
+			M.HLine(8, Size - 9, 6, DotType.CodeForeground, true);
+			M.VLine(6, 8, Size - 9, DotType.CodeForeground, true);
 
 			// Dark module
 
-			M.HLine(8, 8, Size - 8, true, false);
+			M.HLine(8, 8, Size - 8, DotType.CodeForeground, false);
 
 			// Reserve format information area
 
-			M.HLine(0, 5, 8, false, false);
-			M.HLine(7, 8, 8, false, false);
-			M.VLine(8, 0, 5, false, false);
-			M.VLine(8, 7, 7, false, false);
+			M.HLine(0, 5, 8, DotType.CodeBackground, false);
+			M.HLine(7, 8, 8, DotType.CodeBackground, false);
+			M.VLine(8, 0, 5, DotType.CodeBackground, false);
+			M.VLine(8, 7, 7, DotType.CodeBackground, false);
 
-			M.HLine(Size - 8, Size - 1, 8, false, false);
+			M.HLine(Size - 8, Size - 1, 8, DotType.CodeBackground, false);
 
-			M.VLine(8, Size - 7, Size - 1, false, false);
+			M.VLine(8, Size - 7, Size - 1, DotType.CodeBackground, false);
 
 			// Reserve version information area
 
@@ -338,8 +338,8 @@ namespace Waher.Content.QR
 			{
 				for (i = 0; i < 3; i++)
 				{
-					M.HLine(0, 5, Size - 9 - i, false, false);
-					M.VLine(Size - 9 - i, 0, 5, false, false);
+					M.HLine(0, 5, Size - 9 - i, DotType.CodeBackground, false);
+					M.VLine(Size - 9 - i, 0, 5, DotType.CodeBackground, false);
 				}
 			}
 

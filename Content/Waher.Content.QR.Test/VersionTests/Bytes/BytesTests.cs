@@ -22,7 +22,7 @@ namespace Waher.Content.QR.Test.VersionTests.Bytes
 		{
 			VersionInfo Version = Versions.FindVersionInfo(ForVersion, this.Level);
 			int NrBytes = Version.TotalDataBytes - 5;
-			return LoremIpsum.Substring(0, NrBytes);
+			return LoremIpsum[..NrBytes];
 		}
 	}
 }

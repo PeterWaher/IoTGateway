@@ -290,110 +290,121 @@ namespace Waher.Content.QR.Test
 			Console.Out.WriteLine(Matrix.ToQuarterBlockText());
 		}
 
-		private const bool X = true;
-		private const bool _ = false;
-		private static readonly bool[,] penaltyMatrix = new bool[,]
+		private static class PenaltyMatrix
 		{
-			{  X, X, X, X, X, X, X, _, X, X, _, _, _, _, X, X, X, X, X, X, X },
-			{  X, _, _, _, _, _, X, _, X, _, _, X, _, _, X, _, _, _, _, _, X },
-			{  X, _, X, X, X, _, X, _, X, _, _, X, X, _, X, _, X, X, X, _, X },
-			{  X, _, X, X, X, _, X, _, X, _, _, _, _, _, X, _, X, X, X, _, X },
-			{  X, _, X, X, X, _, X, _, X, _, X, _, _, _, X, _, X, X, X, _, X },
-			{  X, _, _, _, _, _, X, _, _, _, X, _, _, _, X, _, _, _, _, _, X },
-			{  X, X, X, X, X, X, X, _, X, _, X, _, X, _, X, X, X, X, X, X, X },
-			{  _, _, _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  _, X, X, _, X, _, X, X, _, _, _, _, X, _, X, _, X, X, X, X, X },
-			{  _, X, _, _, _, _, _, _, X, X, X, X, _, _, _, _, X, _, _, _, X },
-			{  _, _, X, X, _, X, X, X, _, X, X, _, _, _, X, _, X, X, _, _, _ },
-			{  _, X, X, _, X, X, _, X, _, _, X, X, _, X, _, X, _, X, X, X, _ },
-			{  X, _, _, _, X, _, X, _, X, _, X, X, X, _, X, X, X, _, X, _, X },
-			{  _, _, _, _, _, _, _, _, X, X, _, X, _, _, X, _, _, _, X, _, X },
-			{  X, X, X, X, X, X, X, _, X, _, X, _, _, _, _, X, _, X, X, _, _ },
-			{  X, _, _, _, _, _, X, _, _, X, _, X, X, _, X, X, _, X, _, _, _ },
-			{  X, _, X, X, X, _, X, _, X, _, X, _, _, _, X, X, X, X, X, X, X },
-			{  X, _, X, X, X, _, X, _, _, X, _, X, _, X, _, X, _, _, _, X, _ },
-			{  X, _, X, X, X, _, X, _, X, _, _, _, X, X, X, X, _, X, _, _, X },
-			{  X, _, _, _, _, _, X, _, X, _, X, X, _, X, _, _, _, X, _, X, X },
-			{  X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, _, _, _, _, X },
-		};
-		private static readonly bool[,] penaltyMask = new bool[,]
+			private const DotType X = DotType.CodeForeground;
+			private const DotType _ = DotType.CodeBackground;
+
+			public static readonly DotType[,] M = new DotType[,]
+			{
+				{  X, X, X, X, X, X, X, _, X, X, _, _, _, _, X, X, X, X, X, X, X },
+				{  X, _, _, _, _, _, X, _, X, _, _, X, _, _, X, _, _, _, _, _, X },
+				{  X, _, X, X, X, _, X, _, X, _, _, X, X, _, X, _, X, X, X, _, X },
+				{  X, _, X, X, X, _, X, _, X, _, _, _, _, _, X, _, X, X, X, _, X },
+				{  X, _, X, X, X, _, X, _, X, _, X, _, _, _, X, _, X, X, X, _, X },
+				{  X, _, _, _, _, _, X, _, _, _, X, _, _, _, X, _, _, _, _, _, X },
+				{  X, X, X, X, X, X, X, _, X, _, X, _, X, _, X, X, X, X, X, X, X },
+				{  _, _, _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  _, X, X, _, X, _, X, X, _, _, _, _, X, _, X, _, X, X, X, X, X },
+				{  _, X, _, _, _, _, _, _, X, X, X, X, _, _, _, _, X, _, _, _, X },
+				{  _, _, X, X, _, X, X, X, _, X, X, _, _, _, X, _, X, X, _, _, _ },
+				{  _, X, X, _, X, X, _, X, _, _, X, X, _, X, _, X, _, X, X, X, _ },
+				{  X, _, _, _, X, _, X, _, X, _, X, X, X, _, X, X, X, _, X, _, X },
+				{  _, _, _, _, _, _, _, _, X, X, _, X, _, _, X, _, _, _, X, _, X },
+				{  X, X, X, X, X, X, X, _, X, _, X, _, _, _, _, X, _, X, X, _, _ },
+				{  X, _, _, _, _, _, X, _, _, X, _, X, X, _, X, X, _, X, _, _, _ },
+				{  X, _, X, X, X, _, X, _, X, _, X, _, _, _, X, X, X, X, X, X, X },
+				{  X, _, X, X, X, _, X, _, _, X, _, X, _, X, _, X, _, _, _, X, _ },
+				{  X, _, X, X, X, _, X, _, X, _, _, _, X, X, X, X, _, X, _, _, X },
+				{  X, _, _, _, _, _, X, _, X, _, X, X, _, X, _, _, _, X, _, X, X },
+				{  X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, _, _, _, _, X },
+			};
+		}
+
+		private static class PenaltyMask
 		{
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
-			{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-			{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
-		};
+			private const bool X = true;
+			private const bool _ = false;
+
+			public static readonly bool[,] M = new bool[,]
+			{
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, X, X, X, X, X, X, X, X },
+				{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  _, _, _, _, _, _, X, _, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+				{  X, X, X, X, X, X, X, X, _, _, _, _, _, _, _, _, _, _, _, _, _ },
+			};
+		}
 
 		[TestMethod]
 		public void Test_15_Penalty_HorizontalBands()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(88, M.PenaltyHorizontalBands());
 		}
 
 		[TestMethod]
 		public void Test_16_Penalty_VerticalBands()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(92, M.PenaltyVerticalBands());
 		}
 
 		[TestMethod]
 		public void Test_17_Penalty_Blocks()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(90, M.PenaltyBlocks());
 		}
 
 		[TestMethod]
 		public void Test_18_Penalty_HorizontalFinderPattern()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(40, M.PenaltyHorizontalFinderPattern());
 		}
 
 		[TestMethod]
 		public void Test_19_Penalty_VerticalFinderPattern()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(40, M.PenaltyVerticalFinderPattern());
 		}
 
 		[TestMethod]
 		public void Test_20_Penalty_Balance()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(0, M.PenaltyBalance());
 		}
 
 		[TestMethod]
 		public void Test_21_Penalty_Total()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(350, M.Penalty());
 		}
 
 		[TestMethod]
 		public void Test_22_Penalty_Total_Mask0()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			string s1 = M.ToFullBlockText();
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask0);
@@ -407,7 +418,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_23_Penalty_Total_Mask1()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask1);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -418,7 +429,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_24_Penalty_Total_Mask2()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask2);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -429,7 +440,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_25_Penalty_Total_Mask3()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask3);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -440,7 +451,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_26_Penalty_Total_Mask4()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask4);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -451,7 +462,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_27_Penalty_Total_Mask5()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask5);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -462,7 +473,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_28_Penalty_Total_Mask6()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask6);
 			Console.Out.WriteLine(M.ToFullBlockText());
@@ -473,7 +484,7 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_29_Penalty_Total_Mask7()
 		{
-			QrMatrix M = new QrMatrix((bool[,])penaltyMatrix.Clone(), (bool[,])penaltyMask.Clone());
+			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask7);
 			Console.Out.WriteLine(M.ToFullBlockText());

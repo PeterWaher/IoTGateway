@@ -60,4 +60,40 @@ namespace Waher.Content.QR
 		/// </summary>
 		Eci = 0b0111
 	}
+
+	/// <summary>
+	/// Type of dot in code.
+	/// </summary>
+	public enum DotType
+	{
+		/// <summary>
+		/// Code background color
+		/// </summary>
+		CodeBackground = 0,
+
+		/// <summary>
+		/// Code foreground color
+		/// </summary>
+		CodeForeground = 1,
+
+		/// <summary>
+		/// Finder Marker background color
+		/// </summary>
+		FinderMarkerBackground = 2,
+
+		/// <summary>
+		/// Finder Marker foreground color
+		/// </summary>
+		FinderMarkerForeground = 3,
+
+		/// <summary>
+		/// Alignment Marker background color
+		/// </summary>
+		AlignmentMarkerBackground = 4,
+
+		/// <summary>
+		/// Alignment Marker foreground color
+		/// </summary>
+		AlignmentMarkerForeground = 5
+	}
 }

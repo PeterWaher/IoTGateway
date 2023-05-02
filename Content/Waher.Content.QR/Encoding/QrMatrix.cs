@@ -16,41 +16,54 @@ namespace Waher.Content.QR.Encoding
 	/// </summary>
 	/// <param name="x">Zero-based X-coordinte.</param>
 	/// <param name="y">Zero-based Y-coordinte.</param>
+	/// <param name="Type">Type of dot to paint.</param>
 	/// <returns>Color of pixel, in RGBA (LSB first, i.e. 0xAABBGGRR format).</returns>
-	public delegate uint ColorFunction(int x, int y);
+	public delegate uint ColorFunction(int x, int y, DotType Type);
 
 	/// <summary>
 	/// Class used to compute a QR code matrix.
 	/// </summary>
 	public class QrMatrix
 	{
-		private const bool X = true;
-		private const bool _ = false;
-		private static readonly bool[,] finderMarker = new bool[,]
+		private static class FinderMarker
 		{
-			{  X, X, X, X, X, X, X },
-			{  X, _, _, _, _, _, X },
-			{  X, _, X, X, X, _, X },
-			{  X, _, X, X, X, _, X },
-			{  X, _, X, X, X, _, X },
-			{  X, _, _, _, _, _, X },
-			{  X, X, X, X, X, X, X }
-		};
-		private static readonly bool[,] alignmentMarker = new bool[,]
+			private const DotType X = DotType.FinderMarkerForeground;
+			private const DotType _ = DotType.FinderMarkerBackground;
+
+			public static readonly DotType[,] Dots = new DotType[,]
+			{
+				{  X, X, X, X, X, X, X },
+				{  X, _, _, _, _, _, X },
+				{  X, _, X, X, X, _, X },
+				{  X, _, X, X, X, _, X },
+				{  X, _, X, X, X, _, X },
+				{  X, _, _, _, _, _, X },
+				{  X, X, X, X, X, X, X }
+			};
+		}
+
+		private static class AlignmentMarker
 		{
-			{  X, X, X, X, X },
-			{  X, _, _, _, X },
-			{  X, _, X, _, X },
-			{  X, _, _, _, X },
-			{  X, X, X, X, X }
-		};
+			private const DotType X = DotType.AlignmentMarkerForeground;
+			private const DotType _ = DotType.AlignmentMarkerBackground;
+
+			public static readonly DotType[,] Dots = new DotType[,]
+			{
+				{  X, X, X, X, X },
+				{  X, _, _, _, X },
+				{  X, _, X, _, X },
+				{  X, _, _, _, X },
+				{  X, X, X, X, X }
+			};
+		}
+
 		private static readonly char[] halfBlocks = new char[] { ' ', '▀', '▄', '█' };
 		private static readonly char[] quarterBlocks = new char[] { ' ', '▘', '▝', '▀', '▖', '▌', '▞', '▛', '▗', '▚', '▐', '▜', '▄', '▙', '▟', '█' };
 
 		private readonly int size;
 		private readonly bool[,] defined;
 		private bool[,] mask;
-		private bool[,] dots;
+		private DotType[,] dots;
 
 		/// <summary>
 		/// Class used to compute a QR code matrix.
@@ -63,13 +76,13 @@ namespace Waher.Content.QR.Encoding
 
 			this.size = Size;
 			this.defined = this.mask = new bool[Size, Size];
-			this.dots = new bool[Size, Size];
+			this.dots = new DotType[Size, Size];
 		}
 
 		/// <summary>
 		/// Class used to compute a QR code matrix.
 		/// </summary>
-		public QrMatrix(bool[,] Matrix, bool[,] Mask)
+		public QrMatrix(DotType[,] Matrix, bool[,] Mask)
 		{
 			int c = Matrix.GetLength(0);
 			if (Matrix.GetLength(1) != c)
@@ -95,7 +108,7 @@ namespace Waher.Content.QR.Encoding
 		/// <summary>
 		/// Encoded dots.
 		/// </summary>
-		public bool[,] Dots => this.dots;
+		public DotType[,] Dots => this.dots;
 
 		/// <summary>
 		/// What parts of the mask has been defined.
@@ -116,7 +129,7 @@ namespace Waher.Content.QR.Encoding
 				for (x = 0; x < 7; x++)
 				{
 					this.defined[y + Y, x + X] = true;
-					this.dots[y + Y, x + X] = finderMarker[y, x];
+					this.dots[y + Y, x + X] = FinderMarker.Dots[y, x];
 				}
 			}
 		}
@@ -135,7 +148,7 @@ namespace Waher.Content.QR.Encoding
 				for (x = 0; x < 5; x++)
 				{
 					this.defined[y + Y, x + X] = true;
-					this.dots[y + Y, x + X] = alignmentMarker[y, x];
+					this.dots[y + Y, x + X] = AlignmentMarker.Dots[y, x];
 				}
 			}
 		}
@@ -148,14 +161,16 @@ namespace Waher.Content.QR.Encoding
 		/// <param name="Y">Y coordinate.</param>
 		/// <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
 		/// <param name="Dotted">If pixels should be set and cleared consecutively.</param>
-		public void HLine(int X1, int X2, int Y, bool Dot, bool Dotted)
+		public void HLine(int X1, int X2, int Y, DotType Dot, bool Dotted)
 		{
 			while (X1 <= X2)
 			{
 				this.defined[Y, X1] = true;
 				this.dots[Y, X1] = Dot;
 				X1++;
-				Dot ^= Dotted;
+
+				if (Dotted)
+					Dot = (DotType)((int)Dot ^ 1);
 			}
 		}
 
@@ -167,14 +182,16 @@ namespace Waher.Content.QR.Encoding
 		/// <param name="Y2">Bottom coordinate.</param>
 		/// <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
 		/// <param name="Dotted">If pixels should be set and cleared consecutively.</param>
-		public void VLine(int X, int Y1, int Y2, bool Dot, bool Dotted)
+		public void VLine(int X, int Y1, int Y2, DotType Dot, bool Dotted)
 		{
 			while (Y1 <= Y2)
 			{
 				this.defined[Y1, X] = true;
 				this.dots[Y1, X] = Dot;
 				Y1++;
-				Dot ^= Dotted;
+
+				if (Dotted)
+					Dot = (DotType)((int)Dot ^ 1);
 			}
 		}
 
@@ -235,7 +252,7 @@ namespace Waher.Content.QR.Encoding
 					else
 					{
 						this.defined[y, x] = true;
-						this.dots[y, x] = (b & 0x80) != 0;
+						this.dots[y, x] = (b & 0x80) != 0 ? DotType.CodeForeground : DotType.CodeBackground;
 						b <<= 1;
 					}
 
@@ -310,7 +327,7 @@ namespace Waher.Content.QR.Encoding
 
 				for (x = 0; x < this.size; x++)
 				{
-					if (this.dots[y, x])
+					if (((int)this.dots[y, x] & 1) != 0)
 						sb.Append("██");
 					else
 						sb.Append("  ");
@@ -351,9 +368,9 @@ namespace Waher.Content.QR.Encoding
 
 				for (x = 0; x < this.size; x++)
 				{
-					i = this.dots[y, x] ? 1 : 0;
+					i = (int)this.dots[y, x] & 1;
 
-					if (y2 < this.size && this.dots[y2, x])
+					if (y2 < this.size && ((int)this.dots[y2, x] & 1) != 0)
 						i |= 2;
 
 					sb.Append(halfBlocks[i]);
@@ -396,15 +413,15 @@ namespace Waher.Content.QR.Encoding
 				{
 					x2 = x + 1;
 
-					i = this.dots[y, x] ? 1 : 0;
+					i = (int)this.dots[y, x] & 1;
 
-					if (x2 < this.size && this.dots[y, x2])
+					if (x2 < this.size && ((int)this.dots[y, x2] & 1) != 0)
 						i |= 2;
 
-					if (y2 < this.size && this.dots[y2, x])
+					if (y2 < this.size && ((int)this.dots[y2, x] & 1) != 0)
 						i |= 4;
 
-					if (x2 < this.size && y2 < this.size && this.dots[y2, x2])
+					if (x2 < this.size && y2 < this.size && ((int)this.dots[y2, x2] & 1) != 0)
 						i |= 8;
 
 					sb.Append(quarterBlocks[i]);
@@ -439,7 +456,7 @@ namespace Waher.Content.QR.Encoding
 				{
 					if (Prev.HasValue)
 					{
-						if (Prev == (b = this.dots[y, x]))
+						if (Prev == (b = ((int)this.dots[y, x] & 1) != 0))
 						{
 							c++;
 							if (c == 5)
@@ -455,7 +472,7 @@ namespace Waher.Content.QR.Encoding
 					}
 					else
 					{
-						Prev = this.dots[y, x];
+						Prev = ((int)this.dots[y, x] & 1) != 0;
 						c = 1;
 					}
 				}
@@ -484,7 +501,7 @@ namespace Waher.Content.QR.Encoding
 				{
 					if (Prev.HasValue)
 					{
-						if (Prev == (b = this.dots[y, x]))
+						if (Prev == (b = ((int)this.dots[y, x] & 1) != 0))
 						{
 							c++;
 							if (c == 5)
@@ -499,7 +516,7 @@ namespace Waher.Content.QR.Encoding
 					}
 					else
 					{
-						Prev = this.dots[y, x];
+						Prev = ((int)this.dots[y, x] & 1) != 0;
 						c = 1;
 					}
 				}
@@ -516,15 +533,17 @@ namespace Waher.Content.QR.Encoding
 		{
 			int x, y, c = this.size - 1;
 			int Result = 0;
-			bool b;
+			int b;
 
 			for (y = 0; y < c; y++)
 			{
 				for (x = 0; x < c; x++)
 				{
-					if (this.dots[y + 1, x] == (b = this.dots[y, x]) &&
-						this.dots[y, x + 1] == b &&
-						this.dots[y + 1, x + 1] == b)
+					b = (int)this.dots[y, x] & 1;
+
+					if (((int)this.dots[y + 1, x] & 1) == b &&
+						((int)this.dots[y, x + 1] & 1) == b &&
+						((int)this.dots[y + 1, x + 1] & 1) == b)
 					{
 						Result += 3;
 					}
@@ -549,7 +568,7 @@ namespace Waher.Content.QR.Encoding
 				i = 0;
 				for (x = 0; x < this.size; x++)
 				{
-					b = this.dots[y, x];
+					b = ((int)this.dots[y, x] & 1) != 0;
 					switch (i)
 					{
 						case 0:
@@ -606,7 +625,7 @@ namespace Waher.Content.QR.Encoding
 				i = 0;
 				for (y = 0; y < this.size; y++)
 				{
-					b = this.dots[y, x];
+					b = ((int)this.dots[y, x] & 1) != 0;
 					switch (i)
 					{
 						case 0:
@@ -663,7 +682,7 @@ namespace Waher.Content.QR.Encoding
 			{
 				for (x = 0; x < this.size; x++)
 				{
-					if (this.dots[y, x])
+					if (((int)this.dots[y, x] & 1) != 0)
 						NrDark++;
 					else
 						NrLight++;
@@ -696,7 +715,7 @@ namespace Waher.Content.QR.Encoding
 		/// <returns>Penalty score.</returns>
 		public int Penalty(MaskFunction Mask)
 		{
-			bool[,] Bak = this.dots;
+			DotType[,] Bak = this.dots;
 
 			if (!(Mask is null))
 				this.ApplyMask(Mask);
@@ -794,14 +813,14 @@ namespace Waher.Content.QR.Encoding
 		{
 			int x, y;
 
-			this.dots = (bool[,])this.dots.Clone();
+			this.dots = (DotType[,])this.dots.Clone();
 
 			for (y = 0; y < this.size; y++)
 			{
 				for (x = 0; x < this.size; x++)
 				{
 					if (!this.mask[y, x] && Mask(x, y))
-						this.dots[y, x] = !this.dots[y, x];
+						this.dots[y, x] = (DotType)((int)this.dots[y, x] ^ 1);
 				}
 			}
 		}
@@ -820,7 +839,7 @@ namespace Waher.Content.QR.Encoding
 			while (NrBits > 0)
 			{
 				this.defined[Y, X] = true;
-				this.dots[Y, X] = (Bits & 0x80000000) != 0;
+				this.dots[Y, X] = (Bits & 0x80000000) != 0 ? DotType.CodeForeground : DotType.CodeBackground;
 				Bits <<= 1;
 				NrBits--;
 				X += Dx;
@@ -882,7 +901,7 @@ namespace Waher.Content.QR.Encoding
 					if (x >= this.size)
 						break;
 
-					if (this.dots[y, x])
+					if (((int)this.dots[y, x] & 1) != 0)
 					{
 						Result[i++] = 0x00;
 						Result[i++] = 0x00;
@@ -969,25 +988,15 @@ namespace Waher.Content.QR.Encoding
 					if (x >= this.size)
 						break;
 
-					if (this.dots[y, x])
-					{
-						cl = Color(x, y);
+					cl = Color(x, y, this.dots[y, x]);
 
-						Result[i++] = (byte)cl;
-						cl >>= 8;
-						Result[i++] = (byte)cl;
-						cl >>= 8;
-						Result[i++] = (byte)cl;
-						cl >>= 8;
-						Result[i++] = (byte)cl;
-					}
-					else
-					{
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
-						Result[i++] = 0xff;
-					}
+					Result[i++] = (byte)cl;
+					cl >>= 8;
+					Result[i++] = (byte)cl;
+					cl >>= 8;
+					Result[i++] = (byte)cl;
+					cl >>= 8;
+					Result[i++] = (byte)cl;
 
 					srcX += dx;
 				}

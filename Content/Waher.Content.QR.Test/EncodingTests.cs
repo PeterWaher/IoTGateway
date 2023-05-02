@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkiaSharp;
 using Waher.Content.QR.Encoding;
 
 namespace Waher.Content.QR.Test
@@ -553,16 +554,114 @@ namespace Waher.Content.QR.Test
 			VersionTests.VersionTests.SaveImage(M, 500, "CustomAntiAlias.png", CustomColor, true);
 		}
 
+		private static int IconWidth = 256;
+		private static int IconHeight = 256;
+		private static SKBitmap Icon = GetIcon(SKColors.Green, SKColors.White);
+
+		private static SKBitmap GetIcon(SKColor Foreground, SKColor Background)
+		{
+			// Generating icon from SVG.
+			// <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+			SKSurface Surface = SKSurface.Create(new SKImageInfo(IconWidth, IconHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+			try
+			{
+				// <rect width="256" height="256" rx="128" fill="#FCFCFC"/>
+
+				SKCanvas Canvas = Surface.Canvas;
+				Canvas.Clear(Background);
+
+				// <path d="
+				// M128.001 21.3291
+				// C69.1211 21.3291 21.3345 69.1158 21.3345 127.996
+				// C21.3345 186.876 69.1211 234.662 128.001 234.662
+				// C186.881 234.662 234.668 186.876 234.668 127.996
+				// C234.668 69.1158 186.881 21.3291 128.001 21.3291
+				// Z
+				// M128.001 53.3291
+				// C145.708 53.3291 160.001 67.6224 160.001 85.3291
+				// C160.001 103.036 145.708 117.329 128.001 117.329
+				// C110.294 117.329 96.0012 103.036 96.0012 85.3291
+				// C96.0012 67.6224 110.294 53.3291 128.001 53.3291
+				// Z
+				// M128.001 204.796
+				// C101.334 204.796 77.7612 191.142 64.0011 170.449
+				// C64.3211 149.222 106.668 137.596 128.001 137.596
+				// C149.228 137.596 191.681 149.222 192.001 170.449
+				// C178.241 191.142 154.668 204.796 128.001 204.796
+				// Z" fill="#F2495C"/>
+
+				SKPath Path = new SKPath();
+				Path.MoveTo(128.001f, 21.3291f);
+				Path.CubicTo(69.1211f, 21.3291f, 21.3345f, 69.1158f, 21.3345f, 127.996f);
+				Path.CubicTo(21.3345f, 186.876f, 69.1211f, 234.662f, 128.001f, 234.662f);
+				Path.CubicTo(186.881f, 234.662f, 234.668f, 186.876f, 234.668f, 127.996f);
+				Path.CubicTo(234.668f, 69.1158f, 186.881f, 21.3291f, 128.001f, 21.3291f);
+				Path.Close();
+
+				Path.MoveTo(128.001f, 53.3291f);
+				Path.CubicTo(145.708f, 53.3291f, 160.001f, 67.6224f, 160.001f, 85.3291f);
+				Path.CubicTo(160.001f, 103.036f, 145.708f, 117.329f, 128.001f, 117.329f);
+				Path.CubicTo(110.294f, 117.329f, 96.0012f, 103.036f, 96.0012f, 85.3291f);
+				Path.CubicTo(96.0012f, 67.6224f, 110.294f, 53.3291f, 128.001f, 53.3291f);
+				Path.Close();
+
+				Path.MoveTo(128.001f, 204.796f);
+				Path.CubicTo(101.334f, 204.796f, 77.7612f, 191.142f, 64.0011f, 170.449f);
+				Path.CubicTo(64.3211f, 149.222f, 106.668f, 137.596f, 128.001f, 137.596f);
+				Path.CubicTo(149.228f, 137.596f, 191.681f, 149.222f, 192.001f, 170.449f);
+				Path.CubicTo(178.241f, 191.142f, 154.668f, 204.796f, 128.001f, 204.796f);
+				Path.Close();
+
+				SKPaint IconFill = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Foreground
+				};
+
+				Canvas.DrawPath(Path, IconFill);
+
+				using (SKImage Image = Surface.Snapshot())
+				{
+					return SKBitmap.FromImage(Image);
+				}
+			}
+			finally
+			{
+				Surface.Dispose();
+			}
+		}
+
 		private static uint CustomColor(float CodeX, float CodeY, float DotX, float DotY, DotType Type)
 		{
 			float dx = (CodeX - 0.5f);
 			float dy = (CodeY - 0.5f);
 			float d2 = dx * dx + dy * dy;
 
-			if (d2 < 0.005)
-				return 0xff00ff00;  // green
-
 			if (d2 < 0.01)
+			{
+				int IconX = (int)(128 + 1024 * dx + 0.5f);
+				int IconY = (int)(128 + 1024 * dy + 0.5f);
+
+				if (IconX >= 0 && IconX < IconWidth && IconY >= 0 && IconY < IconHeight)
+				{
+					SKColor cl = Icon.GetPixel(IconX, IconY);
+
+					uint Result = cl.Alpha;
+					Result <<= 8;
+					Result |= cl.Blue;
+					Result <<= 8;
+					Result |= cl.Green;
+					Result <<= 8;
+					Result |= cl.Red;
+
+					return Result;
+				}
+			}
+
+			if (d2 < 0.015)
 				return 0xffffffff;  // white
 
 			switch (Type)

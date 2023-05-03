@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <Description>The library contains a light-weight managed encoder of QR codes. It can generate both text-based output (using block characters) for display on text devices, as well as images and color-coded codes.</Description>
+    <Description>The library contains a light-weight managed encoder of QR codes. It can generate both text-based output (using block characters) for display on text devices, as well as images and color-coded codes. Contains methods for customization of QR-codes, including controlling color and shape of dots, overlaying of images, and procedural coloring.</Description>
     <Authors>Peter Waher</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

@@ -85,7 +85,7 @@
 		/// <summary>
 		/// Finder Marker foreground color (inner)
 		/// </summary>
-		FinderMarkerForegroundInner = 4,
+		FinderMarkerForegroundInner = 5,
 
 		/// <summary>
 		/// Alignment Marker background color
@@ -100,6 +100,6 @@
 		/// <summary>
 		/// Alignment Marker foreground color (inner)
 		/// </summary>
-		AlignmentMarkerForegroundInner = 8
+		AlignmentMarkerForegroundInner = 9
 	}
 }

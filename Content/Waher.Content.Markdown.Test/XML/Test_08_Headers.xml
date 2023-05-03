@@ -21,6 +21,12 @@
 		<Header id="thisIsASecondH2" level="2">
 			<InlineText>This is a second H2</InlineText>
 		</Header>
+		<Header id="thisIsASecondH3" level="3">
+			<InlineText>This is a second H3</InlineText>
+		</Header>
+		<Header id="thisIsASecondH4" level="4">
+			<InlineText>This is a second H4</InlineText>
+		</Header>
 		<Header id="thisIsAnH6" level="6">
 			<InlineText>This is an H6</InlineText>
 		</Header>
@@ -29,6 +35,12 @@
 		</Header>
 		<Header id="thisIsAThirdH2" level="2">
 			<InlineText>This is a third H2</InlineText>
+		</Header>
+		<Header id="thisIsAThirdH3" level="3">
+			<InlineText>This is a third H3</InlineText>
+		</Header>
+		<Header id="thisIsAThirdH4" level="4">
+			<InlineText>This is a third H4</InlineText>
 		</Header>
 		<Header id="thisIsAnH3" level="3">
 			<InlineText>This is an H3</InlineText>

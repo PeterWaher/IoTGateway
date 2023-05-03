@@ -4513,7 +4513,7 @@ namespace Waher.Content.Markdown
 						if (ch == '#')
 							StartsWithHashSigns = true;
 					}
-					else 
+					else if (ch != '#')
 						StartsWithHashSigns = false;
 
 					RowEnd = Pos;

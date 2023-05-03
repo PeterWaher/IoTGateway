@@ -24,9 +24,23 @@
 			<body>
 				<section>
 					<header>
-						<text>This is an H6</text>
+						<text>This is a second H3</text>
 					</header>
-					<body />
+					<body>
+						<section>
+							<header>
+								<text>This is a second H4</text>
+							</header>
+							<body>
+								<section>
+									<header>
+										<text>This is an H6</text>
+									</header>
+									<body />
+								</section>
+							</body>
+						</section>
+					</body>
 				</section>
 			</body>
 		</section>
@@ -42,6 +56,19 @@
 				<text>This is a third H2</text>
 			</header>
 			<body>
+				<section>
+					<header>
+						<text>This is a third H3</text>
+					</header>
+					<body>
+						<section>
+							<header>
+								<text>This is a third H4</text>
+							</header>
+							<body />
+						</section>
+					</body>
+				</section>
 				<section>
 					<header>
 						<text>This is an H3</text>

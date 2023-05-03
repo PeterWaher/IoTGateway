@@ -98,8 +98,11 @@
             <summary>
             Delegate for QR-code color functions
             </summary>
-            <param name="x">Zero-based X-coordinte.</param>
-            <param name="y">Zero-based Y-coordinte.</param>
+            <param name="CodeX">Zero-based normalized X-coordinte into code.</param>
+            <param name="CodeY">Zero-based normalized Y-coordinte into code.</param>
+            <param name="DotX">Zero-based normalized X-coordinte into dot.</param>
+            <param name="DotY">Zero-based normalized Y-coordinte into dot.</param>
+            <param name="Type">Type of dot to paint.</param>
             <returns>Color of pixel, in RGBA (LSB first, i.e. 0xAABBGGRR format).</returns>
         </member>
         <member name="T:Waher.Content.QR.Encoding.QrMatrix">
@@ -113,7 +116,7 @@
             </summary>
             <param name="Size">Size of matrix.</param>
         </member>
-        <member name="M:Waher.Content.QR.Encoding.QrMatrix.#ctor(System.Boolean[0:,0:],System.Boolean[0:,0:])">
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.#ctor(Waher.Content.QR.DotType[0:,0:],System.Boolean[0:,0:])">
             <summary>
             Class used to compute a QR code matrix.
             </summary>
@@ -147,7 +150,7 @@
             <param name="X">Left coordinate of the marker.</param>
             <param name="Y">Right coordinate of the marker.</param>
         </member>
-        <member name="M:Waher.Content.QR.Encoding.QrMatrix.HLine(System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.HLine(System.Int32,System.Int32,System.Int32,Waher.Content.QR.DotType,System.Boolean)">
             <summary>
             Draws a horizontal line in the matrix.
             </summary>
@@ -157,7 +160,7 @@
             <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
             <param name="Dotted">If pixels should be set and cleared consecutively.</param>
         </member>
-        <member name="M:Waher.Content.QR.Encoding.QrMatrix.VLine(System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.VLine(System.Int32,System.Int32,System.Int32,Waher.Content.QR.DotType,System.Boolean)">
             <summary>
             Draws a horizontal line in the matrix.
             </summary>
@@ -347,6 +350,13 @@
             <param name="Dy">Movement along Y-axis after each bit.</param>
             <param name="NrBits">Number of bits to write.</param>
         </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA">
+            <summary>
+            Converts the matrix to pixels, each pixel represented by 4 bytes
+            in the order Red, Green, Blue, Alpha (RGBA).
+            </summary>
+            <returns>Pixels</returns>
+        </member>
         <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(System.Int32,System.Int32)">
             <summary>
             Converts the matrix to pixels, each pixel represented by 4 bytes
@@ -356,7 +366,16 @@
             <param name="Height">Height of resulting bitmap image.</param>
             <returns>Pixels</returns>
         </member>
-        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(System.Int32,System.Int32,Waher.Content.QR.Encoding.ColorFunction)">
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(Waher.Content.QR.Encoding.ColorFunction,System.Boolean)">
+            <summary>
+            Converts the matrix to pixels, each pixel represented by 4 bytes
+            in the order Red, Green, Blue, Alpha (RGBA).
+            </summary>
+            <param name="Color">Color function used to color dots representing ones.</param>
+            <param name="AntiAlias">If anti-aliasing is to be used.</param>
+            <returns>Pixels</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(System.Int32,System.Int32,Waher.Content.QR.Encoding.ColorFunction,System.Boolean)">
             <summary>
             Converts the matrix to pixels, each pixel represented by 4 bytes
             in the order Red, Green, Blue, Alpha (RGBA).
@@ -364,6 +383,7 @@
             <param name="Width">Width of resulting bitmap image.</param>
             <param name="Height">Height of resulting bitmap image.</param>
             <param name="Color">Color function used to color dots representing ones.</param>
+            <param name="AntiAlias">If anti-aliasing is to be used.</param>
             <returns>Pixels</returns>
         </member>
         <member name="T:Waher.Content.QR.Encoding.ReedSolomonEC">
@@ -538,6 +558,51 @@
         <member name="F:Waher.Content.QR.EncodingMode.Eci">
             <summary>
             Extended Channel Interpretation, allows specification of character set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.DotType">
+            <summary>
+            Type of dot in code.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.CodeBackground">
+            <summary>
+            Code background color
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.CodeForeground">
+            <summary>
+            Code foreground color
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.FinderMarkerBackground">
+            <summary>
+            Finder Marker background color
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.FinderMarkerForegroundOuter">
+            <summary>
+            Finder Marker foreground color (outer)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.FinderMarkerForegroundInner">
+            <summary>
+            Finder Marker foreground color (inner)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.AlignmentMarkerBackground">
+            <summary>
+            Alignment Marker background color
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.AlignmentMarkerForegroundOuter">
+            <summary>
+            Alignment Marker foreground color (outer)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.DotType.AlignmentMarkerForegroundInner">
+            <summary>
+            Alignment Marker foreground color (inner)
             </summary>
         </member>
         <member name="T:Waher.Content.QR.QrEncoder">

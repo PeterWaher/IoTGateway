@@ -725,6 +725,7 @@
 		<Content fileName='RemoteEndpoints.md'/>
 		<Content fileName="robots.txt"/>
 		<Content fileName='Script.md'/>
+		<Content fileName='ScriptColors.md'/>
 		<Content fileName="SignatureRequest.js"/>
 		<Content fileName="SignatureRequest.md"/>
 		<Content fileName='Smileys.md'/>

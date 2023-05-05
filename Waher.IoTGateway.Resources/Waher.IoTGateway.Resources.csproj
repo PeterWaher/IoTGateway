@@ -228,6 +228,7 @@
     <None Remove="Root\RemoteEndpoints.md" />
     <None Remove="Root\robots.txt" />
     <None Remove="Root\Script.md" />
+    <None Remove="Root\ScriptColors.md" />
     <None Remove="Root\Smileys.md" />
     <None Remove="Root\TargetBlank.js" />
     <None Remove="Root\Templates\Repeat.md" />
@@ -854,6 +855,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Prompt.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\ScriptColors.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Script.md">

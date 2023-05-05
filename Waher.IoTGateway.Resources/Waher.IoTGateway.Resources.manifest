@@ -159,6 +159,7 @@
 		<Content fileName="Prompt.md"/>
 		<Content fileName="robots.txt"/>
 		<Content fileName="Script.md"/>
+		<Content fileName="ScriptColors.md"/>
 		<Content fileName="Smileys.md"/>
 		<Content fileName="TargetBlank.js"/>
 		<Folder name="Audio">

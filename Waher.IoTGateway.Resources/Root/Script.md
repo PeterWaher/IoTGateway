@@ -1115,6 +1115,9 @@ The following functions are available in the `Waher.Script.Graphs` library.
 | `RGB(R,G,B)`              | Creates a color from its RGB representation.                                                                                                                            | `RGB(100,150,200)`     |
 | `RGBA(R,G,B,A)`           | Creates a color from its RGBA representation.                                                                                                                           | `RGBA(100,150,200,64)` |
 
+**Note**: In all functions expecting color arguments, you can pass any of the [named colors](ScriptColors.md) as a string instead.
+The named colors will be recognized, and converted to the corresponding color.
+
 #### Graph functions (Waher.Script.Graphs)
 
 The following functions are available in the `Waher.Script.Graphs` library. In an interactive script environment, clicking on the resulting graphs

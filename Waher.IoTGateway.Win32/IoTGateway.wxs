@@ -1598,6 +1598,7 @@
 							<File Id='RemoteEndpoints.md' Name='RemoteEndpoints.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoints.md'/>
 							<File Id='robots.txt' Name='robots.txt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\robots.txt'/>
 							<File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
+							<File Id='ScriptColors.md' Name='ScriptColors.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\ScriptColors.md'/>
 							<File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.js' />
 							<File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.md' />
 							<File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
@@ -1623,6 +1624,7 @@
 							<RemoveFile Id='RemoveRemoteEndpoints.md' Name='RemoteEndpoints.md' On='uninstall'/>
 							<RemoveFile Id='Removerobots.txt' Name='robots.txt' On='uninstall'/>
 							<RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
+							<RemoveFile Id='RemoveScriptColors.md' Name='ScriptColors.md' On='uninstall'/>
 							<RemoveFile Id='RemoveSignatureRequest.js' Name='SignatureRequest.js' On='uninstall'/>
 							<RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
 							<RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>

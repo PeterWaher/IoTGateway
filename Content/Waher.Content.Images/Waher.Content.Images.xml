@@ -2122,6 +2122,21 @@
             <param name="Background">Background color.</param>
             <returns>Generated image.</returns>
         </member>
+        <member name="M:Waher.Content.Images.SvgPath.SvgPathToImage(System.String,System.Int32,System.Int32,SkiaSharp.SKColor,SkiaSharp.SKColor,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Parses an SVG Path and generates an image from it.
+            </summary>
+            <param name="SvgPath">SVG Path</param>
+            <param name="Width">Width of image.</param>
+            <param name="Height">Height of image.</param>
+            <param name="Foreground">Foreground color.</param>
+            <param name="Background">Background color.</param>
+            <param name="OffsetX">X-offset of path in image.</param>
+            <param name="OffsetY">Y-offset of path in image.</param>
+            <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+            <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
+            <returns>Generated image.</returns>
+        </member>
         <member name="M:Waher.Content.Images.SvgPath.SvgPathToBitmap(System.String,System.Int32,System.Int32,SkiaSharp.SKColor,SkiaSharp.SKColor)">
             <summary>
             Parses an SVG Path and generates a bitmap image from it.
@@ -2133,6 +2148,21 @@
             <param name="Background">Background color.</param>
             <returns>Generated image.</returns>
         </member>
+        <member name="M:Waher.Content.Images.SvgPath.SvgPathToBitmap(System.String,System.Int32,System.Int32,SkiaSharp.SKColor,SkiaSharp.SKColor,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Parses an SVG Path and generates a bitmap image from it.
+            </summary>
+            <param name="SvgPath">SVG Path</param>
+            <param name="Width">Width of bitmap image.</param>
+            <param name="Height">Height of bitmap image.</param>
+            <param name="Foreground">Foreground color.</param>
+            <param name="Background">Background color.</param>
+            <param name="OffsetX">X-offset of path in image.</param>
+            <param name="OffsetY">Y-offset of path in image.</param>
+            <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+            <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
+            <returns>Generated image.</returns>
+        </member>
         <member name="M:Waher.Content.Images.SvgPath.Parse(System.String)">
             <summary>
             Parses an SVG Path.
@@ -2141,6 +2171,20 @@
             https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
             </summary>
             <param name="Path">Path string.</param>
+            <returns>Parsed path</returns>
+        </member>
+        <member name="M:Waher.Content.Images.SvgPath.Parse(System.String,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Parses an SVG Path.
+            
+            Reference:
+            https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+            </summary>
+            <param name="Path">Path string.</param>
+            <param name="OffsetX">X-offset of path in image.</param>
+            <param name="OffsetY">Y-offset of path in image.</param>
+            <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+            <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
             <returns>Parsed path</returns>
         </member>
     </members>

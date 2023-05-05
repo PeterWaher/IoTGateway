@@ -27,15 +27,32 @@ namespace Waher.Content.Images
 		public static SKImage SvgPathToImage(string SvgPath, int Width, int Height,
 			SKColor Foreground, SKColor Background)
 		{
+			return SvgPathToImage(SvgPath, Width, Height, Foreground, Background, 0, 0, 1, 1);
+		}
+
+		/// <summary>
+		/// Parses an SVG Path and generates an image from it.
+		/// </summary>
+		/// <param name="SvgPath">SVG Path</param>
+		/// <param name="Width">Width of image.</param>
+		/// <param name="Height">Height of image.</param>
+		/// <param name="Foreground">Foreground color.</param>
+		/// <param name="Background">Background color.</param>
+		/// <param name="OffsetX">X-offset of path in image.</param>
+		/// <param name="OffsetY">Y-offset of path in image.</param>
+		/// <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+		/// <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
+		/// <returns>Generated image.</returns>
+		public static SKImage SvgPathToImage(string SvgPath, int Width, int Height,
+			SKColor Foreground, SKColor Background, float OffsetX, float OffsetY, float ScaleX, float ScaleY)
+		{
 			SKSurface Surface = SKSurface.Create(new SKImageInfo(Width, Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
 			try
 			{
-				// <rect width="256" height="256" rx="128" fill="#FCFCFC"/>
-
 				SKCanvas Canvas = Surface.Canvas;
 				Canvas.Clear(Background);
 
-				SKPath Path = Parse(SvgPath);
+				SKPath Path = Parse(SvgPath, OffsetX, OffsetY, ScaleX, ScaleY);
 
 				SKPaint IconFill = new SKPaint()
 				{
@@ -67,7 +84,26 @@ namespace Waher.Content.Images
 		public static SKBitmap SvgPathToBitmap(string SvgPath, int Width, int Height,
 			SKColor Foreground, SKColor Background)
 		{
-			using (SKImage Image = SvgPathToImage(SvgPath, Width, Height, Foreground, Background))
+			return SvgPathToBitmap(SvgPath, Width, Height, Foreground, Background, 0, 0, 1, 1);
+		}
+
+		/// <summary>
+		/// Parses an SVG Path and generates a bitmap image from it.
+		/// </summary>
+		/// <param name="SvgPath">SVG Path</param>
+		/// <param name="Width">Width of bitmap image.</param>
+		/// <param name="Height">Height of bitmap image.</param>
+		/// <param name="Foreground">Foreground color.</param>
+		/// <param name="Background">Background color.</param>
+		/// <param name="OffsetX">X-offset of path in image.</param>
+		/// <param name="OffsetY">Y-offset of path in image.</param>
+		/// <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+		/// <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
+		/// <returns>Generated image.</returns>
+		public static SKBitmap SvgPathToBitmap(string SvgPath, int Width, int Height,
+			SKColor Foreground, SKColor Background, float OffsetX, float OffsetY, float ScaleX, float ScaleY)
+		{
+			using (SKImage Image = SvgPathToImage(SvgPath, Width, Height, Foreground, Background, OffsetX, OffsetY, ScaleX, ScaleY))
 			{
 				return SKBitmap.FromImage(Image);
 			}
@@ -82,6 +118,23 @@ namespace Waher.Content.Images
 		/// <param name="Path">Path string.</param>
 		/// <returns>Parsed path</returns>
 		public static SKPath Parse(string Path)
+		{
+			return Parse(Path, 0, 0, 1, 1);
+		}
+
+		/// <summary>
+		/// Parses an SVG Path.
+		/// 
+		/// Reference:
+		/// https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+		/// </summary>
+		/// <param name="Path">Path string.</param>
+		/// <param name="OffsetX">X-offset of path in image.</param>
+		/// <param name="OffsetY">Y-offset of path in image.</param>
+		/// <param name="ScaleX">Scaling factor for x-coordinates of path in image.</param>
+		/// <param name="ScaleY">Scaling factor for y-coordinates of path in image.</param>
+		/// <returns>Parsed path</returns>
+		public static SKPath Parse(string Path, float OffsetX, float OffsetY, float ScaleX, float ScaleY)
 		{
 			SKPath Result = new SKPath();
 			SvgPathState State = SvgPathState.ExpectCommand;
@@ -135,7 +188,7 @@ namespace Waher.Content.Images
 									break;
 
 								case 'Z':   // Close loop
-									AddCommand(Result, Command, Numbers, ref LastX, ref LastY);
+									AddCommand(Result, Command, Numbers, ref LastX, ref LastY, OffsetX, OffsetY, ScaleX, ScaleY);
 									break;
 
 								case 'C':   // Bezier curve Absolute
@@ -207,7 +260,7 @@ namespace Waher.Content.Images
 
 									if (NrNumbers == 0)
 									{
-										AddCommand(Result, Command, Numbers, ref LastX, ref LastY);
+										AddCommand(Result, Command, Numbers, ref LastX, ref LastY, OffsetX, OffsetY, ScaleX, ScaleY);
 										State = SvgPathState.ExpectCommand;
 									}
 									break;
@@ -244,7 +297,7 @@ namespace Waher.Content.Images
 									if (NrNumbers != 0)
 										throw new Exception("Unexpected numerical character: " + ch);
 
-									AddCommand(Result, Command, Numbers, ref LastX, ref LastY);
+									AddCommand(Result, Command, Numbers, ref LastX, ref LastY, OffsetX, OffsetY, ScaleX, ScaleY);
 									State = SvgPathState.ExpectCommand;
 
 									Again = true;
@@ -264,51 +317,51 @@ namespace Waher.Content.Images
 		}
 
 		private static void AddCommand(SKPath Path, char Command, float[] Numbers,
-			ref float LastX, ref float LastY)
+			ref float LastX, ref float LastY, float OffsetX, float OffsetY, float ScaleX, float ScaleY)
 		{
 			switch (Command)
 			{
 				case 'M':   // Move-to Absolute
-					LastX = Numbers[0];
-					LastY = Numbers[1];
+					LastX = Numbers[0] * ScaleX + OffsetX;
+					LastY = Numbers[1] * ScaleY + OffsetY;
 					Path.MoveTo(LastX, LastY);
 					break;
 
 				case 'm':   // Move-to Relative
-					LastX += Numbers[0];
-					LastY += Numbers[1];
+					LastX += Numbers[0] * ScaleX;
+					LastY += Numbers[1] * ScaleY;
 					Path.MoveTo(LastX, LastY);
 					break;
 
 				case 'L':   // Line-to Absolute
-					LastX = Numbers[0];
-					LastY = Numbers[1];
+					LastX = Numbers[0] * ScaleX + OffsetX;
+					LastY = Numbers[1] * ScaleY + OffsetY;
 					Path.LineTo(LastX, LastY);
 					break;
 
 				case 'l':   // Line-to Relative
-					LastX += Numbers[0];
-					LastY += Numbers[1];
+					LastX += Numbers[0] * ScaleX;
+					LastY += Numbers[1] * ScaleY;
 					Path.LineTo(LastX, LastY);
 					break;
 
 				case 'H':   // Horizontal Line-to Absolute
-					LastX = Numbers[0];
+					LastX = Numbers[0] * ScaleX + OffsetX;
 					Path.LineTo(LastX, LastY);
 					break;
 
 				case 'h':   // Horizontal Line-to Relative
-					LastX += Numbers[0];
+					LastX += Numbers[0] * ScaleX;
 					Path.LineTo(LastX, LastY);
 					break;
 
 				case 'V':   // Vertical Line-to Absolute
-					LastY = Numbers[0];
+					LastY = Numbers[0] * ScaleY + OffsetY;
 					Path.LineTo(LastX, LastY);
 					break;
 
 				case 'v':   // Vertical Line-to Relative
-					LastY += Numbers[0];
+					LastY += Numbers[0] * ScaleY;
 					Path.LineTo(LastX, LastY);
 					break;
 
@@ -318,55 +371,61 @@ namespace Waher.Content.Images
 
 				case 'C':   // Bezier curve Absolute
 				case 'S':   // Short-hand Bezier curve Absolute
-					LastX = Numbers[4];
-					LastY = Numbers[5];
-					Path.CubicTo(Numbers[0], Numbers[1], Numbers[2], Numbers[3], LastX, LastY);
+					float x1 = Numbers[0] * ScaleX + OffsetX;
+					float y1 = Numbers[1] * ScaleY + OffsetY;
+					float x2 = Numbers[2] * ScaleX + OffsetX;
+					float y2 = Numbers[3] * ScaleY + OffsetY;
+					LastX = Numbers[4] * ScaleX + OffsetX;
+					LastY = Numbers[5] * ScaleY + OffsetY;
+					Path.CubicTo(x1, y1, x2, y2, LastX, LastY);
 					break;
 
 				case 'c':   // Bezier curve Relative
 				case 's':   // Short-hand Bezier curve Relative
-					float x1 = LastX + Numbers[0];
-					float y1 = LastY + Numbers[1];
-					float x2 = LastX + Numbers[2];
-					float y2 = LastY + Numbers[3];
+					x1 = LastX + Numbers[0] * ScaleX;
+					y1 = LastY + Numbers[1] * ScaleY;
+					x2 = LastX + Numbers[2] * ScaleX;
+					y2 = LastY + Numbers[3] * ScaleY;
 					
-					LastX += Numbers[4];
-					LastY += Numbers[5];
+					LastX += Numbers[4] * ScaleX;
+					LastY += Numbers[5] * ScaleY;
 
 					Path.CubicTo(x1, y1, x2, y2, LastX, LastY);
 					break;
 
 				case 'Q':   // Quadratic curve Absolute
 				case 'T':   // Short-hand Quadratic curve Absolute
-					LastX = Numbers[2];
-					LastY = Numbers[3];
-					Path.QuadTo(Numbers[0], Numbers[1], LastX, LastY);
+					x1 = Numbers[0] * ScaleX + OffsetX;
+					y1 = Numbers[1] * ScaleY + OffsetY;
+					LastX = Numbers[2] * ScaleX + OffsetX;
+					LastY = Numbers[3] * ScaleY + OffsetY;
+					Path.QuadTo(x1, y1, LastX, LastY);
 					break;
 
 				case 'q':   // Quadratic curve Relative
 				case 't':   // Short-hand Quadratic curve Relative
-					x1 = LastX + Numbers[0];
-					y1 = LastY + Numbers[1];
+					x1 = LastX + Numbers[0] * ScaleX;
+					y1 = LastY + Numbers[1] * ScaleY;
 
-					LastX += Numbers[2];
-					LastY += Numbers[3];
+					LastX += Numbers[2] * ScaleX;
+					LastY += Numbers[3] * ScaleY;
 
 					Path.QuadTo(x1, y1, LastX, LastY);
 					break;
 
 				case 'A':   // Arc Absolute
-					LastX = Numbers[5];
-					LastY = Numbers[6];
-					Path.ArcTo(Numbers[0], Numbers[1], Numbers[2],
+					LastX = Numbers[5] * ScaleX + OffsetX;
+					LastY = Numbers[6] * ScaleY + OffsetY;
+					Path.ArcTo(Numbers[0] * ScaleX, Numbers[1] * ScaleY, Numbers[2],
 						Numbers[3] == 0 ? SKPathArcSize.Large : SKPathArcSize.Small,
 						Numbers[4] == 0 ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise,
 						LastX, LastY);
 					break;
 
 				case 'a':   // Arc Relative
-					LastX += Numbers[5];
-					LastY += Numbers[6];
-					Path.ArcTo(Numbers[0], Numbers[1], Numbers[2],
+					LastX += Numbers[5] * ScaleX;
+					LastY += Numbers[6] * ScaleY;
+					Path.ArcTo(Numbers[0] * ScaleX, Numbers[1] * ScaleY, Numbers[2],
 						Numbers[3] == 0 ? SKPathArcSize.Small : SKPathArcSize.Large,
 						Numbers[4] == 0 ? SKPathDirection.CounterClockwise : SKPathDirection.Clockwise,
 						LastX, LastY);

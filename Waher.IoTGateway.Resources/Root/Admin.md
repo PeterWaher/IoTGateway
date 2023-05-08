@@ -94,8 +94,8 @@ foreach Module in Waher.Runtime.Inventory.Types.Modules do
 (
 	if Module is Waher.IoTGateway.IConfigurableModule then
 	(
-		foreach Page in Module.GetConfigurablePages() do
-			MenuItem(Page.Title,Page.ConfigurationPage,Page.Privileges)
+		foreach ConfigurablePage in Module.GetConfigurablePages() do
+			MenuItem(ConfigurablePage.Title,ConfigurablePage.ConfigurationPage,ConfigurablePage.Privileges)
 	)
 );
 MenuFooter();

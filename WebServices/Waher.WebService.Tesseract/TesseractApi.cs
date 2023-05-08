@@ -23,7 +23,7 @@ namespace Waher.WebService.Tesseract
 	/// Class providing a web API for OCR using Tesseract, installed on the server.
 	/// </summary>
 	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]
-	public class TesseractApi : IModule
+	public class TesseractApi : IConfigurableModule
 	{
 		private const string FolderPrefix = "Tesseract";
 		private const string ExecutableName = "tesseract.exe";
@@ -136,6 +136,18 @@ namespace Waher.WebService.Tesseract
 			exeFound = false;
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Gets an array of configurable pages for the module.
+		/// </summary>
+		/// <returns>Configurable pages</returns>
+		public Task<IConfigurablePage[]> GetConfigurablePages()
+		{
+			return Task.FromResult(new IConfigurablePage[]
+			{
+				new ConfigurablePage("Tesseract OCR", "/Tesseract/Api.md")
+			});
 		}
 
 		/// <summary>
@@ -327,9 +339,9 @@ namespace Waher.WebService.Tesseract
 		public Task<string> PerformOcr(byte[] Image, string ContentType, string PageSegmentationMode, string Language)
 		{
 			if (Enum.TryParse(PageSegmentationMode, out PageSegmentationMode ParsedPageSegmentationMode))
-				return PerformOcr(Image, ContentType, ParsedPageSegmentationMode, Language);
+				return this.PerformOcr(Image, ContentType, ParsedPageSegmentationMode, Language);
 			else
-				return PerformOcr(Image, ContentType, (PageSegmentationMode?)null, Language);
+				return this.PerformOcr(Image, ContentType, (PageSegmentationMode?)null, Language);
 		}
 
 		/// <summary>

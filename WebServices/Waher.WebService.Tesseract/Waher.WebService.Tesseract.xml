@@ -147,6 +147,12 @@
             Stops the module.
             </summary>
         </member>
+        <member name="M:Waher.WebService.Tesseract.TesseractApi.GetConfigurablePages">
+            <summary>
+            Gets an array of configurable pages for the module.
+            </summary>
+            <returns>Configurable pages</returns>
+        </member>
         <member name="P:Waher.WebService.Tesseract.TesseractApi.ExecutablePath">
             <summary>
             Path of executable file.

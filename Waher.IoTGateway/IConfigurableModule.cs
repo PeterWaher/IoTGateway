@@ -11,7 +11,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Gets an array of configurable pages for the module.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Configurable pages</returns>
 		Task<IConfigurablePage[]> GetConfigurablePages();
 	}
 }

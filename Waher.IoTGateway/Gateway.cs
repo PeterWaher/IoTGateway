@@ -4594,7 +4594,7 @@ namespace Waher.IoTGateway
 
 		/// <summary>
 		/// Processes new Service Configuration Files. This method should be called after installation of new
-		/// services (or updating such services) contaiing such service configuration files in the root application 
+		/// services (or updating such services) containg such service configuration files in the root application 
 		/// data folder.
 		/// </summary>
 		/// <returns>Number of configuration files executed.</returns>

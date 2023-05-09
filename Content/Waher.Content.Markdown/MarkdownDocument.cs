@@ -126,7 +126,7 @@ namespace Waher.Content.Markdown
 			this.url = URL;
 			this.transparentExceptionTypes = TransparentExceptionTypes;
 
-			List<Block> Blocks = this.ParseTextToBlocks(this.markdownText);
+			List<Block> Blocks = ParseTextToBlocks(this.markdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
 			Block Block;
 			KeyValuePair<string, bool>[] Prev;
@@ -640,12 +640,12 @@ namespace Waher.Content.Markdown
 					Elements.AddLast(new CommentBlock(this, Comment));
 					continue;
 				}
-				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true, true) || this.IsUnderline(Block.Rows[0], '*', true, true)))
+				else if (Block.End == Block.Start && (IsUnderline(Block.Rows[0], '-', true, true) || IsUnderline(Block.Rows[0], '*', true, true)))
 				{
 					Elements.AddLast(new HorizontalRule(this, Block.Rows[0]));
 					continue;
 				}
-				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '=', true, false)))
+				else if (Block.End == Block.Start && (IsUnderline(Block.Rows[0], '=', true, false)))
 				{
 					int NrColumns = Block.Rows[0].Split(whiteSpace, StringSplitOptions.RemoveEmptyEntries).Length;
 					HasSections = true;
@@ -659,7 +659,7 @@ namespace Waher.Content.Markdown
 						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns, Block.Rows[0]));
 					continue;
 				}
-				else if (Block.End == Block.Start && this.IsUnderline(Block.Rows[0], '~', false, false))
+				else if (Block.End == Block.Start && IsUnderline(Block.Rows[0], '~', false, false))
 				{
 					Elements.AddLast(new InvisibleBreak(this, Block.Rows[0]));
 					continue;
@@ -1094,14 +1094,14 @@ namespace Waher.Content.Markdown
 				{
 					s = Rows[c];
 
-					if (this.IsUnderline(s, '=', false, false))
+					if (IsUnderline(s, '=', false, false))
 					{
 						Header Header = new Header(this, 1, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
 					}
-					else if (this.IsUnderline(s, '-', false, false))
+					else if (IsUnderline(s, '-', false, false))
 					{
 						Header Header = new Header(this, 2, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
 						Elements.AddLast(Header);
@@ -1111,7 +1111,7 @@ namespace Waher.Content.Markdown
 				}
 
 				s = Rows[Block.Start];
-				if (this.IsPrefixedBy(s, '#', out d, true) && d < s.Length)
+				if (IsPrefixedBy(s, '#', out d, true) && d < s.Length)
 				{
 					string Prefix = s.Substring(0, d);
 					Rows[Block.Start] = s.Substring(d).Trim();
@@ -1669,7 +1669,7 @@ namespace Waher.Content.Markdown
 									}
 
 									if (ch == '!')
-										this.ParseWidthHeight(State, out Width, out Height);
+										ParseWidthHeight(State, out Width, out Height);
 									else
 										Width = Height = null;
 
@@ -1720,7 +1720,7 @@ namespace Waher.Content.Markdown
 													Title = string.Empty;
 											}
 
-											this.ParseWidthHeight(State, out Width, out Height);
+											ParseWidthHeight(State, out Width, out Height);
 
 											while (ch2 != 0 && ch2 != ')')
 												ch2 = State.NextCharSameRow();
@@ -1785,7 +1785,7 @@ namespace Waher.Content.Markdown
 										else
 											Title = string.Empty;
 
-										this.ParseWidthHeight(State, out Width, out Height);
+										ParseWidthHeight(State, out Width, out Height);
 
 										Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
 										if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
@@ -2975,7 +2975,7 @@ namespace Waher.Content.Markdown
 
 					case '"':
 						this.AppendAnyText(Elements, Text);
-						if (this.IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
+						if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
 							Elements.AddLast(new HtmlEntity(this, "ldquo"));
 						else
 							Elements.AddLast(new HtmlEntity(this, "rdquo"));
@@ -3022,7 +3022,7 @@ namespace Waher.Content.Markdown
 												break;
 
 											default:
-												if (this.IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
+												if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
 													Elements.AddLast(new HtmlEntity(this, "lsquo"));
 												else
 													Elements.AddLast(new HtmlEntity(this, "rsquo"));
@@ -3033,7 +3033,7 @@ namespace Waher.Content.Markdown
 										break;
 
 									default:
-										if (this.IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
+										if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
 											Elements.AddLast(new HtmlEntity(this, "lsquo"));
 										else
 											Elements.AddLast(new HtmlEntity(this, "rsquo"));
@@ -3059,7 +3059,7 @@ namespace Waher.Content.Markdown
 										break;
 
 									default:
-										if (this.IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
+										if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
 											Elements.AddLast(new HtmlEntity(this, "lsquo"));
 										else
 											Elements.AddLast(new HtmlEntity(this, "rsquo"));
@@ -3070,7 +3070,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							default:
-								if (this.IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
+								if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
 									Elements.AddLast(new HtmlEntity(this, "lsquo"));
 								else
 									Elements.AddLast(new HtmlEntity(this, "rsquo"));
@@ -4227,7 +4227,7 @@ namespace Waher.Content.Markdown
 			return (ch == TerminationCharacter);
 		}
 
-		private bool IsLeftQuote(char PrevChar, char NextChar)
+		private static bool IsLeftQuote(char PrevChar, char NextChar)
 		{
 			bool Left = (PrevChar <= ' ' || PrevChar == 160 || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar));
 			bool Right = (NextChar <= ' ' || NextChar == 160 || char.IsPunctuation(NextChar) || char.IsSeparator(NextChar));
@@ -4249,7 +4249,7 @@ namespace Waher.Content.Markdown
 				return Left;
 		}
 
-		private void ParseWidthHeight(BlockParseState State, out int? Width, out int? Height)
+		private static void ParseWidthHeight(BlockParseState State, out int? Width, out int? Height)
 		{
 			Width = null;
 			Height = null;
@@ -4359,7 +4359,7 @@ namespace Waher.Content.Markdown
 				return true;
 		}
 
-		private bool IsPrefixedBy(string s, char ch, out int Count, bool MustHaveWhiteSpaceAfter)
+		private static bool IsPrefixedBy(string s, char ch, out int Count, bool MustHaveWhiteSpaceAfter)
 		{
 			int c = s.Length;
 
@@ -4381,7 +4381,7 @@ namespace Waher.Content.Markdown
 				return true;
 		}
 
-		private bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
+		private static bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
 		{
 			int i, c = s.Length;
 			bool LastSpace = true;
@@ -4410,7 +4410,7 @@ namespace Waher.Content.Markdown
 			return Count >= 3;
 		}
 
-		private List<Block> ParseTextToBlocks(string MarkdownText)
+		private static List<Block> ParseTextToBlocks(string MarkdownText)
 		{
 			List<Block> Blocks = new List<Block>();
 			List<string> Rows = new List<string>();

@@ -237,6 +237,144 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Child">Child element.</param>
+		/// <param name="Suffix">Block suffix</param>
+		protected static Task SuffixedBlock(StringBuilder Output, MarkdownElement Child, string Suffix)
+		{
+			return SuffixedBlock(Output, Child, Suffix, Suffix);
+		}
+
+		/// <summary>
+		/// Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Children">Child elements.</param>
+		/// <param name="Suffix">Block suffix</param>
+		protected static Task SuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, string Suffix)
+		{
+			return SuffixedBlock(Output, Children, Suffix, Suffix);
+		}
+
+		/// <summary>
+		/// Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Child">Child element.</param>
+		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
+		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+		protected static Task SuffixedBlock(StringBuilder Output, MarkdownElement Child, string SuffixFirstRow, string SuffixNextRows)
+		{
+			return SuffixedBlock(Output, new MarkdownElement[] { Child }, SuffixFirstRow, SuffixNextRows);
+		}
+
+		/// <summary>
+		/// Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Children">Child elements.</param>
+		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
+		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+		protected static async Task SuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
+			string SuffixFirstRow, string SuffixNextRows)
+		{
+			StringBuilder Temp = new StringBuilder();
+
+			foreach (MarkdownElement E in Children)
+				await E.GenerateMarkdown(Temp);
+
+			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
+			string[] Rows = s.Split('\n');
+			int i, c = Rows.Length;
+
+			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
+				c--;
+
+			for (i = 0; i < c; i++)
+			{
+				Output.Append(Rows[i]);
+				Output.AppendLine(SuffixFirstRow);
+				SuffixFirstRow = SuffixNextRows;
+			}
+		}
+
+		/// <summary>
+		/// Prefixes and Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Child">Child element.</param>
+		/// <param name="Prefix">Block prefix</param>
+		/// <param name="Suffix">Block suffix</param>
+		protected static Task PrefixSuffixedBlock(StringBuilder Output, MarkdownElement Child, string Prefix, string Suffix)
+		{
+			return PrefixSuffixedBlock(Output, Child, Prefix, Prefix, Suffix, Suffix);
+		}
+
+		/// <summary>
+		/// Prefixes and Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Children">Child elements.</param>
+		/// <param name="Prefix">Block prefix</param>
+		/// <param name="Suffix">Block suffix</param>
+		protected static Task PrefixSuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, 
+			string Prefix, string Suffix)
+		{
+			return PrefixSuffixedBlock(Output, Children, Prefix, Prefix, Suffix, Suffix);
+		}
+
+		/// <summary>
+		/// Prefixes and Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Child">Child element.</param>
+		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
+		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
+		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
+		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+		protected static Task PrefixSuffixedBlock(StringBuilder Output, MarkdownElement Child,
+			string PrefixFirstRow, string PrefixNextRows, string SuffixFirstRow, string SuffixNextRows)
+		{
+			return PrefixSuffixedBlock(Output, new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows, SuffixFirstRow, SuffixNextRows);
+		}
+
+		/// <summary>
+		/// Prefixes and Suffixes a block of markdown.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Children">Child elements.</param>
+		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
+		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
+		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
+		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+		protected static async Task PrefixSuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
+			string PrefixFirstRow, string PrefixNextRows, string SuffixFirstRow, string SuffixNextRows)
+		{
+			StringBuilder Temp = new StringBuilder();
+
+			foreach (MarkdownElement E in Children)
+				await E.GenerateMarkdown(Temp);
+
+			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
+			string[] Rows = s.Split('\n');
+			int i, c = Rows.Length;
+
+			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
+				c--;
+
+			for (i = 0; i < c; i++)
+			{
+				Output.Append(PrefixFirstRow);
+				Output.Append(Rows[i]);
+				Output.AppendLine(SuffixFirstRow);
+				PrefixFirstRow = PrefixNextRows;
+				SuffixFirstRow = SuffixNextRows;
+			}
+		}
+
+		/// <summary>
 		/// Checks if two typed arrays are equal
 		/// </summary>
 		/// <param name="Items1">First array</param>

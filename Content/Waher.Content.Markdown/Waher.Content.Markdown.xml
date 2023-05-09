@@ -1897,6 +1897,26 @@
             Number of nested blocks.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrCenterAlignedBlocks">
+            <summary>
+            Number of center-aligned blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrLeftAlignedBlocks">
+            <summary>
+            Number of left-aligned blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrRightAlignedBlocks">
+            <summary>
+            Number of right-aligned blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMarginAlignedBlocks">
+            <summary>
+            Number of margin-aligned blocks.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Atoms.Atom">
             <summary>
             Represents an atom of editable text (i.e. typed character).
@@ -2254,6 +2274,82 @@
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.BlockElements.CenterAligned">
+            <summary>
+            Represents a center-aligned set of blocks in a markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Represents a center-aligned set of blocks in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Children">Child elements.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GenerateHTML(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GeneratePlainText(System.Text.StringBuilder)">
+            <summary>
+            Generates plain text for the markdown element.
+            </summary>
+            <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CenterAligned.InlineSpanElement">
+            <summary>
+            If the element is an inline span element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.Create(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Creates an object of the same type, and meta-data, as the current object,
+            but with content defined by <paramref name="Children"/>.
+            </summary>
+            <param name="Children">New content.</param>
+            <param name="Document">Document that will contain the element.</param>
+            <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CenterAligned.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
             <summary>
             Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
             </summary>
@@ -3383,6 +3479,158 @@
             </summary>
             <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
+        <member name="T:Waher.Content.Markdown.Model.BlockElements.LeftAligned">
+            <summary>
+            Represents a left-aligned set of blocks in a markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Represents a left-aligned set of blocks in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Children">Child elements.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GenerateHTML(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GeneratePlainText(System.Text.StringBuilder)">
+            <summary>
+            Generates plain text for the markdown element.
+            </summary>
+            <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.LeftAligned.InlineSpanElement">
+            <summary>
+            If the element is an inline span element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.Create(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Creates an object of the same type, and meta-data, as the current object,
+            but with content defined by <paramref name="Children"/>.
+            </summary>
+            <param name="Children">New content.</param>
+            <param name="Document">Document that will contain the element.</param>
+            <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.LeftAligned.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.BlockElements.MarginAligned">
+            <summary>
+            Represents a margin-aligned set of blocks in a markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Represents a margin-aligned set of blocks in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Children">Child elements.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GenerateHTML(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GeneratePlainText(System.Text.StringBuilder)">
+            <summary>
+            Generates plain text for the markdown element.
+            </summary>
+            <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.MarginAligned.InlineSpanElement">
+            <summary>
+            If the element is an inline span element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.Create(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Creates an object of the same type, and meta-data, as the current object,
+            but with content defined by <paramref name="Children"/>.
+            </summary>
+            <param name="Children">New content.</param>
+            <param name="Document">Document that will contain the element.</param>
+            <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.MarginAligned.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.NestedBlock">
             <summary>
             Represents a nested block with no special formatting rules in a markdown document.
@@ -3755,6 +4003,82 @@
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.BlockElements.RightAligned">
+            <summary>
+            Represents a right-aligned set of blocks in a markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Represents a right-aligned set of blocks in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Children">Child elements.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GenerateHTML(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GeneratePlainText(System.Text.StringBuilder)">
+            <summary>
+            Generates plain text for the markdown element.
+            </summary>
+            <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.RightAligned.InlineSpanElement">
+            <summary>
+            If the element is an inline span element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.Create(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Creates an object of the same type, and meta-data, as the current object,
+            but with content defined by <paramref name="Children"/>.
+            </summary>
+            <param name="Children">New content.</param>
+            <param name="Document">Document that will contain the element.</param>
+            <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.RightAligned.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
             <summary>
             Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
             </summary>
@@ -5040,6 +5364,80 @@
             <param name="Children">Child elements.</param>
             <param name="PrefixFirstRow">Prefix, for first row.</param>
             <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.SuffixedBlock(System.Text.StringBuilder,Waher.Content.Markdown.Model.MarkdownElement,System.String)">
+            <summary>
+            Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Child">Child element.</param>
+            <param name="Suffix">Block suffix</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.SuffixedBlock(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.String)">
+            <summary>
+            Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Children">Child elements.</param>
+            <param name="Suffix">Block suffix</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.SuffixedBlock(System.Text.StringBuilder,Waher.Content.Markdown.Model.MarkdownElement,System.String,System.String)">
+            <summary>
+            Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Child">Child element.</param>
+            <param name="SuffixFirstRow">Suffix, for first row.</param>
+            <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.SuffixedBlock(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.String,System.String)">
+            <summary>
+            Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Children">Child elements.</param>
+            <param name="SuffixFirstRow">Suffix, for first row.</param>
+            <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.PrefixSuffixedBlock(System.Text.StringBuilder,Waher.Content.Markdown.Model.MarkdownElement,System.String,System.String)">
+            <summary>
+            Prefixes and Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Child">Child element.</param>
+            <param name="Prefix">Block prefix</param>
+            <param name="Suffix">Block suffix</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.PrefixSuffixedBlock(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.String,System.String)">
+            <summary>
+            Prefixes and Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Children">Child elements.</param>
+            <param name="Prefix">Block prefix</param>
+            <param name="Suffix">Block suffix</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.PrefixSuffixedBlock(System.Text.StringBuilder,Waher.Content.Markdown.Model.MarkdownElement,System.String,System.String,System.String,System.String)">
+            <summary>
+            Prefixes and Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Child">Child element.</param>
+            <param name="PrefixFirstRow">Prefix, for first row.</param>
+            <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
+            <param name="SuffixFirstRow">Suffix, for first row.</param>
+            <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.PrefixSuffixedBlock(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.String,System.String,System.String,System.String)">
+            <summary>
+            Prefixes and Suffixes a block of markdown.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Children">Child elements.</param>
+            <param name="PrefixFirstRow">Prefix, for first row.</param>
+            <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
+            <param name="SuffixFirstRow">Suffix, for first row.</param>
+            <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.MarkdownElement.AreEqual(System.Array,System.Array)">
             <summary>

@@ -331,5 +331,25 @@ namespace Waher.Content.Markdown
 		/// Number of nested blocks.
 		/// </summary>
 		public int NrNestedBlocks { get; set; }
+
+		/// <summary>
+		/// Number of center-aligned blocks.
+		/// </summary>
+		public int NrCenterAlignedBlocks { get; set; }
+
+		/// <summary>
+		/// Number of left-aligned blocks.
+		/// </summary>
+		public int NrLeftAlignedBlocks { get; set; }
+
+		/// <summary>
+		/// Number of right-aligned blocks.
+		/// </summary>
+		public int NrRightAlignedBlocks { get; set; }
+
+		/// <summary>
+		/// Number of margin-aligned blocks.
+		/// </summary>
+		public int NrMarginAlignedBlocks { get; set; }
 	}
 }

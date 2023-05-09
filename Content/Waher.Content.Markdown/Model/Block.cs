@@ -126,6 +126,70 @@ namespace Waher.Content.Markdown.Model
 			return Result;
 		}
 
+		public bool IsSuffixedBy(string Suffix)
+		{
+			return MarkdownDocument.IsSuffixedBy(this.rows[this.start], Suffix);
+		}
+
+		public List<Block> RemoveSuffix(string Suffix)
+		{
+			List<Block> Result = new List<Block>();
+			List<string> Rows = new List<string>();
+			List<int> Positions = new List<int>();
+			string s;
+			int i, c;
+			int d = Suffix.Length;
+			int Pos;
+			bool FirstRow = true;
+
+			for (i = this.start; i <= this.end; i++)
+			{
+				s = this.rows[i];
+				Pos = this.positions[i];
+
+				c = s.Length;
+
+				if (s.EndsWith(Suffix))
+				{
+					c -= d;
+					s = s.Substring(0, c);
+				}
+
+				if (string.IsNullOrEmpty(s))
+				{
+					if (!FirstRow)
+					{
+						Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), this.Indent));
+						Rows.Clear();
+						Positions.Clear();
+						FirstRow = true;
+					}
+				}
+				else
+				{
+					FirstRow = false;
+					Rows.Add(s);
+					Positions.Add(Pos);
+				}
+			}
+
+			if (!FirstRow)
+				Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), this.Indent));
+
+			return Result;
+		}
+
+		public List<Block> RemovePrefixAndSuffix(string Prefix, int NrCharacters, string Suffix)
+		{
+			List<Block> Temp = this.RemovePrefix(Prefix, NrCharacters);
+			List<Block> Result = new List<Block>();
+
+			foreach (Block Block in Temp)
+				Result.AddRange(Block.RemoveSuffix(Suffix));
+
+			return Result;
+		}
+
 		private static readonly Regex caption = new Regex(@"^\s*([\[](?'Caption'[^\]]*)[\]])?([\[](?'Id'[^\]]*)[\]])\s*$", RegexOptions.Compiled);
 
 		public bool IsTable(out TableInformation TableInformation)
@@ -169,7 +233,7 @@ namespace Waher.Content.Markdown.Model
 							s = s.Substring(1, s.Length - 2);
 						else
 							s = s.Substring(1);
-					
+
 						Pos++;
 					}
 					else if (s.EndsWith("|"))

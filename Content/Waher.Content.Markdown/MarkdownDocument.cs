@@ -599,12 +599,56 @@ namespace Waher.Content.Markdown
 
 				if (Block.IsPrefixedBy(">", false))
 				{
-					Content = this.ParseBlocks(Block.RemovePrefix(">", 2));
+					if (Block.IsSuffixedBy("<<") && Block.IsPrefixedBy(">>", false))
+					{
+						Content = this.ParseBlocks(Block.RemovePrefixAndSuffix(">>", 2, "<<"));
 
-					if (!(Elements.Last is null) && Elements.Last.Value is BlockQuote BlockQuote)
-						BlockQuote.AddChildren(Content);
+						if (!(Elements.Last is null) && Elements.Last.Value is CenterAligned CenterAligned)
+							CenterAligned.AddChildren(Content);
+						else
+							Elements.AddLast(new CenterAligned(this, Content));
+					}
 					else
-						Elements.AddLast(new BlockQuote(this, Content));
+					{
+						Content = this.ParseBlocks(Block.RemovePrefix(">", 2));
+
+						if (!(Elements.Last is null) && Elements.Last.Value is BlockQuote BlockQuote)
+							BlockQuote.AddChildren(Content);
+						else
+							Elements.AddLast(new BlockQuote(this, Content));
+					}
+
+					continue;
+				}
+				else if (Block.IsPrefixedBy("<<", false))
+				{
+					if (Block.IsSuffixedBy(">>"))
+					{
+						Content = this.ParseBlocks(Block.RemovePrefixAndSuffix("<<", 2, ">>"));
+
+						if (!(Elements.Last is null) && Elements.Last.Value is MarginAligned MarginAligned)
+							MarginAligned.AddChildren(Content);
+						else
+							Elements.AddLast(new MarginAligned(this, Content));
+					}
+					else
+					{
+						Content = this.ParseBlocks(Block.RemovePrefix("<<", 2));
+
+						if (!(Elements.Last is null) && Elements.Last.Value is LeftAligned LeftAligned)
+							LeftAligned.AddChildren(Content);
+						else
+							Elements.AddLast(new LeftAligned(this, Content));
+					}
+				}
+				else if (Block.IsSuffixedBy(">>"))
+				{
+					Content = this.ParseBlocks(Block.RemoveSuffix(">>"));
+
+					if (!(Elements.Last is null) && Elements.Last.Value is RightAligned RightAligned)
+						RightAligned.AddChildren(Content);
+					else
+						Elements.AddLast(new RightAligned(this, Content));
 
 					continue;
 				}
@@ -4381,6 +4425,25 @@ namespace Waher.Content.Markdown
 				return true;
 		}
 
+		internal static bool IsSuffixedBy(string s, string Suffix)
+		{
+			return s.EndsWith(Suffix);
+		}
+
+		private static bool IsSuffixedBy(string s, char ch, out int Count)
+		{
+			int c = s.Length;
+
+			Count = 0;
+			while (Count < c && s[c - Count - 1] == ch)
+				Count++;
+
+			if (Count == 0)
+				return false;
+
+			return true;
+		}
+
 		private static bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
 		{
 			int i, c = s.Length;
@@ -6995,6 +7058,7 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("\\usepackage{graphicx}");
 				Output.AppendLine("\\usepackage{pifont}");
 				Output.AppendLine("\\usepackage{multirow}");
+				Output.AppendLine("\\usepackage{ragged2e}");
 				Output.AppendLine("\\newlist{tasklist}{itemize}{2}");
 				Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
 				Output.AppendLine("\\newcommand{\\checkmarksymbol}{\\ding{51}}");

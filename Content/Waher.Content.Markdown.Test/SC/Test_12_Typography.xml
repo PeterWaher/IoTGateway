@@ -29,6 +29,7 @@
 	<text> quote HTML entities</text>
 </paragraph>
 <paragraph>
+	<text>Rings: </text>
 	<text>©</text>
 	<text> </text>
 	<text>©</text>
@@ -46,6 +47,7 @@
 	<text>Ⓢ</text>
 </paragraph>
 <paragraph>
+	<text>Special: </text>
 	<text>«</text>
 	<text> </text>
 	<text>⋘</text>
@@ -77,8 +79,7 @@
 	<text>∓</text>
 	<text> </text>
 	<text>±</text>
-</paragraph>
-<paragraph>
+	<text> </text>
 	<text>⟦</text>
 	<text> </text>
 	<text>⟧</text>
@@ -86,7 +87,9 @@
 	<text>‰</text>
 	<text> </text>
 	<text>‱</text>
-	<text> </text>
+</paragraph>
+<paragraph>
+	<text>Power: </text>
 	<text>°</text>
 	<text> </text>
 	<text>¹</text>

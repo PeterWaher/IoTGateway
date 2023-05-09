@@ -1,0 +1,63 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is paragraph 1]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
+			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is paragraph 2]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the third paragraph.]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
+			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[In this fourth paragraph<br/>
+a line break is inserted.]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is an H1]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
+			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is an H2]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a second H1]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
+			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a second H2]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a third H1]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
+			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a third H2]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
+			<Label LineBreakMode="WordWrap" FontSize="22" TextColor="Navy" TextType="Html"><![CDATA[This is a third H3]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" FontSize="20" TextColor="Navy" TextType="Html"><![CDATA[This is a third H4]]></Label>
+		</ContentView>
+	</StackLayout>
+</StackLayout>

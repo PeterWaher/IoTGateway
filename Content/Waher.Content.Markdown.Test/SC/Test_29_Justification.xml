@@ -1,0 +1,66 @@
+﻿<paragraph>
+	<text>This is paragraph 1</text>
+</paragraph>
+<paragraph>
+	<text>This is paragraph 2</text>
+</paragraph>
+<paragraph>
+	<text>This is the third paragraph.</text>
+</paragraph>
+<paragraph>
+	<text>In this fourth paragraph</text>
+	<text>a line break is inserted.</text>
+</paragraph>
+<section>
+	<header>
+		<text>This is an H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is an H2</text>
+			</header>
+			<body />
+		</section>
+	</body>
+</section>
+<section>
+	<header>
+		<text>This is a second H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is a second H2</text>
+			</header>
+			<body />
+		</section>
+	</body>
+</section>
+<section>
+	<header>
+		<text>This is a third H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is a third H2</text>
+			</header>
+			<body>
+				<section>
+					<header>
+						<text>This is a third H3</text>
+					</header>
+					<body>
+						<section>
+							<header>
+								<text>This is a third H4</text>
+							</header>
+							<body />
+						</section>
+					</body>
+				</section>
+			</body>
+		</section>
+	</body>
+</section>

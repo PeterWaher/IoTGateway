@@ -1,0 +1,38 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is paragraph 1</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Right">This is paragraph 2</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is the third paragraph.</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Center">In this fourth paragraph<LineBreak />a line break is inserted.</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is an H1</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Right" FontSize="24" Foreground="Navy">This is an H2</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is a second H1</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Center" FontSize="24" Foreground="Navy">This is a second H2</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is a third H1</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Right" FontSize="24" Foreground="Navy">This is a third H2</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Center" FontSize="22" Foreground="Navy">This is a third H3</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="20" Foreground="Navy">This is a third H4</TextBlock>
+	</StackPanel>
+</StackPanel>

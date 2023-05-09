@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Xml;
 using Waher.Script;
 using System.Threading.Tasks;
@@ -16,7 +14,6 @@ namespace Waher.Content.Markdown.Test
 			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
 			string ExpectedText = await Resources.ReadAllTextAsync("SC/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
-			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
 			MarkdownSettings Settings = new MarkdownSettings(null, true, new Variables());
 
@@ -197,6 +194,12 @@ namespace Waher.Content.Markdown.Test
 		public async Task Test_28_Nesting()
 		{
 			await this.DoTest("Test_28_Nesting.md", "Test_28_Nesting.xml");
+		}
+
+		[TestMethod]
+		public async Task Test_29_Justification()
+		{
+			await this.DoTest("Test_29_Justification.md", "Test_29_Justification.xml");
 		}
 	}
 }

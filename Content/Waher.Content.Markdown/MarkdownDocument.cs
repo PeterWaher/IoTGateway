@@ -640,6 +640,8 @@ namespace Waher.Content.Markdown
 						else
 							Elements.AddLast(new LeftAligned(this, Content));
 					}
+
+					continue;
 				}
 				else if (Block.IsSuffixedBy(">>"))
 				{
@@ -2873,7 +2875,7 @@ namespace Waher.Content.Markdown
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
 
-								ch3 = State.NextCharSameRow();
+								ch3 = State.PeekNextCharSameRow();
 								if (ch3 == '>')
 								{
 									State.NextCharSameRow();

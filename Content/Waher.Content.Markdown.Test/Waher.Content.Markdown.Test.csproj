@@ -88,6 +88,7 @@
     <None Remove="Markdown\Generated\Test_26_Comments.md" />
     <None Remove="Markdown\Generated\Test_27_Contract.md" />
     <None Remove="Markdown\Generated\Test_28_Nesting.md" />
+    <None Remove="Markdown\Generated\Test_29_Justification.md" />
     <None Remove="Markdown\Syntax\Test_25_HashTags.md" />
     <None Remove="Markdown\Syntax\Test_26_Comments.md" />
     <None Remove="Markdown\Syntax\Test_27_Contract.md" />
@@ -453,6 +454,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Generated\Test_27_Contract.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Markdown\Generated\Test_29_Justification.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Syntax\Test_29_Justification.md">

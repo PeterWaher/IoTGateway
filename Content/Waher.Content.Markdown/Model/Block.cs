@@ -128,7 +128,7 @@ namespace Waher.Content.Markdown.Model
 
 		public bool IsSuffixedBy(string Suffix)
 		{
-			return MarkdownDocument.IsSuffixedBy(this.rows[this.start], Suffix);
+			return MarkdownDocument.IsSuffixedBy(this.rows[this.end], Suffix);
 		}
 
 		public List<Block> RemoveSuffix(string Suffix)

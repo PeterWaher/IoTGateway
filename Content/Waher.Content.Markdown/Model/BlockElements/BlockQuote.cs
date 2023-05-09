@@ -168,7 +168,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
 		public override void IncrementStatistics(MarkdownStatistics Statistics)
 		{
-			Statistics.NrDelete++;
+			Statistics.NrBlockQuotes++;
 		}
 	}
 }

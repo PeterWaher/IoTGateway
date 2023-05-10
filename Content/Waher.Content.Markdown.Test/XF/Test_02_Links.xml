@@ -1,6 +1,6 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="This is " />
@@ -15,7 +15,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="This link" TextColor="{Binding HyperlinkColor}">
@@ -29,7 +29,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="See my " />
@@ -44,7 +44,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="This is " />
@@ -59,7 +59,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="This is " />
@@ -74,7 +74,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="This is " />
@@ -89,7 +89,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="Visit " />
@@ -104,7 +104,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="I get 10 times more traffic from " />
@@ -131,7 +131,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="I get 10 times more traffic from " />
@@ -158,7 +158,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="I get 10 times more traffic from " />
@@ -185,7 +185,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="You can also write links, such as " />
@@ -200,10 +200,10 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Or on separate paragraphs:]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Or on separate paragraphs:]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
 			<Label.FormattedText>
 				<FormattedString>
 					<Span Text="http://lils.is/" TextColor="{Binding HyperlinkColor}">
@@ -216,7 +216,7 @@
 		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Recognized multi-media content put on separate rows are automatically handled as multi-media:]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Recognized multi-media content put on separate rows are automatically handled as multi-media:]]></Label>
 	</ContentView>
 	<WebView Source="https://www.youtube.com/embed/whBPLc8m4SU" />
 </StackLayout>

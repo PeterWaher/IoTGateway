@@ -3082,6 +3082,13 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.XamarinFormsLabelAlignment(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState)">
+            <summary>
+            Writes a text-alignment attribute to a Xamarin.Forms label element.
+            </summary>
+            <param name="Output">XML output</param>
+            <param name="State">Current rendering state.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState)">
             <summary>
             Generates Human-Readable XML for Smart Contracts from the markdown text.

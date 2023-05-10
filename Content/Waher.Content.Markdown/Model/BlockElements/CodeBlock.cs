@@ -505,6 +505,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				Output.WriteStartElement("Label");
 				Output.WriteAttributeString("LineBreakMode", "NoWrap");
+				Header.XamarinFormsLabelAlignment(Output, State);
 				Output.WriteAttributeString("FontFamily", "Courier New");
 				Output.WriteAttributeString("Text", Row);
 				Output.WriteEndElement();

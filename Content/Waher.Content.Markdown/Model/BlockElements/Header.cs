@@ -191,6 +191,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.WriteStartElement("Label");
 			Output.WriteAttributeString("LineBreakMode", "WordWrap");
+			XamarinFormsLabelAlignment(Output, State);
 
 			if (this.level > 0 && this.level <= Settings.HeaderFontSize.Length)
 			{
@@ -209,6 +210,29 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.WriteEndElement();
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Writes a text-alignment attribute to a Xamarin.Forms label element.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		/// <param name="State">Current rendering state.</param>
+		public static void XamarinFormsLabelAlignment(XmlWriter Output, XamarinRenderingState State)
+		{
+			switch (State.TextAlignment)
+			{
+				case TextAlignment.Left:
+					Output.WriteAttributeString("HorizontalTextAlignment", "Start");
+					break;
+
+				case TextAlignment.Right:
+					Output.WriteAttributeString("HorizontalTextAlignment", "End");
+					break;
+
+				case TextAlignment.Center:
+					Output.WriteAttributeString("HorizontalTextAlignment", "Center");
+					break;
+			}
 		}
 
 		/// <summary>

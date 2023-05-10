@@ -118,6 +118,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.WriteStartElement("Label");
 			Output.WriteAttributeString("LineBreakMode", "WordWrap");
+			Header.XamarinFormsLabelAlignment(Output, State);
 
 			if (HasLink)
 			{
@@ -181,6 +182,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				Output.WriteStartElement("Label");
 				Output.WriteAttributeString("LineBreakMode", "WordWrap");
+				Header.XamarinFormsLabelAlignment(Output, State);
 				Output.WriteStartElement("Label.FormattedText");
 				Output.WriteStartElement("FormattedString");
 			}

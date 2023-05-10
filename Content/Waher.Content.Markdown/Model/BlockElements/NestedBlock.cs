@@ -121,6 +121,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						{
 							Output.WriteStartElement("Label");
 							Output.WriteAttributeString("LineBreakMode", "WordWrap");
+							Header.XamarinFormsLabelAlignment(Output, State);
 							Output.WriteAttributeString("TextType", "Html");
 							Output.WriteCData(Html.ToString());
 							Output.WriteEndElement();
@@ -136,6 +137,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				{
 					Output.WriteStartElement("Label");
 					Output.WriteAttributeString("LineBreakMode", "WordWrap");
+					Header.XamarinFormsLabelAlignment(Output, State);
 					Output.WriteAttributeString("TextType", "Html");
 					Output.WriteCData(Html.ToString());
 					Output.WriteEndElement();

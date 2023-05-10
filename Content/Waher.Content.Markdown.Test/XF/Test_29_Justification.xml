@@ -1,63 +1,95 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is paragraph 1]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This is paragraph 1]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
-			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is paragraph 2]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="End" TextType="Html"><![CDATA[This is paragraph 2]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the third paragraph.]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This is the third paragraph.]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
-			<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[In this fourth paragraph<br/>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Center" TextType="Html"><![CDATA[In this fourth paragraph<br/>
 a line break is inserted.]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is an H1]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is an H1]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
-			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is an H2]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="End" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is an H2]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a second H1]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a second H1]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
-			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a second H2]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Center" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a second H2]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a third H1]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[This is a third H1]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
-			<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a third H2]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="End" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a third H2]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
-			<Label LineBreakMode="WordWrap" FontSize="22" TextColor="Navy" TextType="Html"><![CDATA[This is a third H3]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Center" FontSize="22" TextColor="Navy" TextType="Html"><![CDATA[This is a third H3]]></Label>
 		</ContentView>
 	</StackLayout>
 	<StackLayout Orientation="Vertical">
 		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-			<Label LineBreakMode="WordWrap" FontSize="20" TextColor="Navy" TextType="Html"><![CDATA[This is a third H4]]></Label>
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="20" TextColor="Navy" TextType="Html"><![CDATA[This is a third H4]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="18" TextColor="Navy" TextType="Html"><![CDATA[Left-aligned Example]]></Label>
+		</ContentView>
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This text is left-aligned. Left-alignment is done by placing <code>&lt;&lt;</code> in the beginning of each block, or each row in each block, as appropriate.]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="End" FontSize="18" TextColor="Navy" TextType="Html"><![CDATA[Right-aligned Example]]></Label>
+		</ContentView>
+		<ContentView Padding="0,5,0,5" HorizontalOptions="End">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="End" TextType="Html"><![CDATA[This text is right-aligned. Right-alignment is done by placing <code>&gt;&gt;</code> at the end of each block, or each row in each block, as appropriate.]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Center" FontSize="18" TextColor="Navy" TextType="Html"><![CDATA[Center-aligned Example]]></Label>
+		</ContentView>
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Center">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Center" TextType="Html"><![CDATA[This text is center-aligned. Center-alignment is done by placing <code>&gt;&gt;</code> in the beginning of each block, or each row in each block, and <code>&lt;&lt;</code> at the end of each block, or at the end of each row in each block, as appropriate.]]></Label>
+		</ContentView>
+	</StackLayout>
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" FontSize="18" TextColor="Navy" TextType="Html"><![CDATA[Margin-aligned Example]]></Label>
+		</ContentView>
+		<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+			<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This text is margin-aligned. Margin-alignment is done by placing <code>&lt;&lt;</code> in the beginning of each block, or each row in each block, and <code>&gt;&gt;</code> at the end of each block, or at the end of each row in each block, as appropriate.]]></Label>
 		</ContentView>
 	</StackLayout>
 </StackLayout>

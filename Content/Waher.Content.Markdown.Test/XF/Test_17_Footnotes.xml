@@ -1,12 +1,12 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here is some text containing a footnote<sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>. You can then continue your thought…]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Here is some text containing a footnote<sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>. You can then continue your thought…]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Even go to a new paragraph and the footnotes with go to the bottom of the document<sup id="fnref-2"><a href="#fn-2" class="footnote-ref">2</a></sup>.]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Even go to a new paragraph and the footnotes with go to the bottom of the document<sup id="fnref-2"><a href="#fn-2" class="footnote-ref">2</a></sup>.]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is an example of an inline footnote.<sup id="fnref-3"><a href="#fn-3" class="footnote-ref">3</a></sup>]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This is an example of an inline footnote.<sup id="fnref-3"><a href="#fn-3" class="footnote-ref">3</a></sup>]]></Label>
 	</ContentView>
 	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
 	<Grid RowSpacing="0" ColumnSpacing="0">
@@ -24,7 +24,7 @@
 		</ContentView>
 		<ContentView Grid.Column="1" Grid.Row="0">
 			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here is the text of the footnote itself.]]></Label>
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Here is the text of the footnote itself.]]></Label>
 			</ContentView>
 		</ContentView>
 		<ContentView Margin="0,5,2,5" Grid.Column="0" Grid.Row="1" Scale="0.75" TranslationY="-5">
@@ -32,10 +32,10 @@
 		</ContentView>
 		<ContentView Grid.Column="1" Grid.Row="1">
 			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Depending on the final form of your document, of course. See the documentation and experiment.]]></Label>
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Depending on the final form of your document, of course. See the documentation and experiment.]]></Label>
 			</ContentView>
 			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This footnote has a second paragraph.]]></Label>
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This footnote has a second paragraph.]]></Label>
 			</ContentView>
 		</ContentView>
 		<ContentView Margin="0,5,2,5" Grid.Column="0" Grid.Row="2" Scale="0.75" TranslationY="-5">
@@ -43,7 +43,7 @@
 		</ContentView>
 		<ContentView Grid.Column="1" Grid.Row="2">
 			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the <em>actual</em> footnote.]]></Label>
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This is the <em>actual</em> footnote.]]></Label>
 			</ContentView>
 		</ContentView>
 	</Grid>

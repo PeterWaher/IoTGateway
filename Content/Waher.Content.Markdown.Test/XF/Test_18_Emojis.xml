@@ -136,1272 +136,1272 @@
 			</Grid.RowDefinitions>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="0">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Smiley]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html" FontAttributes="Bold"><![CDATA[Smiley]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="0">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Emoji]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html" FontAttributes="Bold"><![CDATA[Emoji]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="1">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":heavy black heart:" title="heart" width="24" height="24" src="/emoji1/2764.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":heavy black heart:" title="heart" width="24" height="24" src="/emoji1/2764.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="1">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":heavy black heart:" title="heart" width="24" height="24" src="/emoji1/2764.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":heavy black heart:" title="heart" width="24" height="24" src="/emoji1/2764.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="2">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":broken heart:" title="broken_heart" width="24" height="24" src="/emoji1/1f494.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":broken heart:" title="broken_heart" width="24" height="24" src="/emoji1/1f494.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="2">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":broken heart:" title="broken_heart" width="24" height="24" src="/emoji1/1f494.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":broken heart:" title="broken_heart" width="24" height="24" src="/emoji1/1f494.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="3">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="3">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="4">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="4">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with tears of joy:" title="joy" width="24" height="24" src="/emoji1/1f602.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="5">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="5">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="6">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="6">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="7">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="7">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth:" title="smiley" width="24" height="24" src="/emoji1/1f603.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="8">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="8">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="9">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="9">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="10">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="10">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="11">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="11">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="12">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="12">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and smiling eyes:" title="smile" width="24" height="24" src="/emoji1/1f604.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="13">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="13">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="14">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="14">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="15">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="15">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="16">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="16">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="17">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="17">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="18">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="18">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and cold sweat:" title="sweat_smile" width="24" height="24" src="/emoji1/1f605.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="19">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="19">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="20">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="20">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="21">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="21">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="22">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="22">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with open mouth and tightly-closed eyes:" title="laughing" width="24" height="24" src="/emoji1/1f606.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="23">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="23">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="24">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="24">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="25">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="25">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="26">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="26">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="27">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="27">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="28">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="28">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="29">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="29">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="30">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="30">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":winking face:" title="wink" width="24" height="24" src="/emoji1/1f609.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="31">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="31">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="32">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="32">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="33">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="33">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with cold sweat:" title="sweat" width="24" height="24" src="/emoji1/1f613.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="34">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="34">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="35">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="35">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="36">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="36">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="37">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="37">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face throwing a kiss:" title="kissing_heart" width="24" height="24" src="/emoji1/1f618.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="38">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="38">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="39">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="39">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="40">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="40">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue and winking eye:" title="stuck_out_tongue_winking_eye" width="24" height="24" src="/emoji1/1f61c.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="41">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="41">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="42">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="42">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="43">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="43">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="44">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="44">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="45">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="45">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="46">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="46">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":disappointed face:" title="disappointed" width="24" height="24" src="/emoji1/1f61e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="47">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="47">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="48">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="48">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="49">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="49">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":angry face:" title="angry" width="24" height="24" src="/emoji1/1f620.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="50">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="50">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="51">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="51">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="52">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="52">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="53">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="53">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":crying face:" title="cry" width="24" height="24" src="/emoji1/1f622.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="54">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":persevering face:" title="persevere" width="24" height="24" src="/emoji1/1f623.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":persevering face:" title="persevere" width="24" height="24" src="/emoji1/1f623.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="54">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":persevering face:" title="persevere" width="24" height="24" src="/emoji1/1f623.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":persevering face:" title="persevere" width="24" height="24" src="/emoji1/1f623.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="55">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="55">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="56">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="56">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":flushed face:" title="flushed" width="24" height="24" src="/emoji1/1f633.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="57">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="57">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="58">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="58">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="59">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="59">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="60">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="60">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="61">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="61">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="62">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="62">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":dizzy face:" title="dizzy_face" width="24" height="24" src="/emoji1/1f635.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="63">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="63">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="64">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="64">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="65">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="65">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="66">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="66">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with ok gesture:" title="ok_woman" width="24" height="24" src="/emoji1/1f646.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="67">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="67">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="68">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="68">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="69">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="69">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="70">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="70">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="71">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="71">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="72">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="72">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="73">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="73">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="74">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="74">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="75">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="75">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="76">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="76">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="77">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="77">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="78">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="78">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="79">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="79">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with halo:" title="innocent" width="24" height="24" src="/emoji1/1f607.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="80">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="80">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="81">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="81">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="82">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="82">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="83">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="83">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="84">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="84">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="85">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="85">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":smiling face with sunglasses:" title="sunglasses" width="24" height="24" src="/emoji1/1f60e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="86">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="86">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="87">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="87">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="88">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="88">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":expressionless face:" title="expressionless" width="24" height="24" src="/emoji1/1f611.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="89">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="89">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="90">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="90">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="91">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="91">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="92">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="92">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="93">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="93">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="94">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="94">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="95">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="95">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="96">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="96">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="97">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="97">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="98">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="98">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":confused face:" title="confused" width="24" height="24" src="/emoji1/1f615.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="99">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="99">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="100">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="100">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="101">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="101">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="102">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="102">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="103">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="103">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="104">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="104">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="105">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="105">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="106">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="106">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="107">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="107">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="108">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="108">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="109">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="109">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="110">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="110">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="111">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="111">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with stuck-out tongue:" title="stuck_out_tongue" width="24" height="24" src="/emoji1/1f61b.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="112">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="112">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="113">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="113">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="114">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="114">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="115">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="115">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="116">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="116">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="117">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="117">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face with open mouth:" title="open_mouth" width="24" height="24" src="/emoji1/1f62e.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="118">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="118">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="119">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="119">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="120">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="120">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="121">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="121">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="122">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="122">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="123">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="123">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="124">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="124">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="125">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="125">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="126">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="126">
 				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<img alt=":face without mouth:" title="no_mouth" width="24" height="24" src="/emoji1/1f636.svg"/>]]></Label>
 				</ContentView>
 			</Frame>
 		</Grid>

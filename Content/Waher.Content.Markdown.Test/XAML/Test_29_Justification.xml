@@ -35,4 +35,20 @@
 	<StackPanel>
 		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="20" Foreground="Navy">This is a third H4</TextBlock>
 	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="18" Foreground="Navy">Left-aligned Example</TextBlock>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This text is left-aligned. Left-alignment is done by placing <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&lt;&lt;</TextBlock> in the beginning of each block, or each row in each block, as appropriate.</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Right" FontSize="18" Foreground="Navy">Right-aligned Example</TextBlock>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Right">This text is right-aligned. Right-alignment is done by placing <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New" TextAlignment="Right">&gt;&gt;</TextBlock> at the end of each block, or each row in each block, as appropriate.</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Center" FontSize="18" Foreground="Navy">Center-aligned Example</TextBlock>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" TextAlignment="Center">This text is center-aligned. Center-alignment is done by placing <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New" TextAlignment="Center">&gt;&gt;</TextBlock> in the beginning of each block, or each row in each block, and <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New" TextAlignment="Center">&lt;&lt;</TextBlock> at the end of each block, or at the end of each row in each block, as appropriate.</TextBlock>
+	</StackPanel>
+	<StackPanel>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="18" Foreground="Navy">Margin-aligned Example</TextBlock>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This text is margin-aligned. Margin-alignment is done by placing <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&lt;&lt;</TextBlock> in the beginning of each block, or each row in each block, and <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&gt;&gt;</TextBlock> at the end of each block, or at the end of each row in each block, as appropriate.</TextBlock>
+	</StackPanel>
 </StackPanel>

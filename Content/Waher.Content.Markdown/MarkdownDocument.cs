@@ -608,6 +608,15 @@ namespace Waher.Content.Markdown
 						else
 							Elements.AddLast(new CenterAligned(this, Content));
 					}
+					else if (Block.IsSuffixedBy(">>"))
+					{
+						Content = this.ParseBlocks(Block.RemoveSuffix(">>"));
+
+						if (!(Elements.Last is null) && Elements.Last.Value is RightAligned RightAligned)
+							RightAligned.AddChildren(Content);
+						else
+							Elements.AddLast(new RightAligned(this, Content));
+					}
 					else
 					{
 						Content = this.ParseBlocks(Block.RemovePrefix(">", 2));

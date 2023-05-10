@@ -734,6 +734,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				Output.WriteStartElement("Label");
 				Output.WriteAttributeString("LineBreakMode", "WordWrap");
+				BlockElements.Header.XamarinFormsLabelAlignment(Output, State);
 				Output.WriteValue(Result.ToString());
 				Output.WriteEndElement();
 

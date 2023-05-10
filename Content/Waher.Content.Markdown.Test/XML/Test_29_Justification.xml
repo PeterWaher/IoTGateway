@@ -67,6 +67,50 @@
 				<InlineText>This is a third H4</InlineText>
 			</Header>
 		</MarginAligned>
+		<LeftAligned>
+			<Header id="leftAlignedExample" level="5">
+				<InlineText>Left-aligned Example</InlineText>
+			</Header>
+			<Paragraph>
+				<InlineText>This text is left-aligned. Left-alignment is done by placing </InlineText>
+				<InlineCode><![CDATA[<<]]></InlineCode>
+				<InlineText> in the beginning of each block, or each row in each block, as appropriate.</InlineText>
+			</Paragraph>
+		</LeftAligned>
+		<RightAligned>
+			<Header id="rightAlignedExample" level="5">
+				<InlineText>Right-aligned Example</InlineText>
+			</Header>
+			<Paragraph>
+				<InlineText>This text is right-aligned. Right-alignment is done by placing </InlineText>
+				<InlineCode><![CDATA[>>]]></InlineCode>
+				<InlineText> at the end of each block, or each row in each block, as appropriate.</InlineText>
+			</Paragraph>
+		</RightAligned>
+		<CenterAligned>
+			<Header id="centerAlignedExample" level="5">
+				<InlineText>Center-aligned Example</InlineText>
+			</Header>
+			<Paragraph>
+				<InlineText>This text is center-aligned. Center-alignment is done by placing </InlineText>
+				<InlineCode><![CDATA[>>]]></InlineCode>
+				<InlineText> in the beginning of each block, or each row in each block, and </InlineText>
+				<InlineCode><![CDATA[<<]]></InlineCode>
+				<InlineText> at the end of each block, or at the end of each row in each block, as appropriate.</InlineText>
+			</Paragraph>
+		</CenterAligned>
+		<MarginAligned>
+			<Header id="marginAlignedExample" level="5">
+				<InlineText>Margin-aligned Example</InlineText>
+			</Header>
+			<Paragraph>
+				<InlineText>This text is margin-aligned. Margin-alignment is done by placing </InlineText>
+				<InlineCode><![CDATA[<<]]></InlineCode>
+				<InlineText> in the beginning of each block, or each row in each block, and </InlineText>
+				<InlineCode><![CDATA[>>]]></InlineCode>
+				<InlineText> at the end of each block, or at the end of each row in each block, as appropriate.</InlineText>
+			</Paragraph>
+		</MarginAligned>
 	</elements>
 	<references />
 </parsedMakdown>

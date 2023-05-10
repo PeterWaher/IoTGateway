@@ -1124,3 +1124,23 @@ abbr:hover::after
     content: attr(data-title);
     z-index: 1;
 }
+
+.horizontalAlignLeft
+{
+    text-align:start;
+}
+
+.horizontalAlignRight
+{
+    text-align:end;
+}
+
+.horizontalAlignCenter
+{
+    text-align:center;
+}
+
+.horizontalAlignMargins
+{
+    text-align:justify;
+}

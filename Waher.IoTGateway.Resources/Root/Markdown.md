@@ -705,6 +705,89 @@ This gets shown as:
 	[X] Another checked subitem
 [X] A second checked item
 
+### Horizontal Alignment of text
+
+You can control horizontal alignment of blocks in Markdown, by using combinations of `<<` and `>>` around the contents of the
+blocks, as illustrated in the following sections. You can choose to put the `<<` and `>>` operators on each row, or only on the
+first or last rows of each block correspondingly.
+
+**Note**: For the following examples, you might need to decrease the width of the browser window, to properly see how text
+alignment works.
+
+#### Left alignment of text
+
+Add `<<` at the beginning of each block, or at the beginning of each row in each block, to left-align the contents. Example:
+
+```
+<<##### Left-aligned Example
+<<
+<<This text is left-aligned. Left-alignment is done by placing `<<` in the beginning of each block, or each row in each block,
+<<as appropriate.
+```
+
+This is shown as:
+
+<<##### Left-aligned Example
+<<
+<<This text is left-aligned. Left-alignment is done by placing `<<` in the beginning of each block, or each row in each block,
+<<as appropriate.
+
+#### Right alignment of text
+
+Add `>>` at the end of each block, or at the end of each row in each block, to right-align the contents. Example:
+
+```
+##### Right-aligned Example>>
+>>
+This text is right-aligned. Right-alignment is done by placing `>>` at the end of each block, or each row in each block,>>
+as appropriate.>>
+```
+
+This is shown as:
+
+##### Right-aligned Example>>
+>>
+This text is right-aligned. Right-alignment is done by placing `>>` at the end of each block, or each row in each block,>>
+as appropriate.>>
+
+#### Center alignment of text
+
+Add `>>` at the beginning of each block, or at the beginning of each row in each block, and `<<` at the end of each block,
+or at the end of each row in each block, to center-align the contents. Example:
+
+```
+>>##### Center-aligned Example<<
+>><<
+>>This text is center-aligned. Center-alignment is done by placing `>>` in the beginning of each block, or each row in each block,<<
+>>and `<<` at the end of each block, or at the end of each row in each block, as appropriate.<<
+```
+
+This is shown as:
+
+>>##### Center-aligned Example<<
+>><<
+>>This text is center-aligned. Center-alignment is done by placing `>>` in the beginning of each block, or each row in each block,<<
+>>and `<<` at the end of each block, or at the end of each row in each block, as appropriate.<<
+
+#### Margin alignment of text
+
+Add `<<` at the beginning of each block, or at the beginning of each row in each block, and `>>` at the end of each block,
+or at the end of each row in each block, to margin-align the contents. Example:
+
+```
+<<##### Margin-aligned Example>>
+<<>>
+<<This text is margin-aligned. Margin-alignment is done by placing `<<` in the beginning of each block, or each row in each block,>>
+<<and `>>` at the end of each block, or at the end of each row in each block, as appropriate.>>
+```
+
+This is shown as:
+
+<<##### Margin-aligned Example>>
+<<>>
+<<This text is margin-aligned. Margin-alignment is done by placing `<<` in the beginning of each block, or each row in each block,>>
+<<and `>>` at the end of each block, or at the end of each row in each block, as appropriate.>>
+
 ### Code blocks
 
 If you want to include larger blocks of code, there are two ways to do this. In both cases you write the code, as-is, with empty rows before and after.

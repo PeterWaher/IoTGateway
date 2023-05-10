@@ -56,7 +56,60 @@
 							<header>
 								<text>This is a third H4</text>
 							</header>
-							<body />
+							<body>
+								<section>
+									<header>
+										<text>Left-aligned Example</text>
+									</header>
+									<body>
+										<paragraph>
+											<text>This text is left-aligned. Left-alignment is done by placing </text>
+											<text>&lt;&lt;</text>
+											<text> in the beginning of each block, or each row in each block, as appropriate.</text>
+										</paragraph>
+									</body>
+								</section>
+								<section>
+									<header>
+										<text>Right-aligned Example</text>
+									</header>
+									<body>
+										<paragraph>
+											<text>This text is right-aligned. Right-alignment is done by placing </text>
+											<text>&gt;&gt;</text>
+											<text> at the end of each block, or each row in each block, as appropriate.</text>
+										</paragraph>
+									</body>
+								</section>
+								<section>
+									<header>
+										<text>Center-aligned Example</text>
+									</header>
+									<body>
+										<paragraph>
+											<text>This text is center-aligned. Center-alignment is done by placing </text>
+											<text>&gt;&gt;</text>
+											<text> in the beginning of each block, or each row in each block, and </text>
+											<text>&lt;&lt;</text>
+											<text> at the end of each block, or at the end of each row in each block, as appropriate.</text>
+										</paragraph>
+									</body>
+								</section>
+								<section>
+									<header>
+										<text>Margin-aligned Example</text>
+									</header>
+									<body>
+										<paragraph>
+											<text>This text is margin-aligned. Margin-alignment is done by placing </text>
+											<text>&lt;&lt;</text>
+											<text> in the beginning of each block, or each row in each block, and </text>
+											<text>&gt;&gt;</text>
+											<text> at the end of each block, or at the end of each row in each block, as appropriate.</text>
+										</paragraph>
+									</body>
+								</section>
+							</body>
 						</section>
 					</body>
 				</section>

@@ -214,7 +214,7 @@ namespace Waher.WebService.Script
 
 			try
 			{
-				this.variables.OnPreview += Expression_OnPreview;
+				this.variables.OnPreview += this.Expression_OnPreview;
 				try
 				{
 					this.watch.Start();
@@ -235,7 +235,7 @@ namespace Waher.WebService.Script
 				}
 				finally
 				{
-					this.variables.OnPreview -= Expression_OnPreview;
+					this.variables.OnPreview -= this.Expression_OnPreview;
 					this.watch.Stop();
 
 					Timer Temp = this.watchdog;

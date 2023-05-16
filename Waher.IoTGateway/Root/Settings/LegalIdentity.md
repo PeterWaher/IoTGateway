@@ -36,6 +36,9 @@ more information about their approval procedure.
 
 <div id="LegalIdentityProperties" style="display:{{Config.UseLegalIdentity ? "block" : "none"}}">
 
+<fieldset>
+<legend>Personal Information</legend>
+
 <p>
 <label for="FirstName">First Name:</label>  
 <input id="FirstName" name="FirstName" type="text" style="width:20em" title="First name of person." value="{{Config.FirstName}}" {{Config.Step=0 ? "autofocus" : ""}}/>
@@ -52,7 +55,7 @@ more information about their approval procedure.
 </p>
 
 <p>
-<label for="PNr">Personal Number (organizational number):</label>  
+<label for="PNr">Personal Number:</label>  
 <input id="PNr" name="PNr" type="text" style="width:20em" title="Number of person or organization." value="{{Config.PersonalNumber}}"/>
 </p>
 
@@ -336,6 +339,71 @@ more information about their approval procedure.
 }}
 </select>
 </p>
+</fieldset>
+
+<fieldset>
+<legend>Organizational Information (optional)</legend>
+
+<p>
+<label for="OrgName">Organization Name:</label>  
+<input id="OrgName" name="OrgName" type="text" style="width:20em" title="Name of organization person belongs to." value="{{Config.OrgName}}"/>
+</p>
+
+<p>
+<label for="OrgDepartment">Department:</label>  
+<input id="OrgDepartment" name="OrgDepartment" type="text" style="width:20em" title="Department person works in." value="{{Config.OrgDepartment}}"/>
+</p>
+
+<p>
+<label for="OrgRole">Role:</label>  
+<input id="OrgRole" name="OrgRole" type="text" style="width:20em" title="Role person has in department." value="{{Config.OrgRole}}"/>
+</p>
+
+<p>
+<label for="OrgNumber">Organizational number:</label>  
+<input id="OrgNumber" name="OrgNumber" type="text" style="width:20em" title="Number of organization." value="{{Config.OrgNumber}}"/>
+</p>
+
+<p>
+<label for="OrgAddress">Address:</label>  
+<input id="OrgAddress" name="OrgAddress" type="text" style="width:20em" title="Organization Address." value="{{Config.OrgAddress}}"/>  
+<input id="OrgAddress2" name="OrgAddress2" type="text" style="width:20em" title="Organization Address." value="{{Config.OrgAddress2}}"/>
+</p>
+
+<p>
+<label for="OrgPostalCode">Postal Code (ZIP):</label>  
+<input id="OrgPostalCode" name="OrgPostalCode" type="text" style="width:20em" title="Organization Postal code, or zip code." value="{{Config.OrgPostalCode}}"/>
+</p>
+
+<p>
+<label for="OrgArea">Area:</label>  
+<input id="OrgArea" name="OrgArea" type="text" style="width:20em" title="Name of area where organization resides." value="{{Config.OrgArea}}"/>
+</p>
+
+<p>
+<label for="OrgCity">City:</label>  
+<input id="OrgCity" name="OrgCity" type="text" style="width:20em" title="Name of city where organization resides." value="{{Config.OrgCity}}"/>
+</p>
+
+<p>
+<label for="OrgRegion">Region:</label>  
+<input id="OrgRegion" name="OrgRegion" type="text" style="width:20em" title="Name of region where organization resides." value="{{Config.OrgRegion}}"/>
+</p>
+
+<p>
+<label for="OrgCountry">Country:</label>  
+<select id="OrgCountry" name="OrgCountry" style="width:20em" title="Name of country where organization resides.">
+<option value=""{{empty(Config.OrgCountry)?" selected":""}}></option>
+{{
+	foreach Country in Countries do
+		]]<option value="((Country.code))"((Config.OrgCountry=Country.code?" selected":""))>((Country.name))</option>[[
+}}
+</select>
+</p>
+</fieldset>
+
+<fieldset>
+<legend>Additional Information</legend>
 
 {{if Config.AlternativeFields!=null then (Index:=0;foreach AlternativeField in Config.AlternativeFields do (]]
 <p>
@@ -361,6 +429,7 @@ more information about their approval procedure.
 <input id="AltFieldValue" name="AltFieldValue" type="text" style="width:20em" title="Alternative field value."/>
 <button type="button" class="posButtonSm" onclick="AddAltField()">Add</button>
 </p>
+</fieldset>
 
 <p>
 <input type="checkbox" name="ProtectWithPassword" id="ProtectWithPassword" {{Config.ProtectWithPassword ? "checked" : ""}} onclick="TogglePasswordProperties()"/>

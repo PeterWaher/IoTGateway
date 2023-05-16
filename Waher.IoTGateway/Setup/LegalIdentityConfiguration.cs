@@ -76,6 +76,17 @@ namespace Waher.IoTGateway.Setup
 		private string city = string.Empty;
 		private string region = string.Empty;
 		private string country = string.Empty;
+		private string orgName = string.Empty;
+		private string orgDepartment = string.Empty;
+		private string orgRole = string.Empty;
+		private string orgNumber = string.Empty;
+		private string orgAddress = string.Empty;
+		private string orgAddress2 = string.Empty;
+		private string orgPostalCode = string.Empty;
+		private string orgArea = string.Empty;
+		private string orgCity = string.Empty;
+		private string orgRegion = string.Empty;
+		private string orgCountry = string.Empty;
 		private AlternativeField[] altFields = null;
 		private AlternativeField[] passwordHashes = null;
 		private DateTime checkApprovedExpiry = DateTime.MinValue;
@@ -210,6 +221,116 @@ namespace Waher.IoTGateway.Setup
 		{
 			get => this.country;
 			set => this.country = value;
+		}
+
+		/// <summary>
+		/// Organization Name
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgName
+		{
+			get => this.orgName;
+			set => this.orgName = value;
+		}
+
+		/// <summary>
+		/// Organization Department
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgDepartment
+		{
+			get => this.orgDepartment;
+			set => this.orgDepartment = value;
+		}
+
+		/// <summary>
+		/// Organization Role
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgRole
+		{
+			get => this.orgRole;
+			set => this.orgRole = value;
+		}
+
+		/// <summary>
+		/// Organization number
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgNumber
+		{
+			get => this.orgNumber;
+			set => this.orgNumber = value;
+		}
+
+		/// <summary>
+		/// Organization Address
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgAddress
+		{
+			get => this.orgAddress;
+			set => this.orgAddress = value;
+		}
+
+		/// <summary>
+		/// Organization Address, 2nd row
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgAddress2
+		{
+			get => this.orgAddress2;
+			set => this.orgAddress2 = value;
+		}
+
+		/// <summary>
+		/// Organization Postal Code (or zip code)
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgPostalCode
+		{
+			get => this.orgPostalCode;
+			set => this.orgPostalCode = value;
+		}
+
+		/// <summary>
+		/// Organization Area
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgArea
+		{
+			get => this.orgArea;
+			set => this.orgArea = value;
+		}
+
+		/// <summary>
+		/// Organization City
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgCity
+		{
+			get => this.orgCity;
+			set => this.orgCity = value;
+		}
+
+		/// <summary>
+		/// Organization Region
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgRegion
+		{
+			get => this.orgRegion;
+			set => this.orgRegion = value;
+		}
+
+		/// <summary>
+		/// Organization Country
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string OrgCountry
+		{
+			get => this.orgCountry;
+			set => this.orgCountry = value;
 		}
 
 		/// <summary>
@@ -430,6 +551,17 @@ namespace Waher.IoTGateway.Setup
 							{ "MIDDLE", string.Empty },
 							{ "LAST", string.Empty },
 							{ "PNR", string.Empty },
+							{ "ORGADDR", string.Empty },
+							{ "ORGADDR2", string.Empty },
+							{ "ORGZIP", string.Empty },
+							{ "ORGAREA", string.Empty },
+							{ "ORGCITY", string.Empty },
+							{ "ORGREGION", string.Empty },
+							{ "ORGCOUNTRY", string.Empty },
+							{ "ORGNAME", string.Empty },
+							{ "ORGDEPT", string.Empty },
+							{ "ORGROLE", string.Empty },
+							{ "ORGNR", string.Empty },
 							{ "", string.Empty }
 						};
 
@@ -738,6 +870,17 @@ namespace Waher.IoTGateway.Setup
 						case "CITY":
 						case "REGION":
 						case "COUNTRY":
+						case "ORGNAME":
+						case "ORGDEPT":
+						case "ORGROLE":
+						case "ORGNR":
+						case "ORGADDR":
+						case "ORGADDR2":
+						case "ORGZIP":
+						case "ORGAREA":
+						case "ORGCITY":
+						case "ORGREGION":
+						case "ORGCOUNTRY":
 							throw new BadRequestException("The following alternative field name is not allowed: " + P.Key);
 
 						default:
@@ -859,7 +1002,7 @@ namespace Waher.IoTGateway.Setup
 			if (!string.IsNullOrEmpty(this.lastName))
 				Properties.Add(new Property("LAST", this.lastName));
 
-			if (!string.IsNullOrEmpty(this.firstName))
+			if (!string.IsNullOrEmpty(this.personalNumber))
 				Properties.Add(new Property("PNR", this.personalNumber));
 
 			if (!string.IsNullOrEmpty(this.address))
@@ -882,6 +1025,39 @@ namespace Waher.IoTGateway.Setup
 
 			if (!string.IsNullOrEmpty(this.country))
 				Properties.Add(new Property("COUNTRY", this.country));
+
+			if (!string.IsNullOrEmpty(this.orgName))
+				Properties.Add(new Property("ORGNAME", this.orgName));
+
+			if (!string.IsNullOrEmpty(this.orgDepartment))
+				Properties.Add(new Property("ORGDEPT", this.orgDepartment));
+
+			if (!string.IsNullOrEmpty(this.orgRole))
+				Properties.Add(new Property("ORGROLE", this.orgRole));
+
+			if (!string.IsNullOrEmpty(this.orgNumber))
+				Properties.Add(new Property("ORGNR", this.orgNumber));
+
+			if (!string.IsNullOrEmpty(this.orgAddress))
+				Properties.Add(new Property("ORGADDR", this.orgAddress));
+
+			if (!string.IsNullOrEmpty(this.orgAddress2))
+				Properties.Add(new Property("ORGADDR2", this.orgAddress2));
+
+			if (!string.IsNullOrEmpty(this.orgPostalCode))
+				Properties.Add(new Property("ORGZIP", this.orgPostalCode));
+
+			if (!string.IsNullOrEmpty(this.orgArea))
+				Properties.Add(new Property("ORGAREA", this.orgArea));
+
+			if (!string.IsNullOrEmpty(this.orgCity))
+				Properties.Add(new Property("ORGCITY", this.orgCity));
+
+			if (!string.IsNullOrEmpty(this.orgRegion))
+				Properties.Add(new Property("ORGREGION", this.orgRegion));
+
+			if (!string.IsNullOrEmpty(this.orgCountry))
+				Properties.Add(new Property("ORGCOUNTRY", this.orgCountry));
 
 			if (!(this.altFields is null))
 			{

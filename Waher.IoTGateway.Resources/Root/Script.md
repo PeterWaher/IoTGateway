@@ -321,6 +321,27 @@ You can also choose to create an empty object, and assign properties dynamically
 	Obj:={};
 	Obj.["a","b","c"]:=1
 
+##### Object methods
+
+You can create objects with methods using object ex-nihilo notation and lambda expression. Example:
+
+```
+Obj:=
+{
+	"Sum":(x,y)->x+y,
+	"Prod":(x,y)->x*y,
+	"Pow":(x,y)->x^y
+};
+
+[Obj.Sum(3,4), Obj.Prod(3,4), Obj.Pow(3,4)]
+```
+
+Would return:
+
+```
+[7, 12, 81]
+```
+
 ### Suffix-operators
 
 Suffix-operators are written after the operand to which they are applied. The following table lists available suffix operators:

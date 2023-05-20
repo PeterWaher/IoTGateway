@@ -2318,6 +2318,16 @@ IoT Broker or the Neuron^TM.
 | `GetServiceProvidersForPeerReview(MetaData)`            | Gets available service providers that can be used for peer reviews of identity applications. Meta-data about the person is provided in the `MetaData` argument, which is assumed to be an object ex-nihilo. | `GetServiceProvidersForPeerReview({"COUNTRY":"SE","CITY":"Stockholm"})` |
 | `GetServiceProvidersForSellingEDaler(Country,Currency)` | Gets available service providers that can be used to sell eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForSellingEDaler("US","USD")` |
 
+#### Scriptable Providers Extensions (available in TAG.ScriptProviders.package)
+
+The following functions are available on systems with the `TAG.ScriptProviders.package` installed. A more detailed description
+about the script functions referenced in this section is available in the [NeuronScriptProviders repository](https://github.com/Trust-Anchor-Group/NeuronScriptProviders#creating-script-based-services).
+
+| Function                         | Description                                           |
+|----------------------------------|-------------------------------------------------------|
+| `BuyEDalerService(Definition)`   | Creates a script-based service for buying eDaler(R).  |
+| `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
+
 =========================================================================================================================================================
 
 URI Schemes

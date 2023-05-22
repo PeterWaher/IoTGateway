@@ -2764,7 +2764,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5670,7 +5670,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8612,7 +8612,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11527,7 +11527,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14478,7 +14478,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17393,7 +17393,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -20344,7 +20344,7 @@
           "Waher.Content.Xml": "2.1.1"
         }
       },
-      "Waher.Content.Markdown/2.4.0": {
+      "Waher.Content.Markdown/2.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -30553,7 +30553,7 @@
       "path": "../Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../Waher.Content.Html/Waher.Content.Html.csproj"
     },
-    "Waher.Content.Markdown/2.4.0": {
+    "Waher.Content.Markdown/2.5.0": {
       "type": "project",
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"

@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Test
 				sb.AppendLine("Changes required:");
 				sb.AppendLine();
 
-				EditScript<string> Script = Difference.AnalyzeRows(Generated, Expected);
+				EditScript<string> Script = Difference.AnalyzeRows(Expected, Generated);
 
 				foreach (Step<string> Op in Script.Steps)
 				{
@@ -245,6 +245,12 @@ namespace Waher.Content.Markdown.Test
 		public async Task Test_29_Justification()
 		{
 			await this.DoTest("Test_29_Justification.md", "Test_29_Justification.html");
+		}
+
+		[TestMethod]
+		public async Task Test_30_Incomplete()
+		{
+			await this.DoTest("Test_30_Incomplete.md", "Test_30_Incomplete.html");
 		}
 	}
 }

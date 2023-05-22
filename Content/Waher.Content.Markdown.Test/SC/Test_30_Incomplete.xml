@@ -1,0 +1,88 @@
+﻿<paragraph>
+	<text>Incomplete </text>
+	<bold>
+		<text>strong</text>
+	</bold>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<bold>
+		<text>strong</text>
+		<text>*</text>
+	</bold>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<italic>
+		<text>emphasis</text>
+	</italic>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<underline>
+		<text>underline</text>
+	</underline>
+</paragraph>
+<paragraph>
+	<text>Incoplete </text>
+	<text>insertion</text>
+</paragraph>
+<paragraph>
+	<text>Incoplete </text>
+	<text>insertion 2_</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<strikeThrough>
+		<text>strike over</text>
+	</strikeThrough>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>deletion</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>deletion 2~</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<super>
+		<text>superscript</text>
+	</super>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<super>
+		<text>superscript 2</text>
+	</super>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>[</text>
+	<text>subscript</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<sub>
+		<text>link</text>
+	</sub>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>link 2</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>![</text>
+	<text>media</text>
+	<text>]</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>media 2</text>
+</paragraph>
+<paragraph>
+	<text>Incomplete </text>
+	<text>code</text>
+</paragraph>

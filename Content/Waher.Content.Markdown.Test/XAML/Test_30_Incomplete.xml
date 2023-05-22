@@ -1,0 +1,20 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Bold>strong</Bold></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Bold>strong*</Bold></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Italic>emphasis</Italic></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Underline>underline</Underline></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incoplete <Underline>insertion</Underline></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incoplete <Underline>insertion 2_</Underline></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>strike over</TextBlock></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>deletion</TextBlock></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>deletion 2~</TextBlock></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Run Typography.Variants="Superscript">superscript</Run></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Run Typography.Variants="Superscript">superscript 2</Run></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete [subscript</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Run Typography.Variants="Subscript">link</Run></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Hyperlink NavigateUri="http://example.com">link 2</Hyperlink></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete ![media]</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <InlineUIContainer BaselineAlignment="Center"><Image Source="http://example.com" Stretch="None" /></InlineUIContainer></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">code</TextBlock></TextBlock>
+	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">Incomplete code 2</TextBlock>
+</StackPanel>

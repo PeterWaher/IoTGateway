@@ -1,0 +1,114 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_30_Incomplete.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Strong>
+				<InlineText>strong</InlineText>
+			</Strong>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Strong>
+				<InlineText>strong</InlineText>
+				<InlineText>*</InlineText>
+			</Strong>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Emphasize>
+				<InlineText>emphasis</InlineText>
+			</Emphasize>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Underline>
+				<InlineText>underline</InlineText>
+			</Underline>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incoplete </InlineText>
+			<Insert>
+				<InlineText>insertion</InlineText>
+			</Insert>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incoplete </InlineText>
+			<Insert>
+				<InlineText>insertion 2_</InlineText>
+			</Insert>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<StrikeThrough>
+				<InlineText>strike over</InlineText>
+			</StrikeThrough>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Delete>
+				<InlineText>deletion</InlineText>
+			</Delete>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Delete>
+				<InlineText>deletion 2~</InlineText>
+			</Delete>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<SuperScript>
+				<InlineText>superscript</InlineText>
+			</SuperScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<SuperScript>
+				<InlineText>superscript 2</InlineText>
+			</SuperScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<InlineText>[</InlineText>
+			<InlineText>subscript</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<SubScript>
+				<InlineText>link</InlineText>
+			</SubScript>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Link url="http://example.com" title="">
+				<InlineText>link 2</InlineText>
+			</Link>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<InlineText>![</InlineText>
+			<InlineText>media</InlineText>
+			<InlineText>]</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<Multimedia aloneInParagraph="false">
+				<InlineText>media 2</InlineText>
+				<MultimediaItem url="http://example.com" title="" extension="" contentType="" />
+			</Multimedia>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>Incomplete </InlineText>
+			<InlineCode><![CDATA[code]]></InlineCode>
+		</Paragraph>
+		<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+			<Row>Incomplete code 2</Row>
+		</CodeBlock>
+	</elements>
+	<references />
+</parsedMakdown>

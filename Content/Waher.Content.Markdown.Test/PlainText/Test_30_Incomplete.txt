@@ -1,0 +1,36 @@
+﻿Incomplete strong
+
+Incomplete strong*
+
+Incomplete emphasis
+
+Incomplete underline
+
+Incoplete insertion
+
+Incoplete insertion 2_
+
+Incomplete strike over
+
+Incomplete deletion
+
+Incomplete deletion 2~
+
+Incomplete ˢᵘᵖᵉʳˢᶜʳⁱᵖᵗ
+
+Incomplete ˢᵘᵖᵉʳˢᶜʳⁱᵖᵗ ²
+
+Incomplete [subscript
+
+Incomplete ₗᵢₙₖ
+
+Incomplete link 2
+
+Incomplete ![media]
+
+Incomplete media 2
+
+Incomplete code
+
+Incomplete code 2
+

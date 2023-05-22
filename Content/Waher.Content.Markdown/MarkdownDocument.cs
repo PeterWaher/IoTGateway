@@ -554,47 +554,55 @@ namespace Waher.Content.Markdown
 					s = s.Substring(0, i);
 
 					i = BlockIndex;
-					while (i <= EndBlock && (!(Block = Blocks[i]).Rows[Block.End].StartsWith(s) || (i == BlockIndex && Block.Start == Block.End)))
-						i++;
-
-					if (i <= EndBlock)
+					while (i <= EndBlock &&
+						(!(Block = Blocks[i]).Rows[Block.End].StartsWith(s) ||
+						(i == BlockIndex && Block.Start == Block.End)))
 					{
-						List<string> Code = new List<string>();
+						i++;
+					}
 
-						for (j = BlockIndex; j <= i; j++)
+					List<string> Code = new List<string>();
+					bool Complete = true;
+
+					if (i > EndBlock)
+					{
+						i = EndBlock;
+						Complete = false;
+					}
+
+					for (j = BlockIndex; j <= i; j++)
+					{
+						Block = Blocks[j];
+						if (j == BlockIndex)
+							Index = Block.Start + 1;
+						else
 						{
-							Block = Blocks[j];
-							if (j == BlockIndex)
-								Index = Block.Start + 1;
-							else
-							{
-								Code.Add(string.Empty);
-								Index = Block.Start;
-							}
-
-							if (j == i)
-								c = Block.End - 1;
-							else
-								c = Block.End;
-
-							while (Index <= c)
-							{
-								Code.Add(Block.Rows[Index]);
-								Index++;
-							}
+							Code.Add(string.Empty);
+							Index = Block.Start;
 						}
 
-						Block = Blocks[BlockIndex];
-						s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
-						CodeBlock CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
-						Elements.AddLast(CodeBlock);
+						if (j == i && Complete)
+							c = Block.End - 1;
+						else
+							c = Block.End;
 
-						if (!string.IsNullOrEmpty(s) && !CodeBlock.HasHandler)
-							this.syntaxHighlighting = true;
-
-						BlockIndex = i;
-						continue;
+						while (Index <= c)
+						{
+							Code.Add(Block.Rows[Index]);
+							Index++;
+						}
 					}
+
+					Block = Blocks[BlockIndex];
+					s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
+					CodeBlock CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+					Elements.AddLast(CodeBlock);
+
+					if (!string.IsNullOrEmpty(s) && !CodeBlock.HasHandler)
+						this.syntaxHighlighting = true;
+
+					BlockIndex = i;
+					continue;
 				}
 
 				if (Block.IsPrefixedBy(">", false))
@@ -1227,12 +1235,13 @@ namespace Waher.Content.Markdown
 			bool PreserveCrLf = Rows[StartRow].StartsWith("<") && Rows[EndRow].EndsWith(">");
 			BlockParseState State = new BlockParseState(Rows, Positions, StartRow, EndRow, PreserveCrLf);
 
-			this.ParseBlock(State, (char)0, 1, Elements);
+			this.ParseBlock(State, (char)0, 1, Elements, true);
 
 			return Elements;
 		}
 
-		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, LinkedList<MarkdownElement> Elements)
+		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount,
+			LinkedList<MarkdownElement> Elements, bool AcceptIncomplete)
 		{
 			LinkedList<MarkdownElement> ChildElements;
 			StringBuilder Text = new StringBuilder();
@@ -1336,10 +1345,8 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '*', 2, ChildElements))
-								Elements.AddLast(new Strong(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "**", ChildElements);
+							this.ParseBlock(State, '*', 2, ChildElements, true);
+							Elements.AddLast(new Strong(this, ChildElements));
 						}
 						else
 						{
@@ -1367,7 +1374,7 @@ namespace Waher.Content.Markdown
 									{
 										State.RestoreState();
 
-										if (this.ParseBlock(State, '*', 1, ChildElements))
+										if (this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
 											Elements.AddLast(new Emphasize(this, ChildElements));
 										else
 											this.FixSyntaxError(Elements, "*", ChildElements);
@@ -1392,7 +1399,7 @@ namespace Waher.Content.Markdown
 									}
 
 									State.RestoreState();
-									if (this.ParseBlock(State, '*', 1, ChildElements))
+									if (this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
 										Elements.AddLast(new Emphasize(this, ChildElements));
 									else
 										this.FixSyntaxError(Elements, "*", ChildElements);
@@ -1400,7 +1407,7 @@ namespace Waher.Content.Markdown
 									break;
 
 								default:
-									if (this.ParseBlock(State, '*', 1, ChildElements))
+									if (this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
 										Elements.AddLast(new Emphasize(this, ChildElements));
 									else
 										this.FixSyntaxError(Elements, "*", ChildElements);
@@ -1423,14 +1430,12 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '_', 2, ChildElements))
-								Elements.AddLast(new Insert(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "__", ChildElements);
+							this.ParseBlock(State, '_', 2, ChildElements, true);
+							Elements.AddLast(new Insert(this, ChildElements));
 						}
 						else
 						{
-							if (this.ParseBlock(State, '_', 1, ChildElements))
+							if (this.ParseBlock(State, '_', 1, ChildElements, TerminationCharacter != '_'))
 								Elements.AddLast(new Underline(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "_", ChildElements);
@@ -1451,14 +1456,12 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '~', 2, ChildElements))
-								Elements.AddLast(new Delete(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "~~", ChildElements);
+							this.ParseBlock(State, '~', 2, ChildElements, true);
+							Elements.AddLast(new Delete(this, ChildElements));
 						}
 						else
 						{
-							if (this.ParseBlock(State, '~', 1, ChildElements))
+							if (this.ParseBlock(State, '~', 1, ChildElements, TerminationCharacter != '~'))
 								Elements.AddLast(new StrikeThrough(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~", ChildElements);
@@ -1671,7 +1674,7 @@ namespace Waher.Content.Markdown
 						ChildElements = new LinkedList<MarkdownElement>();
 						this.AppendAnyText(Elements, Text);
 
-						if (this.ParseBlock(State, ']', 1, ChildElements))
+						if (this.ParseBlock(State, ']', 1, ChildElements, false))
 						{
 							ch2 = State.PeekNextNonWhitespaceChar(false);
 							if (ch2 == '(')
@@ -1889,7 +1892,11 @@ namespace Waher.Content.Markdown
 							else
 							{
 								this.FixSyntaxError(Elements, "![", ChildElements);
-								Elements.AddLast(new InlineText(this, "]" + ch2));
+
+								if (ch2 == (char)0)
+									Elements.AddLast(new InlineText(this, "]"));
+								else
+									Elements.AddLast(new InlineText(this, "]" + ch2));
 							}
 						}
 						else
@@ -3438,10 +3445,8 @@ namespace Waher.Content.Markdown
 
 								ChildElements = new LinkedList<MarkdownElement>();
 
-								if (this.ParseBlock(State, ')', 1, ChildElements))
-									Elements.AddLast(new SuperScript(this, ChildElements));
-								else
-									this.FixSyntaxError(Elements, "^(", ChildElements);
+								this.ParseBlock(State, ')', 1, ChildElements, true);
+								Elements.AddLast(new SuperScript(this, ChildElements));
 								break;
 
 							case '[':
@@ -3450,10 +3455,8 @@ namespace Waher.Content.Markdown
 
 								ChildElements = new LinkedList<MarkdownElement>();
 
-								if (this.ParseBlock(State, ']', 1, ChildElements))
-									Elements.AddLast(new SuperScript(this, ChildElements));
-								else
-									this.FixSyntaxError(Elements, "^]", ChildElements);
+								this.ParseBlock(State, ']', 1, ChildElements, true);
+								Elements.AddLast(new SuperScript(this, ChildElements));
 								break;
 
 							default:
@@ -4279,7 +4282,7 @@ namespace Waher.Content.Markdown
 
 			this.AppendAnyText(Elements, Text);
 
-			return (ch == TerminationCharacter);
+			return (ch == TerminationCharacter) || AcceptIncomplete;
 		}
 
 		private static bool IsLeftQuote(char PrevChar, char NextChar)

@@ -133,14 +133,14 @@ function TestNames()
 function GetDomainNamesReq()
 {
     var Req =
-	{
-		"dynamicDns": document.getElementById("DynamicDns").checked,
-		"dynDnsTemplate": document.getElementById("DynDnsTemplate").value,
-		"checkIpScript": document.getElementById("CheckIpScript").value,
-		"updateIpScript": document.getElementById("UpdateIpScript").value,
-		"dynDnsAccount": document.getElementById("DynDnsAccount").value,
-		"dynDnsPassword": document.getElementById("DynDnsPassword").value,
-		"dynDnsInterval": parseInt(document.getElementById("DynDnsInterval").value),
+    {
+        "dynamicDns": document.getElementById("DynamicDns").checked,
+        "dynDnsTemplate": document.getElementById("DynDnsTemplate").value,
+        "checkIpScript": document.getElementById("CheckIpScript").value,
+        "updateIpScript": document.getElementById("UpdateIpScript").value,
+        "dynDnsAccount": document.getElementById("DynDnsAccount").value,
+        "dynDnsPassword": document.getElementById("DynDnsPassword").value,
+        "dynDnsInterval": parseInt(document.getElementById("DynDnsInterval").value),
         "domainName": document.getElementById("DomainName").value,
         "altDomainName": document.getElementById("AltDomainName").value
     };
@@ -268,44 +268,292 @@ function CertificateOk(Data)
 
 function ToggleDynamicDnsProperties()
 {
-	var CheckBox = document.getElementById("DynamicDns");
-	var Checked = CheckBox.checked;
+    var CheckBox = document.getElementById("DynamicDns");
+    var Checked = CheckBox.checked;
 
-	var Div = document.getElementById("DynDnsProperties");
-	Div.style.display = Checked ? "block" : "none";
+    var Div = document.getElementById("DynDnsProperties");
+    Div.style.display = Checked ? "block" : "none";
 }
 
 function TemplateChanged(Control)
 {
-	var IpScript;
-	var UpdateScript;
+    var IpScript;
+    var UpdateScript;
 
-	switch (Control.value)
-	{
-		case "DynDnsOrg":
-			IpScript = "Html:=Get(\"https://checkip.dyndns.com/\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
-				"s:=Html.Body.InnerHtml;\r\n" +
-				"s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
-			UpdateScript = "Html:=Get(\"https://members.dyndns.org/nic/update?hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
-			break;
+    switch (Control.value)
+    {
+        case "DynDnsOrg":
+            IpScript = "Html:=Get(\"https://checkip.dyndns.com/\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
+                "s:=Html.Body.InnerHtml;\r\n" +
+                "s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
+            UpdateScript = "Html:=Get(\"https://members.dyndns.org/nic/update?hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
+            break;
 
-		case "LoopiaSe":
-			IpScript = "Html:=Get(\"https://dyndns.loopia.se/checkip\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
-				"s:=Html.Body.InnerHtml;\r\n" +
-				"s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
-			UpdateScript = "Html:=Get(\"https://dyndns.loopia.se/?system=custom&hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
-			break;
+        case "LoopiaSe":
+            IpScript = "Html:=Get(\"https://dyndns.loopia.se/checkip\",{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\"});\r\n" +
+                "s:=Html.Body.InnerHtml;\r\n" +
+                "s like \"[^0-9]*(?'IP'\\\\d+[.]\\\\d+[.]\\\\d+[.]\\\\d+)\" ? IP : \"\"";
+            UpdateScript = "Html:=Get(\"https://dyndns.loopia.se/?system=custom&hostname=\"+Domain+\"&myip=\"+IP,{\"Accept\":\"text/html\",\"User-Agent\":\"Waher.IoTGateway\",\"Authorization\":\"Basic \"+Base64Encode(Encode(Account+\":\"+Password)[0])})";
+            break;
 
-		default:
-			return;
-	}
+        default:
+            return;
+    }
 
-	document.getElementById("CheckIpScript").value = IpScript;
-	document.getElementById("UpdateIpScript").value = UpdateScript;
+    document.getElementById("CheckIpScript").value = IpScript;
+    document.getElementById("UpdateIpScript").value = UpdateScript;
 }
 
-function DynamicDnsScriptUpdated(Control,Event)
+function DynamicDnsScriptUpdated(Control, Event)
 {
-	document.getElementById("DynDnsTemplate").value = "";
-	return ScriptKeyDown(Control, Event);
+    document.getElementById("DynDnsTemplate").value = "";
+    return ScriptKeyDown(Control, Event);
+}
+
+function AddHumanReadableNameLanguage(Button)
+{
+    var NrNames = parseInt(Button.getAttribute("data-nrNames"));
+
+    NrNames++;
+    Button.setAttribute("data-nrNames", NrNames);
+
+    var Table = document.createElement("TABLE");
+    Button.parentNode.insertBefore(Table, Button);
+
+    var Tr = document.createElement("TR");
+    Table.appendChild(Tr);
+
+    var Td = document.createElement("TD");
+    Tr.appendChild(Td);
+
+    var Label = document.createElement("LABEL");
+    Label.setAttribute("for", "Language" + NrNames);
+    Label.innerText = "Language " + NrNames + ":";
+    Td.appendChild(Label);
+
+    var Br = document.createElement("BR");
+    Td.appendChild(Br);
+
+    var Input = document.createElement("INPUT");
+    Input.setAttribute("type", "text");
+    Input.setAttribute("id", "Language" + NrNames);
+    Td.appendChild(Input);
+
+    Input.focus();
+
+    Td = document.createElement("TD");
+    Td.setAttribute("style", "width:65%");
+    Tr.appendChild(Td);
+
+    Label = document.createElement("LABEL");
+    Label.setAttribute("for", "LocalizedName" + NrNames);
+    Label.innerText = "Localized Name " + NrNames + ":";
+    Td.appendChild(Label);
+
+    Br = document.createElement("BR");
+    Td.appendChild(Br);
+
+    Input = document.createElement("INPUT");
+    Input.setAttribute("type", "text");
+    Input.setAttribute("id", "LocalizedName" + NrNames);
+    Td.appendChild(Input);
+
+    Td = document.createElement("TD");
+    Tr.appendChild(Td);
+
+    var Button = document.createElement("BUTTON");
+    Button.className = "negButtonSm";
+    Button.setAttribute("type", "button");
+    Button.setAttribute("onclick", "RemoveLocalizedName(" + NrNames + ")");
+    Button.innerText = "Remove";
+    Td.appendChild(Button);
+}
+
+function RemoveLocalizedName(Index)
+{
+    var Control = document.getElementById("Language" + Index);
+    if (Control !== null)
+    {
+        var P = Control.parentNode;
+
+        while (P.tagName !== "TABLE")
+        {
+            Control = P;
+            P = Control.parentNode;
+        }
+
+        P.parentNode.removeChild(P);
+    }
+}
+
+function SaveHumanReadableNames()
+{
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        if (xhttp.readyState === 4)
+        {
+            if (xhttp.status === 200)
+                window.alert("Saved.");
+            else
+                ShowError(xhttp);
+        }
+    };
+
+    var Req =
+    {
+        "humanReadableName": document.getElementById("HumanReadableName").value,
+        "humanReadableNameLanguage": document.getElementById("HumanReadableNameLanguage").value
+    };
+
+    var NrNames = parseInt(document.getElementById("AddNameLocalizationButton").getAttribute("data-nrNames"));
+    var DstIndex = 1;
+    var SrcIndex;
+    var Key;
+    var Value;
+
+    for (SrcIndex = 1; SrcIndex <= NrNames; SrcIndex++)
+    {
+        if ((Key = document.getElementById("Language" + SrcIndex)) !== null &&
+            (Value = document.getElementById("LocalizedName" + SrcIndex)) !== null)
+        {
+            Key = Key.value;
+            Value = Value.value;
+
+            if (Key !== "" && Value !== "")
+            {
+                Req["nameLanguage" + DstIndex] = Key;
+                Req["nameLocalized" + DstIndex] = Value;
+                DstIndex++;
+            }
+        }
+    }
+
+    xhttp.open("POST", "/Settings/SaveNames", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(Req));
+}
+
+function AddHumanReadableDescriptionLanguage(Button)
+{
+    var NrDescriptions = parseInt(Button.getAttribute("data-nrDescriptions"));
+
+    NrDescriptions++;
+    Button.setAttribute("data-nrDescriptions", NrDescriptions);
+
+    var Table = document.createElement("TABLE");
+    Button.parentNode.insertBefore(Table, Button);
+
+    var Tr = document.createElement("TR");
+    Table.appendChild(Tr);
+
+    var Td = document.createElement("TD");
+    Tr.appendChild(Td);
+
+    var Label = document.createElement("LABEL");
+    Label.setAttribute("for", "LanguageDescription" + NrDescriptions);
+    Label.innerText = "Language " + NrDescriptions + ":";
+    Td.appendChild(Label);
+
+    var Br = document.createElement("BR");
+    Td.appendChild(Br);
+
+    var Input = document.createElement("INPUT");
+    Input.setAttribute("type", "text");
+    Input.setAttribute("id", "LanguageDescription" + NrDescriptions);
+    Td.appendChild(Input);
+
+    Input.focus();
+
+    Td = document.createElement("TD");
+    Td.setAttribute("style", "width:65%");
+    Tr.appendChild(Td);
+
+    Label = document.createElement("LABEL");
+    Label.setAttribute("for", "LocalizedDescription" + NrDescriptions);
+    Label.innerText = "Localized Description " + NrDescriptions + ":";
+    Td.appendChild(Label);
+
+    Br = document.createElement("BR");
+    Td.appendChild(Br);
+
+    Input = document.createElement("INPUT");
+    Input.setAttribute("type", "text");
+    Input.setAttribute("id", "LocalizedDescription" + NrDescriptions);
+    Td.appendChild(Input);
+
+    Td = document.createElement("TD");
+    Tr.appendChild(Td);
+
+    var Button = document.createElement("BUTTON");
+    Button.className = "negButtonSm";
+    Button.setAttribute("type", "button");
+    Button.setAttribute("onclick", "RemoveLocalizedDescription(" + NrDescriptions + ")");
+    Button.innerText = "Remove";
+    Td.appendChild(Button);
+}
+
+function RemoveLocalizedDescription(Index)
+{
+    var Control = document.getElementById("LanguageDescription" + Index);
+    if (Control !== null)
+    {
+        var P = Control.parentNode;
+
+        while (P.tagName !== "TABLE")
+        {
+            Control = P;
+            P = Control.parentNode;
+        }
+
+        P.parentNode.removeChild(P);
+    }
+}
+
+function SaveHumanReadableDescriptions()
+{
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        if (xhttp.readyState === 4)
+        {
+            if (xhttp.status === 200)
+                window.alert("Saved.");
+            else
+                ShowError(xhttp);
+        }
+    };
+
+    var Req =
+    {
+        "humanReadableDescription": document.getElementById("HumanReadableDescription").value,
+        "humanReadableDescriptionLanguage": document.getElementById("HumanReadableDescriptionLanguage").value
+    };
+
+    var NrDescriptions = parseInt(document.getElementById("AddDescriptionLocalizationButton").getAttribute("data-nrDescriptions"));
+    var DstIndex = 1;
+    var SrcIndex;
+    var Key;
+    var Value;
+
+    for (SrcIndex = 1; SrcIndex <= NrDescriptions; SrcIndex++)
+    {
+        if ((Key = document.getElementById("LanguageDescription" + SrcIndex)) !== null &&
+            (Value = document.getElementById("LocalizedDescription" + SrcIndex)) !== null)
+        {
+            Key = Key.value;
+            Value = Value.value;
+
+            if (Key !== "" && Value !== "")
+            {
+                Req["descriptionLanguage" + DstIndex] = Key;
+                Req["descriptionLocalized" + DstIndex] = Value;
+                DstIndex++;
+            }
+        }
+    }
+
+    xhttp.open("POST", "/Settings/SaveDescriptions", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(Req));
 }

@@ -15,17 +15,23 @@ Login: /Login.md
 
 ========================================================================
 
-Domain Name
+Domain Settings
 ===================
 
-By providing and using a domain name, it will be easier to reference and protect the application. This is especially important if you plan to make it
-available publicly on the Internet. A domain name must be registered with a *Domain Name Service* (DNS) or a domain name registrar. It must also point to the
-machine where the application is running. If you don't use a domain name, you can still access the application, either by using the predefined domain name 
-**localhost** from the same machine, or by using the IP address of the machine.
+In the following sections you can configure the use of a domain name, as well as provide
+human-readable descriptions of the service provided by the domain.
 
 <form>
 <fieldset>
-<legend>Domain Settings</legend>
+<legend>Domain Name</legend>
+
+By providing and using a domain name, it will be easier to reference and protect the 
+application. This is especially important if you plan to make it available publicly on the 
+Internet. A domain name must be registered with a *Domain Name Service* (DNS) or a domain 
+name registrar. It must also point to the machine where the application is running. If you 
+don't use a domain name, you can still access the application, either by using the 
+predefined domain name `localhost` from the same machine, or by using the IP address of 
+the machine.
 
 <p>
 <input type="checkbox" name="UseDomainName" id="UseDomainName" {{ConfigClass:=Waher.IoTGateway.Setup.DomainConfiguration;Config:=ConfigClass.Instance;Config.UseDomainName ? "checked" : ""}} onclick="ToggleDomainNameProperties()"/>
@@ -191,11 +197,108 @@ to provide is the URL to their ACME Directory below.
 [[;}}
 </div>
 
-</fieldset>
-
 <fieldset id="ConnectionStatus" style="display:none">
 <legend>Status</legend>
 <div id='Status'></div>
+</fieldset>
+</fieldset>
+
+<fieldset>
+<legend>Human-readable Name</legend>
+
+When clients connect to the gateway, they have an option to present a human-readable name
+representing the domain, instead of the domain name configured above. Below you can provide
+a human-readable name to the server. You can provide different localized names for different
+languages.
+
+<p>
+<label for="HumanReadableName">Human-readable Name:</label>  
+<input id="HumanReadableName" name="HumanReadableName" type="text" title="Human-readable name used to identify the machine."
+	value="{{Config.HumanReadableName}}"/>
+</p>
+
+<p>
+<label for="HumanReadableNameLanguage">Human-readable Name Language:</label>  
+<input id="HumanReadableNameLanguage" name="HumanReadableNameLanguage" type="text" style="width:20em" title="Language of human-readable name."
+	value="{{Config.HumanReadableNameLanguage}}"/>
+</p>
+
+{{Index:=0;
+if Config.LocalizedNames!=null then 
+(
+	foreach LocalizedName in Config.LocalizedNames do ]]
+<p>
+<table>
+<tr>
+<td>
+<label for="Language((++Index))">Language ((Index)):</label>  
+<input type="text" id="Language((Index))" value="((LocalizedName.Key))"/>
+</td>
+<td style="width:65%">
+<label for="LocalizedName((Index))">Localized Name ((Index)):</label>  
+<input type="text" id="LocalizedName((Index))" value="((LocalizedName.Value))"/>
+</td>
+<td>
+<button type="button" class="negButtonSm" onclick="RemoveLocalizedName( ((Index)) )">Remove</button>
+</td>
+</tr>
+</table>
+</p>
+[[
+)
+}}
+
+<button id="AddNameLocalizationButton" type="button" onclick="AddHumanReadableNameLanguage(this)" data-nrNames="{{Index}}">Add Language</button>
+<button type="button" onclick="SaveHumanReadableNames()">Save</button>
+</fieldset>
+
+<fieldset>
+<legend>Human-readable Description</legend>
+
+When clients connect to the gateway, they have an option to present a human-readable description
+representing the domain, describing the purpose and role of the server and the service provider
+hosting it. Below you can provide a human-readable description for the server. You can provide 
+different localized descriptions for different languages.
+
+<p>
+<label for="HumanReadableDescription">Human-readable Description:</label>  
+<input id="HumanReadableDescription" name="HumanReadableDescription" type="text" title="Human-readable description used to describe the purpose of the domain."
+	value="{{Config.HumanReadableDescription}}"/>
+</p>
+
+<p>
+<label for="HumanReadableDescriptionLanguage">Human-readable Description Language:</label>  
+<input id="HumanReadableDescriptionLanguage" name="HumanReadableDescriptionLanguage" type="text" style="width:20em" title="Language of human-readable description."
+	value="{{Config.HumanReadableDescriptionLanguage}}"/>
+</p>
+
+{{Index:=0;
+if Config.LocalizedDescriptions!=null then 
+(
+	foreach LocalizedDescription in Config.LocalizedDescriptions do ]]
+<p>
+<table>
+<tr>
+<td>
+<label for="LanguageDescription((++Index))">Language ((Index)):</label>  
+<input type="text" id="LanguageDescription((Index))" value="((LocalizedDescription.Key))"/>
+</td>
+<td style="width:65%">
+<label for="LocalizedDescription((Index))">Localized Description ((Index)):</label>  
+<input type="text" id="LocalizedDescription((Index))" value="((LocalizedDescription.Value))"/>
+</td>
+<td>
+<button type="button" class="negButtonSm" onclick="RemoveLocalizedDescription( ((Index)) )">Remove</button>
+</td>
+</tr>
+</table>
+</p>
+[[
+)
+}}
+
+<button id="AddDescriptionLocalizationButton" type="button" onclick="AddHumanReadableDescriptionLanguage(this)" data-nrDescriptions="{{Index}}">Add Language</button>
+<button type="button" onclick="SaveHumanReadableDescriptions()">Save</button>
 </fieldset>
 
 </form>

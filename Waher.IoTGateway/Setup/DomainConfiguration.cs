@@ -35,11 +35,19 @@ namespace Waher.IoTGateway.Setup
 		private HttpResource testDomainName = null;
 		private HttpResource testCA = null;
 		private HttpResource acmeChallenge = null;
+		private HttpResource saveNames = null;
+		private HttpResource saveDescriptions = null;
 
+		private AlternativeField[] localizedNames = null;
+		private AlternativeField[] localizedDescriptions = null;
 		private string[] alternativeDomains = null;
 		private byte[] certificate = null;
 		private byte[] privateKey = null;
 		private byte[] pfx = null;
+		private string humanReadableName = string.Empty;
+		private string humanReadableNameLanguage = string.Empty;
+		private string humanReadableDescription = string.Empty;
+		private string humanReadableDescriptionLanguage = string.Empty;
 		private string domain = string.Empty;
 		private string acmeDirectory = string.Empty;
 		private string contactEMail = string.Empty;
@@ -277,6 +285,66 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Human-readable name of domain
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string HumanReadableName
+		{
+			get => this.humanReadableName;
+			set => this.humanReadableName = value;
+		}
+
+		/// <summary>
+		/// Language of <see cref="HumanReadableName"/>.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string HumanReadableNameLanguage
+		{
+			get => this.humanReadableNameLanguage;
+			set => this.humanReadableNameLanguage = value;
+		}
+
+		/// <summary>
+		/// Human-readable description of domain
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string HumanReadableDescription
+		{
+			get => this.humanReadableDescription;
+			set => this.humanReadableDescription = value;
+		}
+
+		/// <summary>
+		/// Language of <see cref="HumanReadableDescription"/>.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string HumanReadableDescriptionLanguage
+		{
+			get => this.humanReadableDescriptionLanguage;
+			set => this.humanReadableDescriptionLanguage = value;
+		}
+
+		/// <summary>
+		/// Localized names of domain
+		/// </summary>
+		[DefaultValueNull]
+		public AlternativeField[] LocalizedNames
+		{
+			get => this.localizedNames;
+			set => this.localizedNames = value;
+		}
+
+		/// <summary>
+		/// Localized descriptions of domain
+		/// </summary>
+		[DefaultValueNull]
+		public AlternativeField[] LocalizedDescriptions
+		{
+			get => this.localizedDescriptions;
+			set => this.localizedDescriptions = value;
+		}
+
+		/// <summary>
 		/// If the CA has a Terms of Service.
 		/// </summary>
 		public bool HasToS => !string.IsNullOrEmpty(this.urlToS);
@@ -328,6 +396,8 @@ namespace Waher.IoTGateway.Setup
 			this.testDomainName = WebServer.Register("/Settings/TestDomainName", this.TestDomainName, true, false, true);
 			this.testCA = WebServer.Register("/Settings/TestCA", null, this.TestCA, true, false, true);
 			this.acmeChallenge = WebServer.Register("/.well-known/acme-challenge", this.AcmeChallenge, true, true, true);
+			this.saveNames = WebServer.Register("/Settings/SaveNames", null, this.SaveNames, true, false, true);
+			this.saveDescriptions = WebServer.Register("/Settings/SaveDescriptions", null, this.SaveDescriptions, true, false, true);
 
 			return base.InitSetup(WebServer);
 		}
@@ -342,6 +412,8 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.testDomainName);
 			WebServer.Unregister(this.testCA);
 			WebServer.Unregister(this.acmeChallenge);
+			WebServer.Unregister(this.saveNames);
+			WebServer.Unregister(this.saveDescriptions);
 
 			return base.UnregisterSetup(WebServer);
 		}
@@ -782,6 +854,7 @@ namespace Waher.IoTGateway.Setup
 				return Msg;
 			}
 
+			this.Updated = DateTime.Now;
 			await Database.Update(this);
 
 			return null;
@@ -860,6 +933,7 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
+			this.Updated = DateTime.Now;
 			await Database.Update(this);
 
 			return null;
@@ -889,7 +963,7 @@ namespace Waher.IoTGateway.Setup
 
 		internal Task<bool> CreateCertificate()
 		{
-			return CreateCertificate((string)null);
+			return this.CreateCertificate((string)null);
 		}
 
 		internal async Task<bool> CreateCertificate(string TabID)
@@ -1385,6 +1459,96 @@ namespace Waher.IoTGateway.Setup
 			return Response.Write(Encoding.ASCII.GetBytes(this.token));
 		}
 
+		private async Task SaveNames(HttpRequest Request, HttpResponse Response)
+		{
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = await Request.DecodeDataAsync();
+			if (!(Obj is Dictionary<string, object> Parameters))
+				throw new BadRequestException();
+
+			if (!Parameters.TryGetValue("humanReadableName", out Obj) ||
+				!(Obj is string HumanReadableName) ||
+				!Parameters.TryGetValue("humanReadableNameLanguage", out Obj) ||
+				!(Obj is string HumanReadableNameLanguage))
+			{
+				throw new BadRequestException();
+			}
+
+			List<AlternativeField> LocalizedNames = new List<AlternativeField>();
+			int Index = 1;
+
+			while (Parameters.TryGetValue("nameLanguage" + Index.ToString(), out Obj) && 
+				Obj is string NameLanguage &&
+				Parameters.TryGetValue("nameLocalized" + Index.ToString(), out Obj) &&
+				Obj is string NameLocalized)
+			{
+				if (string.IsNullOrEmpty(NameLanguage))
+					throw new BadRequestException("Language cannot be empty.");
+
+				if (string.IsNullOrEmpty(NameLocalized))
+					throw new BadRequestException("Localized name cannot be empty.");
+
+				LocalizedNames.Add(new AlternativeField(NameLanguage, NameLocalized));
+				Index++;
+			}
+
+			this.HumanReadableName = HumanReadableName;
+			this.HumanReadableNameLanguage = HumanReadableNameLanguage;
+			this.LocalizedNames = LocalizedNames.ToArray();
+
+			this.Updated = DateTime.Now;
+			await Database.Update(this);
+		}
+
+		private async Task SaveDescriptions(HttpRequest Request, HttpResponse Response)
+		{
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = await Request.DecodeDataAsync();
+			if (!(Obj is Dictionary<string, object> Parameters))
+				throw new BadRequestException();
+
+			if (!Parameters.TryGetValue("humanReadableDescription", out Obj) ||
+				!(Obj is string HumanReadableDescription) ||
+				!Parameters.TryGetValue("humanReadableDescriptionLanguage", out Obj) ||
+				!(Obj is string HumanReadableDescriptionLanguage))
+			{
+				throw new BadRequestException();
+			}
+
+			List<AlternativeField> LocalizedDescriptions = new List<AlternativeField>();
+			int Index = 1;
+
+			while (Parameters.TryGetValue("descriptionLanguage" + Index.ToString(), out Obj) &&
+				Obj is string DescriptionLanguage &&
+				Parameters.TryGetValue("descriptionLocalized" + Index.ToString(), out Obj) &&
+				Obj is string DescriptionLocalized)
+			{
+				if (string.IsNullOrEmpty(DescriptionLanguage))
+					throw new BadRequestException("Language cannot be empty.");
+
+				if (string.IsNullOrEmpty(DescriptionLocalized))
+					throw new BadRequestException("Localized description cannot be empty.");
+
+				LocalizedDescriptions.Add(new AlternativeField(DescriptionLanguage, DescriptionLocalized));
+				Index++;
+			}
+
+			this.HumanReadableDescription = HumanReadableDescription;
+			this.HumanReadableDescriptionLanguage = HumanReadableDescriptionLanguage;
+			this.LocalizedDescriptions = LocalizedDescriptions.ToArray();
+
+			this.Updated = DateTime.Now;
+			await Database.Update(this);
+		}
+
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
@@ -1393,6 +1557,5 @@ namespace Waher.IoTGateway.Setup
 		{
 			return Task.FromResult(true);
 		}
-
 	}
 }

@@ -837,7 +837,18 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("area", out Obj) || !(Obj is string Area) ||
 				!Parameters.TryGetValue("city", out Obj) || !(Obj is string City) ||
 				!Parameters.TryGetValue("region", out Obj) || !(Obj is string Region) ||
-				!Parameters.TryGetValue("country", out Obj) || !(Obj is string Country))
+				!Parameters.TryGetValue("country", out Obj) || !(Obj is string Country) ||
+				!Parameters.TryGetValue("orgName", out Obj) || !(Obj is string OrgName) ||
+				!Parameters.TryGetValue("orgDepartment", out Obj) || !(Obj is string OrgDepartment) ||
+				!Parameters.TryGetValue("orgRole", out Obj) || !(Obj is string OrgRole) ||
+				!Parameters.TryGetValue("orgNr", out Obj) || !(Obj is string OrgNr) ||
+				!Parameters.TryGetValue("orgAddress", out Obj) || !(Obj is string OrgAddress) ||
+				!Parameters.TryGetValue("orgAddress2", out Obj) || !(Obj is string OrgAddress2) ||
+				!Parameters.TryGetValue("orgPostalCode", out Obj) || !(Obj is string OrgPostalCode) ||
+				!Parameters.TryGetValue("orgArea", out Obj) || !(Obj is string OrgArea) ||
+				!Parameters.TryGetValue("orgCity", out Obj) || !(Obj is string OrgCity) ||
+				!Parameters.TryGetValue("orgRegion", out Obj) || !(Obj is string OrgRegion) ||
+				!Parameters.TryGetValue("orgCountry", out Obj) || !(Obj is string OrgCountry))
 			{
 				throw new BadRequestException();
 			}
@@ -906,6 +917,17 @@ namespace Waher.IoTGateway.Setup
 			this.city = City;
 			this.region = Region;
 			this.country = Country;
+			this.orgName = OrgName;
+			this.orgDepartment = OrgDepartment;
+			this.orgRole = OrgRole;
+			this.orgNumber = OrgNr;
+			this.orgAddress = OrgAddress;
+			this.orgAddress2 = OrgAddress2;
+			this.orgPostalCode = OrgPostalCode;
+			this.orgArea = OrgArea;
+			this.orgCity = OrgCity;
+			this.orgRegion = OrgRegion;
+			this.orgCountry = OrgCountry;
 			this.altFields = AlternativeFields.ToArray();
 
 			Response.StatusCode = 200;

@@ -130,6 +130,17 @@ function GetLegalIdentityReq()
         "city": document.getElementById("City").value,
         "region": document.getElementById("Region").value,
         "country": document.getElementById("Country").value,
+        "orgName": document.getElementById("OrgName").value,
+        "orgDepartment": document.getElementById("OrgDepartment").value,
+        "orgRole": document.getElementById("OrgRole").value,
+        "orgNr": document.getElementById("OrgNumber").value,
+        "orgAddress": document.getElementById("OrgAddress").value,
+        "orgAddress2": document.getElementById("OrgAddress2").value,
+        "orgPostalCode": document.getElementById("OrgPostalCode").value,
+        "orgArea": document.getElementById("OrgArea").value,
+        "orgCity": document.getElementById("OrgCity").value,
+        "orgRegion": document.getElementById("OrgRegion").value,
+        "orgCountry": document.getElementById("OrgCountry").value,
         "alternative": Alternative
     };
 

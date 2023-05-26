@@ -403,9 +403,9 @@ namespace Waher.Networking.XMPP.Contracts
 				foreach (Property P in this.properties)
 				{
 					Xml.Append("<property name=\"");
-					Xml.Append(P.Name);
+					Xml.Append(XML.Encode(P.Name));
 					Xml.Append("\" value=\"");
-					Xml.Append(P.Value);
+					Xml.Append(XML.Encode(P.Value));
 					Xml.Append("\"/>");
 				}
 			}

@@ -930,6 +930,8 @@ namespace Waher.IoTGateway.Setup
 			this.orgCountry = OrgCountry;
 			this.altFields = AlternativeFields.ToArray();
 
+			await Database.Update(this);
+
 			Response.StatusCode = 200;
 
 			await Gateway.ContractsClient.GenerateNewKeys();

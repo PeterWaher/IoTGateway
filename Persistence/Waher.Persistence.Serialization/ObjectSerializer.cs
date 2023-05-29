@@ -3429,7 +3429,7 @@ namespace Waher.Persistence.Serialization
 								NrDefault++;
 
 								if (DefaultValue is string s && Member.MemberType == typeof(CaseInsensitiveString))
-									DefaultValue = new CaseInsensitiveString(s);
+									DefaultValue = (CaseInsensitiveString)s;
 
 								if (!(DefaultValue is null) && DefaultValue.GetType() != Member.MemberType)
 									DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);

@@ -560,7 +560,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Concat<T>(IEnumerable<T> values)
 		{
-			return new CaseInsensitiveString(string.Concat<T>(values));
+			return (CaseInsensitiveString)string.Concat<T>(values);
 		}
 
 		/// <summary>
@@ -580,7 +580,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Concat(params CaseInsensitiveString[] values)
 		{
-			return new CaseInsensitiveString(string.Concat<CaseInsensitiveString>(values));
+			return (CaseInsensitiveString)string.Concat<CaseInsensitiveString>(values);
 		}
 
 		/// <summary>
@@ -597,7 +597,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1)
 		{
-			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value));
+			return (CaseInsensitiveString)string.Concat(str0?.value, str1?.value);
 		}
 
 		/// <summary>
@@ -620,7 +620,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1, CaseInsensitiveString str2, CaseInsensitiveString str3)
 		{
-			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value, str2?.value, str3?.value));
+			return (CaseInsensitiveString)string.Concat(str0?.value, str1?.value, str2?.value, str3?.value);
 		}
 
 		/// <summary>
@@ -640,7 +640,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(object arg0, object arg1, object arg2)
 		{
-			return new CaseInsensitiveString(string.Concat(arg0, arg1, arg2));
+			return (CaseInsensitiveString)string.Concat(arg0, arg1, arg2);
 		}
 
 		/// <summary>
@@ -657,7 +657,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(object arg0, object arg1)
 		{
-			return new CaseInsensitiveString(string.Concat(arg0, arg1));
+			return (CaseInsensitiveString)string.Concat(arg0, arg1);
 		}
 
 		/// <summary>
@@ -672,7 +672,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(object arg0)
 		{
-			return new CaseInsensitiveString(string.Concat(arg0));
+			return (CaseInsensitiveString)string.Concat(arg0);
 		}
 
 		/// <summary>
@@ -712,7 +712,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Concat(params object[] args)
 		{
-			return new CaseInsensitiveString(string.Concat(args));
+			return (CaseInsensitiveString)string.Concat(args);
 		}
 
 		/// <summary>
@@ -732,7 +732,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1, CaseInsensitiveString str2)
 		{
-			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value, str2?.value));
+			return (CaseInsensitiveString)string.Concat(str0?.value, str1?.value, str2?.value);
 		}
 
 		/// <summary>
@@ -800,7 +800,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(CaseInsensitiveString format, object arg0)
 		{
-			return new CaseInsensitiveString(string.Format(format.lowerCase, arg0));
+			return (CaseInsensitiveString)string.Format(format.lowerCase, arg0);
 		}
 
 		/// <summary>
@@ -830,7 +830,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(IFormatProvider provider, CaseInsensitiveString format, params object[] args)
 		{
-			return new CaseInsensitiveString(string.Format(provider, format.lowerCase, args));
+			return (CaseInsensitiveString)string.Format(provider, format.lowerCase, args);
 		}
 
 		/// <summary>
@@ -866,7 +866,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(IFormatProvider provider, CaseInsensitiveString format, object arg0, object arg1, object arg2)
 		{
-			return new CaseInsensitiveString(string.Format(provider, format.lowerCase, arg0, arg1, arg2));
+			return (CaseInsensitiveString)string.Format(provider, format.lowerCase, arg0, arg1, arg2);
 		}
 
 		/// <summary>
@@ -894,7 +894,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(CaseInsensitiveString format, object arg0, object arg1)
 		{
-			return new CaseInsensitiveString(string.Format(format.lowerCase, arg0, arg1));
+			return (CaseInsensitiveString)string.Format(format.lowerCase, arg0, arg1);
 		}
 
 		/// <summary>
@@ -926,7 +926,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(IFormatProvider provider, CaseInsensitiveString format, object arg0, object arg1)
 		{
-			return new CaseInsensitiveString(string.Format(provider, format.lowerCase, arg0, arg1));
+			return (CaseInsensitiveString)string.Format(provider, format.lowerCase, arg0, arg1);
 		}
 
 		/// <summary>
@@ -956,7 +956,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(IFormatProvider provider, CaseInsensitiveString format, object arg0)
 		{
-			return new CaseInsensitiveString(string.Format(provider, format.lowerCase, arg0));
+			return (CaseInsensitiveString)string.Format(provider, format.lowerCase, arg0);
 		}
 
 		/// <summary>
@@ -982,7 +982,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(CaseInsensitiveString format, params object[] args)
 		{
-			return new CaseInsensitiveString(string.Format(format.lowerCase, args));
+			return (CaseInsensitiveString)string.Format(format.lowerCase, args);
 		}
 
 		/// <summary>
@@ -1014,7 +1014,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(CaseInsensitiveString format, object arg0, object arg1, object arg2)
 		{
-			return new CaseInsensitiveString(string.Format(format.lowerCase, arg0, arg1, arg2));
+			return (CaseInsensitiveString)string.Format(format.lowerCase, arg0, arg1, arg2);
 		}
 
 		/// <summary>
@@ -1067,7 +1067,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, params object[] values)
 		{
-			return new CaseInsensitiveString(string.Join(separator?.value, values));
+			return (CaseInsensitiveString)string.Join(separator?.value, values);
 		}
 
 		/// <summary>
@@ -1090,7 +1090,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, params CaseInsensitiveString[] value)
 		{
-			return new CaseInsensitiveString(string.Join(separator?.value, value.ToStringArray()));
+			return (CaseInsensitiveString)string.Join(separator?.value, value.ToStringArray());
 		}
 
 		/// <summary>
@@ -1116,7 +1116,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join<T>(CaseInsensitiveString separator, IEnumerable<T> values)
 		{
-			return new CaseInsensitiveString(string.Join(separator?.value, values));
+			return (CaseInsensitiveString)string.Join(separator?.value, values);
 		}
 
 		/// <summary>
@@ -1153,7 +1153,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, CaseInsensitiveString[] value, int startIndex, int count)
 		{
-			return new CaseInsensitiveString(string.Join(separator?.value, value.ToStringArray(), startIndex, count));
+			return (CaseInsensitiveString)string.Join(separator?.value, value.ToStringArray(), startIndex, count);
 		}
 
 		/// <summary>
@@ -1177,7 +1177,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, IEnumerable<CaseInsensitiveString> values)
 		{
-			return new CaseInsensitiveString(string.Join<CaseInsensitiveString>(separator?.value, values));
+			return (CaseInsensitiveString)string.Join(separator?.value, values);
 		}
 
 		/// <summary>
@@ -1707,7 +1707,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Insert(int startIndex, CaseInsensitiveString value)
 		{
-			return new CaseInsensitiveString(this.value.Insert(startIndex, value?.value));
+			return (CaseInsensitiveString)this.value.Insert(startIndex, value?.value);
 		}
 
 		/// <summary>
@@ -2089,7 +2089,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString PadLeft(int totalWidth)
 		{
-			return new CaseInsensitiveString(this.value.PadLeft(totalWidth));
+			return (CaseInsensitiveString)this.value.PadLeft(totalWidth);
 		}
 
 		/// <summary>
@@ -2116,7 +2116,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString PadLeft(int totalWidth, char paddingChar)
 		{
-			return new CaseInsensitiveString(this.value.PadLeft(totalWidth, paddingChar));
+			return (CaseInsensitiveString)this.value.PadLeft(totalWidth, paddingChar);
 		}
 
 		/// <summary>
@@ -2139,7 +2139,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString PadRight(int totalWidth)
 		{
-			return new CaseInsensitiveString(this.value.PadRight(totalWidth));
+			return (CaseInsensitiveString)this.value.PadRight(totalWidth);
 		}
 
 		/// <summary>
@@ -2166,7 +2166,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString PadRight(int totalWidth, char paddingChar)
 		{
-			return new CaseInsensitiveString(this.value.PadRight(totalWidth, paddingChar));
+			return (CaseInsensitiveString)this.value.PadRight(totalWidth, paddingChar);
 		}
 
 		/// <summary>
@@ -2185,7 +2185,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Remove(int startIndex)
 		{
-			return new CaseInsensitiveString(this.value.Remove(startIndex));
+			return (CaseInsensitiveString)this.value.Remove(startIndex);
 		}
 
 		/// <summary>
@@ -2207,7 +2207,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Remove(int startIndex, int count)
 		{
-			return new CaseInsensitiveString(this.value.Remove(startIndex, count));
+			return (CaseInsensitiveString)this.value.Remove(startIndex, count);
 		}
 
 		/// <summary>
@@ -2249,7 +2249,7 @@ namespace Waher.Persistence
 				Diff += d - c;
 			}
 
-			return new CaseInsensitiveString(s);
+			return (CaseInsensitiveString)s;
 		}
 
 		/// <summary>
@@ -2277,7 +2277,7 @@ namespace Waher.Persistence
 			else
 				s = s.Replace(char.ToUpper(oldChar), char.ToUpper(newChar));
 
-			return new CaseInsensitiveString(s);
+			return (CaseInsensitiveString)s;
 		}
 
 		/// <summary>
@@ -2366,7 +2366,7 @@ namespace Waher.Persistence
 				if (options != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(s))
 				{
 					count--;
-					Result.Add(new CaseInsensitiveString(s));
+					Result.Add((CaseInsensitiveString)s);
 				}
 
 				Last = i;
@@ -2378,7 +2378,7 @@ namespace Waher.Persistence
 				s = this.value.Substring(Last + 1);
 
 				if (options != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(s))
-					Result.Add(new CaseInsensitiveString(this.value.Substring(Last + 1)));
+					Result.Add((CaseInsensitiveString)this.value.Substring(Last + 1));
 			}
 
 			return Result.ToArray();
@@ -2452,7 +2452,7 @@ namespace Waher.Persistence
 				if (options != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(s))
 				{
 					count--;
-					Result.Add(new CaseInsensitiveString(s));
+					Result.Add((CaseInsensitiveString)s);
 				}
 
 				Last = i;
@@ -2464,7 +2464,7 @@ namespace Waher.Persistence
 				s = this.value.Substring(Last + 1);
 
 				if (options != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(s))
-					Result.Add(new CaseInsensitiveString(this.value.Substring(Last + 1)));
+					Result.Add((CaseInsensitiveString)this.value.Substring(Last + 1));
 			}
 
 			return Result.ToArray();
@@ -2560,7 +2560,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Substring(int startIndex, int length)
 		{
-			return new CaseInsensitiveString(this.value.Substring(startIndex, length));
+			return (CaseInsensitiveString)this.value.Substring(startIndex, length);
 		}
 
 		/// <summary>
@@ -2580,7 +2580,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Substring(int startIndex)
 		{
-			return new CaseInsensitiveString(this.value.Substring(startIndex));
+			return (CaseInsensitiveString)this.value.Substring(startIndex);
 		}
 
 		/// <summary>
@@ -2630,7 +2630,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public CaseInsensitiveString Trim()
 		{
-			return new CaseInsensitiveString(this.value.Trim());
+			return (CaseInsensitiveString)this.value.Trim();
 		}
 
 		/// <summary>
@@ -2649,7 +2649,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public CaseInsensitiveString Trim(params char[] trimChars)
 		{
-			return new CaseInsensitiveString(this.value.Trim(UpperAndLowerCases(trimChars)));
+			return (CaseInsensitiveString)this.value.Trim(UpperAndLowerCases(trimChars));
 		}
 
 		private static char[] UpperAndLowerCases(char[] trimChars)
@@ -2691,7 +2691,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public CaseInsensitiveString TrimEnd(params char[] trimChars)
 		{
-			return new CaseInsensitiveString(this.value.TrimEnd(UpperAndLowerCases(trimChars)));
+			return (CaseInsensitiveString)this.value.TrimEnd(UpperAndLowerCases(trimChars));
 		}
 
 		/// <summary>
@@ -2708,7 +2708,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public CaseInsensitiveString TrimStart(params char[] trimChars)
 		{
-			return new CaseInsensitiveString(this.value.TrimStart(UpperAndLowerCases(trimChars)));
+			return (CaseInsensitiveString)this.value.TrimStart(UpperAndLowerCases(trimChars));
 		}
 
 	}

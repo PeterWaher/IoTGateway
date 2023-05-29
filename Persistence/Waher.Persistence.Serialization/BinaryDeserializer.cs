@@ -395,12 +395,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>Deserialized value.</returns>
 		public CaseInsensitiveString ReadCaseInsensitiveString()
 		{
-			string s = this.ReadString();
-
-			if (s is null)
-				return null;
-			else
-				return new CaseInsensitiveString(s);
+			return (CaseInsensitiveString)this.ReadString();
 		}
 
 		/// <summary>

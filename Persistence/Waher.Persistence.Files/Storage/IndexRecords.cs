@@ -2727,7 +2727,7 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_CI_STRING:
-									j = new CaseInsensitiveString(xReader.ReadChar().ToString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadChar().ToString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
@@ -2862,7 +2862,7 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_CI_STRING:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -2882,87 +2882,87 @@ namespace Waher.Persistence.Files.Storage
 							switch (yType)
 							{
 								case ObjectSerializer.TYPE_BOOLEAN:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString((yReader.ReadBit() ? 1 : 0).ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)(yReader.ReadBit() ? 1 : 0).ToString());
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadByte().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadByte().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadInt16().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadInt16().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARINT16:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthInt16().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthInt16().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadInt32().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadInt32().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARINT32:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthInt32().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthInt32().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadInt64().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadInt64().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARINT64:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthInt64().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthInt64().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadSByte().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadSByte().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadUInt16().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadUInt16().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARUINT16:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthUInt16().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthUInt16().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadUInt32().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadUInt32().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARUINT32:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthUInt32().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthUInt32().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadUInt64().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadUInt64().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_VARUINT64:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadVariableLengthUInt64().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadVariableLengthUInt64().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadDecimal().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadDecimal().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadDouble().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadDouble().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadSingle().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadSingle().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadChar().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadChar().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_ENUM:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
@@ -2971,23 +2971,23 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_DATETIME:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadDateTime().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadDateTime().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_DATETIMEOFFSET:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadDateTimeOffset().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadDateTimeOffset().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_TIMESPAN:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadTimeSpan().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadTimeSpan().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_GUID:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadGuid().ToString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadGuid().ToString());
 									break;
 
 								case ObjectSerializer.TYPE_CI_STRING:
-									j = new CaseInsensitiveString(xReader.ReadString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_BYTEARRAY:
@@ -3039,7 +3039,7 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_CI_STRING:
-									j = new CaseInsensitiveString(xReader.ReadGuid().ToString()).CompareTo(new CaseInsensitiveString(yReader.ReadString()));
+									j = ((CaseInsensitiveString)xReader.ReadGuid().ToString()).CompareTo((CaseInsensitiveString)yReader.ReadString());
 									break;
 
 								case ObjectSerializer.TYPE_GUID:

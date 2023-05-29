@@ -92,7 +92,7 @@ namespace Waher.IoTGateway.Setup
 			this.uploadKey = WebServer.Register("/Settings/UploadKey", null, this.UploadKey, true, false, true);
 			this.restore = WebServer.Register("/Settings/Restore", null, this.Restore, true, false, true);
 
-			WebServer.SessionRemoved += WebServer_SessionRemoved;
+			WebServer.SessionRemoved += this.WebServer_SessionRemoved;
 
 			return base.InitSetup(WebServer);
 		}
@@ -107,7 +107,7 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.uploadKey);
 			WebServer.Unregister(this.restore);
 
-			WebServer.SessionRemoved -= WebServer_SessionRemoved;
+			WebServer.SessionRemoved -= this.WebServer_SessionRemoved;
 
 			return base.UnregisterSetup(WebServer);
 		}
@@ -1111,11 +1111,11 @@ namespace Waher.IoTGateway.Setup
 								break;
 
 							case "CIS":
-								Value = new CaseInsensitiveString(r.Value);
+								Value = (CaseInsensitiveString)r.Value;
 								break;
 
 							case "CIS64":
-								Value = new CaseInsensitiveString(Encoding.UTF8.GetString(Convert.FromBase64String(r.Value)));
+								Value = (CaseInsensitiveString)Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
 								break;
 
 							case "DT":
@@ -1836,7 +1836,7 @@ namespace Waher.IoTGateway.Setup
 					return new DateTimeOffset(DT, TS);
 
 				case BinaryExportFormat.TYPE_CI_STRING:
-					return new CaseInsensitiveString(r.ReadString());
+					return (CaseInsensitiveString)r.ReadString();
 
 				case BinaryExportFormat.TYPE_ARRAY:
 					r.ReadString(); // Type name

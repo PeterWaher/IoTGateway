@@ -29,6 +29,9 @@ namespace Waher.Script.Persistence.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
+			if (Value is null)
+				return null;
+
 			if (!(Value is string String))
 				throw new ArgumentException("Expected string.", nameof(Value));
 
@@ -44,6 +47,9 @@ namespace Waher.Script.Persistence.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
+			if (Value is null)
+				return ObjectValue.Null;
+
 			if (!(Value is string String))
 				throw new ArgumentException("Expected string.", nameof(Value));
 

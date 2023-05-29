@@ -48,12 +48,12 @@ namespace Waher.Persistence.Files.Searching
 
 			if (xTypeCode == ObjectSerializer.TYPE_CI_STRING)
 			{
-				y = new CaseInsensitiveString(ToString(y, yTypeCode));
+				y = (CaseInsensitiveString)ToString(y, yTypeCode);
 				return true;
 			}
 			else if (yTypeCode == ObjectSerializer.TYPE_CI_STRING)
 			{
-				x = new CaseInsensitiveString(ToString(x, xTypeCode));
+				x = (CaseInsensitiveString)ToString(x, xTypeCode);
 				return true;
 			}
 			else if (yTypeCode == ObjectSerializer.TYPE_STRING)
@@ -454,7 +454,7 @@ namespace Waher.Persistence.Files.Searching
 					s = s2.Value;
 					if (Increment(ref s))
 					{
-						Value = new CaseInsensitiveString(s);
+						Value = (CaseInsensitiveString)s;
 						return true;
 					}
 					else
@@ -622,7 +622,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			string s = Value.Value;
 			Increment(ref s);
-			Value = new CaseInsensitiveString(s);
+			Value = (CaseInsensitiveString)s;
 			return true;
 		}
 
@@ -913,7 +913,7 @@ namespace Waher.Persistence.Files.Searching
 					s = s2.Value;
 					if (Decrement(ref s))
 					{
-						Value = new CaseInsensitiveString(s);
+						Value = (CaseInsensitiveString)s;
 						return true;
 					}
 					else
@@ -1088,7 +1088,7 @@ namespace Waher.Persistence.Files.Searching
 			if (!Decrement(ref s))
 				return false;
 
-			Value = new CaseInsensitiveString(s);
+			Value = (CaseInsensitiveString)s;
 			return true;
 		}
 

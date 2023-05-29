@@ -1047,11 +1047,7 @@ namespace Waher.Persistence.Serialization
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
 		public static CaseInsensitiveString ReadCaseInsensitiveString(IDeserializer Reader, uint FieldDataType)
 		{
-			string s = ReadString(Reader, FieldDataType);
-			if (s is null)
-				return null;
-			else
-				return new CaseInsensitiveString(s);
+			return (CaseInsensitiveString)ReadString(Reader, FieldDataType);
 		}
 
 		/// <summary>

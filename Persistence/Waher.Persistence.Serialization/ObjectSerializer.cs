@@ -796,13 +796,6 @@ namespace Waher.Persistence.Serialization
 						CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
 						AppendType(MemberType, CSharp);
 						CSharp.AppendLine("));");
-
-						if (!this.hasByRef)
-						{
-							IObjectSerializer Nested = await this.context.GetObjectSerializer(MemberType);
-							if (Nested is ObjectSerializer Nested2 && Nested2.HasByReference)
-								this.hasByRef = true;
-						}
 					}
 				}
 
@@ -3462,18 +3455,21 @@ namespace Waher.Persistence.Serialization
 
 					if (!string.IsNullOrEmpty(ShortName))
 						this.membersByName[ShortName] = Member;
-
-					if (Member.IsNestedObject)
-					{
-						Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
-						if (Member.NestedSerializer is ObjectSerializer Nested2 && Nested2.HasByReference)
-							this.hasByRef = true;
-					}
 				}
 #if NETSTANDARD2_0
 			}
 #endif
 			this.prepared = true;
+
+			foreach (Member Member2 in this.membersOrdered)
+			{
+				if (GetFieldDataTypeCode(Member2.MemberType) == TYPE_OBJECT)
+				{
+					Member2.NestedSerializer = await this.context.GetObjectSerializer(Member2.MemberType);
+					if (Member2.NestedSerializer is ObjectSerializer Nested2 && Nested2.HasByReference)
+						this.hasByRef = true;
+				}
+			}
 		}
 
 		/// <summary>

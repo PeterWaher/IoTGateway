@@ -58,7 +58,7 @@ namespace Waher.Persistence
 		public override bool Equals(object obj)
 		{
 			if (obj is CaseInsensitiveString S)
-				return this.lowerCase?.Equals(S.lowerCase) ?? (S.lowerCase is null);
+				return this.lowerCase?.Equals(S?.lowerCase) ?? (S.lowerCase is null);
 			else if (obj is string S2)
 				return this.lowerCase?.Equals(S2?.ToLower()) ?? (S2 is null);
 			else if (obj is null)
@@ -279,7 +279,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static CaseInsensitiveString operator +(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return new CaseInsensitiveString(S1?.value + S2?.value);
+			return (CaseInsensitiveString)(S1?.value + S2?.value);
 		}
 
 		/// <summary>
@@ -757,7 +757,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static bool Equals(CaseInsensitiveString a, CaseInsensitiveString b, StringComparison comparisonType)
 		{
-			return string.Equals(a.lowerCase, b.lowerCase, comparisonType);
+			return string.Equals(a?.lowerCase, b?.lowerCase, comparisonType);
 		}
 
 		/// <summary>
@@ -775,7 +775,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static bool Equals(CaseInsensitiveString a, CaseInsensitiveString b)
 		{
-			return string.Equals(a.lowerCase, b.lowerCase);
+			return string.Equals(a?.lowerCase, b?.lowerCase);
 		}
 
 		/// <summary>
@@ -1284,7 +1284,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public bool Equals(CaseInsensitiveString value)
 		{
-			return this.lowerCase.Equals(value.lowerCase);
+			return this.lowerCase?.Equals(value?.lowerCase) ?? value is null;
 		}
 
 		/// <summary>
@@ -1307,7 +1307,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public bool Equals(CaseInsensitiveString value, StringComparison comparisonType)
 		{
-			return this.lowerCase.Equals(value.lowerCase, comparisonType);
+			return this.lowerCase?.Equals(value?.lowerCase, comparisonType) ?? value is null;
 		}
 
 		/// <summary>

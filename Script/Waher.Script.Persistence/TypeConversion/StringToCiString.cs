@@ -35,7 +35,7 @@ namespace Waher.Script.Persistence.TypeConversion
 			if (!(Value is string String))
 				throw new ArgumentException("Expected string.", nameof(Value));
 
-			return new CaseInsensitiveString(String);
+			return (CaseInsensitiveString)String;
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace Waher.Script.Persistence.TypeConversion
 			if (!(Value is string String))
 				throw new ArgumentException("Expected string.", nameof(Value));
 
-			return new ObjectValue(new CaseInsensitiveString(String));
+			return new ObjectValue((CaseInsensitiveString)String);
 		}
 	}
 }

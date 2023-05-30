@@ -8,12 +8,15 @@ namespace Waher.Content.Semantic.TurtleModel
 	/// </summary>
 	public class StringLiteral : SemanticLiteral
 	{
+		private readonly string language;
+
 		/// <summary>
 		/// Represents a string literal.
 		/// </summary>
 		public StringLiteral()
 			: base()
 		{
+			this.language = null;
 		}
 
 		/// <summary>
@@ -23,15 +26,18 @@ namespace Waher.Content.Semantic.TurtleModel
 		public StringLiteral(string Value)
 			: base(Value, Value)
 		{
+			this.language = null;
 		}
 
 		/// <summary>
 		/// Represents a string literal.
 		/// </summary>
 		/// <param name="Value">Parsed value</param>
-		public StringLiteral(string Value, string StringValue)
-			: base(Value, StringValue)
+		/// <param name="Language">Language of string.</param>
+		public StringLiteral(string Value, string Language)
+			: base(Value, Value)
 		{
+			this.language = Language;
 		}
 
 		/// <summary>
@@ -68,6 +74,12 @@ namespace Waher.Content.Semantic.TurtleModel
 			sb.Append('"');
 			sb.Append(JSON.Encode(this.StringValue));
 			sb.Append('"');
+
+			if (!string.IsNullOrEmpty(this.language))
+			{
+				sb.Append('@');
+				sb.Append(this.language);
+			}
 
 			return sb.ToString();
 		}

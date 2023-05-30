@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using Waher.Content.Semantic.TurtleModel;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
 {
@@ -15,7 +16,8 @@ namespace Waher.Content.Semantic
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
-			{ "xsd", "http://www.w3.org/2001/XMLSchema#" }
+			{ "xsd", "http://www.w3.org/2001/XMLSchema#" },
+			{ "ttl", "http://www.w3.org/2008/turtle#" }
 		};
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly string text;
@@ -152,7 +154,7 @@ namespace Waher.Content.Semantic
 
 								if (this.NextNonWhitespaceChar() != '.')
 									throw this.ParsingException("Expected .");
-							
+
 								break;
 
 							case "prefix":
@@ -170,7 +172,7 @@ namespace Waher.Content.Semantic
 
 								if (this.NextNonWhitespaceChar() != '.')
 									throw this.ParsingException("Expected .");
-							
+
 								break;
 
 							default:
@@ -205,15 +207,22 @@ namespace Waher.Content.Semantic
 						{
 							this.pos += 2;
 
-							string DataType = this.ParseUriOrPrefixedToken().AbsoluteUri.ToLower();
+							string DataType = this.ParseUriOrPrefixedToken().AbsoluteUri;
 
 							if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 							{
-								LiteralType = new CustomLiteral(string.Empty, DataType);
+								LiteralType = Types.FindBest<ISemanticLiteral, string>(DataType)
+									?? new CustomLiteral(string.Empty, DataType);
+
 								this.dataTypes[DataType] = LiteralType;
 							}
 
 							return LiteralType.Parse(s, DataType);
+						}
+						else if (this.pos < this.len && this.text[this.pos] == '@')
+						{
+							this.pos++;
+							return new StringLiteral(s, this.ParseLabel());
 						}
 						else
 							return new StringLiteral(s);
@@ -225,7 +234,14 @@ namespace Waher.Content.Semantic
 						if (char.IsWhiteSpace(ch))
 							break;
 
-						if (char.IsLetter(ch) || ch == ':')
+						if (ch == '_')
+						{
+							if (this.NextNonWhitespaceChar() != ':')
+								throw this.ParsingException("Expected :");
+
+							return new BlankNode(this.ParseToken());
+						}
+						else if (char.IsLetter(ch) || ch == ':')
 						{
 							this.pos--;
 							s = this.ParseLabel();
@@ -374,7 +390,7 @@ namespace Waher.Content.Semantic
 			char ch;
 
 			ch = this.PeekNextChar();
-			while (!char.IsWhiteSpace(ch) && ch != 0)
+			while (!char.IsWhiteSpace(ch) && !char.IsPunctuation(ch) && ch != 0)
 			{
 				this.pos++;
 				ch = this.PeekNextChar();

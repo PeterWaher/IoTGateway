@@ -8,21 +8,30 @@
 		/// <summary>
 		/// Represents a blank node
 		/// </summary>
-		/// <param name="Index">Blank-node index in document.</param>
-		public BlankNode(int Index)
+		/// <param name="NodeIndex">Blank-node Node Index in document.</param>
+		public BlankNode(int NodeIndex)
+			: this("n" + NodeIndex.ToString())
 		{
-			this.Index = Index;
 		}
 
 		/// <summary>
-		/// Blank node index.
+		/// Represents a blank node
 		/// </summary>
-		public int Index { get; }
+		/// <param name="NodeId">Blank-node Node ID in document.</param>
+		public BlankNode(string NodeId)
+		{
+			this.NodeId = NodeId;
+		}
+
+		/// <summary>
+		/// Blank node Node ID.
+		/// </summary>
+		public string NodeId { get; }
 
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return "_:n" + this.Index.ToString();
+			return "_:" + this.NodeId.ToString();
 		}
 	}
 }

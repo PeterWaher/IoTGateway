@@ -41,9 +41,9 @@ namespace Waher.Content.Semantic.TurtleModel
 
 			sb.Append('"');
 			sb.Append(JSON.Encode(this.StringValue));
-			sb.Append("\"^^\"");
+			sb.Append("\"^^<");
 			sb.Append(this.StringType);
-			sb.Append('"');
+			sb.Append('>');
 
 			return sb.ToString();
 		}

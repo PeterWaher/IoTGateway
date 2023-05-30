@@ -15,6 +15,7 @@ namespace Waher.Content.Semantic
 		{
 			{ "xsd", "http://www.w3.org/2001/XMLSchema" }
 		};
+		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly string text;
 		private readonly int len;
 		private Uri baseUri = null;
@@ -158,7 +159,7 @@ namespace Waher.Content.Semantic
 								if (this.NextNonWhitespaceChar() != ':')
 									throw this.ParsingException("Expected :");
 
-								if (this.NextNonWhitespaceChar()!='<')
+								if (this.NextNonWhitespaceChar() != '<')
 									throw this.ParsingException("Expected <");
 
 								this.namespaces[s] = this.ParseUri().AbsoluteUri;
@@ -196,36 +197,15 @@ namespace Waher.Content.Semantic
 						{
 							this.pos += 2;
 
-							Uri DataType = this.ParseUriOrPrefixedToken();
+							string DataType = this.ParseUriOrPrefixedToken().AbsoluteUri.ToLower();
 
-							switch (DataType.AbsoluteUri.ToLower())
+							if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 							{
-								case "http://www.w3.org/2001/XMLSchema#integer":
-									if (int.TryParse(s, out int i2))
-										return new Int32Literal(i2);
-									else if (long.TryParse(s, out long l2))
-										return new Int64Literal(l2);
-									else if (BigInteger.TryParse(s, out BigInteger bi2))
-										return new BigIntegerLiteral(bi2);
-									break;
-
-								case "http://www.w3.org/2001/XMLSchema#double":
-									if (CommonTypes.TryParse(s, out double dbl2))
-										return new DoubleLiteral(dbl2);
-									break;
-
-								case "http://www.w3.org/2001/XMLSchema#decimal":
-									if (CommonTypes.TryParse(s, out decimal dec2))
-										return new DecimalLiteral(dec2);
-									break;
-
-								case "http://www.w3.org/2001/XMLSchema#boolean":
-									if (CommonTypes.TryParse(s, out Boolean b))
-										return new BooleanLiteral(b);
-									break;
+								LiteralType = new CustomLiteral(string.Empty, DataType);
+								this.dataTypes[DataType] = LiteralType;
 							}
 
-							return new CustomLiteral(s, DataType.AbsolutePath);
+							return LiteralType.Parse(s, DataType);
 						}
 						else
 							return new StringLiteral(s);
@@ -251,32 +231,19 @@ namespace Waher.Content.Semantic
 								return BooleanLiteral.False;
 						}
 
-						if (IsInteger(s))
-						{
-							if (int.TryParse(s, out int i))
-								return new Int32Literal(i);
+						if (BigInteger.TryParse(s, out BigInteger bi))
+							return new IntegerLiteral(bi);
+						
+						if (CommonTypes.TryParse(s, out double dbl))
+							return new DoubleLiteral(dbl);
 
-							if (long.TryParse(s, out long l))
-								return new Int64Literal(l);
+						if (CommonTypes.TryParse(s, out decimal dec))
+							return new DecimalLiteral(dec);
 
-							if (BigInteger.TryParse(s, out BigInteger bi))
-								return new BigIntegerLiteral(bi);
+						if (this.NextChar() != ':')
+							throw this.ParsingException("Expected literal, URI or prefix.");
 
-							throw this.ParsingException("Unable to parse integer.");
-						}
-						else
-						{
-							if (CommonTypes.TryParse(s, out double dbl))
-								return new DoubleLiteral(dbl);
-
-							if (CommonTypes.TryParse(s, out decimal dec))
-								return new DecimalLiteral(dec);
-
-							if (this.NextChar() != ':')
-								throw this.ParsingException("Expected literal, URI or prefix.");
-
-							return new UriNode(this.ParsePrefixedToken(s));
-						}
+						return new UriNode(this.ParsePrefixedToken(s));
 				}
 			}
 		}
@@ -331,28 +298,6 @@ namespace Waher.Content.Semantic
 			}
 
 			throw this.ParsingException("Expected )");
-		}
-
-		private static bool IsInteger(string s)
-		{
-			if (s is null)
-				return false;
-
-			bool First = true;
-
-			foreach (char ch in s)
-			{
-				if (First)
-				{
-					First = false;
-					if (!char.IsDigit(ch) && ch != '+' && ch != '-')
-						return false;
-				}
-				else if (!char.IsDigit(ch))
-					return false;
-			}
-
-			return true;
 		}
 
 		private Uri ParseUriOrPrefixedToken()

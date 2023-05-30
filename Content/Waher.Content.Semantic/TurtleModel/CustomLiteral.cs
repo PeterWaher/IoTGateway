@@ -1,44 +1,35 @@
-﻿using System;
-
-namespace Waher.Content.Semantic.TurtleModel
+﻿namespace Waher.Content.Semantic.TurtleModel
 {
 	/// <summary>
 	/// Represents a custom literal.
 	/// </summary>
-	public class CustomLiteral : ISemanticLiteral
+	public class CustomLiteral : SemanticLiteral
 	{
-		private readonly string value;
-		private readonly string type;
-
 		/// <summary>
 		/// Represents a custom literal.
 		/// </summary>
 		/// <param name="Value">Literal value</param>
 		/// <param name="Type">Data type.</param>
 		public CustomLiteral(string Value, string Type)
+			: base(Value, Value)
 		{
-			this.value = Value;
-			this.type = Type;
+			this.StringType = Type;
 		}
-
-		/// <summary>
-		/// Parsed value.
-		/// </summary>
-		public object Value => this.value;
-
-		/// <summary>
-		/// Type of value.
-		/// </summary>
-		public Type Type => typeof(string);
 
 		/// <summary>
 		/// Type name
 		/// </summary>
-		public string StringType => this.type;
+		public override string StringType { get; }
 
 		/// <summary>
-		/// String representation of value.
+		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
-		public string StringValue => this.value;
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType)
+		{
+			return new CustomLiteral(Value, DataType);
+		}
 	}
 }

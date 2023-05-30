@@ -1,41 +1,63 @@
 ﻿using System;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.TurtleModel
 {
 	/// <summary>
 	/// Represents a string literal.
 	/// </summary>
-	public class StringLiteral : ISemanticLiteral
+	public class StringLiteral : SemanticLiteral
 	{
-		private readonly string value;
+		/// <summary>
+		/// Represents a string literal.
+		/// </summary>
+		public StringLiteral()
+			: base()
+		{
+		}
 
 		/// <summary>
 		/// Represents a string literal.
 		/// </summary>
-		/// <param name="Value">Literal value</param>
+		/// <param name="Value">Parsed value</param>
 		public StringLiteral(string Value)
+			: base(Value, Value)
 		{
-			this.value = Value;
 		}
 
 		/// <summary>
-		/// Parsed value.
+		/// Represents a string literal.
 		/// </summary>
-		public object Value => this.value;
-
-		/// <summary>
-		/// Type of value.
-		/// </summary>
-		public Type Type => typeof(string);
+		/// <param name="Value">Parsed value</param>
+		public StringLiteral(string Value, string StringValue)
+			: base(Value, StringValue)
+		{
+		}
 
 		/// <summary>
 		/// Type name
 		/// </summary>
-		public string StringType => null;
+		public override string StringType => string.Empty;
 
 		/// <summary>
-		/// String representation of value.
+		/// How well the type supports a given data type.
 		/// </summary>
-		public string StringValue => this.value;
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(string DataType)
+		{
+			return string.IsNullOrEmpty(DataType) || DataType == "http://www.w3.org/2001/XMLSchema#string" ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Tries to parse a string value of the type supported by the class..
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType)
+		{
+			return new StringLiteral(Value);
+		}
 	}
 }

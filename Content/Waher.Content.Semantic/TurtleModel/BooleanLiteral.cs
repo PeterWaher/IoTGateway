@@ -1,51 +1,65 @@
-﻿using System;
-
-namespace Waher.Content.Semantic.TurtleModel
+﻿namespace Waher.Content.Semantic.TurtleModel
 {
 	/// <summary>
 	/// Represents a bool literal.
 	/// </summary>
-	public class BooleanLiteral : ISemanticLiteral
+	public class BooleanLiteral : SemanticLiteral
 	{
 		/// <summary>
 		/// Predefined value "true".
 		/// </summary>
-		public readonly static BooleanLiteral True = new BooleanLiteral(true);
+		public readonly static BooleanLiteral True = new BooleanLiteral(true, "true");
 
 		/// <summary>
 		/// Predefined value "false".
 		/// </summary>
-		public readonly static BooleanLiteral False = new BooleanLiteral(false);
-
-		private readonly bool value;
+		public readonly static BooleanLiteral False = new BooleanLiteral(false, "false");
 
 		/// <summary>
 		/// Represents a bool literal.
 		/// </summary>
 		/// <param name="Value">Literal value</param>
-		public BooleanLiteral(bool Value)
+		public BooleanLiteral()
+			: base()
 		{
-			this.value = Value;
 		}
 
 		/// <summary>
-		/// Parsed value.
+		/// Represents a bool literal.
 		/// </summary>
-		public object Value => this.value;
+		/// <param name="Value">Parsed value</param>
+		public BooleanLiteral(bool Value)
+			: base(Value, CommonTypes.Encode(Value))
+		{
+		}
 
 		/// <summary>
-		/// Type of value.
+		/// Represents a bool literal.
 		/// </summary>
-		public Type Type => typeof(bool);
+		/// <param name="Value">Parsed value</param>
+		/// <param name="StringValue">String value.</param>
+		public BooleanLiteral(bool Value, string StringValue)
+			: base(Value, StringValue)
+		{
+		}
 
 		/// <summary>
 		/// Type name
 		/// </summary>
-		public string StringType => "http://www.w3.org/2001/XMLSchema#boolean";
+		public override string StringType => "http://www.w3.org/2001/XMLSchema#boolean";
 
 		/// <summary>
-		/// String representation of value.
+		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
-		public string StringValue => CommonTypes.Encode(this.value);
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType)
+		{
+			if (CommonTypes.TryParse(Value, out bool b))
+				return new BooleanLiteral(b, Value);
+			else
+				return new CustomLiteral(Value, DataType);
+		}
 	}
 }

@@ -13,7 +13,7 @@ namespace Waher.Content.Semantic
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
-			{ "xsd", "http://www.w3.org/2001/XMLSchema" }
+			{ "xsd", "http://www.w3.org/2001/XMLSchema#" }
 		};
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly string text;
@@ -345,7 +345,7 @@ namespace Waher.Content.Semantic
 
 			string LocalName = this.ParseToken();
 
-			return new Uri(Namespace + "#" + LocalName);
+			return new Uri(Namespace + LocalName);
 		}
 
 		private string ParseLabel()

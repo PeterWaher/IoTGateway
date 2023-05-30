@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Semantic", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory", "Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj", "{FD110B3B-DC5E-404C-B2D1-1A6BC7FC9E23}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{DA84D31A-C3FF-4FFE-8440-5B0921C32043}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{FD110B3B-DC5E-404C-B2D1-1A6BC7FC9E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD110B3B-DC5E-404C-B2D1-1A6BC7FC9E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD110B3B-DC5E-404C-B2D1-1A6BC7FC9E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

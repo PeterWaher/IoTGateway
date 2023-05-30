@@ -123,10 +123,10 @@ namespace Waher.Content.Semantic
 
 		private ISemanticElement ParseElement()
 		{
-			char ch = this.NextNonWhitespaceChar();
-
 			while (true)
 			{
+				char ch = this.NextNonWhitespaceChar();
+
 				switch (ch)
 				{
 					case (char)0:
@@ -137,7 +137,7 @@ namespace Waher.Content.Semantic
 						break;
 
 					case '@':
-						string s = this.ParseToken();
+						string s = this.ParseLabel();
 
 						switch (s)
 						{
@@ -147,14 +147,16 @@ namespace Waher.Content.Semantic
 									throw this.ParsingException("Expected <");
 
 								this.baseUri = this.ParseUri();
+
+								if (this.NextNonWhitespaceChar() != '.')
+									throw this.ParsingException("Expected .");
+							
 								break;
 
 							case "prefix":
 								this.SkipWhiteSpace();
-								if (this.PeekNextChar() == ':')
-									s = string.Empty;
-								else
-									s = this.ParseToken();
+
+								s = this.ParseLabel();
 
 								if (this.NextNonWhitespaceChar() != ':')
 									throw this.ParsingException("Expected :");
@@ -163,6 +165,10 @@ namespace Waher.Content.Semantic
 									throw this.ParsingException("Expected <");
 
 								this.namespaces[s] = this.ParseUri().AbsoluteUri;
+
+								if (this.NextNonWhitespaceChar() != '.')
+									throw this.ParsingException("Expected .");
+							
 								break;
 
 							default:
@@ -214,36 +220,47 @@ namespace Waher.Content.Semantic
 						return new UriNode(this.ParsePrefixedToken(string.Empty));
 
 					default:
-						if (ch <= ' ' || ch == 160)
+						if (char.IsWhiteSpace(ch))
 							break;
 
-						s = this.ParseToken();
-
-						switch (s)
+						if (char.IsLetter(ch) || ch == ':')
 						{
-							case "a":
-								return UriNode.RdfA;
+							this.pos--;
+							s = this.ParseLabel();
 
-							case "true":
-								return BooleanLiteral.True;
+							switch (s)
+							{
+								case "a":
+									return UriNode.RdfA;
 
-							case "false":
-								return BooleanLiteral.False;
+								case "true":
+									return BooleanLiteral.True;
+
+								case "false":
+									return BooleanLiteral.False;
+							}
+
+							if (this.NextChar() != ':')
+								throw this.ParsingException("Expected :");
+
+							return new UriNode(this.ParsePrefixedToken(s));
 						}
+						else
+						{
+							this.pos--;
+							s = this.ParseToken();
 
-						if (BigInteger.TryParse(s, out BigInteger bi))
-							return new IntegerLiteral(bi);
-						
-						if (CommonTypes.TryParse(s, out double dbl))
-							return new DoubleLiteral(dbl);
+							if (BigInteger.TryParse(s, out BigInteger bi))
+								return new IntegerLiteral(bi);
 
-						if (CommonTypes.TryParse(s, out decimal dec))
-							return new DecimalLiteral(dec);
+							if (CommonTypes.TryParse(s, out double dbl))
+								return new DoubleLiteral(dbl);
 
-						if (this.NextChar() != ':')
+							if (CommonTypes.TryParse(s, out decimal dec))
+								return new DecimalLiteral(dec);
+
 							throw this.ParsingException("Expected literal, URI or prefix.");
-
-						return new UriNode(this.ParsePrefixedToken(s));
+						}
 				}
 			}
 		}
@@ -311,7 +328,7 @@ namespace Waher.Content.Semantic
 				return this.ParseUri();
 			}
 
-			string Prefix = this.ParseToken();
+			string Prefix = this.ParseLabel();
 
 			if (this.NextChar() != ':')
 				throw this.ParsingException("Expected :");
@@ -331,15 +348,40 @@ namespace Waher.Content.Semantic
 			return new Uri(Namespace + "#" + LocalName);
 		}
 
+		private string ParseLabel()
+		{
+			int Start = this.pos;
+			char ch;
+
+			ch = this.PeekNextChar();
+			while (char.IsLetter(ch))
+			{
+				this.pos++;
+				ch = this.PeekNextChar();
+			}
+
+			if (this.pos == Start)
+				return string.Empty;
+			else
+				return this.text.Substring(Start, this.pos - Start);
+		}
+
 		private string ParseToken()
 		{
 			int Start = this.pos;
 			char ch;
 
-			while ((ch = this.PeekNextChar()) > ' ' && ch != 160)
+			ch = this.PeekNextChar();
+			while (!char.IsWhiteSpace(ch) && ch != 0)
+			{
 				this.pos++;
+				ch = this.PeekNextChar();
+			}
 
-			return this.text.Substring(Start, this.pos - Start);
+			if (this.pos == Start)
+				return string.Empty;
+			else
+				return this.text.Substring(Start, this.pos - Start);
 		}
 
 		private string ParseString(bool MultiLine)
@@ -357,13 +399,13 @@ namespace Waher.Content.Semantic
 						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
 						{
 							this.pos += 2;
-							return sb?.ToString() ?? this.text.Substring(Start, this.pos - Start - 2);
+							return sb?.ToString() ?? this.text.Substring(Start, this.pos - Start - 3);
 						}
 						else
 							sb?.Append(ch);
 					}
 					else
-						return sb?.ToString() ?? this.text.Substring(Start, this.pos - Start);
+						return sb?.ToString() ?? this.text.Substring(Start, this.pos - Start - 1);
 				}
 				else if (ch == '\\')
 				{
@@ -491,7 +533,7 @@ namespace Waher.Content.Semantic
 		{
 			char ch;
 
-			while (((ch = this.PeekNextChar()) <= ' ' && ch != 0) || ch == 160)
+			while (char.IsWhiteSpace(ch = this.PeekNextChar()) && ch != 0)
 				this.pos++;
 		}
 
@@ -518,7 +560,7 @@ namespace Waher.Content.Semantic
 			while (this.pos < this.len)
 			{
 				ch = this.text[this.pos++];
-				if (ch > ' ' && ch != 160)
+				if (!char.IsWhiteSpace(ch))
 					return ch;
 			}
 

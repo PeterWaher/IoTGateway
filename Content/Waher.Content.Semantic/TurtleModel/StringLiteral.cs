@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.TurtleModel
@@ -8,6 +8,8 @@ namespace Waher.Content.Semantic.TurtleModel
 	/// </summary>
 	public class StringLiteral : SemanticLiteral
 	{
+		private bool? multiLine;
+
 		/// <summary>
 		/// Represents a string literal.
 		/// </summary>
@@ -58,6 +60,30 @@ namespace Waher.Content.Semantic.TurtleModel
 		public override ISemanticLiteral Parse(string Value, string DataType)
 		{
 			return new StringLiteral(Value);
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			if (!this.multiLine.HasValue)
+				this.multiLine = this.StringValue.IndexOfAny(CommonTypes.CRLF) >= 0;
+
+			StringBuilder sb = new StringBuilder();
+
+			if (this.multiLine.Value)
+			{
+				sb.Append("\"\"\"");
+				sb.Append(JSON.Encode(this.StringValue));
+				sb.Append("\"\"\"");
+			}
+			else
+			{
+				sb.Append('"');
+				sb.Append(JSON.Encode(this.StringValue));
+				sb.Append('"');
+			}
+
+			return sb.ToString();
 		}
 	}
 }

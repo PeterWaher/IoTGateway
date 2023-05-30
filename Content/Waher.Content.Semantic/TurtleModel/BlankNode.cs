@@ -18,5 +18,11 @@
 		/// Blank node index.
 		/// </summary>
 		public int Index { get; }
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return "_:n" + this.Index.ToString();
+		}
 	}
 }

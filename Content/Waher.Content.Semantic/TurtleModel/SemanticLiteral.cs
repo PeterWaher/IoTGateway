@@ -1,4 +1,5 @@
-﻿using Waher.Runtime.Inventory;
+﻿using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.TurtleModel
 {
@@ -57,5 +58,19 @@ namespace Waher.Content.Semantic.TurtleModel
 		/// <param name="DataType">Data type.</param>
 		/// <returns>Parsed literal.</returns>
 		public abstract ISemanticLiteral Parse(string Value, string DataType);
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append('"');
+			sb.Append(JSON.Encode(this.StringValue));
+			sb.Append("\"^^\"");
+			sb.Append(this.StringType);
+			sb.Append('"');
+
+			return sb.ToString();
+		}
 	}
 }

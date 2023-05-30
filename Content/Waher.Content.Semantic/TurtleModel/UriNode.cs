@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Waher.Content.Semantic.TurtleModel
 {
@@ -40,5 +41,17 @@ namespace Waher.Content.Semantic.TurtleModel
 		/// URI
 		/// </summary>
 		public Uri Uri { get; }
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append('<');
+			sb.Append(this.Uri.AbsoluteUri);
+			sb.Append('>');
+
+			return sb.ToString();
+		}
 	}
 }

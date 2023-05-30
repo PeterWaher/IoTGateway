@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{DA84D31A-C3FF-4FFE-8440-5B0921C32043}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Semantic.Test", "Content\Waher.Content.Semantic.Test\Waher.Content.Semantic.Test.csproj", "{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA84D31A-C3FF-4FFE-8440-5B0921C32043}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

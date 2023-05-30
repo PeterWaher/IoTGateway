@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using Waher.Content.Semantic.TurtleModel;
 using Waher.Runtime.Inventory;
+using Waher.Script.Constants;
 
 namespace Waher.Content.Semantic
 {
@@ -64,17 +65,23 @@ namespace Waher.Content.Semantic
 		{
 			ISemanticElement Predicate = null;
 			ISemanticElement Object;
+			int TriplePosition = Subject is null ? 0 : 1;
 			bool InBlankNode = !(Subject is null);
 
 			while (this.pos < this.len)
 			{
-				Object = this.ParseElement();
+				Object = this.ParseElement(TriplePosition);
 				if (Object is null)
 				{
 					if (Subject is null)
 						return;
 					else if (Predicate is null)
-						throw this.ParsingException("Expected predicate.");
+					{
+						if (InBlankNode)
+							return;
+						else
+							throw this.ParsingException("Expected predicate.");
+					}
 					else
 						throw this.ParsingException("Expected object.");
 				}
@@ -82,14 +89,12 @@ namespace Waher.Content.Semantic
 				if (Subject is null)
 				{
 					Subject = Object;
-					if (Subject is ISemanticLiteral)
-						throw this.ParsingException("Subjects cannot be literals.");
+					TriplePosition++;
 				}
 				else if (Predicate is null)
 				{
 					Predicate = Object;
-					if (!(Predicate is UriNode))
-						throw this.ParsingException("Predicates must be URIs.");
+					TriplePosition++;
 				}
 				else
 				{
@@ -103,10 +108,12 @@ namespace Waher.Content.Semantic
 
 							Subject = null;
 							Predicate = null;
+							TriplePosition = 0;
 							break;
 
 						case ';':
 							Predicate = null;
+							TriplePosition = 1;
 							break;
 
 						case ',':
@@ -125,7 +132,7 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private ISemanticElement ParseElement()
+		private ISemanticElement ParseElement(int TriplePosition)
 		{
 			while (true)
 			{
@@ -136,12 +143,8 @@ namespace Waher.Content.Semantic
 					case (char)0:
 						return null;
 
-					case '#':
-						this.SkipLine();
-						break;
-
 					case '@':
-						string s = this.ParseLabel();
+						string s = this.ParseName();
 
 						switch (s)
 						{
@@ -160,7 +163,7 @@ namespace Waher.Content.Semantic
 							case "prefix":
 								this.SkipWhiteSpace();
 
-								s = this.ParseLabel();
+								s = this.ParseName();
 
 								if (this.NextNonWhitespaceChar() != ':')
 									throw this.ParsingException("Expected :");
@@ -195,6 +198,9 @@ namespace Waher.Content.Semantic
 						return new UriNode(this.ParseUri());
 
 					case '"':
+						if (TriplePosition != 2)
+							throw this.ParsingException("Literals can only occur in object position.");
+
 						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
 						{
 							this.pos += 2;
@@ -222,7 +228,7 @@ namespace Waher.Content.Semantic
 						else if (this.pos < this.len && this.text[this.pos] == '@')
 						{
 							this.pos++;
-							return new StringLiteral(s, this.ParseLabel());
+							return new StringLiteral(s, this.ParseName());
 						}
 						else
 							return new StringLiteral(s);
@@ -239,45 +245,46 @@ namespace Waher.Content.Semantic
 							if (this.NextNonWhitespaceChar() != ':')
 								throw this.ParsingException("Expected :");
 
-							return new BlankNode(this.ParseToken());
+							return new BlankNode(this.ParseName());
 						}
 						else if (char.IsLetter(ch) || ch == ':')
 						{
 							this.pos--;
-							s = this.ParseLabel();
+							s = this.ParseName();
+
+							if (this.PeekNextChar() == ':')
+							{
+								this.pos++;
+								return new UriNode(this.ParsePrefixedToken(s));
+							}
 
 							switch (s)
 							{
 								case "a":
-									return UriNode.RdfA;
+									if (TriplePosition == 1)
+										return UriNode.RdfA;
+									break;
 
 								case "true":
-									return BooleanLiteral.True;
+									if (TriplePosition == 2)
+										return BooleanLiteral.True;
+									break;
 
 								case "false":
-									return BooleanLiteral.False;
+									if (TriplePosition == 2)
+										return BooleanLiteral.False;
+									break;
 							}
 
-							if (this.NextChar() != ':')
-								throw this.ParsingException("Expected :");
-
-							return new UriNode(this.ParsePrefixedToken(s));
+							throw this.ParsingException("Expected :");
 						}
 						else
 						{
+							if (TriplePosition != 2)
+								throw this.ParsingException("Literals can only occur in object position.");
+
 							this.pos--;
-							s = this.ParseToken();
-
-							if (BigInteger.TryParse(s, out BigInteger bi))
-								return new IntegerLiteral(bi);
-
-							if (CommonTypes.TryParse(s, out double dbl))
-								return new DoubleLiteral(dbl);
-
-							if (CommonTypes.TryParse(s, out decimal dec))
-								return new DecimalLiteral(dec);
-
-							throw this.ParsingException("Expected literal, URI or prefix.");
+							return this.ParseNumber();
 						}
 				}
 			}
@@ -321,7 +328,7 @@ namespace Waher.Content.Semantic
 					return Result;
 				}
 
-				ISemanticElement Element = this.ParseElement();
+				ISemanticElement Element = this.ParseElement(2);
 				if (Element is null)
 					break;
 
@@ -346,7 +353,7 @@ namespace Waher.Content.Semantic
 				return this.ParseUri();
 			}
 
-			string Prefix = this.ParseLabel();
+			string Prefix = this.ParseName();
 
 			if (this.NextChar() != ':')
 				throw this.ParsingException("Expected :");
@@ -361,45 +368,185 @@ namespace Waher.Content.Semantic
 
 			this.SkipWhiteSpace();
 
-			string LocalName = this.ParseToken();
+			string LocalName = this.ParseName();
 
 			return new Uri(Namespace + LocalName);
 		}
 
-		private string ParseLabel()
+		private string ParseName()
 		{
-			int Start = this.pos;
-			char ch;
-
-			ch = this.PeekNextChar();
-			while (char.IsLetter(ch))
-			{
-				this.pos++;
-				ch = this.PeekNextChar();
-			}
-
-			if (this.pos == Start)
+			if (!IsNameStartChar(this.PeekNextChar()))
 				return string.Empty;
-			else
-				return this.text.Substring(Start, this.pos - Start);
+
+			int Start = this.pos++;
+
+			while (IsNameChar(this.PeekNextChar()))
+				this.pos++;
+
+			return this.text.Substring(Start, this.pos - Start);
 		}
 
-		private string ParseToken()
+		private static bool IsNameStartChar(char ch)
+		{
+			if (ch < 'A')
+				return false;
+			else if (ch <= 'Z')
+				return true;
+			else if (ch < '_')
+				return false;
+			else if (ch == '_')
+				return true;
+			else if (ch < 'a')
+				return false;
+			else if (ch <= 'z')
+				return true;
+			else if (ch < '\xc0')
+				return false;
+			else if (ch <= '\xd6')
+				return true;
+			else if (ch < '\xd8')
+				return false;
+			else if (ch <= '\xf6')
+				return true;
+			else if (ch < '\xf8')
+				return false;
+			else if (ch <= '\x02ff')
+				return true;
+			else if (ch < '\x0370')
+				return false;
+			else if (ch <= '\x037d')
+				return true;
+			else if (ch < '\x037f')
+				return false;
+			else if (ch <= '\x1fff')
+				return true;
+			else if (ch < '\x037f')
+				return false;
+			else if (ch <= '\x1fff')
+				return true;
+			else if (ch < '\x200c')
+				return false;
+			else if (ch <= '\x200d')
+				return true;
+			else if (ch < '\x2070')
+				return false;
+			else if (ch <= '\x218f')
+				return true;
+			else if (ch < '\x2C00')
+				return false;
+			else if (ch <= '\x2FEF')
+				return true;
+			else if (ch < '\x3001')
+				return false;
+			else if (ch <= '\xD7FF')
+				return true;
+			else if (ch < '\xF900')
+				return false;
+			else if (ch <= '\xFDCF')
+				return true;
+			else if (ch < '\xFDF0')
+				return false;
+			else if (ch <= '\xFFFD')
+				return true;
+			else
+				return false;
+		}
+
+		private static bool IsNameChar(char ch)
+		{
+			if (IsNameStartChar(ch))
+				return true;
+			else if (ch < '-')
+				return false;
+			else if (ch == '-')
+				return true;
+			else if (ch < '0')
+				return false;
+			else if (ch <= '9')
+				return true;
+			else if (ch < '\x00B7')
+				return false;
+			else if (ch == '\x00B7')
+				return true;
+			else if (ch < '\x0300')
+				return false;
+			else if (ch <= '\x036F')
+				return true;
+			else if (ch < '\x203F')
+				return false;
+			else if (ch <= '\x2040')
+				return true;
+			else
+				return false;
+		}
+
+		private SemanticLiteral ParseNumber()
 		{
 			int Start = this.pos;
-			char ch;
+			bool HasDigits = false;
+			bool HasDecimal = false;
+			bool HasExponent = false;
+			bool HasSign = false;
 
-			ch = this.PeekNextChar();
-			while (!char.IsWhiteSpace(ch) && !char.IsPunctuation(ch) && ch != 0)
+			while (true)
 			{
+				char ch = this.PeekNextChar();
+
+				if (char.IsDigit(ch))
+					HasDigits = true;
+				else if (ch == '+' || ch == '-')
+				{
+					if (HasSign || HasDecimal)
+						break;
+
+					HasSign = true;
+				}
+				else if (ch == '.')
+				{
+					if (HasDecimal || HasExponent)
+						break;
+
+					HasDecimal = true;
+				}
+				else if (ch == 'e' || ch == 'E')
+				{
+					HasExponent = true;
+					HasSign = false;
+				}
+				else
+					break;
+
 				this.pos++;
-				ch = this.PeekNextChar();
 			}
 
-			if (this.pos == Start)
-				return string.Empty;
-			else
-				return this.text.Substring(Start, this.pos - Start);
+			if (this.pos > Start)
+			{
+				string s = this.text.Substring(Start, this.pos - Start);
+
+				if (HasExponent)
+				{
+					if (CommonTypes.TryParse(s, out double dbl))
+						return new DoubleLiteral(dbl);
+					else
+						throw this.ParsingException("Invalid double number.");
+				}
+				else if (HasDecimal)
+				{
+					if (CommonTypes.TryParse(s, out decimal dec))
+						return new DecimalLiteral(dec);
+					else
+						throw this.ParsingException("Invalid decimal number.");
+				}
+				else if (HasDigits)
+				{
+					if (BigInteger.TryParse(s, out BigInteger bi))
+						return new IntegerLiteral(bi);
+					else
+						throw this.ParsingException("Invalid integer number.");
+				}
+			}
+
+			throw this.ParsingException("Expected value element.");
 		}
 
 		private string ParseString(bool MultiLine)
@@ -511,9 +658,11 @@ namespace Waher.Content.Semantic
 
 			while (this.pos < this.len)
 			{
-				char ch = this.NextNonWhitespaceChar();
+				char ch = this.PeekNextChar();
 				if (ch == 0)
 					break;
+
+				this.pos++;
 
 				if (ch == '>')
 				{
@@ -532,7 +681,7 @@ namespace Waher.Content.Semantic
 							throw this.ParsingException("Invalid URI.");
 					}
 				}
-				else
+				else if (!char.IsWhiteSpace(ch))
 					sb.Append(ch);
 			}
 
@@ -566,7 +715,19 @@ namespace Waher.Content.Semantic
 		private char NextChar()
 		{
 			if (this.pos < this.len)
-				return this.text[this.pos++];
+			{
+				char ch = this.text[this.pos++];
+				while (ch == '#')
+				{
+					this.SkipLine();
+					if (this.pos < this.len)
+						ch = this.text[this.pos++];
+					else
+						return (char)0;
+				}
+
+				return ch;
+			}
 			else
 				return (char)0;
 		}
@@ -575,14 +736,13 @@ namespace Waher.Content.Semantic
 		{
 			char ch;
 
-			while (this.pos < this.len)
+			do
 			{
-				ch = this.text[this.pos++];
-				if (!char.IsWhiteSpace(ch))
-					return ch;
+				ch = this.NextChar();
 			}
+			while (ch != 0 && char.IsWhiteSpace(ch));
 
-			return (char)0;
+			return ch;
 		}
 	}
 }

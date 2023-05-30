@@ -136,6 +136,37 @@ namespace Waher.Content.Semantic
 						break;
 
 					case '@':
+						string s = this.ParseToken();
+
+						switch (s)
+						{
+							case "base":
+								ch = this.NextNonWhitespaceChar();
+								if (ch != '<')
+									throw this.ParsingException("Expected <");
+
+								this.baseUri = this.ParseUri();
+								break;
+
+							case "prefix":
+								this.SkipWhiteSpace();
+								if (this.PeekNextChar() == ':')
+									s = string.Empty;
+								else
+									s = this.ParseToken();
+
+								if (this.NextNonWhitespaceChar() != ':')
+									throw this.ParsingException("Expected :");
+
+								if (this.NextNonWhitespaceChar()!='<')
+									throw this.ParsingException("Expected <");
+
+								this.namespaces[s] = this.ParseUri().AbsoluteUri;
+								break;
+
+							default:
+								throw this.ParsingException("Unrecognized keyword.");
+						}
 						break;
 
 					case '[':
@@ -153,8 +184,6 @@ namespace Waher.Content.Semantic
 						return new UriNode(this.ParseUri());
 
 					case '"':
-						string s;
-
 						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
 						{
 							this.pos += 2;
@@ -362,7 +391,7 @@ namespace Waher.Content.Semantic
 			int Start = this.pos;
 			char ch;
 
-			while (this.pos < this.len && (ch = this.text[this.pos]) > ' ' && ch != 160)
+			while ((ch = this.PeekNextChar()) > ' ' && ch != 160)
 				this.pos++;
 
 			return this.text.Substring(Start, this.pos - Start);
@@ -509,7 +538,7 @@ namespace Waher.Content.Semantic
 		{
 			char ch;
 
-			while (this.pos < this.len && (ch = this.text[this.pos]) != '\r' && ch != '\n')
+			while ((ch = this.PeekNextChar()) != '\r' && ch != '\n' && ch != 0)
 				this.pos++;
 		}
 
@@ -517,8 +546,16 @@ namespace Waher.Content.Semantic
 		{
 			char ch;
 
-			while (this.pos < this.len && ((ch = this.text[this.pos]) <= ' ' || ch == 160))
+			while (((ch = this.PeekNextChar()) <= ' ' && ch != 0) || ch == 160)
 				this.pos++;
+		}
+
+		private char PeekNextChar()
+		{
+			if (this.pos < this.len)
+				return this.text[this.pos];
+			else
+				return (char)0;
 		}
 
 		private char NextChar()

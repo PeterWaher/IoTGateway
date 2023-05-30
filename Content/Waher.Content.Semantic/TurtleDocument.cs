@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Net;
 using System.Numerics;
 using System.Text;
 using Waher.Content.Semantic.TurtleModel;
@@ -11,9 +9,8 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
 	/// </summary>
-	public class TurtleDocument : IEnumerable<ISemanticTriple>
+	public class TurtleDocument : SemanticModel
 	{
-		private readonly List<ISemanticTriple> triples = new List<ISemanticTriple>();
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
 			{ "xsd", "http://www.w3.org/2001/XMLSchema" }
@@ -544,24 +541,6 @@ namespace Waher.Content.Semantic
 			}
 
 			return (char)0;
-		}
-
-		/// <summary>
-		/// Gets an enumerator for the semantic information in the document.
-		/// </summary>
-		/// <returns>Enumerator.</returns>
-		public IEnumerator<ISemanticTriple> GetEnumerator()
-		{
-			return this.triples.GetEnumerator();
-		}
-
-		/// <summary>
-		/// Gets an enumerator for the semantic information in the document.
-		/// </summary>
-		/// <returns>Enumerator.</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.triples.GetEnumerator();
 		}
 	}
 }

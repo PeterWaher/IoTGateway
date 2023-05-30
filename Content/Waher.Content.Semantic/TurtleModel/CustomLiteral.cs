@@ -7,8 +7,6 @@ namespace Waher.Content.Semantic.TurtleModel
 	/// </summary>
 	public class CustomLiteral : SemanticLiteral
 	{
-		private bool? multiLine;
-
 		/// <summary>
 		/// Represents a custom literal.
 		/// </summary>
@@ -39,25 +37,11 @@ namespace Waher.Content.Semantic.TurtleModel
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			if (!this.multiLine.HasValue)
-				this.multiLine = this.StringValue.IndexOfAny(CommonTypes.CRLF) >= 0;
-
 			StringBuilder sb = new StringBuilder();
 
-			if (this.multiLine.Value)
-			{
-				sb.Append("\"\"\"");
-				sb.Append(JSON.Encode(this.StringValue));
-				sb.Append("\"\"\"");
-			}
-			else
-			{
-				sb.Append('"');
-				sb.Append(JSON.Encode(this.StringValue));
-				sb.Append('"');
-			}
-
-			sb.Append("^^\"");
+			sb.Append('"');
+			sb.Append(JSON.Encode(this.StringValue));
+			sb.Append("\"^^\"");
 			sb.Append(this.StringType);
 			sb.Append('"');
 

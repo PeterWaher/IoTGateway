@@ -32,6 +32,12 @@ namespace Waher.Content.Semantic.Test
 			this.PerformTest("example2_Short.ttl");
 		}
 
+		[TestMethod]
+		public void Test_04_Example3()
+		{
+			this.PerformTest("example3.ttl");
+		}
+
 		private void PerformTest(string FileName)
 		{
 			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);

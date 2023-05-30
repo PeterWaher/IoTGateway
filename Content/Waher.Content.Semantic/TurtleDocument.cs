@@ -8,6 +8,8 @@ namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
+	/// 
+	/// Ref: https://www.w3.org/TeamSubmission/turtle/
 	/// </summary>
 	public class TurtleDocument : SemanticModel
 	{
@@ -476,7 +478,7 @@ namespace Waher.Content.Semantic
 					}
 				}
 				else
-					sb?.ToString();
+					sb?.Append(ch);
 			}
 
 			throw this.ParsingException("Expected end of string.");

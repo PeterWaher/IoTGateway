@@ -13,9 +13,11 @@
     <None Remove="Data\Turtle\Input\example1.ttl" />
     <None Remove="Data\Turtle\Input\example2.ttl" />
     <None Remove="Data\Turtle\Input\example2_Short.ttl" />
+    <None Remove="Data\Turtle\Input\example3.ttl" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\Turtle\Input\example3.ttl" />
     <EmbeddedResource Include="Data\Turtle\Input\example2_Short.ttl" />
     <EmbeddedResource Include="Data\Turtle\Input\example2.ttl" />
     <EmbeddedResource Include="Data\Turtle\Input\example1.ttl" />

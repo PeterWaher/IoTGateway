@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
-using Waher.Content.Semantic.TurtleModel;
+using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -39,8 +40,8 @@ namespace Waher.Content.Semantic
 		private readonly string text;
 		private readonly string blankNodeIdPrefix;
 		private readonly int len;
+		private readonly BlankNodeIdMode blankNodeIdMode;
 		private Uri baseUri = null;
-		private BlankNodeIdMode blankNodeIdMode;
 		private int blankNodeIndex = 0;
 		private int pos = 0;
 

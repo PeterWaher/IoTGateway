@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Semantic.TurtleModel
+namespace Waher.Content.Semantic.Model
 {
 	/// <summary>
 	/// Abstract base class for semantic literal values.

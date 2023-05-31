@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Waher.Content.Semantic.TurtleModel
+namespace Waher.Content.Semantic.Model
 {
 	/// <summary>
 	/// Represents a URI

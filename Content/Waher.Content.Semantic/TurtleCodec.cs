@@ -84,13 +84,13 @@ namespace Waher.Content.Semantic
 		/// <returns>If the encoder encodes the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is TurtleDocument Doc &&
+			if (Object is TurtleDocument &&
 				InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (Object is ISemanticModel Model &&
+			else if (Object is ISemanticModel &&
 				InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;

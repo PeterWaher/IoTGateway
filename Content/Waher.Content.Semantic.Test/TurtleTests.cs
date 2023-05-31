@@ -1,9 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Security.Cryptography;
 using System.Text;
-using Waher.Content.Semantic.TurtleModel;
+using Waher.Content.Semantic.Model;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.Transforms;
 
 namespace Waher.Content.Semantic.Test
 {

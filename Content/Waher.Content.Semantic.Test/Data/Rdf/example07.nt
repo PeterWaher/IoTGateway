@@ -1,0 +1,4 @@
+<http://www.w3.org/TR/rdf-syntax-grammar> <http://purl.org/dc/elements/1.1/title> "RDF/XML Syntax Specification (Revised)" .
+_:genid1 <http://example.org/stuff/1.0/fullName> "Dave Beckett" .
+_:genid1 <http://example.org/stuff/1.0/homePage> <http://purl.org/net/dajobe/> .
+<http://www.w3.org/TR/rdf-syntax-grammar> <http://example.org/stuff/1.0/editor> _:genid1 .

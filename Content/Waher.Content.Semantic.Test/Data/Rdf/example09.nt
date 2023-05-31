@@ -1,0 +1,1 @@
+<http://example.org/item01> <http://example.org/stuff/1.0/prop> "<a:Box xmlns:a=\"http://example.org/a#\" required=\"true\">\n         <a:widget size=\"10\"></a:widget>\n         <a:grommit id=\"23\"></a:grommit></a:Box>\n    "^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral> .

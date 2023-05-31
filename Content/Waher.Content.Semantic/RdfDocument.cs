@@ -165,15 +165,20 @@ namespace Waher.Content.Semantic
 				Properties.AddLast(new KeyValuePair<string, string>(Attr.NamespaceURI + Attr.LocalName, Attr.Value));
 			}
 
-			UriNode Subject = new UriNode(this.CreateUri(About, BaseUri));
 			bool HasLanguage = !string.IsNullOrEmpty(Language);
+			ISemanticElement Subject;
+
+			if (About is null)
+				Subject = this.CreateBlankNode();
+			else
+				Subject = new UriNode(this.CreateUri(About, BaseUri));
 
 			if (E.NamespaceURI != RdfNamespace)
 			{
 				this.triples.Add(new SemanticTriple(Subject, RdfType,
 					new UriNode(this.CreateUri(E.NamespaceURI + E.LocalName, BaseUri))));
 			}
-			else if (E.LocalName != "Definition")
+			else if (E.LocalName != "Description")
 			{
 				if (E.LocalName == "li")
 				{

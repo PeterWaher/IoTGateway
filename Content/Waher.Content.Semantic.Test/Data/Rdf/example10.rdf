@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ex="http://example.org/stuff/1.0/">
+  <rdf:Description rdf:about="http://example.org/item01">
+    <ex:size rdf:datatype="http://www.w3.org/2001/XMLSchema#int">123</ex:size>
+  </rdf:Description>
+</rdf:RDF>

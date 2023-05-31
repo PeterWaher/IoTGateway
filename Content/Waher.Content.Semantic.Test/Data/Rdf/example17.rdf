@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Seq rdf:about="http://example.org/favourite-fruit">
+    <rdf:_1 rdf:resource="http://example.org/banana"/>
+    <rdf:_2 rdf:resource="http://example.org/apple"/>
+    <rdf:_3 rdf:resource="http://example.org/pear"/>
+  </rdf:Seq>
+</rdf:RDF>

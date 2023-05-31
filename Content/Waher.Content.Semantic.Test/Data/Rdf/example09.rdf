@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ex="http://example.org/stuff/1.0/">
+  <rdf:Description rdf:about="http://example.org/item01">
+    <ex:prop rdf:parseType="Literal"
+             xmlns:a="http://example.org/a#"><a:Box required="true">
+         <a:widget size="10" />
+         <a:grommit id="23" /></a:Box>
+    </ex:prop>
+  </rdf:Description>
+</rdf:RDF>

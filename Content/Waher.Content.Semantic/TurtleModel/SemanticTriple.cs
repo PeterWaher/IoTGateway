@@ -1,4 +1,6 @@
-﻿namespace Waher.Content.Semantic.TurtleModel
+﻿using System.Text;
+
+namespace Waher.Content.Semantic.TurtleModel
 {
 	/// <summary>
 	/// Implements a semantic triple.
@@ -32,5 +34,19 @@
 		/// Object element
 		/// </summary>
 		public ISemanticElement Object { get; }
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.Subject);
+			sb.Append('\t');
+			sb.Append(this.Predicate);
+			sb.Append('\t');
+			sb.Append(this.Object);
+
+			return sb.ToString();
+		}
 	}
 }

@@ -4,7 +4,6 @@ using System.Numerics;
 using System.Text;
 using Waher.Content.Semantic.TurtleModel;
 using Waher.Runtime.Inventory;
-using Waher.Script.Constants;
 
 namespace Waher.Content.Semantic
 {
@@ -22,6 +21,7 @@ namespace Waher.Content.Semantic
 		};
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly string text;
+		private readonly string blankNodeIdPrefix;
 		private readonly int len;
 		private Uri baseUri = null;
 		private int blankNodeIndex = 0;
@@ -42,10 +42,22 @@ namespace Waher.Content.Semantic
 		/// <param name="Text">Text content of Turtle document.</param>
 		/// <param name="BaseUri">Base URI</param>
 		public TurtleDocument(string Text, Uri BaseUri)
+			: this(Text, BaseUri, "n")
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text content of Turtle document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		public TurtleDocument(string Text, Uri BaseUri, string BlankNodeIdPrefix)
 		{
 			this.text = Text;
 			this.len = this.text.Length;
 			this.baseUri = BaseUri;
+			this.blankNodeIdPrefix = BlankNodeIdPrefix;
 
 			if (!(this.baseUri is null))
 				this.namespaces[string.Empty] = this.baseUri.AbsoluteUri;
@@ -198,7 +210,7 @@ namespace Waher.Content.Semantic
 						if (TriplePosition == 1)
 							throw this.ParsingException("Predicate cannot be a blank node.");
 
-						BlankNode Node = new BlankNode(this.blankNodeIndex++);
+						BlankNode Node = this.CreteBlankNode();
 						this.ParseTriples(Node);
 						return Node;
 
@@ -304,6 +316,11 @@ namespace Waher.Content.Semantic
 			}
 		}
 
+		private BlankNode CreteBlankNode()
+		{
+			return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
+		}
+
 		private ISemanticElement ParseCollection()
 		{
 			LinkedList<ISemanticElement> Elements = null;
@@ -320,7 +337,7 @@ namespace Waher.Content.Semantic
 						return UriNode.RdfNil;
 
 					LinkedListNode<ISemanticElement> Loop = Elements.First;
-					BlankNode Result = new BlankNode(this.blankNodeIndex++);
+					BlankNode Result = this.CreteBlankNode();
 					BlankNode Current = Result;
 
 					while (!(Loop is null))
@@ -331,7 +348,7 @@ namespace Waher.Content.Semantic
 
 						if (!(Loop is null))
 						{
-							BlankNode Next = new BlankNode(this.blankNodeIndex++);
+							BlankNode Next = this.CreteBlankNode();
 							this.triples.Add(new SemanticTriple(Current, UriNode.RdfNext, Next));
 							Current = Next;
 						}

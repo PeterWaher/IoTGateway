@@ -246,7 +246,7 @@ namespace Waher.Content.Semantic
 						if (TriplePosition == 1)
 							throw this.ParsingException("Predicate cannot be a blank node.");
 
-						BlankNode Node = this.CreteBlankNode();
+						BlankNode Node = this.CreateBlankNode();
 						this.ParseTriples(Node);
 						return Node;
 
@@ -324,7 +324,7 @@ namespace Waher.Content.Semantic
 							{
 								case "a":
 									if (TriplePosition == 1)
-										return UriNode.RdfA;
+										return RdfDocument.RdfA;
 									break;
 
 								case "true":
@@ -352,7 +352,7 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private BlankNode CreteBlankNode()
+		private BlankNode CreateBlankNode()
 		{
 			if (this.blankNodeIdMode == BlankNodeIdMode.Guid)
 				return new BlankNode(this.blankNodeIdPrefix + Guid.NewGuid().ToString());
@@ -373,27 +373,27 @@ namespace Waher.Content.Semantic
 					this.pos++;
 
 					if (Elements is null)
-						return UriNode.RdfNil;
+						return RdfDocument.RdfNil;
 
 					LinkedListNode<ISemanticElement> Loop = Elements.First;
-					BlankNode Result = this.CreteBlankNode();
+					BlankNode Result = this.CreateBlankNode();
 					BlankNode Current = Result;
 
 					while (!(Loop is null))
 					{
-						this.triples.Add(new SemanticTriple(Current, UriNode.RdfFirst, Loop.Value));
+						this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
-							BlankNode Next = this.CreteBlankNode();
-							this.triples.Add(new SemanticTriple(Current, UriNode.RdfNext, Next));
+							BlankNode Next = this.CreateBlankNode();
+							this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfNext, Next));
 							Current = Next;
 						}
 					}
 
-					this.triples.Add(new SemanticTriple(Current, UriNode.RdfNext, UriNode.RdfNil));
+					this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfNext, RdfDocument.RdfNil));
 
 					return Result;
 				}

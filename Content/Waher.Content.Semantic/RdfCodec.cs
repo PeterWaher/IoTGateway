@@ -2,41 +2,41 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information in Turtle Documents.
+	/// Encoder and Decoder of semantic information in RDF Documents.
 	/// </summary>
-	public class TurtleCodec : IContentDecoder, IContentEncoder
+	public class RdfCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Encoder and Decoder of semantic information in Turtle Documents.
+		/// Encoder and Decoder of semantic information in RDF Documents.
 		/// </summary>
-		public TurtleCodec()
+		public RdfCodec()
 		{
 		}
 
 		/// <summary>
 		/// Supported Internet Content Types.
 		/// </summary>
-		public string[] ContentTypes => TurtleContentTypes;
+		public string[] ContentTypes => RdfContentTypes;
 
-		private static readonly string[] TurtleContentTypes = new string[]
+		private static readonly string[] RdfContentTypes = new string[]
 		{
-			"text/turtle",
-			"application/x-turtle"
+			"application/rdf+xml"
 		};
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions => TurtleFileExtensions;
+		public string[] FileExtensions => RdfFileExtensions;
 
-		private static readonly string[] TurtleFileExtensions = new string[]
+		private static readonly string[] RdfFileExtensions = new string[]
 		{
-			"ttl"
+			"rdf"
 		};
 
 		/// <summary>
@@ -47,7 +47,7 @@ namespace Waher.Content.Semantic
 		/// <returns>If the decoder decodes the given content type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf(TurtleContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(RdfContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -71,7 +71,10 @@ namespace Waher.Content.Semantic
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			TurtleDocument Parsed = new TurtleDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
+			XmlDocument Xml = new XmlDocument();
+			Xml.LoadXml(s);
+
+			RdfDocument Parsed = new RdfDocument(Xml, BaseUri, "n", BlankNodeIdMode.Guid);
 			return Task.FromResult<object>(Parsed);
 		}
 
@@ -84,21 +87,17 @@ namespace Waher.Content.Semantic
 		/// <returns>If the encoder encodes the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is TurtleDocument &&
-				InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
+			if (Object is RdfDocument &&
+				InternetContent.IsAccepted(RdfContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (Object is ISemanticModel &&
-				InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
+			else
 			{
-				Grade = Grade.Barely;
-				return true;
+				Grade = Grade.NotAtAll;
+				return false;
 			}
-
-			Grade = Grade.NotAtAll;
-			return false;
 		}
 
 		/// <summary>
@@ -115,31 +114,13 @@ namespace Waher.Content.Semantic
 
 			string Text;
 
-			if (Object is TurtleDocument Doc)
-				Text = Doc.Text;
+			if (Object is RdfDocument Doc)
+				Text = Doc.Xml.OuterXml;
 			else
-			{
-				if (!(Object is ISemanticModel Model))
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
-
-				StringBuilder sb = new StringBuilder();
-
-				foreach (ISemanticTriple Triple in Model)
-				{
-					sb.Append(Triple.Subject);
-					sb.Append('\t');
-					sb.Append(Triple.Predicate);
-					sb.Append('\t');
-					sb.Append(Triple.Object);
-					sb.Append('\t');
-					sb.AppendLine(".");
-				}
-
-				Text = sb.ToString();
-			}
+				throw new ArgumentException("Unable to encode object.", nameof(Object));
 
 			byte[] Bin = Encoding.GetBytes(Text);
-			string ContentType = TurtleContentTypes[0] + "; charset=" + Encoding.WebName;
+			string ContentType = RdfContentTypes[0] + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
@@ -152,9 +133,9 @@ namespace Waher.Content.Semantic
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == TurtleFileExtensions[0])
+			if (FileExtension.ToLower() == RdfFileExtensions[0])
 			{
-				ContentType = TurtleContentTypes[0];
+				ContentType = RdfContentTypes[0];
 				return true;
 			}
 			else
@@ -172,9 +153,9 @@ namespace Waher.Content.Semantic
 		/// <returns>If Content Type was recognized and File Extension found.</returns>
 		public bool TryGetFileExtension(string ContentType, out string FileExtension)
 		{
-			if (Array.IndexOf(TurtleContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(RdfContentTypes, ContentType) >= 0)
 			{
-				FileExtension = TurtleFileExtensions[0];
+				FileExtension = RdfFileExtensions[0];
 				return true;
 			}
 			else

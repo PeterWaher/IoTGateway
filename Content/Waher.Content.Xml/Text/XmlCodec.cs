@@ -4,10 +4,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Functions.Scalar;
 
 namespace Waher.Content.Xml.Text
 {
@@ -66,7 +64,7 @@ namespace Waher.Content.Xml.Text
 			}
 			else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+xml"))
 			{
-				Grade = Grade.Ok;
+				Grade = Grade.Barely;
 				return true;
 			}
 			else

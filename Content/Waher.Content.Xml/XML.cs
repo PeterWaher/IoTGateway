@@ -1156,6 +1156,5 @@ namespace Waher.Content.Xml
 		}
 
 		#endregion
-
 	}
 }

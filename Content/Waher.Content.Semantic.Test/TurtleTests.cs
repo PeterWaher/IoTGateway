@@ -230,10 +230,161 @@ namespace Waher.Content.Semantic.Test
 			this.PerformTest("test-30.ttl", "test-30.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
 		}
 
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_00()
+		{
+			this.PerformTest("bad-00.ttl", "http://www.w3.org/2001/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_01()
+		{
+			this.PerformTest("bad-01.ttl", "http://www.w3.org/2011/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_02()
+		{
+			this.PerformTest("bad-02.ttl", "http://www.w3.org/2021/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_03()
+		{
+			this.PerformTest("bad-03.ttl", "http://www.w3.org/2031/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_04()
+		{
+			this.PerformTest("bad-04.ttl", "http://www.w3.org/2041/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_05()
+		{
+			this.PerformTest("bad-05.ttl", "http://www.w3.org/2051/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_06()
+		{
+			this.PerformTest("bad-06.ttl", "http://www.w3.org/2061/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_07()
+		{
+			this.PerformTest("bad-07.ttl", "http://www.w3.org/2071/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_08()
+		{
+			this.PerformTest("bad-08.ttl", "http://www.w3.org/2081/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_09()
+		{
+			this.PerformTest("bad-09.ttl", "http://www.w3.org/2091/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_10()
+		{
+			this.PerformTest("bad-10.ttl", "http://www.w3.org/2101/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_11()
+		{
+			this.PerformTest("bad-11.ttl", "http://www.w3.org/2111/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_12()
+		{
+			this.PerformTest("bad-12.ttl", "http://www.w3.org/2121/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_13()
+		{
+			this.PerformTest("bad-13.ttl", "http://www.w3.org/2131/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ParsingException))]
+		public void Bad_14()
+		{
+			this.PerformTest("bad-14.ttl", "http://www.w3.org/2141/sw/DataAccess/df1/bads/");
+		}
+
+		[TestMethod]
+		public void Manifest()
+		{
+			this.PerformTest("manifest.ttl", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+		}
+
+		[TestMethod]
+		public void ManifestBad()
+		{
+			this.PerformTest("manifest-bad.ttl", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+		}
+
+		[TestMethod]
+		public void RdfqResults()
+		{
+			this.PerformTest("rdfq-results.ttl", "rdfq-results.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+		}
+
+		[TestMethod]
+		public void RdfSchema()
+		{
+			this.PerformTest("rdf-schema.ttl", "rdf-schema.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+		}
+
+		[TestMethod]
+		public void RdfsNamespace()
+		{
+			this.PerformTest("rdfs-namespace.ttl", "rdfs-namespace.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+		}
+
 		private void PerformTest(string FileName)
 		{
 			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);
 			TurtleDocument Parsed = new(Text);
+
+			foreach (ISemanticTriple Triple in Parsed)
+			{
+				Console.Out.Write(Triple.Subject);
+				Console.Out.Write("\t");
+				Console.Out.Write(Triple.Predicate);
+				Console.Out.Write("\t");
+				Console.Out.Write(Triple.Object);
+				Console.Out.WriteLine();
+			}
+		}
+
+		private void PerformTest(string FileName, string BaseUri)
+		{
+			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);
+			TurtleDocument Parsed = new(Text, new Uri(BaseUri));
 
 			foreach (ISemanticTriple Triple in Parsed)
 			{

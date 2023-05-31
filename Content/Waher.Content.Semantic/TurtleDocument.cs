@@ -114,6 +114,17 @@ namespace Waher.Content.Semantic
 						case ';':
 							Predicate = null;
 							TriplePosition = 1;
+
+							this.SkipWhiteSpace();
+							if (this.PeekNextChar() == '.')
+							{
+								if (InBlankNode)
+									throw this.ParsingException("Expected ]");
+
+								this.pos++;
+								Subject = null;
+								TriplePosition = 0;
+							}
 							break;
 
 						case ',':
@@ -184,6 +195,9 @@ namespace Waher.Content.Semantic
 						break;
 
 					case '[':
+						if (TriplePosition == 1)
+							throw this.ParsingException("Predicate cannot be a blank node.");
+
 						BlankNode Node = new BlankNode(this.blankNodeIndex++);
 						this.ParseTriples(Node);
 						return Node;
@@ -675,7 +689,11 @@ namespace Waher.Content.Semantic
 					}
 					else
 					{
-						if (Uri.TryCreate(this.baseUri, sb.ToString(), out Uri URI))
+						string s = sb.ToString();
+
+						if (string.IsNullOrEmpty(s))
+							return this.baseUri;
+						else if (Uri.TryCreate(this.baseUri, s, out Uri URI))
 							return URI;
 						else
 							throw this.ParsingException("Invalid URI.");
@@ -700,8 +718,17 @@ namespace Waher.Content.Semantic
 		{
 			char ch;
 
-			while (char.IsWhiteSpace(ch = this.PeekNextChar()) && ch != 0)
-				this.pos++;
+			while (true)
+			{
+				ch = this.PeekNextChar();
+
+				if (char.IsWhiteSpace(ch))
+					this.pos++;
+				else if (ch == '#')
+					this.SkipLine();
+				else
+					break;
+			}
 		}
 
 		private char PeekNextChar()

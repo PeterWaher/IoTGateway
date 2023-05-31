@@ -110,26 +110,35 @@ namespace Waher.Content.Semantic
 		/// <returns></returns>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (!(Object is ISemanticModel Model))
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
-
-			StringBuilder sb = new StringBuilder();
-
-			foreach (ISemanticTriple Triple in Model)
-			{
-				sb.Append(Triple.Subject);
-				sb.Append('\t');
-				sb.Append(Triple.Predicate);
-				sb.Append('\t');
-				sb.Append(Triple.Object);
-				sb.Append('\t');
-				sb.AppendLine(".");
-			}
-
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			byte[] Bin = Encoding.GetBytes(sb.ToString());
+			string Text;
+
+			if (Object is TurtleDocument Doc)
+				Text = Doc.Text;
+			else
+			{
+				if (!(Object is ISemanticModel Model))
+					throw new ArgumentException("Unable to encode object.", nameof(Object));
+
+				StringBuilder sb = new StringBuilder();
+
+				foreach (ISemanticTriple Triple in Model)
+				{
+					sb.Append(Triple.Subject);
+					sb.Append('\t');
+					sb.Append(Triple.Predicate);
+					sb.Append('\t');
+					sb.Append(Triple.Object);
+					sb.Append('\t');
+					sb.AppendLine(".");
+				}
+
+				Text = sb.ToString();
+			}
+
+			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = TurtleContentTypes[0] + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));

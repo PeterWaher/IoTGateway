@@ -96,6 +96,11 @@ namespace Waher.Content.Semantic
 			this.ParseTriples();
 		}
 
+		/// <summary>
+		/// Original text of document.
+		/// </summary>
+		public string Text => this.text;
+
 		private void ParseTriples()
 		{
 			this.ParseTriples(null);

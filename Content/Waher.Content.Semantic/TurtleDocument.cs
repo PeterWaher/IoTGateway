@@ -557,21 +557,21 @@ namespace Waher.Content.Semantic
 				if (HasExponent)
 				{
 					if (CommonTypes.TryParse(s, out double dbl))
-						return new DoubleLiteral(dbl);
+						return new DoubleLiteral(dbl, s);
 					else
 						throw this.ParsingException("Invalid double number.");
 				}
 				else if (HasDecimal)
 				{
 					if (CommonTypes.TryParse(s, out decimal dec))
-						return new DecimalLiteral(dec);
+						return new DecimalLiteral(dec, s);
 					else
 						throw this.ParsingException("Invalid decimal number.");
 				}
 				else if (HasDigits)
 				{
 					if (BigInteger.TryParse(s, out BigInteger bi))
-						return new IntegerLiteral(bi);
+						return new IntegerLiteral(bi, s);
 					else
 						throw this.ParsingException("Invalid integer number.");
 				}

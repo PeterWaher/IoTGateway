@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -93,6 +96,12 @@ namespace Waher.Content.Semantic
 				Grade = Grade.Excellent;
 				return true;
 			}
+			else if (Object is ISemanticModel &&
+				InternetContent.IsAccepted(RdfContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Barely;
+				return true;
+			}
 			else
 			{
 				Grade = Grade.NotAtAll;
@@ -116,6 +125,118 @@ namespace Waher.Content.Semantic
 
 			if (Object is RdfDocument Doc)
 				Text = Doc.Xml.OuterXml;
+			else if (Object is ISemanticModel Model)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.Append("<?xml version=\"1.0\" encoding=\"");
+				sb.Append(Encoding.WebName);
+				sb.AppendLine("\"?>");
+
+				XmlWriterSettings Settings = new XmlWriterSettings()
+				{
+					ConformanceLevel = ConformanceLevel.Document,
+					Encoding = Encoding,
+					Indent = false,
+					NamespaceHandling = NamespaceHandling.OmitDuplicates,
+					NewLineHandling = NewLineHandling.None,
+					NewLineOnAttributes = false,
+					OmitXmlDeclaration = true,
+					WriteEndDocumentOnClose = true
+				};
+
+				using (XmlWriter w = XmlWriter.Create(sb, Settings))
+				{
+					Dictionary<string, string> Prefixes = new Dictionary<string, string>();
+					Dictionary<string, LinkedList<ISemanticTriple>> PerSubject = new Dictionary<string, LinkedList<ISemanticTriple>>();
+					string s;
+
+					foreach (ISemanticTriple Triple in Model)
+					{
+						CheckPrefix(Triple.Subject, Prefixes);
+						CheckPrefix(Triple.Predicate, Prefixes);
+						CheckPrefix(Triple.Object, Prefixes);
+
+						s = Triple.Subject.ToString();
+
+						if (!PerSubject.TryGetValue(s, out LinkedList<ISemanticTriple> List))
+						{
+							List = new LinkedList<ISemanticTriple>();
+							PerSubject[s] = List;
+						}
+
+						List.AddLast(Triple);
+					}
+
+					w.WriteStartElement("rdf", "RDF", RdfDocument.RdfNamespace);
+
+					foreach (KeyValuePair<string, string> P in Prefixes)
+						w.WriteAttributeString("xmlns", P.Key, string.Empty, P.Value);
+
+					foreach (KeyValuePair<string, LinkedList<ISemanticTriple>> Subject in PerSubject)
+					{
+						w.WriteStartElement("rdf", "Description", RdfDocument.RdfNamespace);
+
+						if (Subject.Value.First.Value is BlankNode SubjectBlankNode)
+							w.WriteAttributeString("rdf", "nodeID", string.Empty, SubjectBlankNode.NodeId);
+						else
+							w.WriteAttributeString("rdf", "about", string.Empty, Subject.Key);
+
+						foreach (ISemanticTriple Triple in Subject.Value)
+						{
+							if (Triple.Predicate is UriNode Predicate)
+							{
+								string Uri = Predicate.Uri.AbsoluteUri;
+								string Namespace = GetNamespace(Uri);
+
+								if (Prefixes.TryGetValue(Namespace, out string Prefix))
+								{
+									string LocalName = Uri.Substring(Namespace.Length);
+									w.WriteStartElement(Prefix, LocalName, Namespace);
+								}
+								else
+									w.WriteStartElement(Uri);
+
+								if (Triple.Object is SemanticLiteral Literal)
+								{
+									if (string.IsNullOrEmpty(Literal.StringType))
+									{
+										if (Literal is StringLiteral StringLiteral &&
+											!string.IsNullOrEmpty(StringLiteral.Language))
+										{
+											w.WriteAttributeString("xml", "lang", string.Empty, StringLiteral.Language);
+											w.WriteValue(Literal.StringValue);
+										}
+										else
+											w.WriteValue(Literal.StringValue);
+									}
+									else
+									{
+										w.WriteAttributeString("rdf", "datatype", string.Empty, Literal.StringType);
+										w.WriteValue(Literal.StringValue);
+									}
+								}
+								else if (Triple.Object is BlankNode BlankNode)
+									w.WriteAttributeString("rdf", "nodeID", string.Empty, BlankNode.NodeId);
+								else if (Triple.Object is UriNode UriNode)
+									w.WriteAttributeString("rdf", "resource", string.Empty, UriNode.Uri.AbsoluteUri);
+								else
+									w.WriteValue(Triple.Object.ToString());
+
+								w.WriteEndElement();
+							}
+							else
+								throw new Exception("Unable to encode semantic model as RDF document. RDF documents require predicates to be URIs.");
+						}
+
+						w.WriteEndElement();
+					}
+
+					w.WriteEndElement();
+					w.Flush();
+
+					Text = sb.ToString();
+				}
+			}
 			else
 				throw new ArgumentException("Unable to encode object.", nameof(Object));
 
@@ -123,6 +244,32 @@ namespace Waher.Content.Semantic
 			string ContentType = RdfContentTypes[0] + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+		}
+
+		private static void CheckPrefix(ISemanticElement Element, Dictionary<string, string> Prefixes)
+		{
+			if (Element is UriNode UriNode)
+			{
+				string Namespace = GetNamespace(UriNode.Uri.AbsoluteUri);
+				if (!string.IsNullOrEmpty(Namespace) && !Prefixes.ContainsKey(Namespace))
+				{
+					string Prefix = "p" + (Prefixes.Count + 1).ToString();
+					Prefixes[Namespace] = Prefix;
+				}
+			}
+		}
+
+		private static string GetNamespace(string Uri)
+		{
+			int i = Uri.LastIndexOf('#');
+			if (i >= 0)
+				return Uri.Substring(0, i + 1);
+
+			i = Uri.LastIndexOf('/');
+			if (i >= 0)
+				return Uri.Substring(0, i + 1);
+
+			return null;
 		}
 
 		/// <summary>

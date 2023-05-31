@@ -16,7 +16,7 @@ namespace Waher.Content.Semantic.Model.Literals
         public StringLiteral()
             : base()
         {
-            language = null;
+            this.language = null;
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Waher.Content.Semantic.Model.Literals
         public StringLiteral(string Value)
             : base(Value, Value)
         {
-            language = null;
+			this.language = null;
         }
 
         /// <summary>
@@ -37,13 +37,18 @@ namespace Waher.Content.Semantic.Model.Literals
         public StringLiteral(string Value, string Language)
             : base(Value, Value)
         {
-            language = Language;
+			this.language = Language;
         }
 
         /// <summary>
         /// Type name
         /// </summary>
         public override string StringType => string.Empty;
+
+        /// <summary>
+        /// Language of string.
+        /// </summary>
+        public string Language => this.language;
 
         /// <summary>
         /// How well the type supports a given data type.
@@ -72,13 +77,13 @@ namespace Waher.Content.Semantic.Model.Literals
             StringBuilder sb = new StringBuilder();
 
             sb.Append('"');
-            sb.Append(JSON.Encode(StringValue));
+            sb.Append(JSON.Encode(this.StringValue));
             sb.Append('"');
 
-            if (!string.IsNullOrEmpty(language))
+            if (!string.IsNullOrEmpty(this.language))
             {
                 sb.Append('@');
-                sb.Append(language);
+                sb.Append(this.language);
             }
 
             return sb.ToString();

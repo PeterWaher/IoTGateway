@@ -367,7 +367,7 @@ namespace Waher.Content.Semantic.Test
 
 		private void PerformTest(string FileName)
 		{
-			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);
+			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle." + FileName);
 			TurtleDocument Parsed = new(Text);
 
 			foreach (ISemanticTriple Triple in Parsed)
@@ -383,7 +383,7 @@ namespace Waher.Content.Semantic.Test
 
 		private void PerformTest(string FileName, string BaseUri)
 		{
-			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);
+			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle." + FileName);
 			TurtleDocument Parsed = new(Text, new Uri(BaseUri));
 
 			foreach (ISemanticTriple Triple in Parsed)
@@ -399,8 +399,8 @@ namespace Waher.Content.Semantic.Test
 
 		private void PerformTest(string FileName, string ExpectedFileName, string BaseUri)
 		{
-			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + FileName);
-			string Expected = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle.Input." + ExpectedFileName);
+			string Text = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle." + FileName);
+			string Expected = Resources.LoadResourceAsText(typeof(TurtleTests).Namespace + ".Data.Turtle." + ExpectedFileName);
 			TurtleDocument Parsed = new(Text, new Uri(BaseUri));
 			TurtleDocument ParsedExpected = new(Expected, new Uri(BaseUri));
 

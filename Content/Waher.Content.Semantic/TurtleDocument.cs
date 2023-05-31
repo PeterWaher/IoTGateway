@@ -8,6 +8,22 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Semantic
 {
 	/// <summary>
+	/// How blank node IDs are generated
+	/// </summary>
+	public enum BlankNodeIdMode
+	{
+		/// <summary>
+		/// Sequentially
+		/// </summary>
+		Sequential,
+
+		/// <summary>
+		/// Using GUIDs
+		/// </summary>
+		Guid
+	}
+
+	/// <summary>
 	/// Contains semantic information stored in a turtle document.
 	/// 
 	/// Ref: https://www.w3.org/TeamSubmission/turtle/
@@ -24,6 +40,7 @@ namespace Waher.Content.Semantic
 		private readonly string blankNodeIdPrefix;
 		private readonly int len;
 		private Uri baseUri = null;
+		private BlankNodeIdMode blankNodeIdMode;
 		private int blankNodeIndex = 0;
 		private int pos = 0;
 
@@ -53,11 +70,24 @@ namespace Waher.Content.Semantic
 		/// <param name="BaseUri">Base URI</param>
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		public TurtleDocument(string Text, Uri BaseUri, string BlankNodeIdPrefix)
+			: this(Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text content of Turtle document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
+		public TurtleDocument(string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
 		{
 			this.text = Text;
 			this.len = this.text.Length;
 			this.baseUri = BaseUri;
 			this.blankNodeIdPrefix = BlankNodeIdPrefix;
+			this.blankNodeIdMode = BlankNodeIdMode;
 
 			if (!(this.baseUri is null))
 				this.namespaces[string.Empty] = this.baseUri.AbsoluteUri;
@@ -318,7 +348,10 @@ namespace Waher.Content.Semantic
 
 		private BlankNode CreteBlankNode()
 		{
-			return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
+			if (this.blankNodeIdMode == BlankNodeIdMode.Guid)
+				return new BlankNode(this.blankNodeIdPrefix + Guid.NewGuid().ToString());
+			else
+				return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
 		}
 
 		private ISemanticElement ParseCollection()

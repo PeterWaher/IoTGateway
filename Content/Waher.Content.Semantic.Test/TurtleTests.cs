@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Security.Cryptography;
+using System.Text;
 using Waher.Content.Semantic.TurtleModel;
 using Waher.Runtime.Inventory;
 using Waher.Script.Functions.Transforms;
@@ -230,7 +231,7 @@ namespace Waher.Content.Semantic.Test
 		[TestMethod]
 		public void Test_30()
 		{
-			PerformTest("test-30.ttl", "test-30.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+			PerformTest("test-30.ttl", "test-30.out", "http://www.w3.org/2001/sw/DataAccess/df1/tests/");
 		}
 
 		[TestMethod]
@@ -353,7 +354,7 @@ namespace Waher.Content.Semantic.Test
 		[TestMethod]
 		public void RdfqResults()
 		{
-			PerformTest("rdfq-results.ttl", "rdfq-results.out", "http://www.w3.org/2301/sw/DataAccess/df1/tests/");
+			PerformTest("rdfq-results.ttl", "rdfq-results.out", "http://www.w3.org/2001/sw/DataAccess/df1/tests/");
 		}
 
 		[TestMethod]
@@ -425,13 +426,12 @@ namespace Waher.Content.Semantic.Test
 			Dictionary<string, string> NodeIdMap = new();
 			List<ISemanticTriple> Triples = new();
 			Triples.AddRange(Result);
+			List<ISemanticTriple> NotFound = new();
 
 			int i, c = Triples.Count;
 
 			foreach (ISemanticTriple T in Expected)
 			{
-				Assert.IsTrue(c > 0, "Number of triples do not match.");
-
 				bool Match = false;
 
 				for (i = 0; i < c; i++)
@@ -449,10 +449,50 @@ namespace Waher.Content.Semantic.Test
 					}
 				}
 
-				Assert.IsTrue(Match, "Triple not found.");
+				if (!Match)
+					NotFound.Add(T);
 			}
 
-			Assert.AreEqual(0, Triples.Count, "Number of triples do not match.");
+			if (NotFound.Count > 0 || Triples.Count > 0)
+			{
+				StringBuilder sb = new();
+
+				sb.AppendLine("Unexpected result.");
+
+				if (NotFound.Count > 0)
+				{
+					sb.AppendLine();
+					sb.AppendLine("Expected Triples not found in result: ");
+					sb.AppendLine("=======================================");
+
+					foreach (ISemanticTriple T in NotFound)
+					{
+						sb.Append(T.Subject.ToString());
+						sb.Append('\t');
+						sb.Append(T.Predicate.ToString());
+						sb.Append('\t');
+						sb.AppendLine(T.Object.ToString());
+					}
+				}
+
+				if (Triples.Count > 0)
+				{
+					sb.AppendLine();
+					sb.AppendLine("Generated Triples not expected: ");
+					sb.AppendLine("==================================");
+
+					foreach (ISemanticTriple T in Triples)
+					{
+						sb.Append(T.Subject.ToString());
+						sb.Append('\t');
+						sb.Append(T.Predicate.ToString());
+						sb.Append('\t');
+						sb.AppendLine(T.Object.ToString());
+					}
+				}
+
+				Assert.Fail(sb.ToString());
+			}
 		}
 
 		private static bool Matches(ISemanticTriple T1, ISemanticTriple T2, Dictionary<string, string> NodeIdMap, bool AddToMap)

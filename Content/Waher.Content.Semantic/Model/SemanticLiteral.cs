@@ -72,5 +72,11 @@ namespace Waher.Content.Semantic.Model
 
 			return sb.ToString();
 		}
+
+		/// <inheritdoc/>
+		public override abstract bool Equals(object obj);
+
+		/// <inheritdoc/>
+		public override abstract int GetHashCode();
 	}
 }

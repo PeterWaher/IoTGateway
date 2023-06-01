@@ -50,5 +50,18 @@
             else
                 return new CustomLiteral(Value, DataType);
         }
-    }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is DoubleLiteral Typed &&
+				Typed.StringValue == this.StringValue;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.StringValue.GetHashCode();
+		}
+	}
 }

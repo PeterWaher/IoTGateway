@@ -33,5 +33,18 @@ namespace Waher.Content.Semantic.Model
 
 			return sb.ToString();
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is UriNode Typed &&
+				Typed.Uri == this.Uri;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.Uri.GetHashCode();
+		}
 	}
 }

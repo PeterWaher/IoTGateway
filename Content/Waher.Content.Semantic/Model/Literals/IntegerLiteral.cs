@@ -47,13 +47,13 @@ namespace Waher.Content.Semantic.Model.Literals
         public IntegerLiteral(BigInteger Value, string StringValue, string DataType)
             : base(Value, StringValue)
         {
-            dataType = DataType;
+			this.dataType = DataType;
         }
 
         /// <summary>
         /// Type name
         /// </summary>
-        public override string StringType => dataType ?? "http://www.w3.org/2001/XMLSchema#integer";
+        public override string StringType => this.dataType ?? "http://www.w3.org/2001/XMLSchema#integer";
 
         /// <summary>
         /// How well the type supports a given data type.
@@ -89,5 +89,18 @@ namespace Waher.Content.Semantic.Model.Literals
             else
                 return new CustomLiteral(Value, DataType);
         }
-    }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is IntegerLiteral Typed &&
+				Typed.StringValue == this.StringValue;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.StringValue.GetHashCode();
+		}
+	}
 }

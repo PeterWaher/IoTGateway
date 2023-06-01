@@ -24,5 +24,18 @@
 		{
 			return "_:" + this.NodeId.ToString();
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is BlankNode Typed &&
+				Typed.NodeId == this.NodeId;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.NodeId.GetHashCode();
+		}
 	}
 }

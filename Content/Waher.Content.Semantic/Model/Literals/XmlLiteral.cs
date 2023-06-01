@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Semantic.Model.Literals
 {
@@ -8,67 +9,107 @@ namespace Waher.Content.Semantic.Model.Literals
 	/// Represents an XML literal.
 	/// </summary>
 	public class XmlLiteral : SemanticLiteral
-    {
+	{
+		private string normalizedXml = null;
+
 		/// <summary>
 		/// Represents an XML literal.
 		/// </summary>
 		public XmlLiteral()
-            : base()
-        {
-        }
+			: base()
+		{
+		}
 
 		/// <summary>
 		/// Represents an XML literal.
 		/// </summary>
 		/// <param name="Value">Parsed value</param>
 		public XmlLiteral(XmlNodeList Value)
-            : base(Value, ToString(Value))
-        {
-        }
+			: base(Value, ToString(Value))
+		{
+		}
 
-        private static string ToString(XmlNodeList List)
-        {
-            StringBuilder sb = new StringBuilder();
+		private static string ToString(XmlNodeList List)
+		{
+			StringBuilder sb = new StringBuilder();
 
-            foreach (XmlNode N in List)
-                sb.Append(N.OuterXml);
+			foreach (XmlNode N in List)
+				sb.Append(N.OuterXml);
 
-            return sb.ToString();
-        }
+			return sb.ToString();
+		}
 
-        /// <summary>
-        /// Represents a Uri literal.
-        /// </summary>
-        /// <param name="Value">Parsed value</param>
-        /// <param name="StringValue">String value</param>
-        public XmlLiteral(XmlNodeList Value, string StringValue)
-            : base(Value, StringValue)
-        {
-        }
+		/// <summary>
+		/// Represents a Uri literal.
+		/// </summary>
+		/// <param name="Value">Parsed value</param>
+		/// <param name="StringValue">String value</param>
+		public XmlLiteral(XmlNodeList Value, string StringValue)
+			: base(Value, StringValue)
+		{
+		}
 
-        /// <summary>
-        /// Type name
-        /// </summary>
-        public override string StringType => "http://www.w3.org/2001/XMLSchema#any";
+		/// <summary>
+		/// Type name
+		/// </summary>
+		public override string StringType => "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
 
-        /// <summary>
-        /// Tries to parse a string value of the type supported by the class..
-        /// </summary>
-        /// <param name="Value">String value.</param>
-        /// <param name="DataType">Data type.</param>
-        /// <returns>Parsed literal.</returns>
-        public override ISemanticLiteral Parse(string Value, string DataType)
-        {
-            try
-            {
-                XmlDocument Doc = new XmlDocument();
-                Doc.LoadXml(Value);
-                return new XmlLiteral(Doc.ChildNodes);
-            }
-            catch (Exception)
-            {
+		/// <summary>
+		/// Tries to parse a string value of the type supported by the class..
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType)
+		{
+			try
+			{
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
+
+				Doc.LoadXml(Value);
+
+				return new XmlLiteral(Doc.ChildNodes, Value);
+			}
+			catch (Exception)
+			{
 				return new CustomLiteral(Value, DataType);
 			}
 		}
-    }
+
+		/// <summary>
+		/// Normalized XML
+		/// </summary>
+		public string NormalizedXml
+		{
+			get
+			{
+				if (this.normalizedXml is null)
+					this.normalizedXml = XML.NormalizeXml((XmlNodeList)this.Value, false);
+
+				return this.normalizedXml;
+			}
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			if (!(obj is XmlLiteral Typed))
+				return false;
+
+			string s1 = this.NormalizedXml;
+			string s2 = Typed.NormalizedXml;
+
+			return s1 == s2;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.NormalizedXml.GetHashCode();
+		}
+
+	}
 }

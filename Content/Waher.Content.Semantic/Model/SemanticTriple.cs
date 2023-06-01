@@ -48,5 +48,24 @@ namespace Waher.Content.Semantic.Model
 
 			return sb.ToString();
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is SemanticTriple Typed &&
+				Typed.Subject.Equals(this.Subject) &&
+				Typed.Predicate.Equals(this.Predicate) &&
+				Typed.Object.Equals(this.Object);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int Result = this.Subject.GetHashCode();
+			Result ^= Result << 5 ^ this.Predicate.GetHashCode();
+			Result ^= Result << 5 ^ this.Object.GetHashCode();
+
+			return Result;
+		}
 	}
 }

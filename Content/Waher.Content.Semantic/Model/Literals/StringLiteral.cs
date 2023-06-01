@@ -88,5 +88,21 @@ namespace Waher.Content.Semantic.Model.Literals
 
             return sb.ToString();
         }
-    }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is StringLiteral Typed &&
+				Typed.StringValue == this.StringValue &&
+                string.Compare(Typed.language, this.language, true) == 0;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int Result = this.StringValue.GetHashCode();
+			Result ^= Result << 5 ^ this.language.GetHashCode();
+            return Result;
+		}
+	}
 }

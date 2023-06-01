@@ -100,7 +100,7 @@ namespace Waher.Content.Semantic.Test
 				return true;
 			}
 			else
-				return E1.ToString() == E2.ToString();
+				return E1.Equals(E2);
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace Waher.Content.Semantic.Model.Literals
         public CustomLiteral(string Value, string Type)
             : base(Value, Value)
         {
-            StringType = Type;
+            this.StringType = Type;
         }
 
         /// <summary>
@@ -40,12 +40,28 @@ namespace Waher.Content.Semantic.Model.Literals
             StringBuilder sb = new StringBuilder();
 
             sb.Append('"');
-            sb.Append(JSON.Encode(StringValue));
+            sb.Append(JSON.Encode(this.StringValue));
             sb.Append("\"^^<");
-            sb.Append(StringType);
+            sb.Append(this.StringType);
             sb.Append('>');
 
             return sb.ToString();
         }
-    }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is CustomLiteral Typed &&
+				Typed.StringValue == this.StringValue &&
+                Typed.StringType == this.StringType;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int Result = this.StringValue.GetHashCode();
+			Result ^= Result << 5 ^ this.StringType.GetHashCode();
+            return Result;
+		}
+	}
 }

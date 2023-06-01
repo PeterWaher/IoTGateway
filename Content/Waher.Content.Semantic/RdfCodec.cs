@@ -73,11 +73,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Decoded object.</returns>
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s = CommonTypes.GetString(Data, Encoding);
-			XmlDocument Xml = new XmlDocument();
-			Xml.LoadXml(s);
-
-			RdfDocument Parsed = new RdfDocument(Xml, BaseUri, "n", BlankNodeIdMode.Guid);
+			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			RdfDocument Parsed = new RdfDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
 			return Task.FromResult<object>(Parsed);
 		}
 
@@ -124,7 +121,7 @@ namespace Waher.Content.Semantic
 			string Text;
 
 			if (Object is RdfDocument Doc)
-				Text = Doc.Xml.OuterXml;
+				Text = Doc.Text;
 			else if (Object is ISemanticModel Model)
 			{
 				StringBuilder sb = new StringBuilder();

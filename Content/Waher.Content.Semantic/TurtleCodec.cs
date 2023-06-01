@@ -70,7 +70,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Decoded object.</returns>
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s = CommonTypes.GetString(Data, Encoding);
+			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
 			TurtleDocument Parsed = new TurtleDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
 			return Task.FromResult<object>(Parsed);
 		}

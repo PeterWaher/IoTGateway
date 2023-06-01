@@ -48,6 +48,7 @@ namespace Waher.Content.Semantic
 		private readonly XmlDocument xml;
 		private readonly string blankNodeIdPrefix;
 		private readonly BlankNodeIdMode blankNodeIdMode;
+		private readonly string text;
 		private int blankNodeIndex = 0;
 
 		/// <summary>
@@ -55,7 +56,7 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Xml">XML content of RDF document.</param>
 		public RdfDocument(XmlDocument Xml)
-			: this(Xml, null)
+			: this(Xml, Xml.OuterXml, null)
 		{
 		}
 
@@ -65,7 +66,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Xml">XML content of RDF document.</param>
 		/// <param name="BaseUri">Base URI</param>
 		public RdfDocument(XmlDocument Xml, Uri BaseUri)
-			: this(Xml, BaseUri, "n")
+			: this(Xml, Xml.OuterXml, BaseUri, "n")
 		{
 		}
 
@@ -76,7 +77,7 @@ namespace Waher.Content.Semantic
 		/// <param name="BaseUri">Base URI</param>
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		public RdfDocument(XmlDocument Xml, Uri BaseUri, string BlankNodeIdPrefix)
-			: this(Xml, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential)
+			: this(Xml, Xml.OuterXml, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential)
 		{
 		}
 
@@ -88,10 +89,110 @@ namespace Waher.Content.Semantic
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
 		public RdfDocument(XmlDocument Xml, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
+			: this(Xml, Xml.OuterXml, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text representation of RDF document.</param>
+		public RdfDocument(string Text)
+			: this(ToXml(Text), Text, null)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		public RdfDocument(string Text, Uri BaseUri)
+			: this(ToXml(Text), Text, BaseUri, "n")
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		public RdfDocument(string Text, Uri BaseUri, string BlankNodeIdPrefix)
+			: this(ToXml(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
+		public RdfDocument(string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
+			: this(ToXml(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode)
+		{
+		}
+
+		private static XmlDocument ToXml(string Text)
+		{
+			XmlDocument Xml = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+			Xml.LoadXml(Text);
+
+			return Xml;
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Xml">XML content of RDF document.</param>
+		/// <param name="Text">Text representation of RDF document.</param>
+		public RdfDocument(XmlDocument Xml, string Text)
+			: this(Xml, Text, null)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Xml">XML content of RDF document.</param>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		public RdfDocument(XmlDocument Xml, string Text, Uri BaseUri)
+			: this(Xml, Text, BaseUri, "n")
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Xml">XML content of RDF document.</param>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		public RdfDocument(XmlDocument Xml, string Text, Uri BaseUri, string BlankNodeIdPrefix)
+			: this(Xml, Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential)
+		{
+		}
+
+		/// <summary>
+		/// Contains semantic information stored in a turtle document.
+		/// </summary>
+		/// <param name="Xml">XML content of RDF document.</param>
+		/// <param name="Text">Text representation of RDF document.</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
+		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
+		public RdfDocument(XmlDocument Xml, string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
 		{
 			this.xml = Xml;
 			this.blankNodeIdPrefix = BlankNodeIdPrefix;
 			this.blankNodeIdMode = BlankNodeIdMode;
+			this.text = Text;
 
 			if (Xml is null || Xml.DocumentElement is null)
 				throw new ArgumentNullException(nameof(Xml));
@@ -106,6 +207,11 @@ namespace Waher.Content.Semantic
 		/// Original XML of document.
 		/// </summary>
 		public XmlDocument Xml => this.xml;
+
+		/// <summary>
+		/// Text representation.
+		/// </summary>
+		public string Text => this.text;
 
 		private void ParseDescriptions(XmlElement E, string Language, Uri BaseUri)
 		{

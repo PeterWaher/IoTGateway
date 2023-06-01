@@ -5,12 +5,12 @@ namespace Waher.Content.Semantic.Model.Literals
     /// <summary>
     /// Represents a time literal.
     /// </summary>
-    public class TimeSpanLiteral : SemanticLiteral
+    public class TimeLiteral : SemanticLiteral
     {
         /// <summary>
         /// Represents a time literal.
         /// </summary>
-        public TimeSpanLiteral()
+        public TimeLiteral()
             : base()
         {
         }
@@ -19,7 +19,7 @@ namespace Waher.Content.Semantic.Model.Literals
         /// Represents a time literal.
         /// </summary>
         /// <param name="Value">Parsed value</param>
-        public TimeSpanLiteral(TimeSpan Value)
+        public TimeLiteral(TimeSpan Value)
             : base(Value, Value.ToString())
         {
         }
@@ -29,7 +29,7 @@ namespace Waher.Content.Semantic.Model.Literals
         /// </summary>
         /// <param name="Value">Parsed value</param>
         /// <param name="StringValue">String value</param>
-        public TimeSpanLiteral(TimeSpan Value, string StringValue)
+        public TimeLiteral(TimeSpan Value, string StringValue)
             : base(Value, StringValue)
         {
         }
@@ -48,9 +48,22 @@ namespace Waher.Content.Semantic.Model.Literals
         public override ISemanticLiteral Parse(string Value, string DataType)
         {
             if (TimeSpan.TryParse(Value, out TimeSpan TP))
-                return new TimeSpanLiteral(TP, Value);
+                return new TimeLiteral(TP, Value);
             else
                 return new CustomLiteral(Value, DataType);
         }
-    }
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is TimeLiteral Typed &&
+				Typed.StringValue == this.StringValue;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.StringValue.GetHashCode();
+		}
+	}
 }

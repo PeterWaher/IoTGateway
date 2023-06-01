@@ -625,8 +625,10 @@ namespace Waher.Content.Semantic
 			int Start = this.pos;
 			char ch;
 
-			while ((ch = this.NextChar()) != (char)0)
+			while ((ch = this.PeekNextChar()) != (char)0)
 			{
+				this.pos++;
+
 				if (ch == '"')
 				{
 					if (MultiLine)

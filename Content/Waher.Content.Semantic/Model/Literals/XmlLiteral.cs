@@ -10,6 +10,7 @@ namespace Waher.Content.Semantic.Model.Literals
 	/// </summary>
 	public class XmlLiteral : SemanticLiteral
 	{
+		private readonly string encapsulatingNamespace;
 		private string normalizedXml = null;
 
 		/// <summary>
@@ -24,9 +25,11 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// Represents an XML literal.
 		/// </summary>
 		/// <param name="Value">Parsed value</param>
-		public XmlLiteral(XmlNodeList Value)
+		/// <param name="EncapsulatingNamespace">Namespace</param>
+		public XmlLiteral(XmlNodeList Value, string EncapsulatingNamespace)
 			: base(Value, ToString(Value))
 		{
+			this.encapsulatingNamespace = EncapsulatingNamespace;
 		}
 
 		private static string ToString(XmlNodeList List)
@@ -44,9 +47,10 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// </summary>
 		/// <param name="Value">Parsed value</param>
 		/// <param name="StringValue">String value</param>
-		public XmlLiteral(XmlNodeList Value, string StringValue)
+		public XmlLiteral(XmlNodeList Value, string EncapsulatingNamespace, string StringValue)
 			: base(Value, StringValue)
 		{
+			this.encapsulatingNamespace = EncapsulatingNamespace;
 		}
 
 		/// <summary>
@@ -87,7 +91,11 @@ namespace Waher.Content.Semantic.Model.Literals
 			get
 			{
 				if (this.normalizedXml is null)
-					this.normalizedXml = XML.NormalizeXml((XmlNodeList)this.Value, false);
+				{
+					XmlNormalizationState State = new XmlNormalizationState();
+					XML.NormalizeXml((XmlNodeList)this.Value, false, this.encapsulatingNamespace, State);
+					this.normalizedXml = State.ToString();
+				}
 
 				return this.normalizedXml;
 			}

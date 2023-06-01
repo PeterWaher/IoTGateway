@@ -1163,13 +1163,23 @@ namespace Waher.Content.Xml
 		/// Normalizes a list of XML nodes.
 		/// </summary>
 		/// <param name="Xml">XML to normalize</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(XmlNodeList Xml)
+		{
+			return NormalizeXml(Xml, false);
+		}
+
+		/// <summary>
+		/// Normalizes a list of XML nodes.
+		/// </summary>
+		/// <param name="Xml">XML to normalize</param>
 		/// <param name="IsElementContents">If Node List is contents of element.</param>
 		/// <returns>Normalized XML</returns>
 		public static string NormalizeXml(XmlNodeList Xml, bool IsElementContents)
 		{
-			StringBuilder sb = new StringBuilder();
-			NormalizeXml(Xml, IsElementContents, sb, string.Empty);
-			return sb.ToString();
+			XmlNormalizationState State = new XmlNormalizationState();
+			NormalizeXml(Xml, IsElementContents, string.Empty, State);
+			return State.ToString();
 		}
 
 		/// <summary>
@@ -1179,9 +1189,9 @@ namespace Waher.Content.Xml
 		/// <returns>Normalized XML</returns>
 		public static string NormalizeXml(XmlElement Xml)
 		{
-			StringBuilder sb = new StringBuilder();
-			NormalizeXml(Xml, sb, string.Empty);
-			return sb.ToString();
+			XmlNormalizationState State = new XmlNormalizationState();
+			NormalizeXml(Xml, string.Empty, State);
+			return State.ToString();
 		}
 
 		/// <summary>
@@ -1189,10 +1199,10 @@ namespace Waher.Content.Xml
 		/// </summary>
 		/// <param name="Xml">XML to normalize</param>
 		/// <param name="IsElementContents">If Node List is contents of element.</param>
-		/// <param name="Output">Normalized XML will be output here</param>
 		/// <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
+		/// <param name="State">Normalization State</param>
 		/// <returns>If content was output</returns>
-		public static bool NormalizeXml(XmlNodeList Xml, bool IsElementContents, StringBuilder Output, string CurrentNamespace)
+		public static bool NormalizeXml(XmlNodeList Xml, bool IsElementContents, string CurrentNamespace, XmlNormalizationState State)
 		{
 			bool HasContent = false;
 
@@ -1205,20 +1215,20 @@ namespace Waher.Content.Xml
 						HasContent = true;
 
 						if (IsElementContents)
-							Output.Append('>');
+							State.Append('>');
 					}
 
-					NormalizeXml(E, Output, CurrentNamespace);
+					NormalizeXml(E, CurrentNamespace, State);
 				}
 				else if (N is XmlText || N is XmlCDataSection || N is XmlSignificantWhitespace)
 				{
 					if (!HasContent)
 					{
 						HasContent = true;
-						Output.Append('>');
+						State.Append('>');
 					}
 
-					Output.Append(XML.Encode(N.InnerText));
+					State.Append(XML.Encode(N.InnerText));
 				}
 			}
 
@@ -1229,19 +1239,33 @@ namespace Waher.Content.Xml
 		/// Normalizes an XML element.
 		/// </summary>
 		/// <param name="Xml">XML element to normalize</param>
-		/// <param name="Output">Normalized XML will be output here</param>
 		/// <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
-		public static void NormalizeXml(XmlElement Xml, StringBuilder Output, string CurrentNamespace)
+		/// <param name="State">Normalization State</param>
+		public static void NormalizeXml(XmlElement Xml, string CurrentNamespace, XmlNormalizationState State)
 		{
-			Output.Append('<');
+			State.Append('<');
 
 			SortedDictionary<string, string> Attributes = null;
 			string TagName = Xml.LocalName;
+			bool DoPopPrefixes = false;
 
 			if (!string.IsNullOrEmpty(Xml.Prefix))
+			{
 				TagName = Xml.Prefix + ":" + TagName;
 
-			Output.Append(TagName);
+				State.PushPrefixes();
+				DoPopPrefixes = true;
+
+				if (State.RegisterPrefix(Xml.Prefix, Xml.NamespaceURI))
+				{
+					if (Attributes is null)
+						Attributes = new SortedDictionary<string, string>();
+
+					Attributes["xmlns:" + Xml.Prefix] = Xml.NamespaceURI;
+				}
+			}
+
+			State.Append(TagName);
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
@@ -1266,22 +1290,25 @@ namespace Waher.Content.Xml
 			{
 				foreach (KeyValuePair<string, string> Attr in Attributes)
 				{
-					Output.Append(' ');
-					Output.Append(Attr.Key);
-					Output.Append("=\"");
-					Output.Append(XML.Encode(Attr.Value));
-					Output.Append('"');
+					State.Append(' ');
+					State.Append(Attr.Key);
+					State.Append("=\"");
+					State.Append(XML.Encode(Attr.Value));
+					State.Append('"');
 				}
 			}
 
-			if (NormalizeXml(Xml.ChildNodes, true, Output, CurrentNamespace))
+			if (NormalizeXml(Xml.ChildNodes, true, CurrentNamespace, State))
 			{
-				Output.Append("</");
-				Output.Append(TagName);
-				Output.Append('>');
+				State.Append("</");
+				State.Append(TagName);
+				State.Append('>');
 			}
 			else
-				Output.Append("/>");
+				State.Append("/>");
+
+			if (DoPopPrefixes)
+				State.PopPrefixes();
 		}
 
 		#endregion

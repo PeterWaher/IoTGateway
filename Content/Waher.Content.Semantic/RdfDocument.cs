@@ -455,13 +455,11 @@ namespace Waher.Content.Semantic
 								if (Object is null || Object.ToString() != Def.ToString())
 									this.triples.Add(new SemanticTriple(Subject, Predicate, Def));
 							}
-							else
-								throw this.ParsingException("Unexpected node.");
 						}
 						break;
 
 					case "Literal":
-						Object = new XmlLiteral(E2.ChildNodes);
+						Object = new XmlLiteral(E2.ChildNodes, E2.NamespaceURI);
 						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 						break;
 

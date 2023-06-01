@@ -324,7 +324,7 @@ namespace Waher.Content.Semantic
 							{
 								case "a":
 									if (TriplePosition == 1)
-										return RdfDocument.RdfA;
+										return RdfDocument.RdfType;
 									break;
 
 								case "true":

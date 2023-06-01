@@ -300,6 +300,10 @@ namespace Waher.Content.Semantic.Test
 			string s = Encoding.UTF8.GetString(Data);
 
 			Console.Out.WriteLine(s);
+			Console.Out.WriteLine();
+
+			foreach (ISemanticTriple Triple in Parsed)
+				Console.WriteLine(Triple.ToString());
 		}
 
 		private static async Task<RdfDocument> LoadRdfDocument(string FileName, Uri? BaseUri)
@@ -328,6 +332,8 @@ namespace Waher.Content.Semantic.Test
 			TurtleDocument ParsedExpected = await LoadTurtleDocument(ExpectedFileName, BaseUri is null ? null : new Uri(BaseUri + ExpectedFileName));
 
 			await Print(Parsed);
+			Console.Out.WriteLine();
+			await TurtleTests.Print(ParsedExpected);
 
 			CompareTriples(Parsed, ParsedExpected);
 		}

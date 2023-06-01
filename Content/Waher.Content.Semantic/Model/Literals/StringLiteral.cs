@@ -60,15 +60,16 @@ namespace Waher.Content.Semantic.Model.Literals
             return string.IsNullOrEmpty(DataType) || DataType == "http://www.w3.org/2001/XMLSchema#string" ? Grade.Ok : Grade.NotAtAll;
         }
 
-        /// <summary>
-        /// Tries to parse a string value of the type supported by the class..
-        /// </summary>
-        /// <param name="Value">String value.</param>
-        /// <param name="DataType">Data type.</param>
-        /// <returns>Parsed literal.</returns>
-        public override ISemanticLiteral Parse(string Value, string DataType)
+		/// <summary>
+		/// Tries to parse a string value of the type supported by the class..
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <param name="Language">Language code if available.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType, string Language)
         {
-            return new StringLiteral(Value);
+            return new StringLiteral(Value, Language);
         }
 
         /// <inheritdoc/>
@@ -101,7 +102,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		public override int GetHashCode()
 		{
 			int Result = this.StringValue.GetHashCode();
-			Result ^= Result << 5 ^ this.language.GetHashCode();
+			Result ^= Result << 5 ^ (this.language?.GetHashCode() ?? 0);
             return Result;
 		}
 	}

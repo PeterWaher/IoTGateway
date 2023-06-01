@@ -271,6 +271,14 @@ namespace Waher.Content.Semantic
 						else
 							s = this.ParseString(false);
 
+						string Language = null;
+
+						if (this.pos < this.len && this.text[this.pos] == '@')
+						{
+							this.pos++;
+							Language = this.ParseName();
+						}
+
 						if (this.pos < this.len - 1 && this.text[this.pos] == '^' && this.text[this.pos + 1] == '^')
 						{
 							this.pos += 2;
@@ -285,13 +293,10 @@ namespace Waher.Content.Semantic
 								this.dataTypes[DataType] = LiteralType;
 							}
 
-							return LiteralType.Parse(s, DataType);
+							return LiteralType.Parse(s, DataType, Language);
 						}
-						else if (this.pos < this.len && this.text[this.pos] == '@')
-						{
-							this.pos++;
-							return new StringLiteral(s, this.ParseName());
-						}
+						else if (!string.IsNullOrEmpty(Language))
+							return new StringLiteral(s, Language);
 						else
 							return new StringLiteral(s);
 

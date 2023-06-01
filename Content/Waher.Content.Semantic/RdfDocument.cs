@@ -59,6 +59,11 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		public readonly static UriNode RdfStatement = new UriNode(new Uri(RdfNamespace + "Statement"));
 
+		/// <summary>
+		/// List item reference.
+		/// </summary>
+		public readonly static Uri RdfLi = new Uri(RdfNamespace + "li");
+
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly XmlDocument xml;
 		private readonly string blankNodeIdPrefix;
@@ -212,9 +217,6 @@ namespace Waher.Content.Semantic
 			if (Xml is null || Xml.DocumentElement is null)
 				throw new ArgumentNullException(nameof(Xml));
 
-			if (Xml.DocumentElement.LocalName != "RDF" || Xml.DocumentElement.NamespaceURI != RdfNamespace)
-				throw new ArgumentException("XML document not valid RDF.", nameof(Xml));
-
 			string Language = null;
 
 			foreach (XmlAttribute Attr in Xml.DocumentElement.Attributes)
@@ -231,7 +233,17 @@ namespace Waher.Content.Semantic
 				}
 			}
 
-			this.ParseDescriptions(Xml.DocumentElement, Language, BaseUri);
+			if (Xml.DocumentElement.LocalName == "RDF" && Xml.DocumentElement.NamespaceURI == RdfNamespace)
+				this.ParseDescriptions(Xml.DocumentElement, Language, BaseUri);
+			else
+			{
+				BlankNode RootSubject = this.CreateBlankNode();
+				UriNode RootType = new UriNode(this.CreateUri(Xml.DocumentElement.NamespaceURI + Xml.DocumentElement.LocalName, BaseUri));
+
+				this.triples.Add(new SemanticTriple(RootSubject, RdfType, RootType));
+
+				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri);
+			}
 		}
 
 		/// <summary>
@@ -277,7 +289,7 @@ namespace Waher.Content.Semantic
 						case "nodeID":
 							NodeId = Attr.Value;
 							continue;
-						
+
 						case "about":
 							About = Attr.Value;
 							continue;
@@ -297,7 +309,7 @@ namespace Waher.Content.Semantic
 					BaseUri = this.CreateUri(Attr.Value, BaseUri);
 					continue;
 				}
-				else if (Attr.Prefix == "xmlns" || Attr.Name == "xmlns")
+				else if (Attr.Prefix == "xmlns" || Attr.Name == "xmlns" || Attr.Prefix == "xml")
 					continue;
 
 				if (Properties is null)
@@ -366,6 +378,12 @@ namespace Waher.Content.Semantic
 					continue;
 
 				UriNode Predicate = new UriNode(this.CreateUri(E2.NamespaceURI + E2.LocalName, BaseUri));
+				if (Predicate.Uri.AbsoluteUri.EndsWith("#li") && Predicate.Uri == RdfLi)
+				{
+					ItemCounter++;
+					Predicate = new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri));
+				}
+
 				LinkedList<KeyValuePair<string, string>> Properties = null;
 				ISemanticElement Object = null;
 				Uri BaseUri2 = BaseUri;
@@ -413,7 +431,7 @@ namespace Waher.Content.Semantic
 						BaseUri2 = this.CreateUri(Attr.Value, BaseUri2);
 						continue;
 					}
-					else if (Attr.Prefix == "xmlns" || Attr.Name == "xmlns")
+					else if (Attr.Prefix == "xmlns" || Attr.Name == "xmlns" || Attr.Prefix == "xml")
 						continue;
 
 					if (Properties is null)
@@ -422,14 +440,26 @@ namespace Waher.Content.Semantic
 					Properties.AddLast(new KeyValuePair<string, string>(Attr.NamespaceURI + Attr.LocalName, Attr.Value));
 				}
 
+				if (!string.IsNullOrEmpty(Resource))
+				{
+					Object = new UriNode(this.CreateUri(Resource, BaseUri2));
+					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+				}
+				else if (!string.IsNullOrEmpty(NodeId))
+				{
+					Object = new BlankNode(NodeId);
+					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+				}
+
 				if (!(Properties is null))
 				{
 					if (Object is null)
+					{
 						Object = this.CreateBlankNode();
+						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					}
 
 					bool HasLanguage2 = !string.IsNullOrEmpty(Language2);
-
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 
 					foreach (KeyValuePair<string, string> P in Properties)
 					{
@@ -443,17 +473,6 @@ namespace Waher.Content.Semantic
 
 						this.triples.Add(new SemanticTriple(Object, Predicate2, Literal));
 					}
-				}
-
-				if (!string.IsNullOrEmpty(Resource))
-				{
-					Object = new UriNode(this.CreateUri(Resource, BaseUri2));
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
-				}
-				else if (!string.IsNullOrEmpty(NodeId))
-				{
-					Object = new BlankNode(NodeId);
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 				}
 
 				switch (ParseType)
@@ -478,12 +497,12 @@ namespace Waher.Content.Semantic
 									if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 									{
 										LiteralType = Types.FindBest<ISemanticLiteral, string>(DataType)
-											?? new CustomLiteral(string.Empty, DataType);
+											?? new CustomLiteral(string.Empty, DataType, Language2);
 
 										this.dataTypes[DataType] = LiteralType;
 									}
 
-									Object = LiteralType.Parse(Text.InnerText, DataType);
+									Object = LiteralType.Parse(Text.InnerText, DataType, Language2);
 								}
 
 								this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
@@ -494,12 +513,22 @@ namespace Waher.Content.Semantic
 
 								if (Object is null || Object.ToString() != Def.ToString())
 									this.triples.Add(new SemanticTriple(Subject, Predicate, Def));
+
+								if (Object is null)
+									Object = Def;
 							}
+						}
+
+						if (Object is null)
+						{
+							Object = new StringLiteral(string.Empty);
+							this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 						}
 						break;
 
 					case "Literal":
-						Object = new XmlLiteral(E2.ChildNodes, E2.NamespaceURI);
+					default:
+						Object = new XmlLiteral(E2.ChildNodes, E2.NamespaceURI, Language2);
 						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 						break;
 
@@ -538,7 +567,7 @@ namespace Waher.Content.Semantic
 										this.dataTypes[DataType] = LiteralType;
 									}
 
-									Element = LiteralType.Parse(Text.InnerText, DataType);
+									Element = LiteralType.Parse(Text.InnerText, DataType, Language2);
 								}
 							}
 							else if (N2 is XmlElement E3)
@@ -578,9 +607,6 @@ namespace Waher.Content.Semantic
 							this.triples.Add(new SemanticTriple(Current, RdfNext, RdfNil));
 						}
 						break;
-
-					default:
-						throw this.ParsingException("Unrecognized parse type: " + ParseType);
 				}
 
 
@@ -591,9 +617,7 @@ namespace Waher.Content.Semantic
 					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
 					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
 					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
-
-					if (!(Object is null))
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
 				}
 			}
 

@@ -1225,7 +1225,9 @@ namespace Waher.Content.Xml
 					if (!HasContent)
 					{
 						HasContent = true;
-						State.Append('>');
+
+						if (IsElementContents)
+							State.Append('>');
 					}
 
 					State.Append(XML.Encode(N.InnerText));
@@ -1277,10 +1279,14 @@ namespace Waher.Content.Xml
 
 			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
 			{
-				if (Attributes is null)
-					Attributes = new SortedDictionary<string, string>();
+				if (!string.IsNullOrEmpty(Xml.NamespaceURI))
+				{
+					if (Attributes is null)
+						Attributes = new SortedDictionary<string, string>();
 
-				Attributes["xmlns"] = Xml.NamespaceURI;
+					Attributes["xmlns"] = Xml.NamespaceURI;
+				}
+
 				CurrentNamespace = Xml.NamespaceURI;
 			}
 			else

@@ -40,13 +40,14 @@ namespace Waher.Content.Semantic.Model.Literals
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#base64Binary";
 
-        /// <summary>
-        /// Tries to parse a string value of the type supported by the class..
-        /// </summary>
-        /// <param name="Value">String value.</param>
-        /// <param name="DataType">Data type.</param>
-        /// <returns>Parsed literal.</returns>
-        public override ISemanticLiteral Parse(string Value, string DataType)
+		/// <summary>
+		/// Tries to parse a string value of the type supported by the class..
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <param name="Language">Language code if available.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType, string Language)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace Waher.Content.Semantic.Model.Literals
             }
             catch (Exception)
             {
-                return new CustomLiteral(Value, DataType);
+                return new CustomLiteral(Value, DataType, Language);
             }
         }
 

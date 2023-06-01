@@ -27,7 +27,8 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Value">String value.</param>
 		/// <param name="DataType">Data type.</param>
+		/// <param name="Language">Language code if available.</param>
 		/// <returns>Parsed literal.</returns>
-		ISemanticLiteral Parse(string Value, string DataType);
+		ISemanticLiteral Parse(string Value, string DataType, string Language);
 	}
 }

@@ -56,8 +56,9 @@ namespace Waher.Content.Semantic.Model
 		/// </summary>
 		/// <param name="Value">String value.</param>
 		/// <param name="DataType">Data type.</param>
+		/// <param name="Language">Language code if available.</param>
 		/// <returns>Parsed literal.</returns>
-		public abstract ISemanticLiteral Parse(string Value, string DataType);
+		public abstract ISemanticLiteral Parse(string Value, string DataType, string Language);
 
 		/// <inheritdoc/>
 		public override string ToString()

@@ -39,18 +39,19 @@ namespace Waher.Content.Semantic.Model.Literals
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#anyURI";
 
-        /// <summary>
-        /// Tries to parse a string value of the type supported by the class..
-        /// </summary>
-        /// <param name="Value">String value.</param>
-        /// <param name="DataType">Data type.</param>
-        /// <returns>Parsed literal.</returns>
-        public override ISemanticLiteral Parse(string Value, string DataType)
+		/// <summary>
+		/// Tries to parse a string value of the type supported by the class..
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <param name="DataType">Data type.</param>
+		/// <param name="Language">Language code if available.</param>
+		/// <returns>Parsed literal.</returns>
+		public override ISemanticLiteral Parse(string Value, string DataType, string Language)
         {
             if (Uri.TryCreate(Value, UriKind.Absolute, out Uri ParsedUri))
                 return new UriLiteral(ParsedUri, Value);
             else
-                return new CustomLiteral(Value, DataType);
+                return new CustomLiteral(Value, DataType, Language);
         }
 
 		/// <inheritdoc/>

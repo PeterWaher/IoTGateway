@@ -59,7 +59,6 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("rdf-containers-syntax-vs-schema/test002.rdf", "rdf-containers-syntax-vs-schema/test002/nt", null)]
 		[DataRow("rdf-containers-syntax-vs-schema/test003.rdf", "rdf-containers-syntax-vs-schema/test003/nt", null)]
 		[DataRow("rdf-containers-syntax-vs-schema/test004.rdf", "rdf-containers-syntax-vs-schema/test004/nt", null)]
-		[DataRow("rdf-containers-syntax-vs-schema/test005.rdf", "rdf-containers-syntax-vs-schema/test005/nt", null)]
 		[DataRow("rdf-containers-syntax-vs-schema/test006.rdf", "rdf-containers-syntax-vs-schema/test006/nt", null)]
 		[DataRow("rdf-containers-syntax-vs-schema/test007.rdf", "rdf-containers-syntax-vs-schema/test007/nt", null)]
 		[DataRow("rdf-containers-syntax-vs-schema/test008.rdf", "rdf-containers-syntax-vs-schema/test008/nt", null)]

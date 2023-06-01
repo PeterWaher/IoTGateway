@@ -462,5 +462,38 @@
             <param name="DTD">If DTD processing is allowed. (Default=false)</param>
             <returns>If <paramref name="Xml"/> is valid XML.</returns>
         </member>
+        <member name="M:Waher.Content.Xml.XML.NormalizeXml(System.Xml.XmlNodeList,System.Boolean)">
+            <summary>
+            Normalizes a list of XML nodes.
+            </summary>
+            <param name="Xml">XML to normalize</param>
+            <param name="IsElementContents">If Node List is contents of element.</param>
+            <returns>Normalized XML</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.NormalizeXml(System.Xml.XmlElement)">
+            <summary>
+            Normalizes an XML element.
+            </summary>
+            <param name="Xml">XML to normalize</param>
+            <returns>Normalized XML</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.NormalizeXml(System.Xml.XmlNodeList,System.Boolean,System.Text.StringBuilder,System.String)">
+            <summary>
+            Normalizes a list of XML nodes.
+            </summary>
+            <param name="Xml">XML to normalize</param>
+            <param name="IsElementContents">If Node List is contents of element.</param>
+            <param name="Output">Normalized XML will be output here</param>
+            <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
+            <returns>If content was output</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.NormalizeXml(System.Xml.XmlElement,System.Text.StringBuilder,System.String)">
+            <summary>
+            Normalizes an XML element.
+            </summary>
+            <param name="Xml">XML element to normalize</param>
+            <param name="Output">Normalized XML will be output here</param>
+            <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
+        </member>
     </members>
 </doc>

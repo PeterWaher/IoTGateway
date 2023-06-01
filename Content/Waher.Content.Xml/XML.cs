@@ -1156,5 +1156,134 @@ namespace Waher.Content.Xml
 		}
 
 		#endregion
+
+		#region Normalization
+
+		/// <summary>
+		/// Normalizes a list of XML nodes.
+		/// </summary>
+		/// <param name="Xml">XML to normalize</param>
+		/// <param name="IsElementContents">If Node List is contents of element.</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(XmlNodeList Xml, bool IsElementContents)
+		{
+			StringBuilder sb = new StringBuilder();
+			NormalizeXml(Xml, IsElementContents, sb, string.Empty);
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Normalizes an XML element.
+		/// </summary>
+		/// <param name="Xml">XML to normalize</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(XmlElement Xml)
+		{
+			StringBuilder sb = new StringBuilder();
+			NormalizeXml(Xml, sb, string.Empty);
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Normalizes a list of XML nodes.
+		/// </summary>
+		/// <param name="Xml">XML to normalize</param>
+		/// <param name="IsElementContents">If Node List is contents of element.</param>
+		/// <param name="Output">Normalized XML will be output here</param>
+		/// <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
+		/// <returns>If content was output</returns>
+		public static bool NormalizeXml(XmlNodeList Xml, bool IsElementContents, StringBuilder Output, string CurrentNamespace)
+		{
+			bool HasContent = false;
+
+			foreach (XmlNode N in Xml)
+			{
+				if (N is XmlElement E)
+				{
+					if (!HasContent)
+					{
+						HasContent = true;
+
+						if (IsElementContents)
+							Output.Append('>');
+					}
+
+					NormalizeXml(E, Output, CurrentNamespace);
+				}
+				else if (N is XmlText || N is XmlCDataSection || N is XmlSignificantWhitespace)
+				{
+					if (!HasContent)
+					{
+						HasContent = true;
+						Output.Append('>');
+					}
+
+					Output.Append(XML.Encode(N.InnerText));
+				}
+			}
+
+			return HasContent;
+		}
+
+		/// <summary>
+		/// Normalizes an XML element.
+		/// </summary>
+		/// <param name="Xml">XML element to normalize</param>
+		/// <param name="Output">Normalized XML will be output here</param>
+		/// <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
+		public static void NormalizeXml(XmlElement Xml, StringBuilder Output, string CurrentNamespace)
+		{
+			Output.Append('<');
+
+			SortedDictionary<string, string> Attributes = null;
+			string TagName = Xml.LocalName;
+
+			if (!string.IsNullOrEmpty(Xml.Prefix))
+				TagName = Xml.Prefix + ":" + TagName;
+
+			Output.Append(TagName);
+
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				if (Attributes is null)
+					Attributes = new SortedDictionary<string, string>();
+
+				Attributes[Attr.Name] = Attr.Value;
+			}
+
+			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
+			{
+				if (Attributes is null)
+					Attributes = new SortedDictionary<string, string>();
+
+				Attributes["xmlns"] = Xml.NamespaceURI;
+				CurrentNamespace = Xml.NamespaceURI;
+			}
+			else
+				Attributes?.Remove("xmlns");
+
+			if (!(Attributes is null))
+			{
+				foreach (KeyValuePair<string, string> Attr in Attributes)
+				{
+					Output.Append(' ');
+					Output.Append(Attr.Key);
+					Output.Append("=\"");
+					Output.Append(XML.Encode(Attr.Value));
+					Output.Append('"');
+				}
+			}
+
+			if (NormalizeXml(Xml.ChildNodes, true, Output, CurrentNamespace))
+			{
+				Output.Append("</");
+				Output.Append(TagName);
+				Output.Append('>');
+			}
+			else
+				Output.Append("/>");
+		}
+
+		#endregion
 	}
 }

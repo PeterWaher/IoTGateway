@@ -74,7 +74,8 @@ namespace Waher.Content.Semantic
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
-			RdfDocument Parsed = new RdfDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
+			RdfDocument Parsed = new RdfDocument(s, BaseUri, "n", BlankNodeIdMode.Sequential);
+			// BlankNodeIdMode.Guid);
 			return Task.FromResult<object>(Parsed);
 		}
 

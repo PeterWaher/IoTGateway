@@ -30,6 +30,7 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("xmlsch-02/test001.rdf")]
 		[DataRow("xmlsch-02/test002.rdf")]
 		[DataRow("xmlsch-02/test003.rdf")]
+		[DataRow("ReadTEDSExample.rdf")]
 		public async Task Test_01_Examples(string FileName)
 		{
 			await PerformTest(FileName);

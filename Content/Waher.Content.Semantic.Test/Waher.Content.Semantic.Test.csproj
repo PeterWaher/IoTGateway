@@ -427,6 +427,7 @@
     <None Remove="Data\Rdf\rdfs-subClassOf-a-Property\test001.nt" />
     <None Remove="Data\Rdf\rdfs-subPropertyOf-semantics\test001.nt" />
     <None Remove="Data\Rdf\rdfs-subPropertyOf-semantics\test002.nt" />
+    <None Remove="Data\Rdf\ReadTEDSExample.rdf" />
     <None Remove="Data\Rdf\statement-entailment\test001a.nt" />
     <None Remove="Data\Rdf\statement-entailment\test001b.nt" />
     <None Remove="Data\Rdf\statement-entailment\test002a.nt" />
@@ -898,6 +899,7 @@
     <EmbeddedResource Include="Data\Rdf\rdfs-subClassOf-a-Property\test001.nt" />
     <EmbeddedResource Include="Data\Rdf\rdfs-subPropertyOf-semantics\test001.nt" />
     <EmbeddedResource Include="Data\Rdf\rdfs-subPropertyOf-semantics\test002.nt" />
+    <EmbeddedResource Include="Data\Rdf\ReadTEDSExample.rdf" />
     <EmbeddedResource Include="Data\Rdf\statement-entailment\test001a.nt" />
     <EmbeddedResource Include="Data\Rdf\statement-entailment\test001b.nt" />
     <EmbeddedResource Include="Data\Rdf\statement-entailment\test002a.nt" />

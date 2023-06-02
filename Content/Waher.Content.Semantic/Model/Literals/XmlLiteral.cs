@@ -127,7 +127,20 @@ namespace Waher.Content.Semantic.Model.Literals
 				if (this.language != Custom.Language)
 					return false;
 
-				s2 = Custom.StringValue;
+				try
+				{
+					XmlDocument Doc = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
+					Doc.LoadXml("<root>" + Custom.StringValue + "</root>");
+
+					s2 = XML.NormalizeXml(Doc.DocumentElement.ChildNodes, false);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
 			}
 			else
 				return false;

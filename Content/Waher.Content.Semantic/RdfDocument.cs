@@ -504,7 +504,7 @@ namespace Waher.Content.Semantic
 
 							case "bagID":
 								BagId = Attr.Value;
-								break;
+								continue;
 						}
 					}
 					else if (Attr.Prefix == "xml")
@@ -633,7 +633,11 @@ namespace Waher.Content.Semantic
 
 						if (Object is null)
 						{
-							Object = new StringLiteral(string.Empty);
+							if (!(Bag2 is null))
+								Object = this.CreateBlankNode();
+							else
+								Object = new StringLiteral(string.Empty);
+
 							this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 						}
 						break;

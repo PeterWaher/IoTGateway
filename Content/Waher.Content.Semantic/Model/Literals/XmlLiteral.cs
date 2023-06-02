@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
@@ -28,14 +29,14 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <param name="Value">Parsed value</param>
 		/// <param name="EncapsulatingNamespace">Namespace</param>
 		/// <param name="Language">Language</param>
-		public XmlLiteral(XmlNodeList Value, string EncapsulatingNamespace, string Language)
+		public XmlLiteral(IEnumerable Value, string EncapsulatingNamespace, string Language)
 			: base(Value, ToString(Value))
 		{
 			this.encapsulatingNamespace = EncapsulatingNamespace;
 			this.language = Language;
 		}
 
-		private static string ToString(XmlNodeList List)
+		private static string ToString(IEnumerable List)
 		{
 			StringBuilder sb = new StringBuilder();
 

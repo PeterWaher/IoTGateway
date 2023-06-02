@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using Waher.Content.Semantic.Model;
@@ -74,6 +75,8 @@ namespace Waher.Content.Semantic
 		private readonly string blankNodeIdPrefix;
 		private readonly BlankNodeIdMode blankNodeIdMode;
 		private readonly string text;
+		private Dictionary<Uri, XmlElement> aboutEach = null;
+		private Dictionary<Uri, XmlElement> aboutEachPrefix = null;
 		private int blankNodeIndex = 0;
 
 		/// <summary>
@@ -253,7 +256,7 @@ namespace Waher.Content.Semantic
 
 			ISemanticElement Bag;
 
-			if (string.IsNullOrEmpty(BagId))
+			if (BagId is null)
 				Bag = null;
 			else
 			{
@@ -270,7 +273,7 @@ namespace Waher.Content.Semantic
 
 				this.triples.Add(new SemanticTriple(RootSubject, RdfType, RootType));
 
-				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag);
+				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag, null);
 			}
 		}
 
@@ -299,10 +302,15 @@ namespace Waher.Content.Semantic
 		private ISemanticElement ParseDescription(XmlElement E, string Language, Uri BaseUri,
 			ref int ItemCounter)
 		{
+			string Id = null;
 			string About = null;
 			string NodeId = null;
 			string BagId = null;
+			string Type = null;
+			string AboutEach = null;
+			string AboutEachPrefix = null;
 			LinkedList<KeyValuePair<string, string>> Properties = null;
+			XmlElement ForEach = null;
 
 			foreach (XmlAttribute Attr in E.Attributes)
 			{
@@ -324,11 +332,24 @@ namespace Waher.Content.Semantic
 							continue;
 
 						case "ID":
-							About = "#" + Attr.Value;
+							Id = Attr.Value;
+							About = "#" + Id;
 							continue;
 
 						case "bagID":
 							BagId = Attr.Value;
+							continue;
+
+						case "type":
+							Type = Attr.Value;
+							continue;
+
+						case "aboutEach":
+							AboutEach = Attr.Value;
+							continue;
+
+						case "aboutEachPrefix":
+							AboutEachPrefix = Attr.Value;
 							continue;
 					}
 				}
@@ -356,11 +377,29 @@ namespace Waher.Content.Semantic
 				Properties.AddLast(new KeyValuePair<string, string>(Attr.NamespaceURI + Attr.LocalName, Attr.Value));
 			}
 
+			if (!(AboutEach is null))
+			{
+				if (this.aboutEach is null)
+					this.aboutEach = new Dictionary<Uri, XmlElement>();
+
+				this.aboutEach[this.CreateUri(AboutEach, BaseUri)] = E;
+				return null;
+			}
+
+			if (!(AboutEachPrefix is null))
+			{
+				if (this.aboutEachPrefix is null)
+					this.aboutEachPrefix = new Dictionary<Uri, XmlElement>();
+
+				this.aboutEachPrefix[this.CreateUri(AboutEachPrefix, BaseUri)] = E;
+				return null;
+			}
+
 			bool HasLanguage = !string.IsNullOrEmpty(Language);
 			ISemanticElement Subject;
 			ISemanticElement Bag;
 
-			if (string.IsNullOrEmpty(BagId))
+			if (BagId is null)
 				Bag = null;
 			else
 			{
@@ -369,7 +408,29 @@ namespace Waher.Content.Semantic
 			}
 
 			if (!(About is null))
-				Subject = new UriNode(this.CreateUri(About, BaseUri));
+			{
+				Uri AboutUri = this.CreateUri(About, BaseUri);
+				Subject = new UriNode(AboutUri);
+
+				if (ForEach is null)
+				{
+					if (!(Id is null))
+					{
+						if (!(this.aboutEach?.TryGetValue(AboutUri, out ForEach) ?? false) &&
+							!(this.aboutEachPrefix is null))
+						{
+							foreach (KeyValuePair<Uri, XmlElement> P in this.aboutEachPrefix)
+							{
+								if (AboutUri.AbsoluteUri.StartsWith(P.Key.AbsoluteUri))
+								{
+									ForEach = P.Value;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
 			else if (!(NodeId is null))
 				Subject = new BlankNode(NodeId);
 			else
@@ -413,6 +474,28 @@ namespace Waher.Content.Semantic
 				this.triples.Add(new SemanticTriple(BagDescription, RdfObject, DescriptionNode));
 			}
 
+			if (!(Type is null))
+			{
+				ISemanticElement TypeObject = new UriNode(this.CreateUri(Type, BaseUri));
+
+				this.triples.Add(new SemanticTriple(Subject, RdfType, TypeObject));
+
+				if (!(Bag is null))
+				{
+					ISemanticElement ReificationNode = this.CreateBlankNode();
+
+					ItemCounter++;
+					this.triples.Add(new SemanticTriple(Bag,
+						new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
+						ReificationNode));
+
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, RdfType));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, TypeObject));
+				}
+			}
+
 			if (!(Properties is null))
 			{
 				foreach (KeyValuePair<string, string> P in Properties)
@@ -444,11 +527,11 @@ namespace Waher.Content.Semantic
 				}
 			}
 
-			return this.ParseDescription(E, Subject, Language, BaseUri, Bag);
+			return this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach);
 		}
 
 		private ISemanticElement ParseDescription(XmlElement E, ISemanticElement Subject,
-			string Language, Uri BaseUri, ISemanticElement Bag)
+			string Language, Uri BaseUri, ISemanticElement Bag, XmlElement ForEach)
 		{
 			int ItemCounter = 0;
 
@@ -464,6 +547,8 @@ namespace Waher.Content.Semantic
 					Predicate = new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri));
 				}
 
+				IEnumerable Attributes = ForEach is null ? (IEnumerable)E2.Attributes : new JoinAttributes(E2.Attributes, ForEach.Attributes);
+				IEnumerable ChildNodes = ForEach is null ? (IEnumerable)E2.ChildNodes : new JoinNodes(E2.ChildNodes, ForEach.ChildNodes);
 				LinkedList<KeyValuePair<string, string>> Properties = null;
 				ISemanticElement Object = null;
 				ISemanticElement Bag2 = null;
@@ -476,7 +561,7 @@ namespace Waher.Content.Semantic
 				string ParseType = null;
 				string BagId = null;
 
-				foreach (XmlAttribute Attr in E2.Attributes)
+				foreach (XmlAttribute Attr in Attributes)
 				{
 					if (Attr.NamespaceURI == RdfNamespace)
 					{
@@ -504,6 +589,10 @@ namespace Waher.Content.Semantic
 
 							case "bagID":
 								BagId = Attr.Value;
+								continue;
+
+							case "aboutEach":
+							case "aboutEachPrefix":
 								continue;
 						}
 					}
@@ -590,7 +679,7 @@ namespace Waher.Content.Semantic
 				switch (ParseType)
 				{
 					case null:
-						foreach (XmlNode N2 in E2.ChildNodes)
+						foreach (XmlNode N2 in ChildNodes)
 						{
 							if (N2 is XmlText Text)
 							{
@@ -623,11 +712,14 @@ namespace Waher.Content.Semantic
 							{
 								ISemanticElement Def = this.ParseDescription(E3, Language2, BaseUri2, ref ItemCounter);
 
-								if (Object is null || Object.ToString() != Def.ToString())
-									this.triples.Add(new SemanticTriple(Subject, Predicate, Def));
+								if (!(Def is null))
+								{
+									if (Object is null || Object.ToString() != Def.ToString())
+										this.triples.Add(new SemanticTriple(Subject, Predicate, Def));
 
-								if (Object is null)
-									Object = Def;
+									if (Object is null)
+										Object = Def;
+								}
 							}
 						}
 
@@ -644,20 +736,20 @@ namespace Waher.Content.Semantic
 
 					case "Literal":
 					default:
-						Object = new XmlLiteral(E2.ChildNodes, E2.NamespaceURI, Language2);
+						Object = new XmlLiteral(ChildNodes, E2.NamespaceURI, Language2);
 						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 						break;
 
 					case "Resource":
 						Object = this.CreateBlankNode();
 						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
-						this.ParseDescription(E2, Object, Language2, BaseUri2, Bag2);
+						this.ParseDescription(E2, Object, Language2, BaseUri2, Bag2, null);
 						break;
 
 					case "Collection":
 						LinkedList<ISemanticElement> Elements = null;
 
-						foreach (XmlNode N2 in E2.ChildNodes)
+						foreach (XmlNode N2 in ChildNodes)
 						{
 							ISemanticElement Element;
 
@@ -694,7 +786,8 @@ namespace Waher.Content.Semantic
 							if (Elements is null)
 								Elements = new LinkedList<ISemanticElement>();
 
-							Elements.AddLast(Element);
+							if (!(Element is null))
+								Elements.AddLast(Element);
 						}
 
 						if (Elements is null)

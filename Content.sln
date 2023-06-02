@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xml", "Conten
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Semantic.Test", "Content\Waher.Content.Semantic.Test\Waher.Content.Semantic.Test.csproj", "{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence", "Persistence\Waher.Persistence\Waher.Persistence.csproj", "{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

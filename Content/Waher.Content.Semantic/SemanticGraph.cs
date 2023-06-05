@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
@@ -57,7 +56,9 @@ namespace Waher.Content.Semantic
 				this.nodesStatic = null;
 			}
 
-			if (!Triple.Object.IsLiteral)
+			if (!Triple.Object.IsLiteral &&
+				Triple.Predicate is UriNode Predicate &&
+				Predicate.Uri.AbsoluteUri != RdfDocument.UriRdfType.AbsoluteUri)
 			{
 				this.nodes[Triple.Object] = true;
 				this.nodesStatic = null;
@@ -103,7 +104,7 @@ namespace Waher.Content.Semantic
 
 			Dictionary<ISemanticElement, string> NodeIds = new Dictionary<ISemanticElement, string>();
 			InMemorySemanticCube Cube = await InMemorySemanticCube.Create(this);
-			Dictionary<string, LinkedList<KeyValuePair<string, string>>> LinksByNodeId = new Dictionary<string, LinkedList<KeyValuePair<string, string>>>();
+			Dictionary<string, LinkedList<LinkInfo>> LinksByNodeId = new Dictionary<string, LinkedList<LinkInfo>>();
 			int i = 0;
 
 			foreach (ISemanticElement Node in this.Nodes)
@@ -120,7 +121,9 @@ namespace Waher.Content.Semantic
 				string NodeId = NodeIds[Node];
 				ISemanticPlane Plane = await Cube.GetTriplesBySubject(Node);
 				LinkedList<KeyValuePair<string, object>> Properties = null;
-				LinkedList<KeyValuePair<string, string>> Links = null;
+				LinkedList<LinkInfo> Links = null;
+				string StereoType = null;
+				bool IsRdfType;
 
 				if (!(Plane is null))
 				{
@@ -132,9 +135,15 @@ namespace Waher.Content.Semantic
 						string PropertyName;
 
 						if (Predicates.Current is UriNode UriNode)
+						{
 							PropertyName = UriNode.ShortName;
+							IsRdfType = UriNode.Uri.AbsoluteUri == RdfDocument.UriRdfType.AbsoluteUri;
+						}
 						else
+						{
 							PropertyName = Predicates.Current.ToString();
+							IsRdfType = false;
+						}
 
 						if (!(Line is null))
 						{
@@ -142,7 +151,14 @@ namespace Waher.Content.Semantic
 
 							while (Values.MoveNext())
 							{
-								if (Values.Current is ISemanticLiteral Literal)
+								if (IsRdfType && StereoType is null)
+								{
+									if (Values.Current is UriNode UriNode2)
+										StereoType = UriNode2.ShortName;
+									else
+										StereoType = Values.Current.ToString();
+								}
+								else if (Values.Current is ISemanticLiteral Literal)
 								{
 									if (Properties is null)
 										Properties = new LinkedList<KeyValuePair<string, object>>();
@@ -152,9 +168,15 @@ namespace Waher.Content.Semantic
 								else if (NodeIds.TryGetValue(Values.Current, out string ObjectId))
 								{
 									if (Links is null)
-										Links = new LinkedList<KeyValuePair<string, string>>();
+										Links = new LinkedList<LinkInfo>();
 
-									Links.AddLast(new KeyValuePair<string, string>(PropertyName, ObjectId));
+									Links.AddLast(new LinkInfo()
+									{
+										From = NodeId,
+										To = ObjectId,
+										Type = Node is BlankNode ? "*--" : "-->",
+										Label = PropertyName
+									});
 								}
 								else
 								{
@@ -185,7 +207,16 @@ namespace Waher.Content.Semantic
 						Output.Append(JSON.Encode(Node.ToString()));
 
 					Output.Append("\" as ");
-					Output.AppendLine(NodeId);
+					Output.Append(NodeId);
+
+					if (!string.IsNullOrEmpty(StereoType))
+					{
+						Output.Append("<<");
+						Output.Append(StereoType);
+						Output.Append(">>");
+					}
+
+					Output.AppendLine();
 				}
 				else
 				{
@@ -198,6 +229,14 @@ namespace Waher.Content.Semantic
 
 					Output.Append("\" as ");
 					Output.Append(NodeId);
+
+					if (!string.IsNullOrEmpty(StereoType))
+					{
+						Output.Append("<<");
+						Output.Append(StereoType);
+						Output.Append(">>");
+					}
+
 					Output.AppendLine(" {");
 
 					foreach (KeyValuePair<string, object> P in Properties)
@@ -215,24 +254,30 @@ namespace Waher.Content.Semantic
 					LinksByNodeId[NodeId] = Links;
 			}
 
-			foreach (KeyValuePair<string, LinkedList<KeyValuePair<string, string>>> P in LinksByNodeId)
+			foreach (LinkedList<LinkInfo> Links in LinksByNodeId.Values)
 			{
-				string NodeId = P.Key;
-
-				foreach (KeyValuePair<string, string> P2 in P.Value)
+				foreach (LinkInfo Link in Links)
 				{
-					string PropertyName = P2.Key;
-					string DestId = P2.Value;
-
-					Output.Append(NodeId);
-					Output.Append(" --> ");
-					Output.Append(DestId);
+					Output.Append(Link.From);
+					Output.Append(' ');
+					Output.Append(Link.Type);
+					Output.Append(' ');
+					Output.Append(Link.To);
 					Output.Append(" : ");
-					Output.AppendLine(PropertyName);
+					Output.AppendLine(Link.Label);
 				}
 			}
 
 			Output.AppendLine("@enduml");
 		}
+
+		private class LinkInfo
+		{
+			public string From;
+			public string To;
+			public string Type;
+			public string Label;
+		}
+
 	}
 }

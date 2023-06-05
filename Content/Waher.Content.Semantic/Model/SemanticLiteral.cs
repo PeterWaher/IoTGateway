@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model
@@ -6,8 +7,12 @@ namespace Waher.Content.Semantic.Model
 	/// <summary>
 	/// Abstract base class for semantic literal values.
 	/// </summary>
-	public abstract class SemanticLiteral : ISemanticLiteral
+	public abstract class SemanticLiteral : SemanticElement, ISemanticLiteral
 	{
+		private object value;
+		private Type valueType;
+		private IComparable comparable;
+
 		/// <summary>
 		/// Abstract base class for semantic literal values.
 		/// </summary>
@@ -22,14 +27,31 @@ namespace Waher.Content.Semantic.Model
 		/// <param name="StringValue">String Value</param>
 		public SemanticLiteral(object Value, string StringValue)
 		{
-			this.Value = Value;
+			this.value = Value;
+			this.valueType = null;
+			this.comparable = null;
+
 			this.StringValue = StringValue;
 		}
 
- 		/// <summary>
+		/// <summary>
+		/// If element is a literal.
+		/// </summary>
+		public override bool IsLiteral => true;
+
+		/// <summary>
 		/// Parsed value.
 		/// </summary>
-		public object Value { get; }
+		public object Value
+		{
+			get => this.value;
+			set
+			{
+				this.value = value;
+				this.valueType = null;
+				this.comparable = null;
+			}
+		}
 
 		/// <summary>
 		/// Type name (or null if literal value is a string)
@@ -74,10 +96,38 @@ namespace Waher.Content.Semantic.Model
 			return sb.ToString();
 		}
 
-		/// <inheritdoc/>
-		public override abstract bool Equals(object obj);
+		/// <summary>
+		/// Compares the current instance with another object of the same type and returns
+		/// an integer that indicates whether the current instance precedes, follows, or
+		/// occurs in the same position in the sort order as the other object.
+		/// </summary>
+		/// <param name="obj">An object to compare with this instance.</param>
+		/// <returns>A value that indicates the relative order of the objects being compared. The
+		/// return value has these meanings: Value Meaning Less than zero This instance precedes
+		/// obj in the sort order. Zero This instance occurs in the same position in the
+		/// sort order as obj. Greater than zero This instance follows obj in the sort order.</returns>
+		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
+		public override int CompareTo(object obj)
+		{
+			if (obj is SemanticLiteral Typed)
+			{
+				if (this.valueType is null)
+				{
+					this.valueType = this.value?.GetType() ?? typeof(object);
+					this.comparable = this.value as IComparable;
+				}
 
-		/// <inheritdoc/>
-		public override abstract int GetHashCode();
+				if (Typed.valueType is null)
+				{
+					Typed.valueType = Typed.value?.GetType() ?? typeof(object);
+					Typed.comparable = Typed.value as IComparable;
+				}
+
+				if (this.valueType == Typed.valueType && !(this.comparable is null))
+					return this.comparable.CompareTo(Typed.value);
+			}
+				
+			return base.CompareTo(obj);
+		}
 	}
 }

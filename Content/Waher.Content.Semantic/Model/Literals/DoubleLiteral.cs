@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a double literal.
     /// </summary>
-    public class DoubleLiteral : SemanticLiteral
-    {
+    public class DoubleLiteral : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a double literal.
         /// </summary>
@@ -36,6 +36,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#double";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (double)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

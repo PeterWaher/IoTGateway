@@ -6,8 +6,8 @@ namespace Waher.Content.Semantic.Model.Literals
     /// <summary>
     /// Represents an integer literal of undefined size.
     /// </summary>
-    public class IntegerLiteral : SemanticLiteral
-    {
+    public class IntegerLiteral : SemanticNumericLiteral
+	{
         private readonly string dataType = null;
 
         /// <summary>
@@ -55,12 +55,17 @@ namespace Waher.Content.Semantic.Model.Literals
         /// </summary>
         public override string StringType => this.dataType ?? "http://www.w3.org/2001/XMLSchema#integer";
 
-        /// <summary>
-        /// How well the type supports a given data type.
-        /// </summary>
-        /// <param name="DataType">Data type.</param>
-        /// <returns>Support grade.</returns>
-        public override Grade Supports(string DataType)
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (double)((BigInteger)this.Value);
+
+		/// <summary>
+		/// How well the type supports a given data type.
+		/// </summary>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(string DataType)
         {
             switch (DataType)
             {
@@ -102,6 +107,25 @@ namespace Waher.Content.Semantic.Model.Literals
 		public override int GetHashCode()
 		{
 			return this.StringValue.GetHashCode();
+		}
+
+		/// <summary>
+		/// Compares the current instance with another object of the same type and returns
+		/// an integer that indicates whether the current instance precedes, follows, or
+		/// occurs in the same position in the sort order as the other object.
+		/// </summary>
+		/// <param name="obj">An object to compare with this instance.</param>
+		/// <returns>A value that indicates the relative order of the objects being compared. The
+		/// return value has these meanings: Value Meaning Less than zero This instance precedes
+		/// obj in the sort order. Zero This instance occurs in the same position in the
+		/// sort order as obj. Greater than zero This instance follows obj in the sort order.</returns>
+		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
+		public override int CompareTo(object obj)
+		{
+			if (obj is IntegerLiteral Typed)
+				return ((BigInteger)this.Value).CompareTo((BigInteger)Typed.Value);
+			else
+				return base.CompareTo(obj);
 		}
 	}
 }

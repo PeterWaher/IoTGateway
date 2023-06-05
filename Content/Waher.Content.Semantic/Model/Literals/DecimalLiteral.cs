@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a decimal literal.
     /// </summary>
-    public class DecimalLiteral : SemanticLiteral
-    {
+    public class DecimalLiteral : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a decimal literal.
         /// </summary>
@@ -36,6 +36,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#decimal";
+
+        /// <summary>
+        /// Comparable numeric value.
+        /// </summary>
+        public override double ComparableValue => (double)((decimal)this.Value);
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

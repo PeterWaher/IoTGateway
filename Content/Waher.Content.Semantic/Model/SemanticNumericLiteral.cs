@@ -1,47 +1,33 @@
-﻿namespace Waher.Content.Semantic.Model
+﻿using System;
+
+namespace Waher.Content.Semantic.Model
 {
 	/// <summary>
-	/// Represents a blank node
+	/// Abstract base class for semantic literal numeric values.
 	/// </summary>
-	public class BlankNode : SemanticElement
+	public abstract class SemanticNumericLiteral : SemanticLiteral
 	{
 		/// <summary>
-		/// Represents a blank node
+		/// Abstract base class for semantic literal numeric values.
 		/// </summary>
-		/// <param name="NodeId">Blank-node Node ID in document.</param>
-		public BlankNode(string NodeId)
+		public SemanticNumericLiteral()
 		{
-			this.NodeId = NodeId;
 		}
 
 		/// <summary>
-		/// If element is a literal.
+		/// Abstract base class for semantic literal values.
 		/// </summary>
-		public override bool IsLiteral => false;
+		/// <param name="Value">Parsed Value</param>
+		/// <param name="StringValue">String Value</param>
+		public SemanticNumericLiteral(object Value, string StringValue)
+			: base(Value, StringValue)
+		{
+		}
 
 		/// <summary>
-		/// Blank node Node ID.
+		/// Comparable numeric value.
 		/// </summary>
-		public string NodeId { get; set; }
-
-		/// <inheritdoc/>
-		public override string ToString()
-		{
-			return "_:" + this.NodeId.ToString();
-		}
-
-		/// <inheritdoc/>
-		public override bool Equals(object obj)
-		{
-			return obj is BlankNode Typed &&
-				Typed.NodeId == this.NodeId;
-		}
-
-		/// <inheritdoc/>
-		public override int GetHashCode()
-		{
-			return this.NodeId.GetHashCode();
-		}
+		public abstract double ComparableValue { get; }
 
 		/// <summary>
 		/// Compares the current instance with another object of the same type and returns
@@ -56,8 +42,8 @@
 		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
 		public override int CompareTo(object obj)
 		{
-			if (obj is BlankNode Typed)
-				return this.NodeId.CompareTo(Typed.NodeId);
+			if (obj is SemanticNumericLiteral Typed)
+				return this.ComparableValue.CompareTo(Typed.ComparableValue);
 			else
 				return base.CompareTo(obj);
 		}

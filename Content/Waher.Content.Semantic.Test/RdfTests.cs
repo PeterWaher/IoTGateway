@@ -33,7 +33,8 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("ReadTEDSExample.rdf")]
 		public async Task Test_01_Examples(string FileName)
 		{
-			await PerformTest(FileName);
+			RdfDocument Doc = await PerformTest(FileName);
+			SemanticGraph[] Graphs = await SemanticGraphs.GetConnectedGraphs(Doc);
 		}
 
 		[DataTestMethod]
@@ -281,10 +282,11 @@ namespace Waher.Content.Semantic.Test
 			await PerformTest(FileName, BaseUri);
 		}
 
-		private static async Task PerformTest(string FileName)
+		private static async Task<RdfDocument> PerformTest(string FileName)
 		{
 			RdfDocument Parsed = await LoadRdfDocument(FileName, null);
 			await Print(Parsed);
+			return Parsed;
 		}
 
 		private static async Task PerformTest(string FileName, string BaseUri)

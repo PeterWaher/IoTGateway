@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a 16-bit unsigned integer literal.
     /// </summary>
-    public class UInt16Literal : SemanticLiteral
-    {
+    public class UInt16Literal : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a 16-bit unsigned integer literal.
         /// </summary>
@@ -37,6 +37,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#unsignedShort";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (ushort)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

@@ -1,47 +1,37 @@
-﻿namespace Waher.Content.Semantic.Model
+﻿using System;
+using Waher.Persistence.Attributes;
+
+namespace Waher.Content.Semantic.Model
 {
 	/// <summary>
-	/// Represents a blank node
+	/// Abstract base class for semantic elements.
 	/// </summary>
-	public class BlankNode : SemanticElement
+	[TypeName(TypeNameSerialization.FullName)]
+	public abstract class SemanticElement : ISemanticElement
 	{
 		/// <summary>
-		/// Represents a blank node
+		/// Abstract base class for semantic elements.
 		/// </summary>
-		/// <param name="NodeId">Blank-node Node ID in document.</param>
-		public BlankNode(string NodeId)
+		public SemanticElement()
 		{
-			this.NodeId = NodeId;
 		}
+
+		/// <summary>
+		/// Property used by processor, to tag information to an element.
+		/// </summary>
+		[IgnoreMember]
+		public object Tag { get; set; }
 
 		/// <summary>
 		/// If element is a literal.
 		/// </summary>
-		public override bool IsLiteral => false;
-
-		/// <summary>
-		/// Blank node Node ID.
-		/// </summary>
-		public string NodeId { get; set; }
+		public abstract bool IsLiteral { get; }
 
 		/// <inheritdoc/>
-		public override string ToString()
-		{
-			return "_:" + this.NodeId.ToString();
-		}
+		public override abstract bool Equals(object obj);
 
 		/// <inheritdoc/>
-		public override bool Equals(object obj)
-		{
-			return obj is BlankNode Typed &&
-				Typed.NodeId == this.NodeId;
-		}
-
-		/// <inheritdoc/>
-		public override int GetHashCode()
-		{
-			return this.NodeId.GetHashCode();
-		}
+		public override abstract int GetHashCode();
 
 		/// <summary>
 		/// Compares the current instance with another object of the same type and returns
@@ -54,12 +44,9 @@
 		/// obj in the sort order. Zero This instance occurs in the same position in the
 		/// sort order as obj. Greater than zero This instance follows obj in the sort order.</returns>
 		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
-		public override int CompareTo(object obj)
+		public virtual int CompareTo(object obj)
 		{
-			if (obj is BlankNode Typed)
-				return this.NodeId.CompareTo(Typed.NodeId);
-			else
-				return base.CompareTo(obj);
+			return this.ToString().CompareTo(obj?.ToString() ?? string.Empty);
 		}
 	}
 }

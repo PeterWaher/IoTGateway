@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a 64-bit integer literal.
     /// </summary>
-    public class Int64Literal : SemanticLiteral
-    {
+    public class Int64Literal : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a 64-bit integer literal.
         /// </summary>
@@ -37,6 +37,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#long";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (long)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

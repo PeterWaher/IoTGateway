@@ -6,16 +6,6 @@
     public class BooleanLiteral : SemanticLiteral
     {
         /// <summary>
-        /// Predefined value "true".
-        /// </summary>
-        public readonly static BooleanLiteral True = new BooleanLiteral(true, "true");
-
-        /// <summary>
-        /// Predefined value "false".
-        /// </summary>
-        public readonly static BooleanLiteral False = new BooleanLiteral(false, "false");
-
-        /// <summary>
         /// Represents a bool literal.
         /// </summary>
         /// <param name="Value">Literal value</param>

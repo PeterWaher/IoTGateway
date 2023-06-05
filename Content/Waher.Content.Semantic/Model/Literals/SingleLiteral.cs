@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a float literal.
     /// </summary>
-    public class SingleLiteral : SemanticLiteral
-    {
+    public class SingleLiteral : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a float literal.
         /// </summary>
@@ -36,6 +36,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#float";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (float)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

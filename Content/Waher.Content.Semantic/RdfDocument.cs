@@ -23,52 +23,52 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// rdf:type predicate
 		/// </summary>
-		public static readonly UriNode RdfType = new UriNode(new Uri(RdfNamespace + "type"));
+		public static readonly Uri RdfType = new Uri(RdfNamespace + "type");
 
 		/// <summary>
 		/// Predefined reference to first element in a collection.
 		/// </summary>
-		public readonly static UriNode RdfFirst = new UriNode(new Uri(RdfNamespace + "first"));
+		public static readonly Uri RdfFirst = new Uri(RdfNamespace + "first");
 
 		/// <summary>
 		/// Predefined reference to next element in a collection.
 		/// </summary>
-		public readonly static UriNode RdfNext = new UriNode(new Uri(RdfNamespace + "rest"));
+		public static readonly Uri RdfNext = new Uri(RdfNamespace + "rest");
 
 		/// <summary>
 		/// Predefined reference to end of collection.
 		/// </summary>
-		public readonly static UriNode RdfNil = new UriNode(new Uri(RdfNamespace + "nil"));
+		public static readonly Uri RdfNil = new Uri(RdfNamespace + "nil");
 
 		/// <summary>
 		/// Subject reference, during reification.
 		/// </summary>
-		public readonly static UriNode RdfSubject = new UriNode(new Uri(RdfNamespace + "subject"));
+		public static readonly Uri RdfSubject = new Uri(RdfNamespace + "subject");
 
 		/// <summary>
 		/// Predicate reference, during reification.
 		/// </summary>
-		public readonly static UriNode RdfPredicate = new UriNode(new Uri(RdfNamespace + "predicate"));
+		public static readonly Uri RdfPredicate = new Uri(RdfNamespace + "predicate");
 
 		/// <summary>
 		/// object reference, during reification.
 		/// </summary>
-		public readonly static UriNode RdfObject = new UriNode(new Uri(RdfNamespace + "object"));
+		public static readonly Uri RdfObject = new Uri(RdfNamespace + "object");
 
 		/// <summary>
 		/// Statement reference
 		/// </summary>
-		public readonly static UriNode RdfStatement = new UriNode(new Uri(RdfNamespace + "Statement"));
+		public static readonly Uri RdfStatement = new Uri(RdfNamespace + "Statement");
 
 		/// <summary>
 		/// Bag reference
 		/// </summary>
-		public readonly static UriNode RdfBag = new UriNode(new Uri(RdfNamespace + "Bag"));
+		public static readonly Uri RdfBag = new Uri(RdfNamespace + "Bag");
 
 		/// <summary>
 		/// List item reference.
 		/// </summary>
-		public readonly static Uri RdfLi = new Uri(RdfNamespace + "li");
+		public static readonly Uri RdfLi = new Uri(RdfNamespace + "li");
 
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly XmlDocument xml;
@@ -261,7 +261,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				Bag = new UriNode(this.CreateUri("#" + BagId, BaseUri));
-				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
+				this.triples.Add(new SemanticTriple(Bag, new UriNode(RdfType), new UriNode(RdfBag)));
 			}
 
 			if (Xml.DocumentElement.LocalName == "RDF" && Xml.DocumentElement.NamespaceURI == RdfNamespace)
@@ -271,7 +271,7 @@ namespace Waher.Content.Semantic
 				BlankNode RootSubject = this.CreateBlankNode();
 				UriNode RootType = new UriNode(this.CreateUri(Xml.DocumentElement.NamespaceURI + Xml.DocumentElement.LocalName, BaseUri));
 
-				this.triples.Add(new SemanticTriple(RootSubject, RdfType, RootType));
+				this.triples.Add(new SemanticTriple(RootSubject, new UriNode(RdfType), RootType));
 
 				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag, null);
 			}
@@ -404,7 +404,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				Bag = new UriNode(this.CreateUri("#" + BagId, BaseUri));
-				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
+				this.triples.Add(new SemanticTriple(Bag, new UriNode(RdfType), new UriNode(RdfBag)));
 			}
 
 			if (!(About is null))
@@ -441,7 +441,7 @@ namespace Waher.Content.Semantic
 			if (E.NamespaceURI != RdfNamespace)
 			{
 				DescriptionNode = new UriNode(this.CreateUri(E.NamespaceURI + E.LocalName, BaseUri));
-				this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
+				this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), DescriptionNode));
 			}
 			else if (E.LocalName != "Description")
 			{
@@ -449,13 +449,13 @@ namespace Waher.Content.Semantic
 				{
 					ItemCounter++;
 
-					this.triples.Add(new SemanticTriple(Subject, RdfType,
+					this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType),
 						new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri))));
 				}
 				else
 				{
 					DescriptionNode = new UriNode(this.CreateUri(E.NamespaceURI + E.LocalName, BaseUri));
-					this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
+					this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), DescriptionNode));
 				}
 			}
 
@@ -468,17 +468,17 @@ namespace Waher.Content.Semantic
 					new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
 					BagDescription));
 
-				this.triples.Add(new SemanticTriple(BagDescription, RdfType, RdfStatement));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfSubject, Subject));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfPredicate, RdfType));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfObject, DescriptionNode));
+				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfType), new UriNode(RdfStatement)));
+				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfSubject), Subject));
+				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfPredicate), new UriNode(RdfType)));
+				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfObject), DescriptionNode));
 			}
 
 			if (!(Type is null))
 			{
 				ISemanticElement TypeObject = new UriNode(this.CreateUri(Type, BaseUri));
 
-				this.triples.Add(new SemanticTriple(Subject, RdfType, TypeObject));
+				this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), TypeObject));
 
 				if (!(Bag is null))
 				{
@@ -489,10 +489,10 @@ namespace Waher.Content.Semantic
 						new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
 						ReificationNode));
 
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, RdfType));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, TypeObject));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), new UriNode(RdfType)));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), TypeObject));
 				}
 			}
 
@@ -519,10 +519,10 @@ namespace Waher.Content.Semantic
 							new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
 							ReificationNode));
 
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
+						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
+						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
+						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate));
+						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Object));
 					}
 				}
 			}
@@ -541,7 +541,7 @@ namespace Waher.Content.Semantic
 					continue;
 
 				UriNode Predicate = new UriNode(this.CreateUri(E2.NamespaceURI + E2.LocalName, BaseUri));
-				if (Predicate.Uri.AbsoluteUri.EndsWith("#li") && Predicate.Uri == RdfLi)
+				if (Predicate.UriString.EndsWith("#li") && Predicate.Uri == RdfLi)
 				{
 					ItemCounter++;
 					Predicate = new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri));
@@ -623,7 +623,7 @@ namespace Waher.Content.Semantic
 				if (!(BagId is null))
 				{
 					Bag2 = new UriNode(this.CreateUri("#" + BagId, BaseUri2));
-					this.triples.Add(new SemanticTriple(Bag2, RdfType, RdfBag));
+					this.triples.Add(new SemanticTriple(Bag2, new UriNode(RdfType), new UriNode(RdfBag)));
 				}
 
 				if (!(Resource is null))
@@ -668,10 +668,10 @@ namespace Waher.Content.Semantic
 								new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri2)),
 								ReificationNode));
 
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Object));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate2));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Literal));
+							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
+							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Object));
+							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate2));
+							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Literal));
 						}
 					}
 				}
@@ -791,7 +791,7 @@ namespace Waher.Content.Semantic
 						}
 
 						if (Elements is null)
-							this.triples.Add(new SemanticTriple(Subject, Predicate, RdfNil));
+							this.triples.Add(new SemanticTriple(Subject, Predicate, new UriNode(RdfNil)));
 						else
 						{
 							LinkedListNode<ISemanticElement> Loop = Elements.First;
@@ -801,19 +801,19 @@ namespace Waher.Content.Semantic
 
 							while (!(Loop is null))
 							{
-								this.triples.Add(new SemanticTriple(Current, RdfFirst, Loop.Value));
+								this.triples.Add(new SemanticTriple(Current, new UriNode(RdfFirst), Loop.Value));
 
 								Loop = Loop.Next;
 
 								if (!(Loop is null))
 								{
 									BlankNode Next = this.CreateBlankNode();
-									this.triples.Add(new SemanticTriple(Current, RdfNext, Next));
+									this.triples.Add(new SemanticTriple(Current, new UriNode(RdfNext), Next));
 									Current = Next;
 								}
 							}
 
-							this.triples.Add(new SemanticTriple(Current, RdfNext, RdfNil));
+							this.triples.Add(new SemanticTriple(Current, new UriNode(RdfNext), new UriNode(RdfNil)));
 						}
 						break;
 				}
@@ -836,10 +836,10 @@ namespace Waher.Content.Semantic
 							ReificationNode));
 					}
 
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate));
+					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Object));
 				}
 			}
 

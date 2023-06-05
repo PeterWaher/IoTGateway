@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a 8-bit unsigned integer literal.
     /// </summary>
-    public class UInt8Literal : SemanticLiteral
+    public class UInt8Literal : SemanticNumericLiteral
     {
         /// <summary>
         /// Represents a 8-bit unsigned integer literal.
@@ -37,6 +37,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#unsignedByte";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (byte)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

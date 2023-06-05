@@ -329,17 +329,17 @@ namespace Waher.Content.Semantic
 							{
 								case "a":
 									if (TriplePosition == 1)
-										return RdfDocument.RdfType;
+										return new UriNode(RdfDocument.RdfType);
 									break;
 
 								case "true":
 									if (TriplePosition == 2)
-										return BooleanLiteral.True;
+										return new BooleanLiteral(true);
 									break;
 
 								case "false":
 									if (TriplePosition == 2)
-										return BooleanLiteral.False;
+										return new BooleanLiteral(false);
 									break;
 							}
 
@@ -378,7 +378,7 @@ namespace Waher.Content.Semantic
 					this.pos++;
 
 					if (Elements is null)
-						return RdfDocument.RdfNil;
+						return new UriNode(RdfDocument.RdfNil);
 
 					LinkedListNode<ISemanticElement> Loop = Elements.First;
 					BlankNode Result = this.CreateBlankNode();
@@ -386,19 +386,19 @@ namespace Waher.Content.Semantic
 
 					while (!(Loop is null))
 					{
-						this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
+						this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfFirst), Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
 							BlankNode Next = this.CreateBlankNode();
-							this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfNext, Next));
+							this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfNext), Next));
 							Current = Next;
 						}
 					}
 
-					this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfNext, RdfDocument.RdfNil));
+					this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfNext), new UriNode(RdfDocument.RdfNil)));
 
 					return Result;
 				}

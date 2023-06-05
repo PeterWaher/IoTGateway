@@ -182,7 +182,7 @@ namespace Waher.Content.Semantic
 						{
 							if (Triple.Predicate is UriNode Predicate)
 							{
-								string Uri = Predicate.Uri.AbsoluteUri;
+								string Uri = Predicate.UriString;
 								string Namespace = GetNamespace(Uri);
 
 								if (Prefixes.TryGetValue(Namespace, out string Prefix))
@@ -215,7 +215,7 @@ namespace Waher.Content.Semantic
 								else if (Triple.Object is BlankNode BlankNode)
 									w.WriteAttributeString("rdf", "nodeID", string.Empty, BlankNode.NodeId);
 								else if (Triple.Object is UriNode UriNode)
-									w.WriteAttributeString("rdf", "resource", string.Empty, UriNode.Uri.AbsoluteUri);
+									w.WriteAttributeString("rdf", "resource", string.Empty, UriNode.UriString);
 								else
 									w.WriteValue(Triple.Object.ToString());
 
@@ -247,7 +247,7 @@ namespace Waher.Content.Semantic
 		{
 			if (Element is UriNode UriNode)
 			{
-				string Namespace = GetNamespace(UriNode.Uri.AbsoluteUri);
+				string Namespace = GetNamespace(UriNode.UriString);
 				if (!string.IsNullOrEmpty(Namespace) && !Prefixes.ContainsKey(Namespace))
 				{
 					string Prefix = "p" + (Prefixes.Count + 1).ToString();

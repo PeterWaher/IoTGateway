@@ -3,8 +3,8 @@
     /// <summary>
     /// Represents a 32-bit unsigned integer literal.
     /// </summary>
-    public class UInt32Literal : SemanticLiteral
-    {
+    public class UInt32Literal : SemanticNumericLiteral
+	{
         /// <summary>
         /// Represents a 32-bit unsigned integer literal.
         /// </summary>
@@ -37,6 +37,11 @@
         /// Type name
         /// </summary>
         public override string StringType => "http://www.w3.org/2001/XMLSchema#unsignedInt";
+
+		/// <summary>
+		/// Comparable numeric value.
+		/// </summary>
+		public override double ComparableValue => (uint)this.Value;
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

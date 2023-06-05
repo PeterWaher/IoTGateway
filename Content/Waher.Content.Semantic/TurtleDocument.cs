@@ -212,7 +212,7 @@ namespace Waher.Content.Semantic
 								if (ch != '<')
 									throw this.ParsingException("Expected <");
 
-								this.baseUri = this.ParseUri();
+								this.baseUri = this.ParseUri().Uri;
 
 								if (this.NextNonWhitespaceChar() != '.')
 									throw this.ParsingException("Expected .");
@@ -230,7 +230,7 @@ namespace Waher.Content.Semantic
 								if (this.NextNonWhitespaceChar() != '<')
 									throw this.ParsingException("Expected <");
 
-								this.namespaces[s] = this.ParseUri().AbsoluteUri;
+								this.namespaces[s] = this.ParseUri().Uri.AbsoluteUri;
 
 								if (this.NextNonWhitespaceChar() != '.')
 									throw this.ParsingException("Expected .");
@@ -257,7 +257,7 @@ namespace Waher.Content.Semantic
 						return null;
 
 					case '<':
-						return new UriNode(this.ParseUri());
+						return this.ParseUri();
 
 					case '"':
 						if (TriplePosition != 2)
@@ -266,10 +266,10 @@ namespace Waher.Content.Semantic
 						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
 						{
 							this.pos += 2;
-							s = this.ParseString(true);
+							s = this.ParseString('"', true, true);
 						}
 						else
-							s = this.ParseString(false);
+							s = this.ParseString('"', false, true);
 
 						string Language = null;
 
@@ -283,7 +283,7 @@ namespace Waher.Content.Semantic
 						{
 							this.pos += 2;
 
-							string DataType = this.ParseUriOrPrefixedToken().AbsoluteUri;
+							string DataType = this.ParseUriOrPrefixedToken().Uri.AbsoluteUri;
 
 							if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 							{
@@ -301,7 +301,7 @@ namespace Waher.Content.Semantic
 							return new StringLiteral(s);
 
 					case ':':
-						return new UriNode(this.ParsePrefixedToken(string.Empty));
+						return this.ParsePrefixedToken(string.Empty);
 
 					default:
 						if (char.IsWhiteSpace(ch))
@@ -322,14 +322,14 @@ namespace Waher.Content.Semantic
 							if (this.PeekNextChar() == ':')
 							{
 								this.pos++;
-								return new UriNode(this.ParsePrefixedToken(s));
+								return this.ParsePrefixedToken(s);
 							}
 
 							switch (s)
 							{
 								case "a":
 									if (TriplePosition == 1)
-										return new UriNode(RdfDocument.RdfType);
+										return RdfDocument.RdfType;
 									break;
 
 								case "true":
@@ -378,7 +378,7 @@ namespace Waher.Content.Semantic
 					this.pos++;
 
 					if (Elements is null)
-						return new UriNode(RdfDocument.RdfNil);
+						return RdfDocument.RdfNil;
 
 					LinkedListNode<ISemanticElement> Loop = Elements.First;
 					BlankNode Result = this.CreateBlankNode();
@@ -386,19 +386,19 @@ namespace Waher.Content.Semantic
 
 					while (!(Loop is null))
 					{
-						this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfFirst), Loop.Value));
+						this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
 							BlankNode Next = this.CreateBlankNode();
-							this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfNext), Next));
+							this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
 							Current = Next;
 						}
 					}
 
-					this.triples.Add(new SemanticTriple(Current, new UriNode(RdfDocument.RdfNext), new UriNode(RdfDocument.RdfNil)));
+					this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
 
 					return Result;
 				}
@@ -417,7 +417,7 @@ namespace Waher.Content.Semantic
 			throw this.ParsingException("Expected )");
 		}
 
-		private Uri ParseUriOrPrefixedToken()
+		private UriNode ParseUriOrPrefixedToken()
 		{
 			if (this.pos >= this.len)
 				throw this.ParsingException("Expected URI or prefixed token.");
@@ -436,7 +436,7 @@ namespace Waher.Content.Semantic
 			return this.ParsePrefixedToken(Prefix);
 		}
 
-		private Uri ParsePrefixedToken(string Prefix)
+		private UriNode ParsePrefixedToken(string Prefix)
 		{
 			if (!this.namespaces.TryGetValue(Prefix, out string Namespace))
 				throw this.ParsingException("Prefix unknown.");
@@ -445,7 +445,7 @@ namespace Waher.Content.Semantic
 
 			string LocalName = this.ParseName();
 
-			return new Uri(Namespace + LocalName);
+			return new UriNode(new Uri(Namespace + LocalName), Prefix + ":" + LocalName);
 		}
 
 		private string ParseName()
@@ -624,7 +624,7 @@ namespace Waher.Content.Semantic
 			throw this.ParsingException("Expected value element.");
 		}
 
-		private string ParseString(bool MultiLine)
+		private string ParseString(char EndChar, bool MultiLine, bool IncludeWhiteSpace)
 		{
 			StringBuilder sb = null;
 			int Start = this.pos;
@@ -634,11 +634,11 @@ namespace Waher.Content.Semantic
 			{
 				this.pos++;
 
-				if (ch == '"')
+				if (ch == EndChar)
 				{
 					if (MultiLine)
 					{
-						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
+						if (this.pos < this.len - 1 && this.text[this.pos] == EndChar && this.text[this.pos + 1] == EndChar)
 						{
 							this.pos += 2;
 							return sb?.ToString() ?? this.text.Substring(Start, this.pos - Start - 3);
@@ -717,11 +717,11 @@ namespace Waher.Content.Semantic
 							break;
 					}
 				}
-				else
+				else if (IncludeWhiteSpace || !char.IsWhiteSpace(ch))
 					sb?.Append(ch);
 			}
 
-			throw this.ParsingException("Expected end of string.");
+			throw this.ParsingException("Expected " + new string(EndChar, MultiLine ? 3 : 1));
 		}
 
 		private ParsingException ParsingException(string Message)
@@ -729,44 +729,26 @@ namespace Waher.Content.Semantic
 			return new ParsingException(Message, this.text, this.pos);
 		}
 
-		private Uri ParseUri()
+		private UriNode ParseUri()
 		{
-			StringBuilder sb = new StringBuilder();
+			string Short = this.ParseString('>', false, false);
 
-			while (this.pos < this.len)
+			if (this.baseUri is null)
 			{
-				char ch = this.PeekNextChar();
-				if (ch == 0)
-					break;
-
-				this.pos++;
-
-				if (ch == '>')
-				{
-					if (this.baseUri is null)
-					{
-						if (Uri.TryCreate(sb.ToString(), UriKind.Absolute, out Uri URI))
-							return URI;
-						else
-							throw this.ParsingException("Invalid URI.");
-					}
-					else
-					{
-						string s = sb.ToString();
-
-						if (string.IsNullOrEmpty(s))
-							return this.baseUri;
-						else if (Uri.TryCreate(this.baseUri, s, out Uri URI))
-							return URI;
-						else
-							throw this.ParsingException("Invalid URI.");
-					}
-				}
-				else if (!char.IsWhiteSpace(ch))
-					sb.Append(ch);
+				if (Uri.TryCreate(Short, UriKind.Absolute, out Uri URI))
+					return new UriNode(URI, Short);
+				else
+					throw this.ParsingException("Invalid URI.");
 			}
-
-			throw this.ParsingException("Expected >");
+			else
+			{
+				if (string.IsNullOrEmpty(Short))
+					return new UriNode(this.baseUri, Short);
+				else if (Uri.TryCreate(this.baseUri, Short, out Uri URI))
+					return new UriNode(URI, Short);
+				else
+					throw this.ParsingException("Invalid URI.");
+			}
 		}
 
 		private void SkipLine()

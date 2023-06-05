@@ -23,52 +23,102 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// rdf:type predicate
 		/// </summary>
-		public static readonly Uri RdfType = new Uri(RdfNamespace + "type");
+		public static UriNode RdfType => new UriNode(UriRdfType, "rdf:type");
+
+		/// <summary>
+		/// URI representing rdf:type
+		/// </summary>
+		public static readonly Uri UriRdfType = new Uri(RdfNamespace + "type");
 
 		/// <summary>
 		/// Predefined reference to first element in a collection.
 		/// </summary>
-		public static readonly Uri RdfFirst = new Uri(RdfNamespace + "first");
+		public static UriNode RdfFirst => new UriNode(UriRdfFirst, "rdf:first");
+
+		/// <summary>
+		/// URI representing rdf:first
+		/// </summary>
+		public static readonly Uri UriRdfFirst = new Uri(RdfNamespace + "first");
 
 		/// <summary>
 		/// Predefined reference to next element in a collection.
 		/// </summary>
-		public static readonly Uri RdfNext = new Uri(RdfNamespace + "rest");
+		public static UriNode RdfRest => new UriNode(UriRdfRest, "rdf:rest");
+
+		/// <summary>
+		/// URI representing rdf:rest
+		/// </summary>
+		public static readonly Uri UriRdfRest = new Uri(RdfNamespace + "rest");
 
 		/// <summary>
 		/// Predefined reference to end of collection.
 		/// </summary>
-		public static readonly Uri RdfNil = new Uri(RdfNamespace + "nil");
+		public static UriNode RdfNil => new UriNode(UriRdfNil, "rdf:nil");
+
+		/// <summary>
+		/// URI representing rdf:nil
+		/// </summary>
+		public static readonly Uri UriRdfNil = new Uri(RdfNamespace + "nil");
 
 		/// <summary>
 		/// Subject reference, during reification.
 		/// </summary>
-		public static readonly Uri RdfSubject = new Uri(RdfNamespace + "subject");
+		public static UriNode RdfSubject => new UriNode(UriRdfSubject, "rdf:subject");
+
+		/// <summary>
+		/// URI representing rdf:subject
+		/// </summary>
+		public static readonly Uri UriRdfSubject = new Uri(RdfNamespace + "subject");
 
 		/// <summary>
 		/// Predicate reference, during reification.
 		/// </summary>
-		public static readonly Uri RdfPredicate = new Uri(RdfNamespace + "predicate");
+		public static UriNode RdfPredicate => new UriNode(UriRdfPredicate, "rdf:predicate");
+
+		/// <summary>
+		/// URI representing rdf:predicate
+		/// </summary>
+		public static readonly Uri UriRdfPredicate = new Uri(RdfNamespace + "predicate");
 
 		/// <summary>
 		/// object reference, during reification.
 		/// </summary>
-		public static readonly Uri RdfObject = new Uri(RdfNamespace + "object");
+		public static UriNode RdfObject => new UriNode(UriRdfObject, "rdf:object");
+
+		/// <summary>
+		/// URI representing rdf:object
+		/// </summary>
+		public static readonly Uri UriRdfObject = new Uri(RdfNamespace + "object");
 
 		/// <summary>
 		/// Statement reference
 		/// </summary>
-		public static readonly Uri RdfStatement = new Uri(RdfNamespace + "Statement");
+		public static UriNode RdfStatement => new UriNode(UriRdfStatement, "rdf:Statement");
+
+		/// <summary>
+		/// URI representing rdf:Statement
+		/// </summary>
+		public static readonly Uri UriRdfStatement = new Uri(RdfNamespace + "Statement");
 
 		/// <summary>
 		/// Bag reference
 		/// </summary>
-		public static readonly Uri RdfBag = new Uri(RdfNamespace + "Bag");
+		public static UriNode RdfBag => new UriNode(UriRdfBag, "rdf:Bag");
+
+		/// <summary>
+		/// URI representing rdf:Bag
+		/// </summary>
+		public static readonly Uri UriRdfBag = new Uri(RdfNamespace + "Bag");
 
 		/// <summary>
 		/// List item reference.
 		/// </summary>
-		public static readonly Uri RdfLi = new Uri(RdfNamespace + "li");
+		public static UriNode RdfLi => new UriNode(UriRdfLi, "rdf:li");
+
+		/// <summary>
+		/// URI representing rdf:li
+		/// </summary>
+		public static readonly Uri UriRdfLi = new Uri(RdfNamespace + "li");
 
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly XmlDocument xml;
@@ -260,8 +310,8 @@ namespace Waher.Content.Semantic
 				Bag = null;
 			else
 			{
-				Bag = new UriNode(this.CreateUri("#" + BagId, BaseUri));
-				this.triples.Add(new SemanticTriple(Bag, new UriNode(RdfType), new UriNode(RdfBag)));
+				Bag = this.CreateUriNode("#" + BagId, BaseUri);
+				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
 			}
 
 			if (Xml.DocumentElement.LocalName == "RDF" && Xml.DocumentElement.NamespaceURI == RdfNamespace)
@@ -269,11 +319,12 @@ namespace Waher.Content.Semantic
 			else
 			{
 				BlankNode RootSubject = this.CreateBlankNode();
-				UriNode RootType = new UriNode(this.CreateUri(Xml.DocumentElement.NamespaceURI + Xml.DocumentElement.LocalName, BaseUri));
+				UriNode RootType = this.CreateUriNode(Xml.DocumentElement, BaseUri);
 
-				this.triples.Add(new SemanticTriple(RootSubject, new UriNode(RdfType), RootType));
+				this.triples.Add(new SemanticTriple(RootSubject, RdfType, RootType));
 
-				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag, null);
+				int ItemCounter = 0;
+				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag, null, ref ItemCounter);
 			}
 		}
 
@@ -302,14 +353,14 @@ namespace Waher.Content.Semantic
 		private ISemanticElement ParseDescription(XmlElement E, string Language, Uri BaseUri,
 			ref int ItemCounter)
 		{
-			string Id = null;
-			string About = null;
+			XmlAttribute About = null;
+			XmlAttribute Type = null;
+			XmlAttribute Id = null;
 			string NodeId = null;
 			string BagId = null;
-			string Type = null;
 			string AboutEach = null;
 			string AboutEachPrefix = null;
-			LinkedList<KeyValuePair<string, string>> Properties = null;
+			LinkedList<XmlAttribute> Properties = null;
 			XmlElement ForEach = null;
 
 			foreach (XmlAttribute Attr in E.Attributes)
@@ -328,12 +379,11 @@ namespace Waher.Content.Semantic
 							continue;
 
 						case "about":
-							About = Attr.Value;
+							About = Attr;
 							continue;
 
 						case "ID":
-							Id = Attr.Value;
-							About = "#" + Id;
+							Id = Attr;
 							continue;
 
 						case "bagID":
@@ -341,7 +391,7 @@ namespace Waher.Content.Semantic
 							continue;
 
 						case "type":
-							Type = Attr.Value;
+							Type = Attr;
 							continue;
 
 						case "aboutEach":
@@ -372,9 +422,9 @@ namespace Waher.Content.Semantic
 					continue;
 
 				if (Properties is null)
-					Properties = new LinkedList<KeyValuePair<string, string>>();
+					Properties = new LinkedList<XmlAttribute>();
 
-				Properties.AddLast(new KeyValuePair<string, string>(Attr.NamespaceURI + Attr.LocalName, Attr.Value));
+				Properties.AddLast(Attr);
 			}
 
 			if (!(AboutEach is null))
@@ -403,25 +453,27 @@ namespace Waher.Content.Semantic
 				Bag = null;
 			else
 			{
-				Bag = new UriNode(this.CreateUri("#" + BagId, BaseUri));
-				this.triples.Add(new SemanticTriple(Bag, new UriNode(RdfType), new UriNode(RdfBag)));
+				Bag = this.CreateUriNode("#" + BagId, BaseUri);
+				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
 			}
 
-			if (!(About is null))
+			if (!(About is null) || !(Id is null))
 			{
-				Uri AboutUri = this.CreateUri(About, BaseUri);
-				Subject = new UriNode(AboutUri);
+				UriNode AboutUriNode = About is null ?
+					this.CreateUriNode("#" + Id.Value, BaseUri) :
+					this.CreateUriNode(About.Value, BaseUri);
+				Subject = AboutUriNode;
 
 				if (ForEach is null)
 				{
 					if (!(Id is null))
 					{
-						if (!(this.aboutEach?.TryGetValue(AboutUri, out ForEach) ?? false) &&
+						if (!(this.aboutEach?.TryGetValue(AboutUriNode.Uri, out ForEach) ?? false) &&
 							!(this.aboutEachPrefix is null))
 						{
 							foreach (KeyValuePair<Uri, XmlElement> P in this.aboutEachPrefix)
 							{
-								if (AboutUri.AbsoluteUri.StartsWith(P.Key.AbsoluteUri))
+								if (AboutUriNode.Uri.AbsoluteUri.StartsWith(P.Key.AbsoluteUri))
 								{
 									ForEach = P.Value;
 									break;
@@ -440,22 +492,21 @@ namespace Waher.Content.Semantic
 
 			if (E.NamespaceURI != RdfNamespace)
 			{
-				DescriptionNode = new UriNode(this.CreateUri(E.NamespaceURI + E.LocalName, BaseUri));
-				this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), DescriptionNode));
+				DescriptionNode = this.CreateUriNode(E, BaseUri);
+				this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
 			}
 			else if (E.LocalName != "Description")
 			{
 				if (E.LocalName == "li")
 				{
-					ItemCounter++;
-
-					this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType),
-						new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri))));
+					string Item = "_" + (++ItemCounter).ToString();
+					this.triples.Add(new SemanticTriple(Subject, RdfType,
+						this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item)));
 				}
 				else
 				{
-					DescriptionNode = new UriNode(this.CreateUri(E.NamespaceURI + E.LocalName, BaseUri));
-					this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), DescriptionNode));
+					DescriptionNode = this.CreateUriNode(E, BaseUri);
+					this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
 				}
 			}
 
@@ -463,50 +514,50 @@ namespace Waher.Content.Semantic
 			{
 				ISemanticElement BagDescription = this.CreateBlankNode();
 
-				ItemCounter++;
+				string Item = "_" + (++ItemCounter).ToString();
 				this.triples.Add(new SemanticTriple(Bag,
-					new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
+					this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 					BagDescription));
 
-				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfType), new UriNode(RdfStatement)));
-				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfSubject), Subject));
-				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfPredicate), new UriNode(RdfType)));
-				this.triples.Add(new SemanticTriple(BagDescription, new UriNode(RdfObject), DescriptionNode));
+				this.triples.Add(new SemanticTriple(BagDescription, RdfType, RdfStatement));
+				this.triples.Add(new SemanticTriple(BagDescription, RdfSubject, Subject));
+				this.triples.Add(new SemanticTriple(BagDescription, RdfPredicate, RdfType));
+				this.triples.Add(new SemanticTriple(BagDescription, RdfObject, DescriptionNode));
 			}
 
 			if (!(Type is null))
 			{
-				ISemanticElement TypeObject = new UriNode(this.CreateUri(Type, BaseUri));
+				ISemanticElement TypeObject = this.CreateUriNode(Type.Value, BaseUri);
 
-				this.triples.Add(new SemanticTriple(Subject, new UriNode(RdfType), TypeObject));
+				this.triples.Add(new SemanticTriple(Subject, RdfType, TypeObject));
 
 				if (!(Bag is null))
 				{
 					ISemanticElement ReificationNode = this.CreateBlankNode();
 
-					ItemCounter++;
+					string Item = "_" + (++ItemCounter).ToString();
 					this.triples.Add(new SemanticTriple(Bag,
-						new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
+						this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 						ReificationNode));
 
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), new UriNode(RdfType)));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), TypeObject));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, RdfType));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, TypeObject));
 				}
 			}
 
 			if (!(Properties is null))
 			{
-				foreach (KeyValuePair<string, string> P in Properties)
+				foreach (XmlAttribute Attr in Properties)
 				{
-					UriNode Predicate = new UriNode(this.CreateUri(P.Key, BaseUri));
+					UriNode Predicate = this.CreateUriNode(Attr, BaseUri);
 					StringLiteral Object;
 
 					if (HasLanguage)
-						Object = new StringLiteral(P.Value, Language);
+						Object = new StringLiteral(Attr.Value, Language);
 					else
-						Object = new StringLiteral(P.Value);
+						Object = new StringLiteral(Attr.Value);
 
 					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 
@@ -514,46 +565,50 @@ namespace Waher.Content.Semantic
 					{
 						ISemanticElement ReificationNode = this.CreateBlankNode();
 
-						ItemCounter++;
+						string Item = "_" + (++ItemCounter).ToString();
 						this.triples.Add(new SemanticTriple(Bag,
-							new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri)),
+							this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 							ReificationNode));
 
-						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
-						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
-						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate));
-						this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Object));
+						this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+						this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+						this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
+						this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
 					}
 				}
 			}
 
-			return this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach);
+			int ChildItemCounter = Bag is null ? 0 : ItemCounter;
+
+			return this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach, ref ChildItemCounter);
+
+			if (!(Bag is null))
+				ItemCounter = ChildItemCounter;
 		}
 
 		private ISemanticElement ParseDescription(XmlElement E, ISemanticElement Subject,
-			string Language, Uri BaseUri, ISemanticElement Bag, XmlElement ForEach)
+			string Language, Uri BaseUri, ISemanticElement Bag, XmlElement ForEach,
+			ref int ItemCounter)
 		{
-			int ItemCounter = 0;
-
 			foreach (XmlNode N in E.ChildNodes)
 			{
 				if (!(N is XmlElement E2))
 					continue;
 
-				UriNode Predicate = new UriNode(this.CreateUri(E2.NamespaceURI + E2.LocalName, BaseUri));
-				if (Predicate.UriString.EndsWith("#li") && Predicate.Uri == RdfLi)
+				UriNode Predicate = this.CreateUriNode(E2, BaseUri);
+				if (Predicate.UriString.EndsWith("#li") && Predicate.Uri == UriRdfLi)
 				{
-					ItemCounter++;
-					Predicate = new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri));
+					string Item = "_" + (++ItemCounter).ToString();
+					Predicate = this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item);
 				}
 
 				IEnumerable Attributes = ForEach is null ? (IEnumerable)E2.Attributes : new JoinAttributes(E2.Attributes, ForEach.Attributes);
 				IEnumerable ChildNodes = ForEach is null ? (IEnumerable)E2.ChildNodes : new JoinNodes(E2.ChildNodes, ForEach.ChildNodes);
-				LinkedList<KeyValuePair<string, string>> Properties = null;
+				LinkedList<XmlAttribute> Properties = null;
 				ISemanticElement Object = null;
 				ISemanticElement Bag2 = null;
 				Uri BaseUri2 = BaseUri;
-				string Resource = null;
+				XmlAttribute Resource = null;
 				string NodeId = null;
 				string Id = null;
 				string DataType = null;
@@ -568,7 +623,7 @@ namespace Waher.Content.Semantic
 						switch (Attr.LocalName)
 						{
 							case "resource":
-								Resource = Attr.Value;
+								Resource = Attr;
 								continue;
 
 							case "nodeID":
@@ -615,20 +670,20 @@ namespace Waher.Content.Semantic
 						continue;
 
 					if (Properties is null)
-						Properties = new LinkedList<KeyValuePair<string, string>>();
+						Properties = new LinkedList<XmlAttribute>();
 
-					Properties.AddLast(new KeyValuePair<string, string>(Attr.NamespaceURI + Attr.LocalName, Attr.Value));
+					Properties.AddLast(Attr);
 				}
 
 				if (!(BagId is null))
 				{
-					Bag2 = new UriNode(this.CreateUri("#" + BagId, BaseUri2));
-					this.triples.Add(new SemanticTriple(Bag2, new UriNode(RdfType), new UriNode(RdfBag)));
+					Bag2 = this.CreateUriNode("#" + BagId, BaseUri2);
+					this.triples.Add(new SemanticTriple(Bag2, RdfType, RdfBag));
 				}
 
 				if (!(Resource is null))
 				{
-					Object = new UriNode(this.CreateUri(Resource, BaseUri2));
+					Object = this.CreateUriNode(Resource.Value, BaseUri2);
 					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
 				}
 				else if (!(NodeId is null))
@@ -647,15 +702,15 @@ namespace Waher.Content.Semantic
 
 					bool HasLanguage2 = !string.IsNullOrEmpty(Language2);
 
-					foreach (KeyValuePair<string, string> P in Properties)
+					foreach (XmlAttribute Attr in Properties)
 					{
-						ISemanticElement Predicate2 = new UriNode(this.CreateUri(P.Key, BaseUri2));
+						ISemanticElement Predicate2 = this.CreateUriNode(Attr, BaseUri2);
 						ISemanticElement Literal;
 
 						if (HasLanguage2)
-							Literal = new StringLiteral(P.Value, Language2);
+							Literal = new StringLiteral(Attr.Value, Language2);
 						else
-							Literal = new StringLiteral(P.Value);
+							Literal = new StringLiteral(Attr.Value);
 
 						this.triples.Add(new SemanticTriple(Object, Predicate2, Literal));
 
@@ -663,15 +718,15 @@ namespace Waher.Content.Semantic
 						{
 							ISemanticElement ReificationNode = this.CreateBlankNode();
 
-							ItemCounter++;
+							string Item = "_" + (++ItemCounter).ToString();
 							this.triples.Add(new SemanticTriple(Bag2,
-								new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri2)),
+								this.CreateUriNode(RdfNamespace + Item, BaseUri2, "rdf:" + Item),
 								ReificationNode));
 
-							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
-							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Object));
-							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate2));
-							this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Literal));
+							this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+							this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Object));
+							this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate2));
+							this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Literal));
 						}
 					}
 				}
@@ -743,7 +798,9 @@ namespace Waher.Content.Semantic
 					case "Resource":
 						Object = this.CreateBlankNode();
 						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
-						this.ParseDescription(E2, Object, Language2, BaseUri2, Bag2, null);
+
+						int ChildItemCounter = 0;
+						this.ParseDescription(E2, Object, Language2, BaseUri2, Bag2, null, ref ChildItemCounter);
 						break;
 
 					case "Collection":
@@ -791,7 +848,7 @@ namespace Waher.Content.Semantic
 						}
 
 						if (Elements is null)
-							this.triples.Add(new SemanticTriple(Subject, Predicate, new UriNode(RdfNil)));
+							this.triples.Add(new SemanticTriple(Subject, Predicate, RdfNil));
 						else
 						{
 							LinkedListNode<ISemanticElement> Loop = Elements.First;
@@ -801,19 +858,19 @@ namespace Waher.Content.Semantic
 
 							while (!(Loop is null))
 							{
-								this.triples.Add(new SemanticTriple(Current, new UriNode(RdfFirst), Loop.Value));
+								this.triples.Add(new SemanticTriple(Current, RdfFirst, Loop.Value));
 
 								Loop = Loop.Next;
 
 								if (!(Loop is null))
 								{
 									BlankNode Next = this.CreateBlankNode();
-									this.triples.Add(new SemanticTriple(Current, new UriNode(RdfNext), Next));
+									this.triples.Add(new SemanticTriple(Current, RdfRest, Next));
 									Current = Next;
 								}
 							}
 
-							this.triples.Add(new SemanticTriple(Current, new UriNode(RdfNext), new UriNode(RdfNil)));
+							this.triples.Add(new SemanticTriple(Current, RdfRest, RdfNil));
 						}
 						break;
 				}
@@ -824,26 +881,52 @@ namespace Waher.Content.Semantic
 					ISemanticElement ReificationNode;
 
 					if (!(Id is null))
-						ReificationNode = new UriNode(this.CreateUri("#" + Id, BaseUri2));
+						ReificationNode = this.CreateUriNode("#" + Id, BaseUri2);
 					else
 						ReificationNode = this.CreateBlankNode();
 
 					if (!(Bag is null))
 					{
-						ItemCounter++;
+						string Item = "_" + (++ItemCounter).ToString();
 						this.triples.Add(new SemanticTriple(Bag,
-							new UriNode(this.CreateUri(RdfNamespace + "_" + ItemCounter.ToString(), BaseUri2)),
+							this.CreateUriNode(RdfNamespace + Item, BaseUri2, "rdf:" + Item),
 							ReificationNode));
 					}
 
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfType), new UriNode(RdfStatement)));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfSubject), Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfPredicate), Predicate));
-					this.triples.Add(new SemanticTriple(ReificationNode, new UriNode(RdfObject), Object));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
+					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
 				}
 			}
 
 			return Subject;
+		}
+
+		private UriNode CreateUriNode(string Reference, Uri BaseUri)
+		{
+			return new UriNode(this.CreateUri(Reference, BaseUri), Reference);
+		}
+
+		private UriNode CreateUriNode(string Reference, Uri BaseUri, string ShortName)
+		{
+			return new UriNode(this.CreateUri(Reference, BaseUri), ShortName);
+		}
+
+		private UriNode CreateUriNode(XmlElement Reference, Uri BaseUri)
+		{
+			if (string.IsNullOrEmpty(Reference.Prefix))
+				return new UriNode(this.CreateUri(Reference.NamespaceURI + Reference.LocalName, BaseUri), Reference.LocalName);
+			else
+				return new UriNode(this.CreateUri(Reference.NamespaceURI + Reference.LocalName, BaseUri), Reference.Prefix + ":" + Reference.LocalName);
+		}
+
+		private UriNode CreateUriNode(XmlAttribute Reference, Uri BaseUri)
+		{
+			if (string.IsNullOrEmpty(Reference.Prefix))
+				return new UriNode(this.CreateUri(Reference.NamespaceURI + Reference.LocalName, BaseUri), Reference.LocalName);
+			else
+				return new UriNode(this.CreateUri(Reference.NamespaceURI + Reference.LocalName, BaseUri), Reference.Prefix + ":" + Reference.LocalName);
 		}
 
 		private Uri CreateUri(string Reference, Uri BaseUri)

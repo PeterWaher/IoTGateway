@@ -35,6 +35,16 @@ namespace Waher.Content.Semantic.Test
 		{
 			RdfDocument Doc = await PerformTest(FileName);
 			SemanticGraph[] Graphs = await SemanticGraphs.GetConnectedGraphs(Doc);
+			Assert.AreEqual(1, Graphs.Length);
+
+			SemanticGraph Graph = Graphs[0];
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("Nodes");
+			Console.Out.WriteLine("========");
+
+			foreach (ISemanticElement Element in Graph.Nodes)
+				Console.Out.WriteLine(Element.ToString());
 		}
 
 		[DataTestMethod]

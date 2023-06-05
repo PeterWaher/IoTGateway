@@ -8,27 +8,16 @@ namespace Waher.Content.Semantic
 	/// </summary>
 	public class SemanticGraph : ISemanticModel
 	{
-		private readonly ISemanticModel model;
-		private LinkedList<ISemanticTriple> triples;
+		private readonly LinkedList<ISemanticTriple> triples = new LinkedList<ISemanticTriple>();
+		private readonly Dictionary<ISemanticElement, bool> nodes = new Dictionary<ISemanticElement, bool>();
+		private ISemanticElement lastSubject = null;
+		private ISemanticElement[] nodesStatic = null;
 
 		/// <summary>
 		/// Contains triples that form a graph.
 		/// </summary>
-		/// <param name="Model">Existing model.</param>
-		public SemanticGraph(ISemanticModel Model)
-		{
-			this.model = Model;
-			this.triples = null;
-		}
-
-		/// <summary>
-		/// Contains triples that form a graph.
-		/// </summary>
-		/// <param name="Model">Existing model.</param>
 		public SemanticGraph()
 		{
-			this.model = null;
-			this.triples = new LinkedList<ISemanticTriple>();
 		}
 
 		/// <summary>
@@ -37,7 +26,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator.</returns>
 		public IEnumerator<ISemanticTriple> GetEnumerator()
 		{
-			return this.model?.GetEnumerator() ?? this.triples.GetEnumerator();
+			return this.triples.GetEnumerator();
 		}
 
 		/// <summary>
@@ -46,7 +35,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.model?.GetEnumerator() ?? this.triples.GetEnumerator();
+			return this.triples.GetEnumerator();
 		}
 
 		/// <summary>
@@ -55,15 +44,38 @@ namespace Waher.Content.Semantic
 		/// <param name="Triple">Triple</param>
 		public void Add(ISemanticTriple Triple)
 		{
-			if (this.triples is null)
-			{
-				this.triples = new LinkedList<ISemanticTriple>();
+			this.triples.AddLast(Triple);
 
-				foreach (ISemanticTriple T in this.model)
-					this.triples.AddLast(T);
+			if (this.lastSubject is null || !this.lastSubject.Equals(Triple.Subject))
+			{
+				this.nodes[Triple.Subject] = true;
+				this.lastSubject = Triple.Subject;
+				this.nodesStatic = null;
 			}
 
-			this.triples.AddLast(Triple);
+			if (!Triple.Object.IsLiteral)
+			{
+				this.nodes[Triple.Object] = true;
+				this.nodesStatic = null;
+			}
+		}
+
+		/// <summary>
+		/// Nodes in graph.
+		/// </summary>
+		public ISemanticElement[] Nodes
+		{
+			get
+			{
+				if (this.nodesStatic is null)
+				{
+					ISemanticElement[] Result = new ISemanticElement[this.nodes.Count];
+					this.nodes.Keys.CopyTo(Result, 0);
+					this.nodesStatic = Result;
+				}
+
+				return this.nodesStatic;
+			}
 		}
 	}
 }

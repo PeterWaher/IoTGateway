@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Runtime.Profiling.Events;
+using Waher.Persistence;
 
 namespace Waher.Content.Semantic
 {
@@ -32,6 +31,30 @@ namespace Waher.Content.Semantic
 				Triple.Predicate.Tag = null;
 				Triple.Object.Tag = null;
 			}
+		}
+
+		/// <summary>
+		/// Gets a graph from a semantic model.
+		/// </summary>
+		/// <param name="Model">Semantic model.</param>
+		/// <returns>Semantic graph.</returns>
+		public static async Task<SemanticGraph> GetGraph(ISemanticModel Model)
+		{
+			SemanticGraph Result = new SemanticGraph();
+			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
+
+			if (e is IAsyncEnumerator eAsync)
+			{
+				while (await eAsync.MoveNextAsync())
+					Result.Add(e.Current);
+			}
+			else
+			{
+				while (e.MoveNext())
+					Result.Add(e.Current);
+			}
+
+			return Result;
 		}
 
 		/// <summary>

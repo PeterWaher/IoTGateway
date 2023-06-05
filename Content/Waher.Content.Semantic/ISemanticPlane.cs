@@ -29,5 +29,17 @@ namespace Waher.Content.Semantic
 		/// <param name="Y">Y-coordinate.</param>
 		/// <returns>Available triples, or null if none.</returns>
 		Task<IEnumerable<ISemanticTriple>> GetTriplesByXAndY(ISemanticElement X, ISemanticElement Y);
+
+		/// <summary>
+		/// Gets an enumerator of all elements along the X-axis.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		Task<IEnumerator<ISemanticElement>> GetXAxisEnumerator();
+
+		/// <summary>
+		/// Gets an enumerator of all elements along the Y-axis.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		Task<IEnumerator<ISemanticElement>> GetYAxisEnumerator();
 	}
 }

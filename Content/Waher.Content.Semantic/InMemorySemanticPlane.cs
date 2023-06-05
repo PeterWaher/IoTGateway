@@ -116,5 +116,23 @@ namespace Waher.Content.Semantic
 
 			return Line.GetTriples(Y);
 		}
+
+		/// <summary>
+		/// Gets an enumerator of all elements along the X-axis.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetXAxisEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.yPerX.Keys.GetEnumerator());
+		}
+
+		/// <summary>
+		/// Gets an enumerator of all elements along the Y-axis.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetYAxisEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.xPerY.Keys.GetEnumerator());
+		}
 	}
 }

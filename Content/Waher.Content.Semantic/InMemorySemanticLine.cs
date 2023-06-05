@@ -77,5 +77,14 @@ namespace Waher.Content.Semantic
 
 			return Task.FromResult<IEnumerable<ISemanticTriple>>(Points);
 		}
+
+		/// <summary>
+		/// Gets an enumerator of all values along the line.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetValueEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.points.Keys.GetEnumerator());
+		}
 	}
 }

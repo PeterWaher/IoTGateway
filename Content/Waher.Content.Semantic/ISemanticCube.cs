@@ -85,5 +85,23 @@ namespace Waher.Content.Semantic
 		/// <param name="Object">Object</param>
 		/// <returns>Available triples, or null if none.</returns>
 		Task<IEnumerable<ISemanticTriple>> GetTriplesBySubjectAndPredicateAndObject(ISemanticElement Subject, ISemanticElement Predicate, ISemanticElement Object);
+
+		/// <summary>
+		/// Gets an enumerator of all subjects.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		Task<IEnumerator<ISemanticElement>> GetSubjectEnumerator();
+
+		/// <summary>
+		/// Gets an enumerator of all predicates.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		Task<IEnumerator<ISemanticElement>> GetPredicateEnumerator();
+
+		/// <summary>
+		/// Gets an enumerator of all objects.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		Task<IEnumerator<ISemanticElement>> GetObjectEnumerator();
 	}
 }

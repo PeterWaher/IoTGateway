@@ -45,6 +45,13 @@ namespace Waher.Content.Semantic.Test
 
 			foreach (ISemanticElement Element in Graph.Nodes)
 				Console.Out.WriteLine(Element.ToString());
+
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("UML");
+			Console.Out.WriteLine("======");
+			Console.Out.WriteLine();
+			Console.Out.WriteLine(await Graph.ExportPlantUml());
 		}
 
 		[DataTestMethod]

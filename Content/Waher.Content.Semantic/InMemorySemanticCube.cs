@@ -235,5 +235,32 @@ namespace Waher.Content.Semantic
 
 			return Plane.GetTriplesByXAndY(Predicate, Object);
 		}
+
+		/// <summary>
+		/// Gets an enumerator of all subjects.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetSubjectEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.subjects.Keys.GetEnumerator());
+		}
+
+		/// <summary>
+		/// Gets an enumerator of all predicates.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetPredicateEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.predicates.Keys.GetEnumerator());
+		}
+
+		/// <summary>
+		/// Gets an enumerator of all objects.
+		/// </summary>
+		/// <returns>Enumerator of semantic elements.</returns>
+		public Task<IEnumerator<ISemanticElement>> GetObjectEnumerator()
+		{
+			return Task.FromResult<IEnumerator<ISemanticElement>>(this.objects.Keys.GetEnumerator());
+		}
 	}
 }

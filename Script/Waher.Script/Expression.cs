@@ -29,6 +29,7 @@ using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
 using System.Threading.Tasks;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.Script
 {
@@ -165,6 +166,9 @@ namespace Waher.Script
 
 		internal int Position => this.pos;
 
+		internal bool EndOfScript => this.pos >= this.len;
+		internal bool InScript => this.pos < this.len;
+
 		internal bool CanSkipWhitespace
 		{
 			get => this.canSkipWhitespace;
@@ -212,6 +216,45 @@ namespace Waher.Script
 				return string.Empty;
 
 			return this.script.Substring(this.pos, NrChars);
+		}
+
+		internal bool IsNextChars(string Token)
+		{
+			int c = Token.Length;
+			if (c == 0)
+				return true;
+
+			if (this.pos + c > this.len)
+				return false;
+
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				if (this.script[this.pos + i] != Token[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		internal bool IsNextChars(char ch, int Count)
+		{
+			if (Count < 0)
+				return false;
+
+			if (this.pos + Count > this.len)
+				return false;
+
+			int i;
+
+			for (i = 0; i < Count; i++)
+			{
+				if (this.script[this.pos + i] != ch)
+					return false;
+			}
+
+			return true;
 		}
 
 		internal void SkipChars(int NrChars)

@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Exceptions;
+﻿using Waher.Script.Exceptions;
 using Waher.Script.Units;
 
 namespace Waher.Script.Model
@@ -60,6 +59,24 @@ namespace Waher.Script.Model
 		public char NextChar() => this.expression.NextChar();
 
 		/// <summary>
+		/// Returns the next non-whitespace character to be parsed, and moves the 
+		/// position forward accordingly. If no character is available, 0 is returned.
+		/// </summary>
+		/// <returns>Character</returns>
+		public char NextNonWhitespaceChar()
+		{
+			char ch;
+
+			do
+			{
+				ch = this.NextChar();
+			}
+			while (ch != 0 && char.IsWhiteSpace(ch));
+
+			return ch;
+		}
+
+		/// <summary>
 		/// Undoes a character in the parsing of an expression.
 		/// </summary>
 		public void UndoChar()
@@ -75,6 +92,28 @@ namespace Waher.Script.Model
 		public string PeekNextChars(int NrChars)
 		{
 			return this.expression.PeekNextChars(NrChars);
+		}
+
+		/// <summary>
+		/// If the next characters to be parsed is a given token.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <returns>If the token is the next to be parsed.</returns>
+		public bool IsNextChars(string Token)
+		{
+			return this.expression.IsNextChars(Token);
+		}
+
+		/// <summary>
+		/// If the next characters to be parsed is a given token consisting of
+		/// a character being repeated a given amount of times.
+		/// </summary>
+		/// <param name="ch">Character</param>
+		/// <param name="Count">Number of times character is repeated.</param>
+		/// <returns>If the token is the next to be parsed.</returns>
+		public bool IsNextChars(char ch, int Count)
+		{
+			return this.expression.IsNextChars(ch, Count);
 		}
 
 		/// <summary>
@@ -263,6 +302,23 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <returns>Script node.</returns>
 		public ScriptNode ParseObject() => this.expression.ParseObject();
+
+		/// <summary>
+		/// If position is at end of script.
+		/// </summary>
+		public bool EndOfScript => this.expression.EndOfScript;
+
+		/// <summary>
+		/// If position is in script.
+		/// </summary>
+		public bool InScript => this.expression.InScript;
+
+		/// <summary>
+		/// If there are a given number of characters left to parse.
+		/// </summary>
+		/// <param name="NrCharacters">Number of characters to check.</param>
+		/// <returns>If the number of characeters are available.</returns>
+		public bool HasCharacters(int NrCharacters) => this.expression.Position <= this.expression.Script.Length - NrCharacters;
 
 		/// <summary>
 		/// Returns a Syntax Error Exception object.

@@ -151,7 +151,7 @@ namespace Waher.Script.Xml
 								return Element;
 
 							case "<!":
-								if (Parser.PeekNextChars(4) == "<!--")
+								if (Parser.IsNextChars("<!--"))
 								{
 									Parser.SkipChars(4);
 
@@ -166,7 +166,7 @@ namespace Waher.Script.Xml
 
 									Parser.SkipChars(Len + 3);
 								}
-								else if (Parser.PeekNextChars(9) == "<![CDATA[")
+								else if (Parser.IsNextChars("<![CDATA["))
 								{
 									Parser.SkipChars(9);
 
@@ -192,7 +192,7 @@ namespace Waher.Script.Xml
 								ScriptNode Node = Parser.ParseSequence();
 								Parser.SkipWhiteSpace();
 
-								if (Parser.PeekNextChars(2) != "]>")
+								if (Parser.IsNextChars("]>"))
 									throw Parser.SyntaxError("]> expected.");
 
 								Parser.SkipChars(2);
@@ -206,7 +206,7 @@ namespace Waher.Script.Xml
 								Node = Parser.ParseSequence();
 								Parser.SkipWhiteSpace();
 
-								if (Parser.PeekNextChars(2) != ")>")
+								if (Parser.IsNextChars(")>"))
 									throw Parser.SyntaxError(")> expected.");
 
 								Parser.SkipChars(2);

@@ -11544,6 +11544,13 @@
             </summary>
             <returns>Character</returns>
         </member>
+        <member name="M:Waher.Script.Model.ScriptParser.NextNonWhitespaceChar">
+            <summary>
+            Returns the next non-whitespace character to be parsed, and moves the 
+            position forward accordingly. If no character is available, 0 is returned.
+            </summary>
+            <returns>Character</returns>
+        </member>
         <member name="M:Waher.Script.Model.ScriptParser.UndoChar">
             <summary>
             Undoes a character in the parsing of an expression.
@@ -11555,6 +11562,22 @@
             forward one character. If no character is available, the string is truncated.
             </summary>
             <returns>Characters</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptParser.IsNextChars(System.String)">
+            <summary>
+            If the next characters to be parsed is a given token.
+            </summary>
+            <param name="Token">Token</param>
+            <returns>If the token is the next to be parsed.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptParser.IsNextChars(System.Char,System.Int32)">
+            <summary>
+            If the next characters to be parsed is a given token consisting of
+            a character being repeated a given amount of times.
+            </summary>
+            <param name="ch">Character</param>
+            <param name="Count">Number of times character is repeated.</param>
+            <returns>If the token is the next to be parsed.</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptParser.SkipChars(System.Int32)">
             <summary>
@@ -11739,6 +11762,23 @@
             Parses an object ex nihilo.
             </summary>
             <returns>Script node.</returns>
+        </member>
+        <member name="P:Waher.Script.Model.ScriptParser.EndOfScript">
+            <summary>
+            If position is at end of script.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Model.ScriptParser.InScript">
+            <summary>
+            If position is in script.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptParser.HasCharacters(System.Int32)">
+            <summary>
+            If there are a given number of characters left to parse.
+            </summary>
+            <param name="NrCharacters">Number of characters to check.</param>
+            <returns>If the number of characeters are available.</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptParser.SyntaxError(System.String)">
             <summary>

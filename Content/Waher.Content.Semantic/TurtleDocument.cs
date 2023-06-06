@@ -461,7 +461,12 @@ namespace Waher.Content.Semantic
 			return this.text.Substring(Start, this.pos - Start);
 		}
 
-		private static bool IsNameStartChar(char ch)
+		/// <summary>
+		/// Checks if a character is a character that can start a name.
+		/// </summary>
+		/// <param name="ch">Character</param>
+		/// <returns>If the character can start a name.</returns>
+		public static bool IsNameStartChar(char ch)
 		{
 			if (ch < 'A')
 				return false;
@@ -527,7 +532,12 @@ namespace Waher.Content.Semantic
 				return false;
 		}
 
-		private static bool IsNameChar(char ch)
+		/// <summary>
+		/// Checks if a character can be included in a name.
+		/// </summary>
+		/// <param name="ch">Character</param>
+		/// <returns>If characters can be included in a name.</returns>
+		public static bool IsNameChar(char ch)
 		{
 			if (IsNameStartChar(ch))
 				return true;
@@ -709,7 +719,7 @@ namespace Waher.Content.Semantic
 								this.pos += 8;
 							}
 							else
-								throw this.ParsingException("Expected 4-character hexadecimal code.");
+								throw this.ParsingException("Expected 8-character hexadecimal code.");
 							break;
 
 						default:

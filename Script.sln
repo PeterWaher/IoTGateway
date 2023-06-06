@@ -97,6 +97,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.FullTextSearch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.System", "Script\Waher.Script.System\Waher.Script.System.csproj", "{B62CC398-D36A-4999-8044-0469F8BF6FB0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Semantic", "Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj", "{95102DAA-685D-4D4C-A916-58DD895DFA94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -259,6 +261,10 @@ Global
 		{B62CC398-D36A-4999-8044-0469F8BF6FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B62CC398-D36A-4999-8044-0469F8BF6FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B62CC398-D36A-4999-8044-0469F8BF6FB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95102DAA-685D-4D4C-A916-58DD895DFA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95102DAA-685D-4D4C-A916-58DD895DFA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95102DAA-685D-4D4C-A916-58DD895DFA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95102DAA-685D-4D4C-A916-58DD895DFA94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +290,7 @@ Global
 		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 		{AE75B416-05C4-4E9A-B774-8774F1DDB189} = {0709170C-60A7-4421-8A74-07B7F294A229}
+		{95102DAA-685D-4D4C-A916-58DD895DFA94} = {823D0609-1731-4770-9B1C-305BB49D6133}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

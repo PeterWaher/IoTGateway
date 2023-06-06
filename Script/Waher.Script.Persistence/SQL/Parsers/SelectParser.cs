@@ -6,6 +6,7 @@ using Waher.Script.Objects;
 using Waher.Script.Functions.Vectors;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Persistence.Functions;
+using Waher.Script.Persistence.SPARQL.Parsers;
 using Waher.Script.Persistence.SQL.SourceDefinitions;
 
 namespace Waher.Script.Persistence.SQL.Parsers
@@ -90,6 +91,20 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Parser.NextToken();
 					Columns = null;
 					ColumnNames = null;
+				}
+				else if (s == "?")
+				{
+					if (!(Top is null) || Generic)
+						return false;
+
+					SparqlParser SparqlParser;
+
+					if (Distinct)
+						SparqlParser = new SparqlParser("SELECT DISTINCT ?");
+					else
+						SparqlParser = new SparqlParser("SELECT ?");
+
+					return SparqlParser.TryParse(Parser, out Result);
 				}
 				else
 				{

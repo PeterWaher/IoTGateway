@@ -32,6 +32,7 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Persistence\Waher.Script.Persistence.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />

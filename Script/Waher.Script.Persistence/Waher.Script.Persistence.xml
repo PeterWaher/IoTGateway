@@ -551,6 +551,145 @@
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser">
+            <summary>
+            Parses a SPARQL statement
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.RefInstance">
+            <summary>
+            Reference instance of SPARQL parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.#ctor(System.String)">
+            <summary>
+            Parses a SPARQL statement
+            </summary>
+            <param name="Preamble">Preamble that needs to be re-parsed.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase">
+            <summary>
+            Parses a SPARQL statement that begins with the BASE keyword.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase.#ctor">
+            <summary>
+            Parses a SPARQL statement that begins with the BASE keyword.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserBase.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix">
+            <summary>
+            Parses a SPARQL statement that begins with the PREFIX keyword.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix.#ctor">
+            <summary>
+            Parses a SPARQL statement that begins with the PREFIX keyword.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserPrefix.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.SemanticScriptElement">
+            <summary>
+            Semantic element based on script.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.#ctor(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Semantic element based on script.
+            </summary>
+            <param name="Node">Script definition of semantic element.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.Tag">
+            <summary>
+            Property used by processor, to tag information to an element.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.IsLiteral">
+            <summary>
+            If element is a literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.CompareTo(System.Object)">
+            <summary>
+            Compares element to another.
+            </summary>
+            <param name="obj">Second element.</param>
+            <returns>Comparison result.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>
             Enumerator that only returns elements matching a set of conditions.

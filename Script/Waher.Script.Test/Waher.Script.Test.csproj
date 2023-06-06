@@ -138,6 +138,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj" />

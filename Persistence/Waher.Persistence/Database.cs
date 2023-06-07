@@ -920,9 +920,8 @@ namespace Waher.Persistence
 		public static async Task<T> LoadObject<T>(object ObjectId)
 			where T : class
 		{
-			T Result = await Provider.TryLoadObject<T>(ObjectId);
-			if (Result is null)
-				throw new KeyNotFoundException("Object not found.");
+			T Result = await Provider.TryLoadObject<T>(ObjectId)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			return Result;
 		}
@@ -937,9 +936,8 @@ namespace Waher.Persistence
 		public async static Task<T> LoadObject<T>(string CollectionName, object ObjectId)
 			where T : class
 		{
-			T Result = await Provider.TryLoadObject<T>(CollectionName, ObjectId);
-			if (Result is null)
-				throw new KeyNotFoundException("Object not found.");
+			T Result = await Provider.TryLoadObject<T>(CollectionName, ObjectId)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			return Result;
 		}
@@ -952,9 +950,8 @@ namespace Waher.Persistence
 		/// <returns>Loaded object.</returns>
 		public static async Task<object> LoadObject(string CollectionName, object ObjectId)
 		{
-			object Result = await Provider.TryLoadObject(CollectionName, ObjectId);
-			if (Result is null)
-				throw new KeyNotFoundException("Object not found.");
+			object Result = await Provider.TryLoadObject(CollectionName, ObjectId)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			return Result;
 		}

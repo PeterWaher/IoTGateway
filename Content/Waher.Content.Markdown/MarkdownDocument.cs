@@ -226,7 +226,7 @@ namespace Waher.Content.Markdown
 		/// Gets the end position of the header, if one is found, null otherwise.
 		/// </summary>
 		/// <param name="Markdown">Markdown</param>
-		/// <returns></returns>
+		/// <returns>Position of end of header, if found.</returns>
 		public static int? HeaderEndPosition(string Markdown)
 		{
 			Match M = endOfHeader.Match(Markdown);

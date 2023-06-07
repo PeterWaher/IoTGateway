@@ -3239,7 +3239,7 @@
             <summary>
             Gets the names of the collections that have been flagged as possibly corrupt.
             </summary>
-            <returns></returns>
+            <returns>Names of collections that have been flagged.</returns>
         </member>
         <member name="M:Waher.Persistence.Database.BeginRepair(System.String)">
             <summary>
@@ -4997,7 +4997,7 @@
             Removes the element with the specified key from the System.Collections.IDictionary object.
             </summary>
             <param name="key">The key of the element to remove.</param>
-            <returns></returns>
+            <returns>If the key was found and removed.</returns>
             <exception cref="T:System.ArgumentNullException">key is null.</exception>
         </member>
         <member name="M:Waher.Persistence.IPersistentDictionary.TryGetValueAsync(System.String)">

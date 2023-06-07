@@ -49,7 +49,7 @@ namespace Waher.Persistence
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>
-		/// <returns></returns>
+		/// <returns>If the key was found and removed.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		Task<bool> RemoveAsync(string key);
 

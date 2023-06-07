@@ -55,7 +55,7 @@ namespace Waher.Content.QR.Encoding
 		/// with a divisor in <paramref name="Divisor"/>.
 		/// </summary>
 		/// <param name="Divisor"></param>
-		/// <returns></returns>
+		/// <returns>Residue.</returns>
 		public GF256Px Residue(GF256Px Divisor)
 		{
 			if (this.degree < Divisor.degree)

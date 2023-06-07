@@ -946,7 +946,7 @@ namespace Waher.Content
 		/// <param name="Data">Binary Data</param>
 		/// <param name="DefaultEncoding">Default encoding to use, in case
 		/// a Byte Order Mark (BOM) is not found in the binary representation.</param>
-		/// <returns></returns>
+		/// <returns>Decoded string</returns>
 		public static string GetString(byte[] Data, Encoding DefaultEncoding)
 		{
 			if (Data is null)

@@ -31,7 +31,7 @@
             </summary>
             <param name="s1">First string.</param>
             <param name="s2">Second string.</param>
-            <returns></returns>
+            <returns>Differences found.</returns>
         </member>
         <member name="M:Waher.Runtime.Text.Difference.AnalyzeRows(System.String,System.String)">
             <summary>
@@ -39,7 +39,7 @@
             </summary>
             <param name="Text1">First text.</param>
             <param name="Text2">Second text.</param>
-            <returns></returns>
+            <returns>Differences found.</returns>
         </member>
         <member name="M:Waher.Runtime.Text.Difference.ExtractRows(System.String)">
             <summary>

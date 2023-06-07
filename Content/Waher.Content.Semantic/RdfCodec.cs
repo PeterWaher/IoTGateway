@@ -112,7 +112,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
-		/// <returns></returns>
+		/// <returns>Encoded object.</returns>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)

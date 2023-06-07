@@ -201,7 +201,7 @@ namespace Waher.Runtime.Text
 		/// </summary>
 		/// <param name="s1">First string.</param>
 		/// <param name="s2">Second string.</param>
-		/// <returns></returns>
+		/// <returns>Differences found.</returns>
 		public static EditScript<char> AnalyzeStrings(string s1, string s2)
 		{
 			return Analyze<char>(s1.ToCharArray(), s2.ToCharArray());
@@ -212,7 +212,7 @@ namespace Waher.Runtime.Text
 		/// </summary>
 		/// <param name="Text1">First text.</param>
 		/// <param name="Text2">Second text.</param>
-		/// <returns></returns>
+		/// <returns>Differences found.</returns>
 		public static EditScript<string> AnalyzeRows(string Text1, string Text2)
 		{
 			return Analyze<string>(ExtractRows(Text1), ExtractRows(Text2));

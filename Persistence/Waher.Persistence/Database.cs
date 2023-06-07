@@ -1223,7 +1223,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Gets the names of the collections that have been flagged as possibly corrupt.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Names of collections that have been flagged.</returns>
 		public static string[] GetFlaggedCollectionNames()
 		{
 			string[] Result;

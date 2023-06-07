@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
@@ -9,9 +8,8 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains triples that form a graph.
 	/// </summary>
-	public class SemanticGraph : ISemanticModel
+	public class SemanticGraph : InMemorySemanticCube
 	{
-		private readonly LinkedList<ISemanticTriple> triples = new LinkedList<ISemanticTriple>();
 		private readonly Dictionary<ISemanticElement, bool> nodes = new Dictionary<ISemanticElement, bool>();
 		private ISemanticElement lastSubject = null;
 		private ISemanticElement[] nodesStatic = null;
@@ -20,34 +18,17 @@ namespace Waher.Content.Semantic
 		/// Contains triples that form a graph.
 		/// </summary>
 		public SemanticGraph()
+			: base()
 		{
-		}
-
-		/// <summary>
-		/// Gets an enumerator for the semantic information in the document.
-		/// </summary>
-		/// <returns>Enumerator.</returns>
-		public IEnumerator<ISemanticTriple> GetEnumerator()
-		{
-			return this.triples.GetEnumerator();
-		}
-
-		/// <summary>
-		/// Gets an enumerator for the semantic information in the document.
-		/// </summary>
-		/// <returns>Enumerator.</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.triples.GetEnumerator();
 		}
 
 		/// <summary>
 		/// Adds a triple to the model.
 		/// </summary>
 		/// <param name="Triple">Triple</param>
-		public void Add(ISemanticTriple Triple)
+		public override void Add(ISemanticTriple Triple)
 		{
-			this.triples.AddLast(Triple);
+			base.Add(Triple);
 
 			if (this.lastSubject is null || !this.lastSubject.Equals(Triple.Subject))
 			{
@@ -103,7 +84,6 @@ namespace Waher.Content.Semantic
 			Output.AppendLine("@startuml");
 
 			Dictionary<ISemanticElement, string> NodeIds = new Dictionary<ISemanticElement, string>();
-			InMemorySemanticCube Cube = await InMemorySemanticCube.Create(this);
 			Dictionary<string, LinkedList<LinkInfo>> LinksByNodeId = new Dictionary<string, LinkedList<LinkInfo>>();
 			int i = 0;
 
@@ -119,7 +99,7 @@ namespace Waher.Content.Semantic
 			foreach (ISemanticElement Node in this.Nodes)
 			{
 				string NodeId = NodeIds[Node];
-				ISemanticPlane Plane = await Cube.GetTriplesBySubject(Node);
+				ISemanticPlane Plane = await this.GetTriplesBySubject(Node);
 				LinkedList<KeyValuePair<string, object>> Properties = null;
 				LinkedList<LinkInfo> Links = null;
 				string StereoType = null;

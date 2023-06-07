@@ -29,7 +29,7 @@ namespace Waher.Content.Semantic
 	/// 
 	/// Ref: https://www.w3.org/TeamSubmission/turtle/
 	/// </summary>
-	public class TurtleDocument : SemanticModel
+	public class TurtleDocument : InMemorySemanticCube
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
@@ -146,7 +146,7 @@ namespace Waher.Content.Semantic
 				}
 				else
 				{
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					this.Add(new SemanticTriple(Subject, Predicate, Object));
 
 					switch (this.NextNonWhitespaceChar())
 					{
@@ -386,19 +386,19 @@ namespace Waher.Content.Semantic
 
 					while (!(Loop is null))
 					{
-						this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
+						this.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
 							BlankNode Next = this.CreateBlankNode();
-							this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
+							this.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
 							Current = Next;
 						}
 					}
 
-					this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
+					this.Add(new SemanticTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
 
 					return Result;
 				}

@@ -13,7 +13,7 @@ namespace Waher.Content.Semantic
 	/// 
 	/// Ref: https://www.w3.org/TR/rdf-syntax-grammar/
 	/// </summary>
-	public class RdfDocument : SemanticModel
+	public class RdfDocument : InMemorySemanticCube
 	{
 		/// <summary>
 		/// http://www.w3.org/1999/02/22-rdf-syntax-ns#
@@ -311,7 +311,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				Bag = this.CreateUriNode("#" + BagId, BaseUri);
-				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
+				this.Add(new SemanticTriple(Bag, RdfType, RdfBag));
 			}
 
 			if (Xml.DocumentElement.LocalName == "RDF" && Xml.DocumentElement.NamespaceURI == RdfNamespace)
@@ -321,7 +321,7 @@ namespace Waher.Content.Semantic
 				BlankNode RootSubject = this.CreateBlankNode();
 				UriNode RootType = this.CreateUriNode(Xml.DocumentElement, BaseUri);
 
-				this.triples.Add(new SemanticTriple(RootSubject, RdfType, RootType));
+				this.Add(new SemanticTriple(RootSubject, RdfType, RootType));
 
 				int ItemCounter = 0;
 				this.ParseDescription(Xml.DocumentElement, RootSubject, Language, BaseUri, Bag, null, ref ItemCounter);
@@ -454,7 +454,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				Bag = this.CreateUriNode("#" + BagId, BaseUri);
-				this.triples.Add(new SemanticTriple(Bag, RdfType, RdfBag));
+				this.Add(new SemanticTriple(Bag, RdfType, RdfBag));
 			}
 
 			if (!(About is null) || !(Id is null))
@@ -493,20 +493,20 @@ namespace Waher.Content.Semantic
 			if (E.NamespaceURI != RdfNamespace)
 			{
 				DescriptionNode = this.CreateUriNode(E, BaseUri);
-				this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
+				this.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
 			}
 			else if (E.LocalName != "Description")
 			{
 				if (E.LocalName == "li")
 				{
 					string Item = "_" + (++ItemCounter).ToString();
-					this.triples.Add(new SemanticTriple(Subject, RdfType,
+					this.Add(new SemanticTriple(Subject, RdfType,
 						this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item)));
 				}
 				else
 				{
 					DescriptionNode = this.CreateUriNode(E, BaseUri);
-					this.triples.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
+					this.Add(new SemanticTriple(Subject, RdfType, DescriptionNode));
 				}
 			}
 
@@ -515,35 +515,35 @@ namespace Waher.Content.Semantic
 				ISemanticElement BagDescription = this.CreateBlankNode();
 
 				string Item = "_" + (++ItemCounter).ToString();
-				this.triples.Add(new SemanticTriple(Bag,
+				this.Add(new SemanticTriple(Bag,
 					this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 					BagDescription));
 
-				this.triples.Add(new SemanticTriple(BagDescription, RdfType, RdfStatement));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfSubject, Subject));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfPredicate, RdfType));
-				this.triples.Add(new SemanticTriple(BagDescription, RdfObject, DescriptionNode));
+				this.Add(new SemanticTriple(BagDescription, RdfType, RdfStatement));
+				this.Add(new SemanticTriple(BagDescription, RdfSubject, Subject));
+				this.Add(new SemanticTriple(BagDescription, RdfPredicate, RdfType));
+				this.Add(new SemanticTriple(BagDescription, RdfObject, DescriptionNode));
 			}
 
 			if (!(Type is null))
 			{
 				ISemanticElement TypeObject = this.CreateUriNode(Type.Value, BaseUri);
 
-				this.triples.Add(new SemanticTriple(Subject, RdfType, TypeObject));
+				this.Add(new SemanticTriple(Subject, RdfType, TypeObject));
 
 				if (!(Bag is null))
 				{
 					ISemanticElement ReificationNode = this.CreateBlankNode();
 
 					string Item = "_" + (++ItemCounter).ToString();
-					this.triples.Add(new SemanticTriple(Bag,
+					this.Add(new SemanticTriple(Bag,
 						this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 						ReificationNode));
 
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, RdfType));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, TypeObject));
+					this.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+					this.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+					this.Add(new SemanticTriple(ReificationNode, RdfPredicate, RdfType));
+					this.Add(new SemanticTriple(ReificationNode, RdfObject, TypeObject));
 				}
 			}
 
@@ -559,31 +559,39 @@ namespace Waher.Content.Semantic
 					else
 						Object = new StringLiteral(Attr.Value);
 
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					this.Add(new SemanticTriple(Subject, Predicate, Object));
 
 					if (!(Bag is null))
 					{
 						ISemanticElement ReificationNode = this.CreateBlankNode();
 
 						string Item = "_" + (++ItemCounter).ToString();
-						this.triples.Add(new SemanticTriple(Bag,
+						this.Add(new SemanticTriple(Bag,
 							this.CreateUriNode(RdfNamespace + Item, BaseUri, "rdf:" + Item),
 							ReificationNode));
 
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
-						this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
+						this.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+						this.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+						this.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
+						this.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
 					}
 				}
 			}
 
 			int ChildItemCounter = Bag is null ? 0 : ItemCounter;
+			
+			ISemanticElement Result = this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach, ref ChildItemCounter);
+			return Result;
 
-			return this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach, ref ChildItemCounter);
+			// TODO: Fix item counters & bags.
 
-			if (!(Bag is null))
-				ItemCounter = ChildItemCounter;
+			//
+			//if (!(Bag is null))
+			//	ItemCounter = ChildItemCounter;
+			//
+			//return Result;
+			//
+			//return this.ParseDescription(E, Subject, Language, BaseUri, Bag, ForEach, ref ItemCounter);
 		}
 
 		private ISemanticElement ParseDescription(XmlElement E, ISemanticElement Subject,
@@ -678,18 +686,18 @@ namespace Waher.Content.Semantic
 				if (!(BagId is null))
 				{
 					Bag2 = this.CreateUriNode("#" + BagId, BaseUri2);
-					this.triples.Add(new SemanticTriple(Bag2, RdfType, RdfBag));
+					this.Add(new SemanticTriple(Bag2, RdfType, RdfBag));
 				}
 
 				if (!(Resource is null))
 				{
 					Object = this.CreateUriNode(Resource.Value, BaseUri2);
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					this.Add(new SemanticTriple(Subject, Predicate, Object));
 				}
 				else if (!(NodeId is null))
 				{
 					Object = new BlankNode(NodeId);
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					this.Add(new SemanticTriple(Subject, Predicate, Object));
 				}
 
 				if (!(Properties is null))
@@ -697,7 +705,7 @@ namespace Waher.Content.Semantic
 					if (Object is null)
 					{
 						Object = this.CreateBlankNode();
-						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+						this.Add(new SemanticTriple(Subject, Predicate, Object));
 					}
 
 					bool HasLanguage2 = !string.IsNullOrEmpty(Language2);
@@ -712,21 +720,21 @@ namespace Waher.Content.Semantic
 						else
 							Literal = new StringLiteral(Attr.Value);
 
-						this.triples.Add(new SemanticTriple(Object, Predicate2, Literal));
+						this.Add(new SemanticTriple(Object, Predicate2, Literal));
 
 						if (!(Bag2 is null))
 						{
 							ISemanticElement ReificationNode = this.CreateBlankNode();
 
 							string Item = "_" + (++ItemCounter).ToString();
-							this.triples.Add(new SemanticTriple(Bag2,
+							this.Add(new SemanticTriple(Bag2,
 								this.CreateUriNode(RdfNamespace + Item, BaseUri2, "rdf:" + Item),
 								ReificationNode));
 
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Object));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate2));
-							this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Literal));
+							this.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+							this.Add(new SemanticTriple(ReificationNode, RdfSubject, Object));
+							this.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate2));
+							this.Add(new SemanticTriple(ReificationNode, RdfObject, Literal));
 						}
 					}
 				}
@@ -761,7 +769,7 @@ namespace Waher.Content.Semantic
 									Object = LiteralType.Parse(Text.InnerText, DataType, Language2);
 								}
 
-								this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+								this.Add(new SemanticTriple(Subject, Predicate, Object));
 							}
 							else if (N2 is XmlElement E3)
 							{
@@ -770,7 +778,7 @@ namespace Waher.Content.Semantic
 								if (!(Def is null))
 								{
 									if (Object is null || Object.ToString() != Def.ToString())
-										this.triples.Add(new SemanticTriple(Subject, Predicate, Def));
+										this.Add(new SemanticTriple(Subject, Predicate, Def));
 
 									if (Object is null)
 										Object = Def;
@@ -785,19 +793,19 @@ namespace Waher.Content.Semantic
 							else
 								Object = new StringLiteral(string.Empty);
 
-							this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+							this.Add(new SemanticTriple(Subject, Predicate, Object));
 						}
 						break;
 
 					case "Literal":
 					default:
 						Object = new XmlLiteral(ChildNodes, E2.NamespaceURI, Language2);
-						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+						this.Add(new SemanticTriple(Subject, Predicate, Object));
 						break;
 
 					case "Resource":
 						Object = this.CreateBlankNode();
-						this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+						this.Add(new SemanticTriple(Subject, Predicate, Object));
 
 						int ChildItemCounter = 0;
 						this.ParseDescription(E2, Object, Language2, BaseUri2, Bag2, null, ref ChildItemCounter);
@@ -848,29 +856,29 @@ namespace Waher.Content.Semantic
 						}
 
 						if (Elements is null)
-							this.triples.Add(new SemanticTriple(Subject, Predicate, RdfNil));
+							this.Add(new SemanticTriple(Subject, Predicate, RdfNil));
 						else
 						{
 							LinkedListNode<ISemanticElement> Loop = Elements.First;
 							BlankNode Current = this.CreateBlankNode();
 
-							this.triples.Add(new SemanticTriple(Subject, Predicate, Current));
+							this.Add(new SemanticTriple(Subject, Predicate, Current));
 
 							while (!(Loop is null))
 							{
-								this.triples.Add(new SemanticTriple(Current, RdfFirst, Loop.Value));
+								this.Add(new SemanticTriple(Current, RdfFirst, Loop.Value));
 
 								Loop = Loop.Next;
 
 								if (!(Loop is null))
 								{
 									BlankNode Next = this.CreateBlankNode();
-									this.triples.Add(new SemanticTriple(Current, RdfRest, Next));
+									this.Add(new SemanticTriple(Current, RdfRest, Next));
 									Current = Next;
 								}
 							}
 
-							this.triples.Add(new SemanticTriple(Current, RdfRest, RdfNil));
+							this.Add(new SemanticTriple(Current, RdfRest, RdfNil));
 						}
 						break;
 				}
@@ -888,15 +896,15 @@ namespace Waher.Content.Semantic
 					if (!(Bag is null))
 					{
 						string Item = "_" + (++ItemCounter).ToString();
-						this.triples.Add(new SemanticTriple(Bag,
+						this.Add(new SemanticTriple(Bag,
 							this.CreateUriNode(RdfNamespace + Item, BaseUri2, "rdf:" + Item),
 							ReificationNode));
 					}
 
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
-					this.triples.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
+					this.Add(new SemanticTriple(ReificationNode, RdfType, RdfStatement));
+					this.Add(new SemanticTriple(ReificationNode, RdfSubject, Subject));
+					this.Add(new SemanticTriple(ReificationNode, RdfPredicate, Predicate));
+					this.Add(new SemanticTriple(ReificationNode, RdfObject, Object));
 				}
 			}
 

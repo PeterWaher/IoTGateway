@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 
@@ -8,10 +7,8 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// In-memory semantic cube.
 	/// </summary>
-	public class InMemorySemanticCube : ISemanticCube
+	public class InMemorySemanticCube : InMemorySemanticModel, ISemanticCube
 	{
-		private readonly ISemanticModel model;
-		private readonly LinkedList<ISemanticTriple> elements = new LinkedList<ISemanticTriple>();
 		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> subjects = null;
 		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> predicates = null;
 		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> objects = null;
@@ -19,9 +16,8 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// In-memory semantic cube.
 		/// </summary>
-		private InMemorySemanticCube(ISemanticModel Model)
+		public InMemorySemanticCube()
 		{
-			this.model = Model;
 		}
 
 		/// <summary>
@@ -31,7 +27,10 @@ namespace Waher.Content.Semantic
 		/// <returns>Semantic cube, created from model.</returns>
 		public static async Task<InMemorySemanticCube> Create(ISemanticModel Model)
 		{
-			InMemorySemanticCube Result = new InMemorySemanticCube(Model);
+			if (Model is InMemorySemanticCube Result)
+				return Result;
+
+			Result = new InMemorySemanticCube();
 			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
 
 			if (e is IAsyncEnumerator eAsync)
@@ -48,30 +47,17 @@ namespace Waher.Content.Semantic
 			return Result;
 		}
 
-		private void Add(ISemanticTriple Triple)
+		/// <summary>
+		/// Adds a triple to the cube.
+		/// </summary>
+		/// <param name="Triple">Semantic triple.</param>
+		public virtual void Add(ISemanticTriple Triple)
 		{
-			this.elements.AddLast(Triple);
+			this.triples.AddLast(Triple);
+
 			this.subjects = null;
 			this.predicates = null;
 			this.objects = null;
-		}
-
-		/// <summary>
-		/// Gets an enumerator of available semantic triples.
-		/// </summary>
-		/// <returns>Enumerator object.</returns>
-		public IEnumerator<ISemanticTriple> GetEnumerator()
-		{
-			return this.elements.GetEnumerator();
-		}
-
-		/// <summary>
-		/// Gets an enumerator of available semantic triples.
-		/// </summary>
-		/// <returns>Enumerator object.</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.elements.GetEnumerator();
 		}
 
 		/// <summary>
@@ -274,7 +260,7 @@ namespace Waher.Content.Semantic
 				ISemanticElement LastPoint = null;
 				InMemorySemanticPlane Last = null;
 
-				foreach (ISemanticTriple T in this.elements)
+				foreach (ISemanticTriple T in this.triples)
 				{
 					if ((LastPoint is null || !LastPoint.Equals(T.Subject)) &&
 						!Ordered.TryGetValue(T.Subject, out Last))
@@ -299,7 +285,7 @@ namespace Waher.Content.Semantic
 				ISemanticElement LastPoint = null;
 				InMemorySemanticPlane Last = null;
 
-				foreach (ISemanticTriple T in this.elements)
+				foreach (ISemanticTriple T in this.triples)
 				{
 					if ((LastPoint is null || !LastPoint.Equals(T.Predicate)) &&
 						!Ordered.TryGetValue(T.Predicate, out Last))
@@ -324,7 +310,7 @@ namespace Waher.Content.Semantic
 				ISemanticElement LastPoint = null;
 				InMemorySemanticPlane Last = null;
 
-				foreach (ISemanticTriple T in this.elements)
+				foreach (ISemanticTriple T in this.triples)
 				{
 					if ((LastPoint is null || !LastPoint.Equals(T.Object)) &&
 						!Ordered.TryGetValue(T.Object, out Last))

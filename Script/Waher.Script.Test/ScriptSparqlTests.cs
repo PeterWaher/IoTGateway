@@ -30,7 +30,8 @@ namespace Waher.Script.Test
 
 		[DataTestMethod]
 		[DataRow("Test_01.ttl", "Test_01.rq")]
-		public async Task Test_01_SELECT(string DataSetFileName, string QueryFileName)
+		[DataRow("Test_02.ttl", "Test_02.rq")]
+		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName)
 		{
 			TurtleDocument Doc = LoadTurtleResource(DataSetFileName);
 			string Query = LoadTextResource(QueryFileName);

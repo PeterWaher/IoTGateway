@@ -45,6 +45,8 @@
     <None Remove="File\1.txt" />
     <None Remove="Sparql\Test_01.rq" />
     <None Remove="Sparql\Test_01.ttl" />
+    <None Remove="Sparql\Test_02.rq" />
+    <None Remove="Sparql\Test_02.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -129,6 +131,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sparql\Test_02.rq" />
+    <EmbeddedResource Include="Sparql\Test_02.ttl" />
     <EmbeddedResource Include="Sparql\Test_01.rq" />
     <EmbeddedResource Include="Sparql\Test_01.ttl" />
   </ItemGroup>

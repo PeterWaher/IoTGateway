@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Script.Abstraction.Elements;
@@ -262,7 +263,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnPredicate(
 									await Cube.GetTriplesBySubjectAndObject(Value, T.Object),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name2, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed2)
@@ -277,7 +278,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnSubject(
 									await Cube.GetTriplesByPredicateAndObject(Value2, T.Object),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name, ref NewPossibilities);
 							}
 						}
 						else
@@ -399,7 +400,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnObject(
 									await Cube.GetTriplesBySubjectAndPredicate(Value, T.Predicate),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name2, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed2)
@@ -414,7 +415,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnSubject(
 									await Cube.GetTriplesByPredicateAndObject(T.Predicate, Value2),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name, ref NewPossibilities);
 							}
 						}
 						else
@@ -536,7 +537,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnObject(
 									await Cube.GetTriplesBySubjectAndPredicate(T.Subject, Value),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name2, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed2)
@@ -551,7 +552,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnPredicate(
 									await Cube.GetTriplesByPredicateAndObject(T.Predicate, Value2),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name, ref NewPossibilities);
 							}
 						}
 						else
@@ -698,7 +699,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnObject(
 									await Cube.GetTriplesBySubjectAndPredicate(Value, Value2),
-									Possibilities, Name3, ref NewPossibilities);
+									P, Name3, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed && IsProcessed3)   // Subject & Object variables already processed
@@ -722,7 +723,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnPredicate(
 									await Cube.GetTriplesBySubjectAndObject(Value, Value3),
-									Possibilities, Name2, ref NewPossibilities);
+									P, Name2, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed2 && IsProcessed3)  // Predicate & Object variables already processed
@@ -746,7 +747,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 								CrossPossibilitiesOnSubject(
 									await Cube.GetTriplesByPredicateAndObject(Value2, Value3),
-									Possibilities, Name, ref NewPossibilities);
+									P, Name, ref NewPossibilities);
 							}
 						}
 						else if (IsProcessed)                   // Subject variable processed
@@ -946,7 +947,8 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			List<IElement> Records = new List<IElement>();
-			
+			int Rows = 0;
+
 			if (!(Possibilities is null))
 			{
 				foreach (Possibility P in Possibilities)
@@ -999,10 +1001,11 @@ namespace Waher.Script.Persistence.SPARQL
 					}
 
 					Records.AddRange(Record);
+					Rows++;
 				}
 			}
 
-			return new ObjectMatrix(Records.Count, Columns, Records)
+			return new ObjectMatrix(Rows, Columns, Records)
 			{
 				ColumnNames = ColumnNames
 			};
@@ -1015,24 +1018,35 @@ namespace Waher.Script.Persistence.SPARQL
 			if (NewTriples is null)
 				return false;
 
-			if (NewPossibilities is null)
-				NewPossibilities = new LinkedList<Possibility>();
-
 			if (Possibilities.First is null)
 			{
+				if (NewPossibilities is null)
+					NewPossibilities = new LinkedList<Possibility>();
+
 				foreach (ISemanticTriple T2 in NewTriples)
 					NewPossibilities.AddLast(new Possibility(Name, T2.Subject));
 			}
 			else
 			{
 				foreach (Possibility P in Possibilities)
-				{
-					foreach (ISemanticTriple T2 in NewTriples)
-						NewPossibilities.AddLast(new Possibility(Name, T2.Subject, P));
-				}
+					CrossPossibilitiesOnSubject(NewTriples, P, Name, ref NewPossibilities);
 			}
 
 			return true;
+		}
+
+		private static void CrossPossibilitiesOnSubject(IEnumerable<ISemanticTriple> NewTriples,
+			Possibility Possibility, string Name,
+			ref LinkedList<Possibility> NewPossibilities)
+		{
+			if (NewTriples is null)
+				return;
+
+			if (NewPossibilities is null)
+				NewPossibilities = new LinkedList<Possibility>();
+
+			foreach (ISemanticTriple T2 in NewTriples)
+				NewPossibilities.AddLast(new Possibility(Name, T2.Subject, Possibility));
 		}
 
 		private static bool CrossPossibilitiesOnPredicate(IEnumerable<ISemanticTriple> NewTriples,
@@ -1042,24 +1056,35 @@ namespace Waher.Script.Persistence.SPARQL
 			if (NewTriples is null)
 				return false;
 
-			if (NewPossibilities is null)
-				NewPossibilities = new LinkedList<Possibility>();
-
 			if (Possibilities.First is null)
 			{
+				if (NewPossibilities is null)
+					NewPossibilities = new LinkedList<Possibility>();
+
 				foreach (ISemanticTriple T2 in NewTriples)
 					NewPossibilities.AddLast(new Possibility(Name, T2.Predicate));
 			}
 			else
 			{
 				foreach (Possibility P in Possibilities)
-				{
-					foreach (ISemanticTriple T2 in NewTriples)
-						NewPossibilities.AddLast(new Possibility(Name, T2.Predicate, P));
-				}
+					CrossPossibilitiesOnPredicate(NewTriples, P, Name, ref NewPossibilities);
 			}
 
 			return true;
+		}
+
+		private static void CrossPossibilitiesOnPredicate(IEnumerable<ISemanticTriple> NewTriples,
+			Possibility Possibility, string Name,
+			ref LinkedList<Possibility> NewPossibilities)
+		{
+			if (NewTriples is null)
+				return;
+
+			if (NewPossibilities is null)
+				NewPossibilities = new LinkedList<Possibility>();
+
+			foreach (ISemanticTriple T2 in NewTriples)
+				NewPossibilities.AddLast(new Possibility(Name, T2.Predicate, Possibility));
 		}
 
 		private static bool CrossPossibilitiesOnObject(IEnumerable<ISemanticTriple> NewTriples,
@@ -1069,24 +1094,34 @@ namespace Waher.Script.Persistence.SPARQL
 			if (NewTriples is null)
 				return false;
 
-			if (NewPossibilities is null)
-				NewPossibilities = new LinkedList<Possibility>();
-
 			if (Possibilities.First is null)
 			{
+				if (NewPossibilities is null)
+					NewPossibilities = new LinkedList<Possibility>();
+
 				foreach (ISemanticTriple T2 in NewTriples)
 					NewPossibilities.AddLast(new Possibility(Name, T2.Object));
 			}
 			else
 			{
 				foreach (Possibility P in Possibilities)
-				{
-					foreach (ISemanticTriple T2 in NewTriples)
-						NewPossibilities.AddLast(new Possibility(Name, T2.Object, P));
-				}
+					CrossPossibilitiesOnObject(NewTriples, P, Name, ref NewPossibilities);
 			}
 
 			return true;
+		}
+
+		private static void CrossPossibilitiesOnObject(IEnumerable<ISemanticTriple> NewTriples,
+			Possibility Possibility, string Name, ref LinkedList<Possibility> NewPossibilities)
+		{
+			if (NewTriples is null)
+				return;
+
+			if (NewPossibilities is null)
+				NewPossibilities = new LinkedList<Possibility>();
+
+			foreach (ISemanticTriple T2 in NewTriples)
+				NewPossibilities.AddLast(new Possibility(Name, T2.Object, Possibility));
 		}
 
 		private class Possibility
@@ -1127,6 +1162,28 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 
 				return null;
+			}
+
+			public override string ToString()
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.VariableName);
+				sb.Append('=');
+				sb.Append(Expression.ToString(this.Value));
+
+				Possibility Loop = this.Prev;
+				while (!(Loop is null))
+				{
+					sb.Append(", ");
+					sb.Append(Loop.VariableName);
+					sb.Append('=');
+					sb.Append(Expression.ToString(Loop.Value));
+
+					Loop = Loop.Prev;
+				}
+
+				return sb.ToString();
 			}
 		}
 

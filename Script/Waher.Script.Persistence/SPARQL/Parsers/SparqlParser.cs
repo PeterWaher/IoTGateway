@@ -89,6 +89,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					switch (s)
 					{
 						case "BASE":
+							this.NextToken(Parser);
 							this.SkipWhiteSpace(Parser);
 							if (this.preamblePos < this.preambleLen)
 								return false;
@@ -102,6 +103,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 							break;
 
 						case "PREFIX":
+							this.NextToken(Parser);
 							this.SkipWhiteSpace(Parser);
 							if (this.preamblePos < this.preambleLen)
 								return false;
@@ -131,6 +133,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (s != "SELECT")
 					throw Parser.SyntaxError("Expected SELECT.");
 
+				Parser.NextToken();
 				s = Parser.PeekNextToken().ToUpper();
 				if (string.IsNullOrEmpty(s))
 					return false;
@@ -324,6 +327,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 							Predicate = null;
 							TriplePosition = 0;
 							break;
+
+						case '}':
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
+
+							Parser.UndoChar();
+							return;
 
 						case ';':
 							Predicate = null;

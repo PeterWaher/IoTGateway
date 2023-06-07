@@ -213,7 +213,7 @@ namespace Waher.Content.Semantic
 		{
 		}
 
-		private static XmlDocument ToXml(string Text)
+		internal static XmlDocument ToXml(string Text)
 		{
 			XmlDocument Xml = new XmlDocument()
 			{

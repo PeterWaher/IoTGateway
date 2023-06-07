@@ -1,23 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Semantic
 {
 	/// <summary>
-	/// In-memory semantic cube.
+	/// In-memory semantic plane.
 	/// </summary>
 	public class InMemorySemanticPlane : ISemanticPlane
 	{
-		private readonly LinkedList<ISemanticTriple> elements = new LinkedList<ISemanticTriple>();
-		private readonly SortedDictionary<ISemanticElement, InMemorySemanticLine> yPerX = new SortedDictionary<ISemanticElement, InMemorySemanticLine>();
-		private readonly SortedDictionary<ISemanticElement, InMemorySemanticLine> xPerY = new SortedDictionary<ISemanticElement, InMemorySemanticLine>();
+		private readonly LinkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>> elements = new LinkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>>();
 		private readonly ISemanticElement reference;
-		private InMemorySemanticLine lastX = null;
-		private InMemorySemanticLine lastY = null;
+		private SortedDictionary<ISemanticElement, InMemorySemanticLine> yPerX = null;
+		private SortedDictionary<ISemanticElement, InMemorySemanticLine> xPerY = null;
 
 		/// <summary>
-		/// In-memory semantic cube.
+		/// In-memory semantic plane.
 		/// </summary>
 		/// <param name="Reference">Reference</param>
 		public InMemorySemanticPlane(ISemanticElement Reference)
@@ -38,25 +37,9 @@ namespace Waher.Content.Semantic
 		/// <param name="Triple">Triple</param>
 		internal void Add(ISemanticElement X, ISemanticElement Y, ISemanticTriple Triple)
 		{
-			this.elements.AddLast(Triple);
-
-			if ((this.lastX is null || !this.lastX.Reference.Equals(X)) &&
-				!this.yPerX.TryGetValue(X, out this.lastX))
-			{
-				this.lastX = new InMemorySemanticLine(X);
-				this.yPerX[X] = this.lastX;
-			}
-
-			this.lastX.Add(Y, Triple);
-
-			if ((this.lastY is null || !this.lastY.Reference.Equals(Y)) &&
-				!this.xPerY.TryGetValue(Y, out this.lastY))
-			{
-				this.lastY = new InMemorySemanticLine(Y);
-				this.xPerY[Y] = this.lastY;
-			}
-
-			this.lastY.Add(X, Triple);
+			this.elements.AddLast(new Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>(X, Y, Triple));
+			this.xPerY = null;
+			this.yPerX = null;
 		}
 
 		/// <summary>
@@ -65,7 +48,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator</returns>
 		public IEnumerator<ISemanticTriple> GetEnumerator()
 		{
-			return this.elements.GetEnumerator();
+			return new TripleEnumerator(this.elements.GetEnumerator());
 		}
 
 		/// <summary>
@@ -74,7 +57,23 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.elements.GetEnumerator();
+			return new TripleEnumerator(this.elements.GetEnumerator());
+		}
+
+		private class TripleEnumerator : IEnumerator<ISemanticTriple>
+		{
+			private readonly IEnumerator<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>> e;
+
+			public TripleEnumerator(IEnumerator<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>> e)
+			{
+				this.e = e;
+			}
+
+			public ISemanticTriple Current => this.e.Current.Item3;
+			object IEnumerator.Current => this.e.Current.Item3;
+			public void Dispose() => this.e.Dispose();
+			public bool MoveNext() => this.e.MoveNext();
+			public void Reset() => this.e.Reset();
 		}
 
 		/// <summary>
@@ -84,6 +83,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByX(ISemanticElement X)
 		{
+			this.CheckXOrdered();
+
 			if (!this.yPerX.TryGetValue(X, out InMemorySemanticLine Line))
 				Line = null;
 
@@ -97,6 +98,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByY(ISemanticElement Y)
 		{
+			this.CheckYOrdered();
+
 			if (!this.xPerY.TryGetValue(Y, out InMemorySemanticLine Line))
 				Line = null;
 
@@ -111,6 +114,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<IEnumerable<ISemanticTriple>> GetTriplesByXAndY(ISemanticElement X, ISemanticElement Y)
 		{
+			this.CheckXOrdered();
+
 			if (!this.yPerX.TryGetValue(X, out InMemorySemanticLine Line))
 				return Task.FromResult<IEnumerable<ISemanticTriple>>(null);
 
@@ -123,6 +128,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public Task<IEnumerator<ISemanticElement>> GetXAxisEnumerator()
 		{
+			this.CheckXOrdered();
+
 			return Task.FromResult<IEnumerator<ISemanticElement>>(this.yPerX.Keys.GetEnumerator());
 		}
 
@@ -132,7 +139,59 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public Task<IEnumerator<ISemanticElement>> GetYAxisEnumerator()
 		{
+			this.CheckYOrdered();
+
 			return Task.FromResult<IEnumerator<ISemanticElement>>(this.xPerY.Keys.GetEnumerator());
+		}
+
+		private void CheckXOrdered()
+		{
+			if (this.yPerX is null)
+			{
+				SortedDictionary<ISemanticElement, InMemorySemanticLine> Ordered =
+					new SortedDictionary<ISemanticElement, InMemorySemanticLine>();
+				ISemanticElement LastPoint = null;
+				InMemorySemanticLine Last = null;
+
+				foreach (Tuple<ISemanticElement, ISemanticElement, ISemanticTriple> P in this.elements)
+				{
+					if ((LastPoint is null || !LastPoint.Equals(P.Item1)) &&
+						!Ordered.TryGetValue(P.Item1, out Last))
+					{
+						Last = new InMemorySemanticLine(P.Item1);
+						Ordered[P.Item1] = Last;
+					}
+
+					Last.Add(P.Item1, P.Item3);
+				}
+
+				this.yPerX = Ordered;
+			}
+		}
+
+		private void CheckYOrdered()
+		{
+			if (this.xPerY is null)
+			{
+				SortedDictionary<ISemanticElement, InMemorySemanticLine> Ordered =
+					new SortedDictionary<ISemanticElement, InMemorySemanticLine>();
+				ISemanticElement LastPoint = null;
+				InMemorySemanticLine Last = null;
+
+				foreach (Tuple<ISemanticElement, ISemanticElement, ISemanticTriple> P in this.elements)
+				{
+					if ((LastPoint is null || !LastPoint.Equals(P.Item2)) &&
+						!Ordered.TryGetValue(P.Item2, out Last))
+					{
+						Last = new InMemorySemanticLine(P.Item2);
+						Ordered[P.Item2] = Last;
+					}
+
+					Last.Add(P.Item2, P.Item3);
+				}
+
+				this.xPerY = Ordered;
+			}
 		}
 	}
 }

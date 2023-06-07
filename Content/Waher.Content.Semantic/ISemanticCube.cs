@@ -6,7 +6,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Interface for semantic cubes.
 	/// </summary>
-	public interface ISemanticCube : IEnumerable<ISemanticTriple>
+	public interface ISemanticCube : ISemanticModel
 	{
 		/// <summary>
 		/// Gets available triples in the cube, having a given subject.
@@ -103,5 +103,26 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <returns>Enumerator of semantic elements.</returns>
 		Task<IEnumerator<ISemanticElement>> GetObjectEnumerator();
+
+		/// <summary>
+		/// Returns a new cube, with a subject restriction.
+		/// </summary>
+		/// <param name="Subject">Subject restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		Task<ISemanticCube> RestrictSubject(ISemanticElement Subject);
+
+		/// <summary>
+		/// Returns a new cube, with a predicate restriction.
+		/// </summary>
+		/// <param name="Predicate">Predicate restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		Task<ISemanticCube> RestrictPredicate(ISemanticElement Predicate);
+
+		/// <summary>
+		/// Returns a new cube, with a object restriction.
+		/// </summary>
+		/// <param name="Object">Object restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		Task<ISemanticCube> RestrictObject(ISemanticElement Object);
 	}
 }

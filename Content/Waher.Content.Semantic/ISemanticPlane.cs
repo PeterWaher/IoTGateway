@@ -6,7 +6,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Interface for semantic planes.
 	/// </summary>
-	public interface ISemanticPlane : IEnumerable<ISemanticTriple>
+	public interface ISemanticPlane : ISemanticModel
 	{
 		/// <summary>
 		/// Gets available triples in the plane, having a given X-coordinate.

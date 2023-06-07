@@ -11,12 +11,10 @@ namespace Waher.Content.Semantic
 	public class InMemorySemanticCube : ISemanticCube
 	{
 		private readonly ISemanticModel model;
-		private readonly SortedDictionary<ISemanticElement, InMemorySemanticPlane> subjects = new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
-		private readonly SortedDictionary<ISemanticElement, InMemorySemanticPlane> predicates = new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
-		private readonly SortedDictionary<ISemanticElement, InMemorySemanticPlane> objects = new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
-		private InMemorySemanticPlane lastSubject = null;
-		private InMemorySemanticPlane lastPredicate = null;
-		private InMemorySemanticPlane lastObject = null;
+		private readonly LinkedList<ISemanticTriple> elements = new LinkedList<ISemanticTriple>();
+		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> subjects = null;
+		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> predicates = null;
+		private SortedDictionary<ISemanticElement, InMemorySemanticPlane> objects = null;
 
 		/// <summary>
 		/// In-memory semantic cube.
@@ -52,32 +50,10 @@ namespace Waher.Content.Semantic
 
 		private void Add(ISemanticTriple Triple)
 		{
-			if ((this.lastSubject is null || !this.lastSubject.Reference.Equals(Triple.Subject)) &&
-				!this.subjects.TryGetValue(Triple.Subject, out this.lastSubject))
-			{
-				this.lastSubject = new InMemorySemanticPlane(Triple.Subject);
-				this.subjects[Triple.Subject] = this.lastSubject;
-			}
-
-			this.lastSubject.Add(Triple.Predicate, Triple.Object, Triple);
-
-			if ((this.lastPredicate is null || !this.lastPredicate.Reference.Equals(Triple.Predicate)) &&
-				!this.predicates.TryGetValue(Triple.Predicate, out this.lastPredicate))
-			{
-				this.lastPredicate = new InMemorySemanticPlane(Triple.Predicate);
-				this.predicates[Triple.Predicate] = this.lastPredicate;
-			}
-
-			this.lastPredicate.Add(Triple.Subject, Triple.Object, Triple);
-
-			if ((this.lastObject is null || !this.lastObject.Reference.Equals(Triple.Object)) &&
-				!this.objects.TryGetValue(Triple.Object, out this.lastObject))
-			{
-				this.lastObject = new InMemorySemanticPlane(Triple.Object);
-				this.objects[Triple.Object] = this.lastObject;
-			}
-
-			this.lastObject.Add(Triple.Subject, Triple.Predicate, Triple);
+			this.elements.AddLast(Triple);
+			this.subjects = null;
+			this.predicates = null;
+			this.objects = null;
 		}
 
 		/// <summary>
@@ -86,7 +62,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator object.</returns>
 		public IEnumerator<ISemanticTriple> GetEnumerator()
 		{
-			return this.model.GetEnumerator();
+			return this.elements.GetEnumerator();
 		}
 
 		/// <summary>
@@ -95,7 +71,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator object.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.model.GetEnumerator();
+			return this.elements.GetEnumerator();
 		}
 
 		/// <summary>
@@ -105,6 +81,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by predicate (X) and object (Y), or null if none.</returns>
 		public Task<ISemanticPlane> GetTriplesBySubject(ISemanticElement Subject)
 		{
+			this.CheckSubjectsOrdered();
+
 			if (!this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
 				Plane = null;
 
@@ -118,6 +96,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by subject (X) and object (Y), or null if none.</returns>
 		public Task<ISemanticPlane> GetTriplesByPredicate(ISemanticElement Predicate)
 		{
+			this.CheckPredicatesOrdered();
+
 			if (!this.predicates.TryGetValue(Predicate, out InMemorySemanticPlane Plane))
 				Plane = null;
 
@@ -131,6 +111,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by subject (X) and predicate (Y), or null if none.</returns>
 		public Task<ISemanticPlane> GetTriplesByObject(ISemanticElement Object)
 		{
+			this.CheckObjectsOrdered();
+
 			if (!this.objects.TryGetValue(Object, out InMemorySemanticPlane Plane))
 				Plane = null;
 
@@ -145,6 +127,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesBySubjectAndPredicate(ISemanticElement Subject, ISemanticElement Predicate)
 		{
+			this.CheckSubjectsOrdered();
+
 			if (!this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -159,6 +143,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesBySubjectAndObject(ISemanticElement Subject, ISemanticElement Object)
 		{
+			this.CheckSubjectsOrdered();
+
 			if (!this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -173,6 +159,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByPredicateAndSubject(ISemanticElement Predicate, ISemanticElement Subject)
 		{
+			this.CheckPredicatesOrdered();
+
 			if (!this.predicates.TryGetValue(Predicate, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -187,6 +175,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByPredicateAndObject(ISemanticElement Predicate, ISemanticElement Object)
 		{
+			this.CheckPredicatesOrdered();
+
 			if (!this.predicates.TryGetValue(Predicate, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -201,6 +191,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByObjectAndSubject(ISemanticElement Object, ISemanticElement Subject)
 		{
+			this.CheckObjectsOrdered();
+
 			if (!this.objects.TryGetValue(Object, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -215,6 +207,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<ISemanticLine> GetTriplesByObjectAndPredicate(ISemanticElement Object, ISemanticElement Predicate)
 		{
+			this.CheckObjectsOrdered();
+
 			if (!this.objects.TryGetValue(Object, out InMemorySemanticPlane Plane))
 				return Task.FromResult<ISemanticLine>(null);
 
@@ -230,6 +224,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public Task<IEnumerable<ISemanticTriple>> GetTriplesBySubjectAndPredicateAndObject(ISemanticElement Subject, ISemanticElement Predicate, ISemanticElement Object)
 		{
+			this.CheckSubjectsOrdered();
+
 			if (!this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
 				return Task.FromResult<IEnumerable<ISemanticTriple>>(null);
 
@@ -242,6 +238,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public Task<IEnumerator<ISemanticElement>> GetSubjectEnumerator()
 		{
+			this.CheckSubjectsOrdered();
+
 			return Task.FromResult<IEnumerator<ISemanticElement>>(this.subjects.Keys.GetEnumerator());
 		}
 
@@ -251,6 +249,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public Task<IEnumerator<ISemanticElement>> GetPredicateEnumerator()
 		{
+			this.CheckPredicatesOrdered();
+
 			return Task.FromResult<IEnumerator<ISemanticElement>>(this.predicates.Keys.GetEnumerator());
 		}
 
@@ -260,7 +260,130 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public Task<IEnumerator<ISemanticElement>> GetObjectEnumerator()
 		{
+			this.CheckObjectsOrdered();
+
 			return Task.FromResult<IEnumerator<ISemanticElement>>(this.objects.Keys.GetEnumerator());
 		}
+
+		private void CheckSubjectsOrdered()
+		{
+			if (this.subjects is null)
+			{
+				SortedDictionary<ISemanticElement, InMemorySemanticPlane> Ordered =
+					new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
+				ISemanticElement LastPoint = null;
+				InMemorySemanticPlane Last = null;
+
+				foreach (ISemanticTriple T in this.elements)
+				{
+					if ((LastPoint is null || !LastPoint.Equals(T.Subject)) &&
+						!Ordered.TryGetValue(T.Subject, out Last))
+					{
+						Last = new InMemorySemanticPlane(T.Subject);
+						Ordered[T.Subject] = Last;
+					}
+
+					Last.Add(T.Predicate, T.Object, T);
+				}
+
+				this.subjects = Ordered;
+			}
+		}
+
+		private void CheckPredicatesOrdered()
+		{
+			if (this.predicates is null)
+			{
+				SortedDictionary<ISemanticElement, InMemorySemanticPlane> Ordered =
+					new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
+				ISemanticElement LastPoint = null;
+				InMemorySemanticPlane Last = null;
+
+				foreach (ISemanticTriple T in this.elements)
+				{
+					if ((LastPoint is null || !LastPoint.Equals(T.Predicate)) &&
+						!Ordered.TryGetValue(T.Predicate, out Last))
+					{
+						Last = new InMemorySemanticPlane(T.Predicate);
+						Ordered[T.Predicate] = Last;
+					}
+
+					Last.Add(T.Subject, T.Object, T);
+				}
+
+				this.predicates = Ordered;
+			}
+		}
+
+		private void CheckObjectsOrdered()
+		{
+			if (this.objects is null)
+			{
+				SortedDictionary<ISemanticElement, InMemorySemanticPlane> Ordered =
+					new SortedDictionary<ISemanticElement, InMemorySemanticPlane>();
+				ISemanticElement LastPoint = null;
+				InMemorySemanticPlane Last = null;
+
+				foreach (ISemanticTriple T in this.elements)
+				{
+					if ((LastPoint is null || !LastPoint.Equals(T.Object)) &&
+						!Ordered.TryGetValue(T.Object, out Last))
+					{
+						Last = new InMemorySemanticPlane(T.Object);
+						Ordered[T.Object] = Last;
+					}
+
+					Last.Add(T.Subject, T.Predicate, T);
+				}
+
+				this.objects = Ordered;
+			}
+		}
+
+		/// <summary>
+		/// Returns a new cube, with a subject restriction.
+		/// </summary>
+		/// <param name="Subject">Subject restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		public async Task<ISemanticCube> RestrictSubject(ISemanticElement Subject)
+		{
+			this.CheckSubjectsOrdered();
+
+			if (this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
+				return await Create(Plane);
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Returns a new cube, with a predicate restriction.
+		/// </summary>
+		/// <param name="Predicate">Predicate restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		public async Task<ISemanticCube> RestrictPredicate(ISemanticElement Predicate)
+		{
+			this.CheckPredicatesOrdered();
+
+			if (this.predicates.TryGetValue(Predicate, out InMemorySemanticPlane Plane))
+				return await Create(Plane);
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Returns a new cube, with a object restriction.
+		/// </summary>
+		/// <param name="Object">Object restriction.</param>
+		/// <returns>Restricted cube, or null if empty.</returns>
+		public async Task<ISemanticCube> RestrictObject(ISemanticElement Object)
+		{
+			this.CheckObjectsOrdered();
+
+			if (this.objects.TryGetValue(Object, out InMemorySemanticPlane Plane))
+				return await Create(Plane);
+			else
+				return null;
+		}
+
 	}
 }

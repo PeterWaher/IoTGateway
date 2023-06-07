@@ -6,7 +6,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Interface for semantic lines.
 	/// </summary>
-	public interface ISemanticLine : IEnumerable<ISemanticTriple>
+	public interface ISemanticLine : ISemanticModel
 	{
 		/// <summary>
 		/// Gets available triples on the line, having a given coordinate.

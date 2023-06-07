@@ -838,7 +838,7 @@
             Gets the end position of the header, if one is found, null otherwise.
             </summary>
             <param name="Markdown">Markdown</param>
-            <returns></returns>
+            <returns>Position of end of header, if found.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.Preprocess(System.String,Waher.Content.Markdown.MarkdownSettings,System.Type[])">
             <summary>

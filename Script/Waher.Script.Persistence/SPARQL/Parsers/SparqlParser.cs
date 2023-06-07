@@ -23,7 +23,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 		private readonly string preamble;
 		private readonly int preambleLen;
-		private readonly List<ISemanticTriple> triples = new List<ISemanticTriple>();
+		private readonly List<SemanticQueryTriple> triples = new List<SemanticQueryTriple>();
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>()
 		{
@@ -128,6 +128,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						return false;
 				}
 
+				if (s != "SELECT")
+					throw Parser.SyntaxError("Expected SELECT.");
+
+				s = Parser.PeekNextToken().ToUpper();
+				if (string.IsNullOrEmpty(s))
+					return false;
+
 				if (s == "DISTINCT")
 				{
 					Parser.NextToken();
@@ -136,7 +143,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					s = Parser.PeekNextToken().ToUpper();
 				}
 
-				List<ScriptNode> Variables = new List<ScriptNode>();
+				List<ScriptNode> Columns = new List<ScriptNode>();
 
 				while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
 				{
@@ -147,22 +154,26 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						if (!(Node is VariableReference))
 							throw Parser.SyntaxError("Expected variable name.");
 
-						Variables.Add(Node);
+						Columns.Add(Node);
 					}
 					else
 					{
 						Node = Parser.ParseStatement();
-						Variables.Add(Node);
+						Columns.Add(Node);
 					}
 
 					s = Parser.PeekNextToken().ToUpper();
 				}
 
 				if (s == "FROM")
+				{
+					Parser.NextToken();
 					throw new NotImplementedException();    // TODO
+				}
 
 				if (s == "WHERE")
 				{
+					Parser.NextToken();
 					if (Parser.NextNonWhitespaceChar() != '{')
 						throw Parser.SyntaxError("Expected {");
 
@@ -171,6 +182,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Parser.NextNonWhitespaceChar() != '}')
 						throw Parser.SyntaxError("Expected }");
 				}
+
+				Result = new Select(Columns.ToArray(), this.triples.ToArray(), Distinct,
+					Parser.Start, Parser.Length, Parser.Expression);
 
 				return true;
 			}
@@ -298,7 +312,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				}
 				else
 				{
-					this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
+					this.triples.Add(new SemanticQueryTriple(Subject, Predicate, Object));
 
 					switch (Parser.NextNonWhitespaceChar())
 					{
@@ -368,6 +382,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					case ']':
 						return null;
 
+					case '}':
+						Parser.UndoChar();
+						return null;
+
 					case '<':
 						return this.ParseUri(Parser);
 
@@ -420,7 +438,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					case '?':
 						int Start = Parser.Position;
 						s = this.ParseName(Parser);
-						return new SemanticScriptElement(new VariableReference(s, Start, Parser.Length, Parser.Expression));
+						return new SemanticScriptElement(new VariableReference(s, Start, Parser.Position - Start, Parser.Expression));
 
 					default:
 						if (char.IsWhiteSpace(ch))
@@ -502,19 +520,19 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					while (!(Loop is null))
 					{
-						this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
+						this.triples.Add(new SemanticQueryTriple(Current, RdfDocument.RdfFirst, Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
 							BlankNode Next = this.CreateBlankNode();
-							this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
+							this.triples.Add(new SemanticQueryTriple(Current, RdfDocument.RdfRest, Next));
 							Current = Next;
 						}
 					}
 
-					this.triples.Add(new SemanticTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
+					this.triples.Add(new SemanticQueryTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
 
 					return Result;
 				}

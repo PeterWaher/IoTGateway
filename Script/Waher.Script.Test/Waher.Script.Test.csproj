@@ -43,6 +43,8 @@
     <None Remove="Files\5\4.txt" />
     <None Remove="Files\5\5.txt" />
     <None Remove="File\1.txt" />
+    <None Remove="Sparql\Test_01.rq" />
+    <None Remove="Sparql\Test_01.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -124,6 +126,11 @@
     <Content Include="File\1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Sparql\Test_01.rq" />
+    <EmbeddedResource Include="Sparql\Test_01.ttl" />
   </ItemGroup>
 
   <ItemGroup>

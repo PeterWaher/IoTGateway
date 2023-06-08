@@ -257,7 +257,8 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 			}
 
-			// TODO: Order records
+			if (!(this.orderBy is null))
+				Records.Sort(new OrderResultSet(this.orderBy));
 
 			return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), new Uri[0],
 				Records.ToArray()));
@@ -265,7 +266,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 		private static async Task<LinkedList<Possibility>> CrossPossibilitiesOneVariable(
 			LinkedList<Possibility> Possibilities, SemanticQueryTriple T, int VariableIndex,
-			int ValueIndex1, int ValueIndex2, Dictionary<string,bool> VariablesProcessed, 
+			int ValueIndex1, int ValueIndex2, Dictionary<string, bool> VariablesProcessed,
 			ISemanticCube Cube)
 		{
 			LinkedList<Possibility> NewPossibilities = null;
@@ -459,7 +460,7 @@ namespace Waher.Script.Persistence.SPARQL
 		}
 
 		private static async Task<LinkedList<Possibility>> CrossPossibilitiesThreeVariables(
-			LinkedList<Possibility> Possibilities, SemanticQueryTriple T, 
+			LinkedList<Possibility> Possibilities, SemanticQueryTriple T,
 			Dictionary<string, bool> VariablesProcessed, ISemanticCube Cube)
 		{
 			LinkedList<Possibility> NewPossibilities = null;
@@ -783,7 +784,7 @@ namespace Waher.Script.Persistence.SPARQL
 		}
 
 		private static void CrossPossibilities(IEnumerable<ISemanticTriple> NewTriples,
-			Possibility Possibility, string Name, int Index, ref LinkedList<Possibility> NewPossibilities, 
+			Possibility Possibility, string Name, int Index, ref LinkedList<Possibility> NewPossibilities,
 			bool Optional)
 		{
 			if (NewTriples is null && !Optional)
@@ -906,7 +907,6 @@ namespace Waher.Script.Persistence.SPARQL
 
 			return await InternetContent.GetAsync(Uri,
 				new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9"));
-
 		}
 
 	}

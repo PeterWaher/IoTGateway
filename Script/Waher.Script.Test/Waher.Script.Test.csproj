@@ -56,6 +56,10 @@
     <None Remove="Sparql\Test_05.rq" />
     <None Remove="Sparql\Test_05.srx" />
     <None Remove="Sparql\Test_05.ttl" />
+    <None Remove="Sparql\Test_06.rq" />
+    <None Remove="Sparql\Test_06.ttl" />
+    <None Remove="Sparql\Test_07.rq" />
+    <None Remove="Sparql\Test_07.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -140,6 +144,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sparql\Test_07.rq" />
+    <EmbeddedResource Include="Sparql\Test_07.ttl" />
+    <EmbeddedResource Include="Sparql\Test_06.ttl" />
+    <EmbeddedResource Include="Sparql\Test_06.rq" />
     <EmbeddedResource Include="Sparql\Test_05.rq" />
     <EmbeddedResource Include="Sparql\Test_05.srx" />
     <EmbeddedResource Include="Sparql\Test_05.ttl" />

@@ -656,18 +656,75 @@
             <param name="Result">Parsed Script Node.</param>
             <returns>If successful in parsing a script node.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Possibility">
+            <summary>
+            Represents a possible solution during SPARQL evaluation.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.#ctor(System.String,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Represents a possible solution during SPARQL evaluation.
+            </summary>
+            <param name="VariableName">Variable name</param>
+            <param name="Value">Variable value.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.#ctor(System.String,Waher.Content.Semantic.ISemanticElement,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Represents a possible solution during SPARQL evaluation.
+            </summary>
+            <param name="VariableName">Variable name</param>
+            <param name="Value">Variable value.</param>
+            <param name="Prev">Previous linked list of variables in possibility.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.VariableName">
+            <summary>
+            Name of variable.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.Value">
+            <summary>
+            Variable value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.Prev">
+            <summary>
+            Previous possiblity
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.Item(System.String)">
+            <summary>
+            Access to possible variable values, given a variable name.
+            </summary>
+            <param name="VariableName">Variable name.</param>
+            <returns>Value of variable, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.GetValue(System.String)">
+            <summary>
+            Access to possible variable values, given a variable name.
+            </summary>
+            <param name="VariableName">Variable name.</param>
+            <returns>Value of variable, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.ToString">
+            <summary>
+            Shows the collection of possible values as a string.
+            </summary>
+            <returns>String representation of possibilty.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Select">
             <summary>
             Executes a SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Select.#ctor(Waher.Script.Model.ScriptNode[],Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Select.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{System.String,System.Boolean}[],System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL SELECT statement.
             </summary>
-            <param name="Columns">Columns to select. If null, all columns are selected.</param>
-            <param name="Where">Optional where clause</param>
             <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+            <param name="Columns">Columns to select. If null, all columns are selected.</param>
+            <param name="From">Data source.</param>
+            <param name="Where">Optional where clause</param>
+            <param name="OrderBy">Order to present result set.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -758,19 +815,21 @@
             Semantic query triple
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticTriple)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticTriple,System.Boolean)">
             <summary>
             Semantic query triple
             </summary>
             <param name="Triple">Triple</param>
+            <param name="Optional">If triple is optional.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,System.Boolean)">
             <summary>
             Semantic query triple
             </summary>
             <param name="Subject">Subject</param>
             <param name="Predicate">Predicate</param>
             <param name="Object">Object</param>
+            <param name="Optional">If triple is optional or not.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Subject">
             <summary>
@@ -822,6 +881,30 @@
             Type of triple
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Optional">
+            <summary>
+            If triple is optional.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Required">
+            <summary>
+            If triple is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Item(System.Int32)">
+            <summary>
+            Access to elements: 0=Subject, 1=Predicate, 2=Object.
+            </summary>
+            <param name="Index">Axis index.</param>
+            <returns>Semantic element.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.VariableName(System.Int32)">
+            <summary>
+            Gets a variable name, given the axis index: 0=Subject, 1=Predicate, 2=Object.
+            </summary>
+            <param name="Index">Axis index.</param>
+            <returns>Variable name.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.SemanticScriptElement">
             <summary>
             Semantic element based on script.
@@ -846,6 +929,11 @@
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.IsLiteral">
             <summary>
             If element is a literal.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.ElementValue">
+            <summary>
+            Underlying element value represented by the semantic element.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.Equals(System.Object)">

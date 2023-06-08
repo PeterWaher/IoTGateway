@@ -47,6 +47,8 @@ namespace Waher.Script.Test
 		[DataRow("Test_08.ttl", "Test_08.rq", null, null)]
 		[DataRow("Test_09.ttl", "Test_09.rq", null, null)]
 		[DataRow("Test_10.ttl", "Test_10.rq", null, null)]
+		[DataRow("Test_11.ttl", "Test_11.rq", null, null)]
+		[DataRow("Test_12.ttl", "Test_12.rq", null, null)]
 		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{

@@ -52,7 +52,13 @@ namespace Waher.Script.Operators.Matrices
                 return MatrixDefinition.Encapsulate(Elements, 1, Elements.Count, this);
             }
 
-            return MatrixDefinition.Encapsulate(new IElement[] { Operand }, 1, 1, this);
+			if (Operand is IToMatrix ToMatrix)
+				return ToMatrix.ToMatrix();
+
+			if (Operand?.AssociatedObjectValue is IToMatrix ToMatrix2)
+				return ToMatrix2.ToMatrix();
+
+			return MatrixDefinition.Encapsulate(new IElement[] { Operand }, 1, 1, this);
         }
 
 		/// <summary>

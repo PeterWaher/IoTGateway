@@ -14,6 +14,7 @@ using Waher.Script.Constants;
 using Waher.Script.Functions.Analytic;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -125,6 +126,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is XmlDocument Xml)
 				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+			else if (Result is IToMatrix ToMatrix)
+				Result = ToMatrix.ToMatrix();
 
 			if (Result is Graph G)
 			{
@@ -306,6 +309,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is XmlDocument Xml)
 				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+			else if (Result is IToMatrix ToMatrix)
+				Result = ToMatrix.ToMatrix();
 
 			if (Result is Graph G)
 			{
@@ -789,6 +794,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is XmlDocument Xml)
 				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+			else if (Result is IToMatrix ToMatrix)
+				Result = ToMatrix.ToMatrix();
 
 			if (Result is Graph G)
 			{

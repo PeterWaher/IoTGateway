@@ -19408,6 +19408,17 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Operators.Matrices.IToMatrix">
+            <summary>
+            Interface for objects that can be converted into matrices.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Matrices.IToMatrix.ToMatrix">
+            <summary>
+            Converts the object to a matrix.
+            </summary>
+            <returns>Matrix.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Matrices.MatrixDefinition">
             <summary>
             Creates a matrix.
@@ -20794,6 +20805,17 @@
         </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.GetHashCode">
             <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Operators.Vectors.IToVector">
+            <summary>
+            Interface for objects that can be converted into matrices.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.IToVector.ToVector">
+            <summary>
+            Converts the object to a vector.
+            </summary>
+            <returns>Matrix.</returns>
         </member>
         <member name="T:Waher.Script.Operators.Vectors.ToVector">
             <summary>

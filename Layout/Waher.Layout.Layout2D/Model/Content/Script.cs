@@ -13,6 +13,7 @@ using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Layout.Layout2D.Model.Content
 {
@@ -185,6 +186,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 						this.Document.DisposeContent(this.cid);
 						this.cid = null;
 					}
+
+					if (Result is IToMatrix ToMatrix)
+						Result = ToMatrix.ToMatrix();
 
 					if (Result is Graph G)
 					{

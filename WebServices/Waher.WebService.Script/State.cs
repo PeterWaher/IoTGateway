@@ -19,6 +19,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 using Waher.Security;
 using Waher.Security.LoginMonitor;
 
@@ -370,6 +371,9 @@ namespace Waher.WebService.Script
 
 				byte[] Bin;
 				string s;
+
+				if (Result.AssociatedObjectValue is IToMatrix ToMatrix)
+					Result = ToMatrix.ToMatrix();
 
 				if (Result is Graph G)
 				{

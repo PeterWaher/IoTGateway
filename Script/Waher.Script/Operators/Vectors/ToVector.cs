@@ -4,6 +4,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -33,24 +34,30 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			return ConvertToVector(Operand);
+			return this.ConvertToVector(Operand);
 		}
 
-		private IElement ConvertToVector(IElement E)
+		private IElement ConvertToVector(IElement Operand)
 		{
-			if (this.nullCheck && E.AssociatedObjectValue is null)
-				return E;
+			if (this.nullCheck && Operand.AssociatedObjectValue is null)
+				return Operand;
 
-			if (E is IVectorSpaceElement)
-				return E;
+			if (Operand is IVectorSpaceElement)
+				return Operand;
 
-			if (E is IVector V)
+			if (Operand is IVector V)
 				return VectorDefinition.Encapsulate(V.VectorElements, false, this);
 
-			if (E is ISet S)
+			if (Operand is ISet S)
 				return VectorDefinition.Encapsulate(S.ChildElements, false, this);
 
-			return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
+			if (Operand is IToVector ToVector)
+				return ToVector.ToVector();
+
+			if (Operand?.AssociatedObjectValue is IToVector ToVector2)
+				return ToVector2.ToVector();
+
+			return VectorDefinition.Encapsulate(new IElement[] { Operand }, false, this);
 		}
 
 		/// <summary>

@@ -9,6 +9,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Content.Markdown.Functions
 {
@@ -54,6 +55,9 @@ namespace Waher.Content.Markdown.Functions
 		{
 			if (Argument is StringValue S)
 				return S.Value;
+
+			if (Argument.AssociatedObjectValue is IToMatrix ToMatrix)
+				Argument = ToMatrix.ToMatrix();
 
 			if (Argument is IMatrix Matrix)
 				return MatrixToMarkdown(Matrix);

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Content.Xml
 {
@@ -313,6 +314,9 @@ namespace Waher.Content.Xml
 		{
 			if (Value is null)
 				return false;
+
+			if (Value is IToMatrix ToMatrix)
+				Value = ToMatrix.ToMatrix();
 
 			Type T = Value.GetType();
 			TypeInfo TI = T.GetTypeInfo();

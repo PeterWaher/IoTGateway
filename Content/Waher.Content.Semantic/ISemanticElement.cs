@@ -16,5 +16,10 @@ namespace Waher.Content.Semantic
 		/// If element is a literal.
 		/// </summary>
 		bool IsLiteral { get; }
+
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		object ElementValue { get; }
 	}
 }

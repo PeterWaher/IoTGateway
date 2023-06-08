@@ -45,6 +45,11 @@ namespace Waher.Content.Semantic.Model
 		/// </summary>
 		public bool IsLiteral => this.Subject.IsLiteral && this.Predicate.IsLiteral && this.Object.IsLiteral;
 
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public object ElementValue => this;
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -102,6 +107,25 @@ namespace Waher.Content.Semantic.Model
 				return i;
 
 			return this.Object.CompareTo(T.Object);
+		}
+
+		/// <summary>
+		/// Access to elements: 0=Subject, 1=Predicate, 2=Object.
+		/// </summary>
+		/// <param name="Index"></param>
+		/// <returns>Semantic element.</returns>
+		public ISemanticElement this[int Index]
+		{
+			get
+			{
+				switch (Index)
+				{
+					case 0: return this.Subject;
+					case 1: return this.Predicate;
+					case 2: return this.Object;
+					default: return null;
+				}
+			}
 		}
 	}
 }

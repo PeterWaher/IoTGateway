@@ -371,5 +371,71 @@ namespace Waher.Content.Semantic
 				return null;
 		}
 
+		/// <summary>
+		/// Gets available triples in the cube, having a given value, along a given axis.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="AxisIndex">Axis Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <returns>Available triples, or null if none.</returns>
+		public async Task<IEnumerable<ISemanticTriple>> GetTriples(ISemanticElement Value, int AxisIndex)
+		{
+			switch (AxisIndex)
+			{
+				case 0: return await this.GetTriplesBySubject(Value);
+				case 1: return await this.GetTriplesByPredicate(Value);
+				case 2: return await this.GetTriplesByObject(Value);
+				default: return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets available triples in the cube, having two given values, along two given axes.
+		/// </summary>
+		/// <param name="Value1">Value 1</param>
+		/// <param name="Axis1Index">Axis 1 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <param name="Value2">Value 2</param>
+		/// <param name="Axis2Index">Axis 2 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <returns>Available triples, or null if none.</returns>
+		public async Task<IEnumerable<ISemanticTriple>> GetTriples(ISemanticElement Value1, int Axis1Index,
+			ISemanticElement Value2, int Axis2Index)
+		{
+			if (Axis1Index == Axis2Index)
+			{
+				if (Value1.Equals(Value2))
+					return await this.GetTriples(Value1, Axis1Index);
+			}
+			else
+			{
+				switch (Axis1Index)
+				{
+					case 0:
+						switch (Axis2Index)
+						{
+							case 1: return await this.GetTriplesBySubjectAndPredicate(Value1, Value2);
+							case 2: return await this.GetTriplesBySubjectAndObject(Value1, Value2);
+						}
+						break;
+
+					case 1:
+						switch (Axis2Index)
+						{
+							case 0: return await this.GetTriplesByPredicateAndSubject(Value1, Value2);
+							case 2: return await this.GetTriplesByPredicateAndObject(Value1, Value2);
+						}
+						break;
+
+					case 2:
+						switch (Axis2Index)
+						{
+							case 0: return await this.GetTriplesByObjectAndSubject(Value1, Value2);
+							case 1: return await this.GetTriplesByObjectAndPredicate(Value1, Value2);
+						}
+						break;
+				}
+			}
+
+			return null;
+		}
+
 	}
 }

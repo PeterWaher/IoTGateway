@@ -99,7 +99,7 @@ namespace Waher.Content.Semantic
 				Grade = Grade.Ok;
 				return true;
 			}
-			else if (Object is bool b &&
+			else if (Object is bool &&
 				InternetContent.IsAccepted(SparqlResultSetContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Barely;
@@ -184,7 +184,7 @@ namespace Waher.Content.Semantic
 				foreach (Uri Link in Result.Links)
 				{
 					w.WriteStartElement("link");
-					w.WriteAttributeString("href", Link.AbsoluteUri);
+					w.WriteAttributeString("href", Link.ToString());
 					w.WriteEndAttribute();
 				}
 			}
@@ -300,7 +300,7 @@ namespace Waher.Content.Semantic
 					w.WriteEndElement();
 				}
 				else if (E is UriNode N)
-					w.WriteElementString("uri", N.Uri.AbsoluteUri);
+					w.WriteElementString("uri", N.Uri.ToString());
 				else if (E is BlankNode N2)
 					w.WriteElementString("bnode", N2.NodeId);
 				else if (E is ISemanticTriple T)

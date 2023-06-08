@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Semantic.Model.Literals
+﻿using System;
+using Waher.Runtime.Inventory;
+
+namespace Waher.Content.Semantic.Model.Literals
 {
     /// <summary>
     /// Represents a double literal.
@@ -38,6 +41,16 @@
         public override string StringType => "http://www.w3.org/2001/XMLSchema#double";
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(Type ValueType)
+		{
+			return ValueType == typeof(double) ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
 		/// Comparable numeric value.
 		/// </summary>
 		public override double ComparableValue => (double)this.Value;
@@ -56,6 +69,19 @@
             else
                 return new CustomLiteral(Value, DataType, Language);
         }
+
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public override ISemanticLiteral Encapsulate(object Value)
+		{
+			if (Value is double Typed)
+				return new DoubleLiteral(Typed);
+			else
+				return new StringLiteral(Value?.ToString() ?? string.Empty);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

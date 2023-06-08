@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Semantic.Model.Literals
+﻿using System;
+using Waher.Runtime.Inventory;
+
+namespace Waher.Content.Semantic.Model.Literals
 {
     /// <summary>
     /// Represents a Duration literal.
@@ -38,6 +41,16 @@
         public override string StringType => "http://www.w3.org/2001/XMLSchema#duration";
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(Type ValueType)
+		{
+			return ValueType == typeof(Duration) ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
 		/// <param name="Value">String value.</param>
@@ -51,6 +64,19 @@
             else
                 return new CustomLiteral(Value, DataType, Language);
         }
+
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public override ISemanticLiteral Encapsulate(object Value)
+		{
+			if (Value is Duration Typed)
+				return new DurationLiteral(Typed);
+			else
+				return new StringLiteral(Value?.ToString() ?? string.Empty);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

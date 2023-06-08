@@ -473,7 +473,7 @@ namespace Waher.Content.Semantic
 						{
 							foreach (KeyValuePair<Uri, XmlElement> P in this.aboutEachPrefix)
 							{
-								if (AboutUriNode.Uri.AbsoluteUri.StartsWith(P.Key.AbsoluteUri))
+								if (AboutUriNode.Uri.ToString().StartsWith(P.Key.ToString()))
 								{
 									ForEach = P.Value;
 									break;
@@ -756,7 +756,7 @@ namespace Waher.Content.Semantic
 								else
 								{
 									Uri DataTypeUri = this.CreateUri(DataType, BaseUri2);
-									DataType = DataTypeUri.AbsoluteUri;
+									DataType = DataTypeUri.ToString();
 
 									if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 									{
@@ -830,7 +830,7 @@ namespace Waher.Content.Semantic
 								else
 								{
 									Uri DataTypeUri = this.CreateUri(DataType, BaseUri2);
-									DataType = DataTypeUri.AbsoluteUri;
+									DataType = DataTypeUri.ToString();
 
 									if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 									{

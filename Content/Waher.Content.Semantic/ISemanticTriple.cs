@@ -19,5 +19,15 @@
 		/// Object element
 		/// </summary>
 		ISemanticElement Object { get; }
+
+		/// <summary>
+		/// Access to elements: 0=Subject, 1=Predicate, 2=Object.
+		/// </summary>
+		/// <param name="Index"></param>
+		/// <returns></returns>
+		ISemanticElement this[int Index]
+		{
+			get;
+		}
 	}
 }

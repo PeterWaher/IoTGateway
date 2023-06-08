@@ -28,7 +28,7 @@ namespace Waher.Content.Semantic.Model
 		public UriNode(Uri Uri, string Short)
 		{
 			this.parsed = Uri;
-			this.uri = Uri.AbsoluteUri;
+			this.uri = Uri.ToString();
 			this.shortName = Short;
 		}
 
@@ -56,6 +56,11 @@ namespace Waher.Content.Semantic.Model
 		/// If URI has a short name.
 		/// </summary>
 		public bool HasShortName => !string.IsNullOrEmpty(this.shortName);
+
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public override object ElementValue => this.uri;
 
 		/// <summary>
 		/// URI string
@@ -86,13 +91,13 @@ namespace Waher.Content.Semantic.Model
 		public override bool Equals(object obj)
 		{
 			return obj is UriNode Typed &&
-				Typed.parsed.AbsoluteUri == this.parsed.AbsoluteUri;
+				Typed.parsed.ToString() == this.parsed.ToString();
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			return this.parsed.AbsoluteUri.GetHashCode();
+			return this.parsed.ToString().GetHashCode();
 		}
 
 		/// <summary>
@@ -109,7 +114,7 @@ namespace Waher.Content.Semantic.Model
 		public override int CompareTo(object obj)
 		{
 			if (obj is UriNode Typed)
-				return this.parsed.AbsoluteUri.CompareTo(Typed.parsed.AbsoluteUri);
+				return this.parsed.ToString().CompareTo(Typed.parsed.ToString());
 			else
 				return base.CompareTo(obj);
 		}

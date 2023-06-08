@@ -54,6 +54,11 @@ namespace Waher.Content.Semantic.Model
 		}
 
 		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public override object ElementValue => this.value;
+
+		/// <summary>
 		/// Type name (or null if literal value is a string)
 		/// </summary>
 		public abstract string StringType { get; }
@@ -74,6 +79,13 @@ namespace Waher.Content.Semantic.Model
 		}
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public abstract Grade Supports(Type ValueType);
+
+		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
 		/// <param name="Value">String value.</param>
@@ -81,6 +93,13 @@ namespace Waher.Content.Semantic.Model
 		/// <param name="Language">Language code if available.</param>
 		/// <returns>Parsed literal.</returns>
 		public abstract ISemanticLiteral Parse(string Value, string DataType, string Language);
+		
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public abstract ISemanticLiteral Encapsulate(object Value);
 
 		/// <inheritdoc/>
 		public override string ToString()

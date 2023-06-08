@@ -5,13 +5,19 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Script;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects.Matrices;
+using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Matrices;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Contains the results of a SPARQL query.
 	/// </summary>
-	public class SparqlResultSet
+	public class SparqlResultSet : IToMatrix, IToVector
 	{
 		/// <summary>
 		/// http://www.w3.org/2005/sparql-results#
@@ -136,6 +142,7 @@ namespace Waher.Content.Semantic
 							{
 								case "result":
 									Dictionary<string, SparqlResultItem> Record = new Dictionary<string, SparqlResultItem>();
+									int Index = 0;
 
 									foreach (XmlNode N3 in E2.ChildNodes)
 									{
@@ -147,7 +154,7 @@ namespace Waher.Content.Semantic
 											case "binding":
 												string Name = XML.Attribute(E3, "name");
 												ISemanticElement Value = this.ParseValue(E3);
-												Record[Name] = new SparqlResultItem(Name, Value);
+												Record[Name] = new SparqlResultItem(Name, Value, Index++);
 												break;
 										}
 									}
@@ -312,5 +319,44 @@ namespace Waher.Content.Semantic
 		/// Records in result set.
 		/// </summary>
 		public SparqlResultRecord[] Records { get; }
+
+		/// <summary>
+		/// Converts the object to a matrix.
+		/// </summary>
+		/// <returns>Matrix.</returns>
+		public IMatrix ToMatrix()
+		{
+			int Columns = this.Variables.Length;
+			int Rows = this.Records.Length;
+			IElement[,] Elements = new IElement[Rows, Columns];
+			int x, y;
+
+			for (y = 0; y < Rows; y++)
+			{
+				SparqlResultRecord Record = this.Records[y];
+				ISemanticElement Item;
+
+				for (x = 0; x < Columns; x++)
+				{
+					Item = Record[this.Variables[x]];
+					Elements[y, x] = Expression.Encapsulate(Item?.ElementValue);
+				}
+			}
+
+			return new ObjectMatrix(Elements)
+			{
+				ColumnNames = this.Variables
+			};
+		}
+
+		/// <summary>
+		/// Converts the object to a vector.
+		/// </summary>
+		/// <returns>Matrix.</returns>
+		public IVector ToVector()
+		{
+			return new ObjectVector(((ObjectMatrix)this.ToMatrix()).VectorElements);
+		}
+
 	}
 }

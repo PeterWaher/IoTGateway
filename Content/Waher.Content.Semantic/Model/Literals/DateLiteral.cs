@@ -1,5 +1,6 @@
 ﻿using System;
 using Waher.Content.Xml;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
 {
@@ -41,6 +42,16 @@ namespace Waher.Content.Semantic.Model.Literals
         public override string StringType => "http://www.w3.org/2001/XMLSchema#date";
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(Type ValueType)
+		{
+			return Grade.Barely;
+		}
+
+		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
 		/// <param name="Value">String value.</param>
@@ -54,6 +65,19 @@ namespace Waher.Content.Semantic.Model.Literals
             else
                 return new CustomLiteral(Value, DataType, Language);
         }
+
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public override ISemanticLiteral Encapsulate(object Value)
+		{
+			if (Value is DateTime Typed && Typed.TimeOfDay == TimeSpan.Zero)
+				return new DateLiteral(Typed);
+			else
+				return new StringLiteral(Value?.ToString() ?? string.Empty);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

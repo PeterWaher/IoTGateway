@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
@@ -56,6 +57,16 @@ namespace Waher.Content.Semantic.Model.Literals
         public override string StringType => this.dataType ?? "http://www.w3.org/2001/XMLSchema#integer";
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(Type ValueType)
+		{
+			return ValueType == typeof(BigInteger) ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
 		/// Comparable numeric value.
 		/// </summary>
 		public override double ComparableValue => (double)((BigInteger)this.Value);
@@ -95,6 +106,19 @@ namespace Waher.Content.Semantic.Model.Literals
             else
                 return new CustomLiteral(Value, DataType, Language);
         }
+
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public override ISemanticLiteral Encapsulate(object Value)
+		{
+			if (Value is BigInteger Typed)
+				return new IntegerLiteral(Typed);
+			else
+				return new StringLiteral(Value?.ToString() ?? string.Empty);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic
 
 			if (!Triple.Object.IsLiteral &&
 				Triple.Predicate is UriNode Predicate &&
-				Predicate.Uri.AbsoluteUri != RdfDocument.UriRdfType.AbsoluteUri)
+				Predicate.Uri.ToString() != RdfDocument.UriRdfType.ToString())
 			{
 				this.nodes[Triple.Object] = true;
 				this.nodesStatic = null;
@@ -117,7 +117,7 @@ namespace Waher.Content.Semantic
 						if (Predicates.Current is UriNode UriNode)
 						{
 							PropertyName = UriNode.ShortName;
-							IsRdfType = UriNode.Uri.AbsoluteUri == RdfDocument.UriRdfType.AbsoluteUri;
+							IsRdfType = UriNode.Uri.ToString() == RdfDocument.UriRdfType.ToString();
 						}
 						else
 						{

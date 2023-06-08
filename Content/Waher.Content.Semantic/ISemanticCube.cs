@@ -124,5 +124,25 @@ namespace Waher.Content.Semantic
 		/// <param name="Object">Object restriction.</param>
 		/// <returns>Restricted cube, or null if empty.</returns>
 		Task<ISemanticCube> RestrictObject(ISemanticElement Object);
+
+		/// <summary>
+		/// Gets available triples in the cube, having a given value, along a given axis.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="AxisIndex">Axis Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <returns>Available triples, or null if none.</returns>
+		Task<IEnumerable<ISemanticTriple>> GetTriples(ISemanticElement Value, int AxisIndex);
+
+		/// <summary>
+		/// Gets available triples in the cube, having two given values, along two given axes.
+		/// </summary>
+		/// <param name="Value1">Value 1</param>
+		/// <param name="Axis1Index">Axis 1 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <param name="Value2">Value 2</param>
+		/// <param name="Axis2Index">Axis 2 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+		/// <returns>Available triples, or null if none.</returns>
+		Task<IEnumerable<ISemanticTriple>> GetTriples(ISemanticElement Value1, int Axis1Index,
+			ISemanticElement Value2, int Axis2Index);
+
 	}
 }

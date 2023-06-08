@@ -27,6 +27,11 @@ namespace Waher.Content.Semantic.Model
 		/// </summary>
 		public abstract bool IsLiteral { get; }
 
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public abstract object ElementValue { get; }
+
 		/// <inheritdoc/>
 		public override abstract bool Equals(object obj);
 

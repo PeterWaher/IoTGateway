@@ -24,6 +24,11 @@
 		/// </summary>
 		public string NodeId { get; set; }
 
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public override object ElementValue => this;
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{

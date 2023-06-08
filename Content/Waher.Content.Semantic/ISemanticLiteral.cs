@@ -1,11 +1,12 @@
-﻿using Waher.Runtime.Inventory;
+﻿using System;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Interface for semantic literals.
 	/// </summary>
-	public interface ISemanticLiteral : ISemanticElement, IProcessingSupport<string>
+	public interface ISemanticLiteral : ISemanticElement, IProcessingSupport<string>, IProcessingSupport<Type>
 	{
 		/// <summary>
 		/// Parsed value.
@@ -30,5 +31,12 @@ namespace Waher.Content.Semantic
 		/// <param name="Language">Language code if available.</param>
 		/// <returns>Parsed literal.</returns>
 		ISemanticLiteral Parse(string Value, string DataType, string Language);
+
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		ISemanticLiteral Encapsulate(object Value);
 	}
 }

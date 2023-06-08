@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
 {
@@ -45,6 +47,16 @@ namespace Waher.Content.Semantic.Model.Literals
 		public string Language => this.language;
 
 		/// <summary>
+		/// How well the type supports a given value type.
+		/// </summary>
+		/// <param name="ValueType">Value Type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(Type ValueType)
+		{
+			return Grade.NotAtAll;
+		}
+
+		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
 		/// <param name="Value">String value.</param>
@@ -56,8 +68,18 @@ namespace Waher.Content.Semantic.Model.Literals
             return new CustomLiteral(Value, DataType, Language);
         }
 
-        /// <inheritdoc/>
-        public override string ToString()
+		/// <summary>
+		/// Encapsulates an object value as a semantic literal value.
+		/// </summary>
+		/// <param name="Value">Object value the literal type supports.</param>
+		/// <returns>Encapsulated semantic literal value.</returns>
+		public override ISemanticLiteral Encapsulate(object Value)
+		{
+			return new StringLiteral(Value?.ToString() ?? string.Empty);
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 

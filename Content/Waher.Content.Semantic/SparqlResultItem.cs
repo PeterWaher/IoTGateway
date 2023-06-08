@@ -10,10 +10,12 @@
 		/// </summary>
 		/// <param name="Name">Name of item in record.</param>
 		/// <param name="Value">Value of item in record.</param>
-		public SparqlResultItem(string Name, ISemanticElement Value)
+		/// <param name="Index">Column index.</param>
+		public SparqlResultItem(string Name, ISemanticElement Value, int Index)
 		{
 			this.Name = Name;
 			this.Value = Value;
+			this.Index = Index;
 		}
 
 		/// <summary>
@@ -25,5 +27,10 @@
 		/// Value of item in record.
 		/// </summary>
 		public ISemanticElement Value { get; }
+
+		/// <summary>
+		/// Column index.
+		/// </summary>
+		public int Index { get; }
 	}
 }

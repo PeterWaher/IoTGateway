@@ -26,9 +26,9 @@ namespace Waher.Content.Semantic
 
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
-	/// 
-	/// Ref: https://www.w3.org/TeamSubmission/turtle/
 	/// </summary>
+	/// <seealso cref="https://www.w3.org/TeamSubmission/turtle/"/>
+	/// <seealso cref="https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html"/>
 	public class TurtleDocument : InMemorySemanticCube
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
@@ -91,7 +91,7 @@ namespace Waher.Content.Semantic
 			this.blankNodeIdMode = BlankNodeIdMode;
 
 			if (!(this.baseUri is null))
-				this.namespaces[string.Empty] = this.baseUri.AbsoluteUri;
+				this.namespaces[string.Empty] = this.baseUri.ToString();
 
 			this.ParseTriples();
 		}
@@ -230,7 +230,7 @@ namespace Waher.Content.Semantic
 								if (this.NextNonWhitespaceChar() != '<')
 									throw this.ParsingException("Expected <");
 
-								this.namespaces[s] = this.ParseUri().Uri.AbsoluteUri;
+								this.namespaces[s] = this.ParseUri().Uri.ToString();
 
 								if (this.NextNonWhitespaceChar() != '.')
 									throw this.ParsingException("Expected .");
@@ -257,7 +257,24 @@ namespace Waher.Content.Semantic
 						return null;
 
 					case '<':
-						return this.ParseUri();
+						if (this.PeekNextChar() == '<')	// Quoted triples, part of RDF-star
+						{
+							this.pos++;
+
+							ISemanticElement Subject = this.ParseElement(0);
+							ISemanticElement Predicate = this.ParseElement(1);
+							ISemanticElement Object = this.ParseElement(2);
+
+							if (this.NextNonWhitespaceChar() != '>')
+								throw this.ParsingException("Expected >");
+
+							if (this.NextNonWhitespaceChar() != '>')
+								throw this.ParsingException("Expected >");
+
+							return new SemanticTriple(Subject, Predicate, Object);
+						}
+						else
+							return this.ParseUri();
 
 					case '"':
 						if (TriplePosition != 2)
@@ -283,7 +300,7 @@ namespace Waher.Content.Semantic
 						{
 							this.pos += 2;
 
-							string DataType = this.ParseUriOrPrefixedToken().Uri.AbsoluteUri;
+							string DataType = this.ParseUriOrPrefixedToken().Uri.ToString();
 
 							if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
 							{
@@ -745,7 +762,7 @@ namespace Waher.Content.Semantic
 
 			if (this.baseUri is null)
 			{
-				if (Uri.TryCreate(Short, UriKind.Absolute, out Uri URI))
+				if (Uri.TryCreate(Short, UriKind.RelativeOrAbsolute, out Uri URI))
 					return new UriNode(URI, Short);
 				else
 					throw this.ParsingException("Invalid URI.");

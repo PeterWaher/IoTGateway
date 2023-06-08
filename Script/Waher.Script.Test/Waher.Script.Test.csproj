@@ -73,6 +73,12 @@
     <None Remove="Sparql\Test_13.rq" />
     <None Remove="Sparql\Test_13.ttl" />
     <None Remove="Sparql\Test_13b.ttl" />
+    <None Remove="Sparql\Test_14.rq" />
+    <None Remove="Sparql\Test_14.ttl" />
+    <None Remove="Sparql\Test_15.rq" />
+    <None Remove="Sparql\Test_15.ttl" />
+    <None Remove="Sparql\Test_16.rq" />
+    <None Remove="Sparql\Test_16.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -158,6 +164,12 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Sparql\Test_11.rq" />
+    <EmbeddedResource Include="Sparql\Test_16.rq" />
+    <EmbeddedResource Include="Sparql\Test_16.ttl" />
+    <EmbeddedResource Include="Sparql\Test_15.rq" />
+    <EmbeddedResource Include="Sparql\Test_15.ttl" />
+    <EmbeddedResource Include="Sparql\Test_14.rq" />
+    <EmbeddedResource Include="Sparql\Test_14.ttl" />
     <EmbeddedResource Include="Sparql\Test_13b.ttl" />
     <EmbeddedResource Include="Sparql\Test_13.rq" />
     <EmbeddedResource Include="Sparql\Test_13.ttl" />

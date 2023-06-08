@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
@@ -27,6 +28,7 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly KeyValuePair<ScriptNode, ScriptNode>[] boundVariables;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly ISemanticTriple[] construct;
+		private readonly ScriptNode[] filter;
 		private readonly bool distinct;
 
 		/// <summary>
@@ -38,6 +40,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="From">Data source.</param>
 		/// <param name="Where">Optional where clause</param>
 		/// <param name="BoundVariables">Bound variables.</param>
+		/// <param name="Filter">Filter statements.</param>
 		/// <param name="OrderBy">Order to present result set.</param>
 		/// <param name="Construct">Triples to construct.</param>
 		/// <param name="Start">Start position in script expression.</param>
@@ -46,9 +49,8 @@ namespace Waher.Script.Persistence.SPARQL
 		public SparqlQuery(bool Distinct, ScriptNode[] Columns, ScriptNode[] ColumnNames,
 			ScriptNode From, SemanticQueryTriple[] Where,
 			KeyValuePair<ScriptNode, ScriptNode>[] BoundVariables,
-			KeyValuePair<ScriptNode, bool>[] OrderBy,
-			ISemanticTriple[] Construct,
-			int Start, int Length, Expression Expression)
+			ScriptNode[] Filter, KeyValuePair<ScriptNode, bool>[] OrderBy,
+			ISemanticTriple[] Construct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.distinct = Distinct;
@@ -62,6 +64,9 @@ namespace Waher.Script.Persistence.SPARQL
 
 			this.from = From;
 			this.from?.SetParent(this);
+
+			this.filter = Filter;
+			this.filter?.SetParent(this);
 
 			this.where = Where;
 			this.boundVariables = BoundVariables;
@@ -195,12 +200,49 @@ namespace Waher.Script.Persistence.SPARQL
 					break;
 			}
 
+			if (!(this.filter is null) && !(Possibilities is null))
+			{
+				LinkedListNode<Possibility> Loop = Possibilities.First;
+				LinkedListNode<Possibility> Temp;
+				ObjectProperties RecordVariables = null;
+				bool Pass;
+
+				while (!(Loop is null))
+				{
+					if (RecordVariables is null)
+						RecordVariables = new ObjectProperties(Loop.Value, Variables);
+					else
+						RecordVariables.Object = Loop.Value;
+
+					Pass = true;
+
+					foreach (ScriptNode Filter in this.filter)
+					{
+						object Value = await this.EvaluateValue(RecordVariables, Filter);
+						if (!(Value is bool b) || !b)
+						{
+							Pass = false;
+							break;
+						}
+					}
+
+					if (Pass)
+						Loop = Loop.Next;
+					else
+					{
+						Temp = Loop.Next;
+						Possibilities.Remove(Loop);
+						Loop = Temp;
+					}
+				}
+			}
+
 			if (this.columns is null && this.construct is null)   // ASK
 				return new ObjectValue(new SparqlResultSet(!(Possibilities?.First is null)));
 
 			string Name;
 
-			if (!(this.boundVariables is null))
+			if (!(this.boundVariables is null) && !(Possibilities is null))
 			{
 				LinkedList<Possibility> NewPossibilities = new LinkedList<Possibility>();
 				ObjectProperties RecordVariables = null;
@@ -242,20 +284,23 @@ namespace Waher.Script.Persistence.SPARQL
 				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
 				ObjectProperties RecordVariables = null;
 
-				foreach (Possibility P in Possibilities)
+				if (!(Possibilities is null))
 				{
-					if (RecordVariables is null)
-						RecordVariables = new ObjectProperties(P, Variables);
-					else
-						RecordVariables.Object = P;
-
-					foreach (ISemanticTriple T in this.construct)
+					foreach (Possibility P in Possibilities)
 					{
-						ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
-						ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
-						ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
+						if (RecordVariables is null)
+							RecordVariables = new ObjectProperties(P, Variables);
+						else
+							RecordVariables.Object = P;
 
-						Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
+						foreach (ISemanticTriple T in this.construct)
+						{
+							ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
+							ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
+							ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
+
+							Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
+						}
 					}
 				}
 

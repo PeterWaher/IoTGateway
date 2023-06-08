@@ -18160,6 +18160,16 @@
             <param name="GroupNames">Group name values resulting from the matching.</param>
             <returns>If there was a match or not.</returns>
         </member>
+        <member name="P:Waher.Script.Operators.Comparisons.Like.Options">
+            <summary>
+            Options for regular expression. Default is <see cref="F:System.Text.RegularExpressions.RegexOptions.Singleline"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Operators.Comparisons.Like.PartialMatch">
+            <summary>
+            If a partial match is sufficient for operator to return true. (Default=false)
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Comparisons.Like.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.

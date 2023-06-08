@@ -637,6 +637,56 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions">
+            <summary>
+            Extension of the Like operator, that allows the script to set options.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Extension of the Like operator, that allows the script to set options.
+            </summary>
+            <param name="Argument1">Left argument</param>
+            <param name="Argument2">Right argument</param>
+            <param name="Argument3">Options argument</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.CalcIsAsync">
+            <summary>
+            Recalculates if operator is asynchronous or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.NamedNode">
             <summary>
             Represents a named node.
@@ -1118,7 +1168,7 @@
             Executes a SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode}[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Content.Semantic.ISemanticTriple[],System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode}[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Content.Semantic.ISemanticTriple[],System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL SELECT statement.
             </summary>
@@ -1128,6 +1178,7 @@
             <param name="From">Data source.</param>
             <param name="Where">Optional where clause</param>
             <param name="BoundVariables">Bound variables.</param>
+            <param name="Filter">Filter statements.</param>
             <param name="OrderBy">Order to present result set.</param>
             <param name="Construct">Triples to construct.</param>
             <param name="Start">Start position in script expression.</param>

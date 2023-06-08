@@ -12,6 +12,11 @@ using Waher.Script.Objects;
 using Waher.Script.Functions.Strings;
 using Waher.Script.Operators.Vectors;
 using Waher.Script.Persistence.SPARQL.Functions;
+using Waher.Script.Operators.Logical;
+using Waher.Script.Functions.Vectors;
+using Waher.Script.Operators.Comparisons;
+using Waher.Script.Operators.Membership;
+using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -38,6 +43,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		};
 		private List<SemanticQueryTriple> triples = new List<SemanticQueryTriple>();
 		private List<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
+		private List<ScriptNode> filter = null;
 		private int preamblePos;
 		private Uri baseUri = null;
 		private int blankNodeIndex = 0;
@@ -190,7 +196,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
 					{
-						Node = this.ParseStatement(Parser, false);
+						Node = this.ParseNamedExpression(Parser);
 						if (Node is NamedNode NamedNode)
 						{
 							Columns.Add(NamedNode.LeftOperand);
@@ -259,7 +265,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				while (true)
 				{
-					Node = this.ParseStatement(Parser, true);
+					Node = this.ParseExpression(Parser, true);
 					if (Node is null)
 						break;
 					else if (Node is Asc Asc)
@@ -275,134 +281,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			Result = new SparqlQuery(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
 				From, this.triples.ToArray(), this.boundVariables?.ToArray(),
-				OrderBy?.ToArray(), Construct?.ToArray(), Parser.Start, Parser.Length, Parser.Expression);
+				this.filter?.ToArray(), OrderBy?.ToArray(), Construct?.ToArray(),
+				Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
-		}
-
-		private ScriptNode ParseStatement(ScriptParser Parser, bool NullIfNone)
-		{
-			int Start = Parser.Position;
-			char ch = Parser.NextNonWhitespaceChar();
-			ScriptNode Node;
-			string s;
-
-			switch (ch)
-			{
-				case '?':
-					Node = Parser.ParseObject();
-					if (!(Node is VariableReference))
-						throw Parser.SyntaxError("Expected variable name.");
-					break;
-
-				case '(':
-					Node = this.ParseStatement(Parser, false);
-
-					if (Parser.NextNonWhitespaceChar() != ')')
-						throw Parser.SyntaxError("Expected )");
-					break;
-
-				case '\'':
-				case '"':
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-				case '+':
-				case '-':
-				case '.':
-					Parser.UndoChar();
-					Node = Parser.ParseObject();
-					break;
-
-				default:
-					Parser.UndoChar();
-					s = Parser.PeekNextToken().ToUpper();
-					switch (s)
-					{
-						case "CONCAT":
-							Parser.NextToken();
-
-							if (Parser.NextNonWhitespaceChar() != '(')
-								throw Parser.SyntaxError("Expected (");
-
-							List<ScriptNode> Arguments = new List<ScriptNode>();
-							int Start2 = Parser.Position;
-
-							while (true)
-							{
-								Arguments.Add(this.ParseStatement(Parser, false));
-
-								if (Parser.NextNonWhitespaceChar() != ',')
-								{
-									Parser.UndoChar();
-									break;
-								}
-							}
-
-							VectorDefinition Vector = new VectorDefinition(Arguments.ToArray(),
-								Start2, Parser.Position - Start2, Parser.Expression);
-
-							if (Parser.NextNonWhitespaceChar() != ')')
-								throw Parser.SyntaxError("Expected )");
-
-							Node = new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
-							break;
-
-						case "ASC":
-							Parser.NextToken();
-							if (Parser.NextNonWhitespaceChar() != '(')
-								throw Parser.SyntaxError("Expected (");
-
-							Node = this.ParseStatement(Parser, false);
-
-							if (Parser.NextNonWhitespaceChar() != ')')
-								throw Parser.SyntaxError("Expected )");
-
-							Node = new Asc(Node, Start, Parser.Position - Start, Parser.Expression);
-							break;
-
-						case "DESC":
-							Parser.NextToken();
-							if (Parser.NextNonWhitespaceChar() != '(')
-								throw Parser.SyntaxError("Expected (");
-
-							Node = this.ParseStatement(Parser, false);
-
-							if (Parser.NextNonWhitespaceChar() != ')')
-								throw Parser.SyntaxError("Expected )");
-
-							Node = new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
-							break;
-
-						default:
-							if (NullIfNone)
-								return null;
-							else
-								throw Parser.SyntaxError("Unrecognized keyword.");
-					}
-					break;
-			}
-
-			s = Parser.PeekNextToken().ToUpper();
-			if (s == "AS")
-			{
-				Parser.NextToken();
-
-				ScriptNode Name = this.ParseStatement(Parser, false);
-				if (Name is NamedNode)
-					throw Parser.SyntaxError("Repetetive naming not allowed.");
-
-				Node = new NamedNode(Node, Name, Node.Start, Parser.Position - Node.Start, Parser.Expression);
-			}
-
-			return Node;
 		}
 
 		private char PeekNextChar(ScriptParser Parser)
@@ -617,7 +499,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 								if (Parser.NextNonWhitespaceChar() != '(')
 									throw Parser.SyntaxError("Expected (");
 
-								ScriptNode Node = this.ParseStatement(Parser, false);
+								ScriptNode Node = this.ParseNamedExpression(Parser);
 								if (!(Node is NamedNode NamedNode))
 									throw Parser.SyntaxError("Expected name.");
 
@@ -633,6 +515,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 								Again = true;
 								break;
 
+							case 'f':
+							case 'F':
+								if (char.ToUpper(Parser.NextChar()) != 'I' ||
+									char.ToUpper(Parser.NextChar()) != 'L' ||
+									char.ToUpper(Parser.NextChar()) != 'T' ||
+									char.ToUpper(Parser.NextChar()) != 'E' ||
+									char.ToUpper(Parser.NextChar()) != 'R')
+								{
+									throw Parser.SyntaxError("Expected FILTER");
+								}
+
+								Node = this.ParseUnary(Parser, false);
+
+								if (this.filter is null)
+									this.filter = new List<ScriptNode>();
+
+								this.filter.Add(Node);
+
+								Again = true;
+								break;
+
 							default:
 								if (InBlankNode)
 									throw Parser.SyntaxError("Expected triple delimiter ] ; or ,");
@@ -643,6 +546,503 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					while (Again);
 				}
 			}
+		}
+
+		private ScriptNode ParseNamedExpression(ScriptParser Parser)
+		{
+			ScriptNode Node = this.ParseExpression(Parser, false);
+			string s = Parser.PeekNextToken().ToUpper();
+
+			if (s == "AS")
+			{
+				Parser.NextToken();
+				ScriptNode Name = this.ParseExpression(Parser, false);
+				Node = new NamedNode(Node, Name, Node.Start, Parser.Position - Node.Start, Parser.Expression);
+			}
+
+			return Node;
+		}
+
+		private ScriptNode ParseExpression(ScriptParser Parser, bool Optional)
+		{
+			return this.ParseOrs(Parser, Optional);
+		}
+
+		private ScriptNode ParseOrs(ScriptParser Parser, bool Optional)
+		{
+			ScriptNode Left = this.ParseAnds(Parser, Optional);
+			if (Left is null)
+				return null;
+
+			while (Parser.PeekNextToken() == "||")
+			{
+				Parser.NextToken();
+				ScriptNode Right = this.ParseAnds(Parser, false);
+				Left = new Operators.Logical.Or(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+			}
+
+			return Left;
+		}
+
+		private ScriptNode ParseAnds(ScriptParser Parser, bool Optional)
+		{
+			ScriptNode Left = this.ParseComparisons(Parser, Optional);
+			if (Left is null)
+				return null;
+
+			while (Parser.PeekNextToken() == "&&")
+			{
+				Parser.NextToken();
+				ScriptNode Right = this.ParseComparisons(Parser, false);
+				Left = new Operators.Logical.And(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+			}
+
+			return Left;
+		}
+
+		private ScriptNode ParseComparisons(ScriptParser Parser, bool Optional)
+		{
+			ScriptNode Left = this.ParseTerms(Parser, Optional);
+			if (Left is null)
+				return null;
+
+			while (true)
+			{
+				Parser.SkipWhiteSpace();
+
+				switch (Parser.PeekNextChar())
+				{
+					case '=':
+						Parser.NextChar();
+						ScriptNode Right = this.ParseTerms(Parser, false);
+						Left = new EqualTo(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						break;
+
+					case '!':
+						Parser.NextChar();
+						if (Parser.PeekNextChar() == '=')
+						{
+							Parser.NextChar();
+							Right = this.ParseTerms(Parser, false);
+							Left = new NotEqualTo(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						else
+						{
+							Parser.UndoChar();
+							return Left;
+						}
+						break;
+
+					case '<':
+						Parser.NextChar();
+
+						if (Parser.PeekNextChar() == '=')
+						{
+							Parser.NextChar();
+							Right = this.ParseTerms(Parser, false);
+							Left = new LesserThanOrEqualTo(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						else
+						{
+							Right = this.ParseTerms(Parser, false);
+							Left = new LesserThan(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						break;
+
+					case '>':
+						Parser.NextChar();
+
+						if (Parser.PeekNextChar() == '=')
+						{
+							Parser.NextChar();
+							Right = this.ParseTerms(Parser, false);
+							Left = new GreaterThanOrEqualTo(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						else
+						{
+							Right = this.ParseTerms(Parser, false);
+							Left = new GreaterThan(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						break;
+
+					case 'i':
+					case 'I':
+						if (Parser.PeekNextToken().ToUpper() == "IN")
+						{
+							Parser.NextToken();
+							Right = this.ParseTerms(Parser, false);
+							Left = new In(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						else
+							return Left;
+						break;
+
+					case 'n':
+					case 'N':
+						if (Parser.PeekNextToken().ToUpper() == "NOT")
+						{
+							if (Parser.NextToken().ToUpper() != "IN")
+								throw Parser.SyntaxError("Expected IN");
+
+							Right = this.ParseTerms(Parser, false);
+							Left = new NotIn(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						}
+						else
+							return Left;
+						break;
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseTerms(ScriptParser Parser, bool Optional)
+		{
+			ScriptNode Left = this.ParseFactors(Parser, Optional);
+
+			while (true)
+			{
+				Parser.SkipWhiteSpace();
+
+				switch (Parser.PeekNextChar())
+				{
+					case '+':
+						Parser.NextChar();
+						ScriptNode Right = this.ParseFactors(Parser, false);
+						Left = new Add(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						break;
+
+					case '-':
+						Parser.NextChar();
+						Right = this.ParseFactors(Parser, false);
+						Left = new Subtract(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						break;
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseFactors(ScriptParser Parser, bool Optional)
+		{
+			ScriptNode Left = this.ParseUnary(Parser, Optional);
+
+			while (true)
+			{
+				Parser.SkipWhiteSpace();
+
+				switch (Parser.PeekNextChar())
+				{
+					case '*':
+						Parser.NextChar();
+						ScriptNode Right = this.ParseUnary(Parser, false);
+						Left = new Multiply(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						break;
+
+					case '/':
+						Parser.NextChar();
+						Right = this.ParseUnary(Parser, false);
+						Left = new Divide(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+						break;
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseUnary(ScriptParser Parser, bool Optional)
+		{
+			Parser.SkipWhiteSpace();
+
+			int Start = Parser.Position;
+			char ch;
+
+			switch (ch = Parser.PeekNextChar())
+			{
+				case '!':
+					Parser.NextChar();
+					ScriptNode Node = this.ParseUnary(Parser, false);
+					return new Not(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case '+':
+					Parser.NextChar();
+					return this.ParseUnary(Parser, false);
+
+				case '-':
+					Parser.NextChar();
+
+					switch (Parser.PeekNextChar())
+					{
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+						case '.':
+							Parser.UndoChar();
+							ISemanticElement Element2 = this.ParseElement(Parser, 2, false);
+							return new ConstantElement(new ObjectValue(Element2), Start, Parser.Position - Start, Parser.Expression);
+
+						default:
+							Node = this.ParseUnary(Parser, false);
+							return new Negate(Node, Start, Parser.Position - Start, Parser.Expression);
+					}
+
+				case '(':
+					Parser.NextChar();
+					Node = this.ParseNamedExpression(Parser);
+					if (Parser.NextChar() != ')')
+						throw Parser.SyntaxError("Expected )");
+					return Node;
+
+				case '?':
+					Parser.NextChar();
+					string s = this.ParseName(Parser);
+					return new VariableReference(s, Start, Parser.Position - Start, Parser.Expression);
+
+				case '\'':
+				case '"':
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				case '.':
+					ISemanticElement Element = this.ParseElement(Parser, 2, false);
+					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+
+				case '<':
+					Parser.NextChar();
+					Element = this.ParseUri(Parser);
+					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+
+				case ':':
+					Parser.NextChar();
+					Element = this.ParsePrefixedToken(Parser, string.Empty);
+					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+
+				default:
+					if (!char.IsLetter(ch))
+					{
+						if (Optional)
+							return null;
+
+						throw Parser.SyntaxError("Expected value.");
+					}
+
+					s = Parser.NextToken();
+					if (Parser.PeekNextChar() == ':')
+					{
+						Parser.NextChar();
+						Element = this.ParsePrefixedToken(Parser, s);
+						return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+					}
+
+					return this.ParseFunction(Parser, s, Start, Optional);
+			}
+		}
+
+		private ScriptNode ParseFunction(ScriptParser Parser, string s, int Start, bool Optional)
+		{
+			switch (s.ToUpper())
+			{
+				case "BIND":
+					if (Parser.NextNonWhitespaceChar() != '(')
+						throw Parser.SyntaxError("Expected (");
+
+					ScriptNode Node = this.ParseNamedExpression(Parser);
+					if (!(Node is NamedNode NamedNode))
+						throw Parser.SyntaxError("Expected name.");
+
+					if (this.boundVariables is null)
+						this.boundVariables = new List<KeyValuePair<ScriptNode, ScriptNode>>();
+
+					this.boundVariables.Add(new KeyValuePair<ScriptNode, ScriptNode>(
+						NamedNode.LeftOperand, NamedNode.RightOperand));
+
+					if (Parser.NextNonWhitespaceChar() != ')')
+						throw Parser.SyntaxError("Expected )");
+
+					return this.ParseUnary(Parser, Optional);
+
+				case "FILTER":
+
+					Node = this.ParseUnary(Parser, false);
+
+					if (this.filter is null)
+						this.filter = new List<ScriptNode>();
+
+					this.filter.Add(Node);
+
+					return this.ParseUnary(Parser, Optional);
+
+				case "CONCAT":
+					int Start2 = Parser.Position;
+					ScriptNode[] Arguments = this.ParseArguments(Parser, 1, int.MaxValue);
+
+					VectorDefinition Vector = new VectorDefinition(Arguments,
+						Start2, Parser.Position - Start2, Parser.Expression);
+
+					return new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ASC":
+					Node = this.ParseArgument(Parser);
+					return new Asc(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "DESC":
+					Node = this.ParseArgument(Parser);
+					return new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "REGEX":
+					Arguments = this.ParseArguments(Parser, 2, 3);
+					if (Arguments.Length == 2)
+					{
+						return new LikeWithOptions(Arguments[0], Arguments[1], null,
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+					else
+					{
+						return new LikeWithOptions(Arguments[0], Arguments[1], Arguments[2],
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+
+				// Aggregates
+
+				case "COUNT":
+				case "SUM":
+				case "MIN":
+				case "MAX":
+				case "AVG":
+				case "SAMPLE":
+				case "GROUP_CONCAT":
+
+				// Built-in functions
+
+				case "STR":
+				case "LANG":
+				case "LANGMATCHES":
+				case "DATATYPE":
+				case "BOUND":
+				case "IRI":
+				case "URI":
+				case "BNODE":
+				case "RAND":
+				case "ABS":
+				case "CEIL":
+				case "FLOOR":
+				case "ROUND":
+				case "STRLEN":
+				case "UCASE":
+				case "LCASE":
+				case "ENCODE_FOR_URI":
+				case "CONTAINS":
+				case "STRSTARTS":
+				case "STRENDS":
+				case "STRBEFORE":
+				case "STRAFTER":
+				case "YEAR":
+				case "MONTH":
+				case "DAY":
+				case "HOURS":
+				case "MINUTES":
+				case "SECONDS":
+				case "TIMEZONE":
+				case "TZ":
+				case "NOW":
+				case "UUID":
+				case "STRUUID":
+				case "MD5":
+				case "SHA1":
+				case "SHA256":
+				case "SHA384":
+				case "SHA512":
+				case "COALESCE":
+				case "IF":
+				case "STRLANG":
+				case "STRDT":
+				case "SAMETERM":
+				case "ISIRI":
+				case "ISURI":
+				case "ISBLANK":
+				case "ISLITERAL":
+				case "ISNUMERIC":
+				case "SUBSTR":
+				case "REPLACE":
+				case "EXISTS":
+				case "NOT": // EXISTS
+				case "TRUE":
+				case "FALSE":
+				default:
+					// TODO: Extensible functions
+
+					if (Optional)
+					{
+						int i = s.Length;
+						while (i > 0)
+							Parser.UndoChar();
+
+						return null;
+					}
+
+					throw Parser.SyntaxError("Unexpected token: " + s);
+			}
+		}
+
+		private ScriptNode ParseArgument(ScriptParser Parser)
+		{
+			if (Parser.NextNonWhitespaceChar() != '(')
+				throw Parser.SyntaxError("Expected (");
+
+			ScriptNode Argument = this.ParseExpression(Parser, false);
+
+			if (Parser.NextNonWhitespaceChar() != ')')
+				throw Parser.SyntaxError("Expected )");
+
+			return Argument;
+		}
+
+		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max)
+		{
+			if (Parser.NextNonWhitespaceChar() != '(')
+				throw Parser.SyntaxError("Expected (");
+
+			List<ScriptNode> Arguments = new List<ScriptNode>();
+
+			while (true)
+			{
+				Arguments.Add(this.ParseExpression(Parser, false));
+
+				if (Parser.NextNonWhitespaceChar() != ',')
+				{
+					Parser.UndoChar();
+					break;
+				}
+			}
+
+			int c = Arguments.Count;
+			if (c < Min)
+				throw Parser.SyntaxError("Expected at least " + Min.ToString() + " arguments.");
+
+			if (c > Max)
+				throw Parser.SyntaxError("Expected at most " + Max.ToString() + " arguments.");
+
+			if (Parser.NextNonWhitespaceChar() != ')')
+				throw Parser.SyntaxError("Expected )");
+
+			return Arguments.ToArray();
 		}
 
 		private ISemanticElement ParseElement(ScriptParser Parser, int TriplePosition, bool Optional)
@@ -742,6 +1142,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						else if (char.IsLetter(ch) || ch == ':')
 						{
 							Parser.UndoChar();
+							Start = Parser.Position;
 							s = this.ParseName(Parser);
 
 							if (Parser.PeekNextChar() == ':')
@@ -768,7 +1169,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 									break;
 							}
 
-							throw Parser.SyntaxError("Expected :");
+							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start, true)
+								?? throw Parser.SyntaxError("Expected :");
+
+							return new SemanticScriptElement(ScriptNode);
 						}
 						else
 						{

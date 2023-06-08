@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -86,7 +85,7 @@ namespace Waher.Script.Operators.Comparisons
 					}
 				}
 
-				if (M.Index == 0 && M.Length == sl.Length)
+				if (this.partialMatch || (M.Index == 0 && M.Length == sl.Length))
 					return BooleanValue.True;
 			}
 
@@ -107,7 +106,7 @@ namespace Waher.Script.Operators.Comparisons
 				if (this.lastExpression is null || Expression != this.lastExpression)
 				{
 					this.lastExpression = Expression;
-					this.regex = new Regex(Expression, RegexOptions.Singleline);
+					this.regex = new Regex(Expression, this.options);
 
 					List<string> Names = null;
 
@@ -137,7 +136,34 @@ namespace Waher.Script.Operators.Comparisons
 		private Regex regex = null;
 		private string[] groupNames = null;
 		private string lastExpression = null;
+		private RegexOptions options = RegexOptions.Singleline;
+		private bool partialMatch = false;
 		private readonly object synchObject = new object();
+
+		/// <summary>
+		/// Options for regular expression. Default is <see cref="RegexOptions.Singleline"/>.
+		/// </summary>
+		public RegexOptions Options
+		{
+			get => this.options;
+			set
+			{
+				lock (this.synchObject)
+				{
+					this.options = value;
+					this.lastExpression = null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// If a partial match is sufficient for operator to return true. (Default=false)
+		/// </summary>
+		public bool PartialMatch
+		{
+			get => this.partialMatch;
+			set => this.partialMatch = value;
+		}
 
 		/// <summary>
 		/// Performs a pattern match operation.

@@ -381,34 +381,55 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				{
 					Parser.SkipWhiteSpace();
 
-					if (Parser.PeekNextToken().ToUpper() == "OPTIONAL")
+					switch (Parser.PeekNextToken().ToUpper())
 					{
-						Parser.NextToken();
-						if (Parser.NextNonWhitespaceChar() != '{')
-							throw Parser.SyntaxError("Expected {");
+						case "OPTIONAL":
+							Parser.NextToken();
+							if (Parser.NextNonWhitespaceChar() != '{')
+								throw Parser.SyntaxError("Expected {");
 
-						this.ParseTriples(Parser, null, true);
+							this.ParseTriples(Parser, null, true);
 
-						if (Parser.NextNonWhitespaceChar() != '}')
-							throw Parser.SyntaxError("Expected }");
+							if (Parser.NextNonWhitespaceChar() != '}')
+								throw Parser.SyntaxError("Expected }");
 
-						switch (Parser.NextNonWhitespaceChar())
-						{
-							case '.':
-								Subject = null;
-								Predicate = null;
-								TriplePosition = 0;
-								break;
+							switch (Parser.NextNonWhitespaceChar())
+							{
+								case '.':
+									Subject = null;
+									Predicate = null;
+									TriplePosition = 0;
+									break;
 
-							case '}':
-								Parser.UndoChar();
-								return;
+								case '}':
+									Parser.UndoChar();
+									return;
+							}
 
-							default:
-								throw Parser.SyntaxError("Expected . or }");
-						}
+							continue;
 
-						continue;
+						case "{":
+							Parser.NextToken();
+
+							this.ParseTriples(Parser, null, true);
+
+							if (Parser.NextNonWhitespaceChar() != '}')
+								throw Parser.SyntaxError("Expected }");
+
+							switch (Parser.NextNonWhitespaceChar())
+							{
+								case '.':
+									Subject = null;
+									Predicate = null;
+									TriplePosition = 0;
+									break;
+
+								case '}':
+									Parser.UndoChar();
+									return;
+							}
+
+							continue;
 					}
 				}
 
@@ -804,6 +825,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return Node;
 
 				case '?':
+				case '$':
 					Parser.NextChar();
 					string s = this.ParseName(Parser);
 					return new VariableReference(s, Start, Parser.Position - Start, Parser.Expression);
@@ -879,7 +901,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return this.ParseUnary(Parser, Optional);
 
 				case "FILTER":
-
 					Node = this.ParseUnary(Parser, false);
 
 					if (this.filter is null)
@@ -888,6 +909,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					this.filter.Add(Node);
 
 					return this.ParseUnary(Parser, Optional);
+
+				case "TRUE":
+					return new ConstantElement(BooleanValue.True, Start, Parser.Position - Start, Parser.Expression);
+
+				case "FALSE":
+					return new ConstantElement(BooleanValue.False, Start, Parser.Position - Start, Parser.Expression);
 
 				case "CONCAT":
 					int Start2 = Parser.Position;
@@ -983,8 +1010,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "REPLACE":
 				case "EXISTS":
 				case "NOT": // EXISTS
-				case "TRUE":
-				case "FALSE":
 				default:
 					// TODO: Extensible functions
 
@@ -1124,6 +1149,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						return this.ParsePrefixedToken(Parser, string.Empty);
 
 					case '?':
+					case '$':
 						int Start = Parser.Position;
 						s = this.ParseName(Parser);
 						return new SemanticScriptElement(new VariableReference(s, Start, Parser.Position - Start, Parser.Expression));
@@ -1169,8 +1195,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 									break;
 							}
 
-							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start, true)
-								?? throw Parser.SyntaxError("Expected :");
+							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start, true);
+
+							if (ScriptNode is null)
+							{
+								if (Optional)
+									return null;
+
+								throw Parser.SyntaxError("Expected :");
+							}
 
 							return new SemanticScriptElement(ScriptNode);
 						}

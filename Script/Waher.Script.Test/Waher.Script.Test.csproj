@@ -44,8 +44,10 @@
     <None Remove="Files\5\5.txt" />
     <None Remove="File\1.txt" />
     <None Remove="Sparql\Test_01.rq" />
+    <None Remove="Sparql\Test_01.srx" />
     <None Remove="Sparql\Test_01.ttl" />
     <None Remove="Sparql\Test_02.rq" />
+    <None Remove="Sparql\Test_02.srx" />
     <None Remove="Sparql\Test_02.ttl" />
     <None Remove="Sparql\Test_03.rq" />
     <None Remove="Sparql\Test_03.srx" />
@@ -57,28 +59,44 @@
     <None Remove="Sparql\Test_05.srx" />
     <None Remove="Sparql\Test_05.ttl" />
     <None Remove="Sparql\Test_06.rq" />
+    <None Remove="Sparql\Test_06.srx" />
     <None Remove="Sparql\Test_06.ttl" />
     <None Remove="Sparql\Test_07.rq" />
+    <None Remove="Sparql\Test_07.srx" />
     <None Remove="Sparql\Test_07.ttl" />
     <None Remove="Sparql\Test_08.rq" />
+    <None Remove="Sparql\Test_08.srx" />
     <None Remove="Sparql\Test_08.ttl" />
     <None Remove="Sparql\Test_09.rq" />
+    <None Remove="Sparql\Test_09.srx" />
     <None Remove="Sparql\Test_09.ttl" />
     <None Remove="Sparql\Test_10.rq" />
+    <None Remove="Sparql\Test_10.srx" />
     <None Remove="Sparql\Test_10.ttl" />
     <None Remove="Sparql\Test_11.rq" />
+    <None Remove="Sparql\Test_11.srx" />
     <None Remove="Sparql\Test_11.ttl" />
     <None Remove="Sparql\Test_12.rq" />
+    <None Remove="Sparql\Test_12.srx" />
     <None Remove="Sparql\Test_12.ttl" />
     <None Remove="Sparql\Test_13.rq" />
     <None Remove="Sparql\Test_13.ttl" />
     <None Remove="Sparql\Test_13b.ttl" />
     <None Remove="Sparql\Test_14.rq" />
+    <None Remove="Sparql\Test_14.srx" />
     <None Remove="Sparql\Test_14.ttl" />
     <None Remove="Sparql\Test_15.rq" />
+    <None Remove="Sparql\Test_15.srx" />
     <None Remove="Sparql\Test_15.ttl" />
     <None Remove="Sparql\Test_16.rq" />
+    <None Remove="Sparql\Test_16.srx" />
     <None Remove="Sparql\Test_16.ttl" />
+    <None Remove="Sparql\Test_17.rq" />
+    <None Remove="Sparql\Test_17.srx" />
+    <None Remove="Sparql\Test_17.ttl" />
+    <None Remove="Sparql\Test_18.rq" />
+    <None Remove="Sparql\Test_18.srx" />
+    <None Remove="Sparql\Test_18.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -163,7 +181,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sparql\Test_18.srx" />
+    <EmbeddedResource Include="Sparql\Test_17.srx" />
+    <EmbeddedResource Include="Sparql\Test_16.srx" />
+    <EmbeddedResource Include="Sparql\Test_15.srx" />
+    <EmbeddedResource Include="Sparql\Test_14.srx" />
+    <EmbeddedResource Include="Sparql\Test_12.srx" />
+    <EmbeddedResource Include="Sparql\Test_11.srx" />
+    <EmbeddedResource Include="Sparql\Test_10.srx" />
+    <EmbeddedResource Include="Sparql\Test_09.srx" />
+    <EmbeddedResource Include="Sparql\Test_08.srx" />
+    <EmbeddedResource Include="Sparql\Test_07.srx" />
+    <EmbeddedResource Include="Sparql\Test_06.srx" />
+    <EmbeddedResource Include="Sparql\Test_02.srx" />
+    <EmbeddedResource Include="Sparql\Test_01.srx" />
     <EmbeddedResource Include="Sparql\Test_11.rq" />
+    <EmbeddedResource Include="Sparql\Test_18.rq" />
+    <EmbeddedResource Include="Sparql\Test_18.ttl" />
+    <EmbeddedResource Include="Sparql\Test_17.rq" />
+    <EmbeddedResource Include="Sparql\Test_17.ttl" />
     <EmbeddedResource Include="Sparql\Test_16.rq" />
     <EmbeddedResource Include="Sparql\Test_16.ttl" />
     <EmbeddedResource Include="Sparql\Test_15.rq" />

@@ -6,7 +6,6 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Test
 {
@@ -49,7 +48,8 @@ namespace Waher.Script.Test
 		[DataRow("Test_10.ttl", "Test_10.rq", null, null)]
 		[DataRow("Test_11.ttl", "Test_11.rq", null, null)]
 		[DataRow("Test_12.ttl", "Test_12.rq", null, null)]
-		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName,
+		[DataRow("Test_13.ttl", "Test_13.rq", null, "Test_13b.ttl")]
+		public async Task SPARQL_Tests(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
 			TurtleDocument Doc = LoadTurtleResource(DataSetFileName);
@@ -65,60 +65,97 @@ namespace Waher.Script.Test
 			object Result = await Exp.EvaluateAsync(v);
 			Assert.IsNotNull(Result);
 
-			SparqlResultSet ResultSet = Result as SparqlResultSet;
-			Assert.IsNotNull(ResultSet);
-
-			IMatrix M = ResultSet.ToMatrix();
-			Assert.IsNotNull(M);
-
-			Console.Out.WriteLine(Expression.ToString(M));
-
-			if (!string.IsNullOrEmpty(ResultName))
+			if (Result is SparqlResultSet ResultSet)
 			{
-				SparqlResultSet Expected = await LoadSparqlResultSet(ResultName);
+				IMatrix M = ResultSet.ToMatrix();
+				Assert.IsNotNull(M);
 
-				Assert.IsFalse(Expected.BooleanResult.HasValue ^ ResultSet.BooleanResult.HasValue);
-				if (Expected.BooleanResult.HasValue)
-					Assert.AreEqual(Expected.BooleanResult.Value, ResultSet.BooleanResult.Value);
+				Console.Out.WriteLine(Expression.ToString(M));
 
-				int i, c = Expected.Variables?.Length ?? 0;
-				Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
-
-				for (i = 0; i < c; i++)
-					Assert.AreEqual(Expected.Variables[i], ResultSet.Variables[i]);
-
-				c = Expected.Records?.Length ?? 0;
-				Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");
-
-				Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
-
-				for (i = 0; i < c; i++)
+				if (!string.IsNullOrEmpty(ResultName))
 				{
-					SparqlResultRecord ExpectedRecord = Expected.Records[i];
-					SparqlResultRecord Record = ResultSet.Records[i];
+					SparqlResultSet Expected = await LoadSparqlResultSet(ResultName);
 
-					foreach (string VariableName in Expected.Variables)
+					Assert.IsFalse(Expected.BooleanResult.HasValue ^ ResultSet.BooleanResult.HasValue);
+					if (Expected.BooleanResult.HasValue)
+						Assert.AreEqual(Expected.BooleanResult.Value, ResultSet.BooleanResult.Value);
+
+					int i, c = Expected.Variables?.Length ?? 0;
+					Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
+
+					for (i = 0; i < c; i++)
+						Assert.AreEqual(Expected.Variables[i], ResultSet.Variables[i]);
+
+					c = Expected.Records?.Length ?? 0;
+					Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");
+
+					Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
+
+					for (i = 0; i < c; i++)
 					{
-						ISemanticElement e1 = ExpectedRecord[VariableName];
-						ISemanticElement e2 = Record[VariableName];
+						SparqlResultRecord ExpectedRecord = Expected.Records[i];
+						SparqlResultRecord Record = ResultSet.Records[i];
 
-						Assert.IsFalse((e1 is null) ^ (e2 is null));
-
-						if (e1 is null)
-							continue;
-
-						if (e1 is BlankNode bn1 && e2 is BlankNode bn2)
+						foreach (string VariableName in Expected.Variables)
 						{
-							if (BlankNodeDictionary.TryGetValue(bn1.NodeId, out string s))
-								Assert.AreEqual(s, bn2.NodeId);
-							else
-								BlankNodeDictionary[bn1.NodeId] = bn2.NodeId;
+							ISemanticElement e1 = ExpectedRecord[VariableName];
+							ISemanticElement e2 = Record[VariableName];
+
+							Assert.IsFalse((e1 is null) ^ (e2 is null));
+
+							if (e1 is null)
+								continue;
+
+							AssertEqual(e1, e2, BlankNodeDictionary);
 						}
-						else
-							Assert.AreEqual(e1, e2);
 					}
 				}
 			}
+			else if (Result is InMemorySemanticModel Model)
+			{
+				IMatrix M = Model.ToMatrix();
+				Assert.IsNotNull(M);
+
+				Console.Out.WriteLine(Expression.ToString(M));
+
+				if (!string.IsNullOrEmpty(ResultName))
+				{
+					TurtleDocument Expected = LoadTurtleResource(ResultName);
+
+					Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
+					IEnumerator<ISemanticTriple> e1 = Expected.GetEnumerator();
+					IEnumerator<ISemanticTriple> e2 = Model.GetEnumerator();
+					bool b1 = e1.MoveNext();
+					bool b2 = e2.MoveNext();
+
+					while (b1 && b2)
+					{
+						AssertEqual(e1.Current.Subject, e2.Current.Subject, BlankNodeDictionary);
+						AssertEqual(e1.Current.Predicate, e2.Current.Predicate, BlankNodeDictionary);
+						AssertEqual(e1.Current.Object, e2.Current.Object, BlankNodeDictionary);
+
+						b1 = e1.MoveNext();
+						b2 = e2.MoveNext();
+					}
+
+					Assert.IsFalse(b1);
+					Assert.IsFalse(b2);
+				}
+			}
+		}
+
+		private static void AssertEqual(ISemanticElement e1, ISemanticElement e2,
+			Dictionary<string, string> BlankNodeDictionary)
+		{
+			if (e1 is BlankNode bn1 && e2 is BlankNode bn2)
+			{
+				if (BlankNodeDictionary.TryGetValue(bn1.NodeId, out string s))
+					Assert.AreEqual(s, bn2.NodeId);
+				else
+					BlankNodeDictionary[bn1.NodeId] = bn2.NodeId;
+			}
+			else
+				Assert.AreEqual(e1, e2);
 		}
 
 	}

@@ -17,7 +17,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// <summary>
 	/// Executes a SELECT statement against the object database.
 	/// </summary>
-	public class Select : ScriptNode, IEvaluateAsync
+	public class SparqlQuery : ScriptNode, IEvaluateAsync
 	{
 		private readonly Dictionary<Type, ISemanticLiteral> literalPerType = new Dictionary<Type, ISemanticLiteral>();
 		private readonly ScriptNode[] columns;
@@ -26,6 +26,7 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly SemanticQueryTriple[] where;
 		private readonly KeyValuePair<ScriptNode, ScriptNode>[] boundVariables;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
+		private readonly ISemanticTriple[] construct;
 		private readonly bool distinct;
 
 		/// <summary>
@@ -38,17 +39,20 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Where">Optional where clause</param>
 		/// <param name="BoundVariables">Bound variables.</param>
 		/// <param name="OrderBy">Order to present result set.</param>
+		/// <param name="Construct">Triples to construct.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(bool Distinct, ScriptNode[] Columns, ScriptNode[] ColumnNames,
+		public SparqlQuery(bool Distinct, ScriptNode[] Columns, ScriptNode[] ColumnNames,
 			ScriptNode From, SemanticQueryTriple[] Where,
 			KeyValuePair<ScriptNode, ScriptNode>[] BoundVariables,
 			KeyValuePair<ScriptNode, bool>[] OrderBy,
+			ISemanticTriple[] Construct,
 			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.distinct = Distinct;
+			this.construct = Construct;
 
 			this.columns = Columns;
 			this.columns?.SetParent(this);
@@ -191,7 +195,7 @@ namespace Waher.Script.Persistence.SPARQL
 					break;
 			}
 
-			if (this.columns is null)   // ASK
+			if (this.columns is null && this.construct is null)   // ASK
 				return new ObjectValue(new SparqlResultSet(!(Possibilities?.First is null)));
 
 			string Name;
@@ -222,7 +226,7 @@ namespace Waher.Script.Persistence.SPARQL
 								continue;
 						}
 
-						ISemanticLiteral Literal = await this.EvaluateLiteral(RecordVariables, P2.Key);
+						ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
 
 						P = new Possibility(Name, Literal, P);
 					}
@@ -231,6 +235,31 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 
 				Possibilities = NewPossibilities;
+			}
+
+			if (!(this.construct is null))   // CONSTRUCT
+			{
+				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
+				ObjectProperties RecordVariables = null;
+
+				foreach (Possibility P in Possibilities)
+				{
+					if (RecordVariables is null)
+						RecordVariables = new ObjectProperties(P, Variables);
+					else
+						RecordVariables.Object = P;
+
+					foreach (ISemanticTriple T in this.construct)
+					{
+						ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
+						ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
+						ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
+
+						Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
+					}
+				}
+
+				return new ObjectValue(new InMemorySemanticModel(Construction));
 			}
 
 			Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
@@ -305,7 +334,7 @@ namespace Waher.Script.Persistence.SPARQL
 						foreach (KeyValuePair<ScriptNode, int> P2 in ColumnScript)
 						{
 							Name = ColumnNames[P2.Value];
-							ISemanticLiteral Literal = await this.EvaluateLiteral(RecordVariables, P2.Key);
+							ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
 
 							Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
 						}
@@ -354,22 +383,34 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 		}
 
-		private async Task<ISemanticLiteral> EvaluateLiteral(Variables RecordVariables, ScriptNode Node)
+		private Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ISemanticElement Element)
+		{
+			if (Element is SemanticScriptElement ScriptElement)
+				return this.EvaluateSemanticElement(RecordVariables, ScriptElement.Node);
+			else
+				return Task.FromResult(Element);
+		}
+
+		private async Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ScriptNode Node)
 		{
 			object Value = await this.EvaluateValue(RecordVariables, Node);
 
-			if (Value is ISemanticLiteral Literal)
-				return Literal;
+			if (Value is ISemanticElement Element)
+				return Element;
+
+			if (Value is Uri Uri)
+				return new UriNode(Uri, Uri.OriginalString);
 
 			Type T = Value?.GetType() ?? typeof(object);
+			ISemanticLiteral Literal;
 
 			lock (this.literalPerType)
 			{
 				if (!this.literalPerType.TryGetValue(T, out Literal))
 				{
-					Literal = Types.FindBest<ISemanticLiteral, Type>(T);
-					if (Literal is null)
-						Literal = new CustomLiteral(string.Empty, string.Empty);
+					Literal = Types.FindBest<ISemanticLiteral, Type>(T)
+						?? new CustomLiteral(string.Empty, string.Empty);
+
 					this.literalPerType[T] = Literal;
 				}
 			}
@@ -992,7 +1033,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Select O &&
+			if (!(obj is SparqlQuery O &&
 				AreEqual(this.columns, O.columns) &&
 				AreEqual(this.where, O.where) &&
 				this.distinct == O.distinct &&

@@ -27,7 +27,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 		private readonly string preamble;
 		private readonly int preambleLen;
-		private readonly List<SemanticQueryTriple> triples = new List<SemanticQueryTriple>();
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>()
 		{
@@ -37,6 +36,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{ "fn", "http://www.w3.org/2005/xpath-functions#" },
 			{ "sfn", "http://www.w3.org/ns/sparql#" }
 		};
+		private List<SemanticQueryTriple> triples = new List<SemanticQueryTriple>();
 		private List<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
 		private int preamblePos;
 		private Uri baseUri = null;
@@ -66,7 +66,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "DISTINCT", "FROM", "WHERE", "OPTIONAL", "ORDER", "BY" };
+		public string[] InternalKeywords => new string[] { "DISTINCT", "FROM", "WHERE", "OPTIONAL", "ORDER", "BY", "ASK", "CONSTRUCT" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -87,7 +87,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (string.IsNullOrEmpty(s))
 				return false;
 
-			while (s != "SELECT" && s != "ASK")
+			while (s != "SELECT" && s != "ASK" && s != "CONSTRUCT")
 			{
 				switch (s)
 				{
@@ -136,6 +136,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			List<ScriptNode> Columns = null;
 			List<ScriptNode> ColumnNames = null;
 			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
+			List<SemanticQueryTriple> Construct = null;
 			ScriptNode From;
 
 			switch (s)
@@ -145,6 +146,29 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					s = this.PeekNextToken(Parser).ToUpper();
 					if (string.IsNullOrEmpty(s))
 						return false;
+					break;
+
+				case "CONSTRUCT":
+					this.NextToken(Parser);
+
+					if (Parser.NextNonWhitespaceChar() != '{')
+						throw Parser.SyntaxError("Expected {");
+
+					this.ParseTriples(Parser, false);
+
+					if (Parser.NextNonWhitespaceChar() != '}')
+						throw Parser.SyntaxError("Expected }");
+
+					Construct = this.triples;
+					this.triples = new List<SemanticQueryTriple>();
+
+					foreach (SemanticQueryTriple T in Construct)
+					{
+						if (T.Optional)
+							throw Parser.SyntaxError("Optional triples not permitted here.");
+					}
+
+					s = Parser.PeekNextToken().ToUpper();
 					break;
 
 				case "SELECT":
@@ -246,12 +270,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
 				}
 
-				s = Parser.PeekNextToken().ToUpper();
+				//s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new Select(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
+			Result = new SparqlQuery(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
 				From, this.triples.ToArray(), this.boundVariables?.ToArray(),
-				OrderBy?.ToArray(), Parser.Start, Parser.Length, Parser.Expression);
+				OrderBy?.ToArray(), Construct?.ToArray(), Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
 		}

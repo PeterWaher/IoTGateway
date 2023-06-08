@@ -1,0 +1,7 @@
+﻿@prefix org:    <http://example.com/ns#> .
+
+_:a  org:employeeName   "Alice" .
+_:a  org:employeeId     12345 .
+
+_:b  org:employeeName   "Bob" .
+_:b  org:employeeId     67890 .

@@ -9,6 +9,9 @@ using Waher.Content.Semantic.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Functions.Strings;
+using Waher.Script.Operators.Vectors;
+using Waher.Script.Persistence.SPARQL.Functions;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -34,6 +37,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{ "fn", "http://www.w3.org/2005/xpath-functions#" },
 			{ "sfn", "http://www.w3.org/ns/sparql#" }
 		};
+		private List<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
 		private int preamblePos;
 		private Uri baseUri = null;
 		private int blankNodeIndex = 0;
@@ -130,49 +134,48 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			List<ScriptNode> Columns = null;
-			List<KeyValuePair<string, bool>> OrderBy = null;
+			List<ScriptNode> ColumnNames = null;
+			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 			ScriptNode From;
 
 			switch (s)
 			{
 				case "ASK":
-					Parser.NextToken();
-					s = Parser.PeekNextToken().ToUpper();
+					this.NextToken(Parser);
+					s = this.PeekNextToken(Parser).ToUpper();
 					if (string.IsNullOrEmpty(s))
 						return false;
 					break;
 
 				case "SELECT":
-					Parser.NextToken();
-					s = Parser.PeekNextToken().ToUpper();
+					this.NextToken(Parser);
+					s = this.PeekNextToken(Parser).ToUpper();
 					if (string.IsNullOrEmpty(s))
 						return false;
 
 					if (s == "DISTINCT")
 					{
-						Parser.NextToken();
+						this.NextToken(Parser);
 						Distinct = true;
 
-						s = Parser.PeekNextToken().ToUpper();
+						s = this.PeekNextToken(Parser).ToUpper();
 					}
 
 					Columns = new List<ScriptNode>();
+					ColumnNames = new List<ScriptNode>();
 
 					while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
 					{
-						if (s == "?")
+						Node = this.ParseStatement(Parser, false);
+						if (Node is NamedNode NamedNode)
 						{
-							Parser.NextToken();
-							Node = Parser.ParseObject();
-							if (!(Node is VariableReference))
-								throw Parser.SyntaxError("Expected variable name.");
-
-							Columns.Add(Node);
+							Columns.Add(NamedNode.LeftOperand);
+							ColumnNames.Add(NamedNode.RightOperand);
 						}
 						else
 						{
-							Node = Parser.ParseStatement();
 							Columns.Add(Node);
+							ColumnNames.Add(null);
 						}
 
 						s = Parser.PeekNextToken().ToUpper();
@@ -228,60 +231,154 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (s != "BY")
 					throw Parser.SyntaxError("Expected BY");
 
-				OrderBy = new List<KeyValuePair<string, bool>>();
+				OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
 
-				s = Parser.PeekNextToken().ToUpper();
 				while (true)
 				{
-					switch (s)
-					{
-						case "?":
-							Parser.NextToken();
-							OrderBy.Add(new KeyValuePair<string, bool>(this.ParseName(Parser), true));
-							break;
-
-						case "ASC":
-							Parser.NextToken();
-							if (Parser.NextToken() != "(")
-								throw Parser.SyntaxError("Expected (");
-
-							OrderBy.Add(new KeyValuePair<string, bool>(this.ParseName(Parser), true));
-
-							if (Parser.NextToken() != ")")
-								throw Parser.SyntaxError("Expected )");
-
-							break;
-
-						case "DESC":
-							Parser.NextToken();
-							if (Parser.NextToken() != "(")
-								throw Parser.SyntaxError("Expected (");
-
-							OrderBy.Add(new KeyValuePair<string, bool>(this.ParseName(Parser), false));
-
-							if (Parser.NextToken() != ")")
-								throw Parser.SyntaxError("Expected )");
-
-							break;
-
-						default:
-							s = null;
-							break;
-					}
-
-					if (s is null)
+					Node = this.ParseStatement(Parser, true);
+					if (Node is null)
 						break;
-
-					s = Parser.PeekNextToken().ToUpper();
+					else if (Node is Asc Asc)
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Asc.Argument, true));
+					else if (Node is Desc Desc)
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Desc.Argument, false));
+					else
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
 				}
 
 				s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new Select(Distinct, Columns?.ToArray(), From, this.triples.ToArray(),
+			Result = new Select(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
+				From, this.triples.ToArray(), this.boundVariables?.ToArray(),
 				OrderBy?.ToArray(), Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
+		}
+
+		private ScriptNode ParseStatement(ScriptParser Parser, bool NullIfNone)
+		{
+			int Start = Parser.Position;
+			char ch = Parser.NextNonWhitespaceChar();
+			ScriptNode Node;
+			string s;
+
+			switch (ch)
+			{
+				case '?':
+					Node = Parser.ParseObject();
+					if (!(Node is VariableReference))
+						throw Parser.SyntaxError("Expected variable name.");
+					break;
+
+				case '(':
+					Node = this.ParseStatement(Parser, false);
+
+					if (Parser.NextNonWhitespaceChar() != ')')
+						throw Parser.SyntaxError("Expected )");
+					break;
+
+				case '\'':
+				case '"':
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				case '+':
+				case '-':
+				case '.':
+					Parser.UndoChar();
+					Node = Parser.ParseObject();
+					break;
+
+				default:
+					Parser.UndoChar();
+					s = Parser.PeekNextToken().ToUpper();
+					switch (s)
+					{
+						case "CONCAT":
+							Parser.NextToken();
+
+							if (Parser.NextNonWhitespaceChar() != '(')
+								throw Parser.SyntaxError("Expected (");
+
+							List<ScriptNode> Arguments = new List<ScriptNode>();
+							int Start2 = Parser.Position;
+
+							while (true)
+							{
+								Arguments.Add(this.ParseStatement(Parser, false));
+
+								if (Parser.NextNonWhitespaceChar() != ',')
+								{
+									Parser.UndoChar();
+									break;
+								}
+							}
+
+							VectorDefinition Vector = new VectorDefinition(Arguments.ToArray(),
+								Start2, Parser.Position - Start2, Parser.Expression);
+
+							if (Parser.NextNonWhitespaceChar() != ')')
+								throw Parser.SyntaxError("Expected )");
+
+							Node = new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
+							break;
+
+						case "ASC":
+							Parser.NextToken();
+							if (Parser.NextNonWhitespaceChar() != '(')
+								throw Parser.SyntaxError("Expected (");
+
+							Node = this.ParseStatement(Parser, false);
+
+							if (Parser.NextNonWhitespaceChar() != ')')
+								throw Parser.SyntaxError("Expected )");
+
+							Node = new Asc(Node, Start, Parser.Position - Start, Parser.Expression);
+							break;
+
+						case "DESC":
+							Parser.NextToken();
+							if (Parser.NextNonWhitespaceChar() != '(')
+								throw Parser.SyntaxError("Expected (");
+
+							Node = this.ParseStatement(Parser, false);
+
+							if (Parser.NextNonWhitespaceChar() != ')')
+								throw Parser.SyntaxError("Expected )");
+
+							Node = new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
+							break;
+
+						default:
+							if (NullIfNone)
+								return null;
+							else
+								throw Parser.SyntaxError("Unrecognized keyword.");
+					}
+					break;
+			}
+
+			s = Parser.PeekNextToken().ToUpper();
+			if (s == "AS")
+			{
+				Parser.NextToken();
+
+				ScriptNode Name = this.ParseStatement(Parser, false);
+				if (Name is NamedNode)
+					throw Parser.SyntaxError("Repetetive naming not allowed.");
+
+				Node = new NamedNode(Node, Name, Node.Start, Parser.Position - Node.Start, Parser.Expression);
+			}
+
+			return Node;
 		}
 
 		private char PeekNextChar(ScriptParser Parser)
@@ -377,6 +474,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (TriplePosition == 0)
 				{
 					Parser.SkipWhiteSpace();
+
 					if (Parser.PeekNextToken().ToUpper() == "OPTIONAL")
 					{
 						Parser.NextToken();
@@ -438,52 +536,87 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				{
 					this.triples.Add(new SemanticQueryTriple(Subject, Predicate, Object, Optional));
 
-					switch (Parser.NextNonWhitespaceChar())
+					bool Again;
+
+					do
 					{
-						case '.':
-							if (InBlankNode)
-								throw Parser.SyntaxError("Expected ]");
-
-							Subject = null;
-							Predicate = null;
-							TriplePosition = 0;
-							break;
-
-						case '}':
-							if (InBlankNode)
-								throw Parser.SyntaxError("Expected ]");
-
-							Parser.UndoChar();
-							return;
-
-						case ';':
-							Predicate = null;
-							TriplePosition = 1;
-
-							Parser.SkipWhiteSpace();
-							if (Parser.PeekNextChar() == '.')
-							{
+						Again = false;
+						switch (Parser.NextNonWhitespaceChar())
+						{
+							case '.':
 								if (InBlankNode)
 									throw Parser.SyntaxError("Expected ]");
 
-								Parser.NextChar();
 								Subject = null;
+								Predicate = null;
 								TriplePosition = 0;
-							}
-							break;
+								break;
 
-						case ',':
-							break;
+							case '}':
+								if (InBlankNode)
+									throw Parser.SyntaxError("Expected ]");
 
-						case ']':
-							return;
+								Parser.UndoChar();
+								return;
 
-						default:
-							if (InBlankNode)
-								throw Parser.SyntaxError("Expected triple delimiter ] ; or ,");
-							else
-								throw Parser.SyntaxError("Expected triple delimiter . ; or ,");
+							case ';':
+								Predicate = null;
+								TriplePosition = 1;
+
+								Parser.SkipWhiteSpace();
+								if (Parser.PeekNextChar() == '.')
+								{
+									if (InBlankNode)
+										throw Parser.SyntaxError("Expected ]");
+
+									Parser.NextChar();
+									Subject = null;
+									TriplePosition = 0;
+								}
+								break;
+
+							case ',':
+								break;
+
+							case ']':
+								return;
+
+							case 'b':
+							case 'B':
+								if (char.ToUpper(Parser.NextChar()) != 'I' ||
+									char.ToUpper(Parser.NextChar()) != 'N' ||
+									char.ToUpper(Parser.NextChar()) != 'D')
+								{
+									throw Parser.SyntaxError("Expected BIND");
+								}
+
+								if (Parser.NextNonWhitespaceChar() != '(')
+									throw Parser.SyntaxError("Expected (");
+
+								ScriptNode Node = this.ParseStatement(Parser, false);
+								if (!(Node is NamedNode NamedNode))
+									throw Parser.SyntaxError("Expected name.");
+
+								if (this.boundVariables is null)
+									this.boundVariables = new List<KeyValuePair<ScriptNode, ScriptNode>>();
+
+								this.boundVariables.Add(new KeyValuePair<ScriptNode, ScriptNode>(
+									NamedNode.LeftOperand, NamedNode.RightOperand));
+
+								if (Parser.NextNonWhitespaceChar() != ')')
+									throw Parser.SyntaxError("Expected )");
+
+								Again = true;
+								break;
+
+							default:
+								if (InBlankNode)
+									throw Parser.SyntaxError("Expected triple delimiter ] ; or ,");
+								else
+									throw Parser.SyntaxError("Expected triple delimiter . ; or ,");
+						}
 					}
+					while (Again);
 				}
 			}
 		}

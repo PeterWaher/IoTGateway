@@ -551,6 +551,123 @@
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.Asc">
+            <summary>
+            Orders in ascending order
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Asc.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Ascending argument
+            </summary>
+            <param name="Argument">Argument to order on.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.Asc.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Asc.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Asc.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Asc.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is true.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.Desc">
+            <summary>
+            Orders in descending order
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Desc.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Descending argument
+            </summary>
+            <param name="Argument">Argument to order on.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.Desc.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Desc.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Desc.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.Desc.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is true.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.NamedNode">
+            <summary>
+            Represents a named node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.NamedNode.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Represents a named node.
+            </summary>
+            <param name="Left">Value node</param>
+            <param name="Right">Name node</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.NamedNode.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.NamedNode.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is true.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.OrderResultSet">
             <summary>
             Comparer for ordering a SPARQL result set.
@@ -775,14 +892,16 @@
             Executes a SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Select.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{System.String,System.Boolean}[],System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Select.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode}[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL SELECT statement.
             </summary>
             <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
-            <param name="Columns">Columns to select. If null, all columns are selected.</param>
+            <param name="Columns">Columns to select.</param>
+            <param name="ColumnNames">Names of selected columns.</param>
             <param name="From">Data source.</param>
             <param name="Where">Optional where clause</param>
+            <param name="BoundVariables">Bound variables.</param>
             <param name="OrderBy">Order to present result set.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>

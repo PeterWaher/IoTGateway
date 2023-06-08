@@ -38,7 +38,7 @@ namespace Waher.Script.Lab
 
 		public MainWindow()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -161,7 +161,7 @@ namespace Waher.Script.Lab
 					TextWrapping = TextWrapping.Wrap
 				};
 
-				ScriptBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+				ScriptBlock.PreviewMouseDown += this.TextBlock_PreviewMouseDown;
 
 				this.HistoryPanel.Children.Add(ScriptBlock);
 				this.HistoryScrollViewer.ScrollToBottom();
@@ -343,7 +343,7 @@ namespace Waher.Script.Lab
 							FontWeight = FontWeight
 						};
 
-						TextBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+						TextBlock.PreviewMouseDown += this.TextBlock_PreviewMouseDown;
 
 						this.AddBlock(ScriptBlock, TextBlock);
 					}
@@ -402,7 +402,7 @@ namespace Waher.Script.Lab
 						ImageBlock.Source = BitmapImage;
 						ImageBlock.Width = Pixels.Width;
 						ImageBlock.Height = Pixels.Height;
-						ImageBlock.Tag = Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States);
+						ImageBlock.Tag = this.Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States);
 					}
 					else
 					{
@@ -414,7 +414,7 @@ namespace Waher.Script.Lab
 							Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States)
 						};
 
-						ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+						ImageBlock.PreviewMouseDown += this.ImageBlock_PreviewMouseDown;
 
 						this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
 					}

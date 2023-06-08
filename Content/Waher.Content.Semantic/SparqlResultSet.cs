@@ -17,6 +17,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains the results of a SPARQL query.
 	/// </summary>
+	/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 	public class SparqlResultSet : IToMatrix, IToVector
 	{
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Waher.Content.Semantic
 {
@@ -14,6 +15,7 @@ namespace Waher.Content.Semantic
 		/// Contains a record from the results of a SPARQL query.
 		/// </summary>
 		/// <param name="Items">Items in record.</param>
+		/// <param name="VariableOrder">Variable order.</param>
 		public SparqlResultRecord(Dictionary<string, SparqlResultItem> Items)
 		{
 			this.items = Items;
@@ -52,6 +54,25 @@ namespace Waher.Content.Semantic
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.items.Values.GetEnumerator();
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (SparqlResultItem Item in this.items.Values)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(", ");
+
+				sb.Append(Item.ToString());
+			}
+
+			return sb.ToString();
 		}
 	}
 }

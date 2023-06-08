@@ -23,7 +23,7 @@
       <binding name="name"><literal>Alice</literal></binding>
       <binding name="mbox"><literal></literal></binding>
       <binding name="friend"><bnode>r2</bnode></binding>
-      <binding name="blurb"><literal datatype="http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral">&lt;p xmlns="http://www.w3.org/1999/xhtml"&gt;My name is &lt;b&gt;alice&lt;/b&gt;&lt;/p&gt;</literal></binding>
+      <binding name="blurb"><literal datatype="http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral">&lt;p xmlns="http://www.w3.org/1999/xhtml"&gt;My name is &lt;em&gt;Alice&lt;/em&gt;&lt;/p&gt;</literal></binding>
     </result>
 
     <result> 

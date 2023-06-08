@@ -32,5 +32,11 @@
 		/// Column index.
 		/// </summary>
 		public int Index { get; }
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return this.Name + "=" + this.Value.ToString();
+		}
 	}
 }

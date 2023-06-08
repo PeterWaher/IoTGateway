@@ -165,6 +165,9 @@ namespace Waher.Script.Persistence.SPARQL
 					break;
 			}
 
+			if (this.columns is null)   // ASK
+				return new ObjectValue(new SparqlResultSet(!(Possibilities?.First is null)));
+			
 			Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
 			LinkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
 			List<string> ColumnNames = new List<string>();

@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Test
@@ -39,6 +40,8 @@ namespace Waher.Script.Test
 		[DataRow("Test_01.ttl", "Test_01.rq", null, null)]
 		[DataRow("Test_02.ttl", "Test_02.rq", null, null)]
 		[DataRow("Test_03.ttl", "Test_03.rq", "data.n3", "Test_03.srx")]
+		[DataRow("Test_04.ttl", "Test_04.rq", "data.n3", "Test_04.srx")]
+		[DataRow("Test_05.ttl", "Test_05.rq", "data.n3", "Test_05.srx")]
 		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
@@ -58,9 +61,8 @@ namespace Waher.Script.Test
 			SparqlResultSet ResultSet = Result as SparqlResultSet;
 			Assert.IsNotNull(ResultSet);
 
-			ObjectMatrix M = ResultSet.ToMatrix() as ObjectMatrix;
+			IMatrix M = ResultSet.ToMatrix();
 			Assert.IsNotNull(M);
-			Assert.IsNotNull(M.ColumnNames);
 
 			Console.Out.WriteLine(Expression.ToString(M));
 
@@ -68,14 +70,18 @@ namespace Waher.Script.Test
 			{
 				SparqlResultSet Expected = await LoadSparqlResultSet(ResultName);
 
-				int i, c = Expected.Variables.Length;
-				Assert.AreEqual(c, ResultSet.Variables.Length, "Variable count not as expected.");
+				Assert.IsFalse(Expected.BooleanResult.HasValue ^ ResultSet.BooleanResult.HasValue);
+				if (Expected.BooleanResult.HasValue)
+					Assert.AreEqual(Expected.BooleanResult.Value, ResultSet.BooleanResult.Value);
+
+				int i, c = Expected.Variables?.Length ?? 0;
+				Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
 
 				for (i = 0; i < c; i++)
 					Assert.AreEqual(Expected.Variables[i], ResultSet.Variables[i]);
 
-				c = Expected.Records.Length;
-				Assert.AreEqual(c, ResultSet.Records.Length, "Record count not as expected.");
+				c = Expected.Records?.Length ?? 0;
+				Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");
 
 				Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
 

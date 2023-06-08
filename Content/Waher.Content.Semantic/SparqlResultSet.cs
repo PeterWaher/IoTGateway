@@ -326,6 +326,9 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IMatrix ToMatrix()
 		{
+			if (this.BooleanResult.HasValue)
+				return new BooleanMatrix(new bool[1, 1] { { this.BooleanResult.Value } });
+
 			int Columns = this.Variables.Length;
 			int Rows = this.Records.Length;
 			IElement[,] Elements = new IElement[Rows, Columns];

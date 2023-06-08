@@ -83,7 +83,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (string.IsNullOrEmpty(s))
 				return false;
 
-			while (s != "SELECT")
+			while (s != "SELECT" && s != "ASK")
 			{
 				switch (s)
 				{
@@ -129,44 +129,58 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return false;
 			}
 
-			if (s != "SELECT")
-				throw Parser.SyntaxError("Expected SELECT.");
-
-			Parser.NextToken();
-			s = Parser.PeekNextToken().ToUpper();
-			if (string.IsNullOrEmpty(s))
-				return false;
-
-			if (s == "DISTINCT")
-			{
-				Parser.NextToken();
-				Distinct = true;
-
-				s = Parser.PeekNextToken().ToUpper();
-			}
-
-			List<ScriptNode> Columns = new List<ScriptNode>();
+			List<ScriptNode> Columns = null;
 			List<KeyValuePair<string, bool>> OrderBy = null;
 			ScriptNode From;
 
-			while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
+			switch (s)
 			{
-				if (s == "?")
-				{
+				case "ASK":
 					Parser.NextToken();
-					Node = Parser.ParseObject();
-					if (!(Node is VariableReference))
-						throw Parser.SyntaxError("Expected variable name.");
+					s = Parser.PeekNextToken().ToUpper();
+					if (string.IsNullOrEmpty(s))
+						return false;
+					break;
 
-					Columns.Add(Node);
-				}
-				else
-				{
-					Node = Parser.ParseStatement();
-					Columns.Add(Node);
-				}
+				case "SELECT":
+					Parser.NextToken();
+					s = Parser.PeekNextToken().ToUpper();
+					if (string.IsNullOrEmpty(s))
+						return false;
 
-				s = Parser.PeekNextToken().ToUpper();
+					if (s == "DISTINCT")
+					{
+						Parser.NextToken();
+						Distinct = true;
+
+						s = Parser.PeekNextToken().ToUpper();
+					}
+
+					Columns = new List<ScriptNode>();
+
+					while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
+					{
+						if (s == "?")
+						{
+							Parser.NextToken();
+							Node = Parser.ParseObject();
+							if (!(Node is VariableReference))
+								throw Parser.SyntaxError("Expected variable name.");
+
+							Columns.Add(Node);
+						}
+						else
+						{
+							Node = Parser.ParseStatement();
+							Columns.Add(Node);
+						}
+
+						s = Parser.PeekNextToken().ToUpper();
+					}
+					break;
+
+				default:
+					throw Parser.SyntaxError("Expected SELECT or ASK.");
 			}
 
 			if (s == "FROM")
@@ -206,6 +220,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			if (s == "ORDER")
 			{
+				if (Columns is null)
+					throw Parser.SyntaxError("ORDER BY not expected in ASK queries.");
+
 				Parser.NextToken();
 				s = Parser.NextToken().ToUpper();
 				if (s != "BY")
@@ -254,14 +271,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					if (s is null)
 						break;
-					
+
 					s = Parser.PeekNextToken().ToUpper();
 				}
 
 				s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new Select(Distinct, Columns.ToArray(), From, this.triples.ToArray(),
+			Result = new Select(Distinct, Columns?.ToArray(), From, this.triples.ToArray(),
 				OrderBy?.ToArray(), Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;

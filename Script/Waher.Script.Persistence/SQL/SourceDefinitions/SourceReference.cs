@@ -7,6 +7,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL.SourceDefinitions
@@ -78,6 +79,9 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 		private static IDataSource GetDataSource(string Name, string Alias, IElement E, ScriptNode Source)
 		{
+			if (E.AssociatedObjectValue is IToMatrix ToMatrix)
+				E = ToMatrix.ToMatrix();
+
 			if (E.AssociatedObjectValue is Type T)
 				return new TypeSource(T, Alias);
 			else if (E is StringValue S)

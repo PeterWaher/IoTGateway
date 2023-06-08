@@ -8,6 +8,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -68,6 +69,9 @@ namespace Waher.Script.Persistence.SQL
 			IDataSource Source = await this.source.GetSource(Variables);
 			IElement E = await this.select.EvaluateAsync(Variables);
 			long Count = 0;
+
+			if (E.AssociatedObjectValue is IToMatrix ToMatrix)
+				E = ToMatrix.ToMatrix();
 
 			await Database.StartBulk();
 			try

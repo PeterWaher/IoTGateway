@@ -10,11 +10,6 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class ScriptSparqlTests
 	{
-		[ClassInitialize]
-		public static async Task ClassInitialize(TestContext _)
-		{
-		}
-
 		private static string LoadTextResource(string FileName)
 		{
 			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
@@ -26,32 +21,35 @@ namespace Waher.Script.Test
 			return new TurtleDocument(Text);
 		}
 
-		#region SELECT
-
 		[DataTestMethod]
-		[DataRow("Test_01.ttl", "Test_01.rq")]
-		[DataRow("Test_02.ttl", "Test_02.rq")]
-		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName)
+		[DataRow("Test_01.ttl", "Test_01.rq", null)]
+		[DataRow("Test_02.ttl", "Test_02.rq", null)]
+		[DataRow("Test_03.ttl", "Test_03.rq", "data.n3")]
+		public async Task SELECT_Tests(string DataSetFileName, string QueryFileName,
+			string SourceName)
 		{
 			TurtleDocument Doc = LoadTurtleResource(DataSetFileName);
 			string Query = LoadTextResource(QueryFileName);
 			Expression Exp = new Expression(Query);
-			Variables v = new Variables
-			{
-				[" Default Graph "] = Doc
-			};
+			Variables v = new Variables();
+
+			if (string.IsNullOrEmpty(SourceName))
+				v[" Default Graph "] = Doc;
+			else
+				v[" " + SourceName + " "] = Doc;
 
 			object Result = await Exp.EvaluateAsync(v);
 			Assert.IsNotNull(Result);
 
-			ObjectMatrix M = Result as ObjectMatrix;
+			SparqlResultSet ResultSet = Result as SparqlResultSet;
+			Assert.IsNotNull(ResultSet);
+
+			ObjectMatrix M = ResultSet.ToMatrix() as ObjectMatrix;
 			Assert.IsNotNull(M);
 			Assert.IsNotNull(M.ColumnNames);
 
 			Console.Out.WriteLine(Expression.ToString(M));
 		}
-
-		#endregion
 
 	}
 }

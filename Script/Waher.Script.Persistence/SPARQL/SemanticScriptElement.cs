@@ -34,6 +34,11 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		public bool IsLiteral => false;
 
+		/// <summary>
+		/// Underlying element value represented by the semantic element.
+		/// </summary>
+		public object ElementValue => this.node;
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{

@@ -41,41 +41,34 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			Result = null;
 
-			try
-			{
-				string s = Parser.NextToken().ToUpper();
-				if (s != "INDEX")
-					return false;
-
-				ScriptNode Name = Parser.ParseNoWhiteSpace();
-
-				s = Parser.NextToken().ToUpper();
-				if (s != "ON")
-					return false;
-
-				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
-					return false;
-
-				s = Parser.NextToken();
-				if (s != "(")
-					return false;
-
-				this.ParseList(Parser, out ScriptNode[] Columns, out bool[] Ascending);
-
-				if (Columns.Length == 0)
-					return false;
-
-				if (Parser.NextToken() != ")")
-					return false;
-
-				Result = new CreateIndex(Name, Source, Columns, Ascending, Parser.Start, Parser.Length, Parser.Expression);
-
-				return true;
-			}
-			catch (Exception)
-			{
+			string s = Parser.NextToken().ToUpper();
+			if (s != "INDEX")
 				return false;
-			}
+
+			ScriptNode Name = Parser.ParseNoWhiteSpace();
+
+			s = Parser.NextToken().ToUpper();
+			if (s != "ON")
+				return false;
+
+			if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+				return false;
+
+			s = Parser.NextToken();
+			if (s != "(")
+				return false;
+
+			this.ParseList(Parser, out ScriptNode[] Columns, out bool[] Ascending);
+
+			if (Columns.Length == 0)
+				return false;
+
+			if (Parser.NextToken() != ")")
+				return false;
+
+			Result = new CreateIndex(Name, Source, Columns, Ascending, Parser.Start, Parser.Length, Parser.Expression);
+
+			return true;
 		}
 
 		internal void ParseList(ScriptParser Parser, out ScriptNode[] Columns, out bool[] Ascending)

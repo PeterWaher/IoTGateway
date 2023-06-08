@@ -40,37 +40,30 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			Result = null;
 
-			try
-			{
-				string s = Parser.NextToken().ToUpper();
-				bool Lazy = s == "LAZY";
+			string s = Parser.NextToken().ToUpper();
+			bool Lazy = s == "LAZY";
 
-				if (Lazy)
-					s = Parser.NextToken().ToUpper();
+			if (Lazy)
+				s = Parser.NextToken().ToUpper();
 
-				if (s != "FROM")
-					return false;
-
-				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
-					return false;
-
-				ScriptNode Where = null;
-
-				s = Parser.PeekNextToken().ToUpper();
-				if (s == "WHERE")
-				{
-					Parser.NextToken();
-					Where = Parser.ParseOrs();
-				}
-
-				Result = new Delete(Source, Where, Lazy, Parser.Start, Parser.Length, Parser.Expression);
-
-				return true;
-			}
-			catch (Exception)
-			{
+			if (s != "FROM")
 				return false;
+
+			if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+				return false;
+
+			ScriptNode Where = null;
+
+			s = Parser.PeekNextToken().ToUpper();
+			if (s == "WHERE")
+			{
+				Parser.NextToken();
+				Where = Parser.ParseOrs();
 			}
+
+			Result = new Delete(Source, Where, Lazy, Parser.Start, Parser.Length, Parser.Expression);
+
+			return true;
 		}
 
 	}

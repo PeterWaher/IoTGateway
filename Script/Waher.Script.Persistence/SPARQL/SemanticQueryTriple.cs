@@ -58,8 +58,9 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Semantic query triple
 		/// </summary>
 		/// <param name="Triple">Triple</param>
-		public SemanticQueryTriple(ISemanticTriple Triple)
-			: this(Triple.Subject, Triple.Predicate, Triple.Object)
+		/// <param name="Optional">If triple is optional.</param>
+		public SemanticQueryTriple(ISemanticTriple Triple, bool Optional)
+			: this(Triple.Subject, Triple.Predicate, Triple.Object, Optional)
 		{
 		}
 
@@ -69,12 +70,14 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Subject">Subject</param>
 		/// <param name="Predicate">Predicate</param>
 		/// <param name="Object">Object</param>
+		/// <param name="Optional">If triple is optional or not.</param>
 		public SemanticQueryTriple(ISemanticElement Subject, ISemanticElement Predicate,
-			ISemanticElement Object)
+			ISemanticElement Object, bool Optional)
 		{
 			this.Subject = Subject;
 			this.Predicate = Predicate;
 			this.Object = Object;
+			this.Optional = Optional;
 
 			int i = 0;
 
@@ -169,5 +172,50 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Type of triple
 		/// </summary>
 		public QueryTripleType Type { get; }
+
+		/// <summary>
+		/// If triple is optional.
+		/// </summary>
+		public bool Optional { get; }
+
+		/// <summary>
+		/// If triple is required.
+		/// </summary>
+		public bool Required => !this.Optional;
+
+		/// <summary>
+		/// Access to elements: 0=Subject, 1=Predicate, 2=Object.
+		/// </summary>
+		/// <param name="Index">Axis index.</param>
+		/// <returns>Semantic element.</returns>
+		public ISemanticElement this[int Index]
+		{
+			get
+			{
+				switch (Index)
+				{
+					case 0: return this.Subject;
+					case 1: return this.Predicate;
+					case 2: return this.Object;
+					default: return null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets a variable name, given the axis index: 0=Subject, 1=Predicate, 2=Object.
+		/// </summary>
+		/// <param name="Index">Axis index.</param>
+		/// <returns>Variable name.</returns>
+		public string VariableName(int Index)
+		{
+			switch (Index)
+			{
+				case 0: return this.SubjectVariable;
+				case 1: return this.PredicateVariable;
+				case 2: return this.ObjectVariable;
+				default: return null;
+			}
+		}
 	}
 }

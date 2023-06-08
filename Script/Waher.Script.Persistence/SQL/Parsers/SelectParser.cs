@@ -48,266 +48,259 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			Result = null;
 
-			try
+			List<ScriptNode> Columns;
+			List<ScriptNode> ColumnNames;
+			ScriptNode Top = null;
+			string s;
+			bool Distinct = false;
+			bool Generic = false;
+
+			s = Parser.PeekNextToken().ToUpper();
+			if (string.IsNullOrEmpty(s))
+				return false;
+
+			while (s == "TOP" || s == "DISTINCT" || s == "GENERIC")
 			{
-				List<ScriptNode> Columns;
-				List<ScriptNode> ColumnNames;
-				ScriptNode Top = null;
-				string s;
-				bool Distinct = false;
-				bool Generic = false;
+				switch (s)
+				{
+					case "TOP":
+						Parser.NextToken();
+						Top = Parser.ParseNoWhiteSpace();
+						break;
+
+					case "DISTINCT":
+						Parser.NextToken();
+						Distinct = true;
+						break;
+
+					case "GENERIC":
+						Parser.NextToken();
+						Generic = true;
+						break;
+				}
 
 				s = Parser.PeekNextToken().ToUpper();
 				if (string.IsNullOrEmpty(s))
 					return false;
+			}
 
-				while (s == "TOP" || s == "DISTINCT" || s == "GENERIC")
+			if (s == "*")
+			{
+				Parser.NextToken();
+				Columns = null;
+				ColumnNames = null;
+			}
+			else if (s == "?")
+			{
+				if (!(Top is null) || Generic)
+					return false;
+
+				SparqlParser SparqlParser;
+
+				if (Distinct)
+					SparqlParser = new SparqlParser("SELECT DISTINCT ?");
+				else
+					SparqlParser = new SparqlParser("SELECT ?");
+
+				return SparqlParser.TryParse(Parser, out Result);
+			}
+			else
+			{
+				Columns = new List<ScriptNode>();
+				ColumnNames = new List<ScriptNode>();
+
+				ScriptNode Node;
+				ScriptNode Name;
+
+				while (true)
 				{
-					switch (s)
+					if (s == "/" || s == "." || s == "@")
+						Node = ParseXPath(Parser, true);
+					else
 					{
-						case "TOP":
-							Parser.NextToken();
-							Top = Parser.ParseNoWhiteSpace();
-							break;
+						Node = Parser.ParseNoWhiteSpace();
 
-						case "DISTINCT":
-							Parser.NextToken();
-							Distinct = true;
-							break;
-
-						case "GENERIC":
-							Parser.NextToken();
-							Generic = true;
-							break;
+						if (Node is XPath XPath)
+							XPath.ExtractValue = true;
 					}
 
+					Name = null;
+					Parser.SkipWhiteSpace();
+
 					s = Parser.PeekNextToken().ToUpper();
-					if (string.IsNullOrEmpty(s))
-						return false;
-				}
+					if (!string.IsNullOrEmpty(s) && s != "," && s != "FROM")
+					{
+						if (s == "AS")
+							Parser.NextToken();
 
-				if (s == "*")
-				{
+						Name = Parser.ParseNoWhiteSpace();
+						s = Parser.PeekNextToken();
+					}
+					else if (Node is VariableReference Ref)
+						Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
+					else if (Node is NamedMember NamedMember)
+						Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
+
+					Columns.Add(Node);
+					ColumnNames.Add(Name);
+
+					if (s != ",")
+						break;
+
 					Parser.NextToken();
-					Columns = null;
-					ColumnNames = null;
+					s = Parser.PeekNextToken();
 				}
-				else if (s == "?")
-				{
-					if (!(Top is null) || Generic)
-						return false;
+			}
 
-					SparqlParser SparqlParser;
+			s = Parser.NextToken().ToUpper();
+			if (s != "FROM")
+				return false;
 
-					if (Distinct)
-						SparqlParser = new SparqlParser("SELECT DISTINCT ?");
-					else
-						SparqlParser = new SparqlParser("SELECT ?");
+			if (!TryParseSources(Parser, out SourceDefinition Source))
+				return false;
 
-					return SparqlParser.TryParse(Parser, out Result);
-				}
+			ScriptNode Where = null;
+
+			s = Parser.PeekNextToken().ToUpper();
+			if (s == "WHERE")
+			{
+				Parser.NextToken();
+
+				s = Parser.PeekNextToken();
+				if (s == "/" || s == "." || s == "@")
+					Where = ParseXPath(Parser, false);
 				else
-				{
-					Columns = new List<ScriptNode>();
-					ColumnNames = new List<ScriptNode>();
+					Where = Parser.ParseOrs();
 
-					ScriptNode Node;
+				s = Parser.PeekNextToken().ToUpper();
+			}
+
+			List<ScriptNode> GroupBy = null;
+			List<ScriptNode> GroupByNames = null;
+			ScriptNode Having = null;
+
+			if (s == "GROUP")
+			{
+				Parser.NextToken();
+				if (Parser.NextToken().ToUpper() != "BY")
+					return false;
+
+				GroupBy = new List<ScriptNode>();
+				GroupByNames = new List<ScriptNode>();
+
+				while (true)
+				{
+					ScriptNode Node = Parser.ParseNoWhiteSpace();
 					ScriptNode Name;
 
-					while (true)
+					Parser.SkipWhiteSpace();
+
+					s = Parser.PeekNextToken().ToUpper();
+					if (!string.IsNullOrEmpty(s) && s != "," && s != ";" && s != ")" && s != "]" && s != "}" && s != "HAVING" && s != "ORDER" && s != "OFFSET")
 					{
-						if (s == "/" || s == "." || s == "@")
-							Node = ParseXPath(Parser, true);
-						else
-						{
-							Node = Parser.ParseNoWhiteSpace();
+						if (s == "AS")
+							Parser.NextToken();
 
-							if (Node is XPath XPath)
-								XPath.ExtractValue = true;
-						}
-
-						Name = null;
-						Parser.SkipWhiteSpace();
-
+						Name = Parser.ParseNoWhiteSpace();
 						s = Parser.PeekNextToken().ToUpper();
-						if (!string.IsNullOrEmpty(s) && s != "," && s != "FROM")
-						{
-							if (s == "AS")
-								Parser.NextToken();
+					}
+					else
+						Name = null;
 
-							Name = Parser.ParseNoWhiteSpace();
-							s = Parser.PeekNextToken();
-						}
-						else if (Node is VariableReference Ref)
+					if (Name is null)
+					{
+						if (Node is VariableReference Ref)
 							Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
 						else if (Node is NamedMember NamedMember)
 							Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
-
-						Columns.Add(Node);
-						ColumnNames.Add(Name);
-
-						if (s != ",")
-							break;
-
-						Parser.NextToken();
-						s = Parser.PeekNextToken();
 					}
+
+					GroupBy.Add(Node);
+					GroupByNames.Add(Name);
+
+					if (s != ",")
+						break;
+
+					Parser.NextToken();
 				}
 
-				s = Parser.NextToken().ToUpper();
-				if (s != "FROM")
-					return false;
-
-				if (!TryParseSources(Parser, out SourceDefinition Source))
-					return false;
-
-				ScriptNode Where = null;
-
-				s = Parser.PeekNextToken().ToUpper();
-				if (s == "WHERE")
+				if (s == "HAVING")
 				{
 					Parser.NextToken();
-
-					s = Parser.PeekNextToken();
-					if (s == "/" || s == "." || s == "@")
-						Where = ParseXPath(Parser, false);
-					else
-						Where = Parser.ParseOrs();
-				
+					Having = Parser.ParseOrs();
 					s = Parser.PeekNextToken().ToUpper();
 				}
+			}
+			else if (!(Columns is null))
+			{
+				bool ImplicitGrouping = false;
 
-				List<ScriptNode> GroupBy = null;
-				List<ScriptNode> GroupByNames = null;
-				ScriptNode Having = null;
-
-				if (s == "GROUP")
+				foreach (ScriptNode Column in Columns)
 				{
-					Parser.NextToken();
-					if (Parser.NextToken().ToUpper() != "BY")
-						return false;
+					if (this.ContainsVectorFunction(Column))
+					{
+						ImplicitGrouping = true;
+						break;
+					}
+				}
 
+				if (ImplicitGrouping)
+				{
 					GroupBy = new List<ScriptNode>();
 					GroupByNames = new List<ScriptNode>();
-
-					while (true)
-					{
-						ScriptNode Node = Parser.ParseNoWhiteSpace();
-						ScriptNode Name = null;
-
-						Parser.SkipWhiteSpace();
-
-						s = Parser.PeekNextToken().ToUpper();
-						if (!string.IsNullOrEmpty(s) && s != "," && s != ";" && s != ")" && s != "]" && s != "}" && s != "HAVING" && s != "ORDER" && s != "OFFSET")
-						{
-							if (s == "AS")
-								Parser.NextToken();
-
-							Name = Parser.ParseNoWhiteSpace();
-							s = Parser.PeekNextToken().ToUpper();
-						}
-						else
-							Name = null;
-
-						if (Name is null)
-						{
-							if (Node is VariableReference Ref)
-								Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
-							else if (Node is NamedMember NamedMember)
-								Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
-						}
-
-						GroupBy.Add(Node);
-						GroupByNames.Add(Name);
-
-						if (s != ",")
-							break;
-
-						Parser.NextToken();
-					}
-
-					if (s == "HAVING")
-					{
-						Parser.NextToken();
-						Having = Parser.ParseOrs();
-						s = Parser.PeekNextToken().ToUpper();
-					}
 				}
-				else if (!(Columns is null))
-				{
-					bool ImplicitGrouping = false;
-
-					foreach (ScriptNode Column in Columns)
-					{
-						if (this.ContainsVectorFunction(Column))
-						{
-							ImplicitGrouping = true;
-							break;
-						}
-					}
-
-					if (ImplicitGrouping)
-					{
-						GroupBy = new List<ScriptNode>();
-						GroupByNames = new List<ScriptNode>();
-					}
-				}
-
-				List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
-
-				if (s == "ORDER")
-				{
-					Parser.NextToken();
-					if (Parser.NextToken().ToUpper() != "BY")
-						return false;
-
-					OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
-
-					while (true)
-					{
-						ScriptNode Node = Parser.ParseNoWhiteSpace();
-
-						s = Parser.PeekNextToken().ToUpper();
-						if (s == "ASC")
-						{
-							Parser.NextToken();
-							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
-							s = Parser.PeekNextToken().ToUpper();
-						}
-						else if (s == "DESC")
-						{
-							Parser.NextToken();
-							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, false));
-							s = Parser.PeekNextToken().ToUpper();
-						}
-						else
-							OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
-
-						if (s != ",")
-							break;
-
-						Parser.NextToken();
-					}
-				}
-
-				ScriptNode Offset = null;
-
-				if (s == "OFFSET")
-				{
-					Parser.NextToken();
-					Offset = Parser.ParseNoWhiteSpace();
-				}
-
-				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where, GroupBy?.ToArray(),
-					GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct, Generic,
-					Parser.Start, Parser.Length, Parser.Expression);
-
-				return true;
 			}
-			catch (Exception)
+
+			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
+
+			if (s == "ORDER")
 			{
-				return false;
+				Parser.NextToken();
+				if (Parser.NextToken().ToUpper() != "BY")
+					return false;
+
+				OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
+
+				while (true)
+				{
+					ScriptNode Node = Parser.ParseNoWhiteSpace();
+
+					s = Parser.PeekNextToken().ToUpper();
+					if (s == "ASC")
+					{
+						Parser.NextToken();
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
+						s = Parser.PeekNextToken().ToUpper();
+					}
+					else if (s == "DESC")
+					{
+						Parser.NextToken();
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, false));
+						s = Parser.PeekNextToken().ToUpper();
+					}
+					else
+						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
+
+					if (s != ",")
+						break;
+
+					Parser.NextToken();
+				}
 			}
+
+			ScriptNode Offset = null;
+
+			if (s == "OFFSET")
+			{
+				Parser.NextToken();
+				Offset = Parser.ParseNoWhiteSpace();
+			}
+
+			Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where, GroupBy?.ToArray(),
+				GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct, Generic,
+				Parser.Start, Parser.Length, Parser.Expression);
+
+			return true;
 		}
 
 		private static XPath ParseXPath(ScriptParser Parser, bool ExtractValue)

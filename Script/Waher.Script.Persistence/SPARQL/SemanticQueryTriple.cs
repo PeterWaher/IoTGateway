@@ -58,9 +58,8 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Semantic query triple
 		/// </summary>
 		/// <param name="Triple">Triple</param>
-		/// <param name="Optional">If triple is optional.</param>
-		public SemanticQueryTriple(ISemanticTriple Triple, bool Optional)
-			: this(Triple.Subject, Triple.Predicate, Triple.Object, Optional)
+		public SemanticQueryTriple(ISemanticTriple Triple)
+			: this(Triple.Subject, Triple.Predicate, Triple.Object)
 		{
 		}
 
@@ -70,14 +69,12 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Subject">Subject</param>
 		/// <param name="Predicate">Predicate</param>
 		/// <param name="Object">Object</param>
-		/// <param name="Optional">If triple is optional or not.</param>
 		public SemanticQueryTriple(ISemanticElement Subject, ISemanticElement Predicate,
-			ISemanticElement Object, bool Optional)
+			ISemanticElement Object)
 		{
 			this.Subject = Subject;
 			this.Predicate = Predicate;
 			this.Object = Object;
-			this.Optional = Optional;
 
 			int i = 0;
 
@@ -172,16 +169,6 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Type of triple
 		/// </summary>
 		public QueryTripleType Type { get; }
-
-		/// <summary>
-		/// If triple is optional.
-		/// </summary>
-		public bool Optional { get; }
-
-		/// <summary>
-		/// If triple is required.
-		/// </summary>
-		public bool Required => !this.Optional;
 
 		/// <summary>
 		/// Access to elements: 0=Subject, 1=Predicate, 2=Object.

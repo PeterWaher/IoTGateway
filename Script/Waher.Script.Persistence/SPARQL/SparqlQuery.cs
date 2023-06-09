@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
@@ -24,11 +23,9 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode from;
-		private readonly SemanticQueryTriple[] where;
-		private readonly KeyValuePair<ScriptNode, ScriptNode>[] boundVariables;
+		private readonly SparqlPattern where;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
-		private readonly ISemanticTriple[] construct;
-		private readonly ScriptNode[] filter;
+		private readonly SparqlPattern construct;
 		private readonly bool distinct;
 
 		/// <summary>
@@ -39,18 +36,14 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="ColumnNames">Names of selected columns.</param>
 		/// <param name="From">Data source.</param>
 		/// <param name="Where">Optional where clause</param>
-		/// <param name="BoundVariables">Bound variables.</param>
-		/// <param name="Filter">Filter statements.</param>
 		/// <param name="OrderBy">Order to present result set.</param>
 		/// <param name="Construct">Triples to construct.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public SparqlQuery(bool Distinct, ScriptNode[] Columns, ScriptNode[] ColumnNames,
-			ScriptNode From, SemanticQueryTriple[] Where,
-			KeyValuePair<ScriptNode, ScriptNode>[] BoundVariables,
-			ScriptNode[] Filter, KeyValuePair<ScriptNode, bool>[] OrderBy,
-			ISemanticTriple[] Construct, int Start, int Length, Expression Expression)
+			ScriptNode From, SparqlPattern Where, KeyValuePair<ScriptNode, bool>[] OrderBy,
+			SparqlPattern Construct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.distinct = Distinct;
@@ -65,33 +58,10 @@ namespace Waher.Script.Persistence.SPARQL
 			this.from = From;
 			this.from?.SetParent(this);
 
-			this.filter = Filter;
-			this.filter?.SetParent(this);
-
 			this.where = Where;
-			this.boundVariables = BoundVariables;
+			this.where?.SetParent(this);
+
 			this.orderBy = OrderBy;
-
-			foreach (ISemanticTriple T in Where)
-			{
-				if (T.Subject is SemanticScriptElement S)
-					S.Node.SetParent(this);
-
-				if (T.Predicate is SemanticScriptElement P)
-					P.Node.SetParent(this);
-
-				if (T.Object is SemanticScriptElement O)
-					O.Node.SetParent(this);
-			}
-
-			if (!(this.boundVariables is null))
-			{
-				foreach (KeyValuePair<ScriptNode, ScriptNode> P in this.boundVariables)
-				{
-					P.Key.SetParent(this);
-					P.Value.SetParent(this);
-				}
-			}
 
 			if (!(this.orderBy is null))
 			{
@@ -148,135 +118,19 @@ namespace Waher.Script.Persistence.SPARQL
 					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
 			}
 
-			Dictionary<string, bool> VariablesProcessed = new Dictionary<string, bool>();
-			LinkedList<Possibility> Possibilities = new LinkedList<Possibility>();
+			IEnumerable<Possibility> Possibilities;
 
-			foreach (SemanticQueryTriple T in this.where)
-			{
-				switch (T.Type)
-				{
-					case QueryTripleType.Constant:
-						if (T.Required && await Cube.GetTriplesBySubjectAndPredicateAndObject(T.Subject, T.Predicate, T.Object) is null)
-							Possibilities = null;
-						break;
-
-					case QueryTripleType.SubjectVariable:
-						Possibilities = await CrossPossibilitiesOneVariable(Possibilities, T,
-							0, 1, 2, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.PredicateVariable:
-						Possibilities = await CrossPossibilitiesOneVariable(Possibilities, T,
-							1, 0, 2, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.ObjectVariable:
-						Possibilities = await CrossPossibilitiesOneVariable(Possibilities, T,
-							2, 0, 1, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.SubjectPredicateVariables:
-						Possibilities = await CrossPossibilitiesTwoVariables(Possibilities, T,
-							0, 1, 2, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.SubjectObjectVariable:
-						Possibilities = await CrossPossibilitiesTwoVariables(Possibilities, T,
-							0, 2, 1, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.PredicateObjectVariable:
-						Possibilities = await CrossPossibilitiesTwoVariables(Possibilities, T,
-							1, 2, 0, VariablesProcessed, Cube);
-						break;
-
-					case QueryTripleType.SubjectPredicateObjectVariable:
-						Possibilities = await CrossPossibilitiesThreeVariables(Possibilities, T,
-							VariablesProcessed, Cube);
-						break;
-				}
-
-				if (Possibilities?.First is null)
-					break;
-			}
-
-			if (!(this.filter is null) && !(Possibilities is null))
-			{
-				LinkedListNode<Possibility> Loop = Possibilities.First;
-				LinkedListNode<Possibility> Temp;
-				ObjectProperties RecordVariables = null;
-				bool Pass;
-
-				while (!(Loop is null))
-				{
-					if (RecordVariables is null)
-						RecordVariables = new ObjectProperties(Loop.Value, Variables);
-					else
-						RecordVariables.Object = Loop.Value;
-
-					Pass = true;
-
-					foreach (ScriptNode Filter in this.filter)
-					{
-						object Value = await this.EvaluateValue(RecordVariables, Filter);
-						if (!(Value is bool b) || !b)
-						{
-							Pass = false;
-							break;
-						}
-					}
-
-					if (Pass)
-						Loop = Loop.Next;
-					else
-					{
-						Temp = Loop.Next;
-						Possibilities.Remove(Loop);
-						Loop = Temp;
-					}
-				}
-			}
+			if (this.where is null)
+				Possibilities = null;
+			else
+				Possibilities = await this.where.Search(Cube, Variables, this);
 
 			if (this.columns is null && this.construct is null)   // ASK
-				return new ObjectValue(new SparqlResultSet(!(Possibilities?.First is null)));
-
-			string Name;
-
-			if (!(this.boundVariables is null) && !(Possibilities is null))
 			{
-				LinkedList<Possibility> NewPossibilities = new LinkedList<Possibility>();
-				ObjectProperties RecordVariables = null;
-				Possibility P;
+				if (!(Possibilities is null))
+					return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
 
-				foreach (Possibility Possibility in Possibilities)
-				{
-					P = Possibility;
-
-					foreach (KeyValuePair<ScriptNode, ScriptNode> P2 in this.boundVariables)
-					{
-						if (RecordVariables is null)
-							RecordVariables = new ObjectProperties(P, Variables);
-						else
-							RecordVariables.Object = P;
-
-						if (P2.Value is VariableReference Ref)
-							Name = Ref.VariableName;
-						else
-						{
-							Name = (await this.EvaluateValue(RecordVariables, P2.Value))?.ToString();
-							if (string.IsNullOrEmpty(Name))
-								continue;
-						}
-
-						ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
-
-						P = new Possibility(Name, Literal, P);
-					}
-
-					NewPossibilities.AddLast(P);
-				}
-
-				Possibilities = NewPossibilities;
+				return new ObjectValue(new SparqlResultSet(false));
 			}
 
 			if (!(this.construct is null))   // CONSTRUCT
@@ -293,7 +147,7 @@ namespace Waher.Script.Persistence.SPARQL
 						else
 							RecordVariables.Object = P;
 
-						foreach (ISemanticTriple T in this.construct)
+						foreach (ISemanticTriple T in this.construct.Triples)
 						{
 							ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
 							ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
@@ -312,6 +166,7 @@ namespace Waher.Script.Persistence.SPARQL
 			List<string> ColumnNames = new List<string>();
 			int Columns = this.columns.Length;
 			int i, c = this.columnNames?.Length ?? 0;
+			string Name;
 
 			for (i = 0; i < Columns; i++)
 			{
@@ -369,7 +224,7 @@ namespace Waher.Script.Persistence.SPARQL
 						if (ColumnVariables.TryGetValue(Name, out i))
 							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
 
-						Loop = Loop.Prev;
+						Loop = Loop.NextVariable;
 					}
 
 					if (!(ColumnScript is null))
@@ -412,7 +267,7 @@ namespace Waher.Script.Persistence.SPARQL
 				Records.ToArray()));
 		}
 
-		private async Task<object> EvaluateValue(Variables RecordVariables, ScriptNode Node)
+		internal static async Task<object> EvaluateValue(Variables RecordVariables, ScriptNode Node)
 		{
 			try
 			{
@@ -428,7 +283,7 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 		}
 
-		private Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ISemanticElement Element)
+		internal Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ISemanticElement Element)
 		{
 			if (Element is SemanticScriptElement ScriptElement)
 				return this.EvaluateSemanticElement(RecordVariables, ScriptElement.Node);
@@ -436,9 +291,9 @@ namespace Waher.Script.Persistence.SPARQL
 				return Task.FromResult(Element);
 		}
 
-		private async Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ScriptNode Node)
+		internal async Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ScriptNode Node)
 		{
-			object Value = await this.EvaluateValue(RecordVariables, Node);
+			object Value = await EvaluateValue(RecordVariables, Node);
 
 			if (Value is ISemanticElement Element)
 				return Element;
@@ -447,560 +302,18 @@ namespace Waher.Script.Persistence.SPARQL
 				return new UriNode(Uri, Uri.OriginalString);
 
 			Type T = Value?.GetType() ?? typeof(object);
-			ISemanticLiteral Literal;
 
-			lock (this.literalPerType)
+			if (!this.literalPerType.TryGetValue(T, out ISemanticLiteral Literal))
 			{
-				if (!this.literalPerType.TryGetValue(T, out Literal))
-				{
-					Literal = Types.FindBest<ISemanticLiteral, Type>(T)
-						?? new CustomLiteral(string.Empty, string.Empty);
+				Literal = Types.FindBest<ISemanticLiteral, Type>(T)
+					?? new CustomLiteral(string.Empty, string.Empty);
 
-					this.literalPerType[T] = Literal;
-				}
+				this.literalPerType[T] = Literal;
 			}
 
 			Literal = Literal.Encapsulate(Value);
 
 			return Literal;
-		}
-
-		private static async Task<LinkedList<Possibility>> CrossPossibilitiesOneVariable(
-			LinkedList<Possibility> Possibilities, SemanticQueryTriple T, int VariableIndex,
-			int ValueIndex1, int ValueIndex2, Dictionary<string, bool> VariablesProcessed,
-			ISemanticCube Cube)
-		{
-			LinkedList<Possibility> NewPossibilities = null;
-			string Name = T.VariableName(VariableIndex);
-			ISemanticElement Value;
-
-			if (VariablesProcessed.ContainsKey(Name))
-			{
-				if (T.Optional)
-					NewPossibilities = Possibilities;
-				else
-				{
-					foreach (Possibility P in Possibilities)
-					{
-						Value = P.GetValue(Name);
-						if (Value is null)
-							continue;
-
-						if (await Cube.GetTriplesBySubjectAndPredicateAndObject(Value, T.Predicate, T.Object) is null)
-							continue;
-
-						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
-
-						NewPossibilities.AddLast(P);
-					}
-				}
-			}
-			else
-			{
-				VariablesProcessed[Name] = true;
-
-				if (!CrossPossibilities(
-					await Cube.GetTriples(T[ValueIndex1], ValueIndex1, T[ValueIndex2], ValueIndex2),
-					Possibilities, Name, VariableIndex, ref NewPossibilities, T.Optional))
-				{
-					return null;
-				}
-			}
-
-			return NewPossibilities;
-		}
-
-		private static async Task<LinkedList<Possibility>> CrossPossibilitiesTwoVariables(
-			LinkedList<Possibility> Possibilities, SemanticQueryTriple T, int VariableIndex1,
-			int VariableIndex2, int ValueIndex, Dictionary<string, bool> VariablesProcessed,
-			ISemanticCube Cube)
-		{
-			LinkedList<Possibility> NewPossibilities = null;
-			string Name = T.VariableName(VariableIndex1);
-			string Name2 = T.VariableName(VariableIndex2);
-			bool IsProcessed = VariablesProcessed.ContainsKey(Name);
-			bool IsProcessed2 = VariablesProcessed.ContainsKey(Name2);
-			ISemanticElement Value;
-			ISemanticElement Value2;
-			bool SameName = Name == Name2;
-
-			if (IsProcessed && IsProcessed2)
-			{
-				if (T.Optional)
-					NewPossibilities = Possibilities;
-				else
-				{
-					foreach (Possibility P in Possibilities)
-					{
-						Value = P.GetValue(Name);
-						if (Value is null)
-							continue;
-
-						if (SameName)
-							Value2 = Value;
-						else
-						{
-							Value2 = P.GetValue(Name2);
-							if (Value2 is null)
-								continue;
-						}
-
-						if (await Cube.GetTriplesBySubjectAndPredicateAndObject(Value, Value2, T[ValueIndex]) is null)
-							continue;
-
-						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
-
-						NewPossibilities.AddLast(P);
-					}
-				}
-			}
-			else if (IsProcessed)
-			{
-				VariablesProcessed[Name2] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value = P.GetValue(Name);
-					if (Value is null)
-						continue;
-
-					CrossPossibilities(
-						await Cube.GetTriples(Value, VariableIndex1, T[ValueIndex], ValueIndex),
-						P, Name2, VariableIndex2, ref NewPossibilities, T.Optional);
-				}
-			}
-			else if (IsProcessed2)
-			{
-				VariablesProcessed[Name] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value2 = P.GetValue(Name2);
-					if (Value2 is null)
-						continue;
-
-					CrossPossibilities(
-						await Cube.GetTriples(Value2, VariableIndex2, T[ValueIndex], ValueIndex),
-						P, Name, VariableIndex1, ref NewPossibilities, T.Optional);
-				}
-			}
-			else
-			{
-				IEnumerable<ISemanticTriple> Triples = await Cube.GetTriples(T[ValueIndex], ValueIndex);
-
-				VariablesProcessed[Name] = true;
-				if (!SameName)
-					VariablesProcessed[Name2] = true;
-
-				if (Triples is null && T.Required)
-					return null;
-
-				if (Possibilities.First is null)
-				{
-					foreach (ISemanticTriple T2 in Triples)
-					{
-						if (SameName)
-						{
-							ISemanticElement E = T2[VariableIndex1];
-
-							if (!E.Equals(T2[VariableIndex2]))
-								continue;
-
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(new Possibility(Name, E));
-						}
-						else
-						{
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name, T2[VariableIndex1],
-								new Possibility(Name2, T2[VariableIndex2])));
-						}
-					}
-				}
-				else
-				{
-					foreach (Possibility P in Possibilities)
-					{
-						foreach (ISemanticTriple T2 in Triples)
-						{
-							if (SameName)
-							{
-								ISemanticElement E = T2[VariableIndex1];
-
-								if (!E.Equals(T2[VariableIndex2]))
-									continue;
-
-								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
-
-								NewPossibilities.AddLast(
-									new Possibility(Name, E, P));
-							}
-							else
-							{
-								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
-
-								NewPossibilities.AddLast(
-									new Possibility(Name, T2[VariableIndex1],
-									new Possibility(Name2, T2[VariableIndex2], P)));
-							}
-						}
-					}
-				}
-			}
-
-			return NewPossibilities;
-		}
-
-		private static async Task<LinkedList<Possibility>> CrossPossibilitiesThreeVariables(
-			LinkedList<Possibility> Possibilities, SemanticQueryTriple T,
-			Dictionary<string, bool> VariablesProcessed, ISemanticCube Cube)
-		{
-			LinkedList<Possibility> NewPossibilities = null;
-			string Name = T.SubjectVariable;
-			string Name2 = T.PredicateVariable;
-			string Name3 = T.ObjectVariable;
-			bool IsProcessed = VariablesProcessed.ContainsKey(Name);
-			bool IsProcessed2 = VariablesProcessed.ContainsKey(Name2);
-			bool IsProcessed3 = VariablesProcessed.ContainsKey(Name3);
-			bool SameName = Name == Name2;
-			bool SameName2 = Name == Name3;
-			bool SameName3 = Name2 == Name3;
-			ISemanticElement Value;
-			ISemanticElement Value2;
-			ISemanticElement Value3;
-
-			if (IsProcessed && IsProcessed2 && IsProcessed3)
-			{
-				if (T.Optional)
-					NewPossibilities = Possibilities;
-				else
-				{
-					foreach (Possibility P in Possibilities)
-					{
-						Value = P.GetValue(Name);
-						if (Value is null)
-							continue;
-
-						if (SameName)
-							Value2 = Value;
-						else
-						{
-							Value2 = P.GetValue(Name2);
-							if (Value2 is null)
-								continue;
-						}
-
-						if (SameName2)
-							Value3 = Value;
-						else if (SameName3)
-							Value3 = Value2;
-						else
-						{
-							Value3 = P.GetValue(Name3);
-							if (Value3 is null)
-								continue;
-						}
-
-						if (await Cube.GetTriplesBySubjectAndPredicateAndObject(Value, Value2, Value3) is null)
-							continue;
-
-						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
-
-						NewPossibilities.AddLast(P);
-					}
-				}
-			}
-			else if (IsProcessed && IsProcessed2)   // Subject & Predicate variables already processed
-			{
-				VariablesProcessed[Name3] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value = P.GetValue(Name);
-					if (Value is null)
-						continue;
-
-					if (SameName)
-						Value2 = Value;
-					else
-					{
-						Value2 = P.GetValue(Name2);
-						if (Value2 is null)
-							continue;
-					}
-
-					CrossPossibilities(
-						await Cube.GetTriplesBySubjectAndPredicate(Value, Value2),
-						P, Name3, 2, ref NewPossibilities, T.Optional);
-				}
-			}
-			else if (IsProcessed && IsProcessed3)   // Subject & Object variables already processed
-			{
-				VariablesProcessed[Name2] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value = P.GetValue(Name);
-					if (Value is null)
-						continue;
-
-					if (SameName2)
-						Value3 = Value;
-					else
-					{
-						Value3 = P.GetValue(Name3);
-						if (Value3 is null)
-							continue;
-					}
-
-					CrossPossibilities(
-						await Cube.GetTriplesBySubjectAndObject(Value, Value3),
-						P, Name2, 1, ref NewPossibilities, T.Optional);
-				}
-			}
-			else if (IsProcessed2 && IsProcessed3)  // Predicate & Object variables already processed
-			{
-				VariablesProcessed[Name] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value2 = P.GetValue(Name2);
-					if (Value2 is null)
-						continue;
-
-					if (SameName3)
-						Value3 = Value2;
-					else
-					{
-						Value3 = P.GetValue(Name3);
-						if (Value3 is null)
-							continue;
-					}
-
-					CrossPossibilities(
-						await Cube.GetTriplesByPredicateAndObject(Value2, Value3),
-						P, Name, 0, ref NewPossibilities, T.Optional);
-				}
-			}
-			else if (IsProcessed)                   // Subject variable processed
-			{
-				VariablesProcessed[Name2] = true;
-				if (!SameName3)
-					VariablesProcessed[Name3] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value = P.GetValue(Name);
-					if (Value is null)
-						continue;
-
-					ISemanticPlane Plane = await Cube.GetTriplesBySubject(Value);
-					if (Plane is null)
-						continue;
-
-					foreach (ISemanticTriple T2 in Plane)
-					{
-						if (SameName3)
-						{
-							if (!T2.Predicate.Equals(T2.Object))
-								continue;
-
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name2, T2.Predicate, P));
-						}
-						else
-						{
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name2, T2.Predicate,
-								new Possibility(Name3, T2.Object, P)));
-						}
-					}
-				}
-			}
-			else if (IsProcessed2)                  // Predicate variable processed
-			{
-				VariablesProcessed[Name] = true;
-				if (!SameName2)
-					VariablesProcessed[Name3] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value2 = P.GetValue(Name2);
-					if (Value2 is null)
-						continue;
-
-					ISemanticPlane Plane = await Cube.GetTriplesByPredicate(Value2);
-					if (Plane is null)
-						continue;
-
-					foreach (ISemanticTriple T2 in Plane)
-					{
-						if (SameName2)
-						{
-							if (!T2.Subject.Equals(T2.Object))
-								continue;
-
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name, T2.Subject, P));
-						}
-						else
-						{
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name, T2.Subject,
-								new Possibility(Name3, T2.Object, P)));
-						}
-					}
-				}
-			}
-			else if (IsProcessed3)                  // Object variable processed
-			{
-				VariablesProcessed[Name] = true;
-				if (!SameName)
-					VariablesProcessed[Name2] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					Value3 = P.GetValue(Name3);
-					if (Value3 is null)
-						continue;
-
-					ISemanticPlane Plane = await Cube.GetTriplesByObject(Value3);
-					if (Plane is null)
-						continue;
-
-					foreach (ISemanticTriple T2 in Plane)
-					{
-						if (SameName)
-						{
-							if (!T2.Subject.Equals(T2.Predicate))
-								continue;
-
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name, T2.Subject, P));
-						}
-						else
-						{
-							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
-
-							NewPossibilities.AddLast(
-								new Possibility(Name, T2.Subject,
-								new Possibility(Name2, T2.Predicate, P)));
-						}
-					}
-				}
-			}
-			else
-			{
-				VariablesProcessed[Name] = true;
-				if (!SameName)
-					VariablesProcessed[Name2] = true;
-				if (!SameName2 && !SameName3)
-					VariablesProcessed[Name3] = true;
-
-				foreach (Possibility P in Possibilities)
-				{
-					foreach (ISemanticTriple T2 in Cube)
-					{
-						if (SameName && !T2.Subject.Equals(T2.Predicate))
-							continue;
-
-						if (SameName2 && !T2.Subject.Equals(T2.Object))
-							continue;
-
-						if (SameName3 && !T2.Predicate.Equals(T2.Object))
-							continue;
-
-						Possibility NewPossibility = new Possibility(Name, T2.Subject, P);
-
-						if (!SameName)
-							NewPossibility = new Possibility(Name2, T2.Predicate, NewPossibility);
-
-						if (!SameName2 && !SameName3)
-							NewPossibility = new Possibility(Name3, T2.Object, NewPossibility);
-
-						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
-
-						NewPossibilities.AddLast(NewPossibility);
-					}
-				}
-			}
-
-			return NewPossibilities;
-		}
-
-		private static bool CrossPossibilities(IEnumerable<ISemanticTriple> NewTriples,
-			LinkedList<Possibility> Possibilities, string Name, int Index,
-			ref LinkedList<Possibility> NewPossibilities, bool Optional)
-		{
-			if (NewTriples is null && !Optional)
-				return false;
-
-			if (Possibilities.First is null)
-			{
-				if (NewPossibilities is null)
-					NewPossibilities = new LinkedList<Possibility>();
-
-				if (NewTriples is null)
-					NewPossibilities.AddLast(new Possibility(Name, null));
-				else
-				{
-					foreach (ISemanticTriple T2 in NewTriples)
-						NewPossibilities.AddLast(new Possibility(Name, T2[Index]));
-				}
-			}
-			else
-			{
-				foreach (Possibility P in Possibilities)
-					CrossPossibilities(NewTriples, P, Name, Index, ref NewPossibilities, Optional);
-			}
-
-			return true;
-		}
-
-		private static void CrossPossibilities(IEnumerable<ISemanticTriple> NewTriples,
-			Possibility Possibility, string Name, int Index, ref LinkedList<Possibility> NewPossibilities,
-			bool Optional)
-		{
-			if (NewTriples is null && !Optional)
-				return;
-
-			if (NewPossibilities is null)
-				NewPossibilities = new LinkedList<Possibility>();
-
-			if (NewTriples is null)
-				NewPossibilities.AddLast(new Possibility(Name, null, Possibility));
-			else
-			{
-				foreach (ISemanticTriple T2 in NewTriples)
-					NewPossibilities.AddLast(new Possibility(Name, T2[Index], Possibility));
-			}
 		}
 
 		/// <summary>
@@ -1017,59 +330,32 @@ namespace Waher.Script.Persistence.SPARQL
 				if (!this.columns.ForAllChildNodes(Callback, State, Order))
 					return false;
 
-				foreach (ISemanticTriple T in this.where)
-				{
-					if (T.Subject is SemanticScriptElement S)
-						S.Node.ForAllChildNodes(Callback, State, Order);
+				if (!(this.where is null) && !this.where.ForAllChildNodes(Callback, State, Order))
+					return false;
 
-					if (T.Predicate is SemanticScriptElement P)
-						P.Node.ForAllChildNodes(Callback, State, Order);
-
-					if (T.Object is SemanticScriptElement O)
-						O.Node.ForAllChildNodes(Callback, State, Order);
-				}
+				if (!(this.construct is null) && !this.construct.ForAllChildNodes(Callback, State, Order))
+					return false;
 			}
 
 			if (!this.columns.ForAll(Callback, this, State, Order == SearchMethod.TreeOrder))
 				return false;
 
-			foreach (ISemanticTriple T in this.where)
-			{
-				if (T.Subject is SemanticScriptElement S)
-				{
-					if (!S.ForAll(Callback, State, Order))
-						return false;
-				}
+			if (!(this.where is null) && !this.where.ForAll(Callback, State, Order))
+				return false;
 
-				if (T.Predicate is SemanticScriptElement P)
-				{
-					if (!P.ForAll(Callback, State, Order))
-						return false;
-				}
-
-				if (T.Object is SemanticScriptElement O)
-				{
-					if (!O.ForAll(Callback, State, Order))
-						return false;
-				}
-			}
+			if (!(this.construct is null) && !this.construct.ForAll(Callback, State, Order))
+				return false;
 
 			if (Order == SearchMethod.BreadthFirst)
 			{
 				if (!this.columns.ForAllChildNodes(Callback, State, Order))
 					return false;
 
-				foreach (ISemanticTriple T in this.where)
-				{
-					if (T.Subject is SemanticScriptElement S)
-						S.Node.ForAllChildNodes(Callback, State, Order);
+				if (!(this.where is null) && !this.where.ForAllChildNodes(Callback, State, Order))
+					return false;
 
-					if (T.Predicate is SemanticScriptElement P)
-						P.Node.ForAllChildNodes(Callback, State, Order);
-
-					if (T.Object is SemanticScriptElement O)
-						O.Node.ForAllChildNodes(Callback, State, Order);
-				}
+				if (!(this.construct is null) && !this.construct.ForAllChildNodes(Callback, State, Order))
+					return false;
 			}
 
 			return true;
@@ -1078,14 +364,21 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is SparqlQuery O &&
-				AreEqual(this.columns, O.columns) &&
-				AreEqual(this.where, O.where) &&
-				this.distinct == O.distinct &&
-				base.Equals(obj)))
+			if (!(obj is SparqlQuery O) ||
+				!AreEqual(this.columns, O.columns) ||
+				((this.where is null) ^ (O.where is null)) ||
+				((this.construct is null) ^ (O.construct is null)) ||
+				this.distinct != O.distinct ||
+				!base.Equals(obj))
 			{
 				return false;
 			}
+
+			if (!(this.where is null) && !this.where.Equals(O.where))
+				return false;
+
+			if (!(this.construct is null) && !this.construct.Equals(O.construct))
+				return false;
 
 			return true;
 		}
@@ -1094,9 +387,15 @@ namespace Waher.Script.Persistence.SPARQL
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
+
 			Result ^= Result << 5 ^ GetHashCode(this.columns);
-			Result ^= Result << 5 ^ GetHashCode(this.where);
 			Result ^= Result << 5 ^ this.distinct.GetHashCode();
+
+			if (!(this.where is null))
+				Result ^= Result << 5 ^ this.where.GetHashCode();
+
+			if (!(this.construct is null))
+				Result ^= Result << 5 ^ this.construct.GetHashCode();
 
 			return Result;
 		}

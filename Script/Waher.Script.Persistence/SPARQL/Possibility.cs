@@ -6,7 +6,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// <summary>
 	/// Represents a possible solution during SPARQL evaluation.
 	/// </summary>
-	partial class Possibility
+	public class Possibility
 	{
 		/// <summary>
 		/// Represents a possible solution during SPARQL evaluation.
@@ -23,12 +23,12 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="VariableName">Variable name</param>
 		/// <param name="Value">Variable value.</param>
-		/// <param name="Prev">Previous linked list of variables in possibility.</param>
-		public Possibility(string VariableName, ISemanticElement Value, Possibility Prev)
+		/// <param name="NextVariable">Previous linked list of variables in possibility.</param>
+		public Possibility(string VariableName, ISemanticElement Value, Possibility NextVariable)
 		{
 			this.VariableName = VariableName;
 			this.Value = Value;
-			this.Prev = Prev;
+			this.NextVariable = NextVariable;
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <summary>
 		/// Previous possiblity
 		/// </summary>
-		public Possibility Prev { get; }
+		public Possibility NextVariable { get; }
 
 		/// <summary>
 		/// Access to possible variable values, given a variable name.
@@ -66,13 +66,13 @@ namespace Waher.Script.Persistence.SPARQL
 			if (this.VariableName == VariableName)
 				return this.Value;
 
-			Possibility Loop = this.Prev;
+			Possibility Loop = this.NextVariable;
 			while (!(Loop is null))
 			{
 				if (Loop.VariableName == VariableName)
 					return Loop.Value;
 
-				Loop = Loop.Prev;
+				Loop = Loop.NextVariable;
 			}
 
 			return null;
@@ -90,7 +90,7 @@ namespace Waher.Script.Persistence.SPARQL
 			sb.Append('=');
 			sb.Append(Expression.ToString(this.Value));
 
-			Possibility Loop = this.Prev;
+			Possibility Loop = this.NextVariable;
 			while (!(Loop is null))
 			{
 				sb.Append(", ");
@@ -98,7 +98,7 @@ namespace Waher.Script.Persistence.SPARQL
 				sb.Append('=');
 				sb.Append(Expression.ToString(Loop.Value));
 
-				Loop = Loop.Prev;
+				Loop = Loop.NextVariable;
 			}
 
 			return sb.ToString();

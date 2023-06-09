@@ -36,7 +36,7 @@
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return this.Name + "=" + this.Value.ToString();
+			return this.Name + "=" + (this.Value?.ToString() ?? "NULL");
 		}
 	}
 }

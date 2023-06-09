@@ -966,7 +966,7 @@
             </summary>
             <param name="VariableName">Variable name</param>
             <param name="Value">Variable value.</param>
-            <param name="Prev">Previous linked list of variables in possibility.</param>
+            <param name="NextVariable">Previous linked list of variables in possibility.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.Possibility.VariableName">
             <summary>
@@ -978,7 +978,7 @@
             Variable value.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.Prev">
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.NextVariable">
             <summary>
             Previous possiblity
             </summary>
@@ -1053,21 +1053,19 @@
             Semantic query triple
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticTriple,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticTriple)">
             <summary>
             Semantic query triple
             </summary>
             <param name="Triple">Triple</param>
-            <param name="Optional">If triple is optional.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.#ctor(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
             <summary>
             Semantic query triple
             </summary>
             <param name="Subject">Subject</param>
             <param name="Predicate">Predicate</param>
             <param name="Object">Object</param>
-            <param name="Optional">If triple is optional or not.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Subject">
             <summary>
@@ -1117,16 +1115,6 @@
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Type">
             <summary>
             Type of triple
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Optional">
-            <summary>
-            If triple is optional.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Required">
-            <summary>
-            If triple is required.
             </summary>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticQueryTriple.Item(System.Int32)">
@@ -1196,12 +1184,153 @@
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.SparqlPattern">
+            <summary>
+            Represents a pattern in a SPARQL query.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.#ctor(System.Boolean)">
+            <summary>
+            Represents a pattern in a SPARQL query.
+            </summary>
+            <param name="Optional">If pattern is optional</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.Triples">
+            <summary>
+            Triples, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.BoundVariables">
+            <summary>
+            Bound variables, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.Filter">
+            <summary>
+            Filter, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.SubPatterns">
+            <summary>
+            Sub-patterns, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.HasTriples">
+            <summary>
+            If pattern has triples
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.HasBoundVariables">
+            <summary>
+            If pattern has bound variables
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.HasFilter">
+            <summary>
+            If pattern has filter
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.HasSubPatterns">
+            <summary>
+            If pattern has sub-patterns
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.Optional">
+            <summary>
+            If pattern is optional
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.AddTriple(Waher.Script.Persistence.SPARQL.SemanticQueryTriple)">
+            <summary>
+            Adds a triple to the pattern
+            </summary>
+            <param name="Triple">Triple</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.AddVariableBinding(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Adds a variable binding to the pattern.
+            </summary>
+            <param name="Value">Value to bind.</param>
+            <param name="Variable">Variable to bind to.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.AddFilter(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Adds a filter to the pattern.
+            </summary>
+            <param name="Filter">Filter.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.AddSubPattern(Waher.Script.Persistence.SPARQL.SparqlPattern)">
+            <summary>
+            Adds a sub-pattern to the pattern.
+            </summary>
+            <param name="Pattern">Sub-pattern.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.Search(Waher.Content.Semantic.ISemanticCube,Waher.Script.Variables,Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            Searches for the pattern on information in a semantic cube.
+            </summary>
+            <param name="Cube">Semantic cube.</param>
+            <param name="Variables">Script variables.</param>
+            <param name="Query">SPARQL-query being executed.</param>
+            <returns>Matches.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.Search(Waher.Content.Semantic.ISemanticCube,Waher.Script.Variables,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            Searches for the pattern on information in a semantic cube.
+            </summary>
+            <param name="Cube">Semantic cube.</param>
+            <param name="Variables">Script variables.</param>
+            <param name="VariablesProcessed">Variables that have been processed</param>
+            <param name="Query">SPARQL-query being executed.</param>
+            <returns>Matches.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.Search(Waher.Content.Semantic.ISemanticCube,Waher.Script.Variables,System.Collections.Generic.Dictionary{System.String,System.Boolean},System.Collections.Generic.IEnumerable{Waher.Script.Persistence.SPARQL.Possibility},Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            Searches for the pattern on information in a semantic cube.
+            </summary>
+            <param name="Cube">Semantic cube.</param>
+            <param name="Variables">Script variables.</param>
+            <param name="VariablesProcessed">Variables that have been processed</param>
+            <param name="ExistingMatches">Existing matches.</param>
+            <param name="Query">SPARQL-query being executed.</param>
+            <returns>Matches.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.ForAll(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.SetParent(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sets the parent node. Can only be used when expression is being parsed.
+            </summary>
+            <param name="Parent">Parent Node</param>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.SparqlQuery">
             <summary>
             Executes a SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SemanticQueryTriple[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode}[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Content.Semantic.ISemanticTriple[],System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.SparqlPattern,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.SparqlPattern,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL SELECT statement.
             </summary>
@@ -1210,8 +1339,6 @@
             <param name="ColumnNames">Names of selected columns.</param>
             <param name="From">Data source.</param>
             <param name="Where">Optional where clause</param>
-            <param name="BoundVariables">Bound variables.</param>
-            <param name="Filter">Filter statements.</param>
             <param name="OrderBy">Order to present result set.</param>
             <param name="Construct">Triples to construct.</param>
             <param name="Start">Start position in script expression.</param>

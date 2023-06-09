@@ -10,13 +10,8 @@
 
   <results>
 		<result>
-			<binding name="y">
-				<literal>SPARQL (updated)</literal>
-			</binding>
-		</result>
-		<result>
-			<binding name="y">
-				<literal>SPARQL Protocol Tutorial</literal>
+			<binding name="x">
+				<literal>SPARQL Query Language Tutorial</literal>
 			</binding>
 		</result>
 		<result>
@@ -25,8 +20,13 @@
 			</binding>
 		</result>
 		<result>
-			<binding name="x">
-				<literal>SPARQL Query Language Tutorial</literal>
+			<binding name="y">
+				<literal>SPARQL Protocol Tutorial</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="y">
+				<literal>SPARQL (updated)</literal>
 			</binding>
 		</result>
 	</results>

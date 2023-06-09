@@ -155,10 +155,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "CONSTRUCT":
 					this.NextToken(Parser);
 
-					Construct = this.ParsePattern(Parser, false);
+					Construct = this.ParsePattern(Parser, PatternGroupType.Regular);
+					if (Construct is null)
+						throw Parser.SyntaxError("Expected pattern.");
 
-					if (Construct?.Optional ?? false)
-						throw Parser.SyntaxError("Optional triples not permitted in a construct statement.");
+					if (Construct.PatternType != PatternGroupType.Regular)
+						throw Parser.SyntaxError("Regular pattern expected.");
 
 					if (!(Construct.BoundVariables is null))
 						throw Parser.SyntaxError("Bound variables not permitted in construct statement.");
@@ -235,7 +237,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (s == "WHERE")
 			{
 				Parser.NextToken();
-				Where = this.ParsePattern(Parser, false);
+				Where = this.ParsePattern(Parser, PatternGroupType.Regular);
 				s = Parser.PeekNextToken().ToUpper();
 			}
 			else
@@ -352,7 +354,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				return Parser.PeekNextToken();
 		}
 
-		private SparqlPattern ParsePattern(ScriptParser Parser, bool Optional)
+		private SparqlPattern ParsePattern(ScriptParser Parser, PatternGroupType PatternType)
 		{
 			if (Parser.NextNonWhitespaceChar() != '{')
 				throw Parser.SyntaxError("Expected {");
@@ -365,7 +367,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			SparqlPattern Bak = this.currentPattern;
-			this.currentPattern = new SparqlPattern(Optional);
+			this.currentPattern = new SparqlPattern(PatternType);
 
 			this.ParseTriples(Parser);
 
@@ -399,9 +401,58 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					switch (Parser.PeekNextChar())
 					{
 						case '{':
-							SparqlPattern Pattern = this.ParsePattern(Parser, false);
+							SparqlPattern Pattern = this.ParsePattern(Parser, PatternGroupType.Regular);
 							if (!(Pattern is null))
 								this.currentPattern?.AddSubPattern(Pattern);
+
+							Parser.SkipWhiteSpace();
+							switch (Parser.PeekNextChar())
+							{
+								case '.':
+									Parser.NextChar();
+									Subject = null;
+									Predicate = null;
+									TriplePosition = 0;
+									break;
+
+								case '}':
+									return;
+							}
+							continue;
+
+						case 'o':
+						case 'O':
+						case 'u':
+						case 'U':
+						case 'm':
+						case 'M':
+
+							switch (Parser.PeekNextToken().ToUpper())
+							{
+								case "OPTIONAL":
+									Parser.NextToken();
+									Pattern = this.ParsePattern(Parser, PatternGroupType.Optional);
+									break;
+
+								case "UNION":
+									Parser.NextToken();
+									Pattern = this.ParsePattern(Parser, PatternGroupType.Union);
+									break;
+
+								case "MINUS":
+									Parser.NextToken();
+									Pattern = this.ParsePattern(Parser, PatternGroupType.Minus);
+									break;
+
+								default:
+									Pattern = null;
+									break;
+							}
+
+							if (Pattern is null)
+								break;
+
+							this.currentPattern?.AddSubPattern(Pattern);
 
 							switch (Parser.NextNonWhitespaceChar())
 							{
@@ -415,34 +466,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 									Parser.UndoChar();
 									return;
 							}
+
 							continue;
-
-						case 'o':
-						case 'O':
-							if (Parser.PeekNextToken().ToUpper() == "OPTIONAL")
-							{
-								Parser.NextToken();
-
-								Pattern = this.ParsePattern(Parser, true);
-								if (!(Pattern is null))
-									this.currentPattern?.AddSubPattern(Pattern);
-
-								switch (Parser.NextNonWhitespaceChar())
-								{
-									case '.':
-										Subject = null;
-										Predicate = null;
-										TriplePosition = 0;
-										break;
-
-									case '}':
-										Parser.UndoChar();
-										return;
-								}
-
-								continue;
-							}
-							break;
 					}
 				}
 

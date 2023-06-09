@@ -1184,16 +1184,41 @@
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.PatternGroupType">
+            <summary>
+            Type of pattern group
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.PatternGroupType.Regular">
+            <summary>
+            Regular group
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.PatternGroupType.Optional">
+            <summary>
+            Optional group
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.PatternGroupType.Union">
+            <summary>
+            Union group
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.PatternGroupType.Minus">
+            <summary>
+            Subtraction group
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.SparqlPattern">
             <summary>
             Represents a pattern in a SPARQL query.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.#ctor(System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.#ctor(Waher.Script.Persistence.SPARQL.PatternGroupType)">
             <summary>
             Represents a pattern in a SPARQL query.
             </summary>
-            <param name="Optional">If pattern is optional</param>
+            <param name="PatternType">Type of group pattern</param>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.Triples">
             <summary>
@@ -1235,9 +1260,9 @@
             If pattern has sub-patterns
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.Optional">
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlPattern.PatternType">
             <summary>
-            If pattern is optional
+            Type of group pattern.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlPattern.AddTriple(Waher.Script.Persistence.SPARQL.SemanticQueryTriple)">

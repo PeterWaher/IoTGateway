@@ -1,18 +1,43 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
-using Waher.Persistence.Filters;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
 {
 	/// <summary>
+	/// Type of pattern group
+	/// </summary>
+	public enum PatternGroupType
+	{
+		/// <summary>
+		/// Regular group
+		/// </summary>
+		Regular,
+
+		/// <summary>
+		/// Optional group
+		/// </summary>
+		Optional,
+
+		/// <summary>
+		/// Union group
+		/// </summary>
+		Union,
+
+		/// <summary>
+		/// Subtraction group
+		/// </summary>
+		Minus
+	}
+
+	/// <summary>
 	/// Represents a pattern in a SPARQL query.
 	/// </summary>
 	public class SparqlPattern
 	{
-		private readonly bool optional;
+		private readonly PatternGroupType patternType;
 		private LinkedList<SemanticQueryTriple> triples = null;
 		private LinkedList<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
 		private LinkedList<ScriptNode> filter = null;
@@ -21,10 +46,10 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <summary>
 		/// Represents a pattern in a SPARQL query.
 		/// </summary>
-		/// <param name="Optional">If pattern is optional</param>
-		public SparqlPattern(bool Optional)
+		/// <param name="PatternType">Type of group pattern</param>
+		public SparqlPattern(PatternGroupType PatternType)
 		{
-			this.optional = Optional;
+			this.patternType = PatternType;
 		}
 
 		/// <summary>
@@ -68,9 +93,9 @@ namespace Waher.Script.Persistence.SPARQL
 		public bool HasSubPatterns => !(this.patterns is null);
 
 		/// <summary>
-		/// If pattern is optional
+		/// Type of group pattern.
 		/// </summary>
-		public bool Optional => this.optional;
+		public PatternGroupType PatternType => this.patternType;
 
 		/// <summary>
 		/// Adds a triple to the pattern
@@ -120,7 +145,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.triples is null))
 			{
-				this.patterns.AddLast(new SparqlPattern(this.optional)
+				this.patterns.AddLast(new SparqlPattern(this.patternType)
 				{
 					triples = this.triples
 				});
@@ -225,42 +250,80 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			else if (this.HasSubPatterns)
 			{
+				IEnumerable<Possibility> OrgMatches = ExistingMatches;
+				Dictionary<string, bool> VariablesProcessed0 = new Dictionary<string, bool>();
+
+				foreach (string Key in VariablesProcessed.Keys)
+					VariablesProcessed0[Key] = true;
+
 				foreach (SparqlPattern SubPattern in this.patterns)
 				{
-					if (SubPattern.optional && !(ExistingMatches is null))
+					switch (SubPattern.patternType)
 					{
-						LinkedList<Possibility> NewMatches = new LinkedList<Possibility>();
+						case PatternGroupType.Regular:
+						default:
+							IEnumerable<Possibility> NewMatches = await SubPattern.Search(Cube,
+								Variables, VariablesProcessed, ExistingMatches, Query);
 
-						foreach (Possibility P in ExistingMatches)
-						{
+							if (NewMatches is null)
+								return null;
+							else
+								ExistingMatches = NewMatches;
+							break;
+
+						case PatternGroupType.Union:
 							Dictionary<string, bool> VariablesProcessed2 = new Dictionary<string, bool>();
 
-							foreach (string Key in VariablesProcessed.Keys)
+							foreach (string Key in VariablesProcessed0.Keys)
 								VariablesProcessed2[Key] = true;
 
-							IEnumerable<Possibility> NewMatches2 = await SubPattern.Search(Cube,
-								Variables, VariablesProcessed2, new Possibility[] { P }, Query);
+							NewMatches = await SubPattern.Search(Cube,
+								Variables, VariablesProcessed2, OrgMatches, Query);
 
-							if (NewMatches2 is null)
-								NewMatches.AddLast(P);
-							else
+							if (!(NewMatches is null))
 							{
-								foreach (Possibility P2 in NewMatches2)
-									NewMatches.AddLast(P2);
+								if (!(ExistingMatches is LinkedList<Possibility> ExistingMatches2))
+								{
+									ExistingMatches2 = new LinkedList<Possibility>();
+
+									foreach (Possibility P in ExistingMatches)
+										ExistingMatches2.AddLast(P);
+								}
+
+								foreach (Possibility P in NewMatches)
+									ExistingMatches2.AddLast(P);
+
+								ExistingMatches = ExistingMatches2;
 							}
-						}
+							break;
 
-						ExistingMatches = NewMatches;
-					}
-					else
-					{
-						IEnumerable<Possibility> NewMatches = await SubPattern.Search(Cube,
-							Variables, VariablesProcessed, ExistingMatches, Query);
+						case PatternGroupType.Optional:
+							if (ExistingMatches is null)
+								break;
 
-						if (NewMatches is null)
-							return null;
-						else
-							ExistingMatches = NewMatches;
+							LinkedList<Possibility> NewMatches2 = new LinkedList<Possibility>();
+
+							foreach (Possibility P in ExistingMatches)
+							{
+								VariablesProcessed2 = new Dictionary<string, bool>();
+								
+								foreach (string Key in VariablesProcessed.Keys)
+									VariablesProcessed2[Key] = true;
+
+								NewMatches = await SubPattern.Search(Cube, Variables,
+									VariablesProcessed2, new Possibility[] { P }, Query);
+
+								if (NewMatches is null)
+									NewMatches2.AddLast(P);
+								else
+								{
+									foreach (Possibility P2 in NewMatches)
+										NewMatches2.AddLast(P2);
+								}
+							}
+
+							ExistingMatches = NewMatches2;
+							break;
 					}
 				}
 			}
@@ -377,12 +440,7 @@ namespace Waher.Script.Persistence.SPARQL
 					T[ValueIndex1], ValueIndex1, T[ValueIndex2], ValueIndex2);
 
 				if (NewTriples is null)
-				{
-					if (!this.optional)
-						return null;
-					else
-						return Possibilities;
-				}
+					return null;
 
 				if (Possibilities is null)
 				{
@@ -479,7 +537,7 @@ namespace Waher.Script.Persistence.SPARQL
 				if (!SameName)
 					VariablesProcessed[Name2] = true;
 
-				if (Triples is null && !this.optional)
+				if (Triples is null)
 					return null;
 
 				if (Possibilities is null)
@@ -1045,7 +1103,7 @@ namespace Waher.Script.Persistence.SPARQL
 		public override bool Equals(object obj)
 		{
 			if (!(obj is SparqlPattern Typed) ||
-				this.optional != Typed.optional ||
+				this.patternType != Typed.patternType ||
 				((this.triples is null) ^ (Typed.triples is null)) ||
 				((this.boundVariables is null) ^ (Typed.boundVariables is null)) ||
 				((this.filter is null) ^ (Typed.filter is null)) ||
@@ -1121,7 +1179,7 @@ namespace Waher.Script.Persistence.SPARQL
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
-			Result ^= Result << 5 ^ this.optional.GetHashCode();
+			Result ^= Result << 5 ^ this.patternType.GetHashCode();
 
 			if (!(this.triples is null))
 			{

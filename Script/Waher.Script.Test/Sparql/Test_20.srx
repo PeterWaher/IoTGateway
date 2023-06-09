@@ -10,7 +10,7 @@
   <results>
 		<result>
 			<binding name="title">
-				<literal>SPARQL Protocol Tutorial</literal>
+				<literal>SPARQL Query Language Tutorial</literal>
 			</binding>
 		</result>
 		<result>
@@ -20,12 +20,12 @@
 		</result>
 		<result>
 			<binding name="title">
-				<literal>SPARQL (updated)</literal>
+				<literal>SPARQL Protocol Tutorial</literal>
 			</binding>
 		</result>
 		<result>
 			<binding name="title">
-				<literal>SPARQL Query Language Tutorial</literal>
+				<literal>SPARQL (updated)</literal>
 			</binding>
 		</result>
 	</results>

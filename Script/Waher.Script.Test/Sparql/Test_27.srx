@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="s"/>
+		<variable name="p"/>
+		<variable name="o"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="s">
+				<uri>http://example/a</uri>
+			</binding>
+			<binding name="p">
+				<uri>http://example/b</uri>
+			</binding>
+			<binding name="o">
+				<uri>http://example/c</uri>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

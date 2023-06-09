@@ -17,6 +17,7 @@ using Waher.Script.Functions.Vectors;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Arithmetics;
+using System.Xml.Linq;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -918,7 +919,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "CONCAT":
 					int Start2 = Parser.Position;
-					ScriptNode[] Arguments = this.ParseArguments(Parser, 1, int.MaxValue);
+					ScriptNode[] Arguments = this.ParseArguments(Parser, 1, int.MaxValue, true);
 
 					VectorDefinition Vector = new VectorDefinition(Arguments,
 						Start2, Parser.Position - Start2, Parser.Expression);
@@ -926,15 +927,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
 
 				case "ASC":
-					Node = this.ParseArgument(Parser);
+					Node = this.ParseArgument(Parser, false);
 					return new Asc(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "DESC":
-					Node = this.ParseArgument(Parser);
+					Node = this.ParseArgument(Parser, false);
 					return new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "REGEX":
-					Arguments = this.ParseArguments(Parser, 2, 3);
+					Arguments = this.ParseArguments(Parser, 2, 3, true);
 					if (Arguments.Length == 2)
 					{
 						return new LikeWithOptions(Arguments[0], Arguments[1], null,
@@ -1016,7 +1017,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Optional)
 					{
 						int i = s.Length;
-						while (i > 0)
+						while (i-- > 0)
 							Parser.UndoChar();
 
 						return null;
@@ -1026,12 +1027,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 		}
 
-		private ScriptNode ParseArgument(ScriptParser Parser)
+		private ScriptNode ParseArgument(ScriptParser Parser, bool ScriptValueNodes)
 		{
 			if (Parser.NextNonWhitespaceChar() != '(')
 				throw Parser.SyntaxError("Expected (");
 
 			ScriptNode Argument = this.ParseExpression(Parser, false);
+
+			if (ScriptValueNodes)
+				Argument = new ScriptValueNode(Argument);
 
 			if (Parser.NextNonWhitespaceChar() != ')')
 				throw Parser.SyntaxError("Expected )");
@@ -1039,7 +1043,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			return Argument;
 		}
 
-		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max)
+		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max, 
+			bool ScriptValueNodes)
 		{
 			if (Parser.NextNonWhitespaceChar() != '(')
 				throw Parser.SyntaxError("Expected (");
@@ -1048,7 +1053,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			while (true)
 			{
-				Arguments.Add(this.ParseExpression(Parser, false));
+				ScriptNode Node = this.ParseExpression(Parser, false);
+				if (ScriptValueNodes)
+					Node = new ScriptValueNode(Node);
+
+				Arguments.Add(Node);
 
 				if (Parser.NextNonWhitespaceChar() != ',')
 				{

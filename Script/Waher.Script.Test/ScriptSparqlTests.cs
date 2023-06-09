@@ -54,6 +54,19 @@ namespace Waher.Script.Test
 		[DataRow("Test_16.ttl", "Test_16.rq", null, "Test_16.srx")]
 		[DataRow("Test_17.ttl", "Test_17.rq", null, "Test_17.srx")]
 		[DataRow("Test_18.ttl", "Test_18.rq", null, "Test_18.srx")]
+		[DataRow("Test_19.ttl", "Test_19.rq", null, "Test_19.srx")]
+		[DataRow("Test_20.ttl", "Test_20.rq", null, "Test_20.srx")]
+		[DataRow("Test_21.ttl", "Test_21.rq", null, "Test_21.srx")]
+		[DataRow("Test_22.ttl", "Test_22.rq", null, "Test_22.srx")]
+		[DataRow("Test_23.ttl", "Test_23.rq", null, "Test_23.srx")]
+		[DataRow("Test_24.ttl", "Test_24.rq", null, "Test_24.srx")]
+		[DataRow("Test_25.ttl", "Test_25.rq", null, "Test_25.srx")]
+		[DataRow("Test_26.ttl", "Test_26.rq", null, "Test_26.srx")]
+		[DataRow("Test_27.ttl", "Test_27.rq", null, "Test_27.srx")]
+		[DataRow("Test_28.ttl", "Test_28.rq", null, "Test_28.srx")]
+		[DataRow("Test_29.ttl", "Test_29.rq", null, "Test_29.srx")]
+		[DataRow("Test_30.ttl", "Test_30.rq", null, "Test_30.srx")]
+		[DataRow("Test_31.ttl", "Test_31.rq", null, "Test_31.srx")]
 		public async Task SPARQL_Tests(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{

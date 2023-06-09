@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="x"/>
+		<variable name="y"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="y">
+				<literal>SPARQL (updated)</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="y">
+				<literal>SPARQL Protocol Tutorial</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="x">
+				<literal>SPARQL</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="x">
+				<literal>SPARQL Query Language Tutorial</literal>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

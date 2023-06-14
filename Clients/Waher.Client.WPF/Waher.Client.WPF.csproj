@@ -515,6 +515,10 @@
       <Project>{822e04e4-79fa-43e1-bdfc-775ee47236e7}</Project>
       <Name>Waher.Content.QR</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj">
+      <Project>{2eb59799-b2b0-4550-85e7-75ca4f208071}</Project>
+      <Name>Waher.Content.Semantic</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj">
       <Project>{0179c5ca-dadb-4c1f-b219-44b9ab8380b4}</Project>
       <Name>Waher.Content.SystemFiles</Name>

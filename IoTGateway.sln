@@ -525,7 +525,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FullTextS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.FullTextSearch", "Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj", "{FBDB82DF-F638-49F2-94C9-C49153F8A776}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.System", "Script\Waher.Script.System\Waher.Script.System.csproj", "{50ACC169-770C-4471-AB6B-7186064B0F12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.System", "Script\Waher.Script.System\Waher.Script.System.csproj", "{50ACC169-770C-4471-AB6B-7186064B0F12}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Semantic", "Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj", "{2EB59799-B2B0-4550-85E7-75CA4F208071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5988,6 +5990,30 @@ Global
 		{50ACC169-770C-4471-AB6B-7186064B0F12}.Release|x64.Build.0 = Release|Any CPU
 		{50ACC169-770C-4471-AB6B-7186064B0F12}.Release|x86.ActiveCfg = Release|Any CPU
 		{50ACC169-770C-4471-AB6B-7186064B0F12}.Release|x86.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|ARM.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|x64.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Debug|x86.Build.0 = Debug|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|ARM.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|ARM.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|ARM64.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|x64.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|x64.Build.0 = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|x86.ActiveCfg = Release|Any CPU
+		{2EB59799-B2B0-4550-85E7-75CA4F208071}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -6212,6 +6238,7 @@ Global
 		{D0BF4910-D1A7-4B9E-9B40-67AA2BB1C852} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{FBDB82DF-F638-49F2-94C9-C49153F8A776} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{50ACC169-770C-4471-AB6B-7186064B0F12} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
+		{2EB59799-B2B0-4550-85E7-75CA4F208071} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

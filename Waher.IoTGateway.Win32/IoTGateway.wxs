@@ -574,6 +574,7 @@
 							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.dll' Vital='yes'/>
 							<File Id='Waher.Content.QR.dll' Name='Waher.Content.QR.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.dll' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.dll' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xsl.dll' Vital='yes'/>
@@ -698,6 +699,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.dll' Name='Waher.Content.QR.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
@@ -819,6 +821,7 @@
 							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.pdb' Vital='yes'/>
 							<File Id='Waher.Content.QR.pdb' Name='Waher.Content.QR.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.pdb' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xsl.pdb' Vital='yes'/>
@@ -916,6 +919,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.pdb' Name='Waher.Content.QR.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
@@ -1939,10 +1943,10 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemoveCactusRose' On='uninstall' />
-									<File Id='CactusRose.cssx' Name='CactusRose.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.cssx'/>
+									<File Id='CactusRose.cssx' Name='CactusRose.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.cssx' KeyPath='yes'/>
 									<File Id='CactusRose.xml' Name='CactusRose.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.xml'/>
 									<File Id='CactusRose.png' Name='CactusRose.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.png'/>
-									<File Id='CactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1400x425.png' KeyPath='yes'/>
+									<File Id='CactusRoseBanner1400x425.png' Name='CactusRoseBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1400x425.png'/>
 									<File Id='CactusRoseBanner1900x500.png' Name='CactusRoseBanner1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner1900x500.png'/>
 									<File Id='CactusRoseBanner2000x600.png' Name='CactusRoseBanner2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRoseBanner2000x600.png'/>
 									<File Id='CactusRose800x800.png' Name='CactusRose800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose800x800.png'/>
@@ -1967,10 +1971,10 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemoveGothicPeacock' On='uninstall' />
-									<File Id='GothicPeacock.cssx' Name='GothicPeacock.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.cssx'/>
+									<File Id='GothicPeacock.cssx' Name='GothicPeacock.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.cssx' KeyPath='yes'/>
 									<File Id='GothicPeacock.xml' Name='GothicPeacock.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.xml'/>
 									<File Id='GothicPeacock.png' Name='GothicPeacock.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.png'/>
-									<File Id='GothicPeacockBanner1400x425.png' Name='GothicPeacockBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png' KeyPath='yes'/>
+									<File Id='GothicPeacockBanner1400x425.png' Name='GothicPeacockBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacockBanner1400x425.png'/>
 									<File Id='GothicPeacockBanner1900x500.png' Name='GothicPeacockBanner1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacockBanner1900x500.png'/>
 									<File Id='GothicPeacockBanner2000x600.png' Name='GothicPeacockBanner2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacockBanner2000x600.png'/>
 									<File Id='GothicPeacock800x800.png' Name='GothicPeacock800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock800x800.png'/>
@@ -1995,7 +1999,7 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemoveRetro64' On='uninstall' />
-									<File Id='Retro64.cssx' Name='Retro64.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.cssx'/>
+									<File Id='Retro64.cssx' Name='Retro64.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.cssx' KeyPath='yes'/>
 									<File Id='Retro64.xml' Name='Retro64.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.xml'/>
 									<File Id='Retro64.png' Name='Retro64.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.png'/>
 									<RemoveFile Id='RemoveRetro64.cssx' Name='Retro64.cssx' On='uninstall'/>
@@ -2009,7 +2013,7 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemoveSpaceGravel' On='uninstall' />
-									<File Id='SpaceGravel.cssx' Name='SpaceGravel.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.cssx'/>
+									<File Id='SpaceGravel.cssx' Name='SpaceGravel.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.cssx' KeyPath='yes'/>
 									<File Id='SpaceGravel.xml' Name='SpaceGravel.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.xml'/>
 									<File Id='SpaceGravel.png' Name='SpaceGravel.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.png'/>
 									<File Id='SpaceGravel800x800.png' Name='SpaceGravel800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel800x800.png'/>
@@ -2027,10 +2031,10 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemoveWinterDawn' On='uninstall' />
-									<File Id='WinterDawn.cssx' Name='WinterDawn.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.cssx'/>
+									<File Id='WinterDawn.cssx' Name='WinterDawn.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.cssx' KeyPath='yes'/>
 									<File Id='WinterDawn.xml' Name='WinterDawn.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.xml'/>
 									<File Id='WinterDawn.png' Name='WinterDawn.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.png'/>
-									<File Id='WinterDawnBanner1400x425.png' Name='WinterDawnBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner1400x425.png' KeyPath='yes'/>
+									<File Id='WinterDawnBanner1400x425.png' Name='WinterDawnBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner1400x425.png'/>
 									<File Id='WinterDawnBanner1900x500.png' Name='WinterDawnBanner1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner1900x500.png'/>
 									<File Id='WinterDawnBanner2000x600.png' Name='WinterDawnBanner2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner2000x600.png'/>
 									<File Id='WinterDawn800x800.png' Name='WinterDawn800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn800x800.png'/>

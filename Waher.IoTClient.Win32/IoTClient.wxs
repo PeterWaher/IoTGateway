@@ -254,6 +254,7 @@
 							<File Id='Waher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
 							<File Id='Waher.Content.QR.dll' Name='Waher.Content.QR.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.QR.dll' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Semantic.dll' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
@@ -326,6 +327,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.dll' Name='Waher.Content.QR.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
@@ -404,6 +406,8 @@
 							<File Id='Waher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.xml' Vital='yes'/>
 							<File Id='Waher.Content.QR.pdb' Name='Waher.Content.QR.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.QR.pdb' Vital='yes'/>
 							<File Id='Waher.Content.QR.xml' Name='Waher.Content.QR.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.QR.xml' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Semantic.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.xml' Name='Waher.Content.Semantic.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Semantic.xml' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.pdb' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.xml' Vital='yes'/>
 							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
@@ -503,6 +507,8 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.pdb' Name='Waher.Content.QR.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.xml' Name='Waher.Content.QR.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.xml' Name='Waher.Content.Semantic.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>

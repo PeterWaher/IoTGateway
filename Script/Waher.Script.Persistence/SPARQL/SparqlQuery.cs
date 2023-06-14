@@ -10,6 +10,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -284,6 +285,23 @@ namespace Waher.Script.Persistence.SPARQL
 			try
 			{
 				return (await Node.EvaluateAsync(RecordVariables)).AssociatedObjectValue;
+			}
+			catch (ScriptReturnValueException ex)
+			{
+				return ex.ReturnValue.AssociatedObjectValue;
+			}
+			catch (Exception ex)
+			{
+				return ex;
+			}
+		}
+
+		internal static async Task<object> EvaluateValue(Variables RecordVariables, IFilterNode Node, ISemanticCube Cube,
+			Dictionary<string, bool> VariablesProcessed, SparqlQuery Query, Possibility P)
+		{
+			try
+			{
+				return (await Node.EvaluateAsync(RecordVariables, Cube, VariablesProcessed, Query, P)).AssociatedObjectValue;
 			}
 			catch (ScriptReturnValueException ex)
 			{

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -40,7 +41,7 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly PatternGroupType patternType;
 		private LinkedList<SemanticQueryTriple> triples = null;
 		private LinkedList<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
-		private LinkedList<ScriptNode> filter = null;
+		private LinkedList<IFilterNode> filter = null;
 		private LinkedList<SparqlPattern> patterns = null;
 
 		/// <summary>
@@ -65,7 +66,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <summary>
 		/// Filter, null if none.
 		/// </summary>
-		public IEnumerable<ScriptNode> Filter => this.filter;
+		public IEnumerable<IFilterNode> Filter => this.filter;
 
 		/// <summary>
 		/// Sub-patterns, null if none.
@@ -129,9 +130,12 @@ namespace Waher.Script.Persistence.SPARQL
 		public void AddFilter(ScriptNode Filter)
 		{
 			if (this.filter is null)
-				this.filter = new LinkedList<ScriptNode>();
+				this.filter = new LinkedList<IFilterNode>();
 
-			this.filter.AddLast(Filter);
+			if (Filter is IFilterNode FilterNode)
+				this.filter.AddLast(FilterNode);
+			else
+				this.filter.AddLast(new FilterScriptNode(Filter));
 		}
 
 		/// <summary>
@@ -332,7 +336,7 @@ namespace Waher.Script.Persistence.SPARQL
 							foreach (Possibility P in ExistingMatches)
 							{
 								VariablesProcessed2 = new Dictionary<string, bool>();
-								
+
 								foreach (string Key in VariablesProcessed.Keys)
 									VariablesProcessed2[Key] = true;
 
@@ -407,9 +411,9 @@ namespace Waher.Script.Persistence.SPARQL
 
 					Pass = true;
 
-					foreach (ScriptNode Filter in this.filter)
+					foreach (IFilterNode Filter in this.filter)
 					{
-						object Value = await SparqlQuery.EvaluateValue(RecordVariables, Filter);
+						object Value = await SparqlQuery.EvaluateValue(RecordVariables, Filter, Cube, VariablesProcessed, Query, P);
 						if (!(Value is bool b) || !b)
 						{
 							Pass = false;
@@ -1004,9 +1008,9 @@ namespace Waher.Script.Persistence.SPARQL
 
 				if (!(this.filter is null))
 				{
-					foreach (ScriptNode P in this.filter)
+					foreach (IFilterNode P in this.filter)
 					{
-						if (!P.ForAllChildNodes(Callback, State, Order))
+						if (!P.ScriptNode.ForAllChildNodes(Callback, State, Order))
 							return false;
 					}
 				}
@@ -1054,9 +1058,9 @@ namespace Waher.Script.Persistence.SPARQL
 
 				if (!(this.filter is null))
 				{
-					foreach (ScriptNode P in this.filter)
+					foreach (IFilterNode P in this.filter)
 					{
-						if (!P.ForAllChildNodes(Callback, State, Order))
+						if (!P.ScriptNode.ForAllChildNodes(Callback, State, Order))
 							return false;
 					}
 				}
@@ -1131,15 +1135,20 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.filter is null))
 			{
-				LinkedListNode<ScriptNode> Loop = this.filter.First;
+				LinkedListNode<IFilterNode> Loop = this.filter.First;
 
 				while (!(Loop is null))
 				{
-					if (!Callback(Loop.Value, out ScriptNode NewValue, State))
+					if (!Callback(Loop.Value.ScriptNode, out ScriptNode NewValue, State))
 						return false;
 
 					if (!(NewValue is null))
-						Loop.Value = NewValue;
+					{
+						if (NewValue is IFilterNode NewFilterNode)
+							Loop.Value = NewFilterNode;
+						else
+							Loop.Value = new FilterScriptNode(NewValue);
+					}
 
 					Loop = Loop.Next;
 				}
@@ -1192,8 +1201,8 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.filter is null))
 			{
-				IEnumerator<ScriptNode> e1 = this.filter.GetEnumerator();
-				IEnumerator<ScriptNode> e2 = Typed.filter.GetEnumerator();
+				IEnumerator<IFilterNode> e1 = this.filter.GetEnumerator();
+				IEnumerator<IFilterNode> e2 = Typed.filter.GetEnumerator();
 				bool b1 = e1.MoveNext();
 				bool b2 = e2.MoveNext();
 
@@ -1256,7 +1265,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.filter is null))
 			{
-				foreach (ScriptNode N in this.filter)
+				foreach (IFilterNode N in this.filter)
 					Result ^= Result << 5 ^ N.GetHashCode();
 			}
 
@@ -1301,8 +1310,8 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.filter is null))
 			{
-				foreach (ScriptNode P in this.filter)
-					P.SetParent(Parent);
+				foreach (IFilterNode P in this.filter)
+					P.ScriptNode.SetParent(Parent);
 			}
 
 			if (!(this.patterns is null))

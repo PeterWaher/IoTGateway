@@ -16,6 +16,7 @@ using Waher.Script.Operators.Logical;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Arithmetics;
+using Waher.Script.Persistence.SPARQL.Filters;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -288,8 +289,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			Result = new SparqlQuery(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
-				From, Where, OrderBy?.ToArray(), Construct,
-				Parser.Start, Parser.Length, Parser.Expression);
+				From, Where, OrderBy?.ToArray(), Construct, Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
 		}
@@ -988,6 +988,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 							Start, Parser.Position - Start, Parser.Expression);
 					}
 
+				case "EXISTS":
+					return new Exists(this.ParsePattern(Parser, PatternGroupType.Regular),
+						Start, Parser.Position - Start, Parser.Expression);
+
+				case "NOT": // EXISTS
+					if (Parser.NextToken() != "EXISTS")
+						throw Parser.SyntaxError("Expected EXISTS.");
+
+					return new NotExists(this.ParsePattern(Parser, PatternGroupType.Regular),
+						Start, Parser.Position - Start, Parser.Expression);
+
 				// Aggregates
 
 				case "COUNT":
@@ -1050,8 +1061,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "ISNUMERIC":
 				case "SUBSTR":
 				case "REPLACE":
-				case "EXISTS":
-				case "NOT": // EXISTS
 				default:
 					// TODO: Extensible functions
 

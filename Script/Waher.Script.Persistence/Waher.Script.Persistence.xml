@@ -551,6 +551,256 @@
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Filters.Exists">
+            <summary>
+            Checks if a pattern has at least a match.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.#ctor(Waher.Script.Persistence.SPARQL.SparqlPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Checks if a pattern has at least a match.
+            </summary>
+            <param name="Pattern">Pattern to check.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.Exists.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SPARQL.Filters.Exists.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.EvaluateAsync(Waher.Script.Variables,Waher.Content.Semantic.ISemanticCube,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="Cube">Semantic cube being processed.</param>
+            <param name="VariablesProcessed">Variables already processed.</param>
+            <param name="Query">Query being processed.</param>
+            <param name="Possibility">Current possibility being evaluated.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.Exists.ScriptNode">
+            <summary>
+            Reference to the underlying script node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.Exists.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode">
+            <summary>
+            Makes a script node, a filter node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode.#ctor(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Makes a script node, a filter node.
+            </summary>
+            <param name="Node">Script node.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode.EvaluateAsync(Waher.Script.Variables,Waher.Content.Semantic.ISemanticCube,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="Cube">Semantic cube being processed.</param>
+            <param name="VariablesProcessed">Variables already processed.</param>
+            <param name="Query">Query being processed.</param>
+            <param name="Possibility">Current possibility being evaluated.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode.ScriptNode">
+            <summary>
+            Reference to the underlying script node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.FilterScriptNode.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Filters.IFilterNode">
+            <summary>
+            Interface for filter nodes.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.IFilterNode.EvaluateAsync(Waher.Script.Variables,Waher.Content.Semantic.ISemanticCube,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="Cube">Semantic cube being processed.</param>
+            <param name="VariablesProcessed">Variables already processed.</param>
+            <param name="Query">Query being processed.</param>
+            <param name="Possibility">Current possibility being evaluated.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.IFilterNode.ScriptNode">
+            <summary>
+            Reference to the underlying script node.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions">
+            <summary>
+            Extension of the Like operator, that allows the script to set options.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Extension of the Like operator, that allows the script to set options.
+            </summary>
+            <param name="Argument1">Left argument</param>
+            <param name="Argument2">Right argument</param>
+            <param name="Argument3">Options argument</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.CalcIsAsync">
+            <summary>
+            Recalculates if operator is asynchronous or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.EvaluateAsync(Waher.Script.Variables,Waher.Content.Semantic.ISemanticCube,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="Cube">Semantic cube being processed.</param>
+            <param name="VariablesProcessed">Variables already processed.</param>
+            <param name="Query">Query being processed.</param>
+            <param name="Possibility">Current possibility being evaluated.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.ScriptNode">
+            <summary>
+            Reference to the underlying script node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.LikeWithOptions.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Filters.NotExists">
+            <summary>
+            Checks if a pattern has at least no matches.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.#ctor(Waher.Script.Persistence.SPARQL.SparqlPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Checks if a pattern has at least no matches.
+            </summary>
+            <param name="Pattern">Pattern to check.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.NotExists.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.EvaluateAsync(Waher.Script.Variables,Waher.Content.Semantic.ISemanticCube,System.Collections.Generic.Dictionary{System.String,System.Boolean},Waher.Script.Persistence.SPARQL.SparqlQuery,Waher.Script.Persistence.SPARQL.Possibility)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="Cube">Semantic cube being processed.</param>
+            <param name="VariablesProcessed">Variables already processed.</param>
+            <param name="Query">Query being processed.</param>
+            <param name="Possibility">Current possibility being evaluated.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Filters.NotExists.ScriptNode">
+            <summary>
+            Reference to the underlying script node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Filters.NotExists.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Functions.Asc">
             <summary>
             Orders in ascending order
@@ -636,56 +886,6 @@
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions">
-            <summary>
-            Extension of the Like operator, that allows the script to set options.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Extension of the Like operator, that allows the script to set options.
-            </summary>
-            <param name="Argument1">Left argument</param>
-            <param name="Argument2">Right argument</param>
-            <param name="Argument3">Options argument</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.CalcIsAsync">
-            <summary>
-            Recalculates if operator is asynchronous or not.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
-            <summary>
-            Calls the callback method for all child nodes.
-            </summary>
-            <param name="Callback">Callback method to call.</param>
-            <param name="State">State object to pass on to the callback method.</param>
-            <param name="Order">Order to traverse the nodes.</param>
-            <returns>If the process was completed.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.Equals(System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.LikeWithOptions.GetHashCode">
-            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode">
             <summary>

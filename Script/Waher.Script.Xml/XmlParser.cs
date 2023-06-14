@@ -192,7 +192,7 @@ namespace Waher.Script.Xml
 								ScriptNode Node = Parser.ParseSequence();
 								Parser.SkipWhiteSpace();
 
-								if (Parser.IsNextChars("]>"))
+								if (!Parser.IsNextChars("]>"))
 									throw Parser.SyntaxError("]> expected.");
 
 								Parser.SkipChars(2);
@@ -206,7 +206,7 @@ namespace Waher.Script.Xml
 								Node = Parser.ParseSequence();
 								Parser.SkipWhiteSpace();
 
-								if (Parser.IsNextChars(")>"))
+								if (!Parser.IsNextChars(")>"))
 									throw Parser.SyntaxError(")> expected.");
 
 								Parser.SkipChars(2);

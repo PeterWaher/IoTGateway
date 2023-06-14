@@ -5,6 +5,7 @@ using System.Text;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
+using Waher.Script.Functions.Strings;
 
 namespace Waher.Content.Semantic
 {
@@ -585,40 +586,54 @@ namespace Waher.Content.Semantic
 		private SemanticLiteral ParseNumber()
 		{
 			int Start = this.pos;
+			char ch = this.PeekNextChar();
 			bool HasDigits = false;
 			bool HasDecimal = false;
 			bool HasExponent = false;
-			bool HasSign = false;
 
-			while (true)
+			if (ch == '+' || ch == '-')
 			{
-				char ch = this.PeekNextChar();
-
-				if (char.IsDigit(ch))
-					HasDigits = true;
-				else if (ch == '+' || ch == '-')
-				{
-					if (HasSign || HasDecimal)
-						break;
-
-					HasSign = true;
-				}
-				else if (ch == '.')
-				{
-					if (HasDecimal || HasExponent)
-						break;
-
-					HasDecimal = true;
-				}
-				else if (ch == 'e' || ch == 'E')
-				{
-					HasExponent = true;
-					HasSign = false;
-				}
-				else
-					break;
-
 				this.pos++;
+				ch = this.PeekNextChar();
+			}
+
+			while (char.IsDigit(ch))
+			{
+				this.pos++;
+				ch = this.PeekNextChar();
+				HasDigits = true;
+			}
+
+			if (ch == '.')
+			{
+				HasDecimal = true;
+				this.pos++;
+				ch = this.PeekNextChar();
+
+				while (char.IsDigit(ch))
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+			}
+
+			if (ch == 'e' || ch == 'E')
+			{
+				HasExponent = true;
+				this.pos++;
+				ch = this.PeekNextChar();
+
+				if (ch == '+' || ch == '-')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+
+				while (char.IsDigit(ch))
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
 			}
 
 			if (this.pos > Start)

@@ -1,4 +1,5 @@
-﻿using Waher.Content.Semantic;
+﻿using System.Text;
+using Waher.Content.Semantic;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -203,6 +204,42 @@ namespace Waher.Script.Persistence.SPARQL
 				case 2: return this.ObjectVariable;
 				default: return null;
 			}
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			if (this.SubjectIsVariable)
+			{
+				sb.Append('?');
+				sb.Append(this.SubjectVariable);
+			}
+			else
+				sb.Append(this.Subject.ToString());
+
+			sb.Append('\t');
+
+			if (this.PredicateIsVariable)
+			{
+				sb.Append('?');
+				sb.Append(this.PredicateVariable);
+			}
+			else
+				sb.Append(this.Predicate.ToString());
+
+			sb.Append('\t');
+
+			if (this.ObjectIsVariable)
+			{
+				sb.Append('?');
+				sb.Append(this.ObjectVariable);
+			}
+			else
+				sb.Append(this.Object.ToString());
+
+			return base.ToString();
 		}
 	}
 }

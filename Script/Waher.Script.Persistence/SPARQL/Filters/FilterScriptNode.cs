@@ -27,12 +27,11 @@ namespace Waher.Script.Persistence.SPARQL.Filters
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <param name="Cube">Semantic cube being processed.</param>
-		/// <param name="VariablesProcessed">Variables already processed.</param>
 		/// <param name="Query">Query being processed.</param>
 		/// <param name="Possibility">Current possibility being evaluated.</param>
 		/// <returns>Result.</returns>
 		public Task<IElement> EvaluateAsync(Variables Variables, ISemanticCube Cube,
-			Dictionary<string, bool> VariablesProcessed, SparqlQuery Query, Possibility Possibility)
+			SparqlQuery Query, Possibility Possibility)
 		{
 			return this.node.EvaluateAsync(Variables);
 		}

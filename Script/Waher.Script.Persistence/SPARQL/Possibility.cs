@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Waher.Content.Semantic;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -27,7 +28,7 @@ namespace Waher.Script.Persistence.SPARQL
 		public Possibility(string VariableName, ISemanticElement Value, Possibility NextVariable)
 		{
 			this.VariableName = VariableName;
-			this.Value = Value;
+			this.Value = Value ?? new NullValue();
 			this.NextVariable = NextVariable;
 		}
 
@@ -84,24 +85,42 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>String representation of possibilty.</returns>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			return GetSortedDescription(this);
+		}
 
-			sb.Append(this.VariableName);
-			sb.Append('=');
-			sb.Append(Expression.ToString(this.Value));
+		/// <summary>
+		/// Gets a text description of the sorted set of possibilities, starting with
+		/// a given possibility <paramref name="P"/>.
+		/// </summary>
+		/// <param name="P">First possibility.</param>
+		/// <returns>Sorted description.</returns>
+		public static string GetSortedDescription(Possibility P)
+		{
+			SortedDictionary<string, ISemanticElement> Sorted = new SortedDictionary<string, ISemanticElement>();
 
-			Possibility Loop = this.NextVariable;
-			while (!(Loop is null))
+			while (!(P is null))
 			{
-				sb.Append(", ");
-				sb.Append(Loop.VariableName);
-				sb.Append('=');
-				sb.Append(Expression.ToString(Loop.Value));
+				Sorted[P.VariableName] = P.Value;
+				P = P.NextVariable;
+			}
 
-				Loop = Loop.NextVariable;
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (KeyValuePair<string, ISemanticElement> P2 in Sorted)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(", ");
+
+				sb.Append(P2.Key);
+				sb.Append(':');
+				sb.Append(P2.Value.ToString());
 			}
 
 			return sb.ToString();
 		}
+
 	}
 }

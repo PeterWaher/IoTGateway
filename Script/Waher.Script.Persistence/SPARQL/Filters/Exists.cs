@@ -4,15 +4,16 @@ using Waher.Content.Semantic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Persistence.SPARQL.Patterns;
 
 namespace Waher.Script.Persistence.SPARQL.Filters
 {
-	/// <summary>
-	/// Checks if a pattern has at least a match.
-	/// </summary>
-	public class Exists : ScriptNode, IFilterNode
+    /// <summary>
+    /// Checks if a pattern has at least a match.
+    /// </summary>
+    public class Exists : ScriptNode, IFilterNode
 	{
-		private readonly SparqlPattern pattern;
+		private readonly ISparqlPattern pattern;
 
 		/// <summary>
 		/// Checks if a pattern has at least a match.
@@ -21,7 +22,7 @@ namespace Waher.Script.Persistence.SPARQL.Filters
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Exists(SparqlPattern Pattern, int Start, int Length, Expression Expression)
+		public Exists(ISparqlPattern Pattern, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.pattern = Pattern;
@@ -58,14 +59,13 @@ namespace Waher.Script.Persistence.SPARQL.Filters
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <param name="Cube">Semantic cube being processed.</param>
-		/// <param name="VariablesProcessed">Variables already processed.</param>
 		/// <param name="Query">Query being processed.</param>
 		/// <param name="Possibility">Current possibility being evaluated.</param>
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables, ISemanticCube Cube,
-			Dictionary<string, bool> VariablesProcessed, SparqlQuery Query, Possibility Possibility)
+			SparqlQuery Query, Possibility Possibility)
 		{
-			IEnumerable<Possibility> Possibilities = await this.pattern.Search(Cube, Variables, VariablesProcessed, 
+			IEnumerable<Possibility> Possibilities = await this.pattern.Search(Cube, Variables, 
 				new Possibility[] { Possibility }, Query);
 			if (Possibilities is null)
 				return BooleanValue.False;

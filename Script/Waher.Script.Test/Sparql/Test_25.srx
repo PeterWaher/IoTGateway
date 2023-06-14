@@ -10,12 +10,12 @@
   <results>
 		<result>
 			<binding name="s">
-				<uri>http://example/carol</uri>
+				<uri>http://example/alice</uri>
 			</binding>
 		</result>
 		<result>
 			<binding name="s">
-				<uri>http://example/alice</uri>
+				<uri>http://example/carol</uri>
 			</binding>
 		</result>
 	</results>

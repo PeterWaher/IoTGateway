@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Semantic;
@@ -11,12 +12,34 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Persistence.SPARQL.Filters;
+using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
 {
 	/// <summary>
-	/// Executes a SELECT statement against the object database.
+	/// SPARQL query type.
+	/// </summary>
+	public enum QueryType
+	{
+		/// <summary>
+		/// SELECT query
+		/// </summary>
+		Select,
+
+		/// <summary>
+		/// ASK query
+		/// </summary>
+		Ask,
+
+		/// <summary>
+		/// CONSTRUCT query
+		/// </summary>
+		Construct
+	}
+
+	/// <summary>
+	/// Executes a SPARQL query.
 	/// </summary>
 	public class SparqlQuery : ScriptNode, IEvaluateAsync
 	{
@@ -24,14 +47,16 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode from;
-		private readonly SparqlPattern where;
+		private readonly ISparqlPattern where;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
-		private readonly SparqlPattern construct;
+		private readonly SparqlRegularPattern construct;
+		private readonly QueryType queryType;
 		private readonly bool distinct;
 
 		/// <summary>
-		/// Executes a SPARQL SELECT statement.
+		/// Executes a SPARQL query.
 		/// </summary>
+		/// <param name="QueryType">Query type</param>
 		/// <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
 		/// <param name="Columns">Columns to select.</param>
 		/// <param name="ColumnNames">Names of selected columns.</param>
@@ -42,11 +67,13 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public SparqlQuery(bool Distinct, ScriptNode[] Columns, ScriptNode[] ColumnNames,
-			ScriptNode From, SparqlPattern Where, KeyValuePair<ScriptNode, bool>[] OrderBy,
-			SparqlPattern Construct, int Start, int Length, Expression Expression)
+		public SparqlQuery(QueryType QueryType, bool Distinct, ScriptNode[] Columns,
+			ScriptNode[] ColumnNames, ScriptNode From, ISparqlPattern Where,
+			KeyValuePair<ScriptNode, bool>[] OrderBy, SparqlRegularPattern Construct,
+			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
+			this.queryType = QueryType;
 			this.distinct = Distinct;
 			this.construct = Construct;
 
@@ -120,14 +147,13 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			IEnumerable<Possibility> Possibilities;
-			Dictionary<string, bool> VariablesProcessed = new Dictionary<string, bool>();
 
 			if (this.where is null)
 				Possibilities = null;
 			else
-				Possibilities = await this.where.Search(Cube, Variables, VariablesProcessed, this);
+				Possibilities = await this.where.Search(Cube, Variables, null, this);
 
-			if (this.columns is null && this.construct is null)   // ASK
+			if (this.queryType == QueryType.Ask)
 			{
 				if (!(Possibilities is null))
 					return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
@@ -135,7 +161,7 @@ namespace Waher.Script.Persistence.SPARQL
 				return new ObjectValue(new SparqlResultSet(false));
 			}
 
-			if (!(this.construct is null))   // CONSTRUCT
+			if (this.queryType == QueryType.Construct)
 			{
 				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
 				ObjectProperties RecordVariables = null;
@@ -168,16 +194,16 @@ namespace Waher.Script.Persistence.SPARQL
 			List<string> ColumnNames = new List<string>();
 			string Name;
 			int i, c;
+			bool AllNames;
 
 			if (this.columns is null)
-			{
-				foreach (string VariableName in VariablesProcessed.Keys)
-					ColumnNames.Add(VariableName);
-			}
+				AllNames = true;
 			else
 			{
+				AllNames = false;
+
 				int Columns = this.columns.Length;
-				
+
 				c = this.columnNames?.Length ?? 0;
 
 				for (i = 0; i < Columns; i++)
@@ -222,6 +248,8 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			List<SparqlResultRecord> Records = new List<SparqlResultRecord>();
+			Dictionary<string, bool> Distinct = this.distinct ? new Dictionary<string, bool>() : null;
+			StringBuilder sb = this.distinct ? new StringBuilder() : null;
 
 			if (!(Possibilities is null))
 			{
@@ -236,6 +264,14 @@ namespace Waher.Script.Persistence.SPARQL
 
 						if (ColumnVariables.TryGetValue(Name, out i))
 							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
+						else if (AllNames)
+						{
+							i = ColumnNames.Count;
+							ColumnNames.Add(Name);
+							ColumnVariables[Name] = i;
+
+							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
+						}
 
 						Loop = Loop.NextVariable;
 					}
@@ -251,6 +287,32 @@ namespace Waher.Script.Persistence.SPARQL
 
 							Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
 						}
+					}
+
+					if (this.distinct)
+					{
+						bool First = true;
+
+						sb.Clear();
+
+						foreach (SparqlResultItem Value in Record.Values)
+						{
+							if (First)
+								First = false;
+							else
+								sb.Append(';');
+
+							sb.Append(Value.Name);
+							sb.Append('=');
+							sb.Append(Value.Value?.ToString());
+						}
+
+						string Key = sb.ToString();
+
+						if (Distinct.ContainsKey(Key))
+							continue;
+
+						Distinct[Key] = true;
 					}
 
 					Records.Add(new SparqlResultRecord(Record));
@@ -296,12 +358,12 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 		}
 
-		internal static async Task<object> EvaluateValue(Variables RecordVariables, IFilterNode Node, ISemanticCube Cube,
-			Dictionary<string, bool> VariablesProcessed, SparqlQuery Query, Possibility P)
+		internal static async Task<object> EvaluateValue(Variables RecordVariables,
+			IFilterNode Node, ISemanticCube Cube, SparqlQuery Query, Possibility P)
 		{
 			try
 			{
-				return (await Node.EvaluateAsync(RecordVariables, Cube, VariablesProcessed, Query, P)).AssociatedObjectValue;
+				return (await Node.EvaluateAsync(RecordVariables, Cube, Query, P)).AssociatedObjectValue;
 			}
 			catch (ScriptReturnValueException ex)
 			{

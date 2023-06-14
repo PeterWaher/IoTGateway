@@ -17,6 +17,7 @@ using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Persistence.SPARQL.Filters;
+using Waher.Script.Persistence.SPARQL.Patterns;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -41,7 +42,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{ "fn", "http://www.w3.org/2005/xpath-functions#" },
 			{ "sfn", "http://www.w3.org/ns/sparql#" }
 		};
-		private SparqlPattern currentPattern = null;
+		private QueryType queryType;
+		private SparqlRegularPattern currentRegularPattern = null;
+		private ISparqlPattern currentPattern = null;
 		private int preamblePos;
 		private Uri baseUri = null;
 		private int blankNodeIndex = 0;
@@ -52,6 +55,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <param name="Preamble">Preamble that needs to be re-parsed.</param>
 		public SparqlParser(string Preamble)
 		{
+			this.queryType = QueryType.Select;
 			this.preamble = Preamble;
 			this.preambleLen = Preamble?.Length ?? 0;
 			this.preamblePos = 0;
@@ -140,13 +144,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			List<ScriptNode> Columns = null;
 			List<ScriptNode> ColumnNames = null;
 			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
-			SparqlPattern Construct = null;
-			SparqlPattern Where;
+			SparqlRegularPattern Construct = null;
+			ISparqlPattern Where;
 			ScriptNode From;
 
 			switch (s)
 			{
 				case "ASK":
+					this.queryType = QueryType.Ask;
 					this.NextToken(Parser);
 					s = this.PeekNextToken(Parser).ToUpper();
 					if (string.IsNullOrEmpty(s))
@@ -154,28 +159,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					break;
 
 				case "CONSTRUCT":
+					this.queryType = QueryType.Construct;
 					this.NextToken(Parser);
 
-					Construct = this.ParsePattern(Parser, PatternGroupType.Regular);
-					if (Construct is null)
-						throw Parser.SyntaxError("Expected pattern.");
+					ISparqlPattern Pattern = this.ParsePattern(Parser)
+						?? throw Parser.SyntaxError("Expected pattern.");
 
-					if (Construct.PatternType != PatternGroupType.Regular)
-						throw Parser.SyntaxError("Regular pattern expected.");
+					if (!(Pattern is SparqlRegularPattern RegularPattern))
+						throw Parser.SyntaxError("Expected regular pattern.");
 
+					Construct = RegularPattern;
 					if (!(Construct.BoundVariables is null))
 						throw Parser.SyntaxError("Bound variables not permitted in construct statement.");
 
 					if (!(Construct.Filter is null))
 						throw Parser.SyntaxError("Filters not permitted in construct statement.");
 
-					if (!(Construct.SubPatterns is null))
-						throw Parser.SyntaxError("Sub-patterns not permitted in construct statement.");
-
 					s = Parser.PeekNextToken().ToUpper();
 					break;
 
 				case "SELECT":
+					this.queryType = QueryType.Select;
 					this.NextToken(Parser);
 					s = this.PeekNextToken(Parser).ToUpper();
 					if (string.IsNullOrEmpty(s))
@@ -249,12 +253,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (s == "WHERE")
 			{
 				Parser.NextToken();
-				Where = this.ParsePattern(Parser, PatternGroupType.Regular);
+				Where = this.ParsePattern(Parser);
 				s = Parser.PeekNextToken().ToUpper();
 			}
 			else if (s == "{")
 			{
-				Where = this.ParsePattern(Parser, PatternGroupType.Regular);
+				Where = this.ParsePattern(Parser);
 				s = Parser.PeekNextToken().ToUpper();
 			}
 			else
@@ -288,8 +292,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				//s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new SparqlQuery(Distinct, Columns?.ToArray(), ColumnNames?.ToArray(),
-				From, Where, OrderBy?.ToArray(), Construct, Parser.Start, Parser.Length, Parser.Expression);
+			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(), 
+				ColumnNames?.ToArray(), From, Where, OrderBy?.ToArray(), Construct,
+				Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
 		}
@@ -370,7 +375,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				return Parser.PeekNextToken();
 		}
 
-		private SparqlPattern ParsePattern(ScriptParser Parser, PatternGroupType PatternType)
+		private ISparqlPattern ParsePattern(ScriptParser Parser)
 		{
 			if (Parser.NextNonWhitespaceChar() != '{')
 				throw Parser.SyntaxError("Expected {");
@@ -382,16 +387,21 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				return null;
 			}
 
-			SparqlPattern Bak = this.currentPattern;
-			this.currentPattern = new SparqlPattern(PatternType);
+			SparqlRegularPattern Bak = this.currentRegularPattern;
+			ISparqlPattern Bak2 = this.currentPattern;
+
+			this.currentRegularPattern = new SparqlRegularPattern();
+			this.currentPattern = this.currentRegularPattern;
 
 			this.ParseTriples(Parser);
 
 			if (Parser.NextNonWhitespaceChar() != '}')
 				throw Parser.SyntaxError("Expected }");
 
-			SparqlPattern Result = this.currentPattern;
-			this.currentPattern = Bak;
+			ISparqlPattern Result = this.currentPattern;
+
+			this.currentRegularPattern = Bak;
+			this.currentPattern = Bak2;
 
 			return Result;
 		}
@@ -417,9 +427,22 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					switch (Parser.PeekNextChar())
 					{
 						case '{':
-							SparqlPattern Pattern = this.ParsePattern(Parser, PatternGroupType.Regular);
-							if (!(Pattern is null))
-								this.currentPattern?.AddSubPattern(Pattern);
+							ISparqlPattern Left = this.currentPattern;
+							this.currentRegularPattern = new SparqlRegularPattern();
+							this.currentPattern = this.currentRegularPattern;
+
+							ISparqlPattern Pattern = this.ParsePattern(Parser);
+
+							if (this.currentPattern.IsEmpty)
+							{
+								this.currentPattern = Pattern;
+								this.currentRegularPattern = Pattern as SparqlRegularPattern;
+							}
+							else
+							{
+								this.currentRegularPattern = null;
+								this.currentPattern = new IntersectionPattern(Left, Pattern);
+							}
 
 							Parser.SkipWhiteSpace();
 							switch (Parser.PeekNextChar())
@@ -443,32 +466,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'm':
 						case 'M':
 
-							switch (Parser.PeekNextToken().ToUpper())
-							{
-								case "OPTIONAL":
-									Parser.NextToken();
-									Pattern = this.ParsePattern(Parser, PatternGroupType.Optional);
-									break;
-
-								case "UNION":
-									Parser.NextToken();
-									Pattern = this.ParsePattern(Parser, PatternGroupType.Union);
-									break;
-
-								case "MINUS":
-									Parser.NextToken();
-									Pattern = this.ParsePattern(Parser, PatternGroupType.Minus);
-									break;
-
-								default:
-									Pattern = null;
-									break;
-							}
-
-							if (Pattern is null)
+							if (!this.ParsePatternOperator(Parser))
 								break;
-
-							this.currentPattern?.AddSubPattern(Pattern);
 
 							switch (Parser.NextNonWhitespaceChar())
 							{
@@ -515,7 +514,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				}
 				else
 				{
-					this.currentPattern?.AddTriple(new SemanticQueryTriple(Subject, Predicate, Object));
+					if (this.currentRegularPattern is null)
+					{
+						this.currentRegularPattern = new SparqlRegularPattern();
+						this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+					}
+
+					this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Subject, Predicate, Object));
 
 					bool Again;
 
@@ -578,7 +583,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 								if (!(Node is NamedNode NamedNode))
 									throw Parser.SyntaxError("Expected name.");
 
-								this.currentPattern?.AddVariableBinding(
+								if (this.currentRegularPattern is null)
+								{
+									this.currentRegularPattern = new SparqlRegularPattern();
+									this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+								}
+
+								this.currentRegularPattern.AddVariableBinding(
 									NamedNode.LeftOperand, NamedNode.RightOperand);
 
 								if (Parser.NextNonWhitespaceChar() != ')')
@@ -600,20 +611,76 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 								Node = this.ParseUnary(Parser, false);
 
-								this.currentPattern?.AddFilter(Node);
+								if (this.currentRegularPattern is null)
+								{
+									this.currentRegularPattern = new SparqlRegularPattern();
+									this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+								}
+
+								this.currentRegularPattern.AddFilter(Node);
 
 								Again = true;
 								break;
 
-							default:
-								if (InBlankNode)
-									throw Parser.SyntaxError("Expected triple delimiter ] ; or ,");
+							case 'u':
+							case 'U':
+							case 'o':
+							case 'O':
+							case 'm':
+							case 'M':
+								Parser.UndoChar();
+
+								if (this.ParsePatternOperator(Parser))
+									Again = true;
 								else
-									throw Parser.SyntaxError("Expected triple delimiter . ; or ,");
+									throw Parser.SyntaxError("Unexpected token.");
+								break;
+
+							default:
+								throw Parser.SyntaxError("Unexpected token.");
 						}
 					}
 					while (Again);
 				}
+			}
+		}
+
+		private bool ParsePatternOperator(ScriptParser Parser)
+		{
+			switch (Parser.PeekNextToken().ToUpper())
+			{
+				case "OPTIONAL":
+					Parser.NextToken();
+
+					ISparqlPattern Left = this.currentPattern;
+					ISparqlPattern Pattern = this.ParsePattern(Parser);
+
+					this.currentRegularPattern = null;
+					this.currentPattern = new OptionalPattern(Left, Pattern);
+					return true;
+
+				case "UNION":
+					Parser.NextToken();
+
+					Left = this.currentPattern;
+					Pattern = this.ParsePattern(Parser);
+
+					this.currentRegularPattern = null;
+					this.currentPattern = new UnionPattern(Left, Pattern);
+					return true;
+
+				case "MINUS":
+					Parser.NextToken();
+
+					Left = this.currentPattern;
+					Pattern = this.ParsePattern(Parser);
+
+					this.currentRegularPattern = null;
+					this.currentPattern = new ComplementPattern(Left, Pattern);
+					return true;
+
+				default:
+					return false;
 			}
 		}
 
@@ -937,8 +1004,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (!(Node is NamedNode NamedNode))
 						throw Parser.SyntaxError("Expected name.");
 
-					this.currentPattern?.AddVariableBinding(
-						NamedNode.LeftOperand, NamedNode.RightOperand);
+					if (this.currentRegularPattern is null)
+					{
+						this.currentRegularPattern = new SparqlRegularPattern();
+						this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+					}
+
+					this.currentRegularPattern.AddVariableBinding(NamedNode.LeftOperand, NamedNode.RightOperand);
 
 					if (Parser.NextNonWhitespaceChar() != ')')
 						throw Parser.SyntaxError("Expected )");
@@ -948,7 +1020,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "FILTER":
 					Node = this.ParseUnary(Parser, false);
 
-					this.currentPattern?.AddFilter(Node);
+					if (this.currentRegularPattern is null)
+					{
+						this.currentRegularPattern = new SparqlRegularPattern();
+						this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+					}
+
+					this.currentRegularPattern.AddFilter(Node);
 
 					return this.ParseUnary(Parser, Optional);
 
@@ -989,14 +1067,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					}
 
 				case "EXISTS":
-					return new Exists(this.ParsePattern(Parser, PatternGroupType.Regular),
+					return new Exists(this.ParsePattern(Parser),
 						Start, Parser.Position - Start, Parser.Expression);
 
 				case "NOT": // EXISTS
 					if (Parser.NextToken() != "EXISTS")
 						throw Parser.SyntaxError("Expected EXISTS.");
 
-					return new NotExists(this.ParsePattern(Parser, PatternGroupType.Regular),
+					return new NotExists(this.ParsePattern(Parser),
 						Start, Parser.Position - Start, Parser.Expression);
 
 				// Aggregates
@@ -1305,24 +1383,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					BlankNode Result = this.CreateBlankNode();
 					BlankNode Current = Result;
 
+					if (this.currentRegularPattern is null)
+					{
+						this.currentRegularPattern = new SparqlRegularPattern();
+						this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+					}
+
 					while (!(Loop is null))
 					{
-						this.currentPattern?.AddTriple(new SemanticQueryTriple(Current,
-							RdfDocument.RdfFirst, Loop.Value));
+						this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfFirst, Loop.Value));
 
 						Loop = Loop.Next;
 
 						if (!(Loop is null))
 						{
 							BlankNode Next = this.CreateBlankNode();
-							this.currentPattern?.AddTriple(new SemanticQueryTriple(Current,
-								RdfDocument.RdfRest, Next));
+							this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfRest, Next));
 							Current = Next;
 						}
 					}
 
-					this.currentPattern?.AddTriple(new SemanticQueryTriple(Current,
-						RdfDocument.RdfRest, RdfDocument.RdfNil));
+					this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
 
 					return Result;
 				}

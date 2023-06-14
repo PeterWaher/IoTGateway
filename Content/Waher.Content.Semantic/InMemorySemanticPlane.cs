@@ -162,7 +162,7 @@ namespace Waher.Content.Semantic
 						Ordered[P.Item1] = Last;
 					}
 
-					Last.Add(P.Item1, P.Item3);
+					Last.Add(P.Item2, P.Item3);
 				}
 
 				this.yPerX = Ordered;
@@ -187,7 +187,7 @@ namespace Waher.Content.Semantic
 						Ordered[P.Item2] = Last;
 					}
 
-					Last.Add(P.Item2, P.Item3);
+					Last.Add(P.Item1, P.Item3);
 				}
 
 				this.xPerY = Ordered;

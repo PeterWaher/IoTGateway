@@ -19,6 +19,7 @@
     <FileVersion>1.0.4</FileVersion>
     <Version>1.0.4</Version>
     <PackageIcon>Icon_64x64.png</PackageIcon>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

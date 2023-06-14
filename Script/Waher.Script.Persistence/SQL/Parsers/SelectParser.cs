@@ -89,6 +89,22 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				Parser.NextToken();
 				Columns = null;
 				ColumnNames = null;
+
+				if (Top is null && !Generic)
+				{
+					Parser.SkipWhiteSpace();
+					if (Parser.PeekNextChar() == '{')
+					{
+						SparqlParser SparqlParser;
+
+						if (Distinct)
+							SparqlParser = new SparqlParser("SELECT DISTINCT * ");
+						else
+							SparqlParser = new SparqlParser("SELECT * ");
+
+						return SparqlParser.TryParse(Parser, out Result);
+					}
+				}
 			}
 			else if (s == "?")
 			{

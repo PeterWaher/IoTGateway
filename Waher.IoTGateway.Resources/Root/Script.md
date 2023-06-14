@@ -2290,9 +2290,9 @@ or the Neuron^TM.
 | `SendPlainMessage(To,Text[,Subject[,Language]])`                       | Sends a plain-text XMPP message to a recipient `To`, with an optional `Subject` and `Language`.                                                                                                                                                                                                                                                                                                                                                                                                                                       | `SendPlainMessage(To,"Hello there.")`                              |
 | `SendProposal(ContractId,Jid,Role,Proposal)`                           | Sends a contract proposal with ID `ContractId` to an XMPP client using address `JID`, for signing as `Role`. Message inclues a `Proposal` text.                                                                                                                                                                                                                                                                                                                                                                                       | `SendProposal(ContractId,ContactJid,"Creator","Please sign.")`     |
 
-#### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
+#### Multi-User Chat Extensions (available in Waher.Service.LilSis, Waher.Service.IoTBroker)
 
-The following functions are available in applications using Multi-User Chat, such as the `Waher.Service.LittleSister` library,
+The following functions are available in applications using Multi-User Chat, such as the `Waher.Service.LilSis` library,
 part of Lil'Sis'^TM, and the `Waher.Service.IoTBroker` library, part of the Neuron^TM.
 
 | Function                                                          | Description                                                                                                                                                                | Example |

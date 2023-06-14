@@ -297,6 +297,32 @@ namespace Waher.Script.Persistence.SPARQL
 							}
 							break;
 
+						case PatternGroupType.Minus:
+							VariablesProcessed2 = new Dictionary<string, bool>();
+
+							foreach (string Key in VariablesProcessed0.Keys)
+								VariablesProcessed2[Key] = true;
+
+							NewMatches = await SubPattern.Search(Cube,
+								Variables, VariablesProcessed2, OrgMatches, Query);
+
+							if (!(NewMatches is null))
+							{
+								if (!(ExistingMatches is LinkedList<Possibility> ExistingMatches2))
+								{
+									ExistingMatches2 = new LinkedList<Possibility>();
+
+									foreach (Possibility P in ExistingMatches)
+										ExistingMatches2.AddLast(P);
+								}
+
+								foreach (Possibility P in NewMatches)
+									ExistingMatches2.AddLast(P);
+
+								ExistingMatches = ExistingMatches2;
+							}
+							break;
+
 						case PatternGroupType.Optional:
 							if (ExistingMatches is null)
 								break;
@@ -856,12 +882,14 @@ namespace Waher.Script.Persistence.SPARQL
 			else
 			{
 				VariablesProcessed[Name] = true;
+
 				if (!SameName)
 					VariablesProcessed[Name2] = true;
+
 				if (!SameName2 && !SameName3)
 					VariablesProcessed[Name3] = true;
 
-				foreach (Possibility P in Possibilities)
+				if (Possibilities is null)
 				{
 					foreach (ISemanticTriple T2 in Cube)
 					{
@@ -874,7 +902,7 @@ namespace Waher.Script.Persistence.SPARQL
 						if (SameName3 && !T2.Predicate.Equals(T2.Object))
 							continue;
 
-						Possibility NewPossibility = new Possibility(Name, T2.Subject, P);
+						Possibility NewPossibility = new Possibility(Name, T2.Subject);
 
 						if (!SameName)
 							NewPossibility = new Possibility(Name2, T2.Predicate, NewPossibility);
@@ -886,6 +914,36 @@ namespace Waher.Script.Persistence.SPARQL
 							NewPossibilities = new LinkedList<Possibility>();
 
 						NewPossibilities.AddLast(NewPossibility);
+					}
+				}
+				else
+				{
+					foreach (Possibility P in Possibilities)
+					{
+						foreach (ISemanticTriple T2 in Cube)
+						{
+							if (SameName && !T2.Subject.Equals(T2.Predicate))
+								continue;
+
+							if (SameName2 && !T2.Subject.Equals(T2.Object))
+								continue;
+
+							if (SameName3 && !T2.Predicate.Equals(T2.Object))
+								continue;
+
+							Possibility NewPossibility = new Possibility(Name, T2.Subject, P);
+
+							if (!SameName)
+								NewPossibility = new Possibility(Name2, T2.Predicate, NewPossibility);
+
+							if (!SameName2 && !SameName3)
+								NewPossibility = new Possibility(Name3, T2.Object, NewPossibility);
+
+							if (NewPossibilities is null)
+								NewPossibilities = new LinkedList<Possibility>();
+
+							NewPossibilities.AddLast(NewPossibility);
+						}
 					}
 				}
 			}

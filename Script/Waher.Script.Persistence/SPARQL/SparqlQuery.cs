@@ -119,11 +119,12 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			IEnumerable<Possibility> Possibilities;
+			Dictionary<string, bool> VariablesProcessed = new Dictionary<string, bool>();
 
 			if (this.where is null)
 				Possibilities = null;
 			else
-				Possibilities = await this.where.Search(Cube, Variables, this);
+				Possibilities = await this.where.Search(Cube, Variables, VariablesProcessed, this);
 
 			if (this.columns is null && this.construct is null)   // ASK
 			{
@@ -164,46 +165,57 @@ namespace Waher.Script.Persistence.SPARQL
 			Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
 			LinkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
 			List<string> ColumnNames = new List<string>();
-			int Columns = this.columns.Length;
-			int i, c = this.columnNames?.Length ?? 0;
 			string Name;
+			int i, c;
 
-			for (i = 0; i < Columns; i++)
+			if (this.columns is null)
 			{
-				if (i < c && !(this.columnNames[i] is null))
-				{
-					if (this.columnNames[i] is VariableReference Ref2)
-						Name = Ref2.VariableName;
-					else
-						Name = (await this.columnNames[i].EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
+				foreach (string VariableName in VariablesProcessed.Keys)
+					ColumnNames.Add(VariableName);
+			}
+			else
+			{
+				int Columns = this.columns.Length;
+				
+				c = this.columnNames?.Length ?? 0;
 
-					ColumnVariables[Name] = i;
-					ColumnNames.Add(Name);
-				}
-				else
-					Name = null;
-
-				if (this.columns[i] is VariableReference Ref)
+				for (i = 0; i < Columns; i++)
 				{
-					if (Name is null)
+					if (i < c && !(this.columnNames[i] is null))
 					{
-						Name = Ref.VariableName;
+						if (this.columnNames[i] is VariableReference Ref2)
+							Name = Ref2.VariableName;
+						else
+							Name = (await this.columnNames[i].EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
 
 						ColumnVariables[Name] = i;
 						ColumnNames.Add(Name);
 					}
-				}
-				else
-				{
-					if (ColumnScript is null)
-						ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+					else
+						Name = null;
 
-					ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
-
-					if (Name is null)
+					if (this.columns[i] is VariableReference Ref)
 					{
-						Name = " c" + i.ToString();
-						ColumnNames.Add(Name);
+						if (Name is null)
+						{
+							Name = Ref.VariableName;
+
+							ColumnVariables[Name] = i;
+							ColumnNames.Add(Name);
+						}
+					}
+					else
+					{
+						if (ColumnScript is null)
+							ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+
+						ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
+
+						if (Name is null)
+						{
+							Name = " c" + i.ToString();
+							ColumnNames.Add(Name);
+						}
 					}
 				}
 			}

@@ -69,7 +69,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "DISTINCT", "FROM", "WHERE", "OPTIONAL", "ORDER", "BY", "ASK", "CONSTRUCT" };
+		public string[] InternalKeywords => new string[] { "DISTINCT", "FROM", "WHERE", "OPTIONAL", "UNION", "MINUS", "ORDER", "BY", "ASK", "CONSTRUCT" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -188,24 +188,35 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						s = this.PeekNextToken(Parser).ToUpper();
 					}
 
-					Columns = new List<ScriptNode>();
-					ColumnNames = new List<ScriptNode>();
-
-					while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
+					if (s == "*")
 					{
-						Node = this.ParseNamedExpression(Parser);
-						if (Node is NamedNode NamedNode)
-						{
-							Columns.Add(NamedNode.LeftOperand);
-							ColumnNames.Add(NamedNode.RightOperand);
-						}
-						else
-						{
-							Columns.Add(Node);
-							ColumnNames.Add(null);
-						}
+						this.NextToken(Parser);
+						s = this.PeekNextToken(Parser).ToUpper();
 
-						s = Parser.PeekNextToken().ToUpper();
+						Columns = null;
+						ColumnNames = null;
+					}
+					else
+					{
+						Columns = new List<ScriptNode>();
+						ColumnNames = new List<ScriptNode>();
+
+						while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
+						{
+							Node = this.ParseNamedExpression(Parser);
+							if (Node is NamedNode NamedNode)
+							{
+								Columns.Add(NamedNode.LeftOperand);
+								ColumnNames.Add(NamedNode.RightOperand);
+							}
+							else
+							{
+								Columns.Add(Node);
+								ColumnNames.Add(null);
+							}
+
+							s = Parser.PeekNextToken().ToUpper();
+						}
 					}
 					break;
 
@@ -237,6 +248,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (s == "WHERE")
 			{
 				Parser.NextToken();
+				Where = this.ParsePattern(Parser, PatternGroupType.Regular);
+				s = Parser.PeekNextToken().ToUpper();
+			}
+			else if (s == "{")
+			{
 				Where = this.ParsePattern(Parser, PatternGroupType.Regular);
 				s = Parser.PeekNextToken().ToUpper();
 			}

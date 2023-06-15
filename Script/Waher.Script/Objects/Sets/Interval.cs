@@ -82,10 +82,8 @@ namespace Waher.Script.Objects.Sets
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			if (!(Element is DoubleNumber n))
+			if (!(Element.AssociatedObjectValue is double d))
 				return false;
-
-			double d = n.Value;
 
 			if (d == this.from)
 				return this.includesFrom;

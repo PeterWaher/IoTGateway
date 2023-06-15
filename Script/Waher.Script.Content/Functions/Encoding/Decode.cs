@@ -63,7 +63,7 @@ namespace Waher.Script.Content.Functions.Encoding
 			if (!(Argument1.AssociatedObjectValue is byte[] Bin))
 				throw new ScriptRuntimeException("Binary data expected.", this);
 
-			string ContentType = Argument2 is StringValue S2 ? S2.Value : Expression.ToString(Argument2.AssociatedObjectValue);
+			string ContentType = Argument2.AssociatedObjectValue is string s2 ? s2 : Expression.ToString(Argument2.AssociatedObjectValue);
 
 			return this.DoDecodeAsync(Bin, ContentType, null);
 		}

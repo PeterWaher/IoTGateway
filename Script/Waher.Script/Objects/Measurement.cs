@@ -150,8 +150,8 @@ namespace Waher.Script.Objects
 
 				return new Measurement(Magnitude, Unit, Error);
 			}
-			else if (Element is DoubleNumber n)
-				return new Measurement(this.magnitude * n.Value, this.unit, this.error * n.Value);
+			else if (Element.AssociatedObjectValue is double d)
+				return new Measurement(this.magnitude * d, this.unit, this.error * d);
 			else
 				return null;
 		}
@@ -191,8 +191,8 @@ namespace Waher.Script.Objects
 
 				return new Measurement(Magnitude, this.unit, this.error + d);
 			}
-			else if (Element is DoubleNumber n)
-				return new Measurement(this.magnitude + n.Value, this.unit, this.error);
+			else if (Element.AssociatedObjectValue is double d)
+				return new Measurement(this.magnitude + d, this.unit, this.error);
 			else
 				return null;
 		}

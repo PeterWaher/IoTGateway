@@ -73,12 +73,12 @@ namespace Waher.Script.Functions.Vectors
 			else
 				FromIndex = (int)Expression.ToDouble(From.AssociatedObjectValue);
 
-			if (Vector is StringValue S1 && Item is StringValue S2)
+			if (Vector.AssociatedObjectValue is string s1 && Item.AssociatedObjectValue is string s2)
 			{
 				if (From is null)
-					return new DoubleNumber(S1.Value.IndexOf(S2.Value));
+					return new DoubleNumber(s1.IndexOf(s2));
 
-				return new DoubleNumber(S1.Value.IndexOf(S2.Value, FromIndex));
+				return new DoubleNumber(s1.IndexOf(s2, FromIndex));
 			}
 			else
 			{

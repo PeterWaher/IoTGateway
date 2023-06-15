@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="title"/>
+		<variable name="price"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="title">
+				<literal>The Semantic Web</literal>
+			</binding>
+			<binding name="price">
+				<literal datatype="http://www.w3.org/2001/XMLSchema#double">17.25</literal>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

@@ -34,8 +34,8 @@ namespace Waher.Script.Model
 			IElement L = this.left.Evaluate(Variables);
 			IElement R = this.right.Evaluate(Variables);
 
-			if (L is DoubleNumber DL && R is DoubleNumber DR)
-				return this.Evaluate(DL.Value, DR.Value);
+			if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+				return this.Evaluate(DL, DR);
 			else
 				return this.Evaluate(L, R, Variables);
 		}
@@ -53,8 +53,8 @@ namespace Waher.Script.Model
 			IElement L = await this.left.EvaluateAsync(Variables);
 			IElement R = await this.right.EvaluateAsync(Variables);
 
-			if (L is DoubleNumber DL && R is DoubleNumber DR)
-				return await this.EvaluateAsync(DL.Value, DR.Value);
+			if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+				return await this.EvaluateAsync(DL, DR);
 			else
 				return await this.EvaluateAsync(L, R, Variables);
 		}
@@ -68,16 +68,13 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			double l, r;
+			object L = Left.AssociatedObjectValue;
+			object R = Right.AssociatedObjectValue;
 
-			if (Left is DoubleNumber DL)
-				l = DL.Value;
-			else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+			if (!(L is double l) && !Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
-			if (Right is DoubleNumber DR)
-				r = DR.Value;
-			else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+			if (!(R is double r) && !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
 			return this.Evaluate(l, r);
@@ -92,16 +89,13 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Left, IElement Right, Variables Variables)
 		{
-			double l, r;
+			object L = Left.AssociatedObjectValue;
+			object R = Right.AssociatedObjectValue;
 
-			if (Left is DoubleNumber DL)
-				l = DL.Value;
-			else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+			if (!(L is double l) && !Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
-			if (Right is DoubleNumber DR)
-				r = DR.Value;
-			else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+			if (!(R is double r) && !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
 			return this.EvaluateAsync(l, r);

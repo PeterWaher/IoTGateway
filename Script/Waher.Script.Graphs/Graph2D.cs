@@ -682,13 +682,13 @@ namespace Waher.Script.Graphs
 				};
 
 				if (this.SameScale &&
-					this.minX is DoubleNumber MinX &&
-					this.maxX is DoubleNumber MaxX &&
-					this.minY is DoubleNumber MinY &&
-					this.maxY is DoubleNumber MaxY)
+					this.minX.AssociatedObjectValue is double MinX &&
+					this.maxX.AssociatedObjectValue is double MaxX &&
+					this.minY.AssociatedObjectValue is double MinY &&
+					this.maxY.AssociatedObjectValue is double MaxY)
 				{
-					double DX = MaxX.Value - MinX.Value;
-					double DY = MaxY.Value - MinY.Value;
+					double DX = MaxX - MinX;
+					double DY = MaxY - MinY;
 					double SX = w / (DX == 0 ? 1 : DX);
 					double SY = h / (DY == 0 ? 1 : DY);
 
@@ -739,7 +739,7 @@ namespace Waher.Script.Graphs
 
 					if (this.showGrid)
 					{
-						if (Label is DoubleNumber Lbl && Lbl.Value == 0)
+						if (Label.AssociatedObjectValue is double Lbl && Lbl == 0)
 							Canvas.DrawLine(x3, f, x2, f, AxisPen);
 						else
 							Canvas.DrawLine(x3, f, x2, f, GridPen);
@@ -768,7 +768,7 @@ namespace Waher.Script.Graphs
 
 					if (this.showGrid)
 					{
-						if (Label is DoubleNumber DLbl && DLbl.Value == 0)
+						if (Label.AssociatedObjectValue is double DLbl && DLbl == 0)
 							Canvas.DrawLine(f, y1, f, y3, AxisPen);
 						else
 							Canvas.DrawLine(f, y1, f, y3, GridPen);
@@ -989,9 +989,9 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>String representation.</returns>
-		public static string ReducedXmlString(DoubleNumber Value)
+		public static string ReducedXmlString(double Value)
 		{
-			return ((float)Value.Value).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return ((float)Value).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 		}
 
 		/// <summary>
@@ -1222,7 +1222,7 @@ namespace Waher.Script.Graphs
 		/// <returns>String representation.</returns>
 		public static string ReducedXmlString(IElement Value)
 		{
-			if (Value is DoubleNumber N)
+			if (Value.AssociatedObjectValue is double N)
 				return ReducedXmlString(N);
 			else if (Value is DoubleVector v)
 				return ReducedXmlString(v);

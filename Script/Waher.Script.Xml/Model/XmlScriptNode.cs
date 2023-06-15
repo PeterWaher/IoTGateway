@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -86,25 +87,26 @@ namespace Waher.Script.Xml.Model
 		/// <returns>String result.</returns>
 		public static string EvaluateString(IElement Element)
 		{
-			if (Element is StringValue S)
-				return S.Value;
-			else if (Element is BooleanValue B)
-				return CommonTypes.Encode(B.Value);
-			else if (Element is DoubleNumber D)
-				return CommonTypes.Encode(D.Value);
-			else if (Element is DateTimeValue DT)
-				return XML.Encode(DT.Value, DT.Value.TimeOfDay == TimeSpan.Zero);
-			else if (Element is Integer I)
-				return I.Value.ToString();
+			object Obj = Element.AssociatedObjectValue;
+
+			if (Obj is string s)
+				return s;
+			else if (Obj is bool b)
+				return CommonTypes.Encode(b);
+			else if (Obj is double d)
+				return CommonTypes.Encode(d);
+			else if (Obj is DateTime TP)
+				return XML.Encode(TP, TP.TimeOfDay == TimeSpan.Zero);
+			else if (Obj is BigInteger I)
+				return I.ToString();
 			else
 			{
-				object Value = Element.AssociatedObjectValue;
-				if (Value is null)
+				if (Obj is null)
 					return null;
-				else if (Value is CaseInsensitiveString cis)
+				else if (Obj is CaseInsensitiveString cis)
 					return cis.Value;
 				else
-					return Expression.ToString(Value);
+					return Expression.ToString(Obj);
 			}
 		}
 

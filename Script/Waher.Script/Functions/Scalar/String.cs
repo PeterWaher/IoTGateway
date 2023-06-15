@@ -114,6 +114,8 @@ namespace Waher.Script.Functions.Scalar
 		{
 			if (CheckAgainst is StringValue)
 				return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
+			else if (CheckAgainst.AssociatedObjectValue is string s)
+				return this.Argument.PatternMatch(new StringValue(s), AlreadyFound);
 			else if (CheckAgainst.AssociatedObjectValue is null)
 				return this.Argument.PatternMatch(new StringValue(null), AlreadyFound);
 			else

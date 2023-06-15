@@ -43,14 +43,13 @@ namespace Waher.Content.Xsl.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			string s;
-
-			if (Argument1.AssociatedObjectValue is XmlDocument Xml)
-				s = Xml.OuterXml;
-			else if (Argument1 is StringValue S)
-				s = S.Value;
-			else
-				s = Expression.ToString(Argument1.AssociatedObjectValue);
+			if (!(Argument1.AssociatedObjectValue is string s))
+			{
+				if (Argument1.AssociatedObjectValue is XmlDocument Xml)
+					s = Xml.OuterXml;
+				else
+					s = Expression.ToString(Argument1.AssociatedObjectValue);
+			}
 
 			if (!(Argument2.AssociatedObjectValue is XslCompiledTransform Xslt))
 				throw new ScriptRuntimeException("Second parameter must be an XSL Transform (XSLT) object.", this);

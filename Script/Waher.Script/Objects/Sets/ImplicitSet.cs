@@ -136,10 +136,11 @@ namespace Waher.Script.Objects.Sets
 		private static bool SatisfiesCondition(ScriptNode Condition, Variables Variables)
 		{
 			IElement Result = Condition.Evaluate(Variables);
+			object Obj = Result.AssociatedObjectValue;
 
-			if (Result is BooleanValue B)
-				return B.Value;
-			else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
+			if (Obj is bool b)
+				return b;
+			else if (Expression.TryConvert(Obj, out b))
 				return b;
 			else
 				return false;
@@ -148,10 +149,11 @@ namespace Waher.Script.Objects.Sets
 		private static async Task<bool> SatisfiesConditionAsync(ScriptNode Condition, Variables Variables)
 		{
 			IElement Result = await Condition.EvaluateAsync(Variables);
+			object Obj = Result.AssociatedObjectValue;
 
-			if (Result is BooleanValue B)
-				return B.Value;
-			else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
+			if (Obj is bool b)
+				return b;
+			else if (Expression.TryConvert(Obj, out b))
 				return b;
 			else
 				return false;

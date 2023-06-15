@@ -94,18 +94,18 @@ namespace Waher.Script.Model
 			{
 				if (this.bothDouble.Value)
 				{
-					if (L is DoubleNumber DL && R is DoubleNumber DR)
-						return this.Evaluate(DL.Value, DR.Value);
+					if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+						return this.Evaluate(DL, DR);
 					else
 						this.bothDouble = false;
 				}
 			}
 			else
 			{
-				if (L is DoubleNumber DL && R is DoubleNumber DR)
+				if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
 				{
 					this.bothDouble = true;
-					return this.Evaluate(DL.Value, DR.Value);
+					return this.Evaluate(DL, DR);
 				}
 				else
 					this.bothDouble = false;
@@ -183,18 +183,18 @@ namespace Waher.Script.Model
 			{
 				if (this.bothDouble.Value)
 				{
-					if (L is DoubleNumber DL && R is DoubleNumber DR)
-						return await this.EvaluateAsync(DL.Value, DR.Value);
+					if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+						return await this.EvaluateAsync(DL, DR);
 					else
 						this.bothDouble = false;
 				}
 			}
 			else
 			{
-				if (L is DoubleNumber DL && R is DoubleNumber DR)
+				if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
 				{
 					this.bothDouble = true;
-					return await this.EvaluateAsync(DL.Value, DR.Value);
+					return await this.EvaluateAsync(DL, DR);
 				}
 				else
 					this.bothDouble = false;
@@ -212,21 +212,24 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			if (Left is BooleanValue BL && Right is BooleanValue BR)
-				return this.Evaluate(BL.Value, BR.Value);
+			if (Left.AssociatedObjectValue is bool BL &&
+				Right.AssociatedObjectValue is bool BR)
+			{
+				return this.Evaluate(BL, BR);
+			}
 			else
 			{
-				double l, r;
-
-				if (Left is DoubleNumber DL)
-					l = DL.Value;
-				else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+				if (!(Left.AssociatedObjectValue is double l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
 					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+				}
 
-				if (Right is DoubleNumber DR)
-					r = DR.Value;
-				else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+				if (!(Right.AssociatedObjectValue is double r) &&
+					!Expression.TryConvert(Right.AssociatedObjectValue, out r))
+				{
 					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+				}
 
 				return this.Evaluate(l, r);
 			}
@@ -241,21 +244,24 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Left, IElement Right, Variables Variables)
 		{
-			if (Left is BooleanValue BL && Right is BooleanValue BR)
-				return this.EvaluateAsync(BL.Value, BR.Value);
+			if (Left.AssociatedObjectValue is bool BL &&
+				Right.AssociatedObjectValue is bool BR)
+			{
+				return this.EvaluateAsync(BL, BR);
+			}
 			else
 			{
-				double l, r;
-
-				if (Left is DoubleNumber DL)
-					l = DL.Value;
-				else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+				if (!(Left.AssociatedObjectValue is double l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
 					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+				}
 
-				if (Right is DoubleNumber DR)
-					r = DR.Value;
-				else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+				if (!(Right.AssociatedObjectValue is double r) &&
+					!Expression.TryConvert(Right.AssociatedObjectValue, out r))
+				{
 					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+				}
 
 				return this.EvaluateAsync(l, r);
 			}

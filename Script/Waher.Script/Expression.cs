@@ -2795,12 +2795,14 @@ namespace Waher.Script
 
 							if (Node is ConstantElement ConstantElement)
 							{
-								if (ConstantElement.Constant is DoubleNumber DoubleNumber)
+								IElement C = ConstantElement.Constant;
+
+								if (C.AssociatedObjectValue is double d)
 								{
-									Node = new ConstantElement(new PhysicalQuantity(DoubleNumber.Value, Unit),
+									Node = new ConstantElement(new PhysicalQuantity(d, Unit),
 										ConstantElement.Start, this.pos - ConstantElement.Start, this);
 								}
-								else if (ConstantElement.Constant is PhysicalQuantity)
+								else if (C is PhysicalQuantity)
 									Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
 								else
 								{
@@ -2935,12 +2937,14 @@ namespace Waher.Script
 
 							if (Node is ConstantElement ConstantElement)
 							{
-								if (ConstantElement.Constant is DoubleNumber DoubleNumber)
+								IElement C = ConstantElement.Constant;
+
+								if (C.AssociatedObjectValue is double d)
 								{
-									Node = new ConstantElement(new PhysicalQuantity(DoubleNumber.Value, Unit),
+									Node = new ConstantElement(new PhysicalQuantity(d, Unit),
 										ConstantElement.Start, this.pos - ConstantElement.Start, this);
 								}
-								else if (ConstantElement.Constant is PhysicalQuantity)
+								else if (C is PhysicalQuantity)
 									Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
 								else
 								{
@@ -5011,7 +5015,7 @@ namespace Waher.Script
 
 			// TODO: Update to common extension field
 
-			if (E1 is ObjectValue OV1 && OV1.AssociatedObjectValue is Enum Enum1 && E2 is DoubleNumber)
+			if (O1 is Enum Enum1 && O2 is double)
 			{
 				T1 = Enum.GetUnderlyingType(Enum1.GetType());
 				if (T1 == typeof(int))
@@ -5021,7 +5025,7 @@ namespace Waher.Script
 					return true;
 				}
 			}
-			else if (E2 is ObjectValue OV2 && OV2.AssociatedObjectValue is Enum Enum2 && E1 is DoubleNumber)
+			else if (O2 is Enum Enum2 && O1 is double)
 			{
 				T2 = Enum.GetUnderlyingType(Enum2.GetType());
 				if (T2 == typeof(int))

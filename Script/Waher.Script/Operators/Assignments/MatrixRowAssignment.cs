@@ -38,9 +38,8 @@ namespace Waher.Script.Operators.Assignments
                 throw new ScriptRuntimeException("Matrix row vector assignment can only be performed on matrices.", this);
 
             IElement Index = this.middle.Evaluate(Variables);
-            double d;
 
-            if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+            if (!(Index.AssociatedObjectValue is double d) || d < 0 || d > int.MaxValue || d != Math.Truncate(d))
                 throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
             IElement Value = this.right.Evaluate(Variables);
@@ -70,9 +69,8 @@ namespace Waher.Script.Operators.Assignments
                 throw new ScriptRuntimeException("Matrix row vector assignment can only be performed on matrices.", this);
 
             IElement Index = await this.middle.EvaluateAsync(Variables);
-            double d;
 
-            if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+            if (!(Index.AssociatedObjectValue is double d) || d < 0 || d > int.MaxValue || d != Math.Truncate(d))
                 throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
             IElement Value = await this.right.EvaluateAsync(Variables);

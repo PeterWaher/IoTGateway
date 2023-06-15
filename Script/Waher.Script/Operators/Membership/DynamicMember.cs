@@ -72,10 +72,10 @@ namespace Waher.Script.Operators.Membership
         {
             if (Member.IsScalar)
             {
-                if (!(Member is StringValue s))
+                if (!(Member.AssociatedObjectValue is string s))
                     throw new ScriptRuntimeException("Member names must be strings.", Node);
 
-                return await NamedMember.EvaluateDynamic(Operand, s.Value, NullCheck, Node);
+                return await NamedMember.EvaluateDynamic(Operand, s, NullCheck, Node);
             }
             else
             {

@@ -32,8 +32,8 @@ namespace Waher.Script.Model
 		{
 			IElement Op = this.op.Evaluate(Variables);
 
-			if (Op is BooleanValue BOp)
-				return this.Evaluate(BOp.Value);
+			if (Op.AssociatedObjectValue is bool BOp)
+				return this.Evaluate(BOp);
 			else
 				return this.Evaluate(Op, Variables);
 		}
@@ -50,8 +50,8 @@ namespace Waher.Script.Model
 
 			IElement Op = await this.op.EvaluateAsync(Variables);
 
-			if (Op is BooleanValue BOp)
-				return await this.EvaluateAsync(BOp.Value);
+			if (Op.AssociatedObjectValue is bool BOp)
+				return await this.EvaluateAsync(BOp);
 			else
 				return await this.EvaluateAsync(Op, Variables);
 		}
@@ -64,9 +64,11 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
-			if (Operand is BooleanValue BOp)
-				return this.Evaluate(BOp.Value);
-			else if (Expression.TryConvert<bool>(Operand.AssociatedObjectValue, out bool b))
+			object Obj = Operand.AssociatedObjectValue;
+
+			if (Obj is bool BOp)
+				return this.Evaluate(BOp);
+			else if (Expression.TryConvert(Obj, out bool b))
 				return this.Evaluate(b);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
@@ -80,9 +82,11 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override async Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
 		{
-			if (Operand is BooleanValue BOp)
-				return await this.EvaluateAsync(BOp.Value);
-			else if (Expression.TryConvert<bool>(Operand.AssociatedObjectValue, out bool b))
+			object Obj = Operand.AssociatedObjectValue;
+
+			if (Obj is bool BOp)
+				return await this.EvaluateAsync(BOp);
+			else if (Expression.TryConvert(Obj, out bool b))
 				return await this.EvaluateAsync(b);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);

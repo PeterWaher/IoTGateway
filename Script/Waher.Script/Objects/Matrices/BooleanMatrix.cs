@@ -13,7 +13,7 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Boolean-valued matrix.
 	/// </summary>
-	public sealed class BooleanMatrix : RingElement, IVector, IMatrix
+	public sealed class BooleanMatrix : RingElement, IMatrix
 	{
 		private bool[,] values;
 		private ICollection<IElement> elements;
@@ -59,9 +59,12 @@ namespace Waher.Script.Objects.Matrices
 					int x = 0;
 					int y = 0;
 
-					foreach (BooleanValue Element in this.elements)
+					foreach (IElement Element in this.elements)
 					{
-						v[y, x++] = Element.Value;
+						if (!(Element.AssociatedObjectValue is bool b))
+							b = false;
+
+						v[y, x++] = b;
 						if (x >= this.columns)
 						{
 							y++;
@@ -459,13 +462,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			if (!(Value is BooleanValue V))
+			if (!(Value.AssociatedObjectValue is bool V))
 				throw new ScriptException("Elements in a boolean matrix must be boolean values.");
 
 			bool[,] M = this.Values;
 			this.elements = null;
 
-			M[Row, Column] = V.Value;
+			M[Row, Column] = V;
 		}
 
 		/// <summary>

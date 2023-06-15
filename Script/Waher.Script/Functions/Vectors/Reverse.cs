@@ -36,11 +36,10 @@ namespace Waher.Script.Functions.Vectors
 		/// <returns>Result</returns>
 		protected override IElement EvaluateNonVector(IElement Argument, Variables Variables)
 		{
-			if (Argument is StringValue S)
+			if (Argument.AssociatedObjectValue is string s)
 			{
-				string s = S.Value;
 				if (string.IsNullOrEmpty(s))
-					return S;
+					return Argument;
 
 				char[] Characters = s.ToCharArray();
 

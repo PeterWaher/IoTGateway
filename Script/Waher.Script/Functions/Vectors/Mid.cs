@@ -61,9 +61,8 @@ namespace Waher.Script.Functions.Vectors
 
 			int c = (int)Len;
 
-			if (Arguments[0] is StringValue S)
+			if (Arguments[0].AssociatedObjectValue is string s)
 			{
-				string s = S.Value;
 				int l = s.Length;
 
 				if (i > l)

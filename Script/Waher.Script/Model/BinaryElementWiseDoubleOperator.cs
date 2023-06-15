@@ -35,8 +35,8 @@ namespace Waher.Script.Model
 			IElement L = this.left.Evaluate(Variables);
 			IElement R = this.right.Evaluate(Variables);
 
-			if (L is DoubleNumber DL && R is DoubleNumber DR)
-				return this.Evaluate(DL.Value, DR.Value);
+			if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+				return this.Evaluate(DL, DR);
 			else
 				return this.Evaluate(L, R, Variables);
 		}
@@ -54,8 +54,8 @@ namespace Waher.Script.Model
 			IElement L = await this.left.EvaluateAsync(Variables);
 			IElement R = await this.right.EvaluateAsync(Variables);
 
-			if (L is DoubleNumber DL && R is DoubleNumber DR)
-				return await this.EvaluateAsync(DL.Value, DR.Value);
+			if (L.AssociatedObjectValue is double DL && R.AssociatedObjectValue is double DR)
+				return await this.EvaluateAsync(DL, DR);
 			else
 				return await this.EvaluateAsync(L, R, Variables);
 		}

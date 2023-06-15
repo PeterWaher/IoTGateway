@@ -36,8 +36,8 @@ namespace Waher.Script.Operators.Assignments.Post
 			IElement Value = v.ValueElement;
 			IElement Value2;
 
-			if (Value is DoubleNumber n)
-				Value2 = new DoubleNumber(n.Value + 1);
+			if (Value.AssociatedObjectValue	is double d)
+				Value2 = new DoubleNumber(d + 1);
 			else
 				Value2 = Pre.PreIncrement.Increment(Value, this);
 

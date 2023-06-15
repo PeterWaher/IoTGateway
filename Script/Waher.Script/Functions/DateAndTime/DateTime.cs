@@ -297,17 +297,15 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			System.DateTime TP;
+			object Obj = CheckAgainst.AssociatedObjectValue;
 
-			if (CheckAgainst is DateTimeValue DTV)
-				TP = DTV.Value;
-			else
+			if (!(Obj is System.DateTime TP))
 			{
-				if (CheckAgainst is DoubleNumber D)
-					TP = FromInteger((long)D.Value, DateTimeKind.Unspecified);
+				if (Obj is double d)
+					TP = FromInteger((long)d, DateTimeKind.Unspecified);
 				else
 				{
-					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+					string s = Obj?.ToString() ?? string.Empty;
 
 					if (!System.DateTime.TryParse(s, out TP))
 					{
@@ -319,7 +317,7 @@ namespace Waher.Script.Functions.DateAndTime
 				}
 			}
 
-			int c = Arguments.Length;
+			int c = this.Arguments.Length;
 			if (c == 1)
 				return this.Arguments[0].PatternMatch(new DateTimeValue(TP), AlreadyFound);
 

@@ -111,34 +111,38 @@ namespace Waher.Script.Operators.Arithmetics
 					if (!(Result is null))
 						return Result;
 
-					if (Left is DoubleNumber D)
+					object LeftObj = Left.AssociatedObjectValue;
+
+					if (LeftObj is double D)
 					{
 						if (Right is GroupElement E)
-							return EvaluateScalarMultiplication(D.Value, E, Node);
+							return EvaluateScalarMultiplication(D, E, Node);
 						else
-							return EvaluateScalarMultiplication(D.Value, Right, Node);
+							return EvaluateScalarMultiplication(D, Right, Node);
 					}
-					else if (Left is Integer I)
+					else if (LeftObj is BigInteger I)
 					{
 						if (Right is GroupElement E)
-							return EvaluateScalarMultiplication(I.Value, E, Node);
+							return EvaluateScalarMultiplication(I, E, Node);
 						else
-							return EvaluateScalarMultiplication(I.Value, Right, Node);
+							return EvaluateScalarMultiplication(I, Right, Node);
 					}
 
-					if (Right is DoubleNumber D2)
+					object RightObj = Right.AssociatedObjectValue;
+
+					if (RightObj is double D2)
 					{
 						if (Left is GroupElement E2)
-							return EvaluateScalarMultiplication(D2.Value, E2, Node);
+							return EvaluateScalarMultiplication(D2, E2, Node);
 						else
-							return EvaluateScalarMultiplication(D2.Value, Left, Node);
+							return EvaluateScalarMultiplication(D2, Left, Node);
 					}
-					else if (Right is Integer I2)
+					else if (RightObj is BigInteger I2)
 					{
 						if (Left is GroupElement E2)
-							return EvaluateScalarMultiplication(I2.Value, E2, Node);
+							return EvaluateScalarMultiplication(I2, E2, Node);
 						else
-							return EvaluateScalarMultiplication(I2.Value, Left, Node);
+							return EvaluateScalarMultiplication(I2, Left, Node);
 					}
 
 					throw new ScriptRuntimeException("Operands cannot be multiplied.", Node);

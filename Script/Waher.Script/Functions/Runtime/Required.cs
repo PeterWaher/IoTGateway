@@ -37,7 +37,7 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
-            if (E is ObjectValue O && O.Value is null)
+            if (E.AssociatedObjectValue is null)
                 throw new ScriptRuntimeException("Not defined.", this);
 
             return E;
@@ -51,7 +51,7 @@ namespace Waher.Script.Functions.Runtime
         public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
             IElement E = await this.Argument.EvaluateAsync(Variables);
-            if (E is ObjectValue O && O.Value is null)
+            if (E.AssociatedObjectValue is null)
                 throw new ScriptRuntimeException("Not defined.", this);
 
             return E;
@@ -76,7 +76,7 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Pattern match result</returns>
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-            if (CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null)
+            if (CheckAgainst.AssociatedObjectValue is null)
                 return PatternMatchResult.NoMatch;
 
             return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);

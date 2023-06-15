@@ -156,8 +156,8 @@ namespace Waher.Script.Statistics.Functions
 					{
 						E = Data.GetElement(j, 0);
 
-						if (E is DoubleNumber X)
-							x = X.Value;
+						if (E.AssociatedObjectValue is double x2)
+							x = x2;
 						else
 						{
 							try
@@ -172,8 +172,8 @@ namespace Waher.Script.Statistics.Functions
 
 						E = Data.GetElement(j, 1);
 
-						if (E is DoubleNumber Y)
-							y = Y.Value;
+						if (E.AssociatedObjectValue is double y2)
+							y = y2;
 						else
 						{
 							try
@@ -208,8 +208,8 @@ namespace Waher.Script.Statistics.Functions
 					{
 						E = Data.GetElement(0, j);
 
-						if (E is DoubleNumber X)
-							x = X.Value;
+						if (E.AssociatedObjectValue is double x2)
+							x = x2;
 						else
 						{
 							try
@@ -224,8 +224,8 @@ namespace Waher.Script.Statistics.Functions
 
 						E = Data.GetElement(1, j);
 
-						if (E is DoubleNumber Y)
-							y = Y.Value;
+						if (E.AssociatedObjectValue is double y2)
+							y = y2;
 						else
 						{
 							try

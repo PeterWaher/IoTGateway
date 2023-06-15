@@ -91,8 +91,8 @@ namespace Waher.Script.Statistics.Functions
 			{
 				foreach (IElement E in Data.VectorElements)
 				{
-					if (E is DoubleNumber X)
-						x = X.Value;
+					if (E.AssociatedObjectValue is double x2)
+						x = x2;
 					else
 					{
 						try

@@ -13,7 +13,7 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Double-valued matrix.
 	/// </summary>
-	public sealed class DoubleMatrix : RingElement, IVector, IMatrix
+	public sealed class DoubleMatrix : RingElement, IMatrix
     {
 		private double[,] values;
 		private ICollection<IElement> elements;
@@ -59,9 +59,12 @@ namespace Waher.Script.Objects.Matrices
 					int x = 0;
 					int y = 0;
 
-					foreach (DoubleNumber Element in this.elements)
+					foreach (IElement E in this.elements)
 					{
-						v[y, x++] = Element.Value;
+						if (!(E.AssociatedObjectValue is double d))
+							d = 0;
+
+						v[y, x++] = d;
 						if (x >= this.columns)
 						{
 							y++;
@@ -184,15 +187,14 @@ namespace Waher.Script.Objects.Matrices
 			double n;
 			int x, y, z;
 
-			if (Element is DoubleNumber Number)
+			if (Element.AssociatedObjectValue is double d)
 			{
-				n = Number.Value;
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = n * Values[y, x];
+						v[y, x] = d * Values[y, x];
 				}
 
 				return new DoubleMatrix(v);
@@ -236,15 +238,14 @@ namespace Waher.Script.Objects.Matrices
 			double n;
 			int x, y, z;
 
-			if (Element is DoubleNumber Number)
+			if (Element.AssociatedObjectValue is double d)
 			{
-				n = Number.Value;
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = n * Values[y, x];
+						v[y, x] = d * Values[y, x];
 				}
 
 				return new DoubleMatrix(v);
@@ -364,18 +365,16 @@ namespace Waher.Script.Objects.Matrices
 		{
 			double[,] Values = this.Values;
 			double[,] v;
-			double n;
 			int x, y;
 
-			if (Element is DoubleNumber Number)
+			if (Element.AssociatedObjectValue is double d)
 			{
-				n = Number.Value;
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = n + Values[y, x];
+						v[y, x] = d + Values[y, x];
 				}
 
 				return new DoubleMatrix(v);
@@ -652,13 +651,13 @@ namespace Waher.Script.Objects.Matrices
             if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-			if (!(Value is DoubleNumber V))
+			if (!(Value.AssociatedObjectValue is double d))
 				throw new ScriptException("Elements in a double matrix must be double values.");
 
 			double[,] M = this.Values;
             this.elements = null;
 
-            M[Row, Column] = V.Value;
+            M[Row, Column] = d;
         }
 
         /// <summary>

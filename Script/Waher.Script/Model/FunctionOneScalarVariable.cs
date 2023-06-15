@@ -35,17 +35,19 @@ namespace Waher.Script.Model
         {
             if (Argument.IsScalar)
             {
-                if (Argument is DoubleNumber DoubleNumber)
-                    return this.EvaluateScalar(DoubleNumber.Value, Variables);
+                object Obj = Argument.AssociatedObjectValue;
 
-                if (Argument is ComplexNumber ComplexNumber)
-                    return this.EvaluateScalar(ComplexNumber.Value, Variables);
+                if (Obj is double d)
+                    return this.EvaluateScalar(d, Variables);
 
-                if (Argument is BooleanValue BooleanValue)
-                    return this.EvaluateScalar(BooleanValue.Value, Variables);
+                if (Obj is Complex z)
+                    return this.EvaluateScalar(z, Variables);
 
-                if (Argument is StringValue StringValue)
-                    return this.EvaluateScalar(StringValue.Value, Variables);
+                if (Obj is bool b)
+                    return this.EvaluateScalar(b, Variables);
+
+                if (Obj is string s)
+                    return this.EvaluateScalar(s, Variables);
 
 				if (Argument is PhysicalQuantity PhysicalQuantity)
 					return this.EvaluateScalar(PhysicalQuantity.Magnitude, Variables);
@@ -180,17 +182,19 @@ namespace Waher.Script.Model
         {
             if (Argument.IsScalar)
             {
-                if (Argument is DoubleNumber DoubleNumber)
-                    return await this.EvaluateScalarAsync(DoubleNumber.Value, Variables);
+                object Obj = Argument.AssociatedObjectValue;
 
-                if (Argument is ComplexNumber ComplexNumber)
-                    return await this.EvaluateScalarAsync(ComplexNumber.Value, Variables);
+                if (Obj is double d)
+                    return await this.EvaluateScalarAsync(d, Variables);
 
-                if (Argument is BooleanValue BooleanValue)
-                    return await this.EvaluateScalarAsync(BooleanValue.Value, Variables);
+				if (Obj is Complex z)
+					return await this.EvaluateScalarAsync(z, Variables);
 
-                if (Argument is StringValue StringValue)
-                    return await this.EvaluateScalarAsync(StringValue.Value, Variables);
+				if (Obj is bool b)
+					return await this.EvaluateScalarAsync(b, Variables);
+
+				if (Obj is string s)
+					return await this.EvaluateScalarAsync(s, Variables);
 
                 if (Argument is PhysicalQuantity PhysicalQuantity)
                     return await this.EvaluateScalarAsync(PhysicalQuantity.Magnitude, Variables);

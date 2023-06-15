@@ -25,15 +25,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.QR", "Content
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.QR.Test", "Content\Waher.Content.QR.Test\Waher.Content.QR.Test.csproj", "{9D7AC026-59AC-4C89-9CB4-BF8C5373DBC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Semantic", "Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj", "{D37026E0-187A-44AF-BEA6-435277A53CF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Semantic", "Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj", "{D37026E0-187A-44AF-BEA6-435277A53CF4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory", "Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj", "{FD110B3B-DC5E-404C-B2D1-1A6BC7FC9E23}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{DA84D31A-C3FF-4FFE-8440-5B0921C32043}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Semantic.Test", "Content\Waher.Content.Semantic.Test\Waher.Content.Semantic.Test.csproj", "{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Semantic.Test", "Content\Waher.Content.Semantic.Test\Waher.Content.Semantic.Test.csproj", "{860EC75D-B529-4E3C-BFC5-ABA1335B3F1F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence", "Persistence\Waher.Persistence\Waher.Persistence.csproj", "{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{C488B94C-E8A0-43AD-8F14-17C12245C295}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +107,10 @@ Global
 		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8D975CB-9A8F-4421-AFB1-5CE0F5804014}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

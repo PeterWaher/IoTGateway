@@ -54,9 +54,9 @@ namespace Waher.Content.Semantic.Model
 		}
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated object value.
 		/// </summary>
-		public override object ElementValue => this.value;
+		public override object AssociatedObjectValue => this.value;
 
 		/// <summary>
 		/// Type name (or null if literal value is a string)

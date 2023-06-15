@@ -44,7 +44,11 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return Element is RationalNumber || Element is Integer || Element is DoubleNumber;
+			if (Element is RationalNumber)
+				return true;
+
+			object Obj = Element.AssociatedObjectValue;
+			return Obj is BigInteger || Obj is double;
 		}
 
 		/// <inheritdoc/>
@@ -86,9 +90,9 @@ namespace Waher.Script.Objects
 				n1 = q1.Numerator;
 				d1 = q1.Denominator;
 			}
-			else if (x is Integer i1)
+			else if (x.AssociatedObjectValue is BigInteger i1)
 			{
-				n1 = i1.Value;
+				n1 = i1;
 				d1 = BigInteger.One;
 			}
 			else
@@ -102,9 +106,9 @@ namespace Waher.Script.Objects
 				n2 = q2.Numerator;
 				d2 = q2.Denominator;
 			}
-			else if (y is Integer i2)
+			else if (y.AssociatedObjectValue is BigInteger i2)
 			{
-				n2 = i2.Value;
+				n2 = i2;
 				d2 = BigInteger.One;
 			}
 			else

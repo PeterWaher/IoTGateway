@@ -52,7 +52,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 				PrevPoints = DrawingArea.Scale(XAxis, YAxis);
 
-				if (DrawingArea.MinX is StringValue && DrawingArea.MaxX is StringValue)
+				if (DrawingArea.MinX.AssociatedObjectValue is string && 
+					DrawingArea.MaxX.AssociatedObjectValue is string)
 				{
 					PrevPoints[0].X = Points[0].X;
 					PrevPoints[1].X = Points[Points.Length - 1].X;

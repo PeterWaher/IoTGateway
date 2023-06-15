@@ -5,7 +5,7 @@ namespace Waher.Script.Abstraction.Elements
     /// <summary>
     /// Basic interface for matrices.
     /// </summary>
-    public interface IMatrix : IElement
+    public interface IMatrix : IVector
 	{
         /// <summary>
         /// Number of rows.

@@ -294,7 +294,7 @@ namespace Waher.Script.Graphs3D
 			set
 			{
 				if (value < 1)
-					throw new ArgumentException("Must be a positive integer.", nameof(Oversampling));
+					throw new ArgumentException("Must be a positive integer.", nameof(this.Oversampling));
 
 				this.overSampling = value;
 			}
@@ -558,16 +558,16 @@ namespace Waher.Script.Graphs3D
 			float? OrigoZ;
 
 			if (this.SameScale &&
-				this.minX is DoubleNumber MinX &&
-				this.maxX is DoubleNumber MaxX &&
-				this.minY is DoubleNumber MinY &&
-				this.maxY is DoubleNumber MaxY &&
-				this.minZ is DoubleNumber MinZ &&
-				this.maxZ is DoubleNumber MaxZ)
+				this.minX.AssociatedObjectValue is double MinX &&
+				this.maxX.AssociatedObjectValue is double MaxX &&
+				this.minY.AssociatedObjectValue is double MinY &&
+				this.maxY.AssociatedObjectValue is double MaxY &&
+				this.minZ.AssociatedObjectValue is double MinZ &&
+				this.maxZ.AssociatedObjectValue is double MaxZ)
 			{
-				double DX = MaxX.Value - MinX.Value;
-				double DY = MaxY.Value - MinY.Value;
-				double DZ = MaxZ.Value - MinZ.Value;
+				double DX = MaxX - MinX;
+				double DY = MaxY - MinY;
+				double DZ = MaxZ - MinZ;
 				double SX = Width / (DX == 0 ? 1 : DX);
 				double SY = Height / (DY == 0 ? 1 : DY);
 				double SZ = Depth / (DZ == 0 ? 1 : DZ);
@@ -731,7 +731,7 @@ namespace Waher.Script.Graphs3D
 
 				if (this.showGrid)
 				{
-					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
+					if (Label.AssociatedObjectValue is double DLbl && DLbl == 0)
 					{
 						this.DrawPlaneLine(Canvas,
 							new Vector4(f, PlaneY, OffsetZ, 1),
@@ -793,7 +793,7 @@ namespace Waher.Script.Graphs3D
 
 				if (this.showGrid)
 				{
-					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
+					if (Label.AssociatedObjectValue is double DLbl && DLbl == 0)
 					{
 						this.DrawPlaneLine(Canvas,
 							new Vector4(OffsetX, PlaneY, f, 1),
@@ -855,7 +855,7 @@ namespace Waher.Script.Graphs3D
 
 				if (this.showGrid)
 				{
-					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
+					if (Label.AssociatedObjectValue is double DLbl && DLbl == 0)
 					{
 						this.DrawPlaneLine(Canvas,
 							new Vector4(PlaneX, f, OffsetZ, 1),
@@ -1005,19 +1005,23 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Vector of labels.</returns>
 		public static IVector GetLabels(ref IElement Min, ref IElement Max, IEnumerable<IMatrix> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
-			if (Min is DoubleNumber DMin && Max is DoubleNumber DMax)
+			if (Min.AssociatedObjectValue is double DMin &&
+				Max.AssociatedObjectValue is double DMax)
 			{
 				LabelType = LabelType.Double;
-				return new DoubleVector(GetLabels(DMin.Value, DMax.Value, ApproxNrLabels));
+				return new DoubleVector(GetLabels(DMin, DMax, ApproxNrLabels));
 			}
-			else if (Min is DateTimeValue DTMin && Max is DateTimeValue DTMax)
-				return new DateTimeVector(GetLabels(DTMin.Value, DTMax.Value, ApproxNrLabels, out LabelType));
+			else if (Min.AssociatedObjectValue is DateTime DTMin &&
+				Max.AssociatedObjectValue is DateTime DTMax)
+			{
+				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
+			}
 			else if (Min is PhysicalQuantity QMin && Max is PhysicalQuantity QMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
 				return new ObjectVector(GetLabels(QMin, QMax, ApproxNrLabels));
 			}
-			else if (Min is StringValue && Max is StringValue)
+			else if (Min.AssociatedObjectValue is string && Max.AssociatedObjectValue is string)
 			{
 				Dictionary<string, bool> Indices = new Dictionary<string, bool>();
 				List<IElement> Labels = new List<IElement>();
@@ -1131,10 +1135,13 @@ namespace Waher.Script.Graphs3D
 		{
 			if (Matrix is DoubleMatrix DM)
 			{
-				if (!(Min is DoubleNumber dMin) || !(Max is DoubleNumber dMax))
+				if (!(Min.AssociatedObjectValue is double dMin) ||
+					!(Max.AssociatedObjectValue is double dMax))
+				{
 					throw new ScriptException("Incompatible values.");
+				}
 
-				return Scale(DM.Values, dMin.Value, dMax.Value, Offset, Size);
+				return Scale(DM.Values, dMin, dMax, Offset, Size);
 			}
 			else if (Matrix is ObjectMatrix OM)
 			{
@@ -1171,7 +1178,8 @@ namespace Waher.Script.Graphs3D
 				}
 				else
 				{
-					if (Min is DoubleNumber MinD && Max is DoubleNumber MaxD)
+					if (Min.AssociatedObjectValue is double MinD && 
+						Max.AssociatedObjectValue is double MaxD)
 					{
 						double[,] Matrix2 = new double[c, r];
 						DoubleNumber D;
@@ -1186,11 +1194,12 @@ namespace Waher.Script.Graphs3D
 							}
 						}
 
-						return Scale(Matrix2, MinD.Value, MaxD.Value, Offset, Size);
+						return Scale(Matrix2, MinD, MaxD, Offset, Size);
 					}
 					else
 					{
-						if (Min is DateTimeValue MinDT && Max is DateTimeValue MaxDT)
+						if (Min.AssociatedObjectValue is DateTime MinDT && 
+							Max.AssociatedObjectValue is DateTime MaxDT)
 						{
 							DateTime[,] Matrix2 = new DateTime[c, r];
 							DateTimeValue DT;
@@ -1205,7 +1214,7 @@ namespace Waher.Script.Graphs3D
 								}
 							}
 
-							return Scale(Matrix2, MinDT.Value, MaxDT.Value, Offset, Size);
+							return Scale(Matrix2, MinDT, MaxDT, Offset, Size);
 						}
 						else
 							return Scale(OM.Values, Offset, Size, LabelPositions);
@@ -1426,7 +1435,7 @@ namespace Waher.Script.Graphs3D
 			string Label;
 			string s;
 			int i = 1;
-
+			
 			foreach (IVector v in this.x)
 			{
 				s = Graph2D.ReducedXmlString(v);
@@ -1439,7 +1448,7 @@ namespace Waher.Script.Graphs3D
 					Output.WriteElementString("X", Label + ":=" + s);
 				}
 			}
-
+			
 			i = 1;
 
 			foreach (IVector v in this.y)

@@ -53,8 +53,8 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Markdown representation of element.</returns>
 		public static string Evaluate(IElement Argument)
 		{
-			if (Argument is StringValue S)
-				return S.Value;
+			if (Argument.AssociatedObjectValue is string s)
+				return s;
 
 			if (Argument.AssociatedObjectValue is IToMatrix ToMatrix)
 				Argument = ToMatrix.ToMatrix();

@@ -58,10 +58,10 @@ namespace Waher.Script.Objects
         /// <returns>Result, if understood, null otherwise.</returns>
         public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
         {
-            if (!(Element is BooleanValue E))
+            if (!(Element.AssociatedObjectValue is bool b))
                 return null;
             else
-                return new BooleanValue(this.value && E.value);
+                return new BooleanValue(this.value && b);
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace Waher.Script.Objects
         /// <returns>Result, if understood, null otherwise.</returns>
         public override IAbelianGroupElement Add(IAbelianGroupElement Element)
         {
-            if (!(Element is BooleanValue E))
+            if (!(Element.AssociatedObjectValue is bool b))
                 return null;
             else
-                return new BooleanValue(this.value ^ E.value);
+                return new BooleanValue(this.value ^ b);
         }
 
 		/// <summary>
@@ -98,10 +98,10 @@ namespace Waher.Script.Objects
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (!(obj is BooleanValue E))
+            if (!(obj is IElement E) || !(E.AssociatedObjectValue is bool b))
                 return false;
             else
-                return this.value == E.value;
+                return this.value == b;
         }
 
         /// <inheritdoc/>

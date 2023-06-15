@@ -65,13 +65,11 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateResidue(IElement Left, IElement Right, ScriptNode Node)
 		{
-			if (Left is DoubleNumber DL && Right is DoubleNumber DR)
+			if (Left.AssociatedObjectValue is double dl && Right.AssociatedObjectValue is double dr)
 			{
-				double dl = DL.Value;
 				if (dl < long.MinValue || dl > long.MaxValue || dl != Math.Truncate(dl))
 					throw new ScriptRuntimeException("Modulus operator does not work on decimal numbers.", Node);
 
-				double dr = DR.Value;
 				if (dr < long.MinValue || dr > long.MaxValue || dr != Math.Truncate(dr))
 					throw new ScriptRuntimeException("Modulus operator does not work on decimal numbers.", Node);
 

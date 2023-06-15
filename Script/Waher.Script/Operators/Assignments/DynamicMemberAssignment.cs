@@ -85,10 +85,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result</returns>
 		public IElement Evaluate(IElement Left, IElement Middle, IElement Right, Variables Variables)
 		{
-			if (!(Middle is StringValue S))
+			if (!(Middle.AssociatedObjectValue is string Name))
 				throw new ScriptRuntimeException("Member names must be strings.", this);
-
-			string Name = S.Value;
 
 			object LeftValue = Left.AssociatedObjectValue;
 			Type Type = LeftValue.GetType();

@@ -30,7 +30,7 @@ namespace Waher.Script.Objects.Sets
         /// <returns>If the element is contained in the set.</returns>
         public override bool Contains(IElement Element)
         {
-            return Element is DoubleNumber;
+            return Element.AssociatedObjectValue is double;
         }
 
         /// <summary>

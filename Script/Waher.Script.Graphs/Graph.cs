@@ -367,24 +367,33 @@ namespace Waher.Script.Graphs
 		{
 			if (Vector is DoubleVector DV)
 			{
-				if (!(Min is DoubleNumber dMin) || !(Max is DoubleNumber dMax))
+				if (!(Min.AssociatedObjectValue is double dMin) ||
+					!(Max.AssociatedObjectValue is double dMax))
+				{
 					throw new ScriptException("Incompatible values.");
+				}
 
-				return Scale(DV.Values, dMin.Value, dMax.Value, Offset, Size);
+				return Scale(DV.Values, dMin, dMax, Offset, Size);
 			}
 			else if (Vector is Interval I)
 			{
-				if (!(Min is DoubleNumber dMin) || !(Max is DoubleNumber dMax))
+				if (!(Min.AssociatedObjectValue is double dMin) ||
+					!(Max.AssociatedObjectValue is double dMax))
+				{
 					throw new ScriptException("Incompatible values.");
+				}
 
-				return Scale(I.GetArray(), dMin.Value, dMax.Value, Offset, Size);
+				return Scale(I.GetArray(), dMin, dMax, Offset, Size);
 			}
 			else if (Vector is DateTimeVector DTV)
 			{
-				if (!(Min is DateTimeValue dMin) || !(Max is DateTimeValue dMax))
+				if (!(Min.AssociatedObjectValue is DateTime dMin) ||
+					!(Max.AssociatedObjectValue is DateTime dMax))
+				{
 					throw new ScriptException("Incompatible values.");
+				}
 
-				return Scale(DTV.Values, dMin.Value, dMax.Value, Offset, Size);
+				return Scale(DTV.Values, dMin, dMax, Offset, Size);
 			}
 			else if (Vector is ObjectVector OV)
 			{
@@ -411,7 +420,8 @@ namespace Waher.Script.Graphs
 
 					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
 				}
-				else if (Min is DoubleNumber MinD && Max is DoubleNumber MaxD)
+				else if (Min.AssociatedObjectValue is double MinD && 
+					Max.AssociatedObjectValue is double MaxD)
 				{
 					int i = 0;
 					int c = Vector.Dimension;
@@ -427,9 +437,10 @@ namespace Waher.Script.Graphs
 						Vector2[i++] = D.Value;
 					}
 
-					return Scale(Vector2, MinD.Value, MaxD.Value, Offset, Size);
+					return Scale(Vector2, MinD, MaxD, Offset, Size);
 				}
-				else if (Min is DateTimeValue MinDT && Max is DateTimeValue MaxDT)
+				else if (Min.AssociatedObjectValue is DateTime MinDT && 
+					Max.AssociatedObjectValue is DateTime MaxDT)
 				{
 					int i = 0;
 					int c = Vector.Dimension;
@@ -445,7 +456,7 @@ namespace Waher.Script.Graphs
 						Vector2[i++] = DT.Value;
 					}
 
-					return Scale(Vector2, MinDT.Value, MaxDT.Value, Offset, Size);
+					return Scale(Vector2, MinDT, MaxDT, Offset, Size);
 				}
 				else
 					return Scale(OV.Values, Offset, Size, LabelPositions);
@@ -574,8 +585,9 @@ namespace Waher.Script.Graphs
 		{
 			// (v-Offset)*(Max-Min)/Size+Min
 
-			if (Min is DoubleNumber DMin && Max is DoubleNumber DMax)
-				return new DoubleNumber((Value - Offset) * (DMax.Value - DMin.Value) / Size + DMin.Value);
+			if (Min.AssociatedObjectValue is double DMin && 
+				Max.AssociatedObjectValue is double DMax)
+				return new DoubleNumber((Value - Offset) * (DMax - DMin) / Size + DMin);
 			else
 			{
 				IElement Delta = Operators.Arithmetics.Subtract.EvaluateSubtraction(Max, Min, null);
@@ -731,19 +743,24 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector of labels.</returns>
 		public static IVector GetLabels(ref IElement Min, ref IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
-			if (Min is DoubleNumber DMin && Max is DoubleNumber DMax)
+			if (Min.AssociatedObjectValue is double DMin &&
+				Max.AssociatedObjectValue is double DMax)
 			{
 				LabelType = LabelType.Double;
-				return new DoubleVector(GetLabels(DMin.Value, DMax.Value, ApproxNrLabels));
+				return new DoubleVector(GetLabels(DMin, DMax, ApproxNrLabels));
 			}
-			else if (Min is DateTimeValue DTMin && Max is DateTimeValue DTMax)
-				return new DateTimeVector(GetLabels(DTMin.Value, DTMax.Value, ApproxNrLabels, out LabelType));
+			else if (Min.AssociatedObjectValue is DateTime DTMin &&
+				Max.AssociatedObjectValue is DateTime DTMax)
+			{
+				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
+			}
 			else if (Min is PhysicalQuantity QMin && Max is PhysicalQuantity QMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
 				return new ObjectVector(GetLabels(QMin, QMax, ApproxNrLabels));
 			}
-			else if (Min is StringValue && Max is StringValue)
+			else if (Min.AssociatedObjectValue is string &&
+				Max.AssociatedObjectValue is string)
 			{
 				Dictionary<string, bool> Indices = new Dictionary<string, bool>();
 				List<IElement> Labels = new List<IElement>();

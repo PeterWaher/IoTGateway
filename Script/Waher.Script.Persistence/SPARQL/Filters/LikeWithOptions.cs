@@ -58,8 +58,8 @@ namespace Waher.Script.Persistence.SPARQL.Filters
             if (!(this.options is null))
 				this.SetOptions(this.options.Evaluate(Variables));
 
-            IElement Left = SemanticElementToRegexString(this.left.Evaluate(Variables));
-            IElement Right = SemanticElementToRegexString(this.right.Evaluate(Variables));
+            IElement Left = this.left.Evaluate(Variables);
+            IElement Right = this.right.Evaluate(Variables);
 
             return this.EvaluateScalar(Left, Right, Variables);
         }
@@ -74,8 +74,8 @@ namespace Waher.Script.Persistence.SPARQL.Filters
             if (!(this.options is null))
 				this.SetOptions(await this.options.EvaluateAsync(Variables));
 
-            IElement Left = SemanticElementToRegexString(await this.left.EvaluateAsync(Variables));
-            IElement Right = SemanticElementToRegexString(await this.right.EvaluateAsync(Variables));
+            IElement Left = await this.left.EvaluateAsync(Variables);
+            IElement Right = await this.right.EvaluateAsync(Variables);
 
             return await this.EvaluateScalarAsync(Left, Right, Variables);
         }
@@ -99,19 +99,8 @@ namespace Waher.Script.Persistence.SPARQL.Filters
 		/// </summary>
 		public ScriptNode ScriptNode => this;
 
-		private static IElement SemanticElementToRegexString(IElement E)
-        {
-            if (E is StringValue S)
-                return S;
-            else if (E.AssociatedObjectValue is StringLiteral L)
-                return new StringValue(L.StringValue);
-            else
-                return new StringValue(E.AssociatedObjectValue?.ToString() ?? string.Empty);
-        }
-
         private void SetOptions(IElement Options)
         {
-            Options = SemanticElementToRegexString(Options);
             if (!(Options.AssociatedObjectValue is string s))
                 throw new ScriptRuntimeException("Options argument to regex function must be a string.", this);
 

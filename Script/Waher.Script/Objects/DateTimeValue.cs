@@ -54,10 +54,10 @@ namespace Waher.Script.Objects
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is DateTimeValue E))
+			if (!(obj is IElement E) || !(E.AssociatedObjectValue is DateTime TP))
 				return false;
 			else
-				return this.value == E.value;
+				return this.value == TP;
 		}
 
 		/// <inheritdoc/>
@@ -66,29 +66,29 @@ namespace Waher.Script.Objects
 			return this.value.GetHashCode();
 		}
 
-        /// <summary>
-        /// Converts the value to a .NET type.
-        /// </summary>
-        /// <param name="DesiredType">Desired .NET type.</param>
-        /// <param name="Value">Converted value.</param>
-        /// <returns>If conversion was possible.</returns>
-        public override bool TryConvertTo(Type DesiredType, out object Value)
-        {
-            if (DesiredType == typeof(DateTime))
-            {
-                Value = this.value;
-                return true;
-            }
-            else if (DesiredType == typeof(DateTimeOffset))
-            {
-                Value = (DateTimeOffset)this.value;
-                return true;
-            }
-            else if (DesiredType == typeof(DateTimeValue))
-            {
-                Value = this;
-                return true;
-            }
+		/// <summary>
+		/// Converts the value to a .NET type.
+		/// </summary>
+		/// <param name="DesiredType">Desired .NET type.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public override bool TryConvertTo(Type DesiredType, out object Value)
+		{
+			if (DesiredType == typeof(DateTime))
+			{
+				Value = this.value;
+				return true;
+			}
+			else if (DesiredType == typeof(DateTimeOffset))
+			{
+				Value = (DateTimeOffset)this.value;
+				return true;
+			}
+			else if (DesiredType == typeof(DateTimeValue))
+			{
+				Value = this;
+				return true;
+			}
 			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(DateTime).GetTypeInfo()))
 			{
 				Value = this.value;

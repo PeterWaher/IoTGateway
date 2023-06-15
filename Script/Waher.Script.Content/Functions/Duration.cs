@@ -112,16 +112,7 @@ namespace Waher.Script.Content.Functions
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			Waher.Content.Duration D;
-
-			if (CheckAgainst is ObjectValue OV)
-			{
-				if (OV.AssociatedObjectValue is Waher.Content.Duration DV)
-					D = DV;
-				else
-					return PatternMatchResult.NoMatch;
-			}
-			else
+			if (!(CheckAgainst.AssociatedObjectValue is Waher.Content.Duration D))
 			{
 				string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
 
@@ -129,7 +120,7 @@ namespace Waher.Script.Content.Functions
 					return PatternMatchResult.NoMatch;
 			}
 
-			int c = Arguments.Length;
+			int c = this.Arguments.Length;
 			if (c == 1)
 				return this.Arguments[0].PatternMatch(new ObjectValue(D), AlreadyFound);
 

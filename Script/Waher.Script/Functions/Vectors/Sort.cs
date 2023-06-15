@@ -255,14 +255,15 @@ namespace Waher.Script.Functions.Vectors
 			{
 				IComparer<IElement>[] Comparers = new IComparer<IElement>[c];
 				IElement Element;
+				object Obj;
 
 				for (i = 1; i < c; i++)
 				{
 					Element = Arguments[i];
+					Obj = Element.AssociatedObjectValue;
 
-					if (Element is DoubleNumber N)
+					if (Obj is double d)
 					{
-						double d = N.Value;
 						int Sign = 1;
 
 						if (d < 0)
@@ -276,9 +277,8 @@ namespace Waher.Script.Functions.Vectors
 
 						Comparers[i - 1] = new IndexOrder(this, (int)(d - 1), Sign);
 					}
-					else if (Element is StringValue S)
+					else if (Obj is string s)
 					{
-						string s = S.Value;
 						int Sign = 1;
 
 						if (s.StartsWith("-"))
@@ -289,7 +289,7 @@ namespace Waher.Script.Functions.Vectors
 
 						Comparers[i - 1] = new PropertyOrder(this, s, Sign);
 					}
-					else if (Element.AssociatedObjectValue is ILambdaExpression Lambda)
+					else if (Obj is ILambdaExpression Lambda)
 					{
 						if (Lambda.NrArguments != 2)
 							throw new ScriptRuntimeException("Lambda expressions must take exactly two parameters.", this);

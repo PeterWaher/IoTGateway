@@ -43,7 +43,6 @@ namespace Waher.Script.Persistence.SPARQL
 	/// </summary>
 	public class SparqlQuery : ScriptNode, IEvaluateAsync
 	{
-		private readonly Dictionary<Type, ISemanticLiteral> literalPerType = new Dictionary<Type, ISemanticLiteral>();
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode from;
@@ -386,26 +385,7 @@ namespace Waher.Script.Persistence.SPARQL
 		internal async Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ScriptNode Node)
 		{
 			object Value = await EvaluateValue(RecordVariables, Node);
-
-			if (Value is ISemanticElement Element)
-				return Element;
-
-			if (Value is Uri Uri)
-				return new UriNode(Uri, Uri.OriginalString);
-
-			Type T = Value?.GetType() ?? typeof(object);
-
-			if (!this.literalPerType.TryGetValue(T, out ISemanticLiteral Literal))
-			{
-				Literal = Types.FindBest<ISemanticLiteral, Type>(T)
-					?? new CustomLiteral(string.Empty, string.Empty);
-
-				this.literalPerType[T] = Literal;
-			}
-
-			Literal = Literal.Encapsulate(Value);
-
-			return Literal;
+			return SemanticElements.Encapsulate(Value);
 		}
 
 		/// <summary>

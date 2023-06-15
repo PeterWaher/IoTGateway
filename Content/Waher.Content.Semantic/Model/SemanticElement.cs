@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Persistence.Attributes;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
+using Waher.Script.Model;
 
 namespace Waher.Content.Semantic.Model
 {
@@ -28,9 +32,47 @@ namespace Waher.Content.Semantic.Model
 		public abstract bool IsLiteral { get; }
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated Set.
 		/// </summary>
-		public abstract object ElementValue { get; }
+		public ISet AssociatedSet => SemanticElements.Instance;
+
+		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public abstract object AssociatedObjectValue { get; }
+
+		/// <summary>
+		/// If the element represents a scalar value.
+		/// </summary>
+		public bool IsScalar => true;
+
+		/// <summary>
+		/// An enumeration of child elements. If the element is a scalar, this property will return null.
+		/// </summary>
+		public ICollection<IElement> ChildElements => null;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Converts the value to a .NET type.
+		/// </summary>
+		/// <param name="DesiredType">Desired .NET type.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public virtual bool TryConvertTo(Type DesiredType, out object Value)
+		{
+			Value = null;
+			return false;
+		}
 
 		/// <inheritdoc/>
 		public override abstract bool Equals(object obj);

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -62,26 +64,28 @@ namespace Waher.Script.Functions.Runtime
 			try
 			{
 				IElement E = this.Argument.Evaluate(Variables);
-				if (E is DoubleNumber D)
-				{
-					if (double.IsNaN(D.Value))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
+				object Obj = E.AssociatedObjectValue;
 
-				if (E is ComplexNumber C)
-				{
-					if (double.IsNaN(C.Value.Real) || double.IsNaN(C.Value.Imaginary))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
-
-				if (E is ObjectValue O && O.Value is null)
+				if (Obj is null)
 					return BooleanValue.False;
-				else
-					return BooleanValue.True;
+
+				if (Obj is double d)
+				{
+					if (double.IsNaN(d))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
+
+				if (Obj is Complex z)
+				{
+					if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
+
+				return BooleanValue.True;
 			}
 			catch (Exception)
 			{
@@ -119,26 +123,28 @@ namespace Waher.Script.Functions.Runtime
 			try
 			{
 				IElement E = await this.Argument.EvaluateAsync(Variables);
-				if (E is DoubleNumber D)
-				{
-					if (double.IsNaN(D.Value))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
+				object Obj = E.AssociatedObjectValue;
 
-				if (E is ComplexNumber C)
-				{
-					if (double.IsNaN(C.Value.Real) || double.IsNaN(C.Value.Imaginary))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
-
-				if (E is ObjectValue O && O.Value is null)
+				if (Obj is null)
 					return BooleanValue.False;
-				else
-					return BooleanValue.True;
+
+				if (Obj is double d)
+				{
+					if (double.IsNaN(d))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
+
+				if (Obj is Complex z)
+				{
+					if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
+						return BooleanValue.False;
+					else
+						return BooleanValue.True;
+				}
+
+				return BooleanValue.True;
 			}
 			catch (Exception)
 			{

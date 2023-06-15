@@ -100,9 +100,8 @@ namespace Waher.Script.Operators.Matrices
         /// <returns>Result</returns>
         public static IElement EvaluateIndex(IMatrix Matrix, IElement Index, ScriptNode Node)
         {
-			if (Index is DoubleNumber RE)
+			if (Index.AssociatedObjectValue is double d)
 			{
-				double d = RE.Value;
                 if (d < 0 || d > int.MaxValue || d != Math.Truncate(d))
                     throw new ScriptRuntimeException("Row index must be a non-negative integer.", Node);
 

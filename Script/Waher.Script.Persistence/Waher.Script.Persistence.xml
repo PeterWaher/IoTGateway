@@ -882,39 +882,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode">
-            <summary>
-            Makes sure a semantic literal is reduced to its element value.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode.#ctor(Waher.Script.Model.ScriptNode)">
-            <summary>
-            Makes sure a semantic literal is reduced to its element value.
-            </summary>
-            <param name="Operand">Operand</param>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode.IsAsynchronous">
-            <summary>
-            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Operand">Operand.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.ScriptValueNode.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Operand">Operand.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.NamedNode">
             <summary>
             Represents a named node.
@@ -956,19 +923,14 @@
             Represents a null value.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.NullValue.Tag">
-            <summary>
-            Property used by processor, to tag information to an element.
-            </summary>
-        </member>
         <member name="P:Waher.Script.Persistence.SPARQL.NullValue.IsLiteral">
             <summary>
             If element is a literal.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.NullValue.ElementValue">
+        <member name="P:Waher.Script.Persistence.SPARQL.NullValue.AssociatedObjectValue">
             <summary>
-            Underlying element value represented by the semantic element.
+            Associated object value.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.NullValue.CompareTo(System.Object)">
@@ -979,6 +941,12 @@
             <returns>Comparison</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.NullValue.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.GetHashCode">
             <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.OrderResultSet">
@@ -1700,19 +1668,14 @@
             Script definition.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.Tag">
-            <summary>
-            Property used by processor, to tag information to an element.
-            </summary>
-        </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.IsLiteral">
             <summary>
             If element is a literal.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.ElementValue">
+        <member name="P:Waher.Script.Persistence.SPARQL.SemanticScriptElement.AssociatedObjectValue">
             <summary>
-            Underlying element value represented by the semantic element.
+            Associated object value.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SemanticScriptElement.Equals(System.Object)">

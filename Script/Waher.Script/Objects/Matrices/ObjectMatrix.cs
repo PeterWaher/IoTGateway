@@ -12,7 +12,7 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Object-valued matrix.
 	/// </summary>
-	public sealed class ObjectMatrix : RingElement, IVector, IMatrix
+	public sealed class ObjectMatrix : RingElement, IMatrix
 	{
 		private IElement[,] values;
 		private ICollection<IElement> elements;

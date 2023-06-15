@@ -43,7 +43,8 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return (Element is ComplexNumber) || (Element is DoubleNumber);
+			object Obj = Element.AssociatedObjectValue;
+			return (Obj is Complex) || (Obj is double);
 		}
 
 		/// <inheritdoc/>

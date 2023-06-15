@@ -74,7 +74,7 @@ namespace Waher.Script.Persistence.SQL
 					this.properties.Object = this.e.Current;
 
 				IElement E = this.conditions.Evaluate(this.properties);
-				if (!(E is BooleanValue B) || !B.Value)
+				if (!(E.AssociatedObjectValue is bool B) || !B)
 					return false;
 
 				return true;

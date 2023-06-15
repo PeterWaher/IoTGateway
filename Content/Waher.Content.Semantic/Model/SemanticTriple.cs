@@ -1,4 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
+using Waher.Script.Model;
 
 namespace Waher.Content.Semantic.Model
 {
@@ -46,9 +51,83 @@ namespace Waher.Content.Semantic.Model
 		public bool IsLiteral => this.Subject.IsLiteral && this.Predicate.IsLiteral && this.Object.IsLiteral;
 
 		/// <summary>
+		/// Associated Set.
+		/// </summary>
+		public ISet AssociatedSet => SemanticElements.Instance;
+
+		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public object AssociatedObjectValue => this;
+
+		/// <summary>
 		/// Underlying element value represented by the semantic element.
 		/// </summary>
 		public object ElementValue => this;
+
+		/// <summary>
+		/// If the element represents a scalar value.
+		/// </summary>
+		public bool IsScalar => false;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			if (Elements.Count != 3)
+				return null;
+
+			ISemanticElement Subject = null;
+			ISemanticElement Predicate = null;
+			ISemanticElement Object = null;
+
+			foreach (IElement E in Elements)
+			{
+				if (!(E is ISemanticElement SemanticElement))
+					SemanticElement = SemanticElements.Encapsulate(E.AssociatedObjectValue);
+
+				if (Subject is null)
+					Subject = SemanticElement;
+				else if (Predicate is null)
+					Predicate = SemanticElement;
+				else 
+					Object = SemanticElement;
+			}
+
+			return new SemanticTriple(Subject, Predicate, Object);
+		}
+
+		/// <summary>
+		/// Converts the value to a .NET type.
+		/// </summary>
+		/// <param name="DesiredType">Desired .NET type.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public virtual bool TryConvertTo(Type DesiredType, out object Value)
+		{
+			Value = null;
+			return false;
+		}
+
+		/// <summary>
+		/// An enumeration of child elements. If the element is a scalar, this property will return null.
+		/// </summary>
+		public ICollection<IElement> ChildElements
+		{
+			get
+			{
+				return new IElement[]
+				{
+					this.Subject,
+					this.Predicate,
+					this.Object
+				};
+			}
+		}
 
 		/// <inheritdoc/>
 		public override string ToString()

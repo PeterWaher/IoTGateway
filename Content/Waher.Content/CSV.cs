@@ -291,10 +291,10 @@ namespace Waher.Content
 				{
 					E = Matrix.GetElement(Column, Row);
 
-					if (E is StringValue S)
-						Fields.Add(S.Value);
-					else if (E is DoubleNumber D)
-						Fields.Add(CommonTypes.Encode(D.Value));
+					if (E.AssociatedObjectValue is string s)
+						Fields.Add(s);
+					else if (E.AssociatedObjectValue is double d)
+						Fields.Add(CommonTypes.Encode(d));
 					else
 						Fields.Add(E.AssociatedObjectValue?.ToString());
 				}

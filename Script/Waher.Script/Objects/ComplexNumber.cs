@@ -69,15 +69,14 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			if (!(Element is ComplexNumber E))
-			{
-				if (!(Element is DoubleNumber D))
-					return null;
-				else
-					return new ComplexNumber(this.value * D.Value);
-			}
+			object Obj = Element.AssociatedObjectValue;
+
+			if (Obj is Complex z)
+				return new ComplexNumber(this.value * z);
+			else if (Obj is double d)
+				return new ComplexNumber(this.value * d);
 			else
-				return new ComplexNumber(this.value * E.value);
+				return null;
 		}
 
 		/// <summary>
@@ -96,15 +95,14 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			if (!(Element is ComplexNumber E))
-			{
-				if (!(Element is DoubleNumber D))
-					return null;
-				else
-					return new ComplexNumber(this.value + D.Value);
-			}
+			object Obj = Element.AssociatedObjectValue;
+
+			if (Obj is Complex z)
+				return new ComplexNumber(this.value + z);
+			else if (Obj is double d)
+				return new ComplexNumber(this.value + d);
 			else
-				return new ComplexNumber(this.value + E.value);
+				return null;
 		}
 
 		/// <summary>
@@ -119,15 +117,17 @@ namespace Waher.Script.Objects
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is ComplexNumber E))
-			{
-				if (!(obj is DoubleNumber D))
-					return false;
-				else
-					return this.value == D.Value;
-			}
+			if (!(obj is IElement E))
+				return false;
+
+			object Obj = E.AssociatedObjectValue;
+
+			if (Obj is Complex z)
+				return this.value == z;
+			else if (Obj is double d)
+				return this.value == d;
 			else
-				return this.value == E.value;
+				return false;
 		}
 
 		/// <inheritdoc/>

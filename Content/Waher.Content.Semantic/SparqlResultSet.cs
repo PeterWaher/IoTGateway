@@ -7,6 +7,7 @@ using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Matrices;
@@ -338,13 +339,9 @@ namespace Waher.Content.Semantic
 			for (y = 0; y < Rows; y++)
 			{
 				SparqlResultRecord Record = this.Records[y];
-				ISemanticElement Item;
 
 				for (x = 0; x < Columns; x++)
-				{
-					Item = Record[this.Variables[x]];
-					Elements[y, x] = Expression.Encapsulate(Item?.ElementValue);
-				}
+					Elements[y, x] = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;
 			}
 
 			return new ObjectMatrix(Elements)

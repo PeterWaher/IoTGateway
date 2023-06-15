@@ -33,8 +33,8 @@ namespace Waher.Script.Operators.Arithmetics
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			if (Left is DoubleNumber DL && Right is DoubleNumber DR)
-				return new DoubleNumber(DL.Value - DR.Value);
+			if (Left.AssociatedObjectValue is double DL && Right.AssociatedObjectValue is double DR)
+				return new DoubleNumber(DL - DR);
 			else
 				return Subtract.EvaluateSubtraction(Left, Right, this);
 		}

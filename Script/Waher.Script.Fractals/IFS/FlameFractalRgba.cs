@@ -150,8 +150,6 @@ namespace Waher.Script.Fractals.IFS
             int dimx, dimy;
             int i, c;
             int Seed;
-            bool Preview;
-            bool Parallel;
 
             i = 0;
             c = Arguments.Length;
@@ -237,13 +235,13 @@ namespace Waher.Script.Fractals.IFS
                 }
             }
 
-			if (i < c && Arguments[i] is BooleanValue)
-				Preview = (bool)Arguments[i++].AssociatedObjectValue;
+			if (i < c && Arguments[i].AssociatedObjectValue is bool Preview)
+				i++;
 			else
 				Preview = false;
 
-			if (i < c && Arguments[i] is BooleanValue)
-				Parallel = (bool)Arguments[i++].AssociatedObjectValue;
+			if (i < c && Arguments[i].AssociatedObjectValue is bool Parallel)
+				i++;
 			else
 				Parallel = false;
 
@@ -593,8 +591,7 @@ namespace Waher.Script.Fractals.IFS
                     {
                         try
                         {
-                            if (Done[i] != null)
-                                Done[i].Close();
+                            Done[i]?.Close();
                         }
                         catch (Exception)
                         {

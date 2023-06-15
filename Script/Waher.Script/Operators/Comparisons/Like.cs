@@ -46,14 +46,12 @@ namespace Waher.Script.Operators.Comparisons
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			if (!(Left is StringValue L))
+			if (!(Left.AssociatedObjectValue is string sl))
 				throw new ScriptRuntimeException("String values expected.", this);
 
-			if (!(Right is StringValue R))
+			if (!(Right.AssociatedObjectValue is string sr))
 				throw new ScriptRuntimeException("String values expected.", this);
 
-			string sl = L.Value;
-			string sr = R.Value;
 			Match M;
 
 			ExpressionTransform h = this.TransformExpression;
@@ -173,19 +171,17 @@ namespace Waher.Script.Operators.Comparisons
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is StringValue SL))
+			if (!(CheckAgainst.AssociatedObjectValue is string sl))
 				return PatternMatchResult.NoMatch;
 
 			if (this.right is ConstantElement RightConstant &&
-				RightConstant.Constant is StringValue SR)
+				RightConstant.Constant.AssociatedObjectValue is string sr)
 			{
-				string sr = SR.Value;
-
 				ExpressionTransform h = this.TransformExpression;
 				if (!(h is null))
 					sr = h(sr);
 
-				Match M = this.Matches(SL.Value, sr, out string[] GroupNames);
+				Match M = this.Matches(sl, sr, out string[] GroupNames);
 
 				if (M.Success)
 				{

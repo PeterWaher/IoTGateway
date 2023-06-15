@@ -63,9 +63,7 @@ namespace Waher.Script.Operators.Assignments
 		{
 			if (Left is IVector V)
 			{
-				double d;
-
-				if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+				if (!(Index.AssociatedObjectValue is double d) || d < 0 || d > int.MaxValue || d != Math.Truncate(d))
 					throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
 				V.SetElement((int)d, Value);

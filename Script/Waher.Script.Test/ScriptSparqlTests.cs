@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
-using Waher.Content.Text;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Test
@@ -70,6 +68,8 @@ namespace Waher.Script.Test
 		[DataRow("Test_29.ttl", "Test_29.rq", null, "Test_29.srx")]
 		[DataRow("Test_30.ttl", "Test_30.rq", null, "Test_30.srx")]
 		[DataRow("Test_31.ttl", "Test_31.rq", null, "Test_31.srx")]
+		[DataRow("Test_32.ttl", "Test_32.rq", null, "Test_32.srx")]
+		[DataRow("Test_32.ttl", "Test_32b.rq", null, "Test_32.srx")]
 		public async Task SPARQL_Tests(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
@@ -108,7 +108,7 @@ namespace Waher.Script.Test
 					if (Expected.BooleanResult.HasValue)
 						Assert.AreEqual(Expected.BooleanResult.Value, ResultSet.BooleanResult.Value);
 
-					int i, c = Expected.Variables?.Length ?? 0;
+					int i, c;// = Expected.Variables?.Length ?? 0;
 					//Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
 					//
 					//for (i = 0; i < c; i++)
@@ -186,5 +186,6 @@ namespace Waher.Script.Test
 				Assert.AreEqual(e1, e2);
 		}
 
+		// TODO: Property paths.
 	}
 }

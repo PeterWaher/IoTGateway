@@ -95,14 +95,16 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			if (Element is Integer E)
-				return new Integer(this.value * E.value);
+			object Obj = Element.AssociatedObjectValue;
 
-			if (Element is DoubleNumber D)
-				return new DoubleNumber((double)this.value * D.Value);
+			if (Obj is BigInteger i)
+				return new Integer(this.value * i);
 
-			if (Element is ComplexNumber z)
-				return new ComplexNumber((double)this.value * z.Value);
+			if (Obj is double d)
+				return new DoubleNumber((double)this.value * d);
+
+			if (Obj is Complex z)
+				return new ComplexNumber((double)this.value * z);
 
 			return null;
 		}
@@ -126,14 +128,16 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			if (Element is Integer E)
-				return new Integer(this.value + E.value);
+			object Obj = Element.AssociatedObjectValue;
 
-			if (Element is DoubleNumber D)
-				return new DoubleNumber((double)this.value + D.Value);
+			if (Obj is BigInteger i)
+				return new Integer(this.value + i);
 
-			if (Element is ComplexNumber z)
-				return new ComplexNumber((double)this.value + z.Value);
+			if (Obj is double d)
+				return new DoubleNumber((double)this.value + d);
+
+			if (Obj is Complex z)
+				return new ComplexNumber((double)this.value + z);
 
 			return null;
 		}
@@ -150,14 +154,19 @@ namespace Waher.Script.Objects
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (obj is Integer E)
-				return this.value == E.value;
+			if (!(obj is IElement E))
+				return false;
 
-			if (obj is DoubleNumber D)
-				return (double)this.value == D.Value;
+			object Obj = E.AssociatedObjectValue;
 
-			if (obj is ComplexNumber z)
-				return (double)this.value == z.Value;
+			if (Obj is BigInteger i)
+				return this.value == i;
+
+			if (Obj is double d)
+				return (double)this.value == d;
+
+			if (Obj is Complex z)
+				return (double)this.value == z;
 
 			return false;
 		}

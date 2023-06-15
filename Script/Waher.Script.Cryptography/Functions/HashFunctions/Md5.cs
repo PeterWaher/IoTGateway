@@ -39,7 +39,9 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		{
 			if (!(Argument.AssociatedObjectValue is byte[] Bin))
 			{
-				string s = Argument is StringValue S ? S.Value : Expression.ToString(Argument.AssociatedObjectValue);
+				if(!(Argument.AssociatedObjectValue is string s))
+					s = Expression.ToString(Argument.AssociatedObjectValue);
+
 				Bin = System.Text.Encoding.UTF8.GetBytes(s);
 			}
 

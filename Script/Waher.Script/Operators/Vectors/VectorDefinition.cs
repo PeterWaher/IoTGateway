@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -83,8 +84,8 @@ namespace Waher.Script.Operators.Vectors
 				return new DoubleVector(dv);
 			else if (Elements is bool[] bv)
 				return new BooleanVector(bv);
-			else if (Elements is ComplexNumber[] cv)
-				return new ComplexVector(cv);
+			else if (Elements is Complex[] zv)
+				return new ComplexVector(zv);
 			else if (Elements is DateTime[] dtv)
 				return new DateTimeVector(dtv);
 			else if (Elements is object[] ov)

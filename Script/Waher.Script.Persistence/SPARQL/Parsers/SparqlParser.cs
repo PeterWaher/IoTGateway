@@ -33,7 +33,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 		private readonly string preamble;
 		private readonly int preambleLen;
-		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>()
 		{
 			{ "xsd", "http://www.w3.org/2001/XMLSchema#" },
@@ -206,7 +205,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						Columns = new List<ScriptNode>();
 						ColumnNames = new List<ScriptNode>();
 
-						while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM")
+						while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM" && s != "{")
 						{
 							Node = this.ParseNamedExpression(Parser);
 							if (Node is NamedNode NamedNode)
@@ -292,7 +291,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				//s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(), 
+			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
 				ColumnNames?.ToArray(), From, Where, OrderBy?.ToArray(), Construct,
 				Parser.Start, Parser.Length, Parser.Expression);
 
@@ -426,6 +425,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					switch (Parser.PeekNextChar())
 					{
+						case '.':
+							if (TriplePosition == 0)
+								break;
+
+							throw Parser.SyntaxError("Unexpected .");
+
 						case '{':
 							ISparqlPattern Left = this.currentPattern;
 							this.currentRegularPattern = new SparqlRegularPattern();
@@ -522,125 +527,134 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Subject, Predicate, Object));
 
-					bool Again;
-
-					do
+					switch (Parser.NextNonWhitespaceChar())
 					{
-						Again = false;
-						switch (Parser.NextNonWhitespaceChar())
-						{
-							case '.':
+						case '.':
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
+
+							Subject = null;
+							Predicate = null;
+							TriplePosition = 0;
+							break;
+
+						case '}':
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
+
+							Parser.UndoChar();
+							return;
+
+						case ';':
+							Predicate = null;
+							TriplePosition = 1;
+
+							Parser.SkipWhiteSpace();
+							if (Parser.PeekNextChar() == '.')
+							{
 								if (InBlankNode)
 									throw Parser.SyntaxError("Expected ]");
 
+								Parser.NextChar();
 								Subject = null;
-								Predicate = null;
 								TriplePosition = 0;
-								break;
+							}
+							break;
 
-							case '}':
-								if (InBlankNode)
-									throw Parser.SyntaxError("Expected ]");
+						case ',':
+							break;
 
-								Parser.UndoChar();
-								return;
+						case ']':
+							return;
 
-							case ';':
-								Predicate = null;
-								TriplePosition = 1;
+						case 'b':
+						case 'B':
+							if (char.ToUpper(Parser.NextChar()) != 'I' ||
+								char.ToUpper(Parser.NextChar()) != 'N' ||
+								char.ToUpper(Parser.NextChar()) != 'D')
+							{
+								throw Parser.SyntaxError("Expected BIND");
+							}
 
-								Parser.SkipWhiteSpace();
-								if (Parser.PeekNextChar() == '.')
-								{
-									if (InBlankNode)
-										throw Parser.SyntaxError("Expected ]");
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
 
-									Parser.NextChar();
-									Subject = null;
-									TriplePosition = 0;
-								}
-								break;
+							Subject = null;
+							Predicate = null;
+							TriplePosition = 0;
 
-							case ',':
-								break;
+							if (Parser.NextNonWhitespaceChar() != '(')
+								throw Parser.SyntaxError("Expected (");
 
-							case ']':
-								return;
+							ScriptNode Node = this.ParseNamedExpression(Parser);
+							if (!(Node is NamedNode NamedNode))
+								throw Parser.SyntaxError("Expected name.");
 
-							case 'b':
-							case 'B':
-								if (char.ToUpper(Parser.NextChar()) != 'I' ||
-									char.ToUpper(Parser.NextChar()) != 'N' ||
-									char.ToUpper(Parser.NextChar()) != 'D')
-								{
-									throw Parser.SyntaxError("Expected BIND");
-								}
+							if (this.currentRegularPattern is null)
+							{
+								this.currentRegularPattern = new SparqlRegularPattern();
+								this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+							}
 
-								if (Parser.NextNonWhitespaceChar() != '(')
-									throw Parser.SyntaxError("Expected (");
+							this.currentRegularPattern.AddVariableBinding(
+								NamedNode.LeftOperand, NamedNode.RightOperand);
 
-								ScriptNode Node = this.ParseNamedExpression(Parser);
-								if (!(Node is NamedNode NamedNode))
-									throw Parser.SyntaxError("Expected name.");
+							if (Parser.NextNonWhitespaceChar() != ')')
+								throw Parser.SyntaxError("Expected )");
 
-								if (this.currentRegularPattern is null)
-								{
-									this.currentRegularPattern = new SparqlRegularPattern();
-									this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
-								}
+							break;
 
-								this.currentRegularPattern.AddVariableBinding(
-									NamedNode.LeftOperand, NamedNode.RightOperand);
+						case 'f':
+						case 'F':
+							if (char.ToUpper(Parser.NextChar()) != 'I' ||
+								char.ToUpper(Parser.NextChar()) != 'L' ||
+								char.ToUpper(Parser.NextChar()) != 'T' ||
+								char.ToUpper(Parser.NextChar()) != 'E' ||
+								char.ToUpper(Parser.NextChar()) != 'R')
+							{
+								throw Parser.SyntaxError("Expected FILTER");
+							}
 
-								if (Parser.NextNonWhitespaceChar() != ')')
-									throw Parser.SyntaxError("Expected )");
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
 
-								Again = true;
-								break;
+							Subject = null;
+							Predicate = null;
+							TriplePosition = 0;
 
-							case 'f':
-							case 'F':
-								if (char.ToUpper(Parser.NextChar()) != 'I' ||
-									char.ToUpper(Parser.NextChar()) != 'L' ||
-									char.ToUpper(Parser.NextChar()) != 'T' ||
-									char.ToUpper(Parser.NextChar()) != 'E' ||
-									char.ToUpper(Parser.NextChar()) != 'R')
-								{
-									throw Parser.SyntaxError("Expected FILTER");
-								}
+							Node = this.ParseUnary(Parser, false);
 
-								Node = this.ParseUnary(Parser, false);
+							if (this.currentRegularPattern is null)
+							{
+								this.currentRegularPattern = new SparqlRegularPattern();
+								this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+							}
 
-								if (this.currentRegularPattern is null)
-								{
-									this.currentRegularPattern = new SparqlRegularPattern();
-									this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
-								}
+							this.currentRegularPattern.AddFilter(Node);
+							break;
 
-								this.currentRegularPattern.AddFilter(Node);
+						case 'u':
+						case 'U':
+						case 'o':
+						case 'O':
+						case 'm':
+						case 'M':
+							Parser.UndoChar();
 
-								Again = true;
-								break;
-
-							case 'u':
-							case 'U':
-							case 'o':
-							case 'O':
-							case 'm':
-							case 'M':
-								Parser.UndoChar();
-
-								if (this.ParsePatternOperator(Parser))
-									Again = true;
-								else
-									throw Parser.SyntaxError("Unexpected token.");
-								break;
-
-							default:
+							if (!this.ParsePatternOperator(Parser))
 								throw Parser.SyntaxError("Unexpected token.");
-						}
+
+							if (InBlankNode)
+								throw Parser.SyntaxError("Expected ]");
+
+							Subject = null;
+							Predicate = null;
+							TriplePosition = 0;
+							break;
+
+						default:
+							throw Parser.SyntaxError("Unexpected token.");
 					}
-					while (Again);
 				}
 			}
 		}
@@ -1046,11 +1060,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
 
 				case "ASC":
-					Node = this.ParseArgument(Parser, false);
+					Node = this.ParseArgument(Parser);
 					return new Asc(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "DESC":
-					Node = this.ParseArgument(Parser, false);
+					Node = this.ParseArgument(Parser);
 					return new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "REGEX":
@@ -1155,15 +1169,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 		}
 
-		private ScriptNode ParseArgument(ScriptParser Parser, bool ScriptValueNodes)
+		private ScriptNode ParseArgument(ScriptParser Parser)
 		{
 			if (Parser.NextNonWhitespaceChar() != '(')
 				throw Parser.SyntaxError("Expected (");
 
 			ScriptNode Argument = this.ParseExpression(Parser, false);
-
-			if (ScriptValueNodes)
-				Argument = new ScriptValueNode(Argument);
 
 			if (Parser.NextNonWhitespaceChar() != ')')
 				throw Parser.SyntaxError("Expected )");
@@ -1181,11 +1192,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			while (true)
 			{
-				ScriptNode Node = this.ParseExpression(Parser, false);
-				if (ScriptValueNodes)
-					Node = new ScriptValueNode(Node);
-
-				Arguments.Add(Node);
+				Arguments.Add(this.ParseExpression(Parser, false));
 
 				if (Parser.NextNonWhitespaceChar() != ',')
 				{
@@ -1267,15 +1274,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 							string DataType = this.ParseUriOrPrefixedToken(Parser).Uri.ToString();
 
-							if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
-							{
-								LiteralType = Types.FindBest<ISemanticLiteral, string>(DataType)
-									?? new CustomLiteral(string.Empty, DataType);
-
-								this.dataTypes[DataType] = LiteralType;
-							}
-
-							return LiteralType.Parse(s, DataType, Language);
+							return SemanticElements.Parse(s, DataType, Language);
 						}
 						else if (!string.IsNullOrEmpty(Language))
 							return new StringLiteral(s, Language);
@@ -1470,40 +1469,54 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		private SemanticLiteral ParseNumber(ScriptParser Parser)
 		{
 			int Start = Parser.Position;
+			char ch = Parser.PeekNextChar();
 			bool HasDigits = false;
 			bool HasDecimal = false;
 			bool HasExponent = false;
-			bool HasSign = false;
 
-			while (true)
+			if (ch == '+' || ch == '-')
 			{
-				char ch = Parser.PeekNextChar();
-
-				if (char.IsDigit(ch))
-					HasDigits = true;
-				else if (ch == '+' || ch == '-')
-				{
-					if (HasSign || HasDecimal)
-						break;
-
-					HasSign = true;
-				}
-				else if (ch == '.')
-				{
-					if (HasDecimal || HasExponent)
-						break;
-
-					HasDecimal = true;
-				}
-				else if (ch == 'e' || ch == 'E')
-				{
-					HasExponent = true;
-					HasSign = false;
-				}
-				else
-					break;
-
 				Parser.NextChar();
+				ch = Parser.PeekNextChar();
+			}
+
+			while (char.IsDigit(ch))
+			{
+				Parser.NextChar();
+				ch = Parser.PeekNextChar();
+				HasDigits = true;
+			}
+
+			if (ch == '.')
+			{
+				HasDecimal = true;
+				Parser.NextChar();
+				ch = Parser.PeekNextChar();
+
+				while (char.IsDigit(ch))
+				{
+					Parser.NextChar();
+					ch = Parser.PeekNextChar();
+				}
+			}
+
+			if (ch == 'e' || ch == 'E')
+			{
+				HasExponent = true;
+				Parser.NextChar();
+				ch = Parser.PeekNextChar();
+
+				if (ch == '+' || ch == '-')
+				{
+					Parser.NextChar();
+					ch = Parser.PeekNextChar();
+				}
+
+				while (char.IsDigit(ch))
+				{
+					Parser.NextChar();
+					ch = Parser.PeekNextChar();
+				}
 			}
 
 			if (Parser.Position > Start)

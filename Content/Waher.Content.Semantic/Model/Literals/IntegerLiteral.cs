@@ -27,25 +27,25 @@ namespace Waher.Content.Semantic.Model.Literals
         public IntegerLiteral(BigInteger Value)
             : base(Value, Value.ToString())
         {
-        }
+		}
 
-        /// <summary>
-        /// Represents an integer literal of undefined size.
-        /// </summary>
-        /// <param name="Value">Parsed value</param>
-        /// <param name="StringValue">String value.</param>
-        public IntegerLiteral(BigInteger Value, string StringValue)
+		/// <summary>
+		/// Represents an integer literal of undefined size.
+		/// </summary>
+		/// <param name="Value">Parsed value</param>
+		/// <param name="StringValue">String value.</param>
+		public IntegerLiteral(BigInteger Value, string StringValue)
             : base(Value, StringValue)
         {
-        }
+		}
 
-        /// <summary>
-        /// Represents an integer literal of undefined size.
-        /// </summary>
-        /// <param name="Value">Parsed value</param>
-        /// <param name="StringValue">String value.</param>
-        /// <param name="DataType">Data Type.</param>
-        public IntegerLiteral(BigInteger Value, string StringValue, string DataType)
+		/// <summary>
+		/// Represents an integer literal of undefined size.
+		/// </summary>
+		/// <param name="Value">Parsed value</param>
+		/// <param name="StringValue">String value.</param>
+		/// <param name="DataType">Data Type.</param>
+		public IntegerLiteral(BigInteger Value, string StringValue, string DataType)
             : base(Value, StringValue)
         {
 			this.dataType = DataType;

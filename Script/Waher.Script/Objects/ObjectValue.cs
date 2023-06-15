@@ -57,17 +57,18 @@ namespace Waher.Script.Objects
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-			if (obj is ObjectValue E)
-			{
-				if (this.value is null)
-					return E.value is null;
-				else if (E.value is null)
-					return false;
-				else
-					return this.value.Equals(E.value);
-			}
-			else
-				return false;
+            if (!(obj is IElement E))
+                return false;
+
+            object Obj = E.AssociatedObjectValue;
+
+            if ((this.value is null) ^ (Obj is null))
+                return false;
+
+            if (this.value is null)
+                return true;
+
+			return this.value.Equals(Obj);
         }
 
         /// <inheritdoc/>

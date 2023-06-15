@@ -105,11 +105,9 @@ namespace Waher.Script.Operators.Matrices
 		/// <returns>Result</returns>
 		public static IElement EvaluateIndex(IMatrix Matrix, IElement IndexX, IElement IndexY, ScriptNode Node)
         {
-            if (IndexX is DoubleNumber X && IndexY is DoubleNumber Y)
+            if (IndexX.AssociatedObjectValue is double x && 
+                IndexY.AssociatedObjectValue is double y)
             {
-                double x = X.Value;
-                double y = Y.Value;
-
                 if (x < 0 || x > int.MaxValue || x != Math.Truncate(x) || y < 0 || y > int.MaxValue || y != Math.Truncate(y))
                     throw new ScriptRuntimeException("Indices must be non-negative integers.", Node);
 

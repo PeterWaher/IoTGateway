@@ -32,11 +32,8 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			if (Operand is DoubleNumber DOp)
-			{
-				double d = DOp.Value;
+			if (Operand.AssociatedObjectValue is double d)
 				return new DoubleNumber(d * d * d);
-			}
 
 			if (Operand is IRingElement E)
 			{

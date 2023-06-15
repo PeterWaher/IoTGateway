@@ -44,7 +44,8 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return (Element is Integer) || (Element is DoubleNumber d && Math.Truncate(d.Value) == d.Value);
+			object Obj = Element.AssociatedObjectValue;
+			return (Obj is BigInteger) || (Obj is double d && Math.Truncate(d) == d);
 		}
 
 		/// <inheritdoc/>
@@ -79,9 +80,10 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IEuclidianDomainElement Divide(IEuclidianDomainElement Left, IEuclidianDomainElement Right, out IEuclidianDomainElement Remainder)
 		{
-			if (Left is Integer l && Right is Integer r)
+			if (Left.AssociatedObjectValue is BigInteger l && 
+				Right.AssociatedObjectValue is BigInteger r)
 			{
-				BigInteger Result = BigInteger.DivRem(l.Value, r.Value, out BigInteger Residue);
+				BigInteger Result = BigInteger.DivRem(l, r, out BigInteger Residue);
 				Remainder = new Integer(Residue);
 				return new Integer(Result);
 			}

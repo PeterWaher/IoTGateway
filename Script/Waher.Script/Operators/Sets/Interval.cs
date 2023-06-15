@@ -52,10 +52,14 @@ namespace Waher.Script.Operators.Sets
 
 			DoubleNumber S = StepSize as DoubleNumber;
 
-			if (!(From is DoubleNumber F) || !(To is DoubleNumber T) || (S is null && !(StepSize is null)))
-                throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+			if (!(From.AssociatedObjectValue is double F) ||
+				!(To.AssociatedObjectValue is double T) ||
+				(S is null && !(StepSize is null)))
+			{
+				throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+			}
 
-            return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);
+            return new Objects.Sets.Interval(F, T, true, true, S is null ? (double?)null : S.Value);
         }
 
 		/// <summary>
@@ -71,13 +75,22 @@ namespace Waher.Script.Operators.Sets
 			IElement From = await this.left.EvaluateAsync(Variables);
 			IElement To = await this.middle.EvaluateAsync(Variables);
 			IElement StepSize = this.right is null ? null : await this.right.EvaluateAsync(Variables);
+			double? S;
 
-			DoubleNumber S = StepSize as DoubleNumber;
-
-			if (!(From is DoubleNumber F) || !(To is DoubleNumber T) || (S is null && !(StepSize is null)))
+			if (StepSize?.AssociatedObjectValue is double d)
+				S = d;
+			else if (!(StepSize is null))
 				throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+			else
+				S = null;
 
-			return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);
+			if (!(From.AssociatedObjectValue is double F) ||
+				!(To.AssociatedObjectValue is double T))
+			{
+				throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+			}
+
+			return new Objects.Sets.Interval(F, T, true, true, S);
 		}
 	}
 }

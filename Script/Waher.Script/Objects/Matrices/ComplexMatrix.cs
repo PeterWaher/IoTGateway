@@ -14,7 +14,7 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Complex-valued matrix.
 	/// </summary>
-	public sealed class ComplexMatrix : RingElement, IVector, IMatrix
+	public sealed class ComplexMatrix : RingElement, IMatrix
 	{
 		private Complex[,] values;
 		private ICollection<IElement> elements;
@@ -60,9 +60,12 @@ namespace Waher.Script.Objects.Matrices
 					int x = 0;
 					int y = 0;
 
-					foreach (ComplexNumber Element in this.elements)
+					foreach (IElement E in this.elements)
 					{
-						v[y, x++] = Element.Value;
+						if (!(E.AssociatedObjectValue is Complex z))
+							z = 0;
+
+						v[y, x++] = z;
 						if (x >= this.columns)
 						{
 							y++;
@@ -182,12 +185,10 @@ namespace Waher.Script.Objects.Matrices
 		{
 			Complex[,] Values = this.Values;
 			Complex[,] v;
-			Complex n;
 			int x, y, z;
 
-			if (Element is ComplexNumber Number)
+			if (Element.AssociatedObjectValue is Complex n)
 			{
-				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -234,12 +235,10 @@ namespace Waher.Script.Objects.Matrices
 		{
 			Complex[,] Values = this.Values;
 			Complex[,] v;
-			Complex n;
 			int x, y, z;
 
-			if (Element is ComplexNumber Number)
+			if (Element.AssociatedObjectValue is Complex n)
 			{
-				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -366,12 +365,10 @@ namespace Waher.Script.Objects.Matrices
 		{
 			Complex[,] Values = this.Values;
 			Complex[,] v;
-			Complex n;
 			int x, y;
 
-			if (Element is ComplexNumber Number)
+			if (Element.AssociatedObjectValue is Complex n)
 			{
-				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -664,13 +661,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			if (!(Value is ComplexNumber V))
+			if (!(Value.AssociatedObjectValue is Complex V))
 				throw new ScriptException("Elements in a Complex matrix must be Complex values.");
 
 			Complex[,] M = this.Values;
 			this.elements = null;
 
-			M[Row, Column] = V.Value;
+			M[Row, Column] = V;
 		}
 
 		/// <summary>

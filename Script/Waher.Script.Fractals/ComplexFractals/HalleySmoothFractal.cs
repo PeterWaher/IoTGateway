@@ -125,8 +125,11 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			dr = Expression.ToDouble(Arguments[i++].AssociatedObjectValue);
 
-			if (i < c && (Arguments[i] is DoubleNumber || Arguments[i] is ComplexNumber))
-				R = Expression.ToComplex(Arguments[i++].AssociatedObjectValue);
+			if (i < c && ((Obj = Arguments[i].AssociatedObjectValue) is double || Obj is Complex))
+			{
+				R = Expression.ToComplex(Obj);
+				i++;
+			}
 			else
 			{
 				R = Complex.One;

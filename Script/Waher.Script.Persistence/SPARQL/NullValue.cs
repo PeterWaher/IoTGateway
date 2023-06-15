@@ -1,11 +1,13 @@
-﻿using Waher.Content.Semantic;
+﻿using Waher.Content.Semantic.Model;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SPARQL
 {
 	/// <summary>
 	/// Represents a null value.
 	/// </summary>
-	public class NullValue : ISemanticElement
+	public class NullValue : SemanticElement
 	{
 		/// <summary>
 		/// Represents a null value.
@@ -15,26 +17,21 @@ namespace Waher.Script.Persistence.SPARQL
 		}
 
 		/// <summary>
-		/// Property used by processor, to tag information to an element.
-		/// </summary>
-		public object Tag { get; set; }
-
-		/// <summary>
 		/// If element is a literal.
 		/// </summary>
-		public bool IsLiteral => true;
+		public override bool IsLiteral => true;
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated object value.
 		/// </summary>
-		public object ElementValue => null;
+		public override object AssociatedObjectValue => null;
 
 		/// <summary>
 		/// Compares element to another.
 		/// </summary>
 		/// <param name="obj">Second element.</param>
 		/// <returns>Comparison</returns>
-		public int CompareTo(object obj)
+		public override int CompareTo(object obj)
 		{
 			return obj is NullValue ? 0 : -1;
 		}
@@ -43,6 +40,18 @@ namespace Waher.Script.Persistence.SPARQL
 		public override string ToString()
 		{
 			return string.Empty;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj.GetType() == typeof(NullValue);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return this.GetType().GetHashCode();
 		}
 	}
 }

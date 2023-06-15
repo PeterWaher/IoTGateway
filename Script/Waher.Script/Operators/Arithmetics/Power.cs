@@ -65,55 +65,55 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluatePower(IElement Left, IElement Right, ScriptNode Node)
 		{
-			DoubleNumber DR = Right as DoubleNumber;
-
-			if (Left is DoubleNumber DL && !(DR is null))
-				return new DoubleNumber(Math.Pow(DL.Value, DR.Value));
-
-			if (Left is IRingElement LE && !(DR is null))
+			if (Right.AssociatedObjectValue is double DR)
 			{
-				double d = DR.Value;
-				if (d >= long.MinValue && d <= long.MaxValue && Math.Truncate(d) == d)
+				if (Left.AssociatedObjectValue is double DL)
+					return new DoubleNumber(Math.Pow(DL, DR));
+
+				if (Left is IRingElement LE)
 				{
-					long n = (long)d;
-
-					if (n < 0)
+					if (DR >= long.MinValue && DR <= long.MaxValue && Math.Truncate(DR) == DR)
 					{
-						LE = LE.Invert();
-						if (LE is null)
-							throw new ScriptRuntimeException("Base element not invertible.", Node);
+						long n = (long)DR;
 
-						n = -n;
-					}
-					else if (n == 0)
-					{
-						if (!(LE is ICommutativeRingWithIdentityElement LE2))
-							throw new ScriptRuntimeException("Base element ring does not have unity.", Node);
-
-						return LE2.One;
-					}
-
-					IRingElement Result = null;
-
-					while (n > 0)
-					{
-						if ((n & 1) == 1)
+						if (n < 0)
 						{
-							if (Result is null)
-								Result = LE;
-							else
-								Result = (IRingElement)Multiply.EvaluateMultiplication(Result, LE, Node);
+							LE = LE.Invert();
+							if (LE is null)
+								throw new ScriptRuntimeException("Base element not invertible.", Node);
+
+							n = -n;
+						}
+						else if (n == 0)
+						{
+							if (!(LE is ICommutativeRingWithIdentityElement LE2))
+								throw new ScriptRuntimeException("Base element ring does not have unity.", Node);
+
+							return LE2.One;
 						}
 
-						n >>= 1;
-						if (n > 0)
-							LE = (IRingElement)Multiply.EvaluateMultiplication(LE, LE, Node);
-					}
+						IRingElement Result = null;
 
-					return Result;
+						while (n > 0)
+						{
+							if ((n & 1) == 1)
+							{
+								if (Result is null)
+									Result = LE;
+								else
+									Result = (IRingElement)Multiply.EvaluateMultiplication(Result, LE, Node);
+							}
+
+							n >>= 1;
+							if (n > 0)
+								LE = (IRingElement)Multiply.EvaluateMultiplication(LE, LE, Node);
+						}
+
+						return Result;
+					}
+					else
+						throw new ScriptRuntimeException("Exponent too large.", Node);
 				}
-				else
-					throw new ScriptRuntimeException("Exponent too large.", Node);
 			}
 
 			if (Left.IsScalar)

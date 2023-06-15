@@ -39,10 +39,9 @@ namespace Waher.Script.Operators.Assignments
 
             IElement ColIndex = this.middle.Evaluate(Variables);
             IElement RowIndex = this.middle2.Evaluate(Variables);
-            double x, y;
 
-            if (!(ColIndex is DoubleNumber X) || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
-                !(RowIndex is DoubleNumber Y) || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
+            if (!(ColIndex.AssociatedObjectValue is double x) || x < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
+                !(RowIndex.AssociatedObjectValue is double y) || y < 0 || y > int.MaxValue || y != Math.Truncate(y))
             {
                 throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
             }
@@ -70,12 +69,11 @@ namespace Waher.Script.Operators.Assignments
 
             IElement ColIndex = await this.middle.EvaluateAsync(Variables);
             IElement RowIndex = await this.middle2.EvaluateAsync(Variables);
-            double x, y;
 
-            if (!(ColIndex is DoubleNumber X) || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
-                !(RowIndex is DoubleNumber Y) || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
-            {
-                throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
+			if (!(ColIndex.AssociatedObjectValue is double x) || x < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
+				!(RowIndex.AssociatedObjectValue is double y) || y < 0 || y > int.MaxValue || y != Math.Truncate(y))
+			{
+				throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
             }
 
             IElement Value = await this.right.EvaluateAsync(Variables);

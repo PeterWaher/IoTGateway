@@ -42,9 +42,9 @@ namespace Waher.Script.Operators
 				Magnitude = Q1.Magnitude;
 				Unit = Q1.Unit;
 			}
-			else if (Operand1 is DoubleNumber D1)
+			else if (Operand1.AssociatedObjectValue is double D1)
 			{
-				Magnitude = D1.Value;
+				Magnitude = D1;
 				Unit = Unit.Empty;
 			}
 			else
@@ -60,8 +60,8 @@ namespace Waher.Script.Operators
 				else if (!Unit.TryConvert(Q2.Magnitude, Q2.Unit, Unit, out Error))
 					throw new ScriptRuntimeException("Incompatible error unit.", this);
 			}
-			else if (Operand2 is DoubleNumber D2)
-				Error = D2.Value;
+			else if (Operand2.AssociatedObjectValue is double D2)
+				Error = D2;
 			else
 				throw new ScriptRuntimeException("Expected Physical Quantity our numeric value.", this.RightOperand);
 

@@ -41,7 +41,7 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return Element is BooleanValue;
+			return Element.AssociatedObjectValue is bool;
 		}
 
 		/// <inheritdoc/>

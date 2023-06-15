@@ -182,11 +182,11 @@ namespace Waher.Script.Model
 				ScriptNode ChainFactor = Differentiable.Differentiate(VariableName, Variables);
 
 				if (ChainFactor is ConstantElement ConstantElement &&
-					ConstantElement.Constant is DoubleNumber DoubleNumber)
+					ConstantElement.Constant.AssociatedObjectValue is double d)
 				{
-					if (DoubleNumber.Value == 0)
+					if (d == 0)
 						return ConstantElement;
-					else if (DoubleNumber.Value == 1)
+					else if (d == 1)
 						return Differentiation;
 				}
 
@@ -357,12 +357,14 @@ namespace Waher.Script.Model
 		/// <returns>Boolean, if successful.</returns>
 		protected static bool? ToBoolean(IElement Value)
 		{
-			if (Value is BooleanValue b)
-				return b.Value;
-			else if (Value is DoubleNumber d)
-				return d.Value != 0;
-			else if (Value is StringValue s)
-				return Functions.Scalar.Boolean.ToBoolean(s.Value);
+			object Obj = Value.AssociatedObjectValue;
+
+			if (Obj is bool b)
+				return b;
+			else if (Obj is double d)
+				return d != 0;
+			else if (Obj is string s)
+				return Functions.Scalar.Boolean.ToBoolean(s);
 			else
 				return null;
 		}
@@ -375,17 +377,16 @@ namespace Waher.Script.Model
 		protected T ToEnum<T>(IElement Value)
 			where T : struct
 		{
-			if (Value is ObjectValue Obj)
-			{
-				if (Obj.AssociatedObjectValue is T e)
-					return e;
-			}
-			else if (Value is DoubleNumber d)
-				return (T)Enum.ToObject(typeof(T), (int)d.Value);
+			object Obj = Value.AssociatedObjectValue;
 
-			string s = Value?.AssociatedObjectValue?.ToString() ?? string.Empty;
+			if (Value is T e)
+				return e;
+			else if (Obj is double d)
+				return (T)Enum.ToObject(typeof(T), (int)d);
 
-			if (Enum.TryParse<T>(s, out T Result))
+			string s = Obj?.ToString() ?? string.Empty;
+
+			if (Enum.TryParse(s, out T Result))
 				return Result;
 
 			throw new ScriptRuntimeException("Enumeration of type " + typeof(T).FullName + " expected.", this);

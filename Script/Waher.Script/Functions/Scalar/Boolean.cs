@@ -127,7 +127,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Pattern match result</returns>
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
-            if (CheckAgainst is BooleanValue)
+            if (CheckAgainst.AssociatedObjectValue is bool)
                 return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
             else
             {

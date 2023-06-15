@@ -66,7 +66,7 @@ namespace Waher.Script.Functions.Vectors
 				ChildElements = v.VectorElements;
 			else if (Arguments[0] is ISet S)
 				ChildElements = S.ChildElements;
-			else if (Arguments[0] is ObjectValue Obj && Obj.Value is System.Collections.ICollection Collection)
+			else if (Arguments[0].AssociatedObjectValue is System.Collections.ICollection Collection)
 			{
 				if (Arguments.Length == 1)
 					return new DoubleNumber(Collection.Count);

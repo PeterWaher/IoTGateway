@@ -94,8 +94,11 @@ namespace Waher.Script.Operators
 					return List.First.Value;
 
 				case 2:
-					if (List.First.Value is DoubleNumber Re && List.First.Next.Value is DoubleNumber Im)
-						return new ComplexNumber(new Complex(Re.Value, Im.Value));
+					if (List.First.Value.AssociatedObjectValue is double Re &&
+						List.First.Next.Value.AssociatedObjectValue is double Im)
+					{
+						return new ComplexNumber(new Complex(Re, Im));
+					}
 					break;
 			}
 
@@ -134,8 +137,11 @@ namespace Waher.Script.Operators
 					return List.First.Value;
 
 				case 2:
-					if (List.First.Value is DoubleNumber Re && List.First.Next.Value is DoubleNumber Im)
-						return new ComplexNumber(new Complex(Re.Value, Im.Value));
+					if (List.First.Value.AssociatedObjectValue is double Re &&
+						List.First.Next.Value.AssociatedObjectValue is double Im)
+					{
+						return new ComplexNumber(new Complex(Re, Im));
+					}
 					break;
 			}
 

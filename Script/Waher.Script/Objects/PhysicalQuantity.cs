@@ -97,8 +97,8 @@ namespace Waher.Script.Objects
 
 				return new PhysicalQuantity(Magnitude, Unit);
 			}
-			else if (Element is DoubleNumber n)
-				return new PhysicalQuantity(this.magnitude * n.Value, this.unit);
+			else if (Element.AssociatedObjectValue is double d)
+				return new PhysicalQuantity(this.magnitude * d, this.unit);
 			else
 				return null;
 		}
@@ -129,8 +129,8 @@ namespace Waher.Script.Objects
 				if (Unit.TryConvert(E.magnitude, E.unit, this.unit, out double d))
 					return new PhysicalQuantity(this.magnitude + d, this.unit);
 			}
-			else if (Element is DoubleNumber n)
-				return new PhysicalQuantity(this.magnitude + n.Value, this.unit);
+			else if (Element.AssociatedObjectValue is double d)
+				return new PhysicalQuantity(this.magnitude + d, this.unit);
 				
 			return null;
 		}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -219,23 +220,12 @@ namespace Waher.Script.Operators
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is ObjectValue Obj))
-				return PatternMatchResult.NoMatch;
-
-			if (this.quick is null)
-			{
-				Dictionary<string, ScriptNode> Quick = new Dictionary<string, ScriptNode>();
-
-				foreach (KeyValuePair<string, ScriptNode> N in this.members)
-					Quick[N.Key] = N.Value;
-
-				this.quick = Quick;
-			}
-
 			PatternMatchResult Result;
 
-			if (Obj.AssociatedObjectValue is IDictionary<string, IElement> Object)
+			if (CheckAgainst.AssociatedObjectValue is IDictionary<string, IElement> Object)
 			{
+				this.CheckQuick();
+
 				foreach (KeyValuePair<string, IElement> P in Object)
 				{
 					if (!(this.quick.ContainsKey(P.Key)))
@@ -253,8 +243,10 @@ namespace Waher.Script.Operators
 						return Result;
 				}
 			}
-			else if (Obj.AssociatedObjectValue is IDictionary<string, object> Object2)
+			else if (CheckAgainst.AssociatedObjectValue is IDictionary<string, object> Object2)
 			{
+				this.CheckQuick();
+
 				foreach (KeyValuePair<string, object> P in Object2)
 				{
 					if (!(this.quick.ContainsKey(P.Key)))
@@ -275,5 +267,19 @@ namespace Waher.Script.Operators
 
 			return PatternMatchResult.Match;
 		}
+
+		private void CheckQuick()
+		{
+			if (this.quick is null)
+			{
+				Dictionary<string, ScriptNode> Quick = new Dictionary<string, ScriptNode>();
+
+				foreach (KeyValuePair<string, ScriptNode> N in this.members)
+					Quick[N.Key] = N.Value;
+
+				this.quick = Quick;
+			}
+		}
+
 	}
 }

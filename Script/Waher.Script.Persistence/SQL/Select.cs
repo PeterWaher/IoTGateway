@@ -117,8 +117,8 @@ namespace Waher.Script.Persistence.SQL
 			if ((this.columns is null || this.columns.Length == 1) &&
 				!(this.top is null) &&
 				this.top is ConstantElement TopConstant &&
-				TopConstant.Constant is DoubleNumber D &&
-				D.Value == 1)
+				TopConstant.Constant.AssociatedObjectValue is double D &&
+				D == 1)
 			{
 				return true;    // select top 1 * ...
 			}
@@ -396,8 +396,8 @@ namespace Waher.Script.Persistence.SQL
 							if (Names[i] is null)
 								Names[i] = (i + 1).ToString();
 						}
-						else if (E is StringValue S)
-							Names[i] = S.Value;
+						else if (E.AssociatedObjectValue is string s)
+							Names[i] = s;
 						else
 							Names[i] = Expression.ToString(E.AssociatedObjectValue);
 

@@ -200,14 +200,12 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			System.TimeSpan TS;
+			object Obj = CheckAgainst.AssociatedObjectValue;
 
-			if (CheckAgainst is ObjectValue Obj && Obj.AssociatedObjectValue is System.TimeSpan TS2)
-				TS = TS2;
-			else
+			if (!(Obj is System.TimeSpan TS))
 			{
-				if (CheckAgainst is DoubleNumber D)
-					TS = new System.TimeSpan((long)D.Value);
+				if (Obj is double d)
+					TS = new System.TimeSpan((long)d);
 				else
 				{
 					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;

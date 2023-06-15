@@ -53,8 +53,13 @@ namespace Waher.Script.Objects.VectorSpaces
 					DateTime[] v = new DateTime[this.dimension];
                     int i = 0;
 
-                    foreach (DateTimeValue Element in this.elements)
-                        v[i++] = Element.Value;
+                    foreach (IElement Element in this.elements)
+                    {
+                        if (!(Element.AssociatedObjectValue is DateTime TP))
+                            TP = DateTime.MinValue;
+
+                        v[i++] = TP;
+                    }
 
                     this.values = v;
                 }
@@ -271,13 +276,13 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            if (!(Value is DateTimeValue V))
+            if (!(Value.AssociatedObjectValue is DateTime V))
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
             DateTime[] Values = this.Values;
             this.elements = null;
 
-            Values[Index] = V.Value;
+            Values[Index] = V;
         }
 
         /// <summary>

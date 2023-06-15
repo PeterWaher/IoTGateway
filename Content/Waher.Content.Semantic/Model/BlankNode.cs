@@ -25,9 +25,9 @@
 		public string NodeId { get; set; }
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated object value.
 		/// </summary>
-		public override object ElementValue => this;
+		public override object AssociatedObjectValue => this;
 
 		/// <inheritdoc/>
 		public override string ToString()

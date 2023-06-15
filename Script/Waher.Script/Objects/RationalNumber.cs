@@ -91,14 +91,16 @@ namespace Waher.Script.Objects
 			if (Element is RationalNumber Q)
 				return this * Q;
 
-			if (Element is Integer i)
-				return this * i.Value;
+			object Obj = Element.AssociatedObjectValue;
 
-			if (Element is DoubleNumber D)
-				return new DoubleNumber(this.ToDouble() * D.Value);
+			if (Obj is BigInteger i)
+				return this * i;
 
-			if (Element is ComplexNumber z)
-				return new ComplexNumber(this.ToDouble() * z.Value);
+			if (Obj is double d)
+				return new DoubleNumber(this.ToDouble() * d);
+
+			if (Obj is Complex z)
+				return new ComplexNumber(this.ToDouble() * z);
 
 			return null;
 		}
@@ -181,14 +183,16 @@ namespace Waher.Script.Objects
 			if (Element is RationalNumber Q)
 				return this + Q;
 
-			if (Element is Integer i)
-				return this + i.Value;
+			object Obj = Element.AssociatedObjectValue;
 
-			if (Element is DoubleNumber D)
-				return new DoubleNumber(this.ToDouble() + D.Value);
+			if (Obj is BigInteger i)
+				return this + i;
 
-			if (Element is ComplexNumber z)
-				return new ComplexNumber(this.ToDouble() + z.Value);
+			if (Obj is double d)
+				return new DoubleNumber(this.ToDouble() + d);
+
+			if (Obj is Complex z)
+				return new ComplexNumber(this.ToDouble() + z);
 
 			return null;
 		}
@@ -246,19 +250,27 @@ namespace Waher.Script.Objects
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (obj is RationalNumber E)
+			if (!(obj is IElement E))
+				return false;
+
+			if (E is RationalNumber Q)
 			{
 				if (this.numerator.IsZero)
-					return E.numerator.IsZero;
+					return Q.numerator.IsZero;
 				else
-					return this.numerator == E.numerator && this.denominator == E.denominator;
+					return this.numerator == Q.numerator && this.denominator == Q.denominator;
 			}
 
-			if (obj is DoubleNumber D)
-				return this.ToDouble() == D.Value;
+			object Obj = E.AssociatedObjectValue;
 
-			if (obj is ComplexNumber z)
-				return this.ToDouble() == z.Value;
+			if (Obj is BigInteger i)
+				return this.numerator == i * this.denominator;
+
+			if (Obj is double d)
+				return this.ToDouble() == d;
+
+			if (Obj is Complex z)
+				return this.ToDouble() == z;
 
 			return false;
 		}

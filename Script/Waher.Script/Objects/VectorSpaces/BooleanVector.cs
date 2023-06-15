@@ -53,10 +53,15 @@ namespace Waher.Script.Objects.VectorSpaces
                     bool[] v = new bool[this.dimension];
                     int i = 0;
 
-                    foreach (BooleanValue Element in this.elements)
-                        v[i++] = Element.Value;
+                    foreach (IElement Element in this.elements)
+                    {
+                        if (!(Element.AssociatedObjectValue is bool b))
+                            b = false;
 
-                    this.values = v;
+                        v[i++] = b;
+					}
+
+					this.values = v;
                 }
 
                 return this.values;
@@ -297,13 +302,13 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            if (!(Value is BooleanValue V))
+            if (!(Value.AssociatedObjectValue is bool V))
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
             bool[] Values = this.Values;
             this.elements = null;
 
-            Values[Index] = V.Value;
+            Values[Index] = V;
         }
 
         /// <summary>

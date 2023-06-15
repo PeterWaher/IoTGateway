@@ -58,9 +58,9 @@ namespace Waher.Content.Semantic.Model
 		public bool HasShortName => !string.IsNullOrEmpty(this.shortName);
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated object value.
 		/// </summary>
-		public override object ElementValue => this.uri;
+		public override object AssociatedObjectValue => this.uri;
 
 		/// <summary>
 		/// URI string

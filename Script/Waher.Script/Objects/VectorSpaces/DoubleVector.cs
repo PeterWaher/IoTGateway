@@ -123,10 +123,9 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IVectorSpaceElement MultiplyScalar(IFieldElement Scalar)
 		{
-			if (!(Scalar is DoubleNumber DoubleNumber))
+			if (!(Scalar.AssociatedObjectValue is double d))
 				return null;
 
-			double d = DoubleNumber.Value;
 			int i;
 			double[] Values = this.Values;
 			double[] v = new double[this.dimension];
@@ -281,13 +280,13 @@ namespace Waher.Script.Objects.VectorSpaces
 			if (Index < 0 || Index >= this.dimension)
 				throw new ScriptException("Index out of bounds.");
 
-			if (!(Value is DoubleNumber V))
+			if (!(Value.AssociatedObjectValue is double d))
 				throw new ScriptException("Elements in a double vector are required to be double values.");
 
 			double[] Values = this.Values;
 			this.elements = null;
 
-			Values[Index] = V.Value;
+			Values[Index] = d;
 		}
 
 		/// <summary>

@@ -23,17 +23,17 @@ namespace Waher.Content.Semantic.Model.Literals
         public DoubleLiteral(double Value)
             : base(Value, CommonTypes.Encode(Value))
         {
-        }
+		}
 
-        /// <summary>
-        /// Represents a double literal.
-        /// </summary>
-        /// <param name="Value">Parsed value</param>
-        /// <param name="StringValue">String value</param>
-        public DoubleLiteral(double Value, string StringValue)
+		/// <summary>
+		/// Represents a double literal.
+		/// </summary>
+		/// <param name="Value">Parsed value</param>
+		/// <param name="StringValue">String value</param>
+		public DoubleLiteral(double Value, string StringValue)
             : base(Value, StringValue)
         {
-        }
+		}
 
         /// <summary>
         /// Type name

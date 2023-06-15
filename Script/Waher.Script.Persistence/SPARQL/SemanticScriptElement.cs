@@ -1,4 +1,4 @@
-﻿using Waher.Content.Semantic;
+﻿using Waher.Content.Semantic.Model;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -6,7 +6,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// <summary>
 	/// Semantic element based on script.
 	/// </summary>
-	public class SemanticScriptElement : ISemanticElement
+	public class SemanticScriptElement : SemanticElement
 	{
 		private ScriptNode node;
 
@@ -25,19 +25,14 @@ namespace Waher.Script.Persistence.SPARQL
 		public ScriptNode Node => this.node;
 
 		/// <summary>
-		/// Property used by processor, to tag information to an element.
-		/// </summary>
-		public object Tag { get; set; }
-
-		/// <summary>
 		/// If element is a literal.
 		/// </summary>
-		public bool IsLiteral => false;
+		public override bool IsLiteral => false;
 
 		/// <summary>
-		/// Underlying element value represented by the semantic element.
+		/// Associated object value.
 		/// </summary>
-		public object ElementValue => this.node;
+		public override object AssociatedObjectValue => this.node;
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -57,7 +52,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="obj">Second element.</param>
 		/// <returns>Comparison result.</returns>
-		public int CompareTo(object obj)
+		public override int CompareTo(object obj)
 		{
 			if (obj is SemanticScriptElement Typed)
 				return this.node.SubExpression.CompareTo(Typed.node.SubExpression);

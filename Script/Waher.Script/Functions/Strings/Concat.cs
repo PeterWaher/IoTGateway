@@ -60,13 +60,10 @@ namespace Waher.Script.Functions.Strings
 
 			StringBuilder Result = new StringBuilder();
 			bool First = true;
-			string s;
 
 			foreach (IElement Item in Vector.VectorElements)
 			{
-				if (Item is StringValue S)
-					s = S.Value;
-				else
+				if (!(Item.AssociatedObjectValue is string s))
 					s = Item.AssociatedObjectValue?.ToString() ?? string.Empty;
 
 				if (First)

@@ -79,26 +79,28 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 		private static IDataSource GetDataSource(string Name, string Alias, IElement E, ScriptNode Source)
 		{
-			if (E.AssociatedObjectValue is IToMatrix ToMatrix)
-				E = ToMatrix.ToMatrix();
+			object Obj = E.AssociatedObjectValue;
 
-			if (E.AssociatedObjectValue is Type T)
+			if (Obj is IToMatrix ToMatrix)
+			{
+				E = ToMatrix.ToMatrix();
+				Obj = E.AssociatedObjectValue;
+			}
+
+			if (Obj is Type T)
 				return new TypeSource(T, Alias);
-			else if (E is StringValue S)
-				return new CollectionSource(S.Value, Alias);
+			else if (Obj is string s)
+				return new CollectionSource(s, Alias);
 			else if (E is ObjectMatrix OM && OM.HasColumnNames)
 				return new VectorSource(Name, Alias, VectorSource.ToGenericObjectVector(OM), Source);
 			else if (E is IVector V)
 				return new VectorSource(Name, Alias, V, Source);
-			else if (E is ObjectValue Value)
-			{
-				if (Value.AssociatedObjectValue is XmlDocument Doc)
-					return new XmlSource(Name, Alias, Doc, Source);
-				else if (Value.AssociatedObjectValue is XmlNode N)
-					return new XmlSource(Name, Alias, N, Source);
-				else if (Value.AssociatedObjectValue is IDataSource DataSource)
-					return DataSource;
-			}
+			else if (Obj is XmlDocument Doc)
+				return new XmlSource(Name, Alias, Doc, Source);
+			else if (Obj is XmlNode N)
+				return new XmlSource(Name, Alias, N, Source);
+			else if (Obj is IDataSource DataSource)
+				return DataSource;
 
 			throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
 		}

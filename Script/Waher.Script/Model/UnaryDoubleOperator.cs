@@ -32,8 +32,8 @@ namespace Waher.Script.Model
 		{
 			IElement Op = this.op.Evaluate(Variables);
 
-			if (Op is DoubleNumber DOp)
-				return this.Evaluate(DOp.Value);
+			if (Op.AssociatedObjectValue is double d)
+				return this.Evaluate(d);
 			else
 				return this.Evaluate(Op, Variables);
 		}
@@ -50,8 +50,8 @@ namespace Waher.Script.Model
 
 			IElement Op = await this.op.EvaluateAsync(Variables);
 
-			if (Op is DoubleNumber DOp)
-				return await this.EvaluateAsync(DOp.Value);
+			if (Op.AssociatedObjectValue is double d)
+				return await this.EvaluateAsync(d);
 			else
 				return await this.EvaluateAsync(Op, Variables);
 		}
@@ -64,9 +64,11 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
-			if (Operand is DoubleNumber DOp)
-				return this.Evaluate(DOp.Value);
-			else if (Expression.TryConvert<double>(Operand.AssociatedObjectValue, out double d))
+			object Obj = Operand.AssociatedObjectValue;
+
+			if (Obj is double d)
+				return this.Evaluate(d);
+			else if (Expression.TryConvert(Obj, out d))
 				return this.Evaluate(d);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
@@ -80,9 +82,11 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override async Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
 		{
-			if (Operand is DoubleNumber DOp)
-				return await this.EvaluateAsync(DOp.Value);
-			else if (Expression.TryConvert<double>(Operand.AssociatedObjectValue, out double d))
+			object Obj = Operand.AssociatedObjectValue;
+
+			if (Obj is double d)
+				return await this.EvaluateAsync(d);
+			else if (Expression.TryConvert(Obj, out d))
 				return await this.EvaluateAsync(d);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);

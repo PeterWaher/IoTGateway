@@ -72,9 +72,9 @@ namespace Waher.Content.Semantic
 
 			foreach (ISemanticTriple T in this.triples)
 			{
-				Elements.AddLast(Expression.Encapsulate(T.Subject.ElementValue));
-				Elements.AddLast(Expression.Encapsulate(T.Predicate.ElementValue));
-				Elements.AddLast(Expression.Encapsulate(T.Object.ElementValue));
+				Elements.AddLast(T.Subject);
+				Elements.AddLast(T.Predicate);
+				Elements.AddLast(T.Object);
 				Rows++;
 			}
 

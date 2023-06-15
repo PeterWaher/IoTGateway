@@ -35,7 +35,7 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
-			string Msg = E is StringValue S ? S.Value : Expression.ToString(E.AssociatedObjectValue);
+			string Msg = E.AssociatedObjectValue is string s ? s : Expression.ToString(E.AssociatedObjectValue);
 			Variables.ConsoleOut?.Write(Msg);
             return E;
         }
@@ -48,7 +48,7 @@ namespace Waher.Script.Functions.Runtime
         public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
             IElement E = await this.Argument.EvaluateAsync(Variables);
-            string Msg = E is StringValue S ? S.Value : Expression.ToString(E.AssociatedObjectValue);
+            string Msg = E.AssociatedObjectValue is string s ? s : Expression.ToString(E.AssociatedObjectValue);
             Variables.ConsoleOut?.Write(Msg);
             return E;
         }

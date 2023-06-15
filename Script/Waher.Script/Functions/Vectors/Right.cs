@@ -54,12 +54,10 @@ namespace Waher.Script.Functions.Vectors
 
 			int c = (int)N;
 
-			if (Arguments[0] is StringValue S)
+			if (Arguments[0].AssociatedObjectValue is string s)
 			{
-				string s = S.Value;
-
 				if (c > s.Length)
-					return S;
+					return Arguments[0];
 				else
 					return new StringValue(s.Substring(s.Length - c, c));
 			}

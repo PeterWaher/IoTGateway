@@ -51,8 +51,8 @@ namespace Waher.Script.Functions.Vectors
 			IElement Vector = Arguments[0];
 			IElement Item = Arguments[1];
 
-			if (Vector is StringValue S1 && Item is StringValue S2)
-				return S1.Value.Contains(S2.Value) ? BooleanValue.True : BooleanValue.False;
+			if (Vector.AssociatedObjectValue is string s1 && Item.AssociatedObjectValue is string s2)
+				return s1.Contains(s2) ? BooleanValue.True : BooleanValue.False;
 			else
 			{
 				ICollection<IElement> ChildElements;

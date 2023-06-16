@@ -10,7 +10,7 @@ namespace Waher.Content.Semantic.Model
 	/// <summary>
 	/// Set of semantic elements.
 	/// </summary>
-	public class SemanticElements : Set
+	public class SemanticElements : Set, IOrderedSet
 	{
 		private static readonly Dictionary<Type, ISemanticLiteral> literalPerType = new Dictionary<Type, ISemanticLiteral>();
 		private static readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
@@ -135,5 +135,18 @@ namespace Waher.Content.Semantic.Model
 			return typeof(SemanticElements).GetHashCode();
 		}
 
+		/// <summary>
+		/// Compares two elements.
+		/// </summary>
+		/// <param name="x">Element 1</param>
+		/// <param name="y">Element 2</param>
+		/// <returns>Comparison result.</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			if (x is ISemanticElement Left)
+				return Left.CompareTo(y);
+			else
+				return 1;
+		}
 	}
 }

@@ -135,7 +135,7 @@ namespace Waher.Script.Persistence.SPARQL
 			else if (From is Uri Uri)
 				From = await this.LoadResource(Uri, Variables);
 			else if (From is string s)
-				From = await this.LoadResource(new Uri(s), Variables);
+				From = await this.LoadResource(new Uri(s, UriKind.RelativeOrAbsolute), Variables);
 
 			if (!(From is ISemanticCube Cube))
 			{
@@ -476,6 +476,11 @@ namespace Waher.Script.Persistence.SPARQL
 		{
 			if (Variables.TryGetVariable(" " + Uri.ToString() + " ", out Variable v))
 				return v.ValueObject;
+
+			// TODO: Check locally hosted sources.
+
+			if (!Uri.IsAbsoluteUri)
+				throw new InvalidOperationException("URI not absolute.");
 
 			return await InternetContent.GetAsync(Uri,
 				new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9"));

@@ -239,7 +239,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					Parser.NextChar();
 					UriNode FromUri = this.ParseUri(Parser);
 
-					From = new ConstantElement(new ObjectValue(FromUri), Start, Parser.Position - Start, Parser.Expression);
+					From = new ConstantElement(FromUri, Start, Parser.Position - Start, Parser.Expression);
 				}
 				else
 					From = Parser.ParseObject();
@@ -939,7 +939,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case '.':
 							Parser.UndoChar();
 							ISemanticElement Element2 = this.ParseElement(Parser, 2);
-							return new ConstantElement(new ObjectValue(Element2), Start, Parser.Position - Start, Parser.Expression);
+							return new ConstantElement(Element2, Start, Parser.Position - Start, Parser.Expression);
 
 						default:
 							Node = this.ParseUnary(Parser, false);
@@ -973,17 +973,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case '9':
 				case '.':
 					ISemanticElement Element = this.ParseElement(Parser, 2);
-					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+					return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
 
 				case '<':
 					Parser.NextChar();
 					Element = this.ParseUri(Parser);
-					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+					return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
 
 				case ':':
 					Parser.NextChar();
 					Element = this.ParsePrefixedToken(Parser, string.Empty);
-					return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+					return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
 
 				default:
 					if (!char.IsLetter(ch))
@@ -999,7 +999,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					{
 						Parser.NextChar();
 						Element = this.ParsePrefixedToken(Parser, s);
-						return new ConstantElement(new ObjectValue(Element), Start, Parser.Position - Start, Parser.Expression);
+						return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
 					}
 
 					return this.ParseFunction(Parser, s, Start, Optional);

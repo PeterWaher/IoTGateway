@@ -8,10 +8,20 @@ namespace Waher.Content.Semantic.Model.Literals
     /// </summary>
     public class DoubleLiteral : SemanticNumericLiteral
 	{
-        /// <summary>
-        /// Represents a double literal.
-        /// </summary>
-        public DoubleLiteral()
+		/// <summary>
+		/// Double value 0.0
+		/// </summary>
+		public static readonly DoubleLiteral ZeroInstance = new DoubleLiteral(0);
+
+		/// <summary>
+		/// Double value 1.0
+		/// </summary>
+		public static readonly DoubleLiteral OneInstance = new DoubleLiteral(1);
+
+		/// <summary>
+		/// Represents a double literal.
+		/// </summary>
+		public DoubleLiteral()
             : base()
         {
         }

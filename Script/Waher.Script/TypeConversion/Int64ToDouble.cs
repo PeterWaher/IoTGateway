@@ -20,7 +20,7 @@ namespace Waher.Script.TypeConversion
 		public Type To => typeof(double);
 
 		/// <summary>
-		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
+		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="Int64ToDouble.To"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
 		/// <returns>Object of type <see cref="To"/>.</returns>

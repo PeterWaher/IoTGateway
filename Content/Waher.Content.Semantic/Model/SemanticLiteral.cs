@@ -73,27 +73,27 @@ namespace Waher.Content.Semantic.Model
 		/// <summary>
 		/// Associated Ring.
 		/// </summary>
-		public IRing AssociatedRing => SemanticLiterals.Instance;
+		public virtual IRing AssociatedRing => SemanticLiterals.Instance;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public IAbelianGroup AssociatedAbelianGroup => SemanticLiterals.Instance;
+		public virtual IAbelianGroup AssociatedAbelianGroup => SemanticLiterals.Instance;
 
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public IAbelianGroupElement Zero => SemanticLiterals.Instance.Zero;
+		public virtual IAbelianGroupElement Zero => SemanticLiterals.Instance.Zero;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public IGroup AssociatedGroup => SemanticLiterals.Instance;
+		public virtual IGroup AssociatedGroup => SemanticLiterals.Instance;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public ISemiGroup AssociatedSemiGroup => SemanticLiterals.Instance;
+		public virtual ISemiGroup AssociatedSemiGroup => SemanticLiterals.Instance;
 
 		/// <summary>
 		/// How well the type supports a given data type.

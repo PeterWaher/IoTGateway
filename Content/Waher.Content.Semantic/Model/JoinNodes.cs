@@ -87,7 +87,6 @@ namespace Waher.Content.Semantic.Model
 			/// <summary>
 			/// Resets the enumerator.
 			/// </summary>
-			/// <exception cref="System.NotImplementedException"></exception>
 			public void Reset()
 			{
 				this.enumerator1.Reset();

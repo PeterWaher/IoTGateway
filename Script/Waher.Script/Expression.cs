@@ -29,7 +29,6 @@ using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
 using System.Threading.Tasks;
-using Waher.Script.Functions.Vectors;
 
 namespace Waher.Script
 {

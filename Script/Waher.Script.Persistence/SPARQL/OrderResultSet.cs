@@ -33,7 +33,6 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Zero, if records are equal
 		/// Positive, if Record 1 is greated than Record 2
 		/// </returns>
-		/// <exception cref="System.NotImplementedException"></exception>
 		public int Compare(SparqlResultRecord x, SparqlResultRecord y)
 		{
 			ISemanticElement e1, e2;

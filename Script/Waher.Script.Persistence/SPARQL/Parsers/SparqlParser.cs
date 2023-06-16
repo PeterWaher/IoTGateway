@@ -433,12 +433,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 						case '{':
 							ISparqlPattern Left = this.currentPattern;
-							this.currentRegularPattern = new SparqlRegularPattern();
-							this.currentPattern = this.currentRegularPattern;
-
 							ISparqlPattern Pattern = this.ParsePattern(Parser);
 
-							if (this.currentPattern.IsEmpty)
+							if (Left.IsEmpty)
 							{
 								this.currentPattern = Pattern;
 								this.currentRegularPattern = Pattern as SparqlRegularPattern;

@@ -1,12 +1,14 @@
 ﻿using System;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Interface for semantic literals.
 	/// </summary>
-	public interface ISemanticLiteral : ISemanticElement, IProcessingSupport<string>, IProcessingSupport<Type>
+	public interface ISemanticLiteral : ISemanticElement, IProcessingSupport<string>, 
+		IProcessingSupport<Type>, IRingElement
 	{
 		/// <summary>
 		/// Parsed value.

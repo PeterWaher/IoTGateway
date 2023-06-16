@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Model.Literals;
 
 namespace Waher.Script.Persistence.SPARQL
 {

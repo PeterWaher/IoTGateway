@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 
 namespace Waher.Content.Semantic.Model
 {
@@ -67,6 +69,31 @@ namespace Waher.Content.Semantic.Model
 		/// String representation of value.
 		/// </summary>
 		public string StringValue { get; }
+
+		/// <summary>
+		/// Associated Ring.
+		/// </summary>
+		public IRing AssociatedRing => SemanticLiterals.Instance;
+
+		/// <summary>
+		/// Associated Abelian Group.
+		/// </summary>
+		public IAbelianGroup AssociatedAbelianGroup => SemanticLiterals.Instance;
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public IAbelianGroupElement Zero => SemanticLiterals.Instance.Zero;
+
+		/// <summary>
+		/// Associated Group.
+		/// </summary>
+		public IGroup AssociatedGroup => SemanticLiterals.Instance;
+
+		/// <summary>
+		/// Associated Semi-Group.
+		/// </summary>
+		public ISemiGroup AssociatedSemiGroup => SemanticLiterals.Instance;
 
 		/// <summary>
 		/// How well the type supports a given data type.
@@ -147,6 +174,80 @@ namespace Waher.Content.Semantic.Model
 			}
 				
 			return base.CompareTo(obj);
+		}
+
+		/// <summary>
+		/// Tries to multiply an element to the current element, from the left.
+		/// </summary>
+		/// <param name="Element">Element to multiply.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual IRingElement MultiplyLeft(IRingElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to multiply an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to multiply.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual IRingElement MultiplyRight(IRingElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Inverts the element, if possible.
+		/// </summary>
+		/// <returns>Inverted element, or null if not possible.</returns>
+		public virtual IRingElement Invert()
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual IAbelianGroupElement Add(IAbelianGroupElement Element)
+		{
+			if (this.AddRight(Element) is IAbelianGroupElement Result)
+				return Result;
+
+			if (Element.AddLeft(this) is IAbelianGroupElement Result2)
+				return Result2;
+
+			return null;
+		}
+
+		/// <summary>
+		/// Negates the element.
+		/// </summary>
+		/// <returns>Negation of current element.</returns>
+		public virtual IGroupElement Negate()
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the left.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual ISemiGroupElement AddLeft(ISemiGroupElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual ISemiGroupElement AddRight(ISemiGroupElement Element)
+		{
+			return null;
 		}
 	}
 }

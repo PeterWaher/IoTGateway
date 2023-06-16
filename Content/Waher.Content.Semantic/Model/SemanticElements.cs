@@ -143,7 +143,7 @@ namespace Waher.Content.Semantic.Model
 		/// <returns>Comparison result.</returns>
 		public int Compare(IElement x, IElement y)
 		{
-			if (x is ISemanticElement Left)
+			if (x is IComparable Left)
 				return Left.CompareTo(y);
 			else
 				return 1;

@@ -913,42 +913,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Persistence.SPARQL.NullValue">
-            <summary>
-            Represents a null value.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.#ctor">
-            <summary>
-            Represents a null value.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.NullValue.IsLiteral">
-            <summary>
-            If element is a literal.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.NullValue.AssociatedObjectValue">
-            <summary>
-            Associated object value.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.CompareTo(System.Object)">
-            <summary>
-            Compares element to another.
-            </summary>
-            <param name="obj">Second element.</param>
-            <returns>Comparison</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.ToString">
-            <inheritdoc/>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.Equals(System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.NullValue.GetHashCode">
-            <inheritdoc/>
-        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.OrderResultSet">
             <summary>
             Comparer for ordering a SPARQL result set.
@@ -973,7 +937,6 @@
             Zero, if records are equal
             Positive, if Record 1 is greated than Record 2
             </returns>
-            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser">
             <summary>

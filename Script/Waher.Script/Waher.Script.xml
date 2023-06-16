@@ -21718,6 +21718,38 @@
             If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.From"/>.</exception>
         </member>
+        <member name="T:Waher.Script.TypeConversion.DecimalToDouble">
+            <summary>
+            Converts decimal numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DecimalToDouble.From">
+            <summary>
+            Converts double numbers to decimal numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DecimalToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DecimalToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DecimalToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DecimalToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.DoubleToBigInteger">
             <summary>
             Converts a double number to a <see cref="T:System.Numerics.BigInteger"/>, if possible.
@@ -21781,6 +21813,166 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.DoubleToDecimal">
+            <summary>
+            Converts double numbers to decimal numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToDecimal.From">
+            <summary>
+            Converts double numbers to decimal numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToDecimal.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToDecimal.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToDecimal.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.Int16ToDouble">
+            <summary>
+            Converts short numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int16ToDouble.From">
+            <summary>
+            Converts double numbers to short numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int16ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int16ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int16ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int16ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.Int32ToDouble">
+            <summary>
+            Converts int numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int32ToDouble.From">
+            <summary>
+            Converts double numbers to int numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int32ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int32ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int32ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int32ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.Int64ToDouble">
+            <summary>
+            Converts long numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int64ToDouble.From">
+            <summary>
+            Converts double numbers to long numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int64ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int64ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int64ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int64ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.Int8ToDouble">
+            <summary>
+            Converts sbyte numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int8ToDouble.From">
+            <summary>
+            Converts double numbers to sbyte numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.Int8ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int8ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.Int8ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.Int8ToDouble.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.TypeConversion.ITypeConverter">
             <summary>
@@ -21910,6 +22102,134 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.UInt16ToDouble">
+            <summary>
+            Converts ushort numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt16ToDouble.From">
+            <summary>
+            Converts double numbers to ushort numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt16ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt16ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt16ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt16ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.UInt32ToDouble">
+            <summary>
+            Converts uint numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt32ToDouble.From">
+            <summary>
+            Converts double numbers to uint numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt32ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt32ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt32ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt32ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.UInt64ToDouble">
+            <summary>
+            Converts ulong numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt64ToDouble.From">
+            <summary>
+            Converts double numbers to ulong numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt64ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt64ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt64ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt64ToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.UInt8ToDouble">
+            <summary>
+            Converts byte numbers to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt8ToDouble.From">
+            <summary>
+            Converts double numbers to byte numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.UInt8ToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt8ToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.UInt8ToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.UInt8ToDouble.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.Units.AtomicUnit">
             <summary>

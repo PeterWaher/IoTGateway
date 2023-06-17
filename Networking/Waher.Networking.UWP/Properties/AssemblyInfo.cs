@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.UWP")]
-[assembly: AssemblyDescription("Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, etc.")]
+[assembly: AssemblyDescription("Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, etc., as well as classes for building client and server applications.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]

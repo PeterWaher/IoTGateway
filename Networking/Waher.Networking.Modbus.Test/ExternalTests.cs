@@ -15,7 +15,7 @@ using Waher.Runtime.Settings;
 namespace Waher.Networking.Modbus.Test
 {
 	[TestClass]
-	public class ModbusTests
+	public class ExternalTests
 	{
 		private static ConsoleEventSink consoleEventSink = null;
 		private static FilesProvider filesProvider = null;

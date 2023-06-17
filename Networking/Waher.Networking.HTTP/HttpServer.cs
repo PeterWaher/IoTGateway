@@ -847,7 +847,6 @@ namespace Waher.Networking.HTTP
 		#region Connections
 
 #if WINDOWS_UWP
-
 		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
 		{
 			try
@@ -878,9 +877,7 @@ namespace Waher.Networking.HTTP
 				Log.Critical(ex);
 			}
 		}
-
 #else
-
 		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls)
 		{
 			try

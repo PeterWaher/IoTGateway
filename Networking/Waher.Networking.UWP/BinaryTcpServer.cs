@@ -49,7 +49,8 @@ namespace Waher.Networking
 		private bool closed = false;
 		private readonly bool tls;
 #endif
-		private Cache<Guid, Connection> connections;
+		private Cache<Guid, ServerTcpConnection> connections;
+		private object synchObj = new object();
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private int port;
@@ -95,7 +96,7 @@ namespace Waher.Networking
 				throw new ArgumentException("Activity timeout must be positive.", nameof(ActivityTimeout));
 
 			this.port = Port;
-			this.connections = new Cache<Guid, Connection>(int.MaxValue, TimeSpan.MaxValue,
+			this.connections = new Cache<Guid, ServerTcpConnection>(int.MaxValue, TimeSpan.MaxValue,
 				ActivityTimeout);
 
 			this.connections.Removed += this.Connections_Removed;
@@ -404,12 +405,11 @@ namespace Waher.Networking
 		public bool TrustClientCertificates => this.trustClientCertificates;
 #endif
 
-		private async Task<bool> AcceptConnection(Connection Connection)
+		private async Task<bool> AcceptConnection(ServerTcpConnection Connection)
 		{
-			ServerConnectionAcceptEventArgs e = new ServerConnectionAcceptEventArgs(
-				Connection.Id, Connection.Client);
+			ServerConnectionAcceptEventArgs e = new ServerConnectionAcceptEventArgs(Connection);
+			EventHandlerAsync<ServerConnectionAcceptEventArgs> h = this.OnAccept;
 
-			ServerConnectionAcceptEventHandler h = this.OnAccept;
 			if (!(h is null))
 			{
 				try
@@ -431,7 +431,7 @@ namespace Waher.Networking
 		/// can set the <see cref="ServerConnectionAcceptEventArgs.Accept"/> property
 		/// to control if the server should accept the connection or not.
 		/// </summary>
-		public event ServerConnectionAcceptEventHandler OnAccept;
+		public event EventHandlerAsync<ServerConnectionAcceptEventArgs> OnAccept;
 
 #if WINDOWS_UWP
 		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
@@ -442,17 +442,13 @@ namespace Waher.Networking
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
 				BinaryTcpClient.Bind(true);
-				Connection Connection = new Connection(this, BinaryTcpClient);
+				ServerTcpConnection Connection = new ServerTcpConnection(this, BinaryTcpClient);
 
 				if (this.AcceptConnection(Connection).Result)
 				{
 					this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 					BinaryTcpClient.Continue();
-
-					lock (this.connections)
-					{
-						this.connections[Connection.Id] = Connection;
-					}
+					Task.Run(() => this.Added(Connection));
 				}
 				else
 				{
@@ -512,7 +508,7 @@ namespace Waher.Networking
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
 							BinaryTcpClient.Bind(true);
 
-							Connection Connection = new Connection(this, BinaryTcpClient);
+							ServerTcpConnection Connection = new ServerTcpConnection(this, BinaryTcpClient);
 
 							if (await this.AcceptConnection(Connection))
 							{
@@ -525,11 +521,7 @@ namespace Waher.Networking
 								else
 								{
 									BinaryTcpClient.Continue();
-
-									lock (this.connections)
-									{
-										this.connections[Connection.Id] = Connection;
-									}
+									await this.Added(Connection);
 								}
 							}
 							else
@@ -583,7 +575,7 @@ namespace Waher.Networking
 			}
 		}
 
-		private async Task SwitchToTls(Connection Connection)
+		private async Task SwitchToTls(ServerTcpConnection Connection)
 		{
 			try
 			{
@@ -619,11 +611,7 @@ namespace Waher.Networking
 				}
 
 				Connection.Client.Continue();
-
-				lock (this.connections)
-				{
-					this.connections[Connection.Id] = Connection;
-				}
+				await this.Added(Connection);
 			}
 			catch (AuthenticationException ex)
 			{
@@ -648,17 +636,16 @@ namespace Waher.Networking
 			}
 		}
 
-		private async Task LoginFailure(Exception ex, Connection Connection)
+		private async Task LoginFailure(Exception ex, ServerTcpConnection Connection)
 		{
-			ServerTlsErrorEventHandler h = this.OnTlsUpgradeError;
+			EventHandlerAsync<ServerTlsErrorEventArgs> h = this.OnTlsUpgradeError;
 
 			if (!(h is null))
 			{
 				Exception ex2 = Log.UnnestException(ex);
 				try
 				{
-					await h(this, new ServerTlsErrorEventArgs(Connection.Id,
-						Connection.Client, ex2));
+					await h(this, new ServerTlsErrorEventArgs(Connection, ex2));
 				}
 				catch (Exception ex3)
 				{
@@ -672,33 +659,126 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when a client is unable to switch to TLS.
 		/// </summary>
-		public event ServerTlsErrorEventHandler OnTlsUpgradeError;
+		public event EventHandlerAsync<ServerTlsErrorEventArgs> OnTlsUpgradeError;
 #endif
+		private async Task Added(ServerTcpConnection Connection)
+		{
+			lock (this.connections)
+			{
+				this.connections[Connection.Id] = Connection;
+			}
 
-		private void Connections_Removed(object Sender, CacheItemEventArgs<Guid, Connection> e)
+			EventHandlerAsync<ServerConnectionEventArgs> h = this.OnClientConnected;
+			if (!(h is null))
+			{
+				try
+				{
+					await h(this, new ServerConnectionEventArgs(Connection));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a client has connected.
+		/// </summary>
+		public event EventHandlerAsync<ServerConnectionEventArgs> OnClientConnected;
+
+		private async void Connections_Removed(object Sender, CacheItemEventArgs<Guid, ServerTcpConnection> e)
 		{
 			try
 			{
 				e.Value.Client?.Dispose();
+
+				EventHandlerAsync<ServerConnectionEventArgs> h = this.OnClientDisconnected;
+				if (!(h is null))
+					await h(this, new ServerConnectionEventArgs(e.Value));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				// Ignore
+				Log.Critical(ex);
 			}
 		}
 
-		private class Connection
+		/// <summary>
+		/// Event raised when a client has been disconnected.
+		/// </summary>
+		public event EventHandlerAsync<ServerConnectionEventArgs> OnClientDisconnected;
+
+		internal void Remove(ServerTcpConnection Connection)
 		{
-			public Connection(BinaryTcpServer Server, BinaryTcpClient Client)
+			this.connections.Remove(Connection.Id);
+		}
+
+		internal async Task DataReceived(ServerTcpConnection Connection, byte[] Buffer,
+			int Offset, int Count)
+		{
+			lock (this.synchObj)
 			{
-				this.Id = Guid.NewGuid();
-				this.Server = Server;
-				this.Client = Client;
+				this.nrBytesRx += Count;
 			}
 
-			public Guid Id { get; }
-			public BinaryTcpServer Server { get; }
-			public BinaryTcpClient Client { get; }
+			if (this.HasSniffers)
+				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+
+			EventHandlerAsync<ServerConnectionDataEventArgs> h = this.OnDataReceived;
+			if (!(h is null))
+			{
+				try
+				{
+					await h(this, new ServerConnectionDataEventArgs(Connection, Buffer, Offset, Count));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raisde when data has been received from a client.
+		/// </summary>
+		public event EventHandlerAsync<ServerConnectionDataEventArgs> OnDataReceived;
+
+		internal void DataSent(byte[] Data)
+		{
+			lock (this.synchObj)
+			{
+				this.nrBytesTx += Data.Length;
+			}
+
+			this.TransmitBinary(Data);
+		}
+
+		/// <summary>
+		/// Number of bytes received
+		/// </summary>
+		public long NrBytesRx
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.nrBytesRx;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Number of bytes transmitted
+		/// </summary>
+		public long NrBytesTx
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.nrBytesTx;
+				}
+			}
 		}
 
 	}

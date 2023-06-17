@@ -562,6 +562,31 @@
             Event raised when a client is unable to switch to TLS.
             </summary>
         </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnClientConnected">
+            <summary>
+            Event raised when a client has connected.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnClientDisconnected">
+            <summary>
+            Event raised when a client has been disconnected.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnDataReceived">
+            <summary>
+            Event raisde when data has been received from a client.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpServer.NrBytesRx">
+            <summary>
+            Number of bytes received
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpServer.NrBytesTx">
+            <summary>
+            Number of bytes transmitted
+            </summary>
+        </member>
         <member name="T:Waher.Networking.ClientCertificates">
             <summary>
             Client Certificate Options
@@ -801,48 +826,61 @@
             </summary>
             <param name="Data">Text data sent.</param>
         </member>
-        <member name="T:Waher.Networking.ServerConnectionAcceptEventHandler">
-            <summary>
-            Delegate for server connection accept event handlers.
-            </summary>
-            <param name="Sender">Sender of event.</param>
-            <param name="e">Event arguments.</param>
-        </member>
         <member name="T:Waher.Networking.ServerConnectionAcceptEventArgs">
             <summary>
             Event arguments for connection accept events.
             </summary>
         </member>
-        <member name="M:Waher.Networking.ServerConnectionAcceptEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient)">
+        <member name="M:Waher.Networking.ServerConnectionAcceptEventArgs.#ctor(Waher.Networking.ServerTcpConnection)">
             <summary>
             Event arguments for connection accept events.
             </summary>
-            <param name="Id">Connection ID</param>
-            <param name="Client">Client connection</param>
+            <param name="Connection">Server connection</param>
         </member>
         <member name="P:Waher.Networking.ServerConnectionAcceptEventArgs.Accept">
             <summary>
             Exception object
             </summary>
         </member>
-        <member name="T:Waher.Networking.ServerConnectionEventHandler">
+        <member name="T:Waher.Networking.ServerConnectionDataEventArgs">
             <summary>
-            Delegate for connection events.
+            Event arguments for server data reception events.
             </summary>
-            <param name="Sender">Sender of event.</param>
-            <param name="e">Event arguments.</param>
+        </member>
+        <member name="M:Waher.Networking.ServerConnectionDataEventArgs.#ctor(Waher.Networking.ServerTcpConnection,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Event arguments for server data reception events.
+            </summary>
+            <param name="Connection">Server connection</param>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionDataEventArgs.Buffer">
+            <summary>
+            Binary Data Buffer
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionDataEventArgs.Offset">
+            <summary>
+            Start index of first byte read.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionDataEventArgs.Count">
+            <summary>
+            Number of bytes read.
+            </summary>
         </member>
         <member name="T:Waher.Networking.ServerConnectionEventArgs">
             <summary>
             Event arguments for connection events.
             </summary>
         </member>
-        <member name="M:Waher.Networking.ServerConnectionEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient)">
+        <member name="M:Waher.Networking.ServerConnectionEventArgs.#ctor(Waher.Networking.ServerTcpConnection)">
             <summary>
             Event arguments for connection events.
             </summary>
-            <param name="Id">Connection ID</param>
-            <param name="Client">Client connection</param>
+            <param name="Connection">Server connection</param>
         </member>
         <member name="P:Waher.Networking.ServerConnectionEventArgs.Id">
             <summary>
@@ -854,24 +892,70 @@
             Client connection
             </summary>
         </member>
-        <member name="T:Waher.Networking.ServerTlsErrorEventHandler">
+        <member name="P:Waher.Networking.ServerConnectionEventArgs.Server">
             <summary>
-            Delegate for TLS upgrade error events.
+            Server reference.
             </summary>
-            <param name="Sender">Sender of event.</param>
-            <param name="e">Event arguments.</param>
+        </member>
+        <member name="M:Waher.Networking.ServerConnectionEventArgs.SendAsync(System.Byte[])">
+            <summary>
+            Sends data back to the client.
+            </summary>
+            <param name="Data">Data to send.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="T:Waher.Networking.ServerTcpConnection">
+            <summary>
+            Maintains information about a connection between an external client and
+            a local server.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerTcpConnection.#ctor(Waher.Networking.BinaryTcpServer,Waher.Networking.BinaryTcpClient)">
+            <summary>
+            Maintains information about a connection between an external client and
+            a local server.
+            </summary>
+            <param name="Server">Local server</param>
+            <param name="Client">External client connection</param>
+        </member>
+        <member name="P:Waher.Networking.ServerTcpConnection.Id">
+            <summary>
+            ID of connection
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ServerTcpConnection.Server">
+            <summary>
+            Local server
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ServerTcpConnection.Client">
+            <summary>
+            External client connection
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerTcpConnection.Dispose">
+            <summary>
+            Disposes of the connection.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerTcpConnection.SendAsync(System.Byte[])">
+            <summary>
+            Sends data back to the client.
+            </summary>
+            <param name="Data">Data to send.</param>
+            <returns>If data was sent.</returns>
         </member>
         <member name="T:Waher.Networking.ServerTlsErrorEventArgs">
             <summary>
             Event arguments for TLS upgrade error events.
             </summary>
         </member>
-        <member name="M:Waher.Networking.ServerTlsErrorEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient,System.Exception)">
+        <member name="M:Waher.Networking.ServerTlsErrorEventArgs.#ctor(Waher.Networking.ServerTcpConnection,System.Exception)">
             <summary>
             Event arguments for TLS upgrade error events.
             </summary>
-            <param name="Id">Connection ID</param>
-            <param name="Client">Client connection</param>
+            <param name="Connection">Server connection</param>
+            <param name="Exception">Exception reporteded.</param>
         </member>
         <member name="P:Waher.Networking.ServerTlsErrorEventArgs.Exception">
             <summary>

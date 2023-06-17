@@ -108,7 +108,9 @@
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="RowTcpClient.cs" />
     <Compile Include="ServerConnectionAcceptEventArgs.cs" />
+    <Compile Include="ServerConnectionDataEventArgs.cs" />
     <Compile Include="ServerConnectionEventArgs.cs" />
+    <Compile Include="ServerTcpConnection.cs" />
     <Compile Include="ServerTlsErrorEventArgs.cs" />
     <Compile Include="Sniffers\DebugSniffer.cs" />
     <Compile Include="Sniffers\Extensions.cs" />

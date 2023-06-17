@@ -4,36 +4,44 @@ using System.Threading.Tasks;
 namespace Waher.Networking
 {
 	/// <summary>
-	/// Delegate for connection events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ServerConnectionEventHandler(object Sender, ServerConnectionEventArgs e);
-
-	/// <summary>
 	/// Event arguments for connection events.
 	/// </summary>
 	public class ServerConnectionEventArgs : EventArgs
 	{
+		private readonly ServerTcpConnection connection;
+
 		/// <summary>
 		/// Event arguments for connection events.
 		/// </summary>
-		/// <param name="Id">Connection ID</param>
-		/// <param name="Client">Client connection</param>
-		public ServerConnectionEventArgs(Guid Id, BinaryTcpClient Client)
+		/// <param name="Connection">Server connection</param>
+		public ServerConnectionEventArgs(ServerTcpConnection Connection)
 		{
-			this.Id = Id;
-			this.Client = Client;
+			this.connection = Connection;
 		}
 
 		/// <summary>
 		/// Connection ID
 		/// </summary>
-		public Guid Id { get; }
+		public Guid Id => this.connection.Id;
 
 		/// <summary>
 		/// Client connection
 		/// </summary>
-		public BinaryTcpClient Client { get; }
+		internal BinaryTcpClient Client => this.connection.Client;
+
+		/// <summary>
+		/// Server reference.
+		/// </summary>
+		public BinaryTcpServer Server => this.connection.Server;
+
+		/// <summary>
+		/// Sends data back to the client.
+		/// </summary>
+		/// <param name="Data">Data to send.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(byte[] Data)
+		{
+			return this.connection.SendAsync(Data);
+		}
 	}
 }

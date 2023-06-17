@@ -451,6 +451,117 @@
             Allows the caller to pause reading.
             </summary>
         </member>
+        <member name="T:Waher.Networking.BinaryTcpServer">
+            <summary>
+            Implements a binary TCP Server. The server adapts to network changes,
+            maintains a list of current connection, and removes unused connections
+            automatically.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.BinaryTcpServer.DefaultConnectionBacklog">
+            <summary>
+            Default Connection backlog (10).
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.BinaryTcpServer.DefaultBufferSize">
+            <summary>
+            Default buffer size (16384).
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.#ctor(System.Int32,System.TimeSpan,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Creates a TCP server, waiting for incoming connections. Encryption is not
+            initiated.
+            </summary>
+            <param name="Port">Port number.</param>
+            <param name="ActivityTimeout">Time before closing unused client connections.</param>
+            <param name="Sniffers">Sniffers</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.#ctor(System.Int32,System.TimeSpan,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Creates a TCP server, waiting for incoming connections. Encryption is
+            initiated for each connection request.
+            </summary>
+            <param name="Port">Port number.</param>
+            <param name="ActivityTimeout">Time before closing unused client connections.</param>
+            <param name="ServerCertificate">Server certificate.</param>
+            <param name="Sniffers">Sniffers</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.NetworkChanged">
+            <summary>
+            Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnNetworkChanged">
+            <summary>
+            Event raised when the network has been changed.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Open(System.Collections.Generic.LinkedList{System.Net.Sockets.TcpListener})">
+            <summary>
+            Opens the server for incoming connection requests.
+            </summary>
+            <param name="Listeners">Optional list of existing listeners to reuse.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Close(System.Boolean)">
+            <summary>
+            Closes the server from incoming connection requests.
+            </summary>
+            <param name="CloseConnectedClients">If connected clients should be
+            closed as well.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Open">
+            <summary>
+            Opens the server for incoming connection requests.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Close">
+            <summary>
+            Closes the server from incoming connection requests. Connected clients
+            are also closed.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.UpdateCertificate(System.Security.Cryptography.X509Certificates.X509Certificate)">
+            <summary>
+            Updates the server certificate
+            </summary>
+            <param name="ServerCertificate">Server Certificate.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.ConfigureMutualTls(Waher.Networking.ClientCertificates,System.Boolean,System.Boolean)">
+            <summary>
+            Configures Mutual-TLS capabilities of the server. Affects all connections, all resources.
+            </summary>
+            <param name="ClientCertificates">If client certificates are not used, optional or required.</param>
+            <param name="TrustClientCertificates">If client certificates should be trusted, even if they do not validate.</param>
+            <param name="LockSettings">If client certificate settings should be locked.</param>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpServer.ClientCertificates">
+            <summary>
+            If client certificates are not used, optional or required.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpServer.TrustClientCertificates">
+            <summary>
+            If client certificates should be trusted, even if they do not validate.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnAccept">
+            <summary>
+            Event raised when a client tries to connect to the server. An event handler
+            can set the <see cref="P:Waher.Networking.ServerConnectionAcceptEventArgs.Accept"/> property
+            to control if the server should accept the connection or not.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpServer.OnTlsUpgradeError">
+            <summary>
+            Event raised when a client is unable to switch to TLS.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.ClientCertificates">
             <summary>
             Client Certificate Options
@@ -689,6 +800,83 @@
             Method called when binary data has been sent.
             </summary>
             <param name="Data">Text data sent.</param>
+        </member>
+        <member name="T:Waher.Networking.ServerConnectionAcceptEventHandler">
+            <summary>
+            Delegate for server connection accept event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.ServerConnectionAcceptEventArgs">
+            <summary>
+            Event arguments for connection accept events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerConnectionAcceptEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient)">
+            <summary>
+            Event arguments for connection accept events.
+            </summary>
+            <param name="Id">Connection ID</param>
+            <param name="Client">Client connection</param>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionAcceptEventArgs.Accept">
+            <summary>
+            Exception object
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.ServerConnectionEventHandler">
+            <summary>
+            Delegate for connection events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.ServerConnectionEventArgs">
+            <summary>
+            Event arguments for connection events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerConnectionEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient)">
+            <summary>
+            Event arguments for connection events.
+            </summary>
+            <param name="Id">Connection ID</param>
+            <param name="Client">Client connection</param>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionEventArgs.Id">
+            <summary>
+            Connection ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ServerConnectionEventArgs.Client">
+            <summary>
+            Client connection
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.ServerTlsErrorEventHandler">
+            <summary>
+            Delegate for TLS upgrade error events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.ServerTlsErrorEventArgs">
+            <summary>
+            Event arguments for TLS upgrade error events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ServerTlsErrorEventArgs.#ctor(System.Guid,Waher.Networking.BinaryTcpClient,System.Exception)">
+            <summary>
+            Event arguments for TLS upgrade error events.
+            </summary>
+            <param name="Id">Connection ID</param>
+            <param name="Client">Client connection</param>
+        </member>
+        <member name="P:Waher.Networking.ServerTlsErrorEventArgs.Exception">
+            <summary>
+            Exception object
+            </summary>
         </member>
         <member name="T:Waher.Networking.Sniffers.ConsoleErrorSniffer">
             <summary>

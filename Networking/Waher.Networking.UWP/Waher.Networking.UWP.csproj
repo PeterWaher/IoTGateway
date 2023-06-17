@@ -103,9 +103,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BinaryOutputStream.cs" />
+    <Compile Include="BinaryTcpServer.cs" />
     <Compile Include="ClientCertificates.cs" />
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="RowTcpClient.cs" />
+    <Compile Include="ServerConnectionAcceptEventArgs.cs" />
+    <Compile Include="ServerConnectionEventArgs.cs" />
+    <Compile Include="ServerTlsErrorEventArgs.cs" />
     <Compile Include="Sniffers\DebugSniffer.cs" />
     <Compile Include="Sniffers\Extensions.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />
@@ -152,6 +156,10 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
+      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
+      <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj">
       <Project>{47f772fe-c923-4f5c-83b5-a4bef962ae15}</Project>

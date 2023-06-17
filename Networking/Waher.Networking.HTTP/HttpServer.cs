@@ -63,6 +63,9 @@ namespace Waher.Networking.HTTP
 #else
 		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 		private X509Certificate serverCertificate;
+		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
+		private bool trustClientCertificates = false;
+		private bool clientCertificateSettingsLocked = false;
 #endif
 		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
 		private TimeSpan sessionTimeout = TimeSpan.FromMinutes(20);
@@ -81,9 +84,6 @@ namespace Waher.Networking.HTTP
 		private readonly VanityResources vanityResources = new VanityResources();
 		private ILoginAuditor loginAuditor = null;
 		private DateTime lastStat = DateTime.MinValue;
-		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
-		private bool trustClientCertificates = false;
-		private bool clientCertificateSettingsLocked = false;
 		private string eTagSalt = string.Empty;
 		private string name = typeof(HttpServer).Namespace;
 		private int[] httpPorts;
@@ -210,7 +210,7 @@ namespace Waher.Networking.HTTP
 			Task _ = this.AddHttpPorts(HttpPorts);
 
 			if (this.adaptToNetworkChanges)
-				NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
+				NetworkInformation.NetworkStatusChanged += this.NetworkChange_NetworkAddressChanged;
 #else
 			this.AddHttpPorts(HttpPorts);
 			this.httpsPorts = new int[0];
@@ -297,7 +297,7 @@ namespace Waher.Networking.HTTP
 					if (value)
 					{
 #if WINDOWS_UWP
-						NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
+						NetworkInformation.NetworkStatusChanged += this.NetworkChange_NetworkAddressChanged;
 #else
 						NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 #endif
@@ -305,7 +305,7 @@ namespace Waher.Networking.HTTP
 					else
 					{
 #if WINDOWS_UWP
-						NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
+						NetworkInformation.NetworkStatusChanged -= this.NetworkChange_NetworkAddressChanged;
 #else
 						NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
 #endif
@@ -384,7 +384,7 @@ namespace Waher.Networking.HTTP
 							{
 								Listener = new StreamSocketListener();
 								await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
-								Listener.ConnectionReceived += Listener_ConnectionReceived;
+								Listener.ConnectionReceived += this.Listener_ConnectionReceived;
 
 								this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
 							}
@@ -597,7 +597,7 @@ namespace Waher.Networking.HTTP
 		public void Dispose()
 		{
 #if WINDOWS_UWP
-			NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
+			NetworkInformation.NetworkStatusChanged -= this.NetworkChange_NetworkAddressChanged;
 #else
 			this.closed = true;
 			NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;

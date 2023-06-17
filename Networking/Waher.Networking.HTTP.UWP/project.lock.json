@@ -2643,6 +2643,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -5403,6 +5404,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -8199,6 +8201,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -10968,6 +10971,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -13773,6 +13777,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -16542,6 +16547,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -19347,6 +19353,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },

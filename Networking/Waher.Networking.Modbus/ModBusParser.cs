@@ -267,6 +267,29 @@ namespace Waher.Networking.Modbus
 						return await this.SendResponse(e, false, Data);
 
 					case 0x05:      // Write Coil
+						if (this.data.Length != 4)
+						{
+							e.Server.Error("Expected four bytes of data.");
+							return false;
+						}
+
+						ReferenceNr = this.data[0];
+						ReferenceNr <<= 8;
+						ReferenceNr |= this.data[1];
+
+						bool BooleanValue = this.data[2] != 0;
+
+						WriteBitEventArgs BitEventArgs = new WriteBitEventArgs(
+							this.unitAddress, ReferenceNr, BooleanValue);
+
+						await this.server.RaiseWriteCoil(BitEventArgs);
+
+						Data = new byte[3];
+						Data[0] = 1;
+						Data[2] = BitEventArgs.Value ? (byte)0xff : (byte)0;
+
+						return await this.SendResponse(e, false, Data);
+
 					case 0x06:      // Write Register
 					case 0x10:      // Write Multiple Registers
 					default:

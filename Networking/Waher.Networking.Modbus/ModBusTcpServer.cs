@@ -265,6 +265,25 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		public event EventHandlerAsync<ReadWordsEventArgs> OnReadInputRegisters;
 
+		internal async Task RaiseWriteCoil(WriteBitEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("WriteCoil(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
+			}
+
+			EventHandlerAsync<WriteBitEventArgs> h = this.OnWriteCoil;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to write a coil output value.
+		/// </summary>
+		public event EventHandlerAsync<WriteBitEventArgs> OnWriteCoil;
+
 		#endregion
 
 	}

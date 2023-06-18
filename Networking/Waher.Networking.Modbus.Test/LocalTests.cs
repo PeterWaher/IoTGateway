@@ -173,17 +173,63 @@ namespace Waher.Networking.Modbus.Test
 		[TestMethod]
 		public async Task Test_05_WriteCoil()
 		{
-			await client.WriteCoil(5, 5000, true);
+			static Task WriteCoil(object Sender, WriteBitEventArgs e)
+			{
+				Assert.AreEqual(5, e.UnitAddress);
+				Assert.AreEqual(5000, e.ReferenceNr);
+				Assert.IsTrue(e.Value);
+
+				return Task.CompletedTask;
+			};
+
+			server.OnWriteCoil += WriteCoil;
+			try
+			{
+				bool Result = await client.WriteCoil(5, 5000, true);
+
+				Assert.IsTrue(Result);
+			}
+			finally
+			{
+				server.OnWriteCoil -= WriteCoil;
+			}
 		}
 
 		[TestMethod]
-		public async Task Test_06_WriteRegister()
+		public async Task Test_06_WriteCoil_2()
+		{
+			static Task WriteCoil(object Sender, WriteBitEventArgs e)
+			{
+				Assert.AreEqual(5, e.UnitAddress);
+				Assert.AreEqual(5000, e.ReferenceNr);
+				Assert.IsTrue(e.Value);
+
+				e.Value = false;
+
+				return Task.CompletedTask;
+			};
+
+			server.OnWriteCoil += WriteCoil;
+			try
+			{
+				bool Result = await client.WriteCoil(5, 5000, true);
+
+				Assert.IsFalse(Result);
+			}
+			finally
+			{
+				server.OnWriteCoil -= WriteCoil;
+			}
+		}
+
+		[TestMethod]
+		public async Task Test_07_WriteRegister()
 		{
 			await client.WriteRegister(6, 6000, 12345);
 		}
 
 		[TestMethod]
-		public async Task Test_07_WriteRegister()
+		public async Task Test_08_WriteRegister()
 		{
 			await client.WriteMultipleRegisters(7, 7000, 123, 234, 345, 456);
 		}

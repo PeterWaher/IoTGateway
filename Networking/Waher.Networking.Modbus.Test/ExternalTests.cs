@@ -17,9 +17,9 @@ namespace Waher.Networking.Modbus.Test
 	[TestClass]
 	public class ExternalTests
 	{
+		internal static ConsoleOutSniffer sniffer = null;
 		private static ConsoleEventSink consoleEventSink = null;
 		private static FilesProvider filesProvider = null;
-		private static ConsoleOutSniffer sniffer = null;
 		private static string host;
 		private static int port;
 

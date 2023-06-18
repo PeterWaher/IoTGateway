@@ -904,6 +904,11 @@
             <param name="Data">Data to send.</param>
             <returns>If data was sent.</returns>
         </member>
+        <member name="M:Waher.Networking.ServerConnectionEventArgs.CloseConnection">
+            <summary>
+            Closes the underlying connection.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.ServerTcpConnection">
             <summary>
             Maintains information about a connection between an external client and

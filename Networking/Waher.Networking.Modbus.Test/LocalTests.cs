@@ -103,13 +103,71 @@ namespace Waher.Networking.Modbus.Test
 		[TestMethod]
 		public async Task Test_03_ReadInputRegisters()
 		{
-			await client.ReadInputRegisters(3, 3000, 10);
+			static Task ReadInputRegisters(object Sender, ReadWordsEventArgs e)
+			{
+				Assert.AreEqual(3, e.UnitAddress);
+				Assert.AreEqual(10, e.NrWords);
+				Assert.AreEqual(3000, e.ReferenceNr);
+
+				int i;
+
+				for (i = 0; i < e.NrWords; i++)
+					e[e.ReferenceNr + i] = (ushort)(i + 1234);
+
+				return Task.CompletedTask;
+			};
+
+			server.OnReadInputRegisters += ReadInputRegisters;
+			try
+			{
+				ushort[] Result = await client.ReadInputRegisters(3, 3000, 10);
+
+				Assert.AreEqual(10, Result.Length);
+
+				int i;
+
+				for (i = 0; i < 10; i++)
+					Assert.AreEqual((ushort)(i + 1234), Result[i]);
+			}
+			finally
+			{
+				server.OnReadInputRegisters -= ReadInputRegisters;
+			}
 		}
 
 		[TestMethod]
-		public async Task Test_04_ReadInputDiscretes()
+		public async Task Test_04_ReadMultipleRegisters()
 		{
-			await client.ReadMultipleRegisters(4, 4000, 20);
+			static Task ReadMultipleRegisters(object Sender, ReadWordsEventArgs e)
+			{
+				Assert.AreEqual(4, e.UnitAddress);
+				Assert.AreEqual(20, e.NrWords);
+				Assert.AreEqual(4000, e.ReferenceNr);
+
+				int i;
+
+				for (i = 0; i < e.NrWords; i++)
+					e[e.ReferenceNr + i] = (ushort)(i ^ 1234);
+
+				return Task.CompletedTask;
+			};
+
+			server.OnReadMultipleRegisters += ReadMultipleRegisters;
+			try
+			{
+				ushort[] Result = await client.ReadMultipleRegisters(4, 4000, 20);
+
+				Assert.AreEqual(20, Result.Length);
+
+				int i;
+
+				for (i = 0; i < 20; i++)
+					Assert.AreEqual((ushort)(i ^ 1234), Result[i]);
+			}
+			finally
+			{
+				server.OnReadMultipleRegisters -= ReadMultipleRegisters;
+			}
 		}
 
 		[TestMethod]

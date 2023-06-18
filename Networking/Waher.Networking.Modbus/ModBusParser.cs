@@ -46,6 +46,7 @@ namespace Waher.Networking.Modbus
 			while (Count > 0)
 			{
 				b = Buffer[Offset++];
+				Count--;
 
 				switch (this.state)
 				{
@@ -144,19 +145,22 @@ namespace Waher.Networking.Modbus
 						ReferenceNr <<= 8;
 						ReferenceNr |= this.data[1];
 
-						ushort NrBits = this.data[2];
-						NrBits <<= 8;
-						NrBits |= this.data[3];
+						ushort NrRegisters = this.data[2];
+						NrRegisters <<= 8;
+						NrRegisters |= this.data[3];
 
-						BitArray Bits = new BitArray(NrBits);
+						BitArray Bits = new BitArray(NrRegisters);
 
 						ReadBitsEventArgs BitsEventArgs = new ReadBitsEventArgs(
-							this.unitAddress, ReferenceNr, NrBits, Bits);
+							this.unitAddress, ReferenceNr, NrRegisters, Bits);
 
 						await this.server.RaiseReadCoils(BitsEventArgs);
 
-						byte[] Bytes = ToArray(Bits);
+						byte[] Bytes = ToBytes(Bits);
 						int c = Bytes.Length;
+						if (c > 255)
+							throw new Exception("Too many bits requested.");
+
 						byte[] Data = new byte[c + 1];
 						Data[0] = (byte)c;
 						Array.Copy(Bytes, 0, Data, 1, c);
@@ -174,19 +178,22 @@ namespace Waher.Networking.Modbus
 						ReferenceNr <<= 8;
 						ReferenceNr |= this.data[1];
 
-						NrBits = this.data[2];
-						NrBits <<= 8;
-						NrBits |= this.data[3];
+						NrRegisters = this.data[2];
+						NrRegisters <<= 8;
+						NrRegisters |= this.data[3];
 
-						Bits = new BitArray(NrBits);
+						Bits = new BitArray(NrRegisters);
 
 						BitsEventArgs = new ReadBitsEventArgs(this.unitAddress,
-							ReferenceNr, NrBits, Bits);
+							ReferenceNr, NrRegisters, Bits);
 
 						await this.server.RaiseReadInputDiscretes(BitsEventArgs);
 
-						Bytes = ToArray(Bits);
+						Bytes = ToBytes(Bits);
 						c = Bytes.Length;
+						if (c > 255)
+							throw new Exception("Too many bits requested.");
+
 						Data = new byte[c + 1];
 						Data[0] = (byte)c;
 						Array.Copy(Bytes, 0, Data, 1, c);
@@ -194,7 +201,71 @@ namespace Waher.Networking.Modbus
 						return await this.SendResponse(e, false, Data);
 
 					case 0x03:      // Read Multiple Registers
+						if (this.data.Length != 4)
+						{
+							e.Server.Error("Expected four bytes of data.");
+							return false;
+						}
+
+						ReferenceNr = this.data[0];
+						ReferenceNr <<= 8;
+						ReferenceNr |= this.data[1];
+
+						NrRegisters = this.data[2];
+						NrRegisters <<= 8;
+						NrRegisters |= this.data[3];
+
+						ushort[] Words = new ushort[NrRegisters];
+
+						ReadWordsEventArgs WordsEventArgs = new ReadWordsEventArgs(
+							this.unitAddress, ReferenceNr, NrRegisters, Words);
+
+						await this.server.RaiseReadMultipleRegisters(WordsEventArgs);
+
+						Bytes = ToBytes(Words);
+						c = Bytes.Length;
+						if (c > 255)
+							throw new Exception("Too many words requested.");
+
+						Data = new byte[c + 1];
+						Data[0] = (byte)c;
+						Array.Copy(Bytes, 0, Data, 1, c);
+
+						return await this.SendResponse(e, false, Data);
+
 					case 0x04:      // Read Input Registers
+						if (this.data.Length != 4)
+						{
+							e.Server.Error("Expected four bytes of data.");
+							return false;
+						}
+
+						ReferenceNr = this.data[0];
+						ReferenceNr <<= 8;
+						ReferenceNr |= this.data[1];
+
+						NrRegisters = this.data[2];
+						NrRegisters <<= 8;
+						NrRegisters |= this.data[3];
+
+						Words = new ushort[NrRegisters];
+
+						WordsEventArgs = new ReadWordsEventArgs(this.unitAddress, 
+							ReferenceNr, NrRegisters, Words);
+
+						await this.server.RaiseReadInputRegisters(WordsEventArgs);
+
+						Bytes = ToBytes(Words);
+						c = Bytes.Length;
+						if (c > 255)
+							throw new Exception("Too many words requested.");
+
+						Data = new byte[c + 1];
+						Data[0] = (byte)c;
+						Array.Copy(Bytes, 0, Data, 1, c);
+
+						return await this.SendResponse(e, false, Data);
+
 					case 0x05:      // Write Coil
 					case 0x06:      // Write Register
 					case 0x10:      // Write Multiple Registers
@@ -215,9 +286,9 @@ namespace Waher.Networking.Modbus
 		/// <summary>
 		/// Converts a bit-array to a byte array.
 		/// </summary>
-		/// <param name="Bits"></param>
-		/// <returns></returns>
-		public static byte[] ToArray(BitArray Bits)
+		/// <param name="Bits">Array of bits</param>
+		/// <returns>Byte array</returns>
+		public static byte[] ToBytes(BitArray Bits)
 		{
 			int c = Bits.Length;
 			int d = (c + 7) / 8;
@@ -241,6 +312,31 @@ namespace Waher.Networking.Modbus
 
 			if (j < d)
 				Result[j] = b;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Converts a word-array to a byte array.
+		/// </summary>
+		/// <param name="Words">Array of words</param>
+		/// <returns>Byte array</returns>
+		public static byte[] ToBytes(ushort[] Words)
+		{
+			int c = Words.Length;
+			int d = c << 1;
+			byte[] Result = new byte[d];
+			int i, j;
+			ushort w;
+
+			for (i = j = 0; i < c; i++)
+			{
+				w = Words[i];
+				Result[j + 1] = (byte)w;
+				w >>= 8;
+				Result[j] = (byte)w;
+				j += 2;
+			}
 
 			return Result;
 		}

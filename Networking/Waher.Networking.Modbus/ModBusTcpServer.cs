@@ -191,6 +191,12 @@ namespace Waher.Networking.Modbus
 
 		internal async Task RaiseReadCoils(ReadBitsEventArgs e)
 		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadCoils(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
+			}
+
 			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadCoils;
 
 			if (!(h is null))
@@ -204,6 +210,12 @@ namespace Waher.Networking.Modbus
 
 		internal async Task RaiseReadInputDiscretes(ReadBitsEventArgs e)
 		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadInputDiscretes(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
+			}
+
 			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadInputDiscretes;
 
 			if (!(h is null))
@@ -214,6 +226,44 @@ namespace Waher.Networking.Modbus
 		/// Event raised when a client wants to read input descrete registers.
 		/// </summary>
 		public event EventHandlerAsync<ReadBitsEventArgs> OnReadInputDiscretes;
+
+		internal async Task RaiseReadMultipleRegisters(ReadWordsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadMultipleRegisters(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadMultipleRegisters;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read multiple registers.
+		/// </summary>
+		public event EventHandlerAsync<ReadWordsEventArgs> OnReadMultipleRegisters;
+
+		internal async Task RaiseReadInputRegisters(ReadWordsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadInputRegisters(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadInputRegisters;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read input registers.
+		/// </summary>
+		public event EventHandlerAsync<ReadWordsEventArgs> OnReadInputRegisters;
 
 		#endregion
 

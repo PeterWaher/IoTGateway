@@ -284,6 +284,25 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		public event EventHandlerAsync<WriteBitEventArgs> OnWriteCoil;
 
+		internal async Task RaiseWriteRegister(WriteWordEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("WriteRegister(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
+			}
+
+			EventHandlerAsync<WriteWordEventArgs> h = this.OnWriteRegister;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to write a register output value.
+		/// </summary>
+		public event EventHandlerAsync<WriteWordEventArgs> OnWriteRegister;
+
 		#endregion
 
 	}

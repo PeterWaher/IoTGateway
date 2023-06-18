@@ -225,11 +225,57 @@ namespace Waher.Networking.Modbus.Test
 		[TestMethod]
 		public async Task Test_07_WriteRegister()
 		{
-			await client.WriteRegister(6, 6000, 12345);
+			static Task WriteRegister(object Sender, WriteWordEventArgs e)
+			{
+				Assert.AreEqual(6, e.UnitAddress);
+				Assert.AreEqual(6000, e.ReferenceNr);
+				Assert.AreEqual((ushort)12345, e.Value);
+
+				return Task.CompletedTask;
+			};
+
+			server.OnWriteRegister += WriteRegister;
+			try
+			{
+				ushort Result = await client.WriteRegister(6, 6000, 12345);
+
+				Assert.AreEqual((ushort)12345, Result);
+			}
+			finally
+			{
+				server.OnWriteRegister -= WriteRegister;
+			}
 		}
 
 		[TestMethod]
-		public async Task Test_08_WriteRegister()
+		public async Task Test_08_WriteRegister_2()
+		{
+			static Task WriteRegister(object Sender, WriteWordEventArgs e)
+			{
+				Assert.AreEqual(6, e.UnitAddress);
+				Assert.AreEqual(6000, e.ReferenceNr);
+				Assert.AreEqual((ushort)12345, e.Value);
+
+				e.Value = 23456;
+
+				return Task.CompletedTask;
+			};
+
+			server.OnWriteRegister += WriteRegister;
+			try
+			{
+				ushort Result = await client.WriteRegister(6, 6000, 12345);
+
+				Assert.AreEqual((ushort)23456, Result);
+			}
+			finally
+			{
+				server.OnWriteRegister -= WriteRegister;
+			}
+		}
+
+		[TestMethod]
+		public async Task Test_09_WriteRegister()
 		{
 			await client.WriteMultipleRegisters(7, 7000, 123, 234, 345, 456);
 		}

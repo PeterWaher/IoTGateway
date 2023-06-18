@@ -291,6 +291,34 @@ namespace Waher.Networking.Modbus
 						return await this.SendResponse(e, false, Data);
 
 					case 0x06:      // Write Register
+						if (this.data.Length != 4)
+						{
+							e.Server.Error("Expected four bytes of data.");
+							return false;
+						}
+
+						ReferenceNr = this.data[0];
+						ReferenceNr <<= 8;
+						ReferenceNr |= this.data[1];
+
+						ushort WordValue = this.data[2];
+						WordValue <<= 8;
+						WordValue |= this.data[3];
+
+						WriteWordEventArgs WordEventArgs = new WriteWordEventArgs(
+							this.unitAddress, ReferenceNr, WordValue);
+
+						await this.server.RaiseWriteRegister(WordEventArgs);
+
+						WordValue = WordEventArgs.Value;
+
+						Data = new byte[4];
+						Data[0] = 2;
+						Data[2] = (byte)(WordValue >> 8);
+						Data[3] = (byte)WordValue;
+
+						return await this.SendResponse(e, false, Data);
+					
 					case 0x10:      // Write Multiple Registers
 					default:
 						e.Server.Error("Unsupported function code received.");

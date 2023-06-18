@@ -250,7 +250,7 @@ namespace Waher.Networking.Modbus
 
 						Words = new ushort[NrRegisters];
 
-						WordsEventArgs = new ReadWordsEventArgs(this.unitAddress, 
+						WordsEventArgs = new ReadWordsEventArgs(this.unitAddress,
 							ReferenceNr, NrRegisters, Words);
 
 						await this.server.RaiseReadInputRegisters(WordsEventArgs);
@@ -318,8 +318,55 @@ namespace Waher.Networking.Modbus
 						Data[3] = (byte)WordValue;
 
 						return await this.SendResponse(e, false, Data);
-					
+
 					case 0x10:      // Write Multiple Registers
+						if (this.data.Length < 5)
+						{
+							e.Server.Error("Expected at least five bytes of data.");
+							return false;
+						}
+
+						ReferenceNr = this.data[0];
+						ReferenceNr <<= 8;
+						ReferenceNr |= this.data[1];
+
+						NrRegisters = this.data[2];
+						NrRegisters <<= 8;
+						NrRegisters |= this.data[3];
+
+						byte ByteCount = this.data[4];
+
+						if (this.data.Length != 5 + ByteCount)
+						{
+							e.Server.Error("Unexpected length.");
+							return false;
+						}
+
+						if (ByteCount != NrRegisters << 1)
+						{
+							e.Server.Error("Inconsistency between number of registers and byte count.");
+							return false;
+						}
+
+						int i, j = 5;
+
+						for (i = 0; i < NrRegisters; i++)
+						{
+							WordValue = this.data[j++];
+							WordValue <<= 8;
+							WordValue |= this.data[j++];
+
+							WordEventArgs = new WriteWordEventArgs(
+								this.unitAddress, (ushort)(ReferenceNr + i), WordValue);
+
+							await this.server.RaiseWriteRegister(WordEventArgs);
+						}
+
+						Data = new byte[4];
+						Array.Copy(this.data, 0, Data, 0, 4);
+
+						return await this.SendResponse(e, false, Data);
+
 					default:
 						e.Server.Error("Unsupported function code received.");
 						return await this.SendResponse(e, true, 0x01);

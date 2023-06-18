@@ -275,9 +275,60 @@ namespace Waher.Networking.Modbus.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_WriteRegister()
+		public async Task Test_09_WriteMultipleRegisters()
 		{
-			await client.WriteMultipleRegisters(7, 7000, 123, 234, 345, 456);
+			TaskCompletionSource<bool>[] Registers = new TaskCompletionSource<bool>[]
+			{
+				new TaskCompletionSource<bool>(),
+				new TaskCompletionSource<bool>(),
+				new TaskCompletionSource<bool>(),
+				new TaskCompletionSource<bool>()
+			};
+
+			Task WriteRegister(object Sender, WriteWordEventArgs e)
+			{
+				Assert.AreEqual(7, e.UnitAddress);
+				
+				switch (e.ReferenceNr)
+				{
+					case 7000:
+						Registers[0].TrySetResult(e.Value == 123);
+						break;
+
+					case 7001:
+						Registers[1].TrySetResult(e.Value == 234);
+						break;
+
+					case 7002:
+						Registers[2].TrySetResult(e.Value == 345);
+						break;
+
+					case 7003:
+						Registers[3].TrySetResult(e.Value == 456);
+						break;
+
+					default:
+						Assert.Fail();
+						break;
+				}
+
+				return Task.CompletedTask;
+			};
+
+			server.OnWriteRegister += WriteRegister;
+			try
+			{
+				await client.WriteMultipleRegisters(7, 7000, 123, 234, 345, 456);
+
+				Assert.IsTrue(await Registers[0].Task);
+				Assert.IsTrue(await Registers[1].Task);
+				Assert.IsTrue(await Registers[2].Task);
+				Assert.IsTrue(await Registers[3].Task);
+			}
+			finally
+			{
+				server.OnWriteRegister -= WriteRegister;
+			}
 		}
 
 	}

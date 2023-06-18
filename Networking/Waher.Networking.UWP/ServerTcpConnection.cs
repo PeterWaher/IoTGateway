@@ -81,7 +81,7 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public async Task<bool> SendAsync(byte[] Data)
 		{
-			if (!await Client.SendAsync(Data))
+			if (!await this.Client.SendAsync(Data))
 			{
 				this.Dispose();
 				return false;

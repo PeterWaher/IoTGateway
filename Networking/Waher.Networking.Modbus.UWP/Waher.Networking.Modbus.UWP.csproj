@@ -132,9 +132,14 @@
     <Compile Include="Exceptions\ModbusException.cs" />
     <Compile Include="Exceptions\NegativeAcknowledgeException.cs" />
     <Compile Include="Exceptions\SlaveDeviceBusyException.cs" />
+    <Compile Include="ModBusParser.cs" />
     <Compile Include="ModbusTcpClient.cs" />
     <Compile Include="ModBusTcpServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadBitsEventArgs.cs" />
+    <Compile Include="ReadWordsEventArgs.cs" />
+    <Compile Include="WriteBitEventArgs.cs" />
+    <Compile Include="WriteWordEventArgs.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.Modbus.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

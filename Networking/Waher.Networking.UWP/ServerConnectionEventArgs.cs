@@ -39,9 +39,17 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Data">Data to send.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Data)
+		public Task<bool> SendAsync(params byte[] Data)
 		{
 			return this.connection.SendAsync(Data);
+		}
+
+		/// <summary>
+		/// Closes the underlying connection.
+		/// </summary>
+		public void CloseConnection()
+		{
+			this.connection.Dispose();
 		}
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.Modbus
@@ -14,27 +16,82 @@ namespace Waher.Networking.Modbus
 	/// </summary>
 	public class ModBusTcpServer : IDisposable, ISniffable
 	{
+		private readonly Dictionary<Guid, ModBusParser> parsers = new Dictionary<Guid, ModBusParser>();
 		private BinaryTcpServer server;
 
 		/// <summary>
 		/// Modbus over TCP server
 		/// </summary>
 		/// <param name="Port">Port number to open</param>
-		/// <param name="Tls">If connections are required to be encypted.</param>
 		/// <param name="Sniffers">Optional set of sniffers.</param>
-		public ModBusTcpServer(int Port, bool Tls, params ISniffer[] Sniffers)
+		private ModBusTcpServer(int Port, params ISniffer[] Sniffers)
 		{
 			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), Sniffers);
 		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Modbus over TCP server
+		/// </summary>
+		/// <param name="Port">Port number to open</param>
+		/// <param name="ServerCertificate">Server certificate, for encryption.</param>
+		/// <param name="Sniffers">Optional set of sniffers.</param>
+		private ModBusTcpServer(int Port, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+		{
+			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), ServerCertificate, Sniffers);
+		}
+#endif
+		/// <summary>
+		/// Creates and opens a ModBus server.
+		/// </summary>
+		/// <param name="Port">Port to listen on.</param>
+		/// <param name="Sniffers">Optional set of sniffers.</param>
+		/// <returns>Created ModBus server object.</returns>
+		public static async Task<ModBusTcpServer> CreateAsync(int Port, params ISniffer[] Sniffers)
+		{
+			ModBusTcpServer Result = new ModBusTcpServer(Port, Sniffers);
+			await Result.Init();
+			return Result;
+		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Creates and opens a ModBus server.
+		/// </summary>
+		/// <param name="Port">Port to listen on.</param>
+		/// <param name="ServerCertificate">Server certificate, for encryption.</param>
+		/// <param name="Sniffers">Optional set of sniffers.</param>
+		/// <returns>Created ModBus server object.</returns>
+		public static async Task<ModBusTcpServer> CreateAsync(int Port, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+		{
+			ModBusTcpServer Result = new ModBusTcpServer(Port, ServerCertificate, Sniffers);
+			await Result.Init();
+			return Result;
+		}
+#endif
+		private async Task Init()
+		{
+			this.server.OnClientConnected += this.Server_OnClientConnected;
+			this.server.OnClientDisconnected += this.Server_OnClientDisconnected;
+			this.server.OnDataReceived += this.Server_OnDataReceived;
+
+			await this.server.Open();
+		}
+
+		#region IDisposable
 
 		/// <summary>
 		/// Closes and disposes of the server.
 		/// </summary>
 		public void Dispose()
 		{
-			this.server.Dispose();
+			this.server?.Dispose();
 			this.server = null;
 		}
+
+		#endregion
+
+		#region ISniffable
 
 		/// <summary>
 		/// Adds a sniffer to the node.
@@ -91,6 +148,164 @@ namespace Waher.Networking.Modbus
 		/// If there are sniffers registered on the object.
 		/// </summary>
 		public bool HasSniffers => this.server?.HasSniffers ?? false;
+
+		#endregion
+
+		#region Binary communication
+
+		private Task Server_OnClientConnected(object Sender, ServerConnectionEventArgs e)
+		{
+			lock (this.parsers)
+			{
+				this.parsers[e.Id] = new ModBusParser(this);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private Task Server_OnClientDisconnected(object Sender, ServerConnectionEventArgs e)
+		{
+			lock (this.parsers)
+			{
+				this.parsers.Remove(e.Id);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private async Task Server_OnDataReceived(object Sender, ServerConnectionDataEventArgs e)
+		{
+			ModBusParser Parser;
+
+			lock (this.parsers)
+			{
+				if (!this.parsers.TryGetValue(e.Id, out Parser))
+					return;
+			}
+
+			if (!await Parser.DataReceived(e))
+				e.CloseConnection();
+		}
+
+		#endregion
+
+		#region events
+
+		internal async Task RaiseReadCoils(ReadBitsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadCoils(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadCoils;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read coils.
+		/// </summary>
+		public event EventHandlerAsync<ReadBitsEventArgs> OnReadCoils;
+
+		internal async Task RaiseReadInputDiscretes(ReadBitsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadInputDiscretes(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadInputDiscretes;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read input descrete registers.
+		/// </summary>
+		public event EventHandlerAsync<ReadBitsEventArgs> OnReadInputDiscretes;
+
+		internal async Task RaiseReadMultipleRegisters(ReadWordsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadMultipleRegisters(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadMultipleRegisters;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read multiple registers.
+		/// </summary>
+		public event EventHandlerAsync<ReadWordsEventArgs> OnReadMultipleRegisters;
+
+		internal async Task RaiseReadInputRegisters(ReadWordsEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("ReadInputRegisters(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
+			}
+
+			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadInputRegisters;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to read input registers.
+		/// </summary>
+		public event EventHandlerAsync<ReadWordsEventArgs> OnReadInputRegisters;
+
+		internal async Task RaiseWriteCoil(WriteBitEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("WriteCoil(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
+			}
+
+			EventHandlerAsync<WriteBitEventArgs> h = this.OnWriteCoil;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to write a coil output value.
+		/// </summary>
+		public event EventHandlerAsync<WriteBitEventArgs> OnWriteCoil;
+
+		internal async Task RaiseWriteRegister(WriteWordEventArgs e)
+		{
+			if (this.HasSniffers)
+			{
+				await this.Information("WriteRegister(" + e.UnitAddress.ToString() + "," +
+					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
+			}
+
+			EventHandlerAsync<WriteWordEventArgs> h = this.OnWriteRegister;
+
+			if (!(h is null))
+				await h(this, e);
+		}
+
+		/// <summary>
+		/// Event raised when a client wants to write a register output value.
+		/// </summary>
+		public event EventHandlerAsync<WriteWordEventArgs> OnWriteRegister;
+
+		#endregion
 
 	}
 }

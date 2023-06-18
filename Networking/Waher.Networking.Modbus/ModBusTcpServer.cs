@@ -29,6 +29,7 @@ namespace Waher.Networking.Modbus
 			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), Sniffers);
 		}
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Modbus over TCP server
 		/// </summary>
@@ -39,7 +40,7 @@ namespace Waher.Networking.Modbus
 		{
 			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), ServerCertificate, Sniffers);
 		}
-
+#endif
 		/// <summary>
 		/// Creates and opens a ModBus server.
 		/// </summary>
@@ -53,6 +54,7 @@ namespace Waher.Networking.Modbus
 			return Result;
 		}
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Creates and opens a ModBus server.
 		/// </summary>
@@ -66,7 +68,7 @@ namespace Waher.Networking.Modbus
 			await Result.Init();
 			return Result;
 		}
-
+#endif
 		private async Task Init()
 		{
 			this.server.OnClientConnected += this.Server_OnClientConnected;

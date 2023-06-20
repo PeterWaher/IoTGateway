@@ -55,8 +55,8 @@
 			<String id="51">Byte Swap Order (B A D C)</String>
 			<String id="52">Word Swap Order (C D A B)</String>
 			<String id="53">Byte and Word Swap Order (D C B A)</String>
-			<String id="54">Holding Floatig-point Register (4x)</String>
-			<String id="55">Input Floatig-point Register (3x)</String>
+			<String id="54">Holding Floating-point Register (4x)</String>
+			<String id="55">Input Floating-point Register (3x)</String>
 			<String id="56">Fix number of decimals.</String>
 			<String id="57">If checked, the number of decimals of the value fieldd will be fixed.</String>
 			<String id="58">Number of decimals:</String>

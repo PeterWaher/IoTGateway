@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -56,50 +57,61 @@ namespace Waher.Things.Modbus
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public async Task StartReadout(ISensorReadout Request)
 		{
-			foreach (INode Child in await this.ChildNodes)
+			try
 			{
-				if (Child is ISensor Sensor)
+				foreach (INode Child in await this.ChildNodes)
 				{
-					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
+					if (Child is ISensor Sensor)
+					{
+						TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 
-					InternalReadoutRequest InternalReadout = new InternalReadoutRequest(this.LogId, null, Request.Types, Request.FieldNames,
-						Request.From, Request.To,
-						(sender, e) =>
-						{
-							foreach (Field F in e.Fields)
-								F.Thing = this;
+						InternalReadoutRequest InternalReadout = new InternalReadoutRequest(this.LogId, null, Request.Types, Request.FieldNames,
+							Request.From, Request.To,
+							(sender, e) =>
+							{
+								foreach (Field F in e.Fields)
+									F.Thing = this;
 
-							Request.ReportFields(e.Done, e.Fields);
+								Request.ReportFields(false, e.Fields);
 
-							if (e.Done)
-								ReadoutCompleted.TrySetResult(true);
+								if (e.Done)
+									ReadoutCompleted.TrySetResult(true);
 
-							return Task.CompletedTask;
-						},
-						(sender, e) =>
-						{
-							List<ThingError> Errors2 = new List<ThingError>();
+								return Task.CompletedTask;
+							},
+							(sender, e) =>
+							{
+								List<ThingError> Errors2 = new List<ThingError>();
 
-							foreach (ThingError Error in e.Errors)
-								Errors2.Add(new ThingError(this, Error.ErrorMessage));
+								foreach (ThingError Error in e.Errors)
+									Errors2.Add(new ThingError(this, Error.ErrorMessage));
 
-							Request.ReportErrors(e.Done, Errors2.ToArray());
+								Request.ReportErrors(false, Errors2.ToArray());
 
-							if (e.Done)
-								ReadoutCompleted.TrySetResult(true);
+								if (e.Done)
+									ReadoutCompleted.TrySetResult(true);
 
-							return Task.CompletedTask;
-						}, null);
+								return Task.CompletedTask;
+							}, null);
 
-					await Sensor.StartReadout(InternalReadout);
+						await Sensor.StartReadout(InternalReadout);
 
-					Task Timeout = Task.Delay(60000);
+						Task Timeout = Task.Delay(60000);
 
-					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
+						Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
 
-					if (!ReadoutCompleted.Task.IsCompleted)
-						Request.ReportErrors(true, new ThingError(this, "Timeout."));
+						if (!ReadoutCompleted.Task.IsCompleted)
+							Request.ReportErrors(false, new ThingError(this, "Timeout."));
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Request.ReportErrors(false, new ThingError(this, ex.Message));
+			}
+			finally
+			{
+				Request.ReportFields(true);
 			}
 		}
 

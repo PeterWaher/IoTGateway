@@ -716,6 +716,8 @@ namespace Waher.Networking
 		internal async Task DataReceived(ServerTcpConnection Connection, byte[] Buffer,
 			int Offset, int Count)
 		{
+			this.connections?.ContainsKey(Connection.Id);	// Refreshes timer for connection.
+
 			lock (this.synchObj)
 			{
 				this.nrBytesRx += Count;

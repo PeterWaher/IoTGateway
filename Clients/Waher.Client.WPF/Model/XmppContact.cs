@@ -344,7 +344,7 @@ namespace Waher.Client.WPF.Model
 						}
 					});
 
-					MenuItem.Click += Subscribe_Click;
+					MenuItem.Click += this.Subscribe_Click;
 				}
 
 				if (SubscriptionState == SubscriptionState.To || SubscriptionState == SubscriptionState.Both)
@@ -368,7 +368,7 @@ namespace Waher.Client.WPF.Model
 						}
 					});
 
-					MenuItem.Click += Unsubscribe_Click;
+					MenuItem.Click += this.Unsubscribe_Click;
 				}
 
 			}
@@ -419,7 +419,7 @@ namespace Waher.Client.WPF.Model
 
 		public override async void Configure()
 		{
-			if (UseActuatorControl)
+			if (this.UseActuatorControl)
 			{
 				base.Configure();
 				return;
@@ -463,6 +463,19 @@ namespace Waher.Client.WPF.Model
 
 				MainWindow.ErrorBox(ex.Message);
 			}
+		}
+
+		/// <summary>
+		/// If node can be copied to clipboard.
+		/// </summary>
+		public override bool CanCopy => true;
+
+		/// <summary>
+		/// Is called when the user wants to copy the node to the clipboard.
+		/// </summary>
+		public override void Copy()
+		{
+			Clipboard.SetText("xmpp:" + this.bareJid);
 		}
 	}
 }

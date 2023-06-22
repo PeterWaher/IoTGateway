@@ -40,7 +40,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			else
 				this.parameters = new DisplayableParameters(this.nodeInfo.ParameterList);
 
-			if (nodeInfo.HasChildren)
+			if (this.nodeInfo.HasChildren)
 			{
 				this.children = new SortedDictionary<string, TreeNode>()
 				{

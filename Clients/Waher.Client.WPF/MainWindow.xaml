@@ -46,8 +46,10 @@
         <KeyBinding Modifiers="Control" Key="F5" Command="Refresh"/>
         <KeyBinding Modifiers="Control" Key="F2" Command="{x:Static wcw:MainWindow.Sniff}"/>
         <KeyBinding Modifiers="Control" Key="F4" Command="{x:Static wcw:MainWindow.CloseTab}"/>
-        <KeyBinding Modifiers="Control" Key="C" Command="{x:Static wcw:MainWindow.Chat}"/>
-        <KeyBinding Modifiers="Control" Key="M" Command="{x:Static wcw:MainWindow.ReadMomentary}"/>
+		<KeyBinding Modifiers="Control" Key="C" Command="{x:Static wcw:MainWindow.Copy}"/>
+		<KeyBinding Modifiers="Control" Key="V" Command="{x:Static wcw:MainWindow.Paste}"/>
+		<KeyBinding Modifiers="Control" Key="I" Command="{x:Static wcw:MainWindow.Chat}"/>
+		<KeyBinding Modifiers="Control" Key="M" Command="{x:Static wcw:MainWindow.ReadMomentary}"/>
         <KeyBinding Modifiers="Control" Key="D" Command="{x:Static wcw:MainWindow.ReadDetailed}"/>
         <KeyBinding Modifiers="Control" Key="B" Command="{x:Static wcw:MainWindow.SubscribeToMomentary}"/>
         <KeyBinding Modifiers="Control" Key="Enter" Command="{x:Static wcw:MainWindow.Configure}"/>

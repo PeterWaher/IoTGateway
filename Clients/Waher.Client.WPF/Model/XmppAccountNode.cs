@@ -7,9 +7,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Waher.Events;
+using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Model.Concentrator;
+using Waher.Client.WPF.Model.Legal;
+using Waher.Client.WPF.Model.Muc;
+using Waher.Client.WPF.Model.Provisioning;
+using Waher.Client.WPF.Model.PubSub;
+using Waher.Client.WPF.Model.Things;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -21,6 +29,7 @@ using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.P2P;
+using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
@@ -31,15 +40,6 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Dialogs;
-using Waher.Client.WPF.Model.Concentrator;
-using Waher.Client.WPF.Model.Legal;
-using Waher.Client.WPF.Model.Muc;
-using Waher.Client.WPF.Model.Provisioning;
-using Waher.Client.WPF.Model.PubSub;
-using Waher.Client.WPF.Model.Things;
-using Waher.Networking.XMPP.P2P.E2E;
 
 namespace Waher.Client.WPF.Model
 {
@@ -207,8 +207,8 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemRemoved += this.Client_OnRosterItemRemoved;
 			this.client.OnRosterItemUpdated += this.Client_OnRosterItemUpdated;
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
-			this.client.OnNormalMessage += Client_OnNormalMessage;
-			this.client.OnErrorMessage += Client_OnErrorMessage;
+			this.client.OnNormalMessage += this.Client_OnNormalMessage;
+			this.client.OnErrorMessage += this.Client_OnErrorMessage;
 
 			this.client.SetPresence(Availability.Chat);
 
@@ -219,7 +219,7 @@ namespace Waher.Client.WPF.Model
 
 			this.AddPepClient(string.Empty);
 
-			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
+			this.concentratorClient.OnEvent += this.ConcentratorClient_OnEvent;
 
 			//this.p2pNetwork = new XmppServerlessMessaging("RDP " + this.BareJID, this.client.BareJID);
 			//this.p2pNetwork.OnNewXmppClient += ServerlessMessaging_OnNewXmppClient;
@@ -230,7 +230,7 @@ namespace Waher.Client.WPF.Model
 			this.client.SetTag("E2E", this.e2eEncryption);
 
 			this.socks5Proxy = new Socks5Proxy(this.client);  //, this.XmppAccountNode.E2E);		TODO
-			this.socks5Proxy.OnOpen += Proxy_OnOpen;
+			this.socks5Proxy.OnOpen += this.Proxy_OnOpen;
 
 			this.rdpClient = new RemoteDesktopClient(this.client, this.e2eEncryption);
 
@@ -253,12 +253,12 @@ namespace Waher.Client.WPF.Model
 
 			this.pepClient = new PepClient(this.client, PubSubComponentAddress);
 
-			this.pepClient.OnUserActivity += PepClient_OnUserActivity;
-			this.pepClient.OnUserAvatarMetaData += PepClient_OnUserAvatarMetaData;
-			this.pepClient.OnUserLocation += PepClient_OnUserLocation;
-			this.pepClient.OnUserMood += PepClient_OnUserMood;
-			this.pepClient.OnUserTune += PepClient_OnUserTune;
-			this.pepClient.RegisterHandler(typeof(SensorData), PepClient_SensorData);
+			this.pepClient.OnUserActivity += this.PepClient_OnUserActivity;
+			this.pepClient.OnUserAvatarMetaData += this.PepClient_OnUserAvatarMetaData;
+			this.pepClient.OnUserLocation += this.PepClient_OnUserLocation;
+			this.pepClient.OnUserMood += this.PepClient_OnUserMood;
+			this.pepClient.OnUserTune += this.PepClient_OnUserTune;
+			this.pepClient.RegisterHandler(typeof(SensorData), this.PepClient_SensorData);
 		}
 
 		private void AddMucClient(string MucComponentAddress)
@@ -1724,5 +1724,59 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// If node can be copied to clipboard.
+		/// </summary>
+		public override bool CanCopy => !(this.client is null);
+
+		/// <summary>
+		/// Is called when the user wants to copy the node to the clipboard.
+		/// </summary>
+		public override void Copy()
+		{
+			Clipboard.SetText("xmpp:" + this.client.BareJID);
+		}
+
+		/// <summary>
+		/// If node can be pasted to, from the clipboard.
+		/// </summary>
+		public override bool CanPaste
+		{
+			get
+			{
+				return this.CanPasteFromClipboard(out _);
+			}
+		}
+
+		private bool CanPasteFromClipboard(out string BareJid)
+		{
+			BareJid = null;
+
+			if (this.client is null || this.client.State != XmppState.Connected)
+				return false;
+
+			if (!Clipboard.ContainsText(TextDataFormat.Text))
+				return false;
+
+			string s = Clipboard.GetText(TextDataFormat.Text);
+			if (!s.StartsWith("xmpp:"))
+				return false;
+
+			s = s.Substring(5);
+			if (!XmppClient.BareJidRegEx.IsMatch(s))
+				return false;
+
+			BareJid = s;
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when the user wants to paste data from the clipboard to the node.
+		/// </summary>
+		public override void Paste()
+		{
+			if (this.CanPasteFromClipboard(out string BareJid))
+				this.client.RequestPresenceSubscription(BareJid);
+		}
 	}
 }

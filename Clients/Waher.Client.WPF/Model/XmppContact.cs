@@ -260,7 +260,7 @@ namespace Waher.Client.WPF.Model
 				TreeNode Loop = this.Parent;
 				XmppAccountNode Result = Loop as XmppAccountNode;
 
-				while (Result is null && Loop != null)
+				while (Result is null && !(Loop is null))
 				{
 					Loop = Loop.Parent;
 					Result = Loop as XmppAccountNode;
@@ -273,7 +273,7 @@ namespace Waher.Client.WPF.Model
 		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
-			if (XmppAccountNode != null)
+			if (!(XmppAccountNode is null))
 			{
 				string To = this.RosterItem?.LastPresenceFullJid;
 				if (string.IsNullOrEmpty(To))
@@ -317,7 +317,7 @@ namespace Waher.Client.WPF.Model
 
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 
-			if (XmppAccountNode != null && XmppAccountNode.IsOnline)
+			if (!(XmppAccountNode is null) && XmppAccountNode.IsOnline)
 			{
 				SubscriptionState SubscriptionState = this.SubscriptionState;
 				MenuItem MenuItem;

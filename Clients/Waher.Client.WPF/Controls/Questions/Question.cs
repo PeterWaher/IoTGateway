@@ -116,7 +116,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			XmppClient Client = ProvisioningClient.Client;
 			RosterItem Item = Client[JID];
 
-			if (Item != null && !string.IsNullOrEmpty(Item.Name))
+			if (!(Item is null) && !string.IsNullOrEmpty(Item.Name))
 			{
 				TextBlock.Inlines.Add(new Run()
 				{
@@ -189,7 +189,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				}
 			}
 
-			if (ToRemove != null)
+			if (!(ToRemove is null))
 			{
 				MainWindow.UpdateGui(() =>
 				{

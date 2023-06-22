@@ -60,7 +60,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				this.xml.LoadXml(Payload);
 
-				if (this.xml != null && (E = this.xml.DocumentElement) != null)
+				if (!(this.xml is null) && (E = this.xml.DocumentElement) != null)
 				{
 					if (E.LocalName == "entry" && E.NamespaceURI == "http://www.w3.org/2005/Atom")
 					{
@@ -112,7 +112,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			if (!string.IsNullOrEmpty(this.title))
 				Parameters.Add(new StringParameter("Title", "Title", this.title));
 
-			if (published != null)
+			if (!(published is null))
 				Parameters.Add(new DateTimeParameter("Published", "Published", this.published.Value));
 
 			this.parameters = new DisplayableParameters(Parameters.ToArray());
@@ -142,7 +142,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (Loop is PubSubService PubSubService)
 						return PubSubService;

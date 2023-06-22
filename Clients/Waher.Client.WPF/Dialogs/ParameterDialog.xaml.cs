@@ -73,7 +73,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			foreach (Networking.XMPP.DataForms.Layout.Page Page in Form.Pages)
 			{
-				if (TabControl != null)
+				if (!(TabControl is null))
 				{
 					TabItem = new TabItem()
 					{
@@ -100,7 +100,7 @@ namespace Waher.Client.WPF.Dialogs
 				else
 					TabItem = null;
 
-				if (Form.Instructions != null && Form.Instructions.Length > 0)
+				if (!(Form.Instructions is null) && Form.Instructions.Length > 0)
 				{
 					foreach (string Row in Form.Instructions)
 					{
@@ -122,11 +122,11 @@ namespace Waher.Client.WPF.Dialogs
 						First = Control;
 				}
 
-				if (TabControl != null && TabControl.Items.Count == 1)
+				if (!(TabControl is null) && TabControl.Items.Count == 1)
 					TabItem.Focus();
 			}
 
-			if (First != null)
+			if (!(First is null))
 				First.Focus();
 
 			Result.CheckOkButtonEnabled();
@@ -705,9 +705,9 @@ namespace Waher.Client.WPF.Dialogs
 				BitmapImage.BeginInit();
 				try
 				{
-					if (Field.Media.Binary != null)
+					if (!(Field.Media.Binary is null))
 						BitmapImage.UriSource = new Uri(await Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(Field.Media.Binary));
-					else if (Uri != null)
+					else if (!(Uri is null))
 						BitmapImage.UriSource = Uri;
 					else if (!string.IsNullOrEmpty(Field.Media.URL))
 						BitmapImage.UriSource = new Uri(Field.Media.URL);
@@ -1192,11 +1192,11 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Window_Activated(object sender, EventArgs e)
 		{
-			if (this.makeVisible != null)
+			if (!(this.makeVisible is null))
 			{
 				LinkedList<FrameworkElement> List = new LinkedList<FrameworkElement>();
 
-				while (this.makeVisible != null)
+				while (!(this.makeVisible is null))
 				{
 					List.AddFirst(this.makeVisible);
 					this.makeVisible = this.makeVisible.Parent as FrameworkElement;

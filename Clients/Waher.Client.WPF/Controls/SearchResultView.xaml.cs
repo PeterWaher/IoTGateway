@@ -48,7 +48,7 @@ namespace Waher.Client.WPF.Controls
 
 			InitializeComponent();
 
-			if (this.table != null)
+			if (!(this.table is null))
 			{
 				this.table.Dispose();
 				this.table = null;
@@ -90,7 +90,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			if (this.table != null)
+			if (!(this.table is null))
 			{
 				this.table.Dispose();
 				this.table = null;

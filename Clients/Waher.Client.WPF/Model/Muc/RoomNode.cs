@@ -149,7 +149,7 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (Loop is MucService MucService)
 						return MucService;
@@ -258,7 +258,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			if (this.IsLoaded)
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 					this.Service?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()

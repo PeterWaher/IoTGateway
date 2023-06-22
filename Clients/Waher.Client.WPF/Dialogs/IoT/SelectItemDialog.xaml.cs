@@ -67,12 +67,12 @@ namespace Waher.Client.WPF.Dialogs.IoT
 
 		private void ItemsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			this.OkButton.IsEnabled = this.ItemsView.SelectedItem != null;
+			this.OkButton.IsEnabled = !(this.ItemsView.SelectedItem is null);
 		}
 
 		private void ItemsView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			if (this.ItemsView.SelectedItem != null)
+			if (!(this.ItemsView.SelectedItem is null))
 				this.DialogResult = true;
 		}
 	}

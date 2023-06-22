@@ -19,7 +19,7 @@ namespace Waher.Client.WPF.Model
 
 		protected void Raise(EventHandler h)
 		{
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

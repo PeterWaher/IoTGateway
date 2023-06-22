@@ -189,7 +189,7 @@ namespace Waher.Client.WPF.Dialogs
 		private Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
-			if (FormType != null && FormType.ValueString == "urn:xmpp:captcha")
+			if (!(FormType is null) && FormType.ValueString == "urn:xmpp:captcha")
 			{
 				MainWindow.UpdateGui(async () =>
 				{
@@ -284,7 +284,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void CloseClient()
 		{
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				XmppClient Client = this.client;
 				this.client = null;

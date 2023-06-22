@@ -30,7 +30,7 @@ namespace Waher.Client.WPF.Controls
 
 		public ConnectionView()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public void Load(MainWindow Owner)
@@ -76,22 +76,22 @@ namespace Waher.Client.WPF.Controls
 				GridView = null;
 
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
-			if (this.selectedNode != null)
+			if (!(this.selectedNode is null))
 			{
 				TreeNode[] Children = this.selectedNode.Children;
 				Dictionary<string, bool> Headers = null;
 				DisplayableParameters Parameters;
 
-				if (Children != null)
+				if (!(Children is null))
 				{
 					foreach (TreeNode Child in this.selectedNode.Children)
 					{
 						this.ConnectionListView.Items.Add(Child);
 
-						if (GridView != null)
+						if (!(GridView is null))
 						{
 							Parameters = Child.DisplayableParameters;
-							if (Parameters != null)
+							if (!(Parameters is null))
 							{
 								foreach (Parameter P in Parameters.Ordered)
 								{
@@ -418,7 +418,7 @@ namespace Waher.Client.WPF.Controls
 			lock (this.syncObj)
 			{
 				this.refreshTimer?.Dispose();
-				this.refreshTimer = new Timer(RefreshTree, null, 250, Timeout.Infinite);
+				this.refreshTimer = new Timer(this.RefreshTree, null, 250, Timeout.Infinite);
 			}
 		}
 
@@ -432,7 +432,7 @@ namespace Waher.Client.WPF.Controls
 				this.status = Message;
 
 				this.statusTimer?.Dispose();
-				this.statusTimer = new Timer(SetStatus, null, 250, Timeout.Infinite);
+				this.statusTimer = new Timer(this.SetStatus, null, 250, Timeout.Infinite);
 			}
 		}
 

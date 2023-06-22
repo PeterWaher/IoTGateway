@@ -96,7 +96,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (Loop is PubSubService PubSubService)
 						return PubSubService;
@@ -299,7 +299,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 			if (this.IsLoaded)
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 					this.Service?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()

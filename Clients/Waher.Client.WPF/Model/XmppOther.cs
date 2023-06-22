@@ -33,7 +33,7 @@ namespace Waher.Client.WPF.Model
 				XmppClient Client = Node.Client;
 				RosterItem Item = Client[this.BareJID];
 
-				return Item != null && Item.HasLastPresence && Item.LastPresence.IsOnline;
+				return !(Item is null) && Item.HasLastPresence && Item.LastPresence.IsOnline;
 			}
 		}
 

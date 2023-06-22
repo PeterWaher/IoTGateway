@@ -74,7 +74,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TreeNode Loop = this.Parent;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (Loop is XmppConcentrator Concentrator)
 						return Concentrator;
@@ -210,7 +210,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (ConcentratorClient is null)
 				return;
 
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;
@@ -235,7 +235,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			this.unsubscribed = true;
 
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;
@@ -264,7 +264,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (this.IsLoaded)
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 					this.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()

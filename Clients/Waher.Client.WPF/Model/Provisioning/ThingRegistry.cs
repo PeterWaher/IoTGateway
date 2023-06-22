@@ -539,7 +539,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (TreeNode is XmppContact Contact)
 			{
-				if (this.registryClient != null)
+				if (!(this.registryClient is null))
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -559,7 +559,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					Item.Click += this.DisownDevice_Click;
 				}
 
-				if (this.provisioningClient != null)
+				if (!(this.provisioningClient is null))
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -596,7 +596,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}
 			else if (TreeNode is Node Node)
 			{
-				if (this.registryClient != null)
+				if (!(this.registryClient is null))
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -616,7 +616,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					Item.Click += this.DisownDeviceNode_Click;
 				}
 
-				if (this.provisioningClient != null)
+				if (!(this.provisioningClient is null))
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 

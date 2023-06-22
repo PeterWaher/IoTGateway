@@ -105,7 +105,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 		private void AddTokens(StackPanel Details, ProvisioningClient Client, string[] Tokens, RoutedEventHandler OnYes, RoutedEventHandler OnNo, OperationRange Range)
 		{
-			if (Tokens != null)
+			if (!(Tokens is null))
 			{
 				X509Certificate2 Certificate;
 
@@ -117,7 +117,7 @@ namespace Waher.Client.WPF.Controls.Questions
 							Certificate = null;
 					}
 
-					if (Certificate != null)
+					if (!(Certificate is null))
 						this.AddToken(Details, Token, Certificate, OnYes, OnNo, Range);
 					else
 					{

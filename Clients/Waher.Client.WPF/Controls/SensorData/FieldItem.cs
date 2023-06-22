@@ -71,7 +71,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				if (this.quantityField != null)
+				if (!(this.quantityField is null))
 					return CommonTypes.Encode(this.quantityField.Value, this.quantityField.NrDecimals);
 				else
 					return this.field.ValueString;
@@ -85,7 +85,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				if (this.quantityField != null)
+				if (!(this.quantityField is null))
 					return this.quantityField.Unit;
 				else
 					return string.Empty;

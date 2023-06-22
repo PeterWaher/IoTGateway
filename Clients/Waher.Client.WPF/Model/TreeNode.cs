@@ -191,7 +191,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (this.parameters != null)
+				if (!(this.parameters is null))
 					return this.parameters[DisplayableParameter];
 				else
 					return string.Empty;
@@ -307,7 +307,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		protected virtual void UnloadGrandchildren()
 		{
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				foreach (TreeNode Node in this.children.Values)
 					Node.UnloadChildren();
@@ -448,7 +448,7 @@ namespace Waher.Client.WPF.Model
 		/// <returns>If the node was found and removed.</returns>
 		public virtual bool RemoveChild(TreeNode Node)
 		{
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				lock (this.children)
 				{
@@ -461,7 +461,7 @@ namespace Waher.Client.WPF.Model
 
 		internal void RenameChild(string OldKey, string NewKey, TreeNode Node)
 		{
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				lock (this.children)
 				{
@@ -594,7 +594,7 @@ namespace Waher.Client.WPF.Model
 			Mouse.OverrideCursor = Cursors.Wait;
 			this.GetConfigurationForm((Sender, e2) =>
 			{
-				if (e2.Ok && e2.Form != null)
+				if (e2.Ok && !(e2.Form is null))
 					MainWindow.UpdateGui(MainWindow.currentInstance.ShowForm, e2.Form);
 				else
 					MainWindow.UpdateGui(MainWindow.currentInstance.ShowError, e2);
@@ -654,7 +654,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			if (this.Parent != null && this.Parent.CanDelete)
+			if (!(this.Parent is null) && this.Parent.CanDelete)
 			{
 				CurrentGroup = "Edit";
 				Menu.Items.Add(new MenuItem()
@@ -837,7 +837,7 @@ namespace Waher.Client.WPF.Model
 			}
 
 			TreeNode Loop = this;
-			while (Loop != null)
+			while (!(Loop is null))
 			{
 				if (Loop is IMenuAggregator MenuAggregator)
 					MenuAggregator.AddContexMenuItems(this, ref CurrentGroup, Menu);

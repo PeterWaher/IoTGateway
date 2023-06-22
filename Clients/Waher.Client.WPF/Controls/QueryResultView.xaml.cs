@@ -107,7 +107,7 @@ namespace Waher.Client.WPF.Controls
 
 					P = this.guiQueue.First.Value;
 					this.guiQueue.RemoveFirst();
-					More = this.guiQueue.First != null;
+					More = !(this.guiQueue.First is null);
 				}
 
 				try

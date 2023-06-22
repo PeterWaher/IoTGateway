@@ -195,7 +195,7 @@ namespace Waher.Client.WPF.Model
 				AllowQuickLogin = true,
 			};
 
-			if (Sniffers != null)
+			if (!(Sniffers is null))
 				this.client.AddRange(Sniffers);
 
 			this.client.OnStateChanged += this.Client_OnStateChanged;
@@ -287,7 +287,7 @@ namespace Waher.Client.WPF.Model
 			{
 				this.unhandledMessages.AddLast(new KeyValuePair<DateTime, MessageEventArgs>(Now, e));
 
-				while (this.unhandledMessages.First != null && this.unhandledMessages.First.Value.Key <= Limit)
+				while (!(this.unhandledMessages.First is null) && this.unhandledMessages.First.Value.Key <= Limit)
 					this.unhandledMessages.RemoveFirst();
 			}
 
@@ -304,7 +304,7 @@ namespace Waher.Client.WPF.Model
 			{
 				Loop = this.unhandledMessages.First;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					Next = Loop.Next;
 
@@ -369,7 +369,7 @@ namespace Waher.Client.WPF.Model
 					bool ImmediateReconnect = this.connected;
 					this.connected = false;
 
-					if (ImmediateReconnect && this.client != null)
+					if (ImmediateReconnect && !(this.client is null))
 						this.client.Reconnect();
 					break;
 			}
@@ -442,7 +442,7 @@ namespace Waher.Client.WPF.Model
 
 		private void CheckConnection(object P)
 		{
-			if (this.client != null && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
+			if (!(this.client is null) && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
 			{
 				try
 				{
@@ -582,7 +582,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return this.client != null && this.client.State == XmppState.Connected;
+				return !(this.client is null) && this.client.State == XmppState.Connected;
 			}
 		}
 
@@ -675,7 +675,7 @@ namespace Waher.Client.WPF.Model
 						}
 					}
 
-					if (Removed != null)
+					if (!(Removed is null))
 					{
 						foreach (KeyValuePair<string, TreeNode> P in Removed)
 							this.children.Remove(P.Key);
@@ -683,25 +683,25 @@ namespace Waher.Client.WPF.Model
 				}
 			}
 
-			if (Added != null)
+			if (!(Added is null))
 			{
 				foreach (TreeNode Node in Added)
 					this.connections.Owner.MainView.NodeAdded(this, Node);
 			}
 
-			if (Removed != null)
+			if (!(Removed is null))
 			{
 				foreach (KeyValuePair<string, TreeNode> P in Removed)
 					this.connections.Owner.MainView.NodeRemoved(this, P.Value);
 			}
 
-			if (Resubscribe != null)
+			if (!(Resubscribe is null))
 			{
 				foreach (RosterItem Item in Resubscribe)
 					this.client.RequestPresenceSubscription(Item.BareJid);
 			}
 
-			if (Reunsubscribe != null)
+			if (!(Reunsubscribe is null))
 			{
 				foreach (RosterItem Item in Reunsubscribe)
 					this.client.RequestPresenceUnsubscription(Item.BareJid);
@@ -763,7 +763,7 @@ namespace Waher.Client.WPF.Model
 					h = null;
 			}
 
-			if (h != null)
+			if (!(h is null))
 			{
 				foreach (RosterItemEventHandlerAsync h2 in h)
 				{
@@ -835,7 +835,7 @@ namespace Waher.Client.WPF.Model
 						Node = null;
 				}
 
-				if (Node != null)
+				if (!(Node is null))
 				{
 					Node.OnUpdated();
 
@@ -848,7 +848,7 @@ namespace Waher.Client.WPF.Model
 					this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
 
 				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
-				if (Item != null)
+				if (!(Item is null))
 					await this.CheckRosterItemSubscriptions(Item);
 			}
 		}
@@ -1051,7 +1051,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanRecycle
 		{
-			get { return this.client != null; }
+			get { return !(this.client is null); }
 		}
 
 		public override void Recycle(MainWindow Window)
@@ -1072,7 +1072,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return this.client != null && this.client.State == XmppState.Connected;
+				return !(this.client is null) && this.client.State == XmppState.Connected;
 			}
 		}
 
@@ -1225,7 +1225,7 @@ namespace Waher.Client.WPF.Model
 							this.connections.Owner.MainView.NodeAdded(this, Component);
 							this.OnUpdated();
 
-							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
+							if (!(ThingRegistry is null) && ThingRegistry.SupportsProvisioning)
 							{
 								MainWindow.UpdateGui(() =>
 								{
@@ -1468,7 +1468,7 @@ namespace Waher.Client.WPF.Model
 				Menu.Items.Add(Item = new MenuItem()
 				{
 					Header = "_Change password...",
-					IsEnabled = (this.client != null && this.client.State == XmppState.Connected)
+					IsEnabled = (!(this.client is null) && this.client.State == XmppState.Connected)
 				});
 
 				Item.Click += this.ChangePassword_Click;
@@ -1565,7 +1565,7 @@ namespace Waher.Client.WPF.Model
 		private Task PepClient_SensorData(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is SensorData SensorData &&
-				SensorData.Fields != null &&
+				!(SensorData.Fields is null) &&
 				this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
 				List<Waher.Things.DisplayableParameters.Parameter> Parameters = new List<Waher.Things.DisplayableParameters.Parameter>();

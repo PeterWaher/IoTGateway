@@ -154,7 +154,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			foreach (TreeNode Node in Nodes)
 				ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Parent, Node));
 
-			while (ToRemove.First != null)
+			while (!(ToRemove.First is null))
 			{
 				KeyValuePair<TreeNode, TreeNode> P = ToRemove.First.Value;
 				ToRemove.RemoveFirst();
@@ -189,7 +189,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (!this.IsLoaded)
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 					this.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()

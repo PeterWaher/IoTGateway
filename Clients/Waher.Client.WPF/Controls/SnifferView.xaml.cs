@@ -35,7 +35,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			if (this.node != null)
+			if (!(this.node is null))
 				this.node.RemoveSniffer(this.sniffer);
 
 			this.Node?.ViewClosed();
@@ -133,7 +133,7 @@ namespace Waher.Client.WPF.Controls
 				w.WriteStartElement(Item.Type.ToString());
 				w.WriteAttributeString("timestamp", XML.Encode(Item.Timestamp));
 
-				if (Item.Data != null)
+				if (!(Item.Data is null))
 					w.WriteValue(Convert.ToBase64String(Item.Data));
 				else
 					w.WriteValue(Item.Message);

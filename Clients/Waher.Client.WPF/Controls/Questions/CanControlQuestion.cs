@@ -100,7 +100,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			if (this.availableParameterNames is null)
 			{
-				if (this.parameterNames != null)
+				if (!(this.parameterNames is null))
 				{
 					foreach (string ParameterName in this.parameterNames)
 					{

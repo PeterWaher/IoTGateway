@@ -190,19 +190,19 @@ namespace Waher.Client.WPF
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int WindowLeft)
+				if (!(Value is null) && Value is int WindowLeft)
 					this.Left = WindowLeft;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int WindowTop)
+				if (!(Value is null) && Value is int WindowTop)
 					this.Top = WindowTop;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int WindowWidth && WindowWidth > 0)
+				if (!(Value is null) && Value is int WindowWidth && WindowWidth > 0)
 					this.Width = WindowWidth;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int WindowHeight && WindowHeight > 0)
+				if (!(Value is null) && Value is int WindowHeight && WindowHeight > 0)
 					this.Height = WindowHeight;
 
 				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionTree.Width);
@@ -212,11 +212,11 @@ namespace Waher.Client.WPF
 				this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string s && Enum.TryParse<WindowState>(s, out WindowState WindowState))
+				if (!(Value is null) && Value is string s && Enum.TryParse<WindowState>(s, out WindowState WindowState))
 					this.WindowState = WindowState;
 
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
-				if (Value != null && Value is string s2)
+				if (!(Value is null) && Value is string s2)
 				{
 					this.MainView.FileName = s2;
 					if (!string.IsNullOrEmpty(this.MainView.FileName))
@@ -353,7 +353,7 @@ namespace Waher.Client.WPF
 		{
 			MainWindow MainWindow = Element as MainWindow;
 
-			while (MainWindow is null && Element != null)
+			while (MainWindow is null && !(Element is null))
 			{
 				Element = Element.Parent as FrameworkElement;
 				MainWindow = Element as MainWindow;
@@ -365,7 +365,7 @@ namespace Waher.Client.WPF
 		private void Add_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanAddChildren);
+			e.CanExecute = (!(Node is null) && Node.CanAddChildren);
 		}
 
 		private void Add_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -380,7 +380,7 @@ namespace Waher.Client.WPF
 		private void Refresh_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanRecycle);
+			e.CanExecute = (!(Node is null) && Node.CanRecycle);
 		}
 
 		private void Refresh_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -395,7 +395,7 @@ namespace Waher.Client.WPF
 		private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanDelete);
+			e.CanExecute = (!(Node is null) && Node.CanDelete);
 		}
 
 		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -422,7 +422,7 @@ namespace Waher.Client.WPF
 		private void Edit_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanEdit);
+			e.CanExecute = (!(Node is null) && Node.CanEdit);
 		}
 
 		private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -437,7 +437,7 @@ namespace Waher.Client.WPF
 		private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanCopy);
+			e.CanExecute = (!(Node is null) && Node.CanCopy);
 		}
 
 		private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -452,7 +452,7 @@ namespace Waher.Client.WPF
 		private void Paste_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanPaste);
+			e.CanExecute = (!(Node is null) && Node.CanPaste);
 		}
 
 		private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -467,7 +467,7 @@ namespace Waher.Client.WPF
 		private void Sniff_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.IsSniffable);
+			e.CanExecute = (!(Node is null) && Node.IsSniffable);
 		}
 
 		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -544,7 +544,7 @@ namespace Waher.Client.WPF
 				if (this.Tabs.Items[i] is TabItem TabItem)
 				{
 					object Content = TabItem.Content;
-					if (Content != null && Content is IDisposable Disposable)
+					if (!(Content is null) && Content is IDisposable Disposable)
 						Disposable.Dispose();
 				}
 
@@ -555,7 +555,7 @@ namespace Waher.Client.WPF
 		private void Chat_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanChat);
+			e.CanExecute = (!(Node is null) && Node.CanChat);
 		}
 
 		private void Chat_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -958,7 +958,7 @@ namespace Waher.Client.WPF
 		private void ReadMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanReadSensorData);
+			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
 		private void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -983,7 +983,7 @@ namespace Waher.Client.WPF
 		private void ReadDetailed_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanReadSensorData);
+			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
 		private void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1008,7 +1008,7 @@ namespace Waher.Client.WPF
 		private void SubscribeToMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanSubscribeToSensorData);
+			e.CanExecute = (!(Node is null) && Node.CanSubscribeToSensorData);
 		}
 
 		private void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1039,7 +1039,7 @@ namespace Waher.Client.WPF
 		private void Configure_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanConfigure);
+			e.CanExecute = (!(Node is null) && Node.CanConfigure);
 		}
 
 		private void Configure_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1091,7 +1091,7 @@ namespace Waher.Client.WPF
 		private void Search_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (Node != null && Node.CanSearch);
+			e.CanExecute = (!(Node is null) && Node.CanSearch);
 		}
 
 		private void Search_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1130,7 +1130,7 @@ namespace Waher.Client.WPF
 		{
 			QuestionView QuestionView = this.FindQuestionTab(Owner, ProvisioningClient);
 
-			if (QuestionView != null && Question != null)
+			if (!(QuestionView is null) && !(Question is null))
 			{
 				QuestionView.NewQuestion(Question);
 				return;
@@ -1168,7 +1168,7 @@ namespace Waher.Client.WPF
 					if (!Found)
 						Questions.AddLast(Question);
 
-					if (Questions.First != null)
+					if (!(Questions.First is null))
 					{
 						UpdateGui(() =>
 						{
@@ -1281,7 +1281,7 @@ namespace Waher.Client.WPF
 			if ((sender as Image)?.Tag is TabItem Item)
 			{
 				MainWindow.currentInstance?.Tabs?.Items.Remove(Item);
-				if (Item.Content != null && Item.Content is IDisposable Disposable)
+				if (!(Item.Content is null) && Item.Content is IDisposable Disposable)
 					Disposable.Dispose();
 			}
 		}

@@ -163,14 +163,14 @@ namespace Waher.Client.WPF.Controls
 
 				w.WriteEndElement();
 
-				if (Event.Tags != null && Event.Tags.Length > 0)
+				if (!(Event.Tags is null) && Event.Tags.Length > 0)
 				{
 					foreach (KeyValuePair<string, object> Tag in Event.Tags)
 					{
 						w.WriteStartElement("Tag");
 						w.WriteAttributeString("key", Tag.Key);
 
-						if (Tag.Value != null)
+						if (!(Tag.Value is null))
 							w.WriteAttributeString("value", Tag.Value.ToString());
 
 						w.WriteEndElement();

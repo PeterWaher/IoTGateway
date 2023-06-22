@@ -179,7 +179,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 			if (this.availableFieldNames is null)
 			{
-				if (this.fieldNames != null)
+				if (!(this.fieldNames is null))
 				{
 					foreach (string FieldName in this.fieldNames)
 					{
@@ -611,7 +611,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 		internal static bool MatchesToken(string Token, string[] Tokens)
 		{
-			if (Tokens != null)
+			if (!(Tokens is null))
 			{
 				foreach (string Token2 in Tokens)
 				{

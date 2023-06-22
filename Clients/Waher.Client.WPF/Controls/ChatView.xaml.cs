@@ -47,7 +47,7 @@ namespace Waher.Client.WPF.Controls
 			this.node = Node;
 			this.muc = Muc;
 
-			InitializeComponent();
+			this.InitializeComponent();
 
 			if (Muc)
 			{

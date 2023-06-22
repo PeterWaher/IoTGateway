@@ -152,7 +152,7 @@ namespace Waher.Client.WPF.Model
 			foreach (TreeNode Node in Nodes)
 				ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Parent, Node));
 
-			while (ToRemove.First != null)
+			while (!(ToRemove.First is null))
 			{
 				KeyValuePair<TreeNode, TreeNode> P = ToRemove.First.Value;
 				ToRemove.RemoveFirst();

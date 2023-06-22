@@ -319,8 +319,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		protected virtual void LoadSiblings()
 		{
-			if (this.parent != null)
-				this.parent.LoadChildren();
+			this.parent?.LoadChildren();
 		}
 
 		/// <summary>
@@ -386,6 +385,40 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void Edit()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// If node can be copied to clipboard.
+		/// </summary>
+		public virtual bool CanCopy
+		{
+			get => false;
+		}
+
+		/// <summary>
+		/// Is called when the user wants to copy the node to the clipboard.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void Copy()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// If node can be pasted to, from the clipboard.
+		/// </summary>
+		public virtual bool CanPaste
+		{
+			get => false;
+		}
+
+		/// <summary>
+		/// Is called when the user wants to paste data from the clipboard to the node.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void Paste()
 		{
 			throw new NotSupportedException();
 		}
@@ -621,7 +654,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			if (this.Parent != null && this.Parent.CanAddChildren)
+			if (this.Parent != null && this.Parent.CanDelete)
 			{
 				CurrentGroup = "Edit";
 				Menu.Items.Add(new MenuItem()
@@ -632,6 +665,39 @@ namespace Waher.Client.WPF.Model
 					Icon = new Image()
 					{
 						Source = new BitmapImage(new Uri("../Graphics/delete_32_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanCopy)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Copy",
+					IsEnabled = true,
+					Command = MainWindow.Copy,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Amitjakhu-Drip-Copy.16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+			if (this.CanPaste)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "_Paste",
+					IsEnabled = true,
+					Command = MainWindow.Paste,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/Amitjakhu-Drip-Clipboard.16.png", UriKind.Relative)),
 						Width = 16,
 						Height = 16
 					}

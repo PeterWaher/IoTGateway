@@ -62,6 +62,8 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand Add = new RoutedUICommand("Add", "Add", typeof(MainWindow));
 		public static RoutedUICommand Edit = new RoutedUICommand("Edit", "Edit", typeof(MainWindow));
 		public static RoutedUICommand Delete = new RoutedUICommand("Delete", "Delete", typeof(MainWindow));
+		public static RoutedUICommand Copy = new RoutedUICommand("Copy", "Copy", typeof(MainWindow));
+		public static RoutedUICommand Paste = new RoutedUICommand("Paste", "Paste", typeof(MainWindow));
 		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
 		public static RoutedUICommand Refresh = new RoutedUICommand("Refresh", "Refresh", typeof(MainWindow));
 		public static RoutedUICommand Sniff = new RoutedUICommand("Sniff", "Sniff", typeof(MainWindow));
@@ -136,7 +138,7 @@ namespace Waher.Client.WPF
 				PlantUml.Init(appDataFolder);
 			});
 
-			InitializeComponent();
+			this.InitializeComponent();
 			this.MainView.Load(this);
 
 			Task.Run(() => this.Start());
@@ -272,30 +274,22 @@ namespace Waher.Client.WPF
 
 		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ITabView TabView = this.CurrentTab;
-			if (TabView != null)
-				TabView.SaveButton_Click(sender, e);
+			this.CurrentTab?.SaveButton_Click(sender, e);
 		}
 
 		private void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ITabView TabView = this.CurrentTab;
-			if (TabView != null)
-				TabView.SaveAsButton_Click(sender, e);
+			this.CurrentTab?.SaveAsButton_Click(sender, e);
 		}
 
 		private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ITabView TabView = this.CurrentTab;
-			if (TabView != null)
-				TabView.OpenButton_Click(sender, e);
+			this.CurrentTab?.OpenButton_Click(sender, e);
 		}
 
 		private void New_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ITabView TabView = this.CurrentTab;
-			if (TabView != null)
-				TabView.NewButton_Click(sender, e);
+			this.CurrentTab?.NewButton_Click(sender, e);
 		}
 
 		internal void SelectionChanged()
@@ -315,6 +309,8 @@ namespace Waher.Client.WPF
 				this.ConfigureButton.IsEnabled = false;
 				this.SubscribeMomentaryButton.IsEnabled = false;
 				this.SearchButton.IsEnabled = false;
+				this.CopyButton.IsEnabled = false;
+				this.PasteButton.IsEnabled = false;
 			}
 			else
 			{
@@ -331,6 +327,8 @@ namespace Waher.Client.WPF
 				this.ConfigureButton.IsEnabled = Node.CanConfigure;
 				this.SubscribeMomentaryButton.IsEnabled = Node.CanSubscribeToSensorData;
 				this.SearchButton.IsEnabled = Node.CanSearch;
+				this.CopyButton.IsEnabled = Node.CanCopy;
+				this.PasteButton.IsEnabled = Node.CanPaste;
 			}
 		}
 
@@ -434,6 +432,36 @@ namespace Waher.Client.WPF
 				return;
 
 			Node.Edit();
+		}
+
+		private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanCopy);
+		}
+
+		private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node is null || !Node.CanCopy)
+				return;
+
+			Node.Copy();
+		}
+
+		private void Paste_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanPaste);
+		}
+
+		private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node is null || !Node.CanPaste)
+				return;
+
+			Node.Paste();
 		}
 
 		private void Sniff_CanExecute(object sender, CanExecuteRoutedEventArgs e)

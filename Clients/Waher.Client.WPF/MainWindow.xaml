@@ -21,7 +21,9 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.Add}" Executed="Add_Executed" CanExecute="Add_CanExecute" />
         <CommandBinding Command="Delete" Executed="Delete_Executed" CanExecute="Delete_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Edit}" Executed="Edit_Executed" CanExecute="Edit_CanExecute" />
-        <CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
+		<CommandBinding Command="{x:Static wcw:MainWindow.Copy}" Executed="Copy_Executed" CanExecute="Copy_CanExecute" />
+		<CommandBinding Command="{x:Static wcw:MainWindow.Paste}" Executed="Paste_Executed" CanExecute="Paste_CanExecute" />
+		<CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
         <CommandBinding Command="Refresh" Executed="Refresh_Executed" CanExecute="Refresh_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Sniff}" Executed="Sniff_Executed" CanExecute="Sniff_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.EventLog}" Executed="EventLog_Executed" CanExecute="EventLog_CanExecute" />
@@ -189,7 +191,15 @@
                     <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
-            <ToolBar Name="InteractionToolBar">
+			<ToolBar Name="ClipboardToolBar">
+				<Button Name="CopyButton" ToolTip="Copy" IsEnabled="False" Command="{x:Static wcw:MainWindow.Copy}">
+					<Image Source="Graphics/Amitjakhu-Drip-Copy.32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+				</Button>
+				<Button Name="PasteButton" ToolTip="Paste" IsEnabled="False" Command="{x:Static wcw:MainWindow.Paste}">
+					<Image Source="Graphics/Amitjakhu-Drip-Clipboard.32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+				</Button>
+			</ToolBar>
+			<ToolBar Name="InteractionToolBar">
                 <Button Name="ChatButton" ToolTip="Chat..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Chat}">
                     <Image Source="Graphics/Chat-icon_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>

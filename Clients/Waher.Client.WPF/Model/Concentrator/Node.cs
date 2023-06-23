@@ -1,10 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
+using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Sniffers;
+using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
@@ -12,13 +21,6 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Client.WPF.Dialogs;
-using Waher.Client.WPF.Dialogs.IoT;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Controls.Sniffers;
-using Waher.Networking.Sniffers;
-using System.Windows.Controls;
-using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -234,7 +236,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && (SensorClient = XmppAccountNode.SensorClient) != null)
+			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.Momentary);
@@ -249,7 +251,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && (SensorClient = XmppAccountNode.SensorClient) != null)
+			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.All);
@@ -264,7 +266,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && (SensorClient = XmppAccountNode.SensorClient) != null)
+			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) },
@@ -282,7 +284,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			ControlClient ControlClient;
 
-			if (!(XmppAccountNode is null) && (ControlClient = XmppAccountNode.ControlClient) != null)
+			if (!(XmppAccountNode is null) && !((ControlClient = XmppAccountNode.ControlClient) is null))
 			{
 				ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
 					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition));
@@ -790,6 +792,116 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			base.Search();
+		}
+
+		public override bool CanCopy => this.IsOnline;
+
+		public override async void Copy()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+				bool Error = false;
+
+				try
+				{
+					StringBuilder sb = new StringBuilder();
+					await ExportToXml(FullJid, ConcentratorClient, (this.Parent as Node)?.nodeInfo, this.nodeInfo, sb);
+					System.Windows.Clipboard.SetText(sb.ToString());
+					MainWindow.MouseDefault();
+				}
+				catch (Exception ex)
+				{
+					MainWindow.ErrorBox(ex.Message);
+					Error = true;
+				}
+				finally
+				{
+					if (!Error)
+						MainWindow.ShowStatus("Copy placed in clipboard.");
+				}
+			}
+		}
+
+		private static async Task ExportToXml(string FullJid, ConcentratorClient ConcentratorClient,
+			NodeInformation Parent, NodeInformation Node, StringBuilder sb)
+		{
+			TaskCompletionSource<DataForm> Request = new TaskCompletionSource<DataForm>();
+			Task ParametersResult(object Sender, DataFormEventArgs e)
+			{
+				if (e.Ok)
+				{
+					if (e.Form.CanCancel)
+						e.Form.Cancel();
+
+					Request.TrySetResult(e.Form);
+				}
+				else
+					Request.TrySetException(e.StanzaError ?? new Exception("Unable to get node information."));
+
+				return Task.CompletedTask;
+			};
+
+			MainWindow.ShowStatus("Copying " + Node.NodeId + "...");
+
+			ConcentratorClient.GetNodeParametersForEdit(FullJid, Node, "en", string.Empty, string.Empty, string.Empty,
+				ParametersResult, null, null);
+
+			DataForm Form = await Request.Task;
+
+			sb.Append("<createNewNode xmlns='");
+			sb.Append(ConcentratorServer.NamespaceConcentrator);
+			sb.Append("' type='");
+			sb.Append(XML.Encode(Node.NodeType));
+
+			if (!(Parent is null))
+			{
+				sb.Append("' id='");
+				sb.Append(XML.Encode(Parent.NodeId));
+
+				if (!string.IsNullOrEmpty(Parent.SourceId))
+				{
+					sb.Append("' src='");
+					sb.Append(XML.Encode(Parent.SourceId));
+				}
+
+				if (!string.IsNullOrEmpty(Parent.Partition))
+				{
+					sb.Append("' pt='");
+					sb.Append(XML.Encode(Parent.Partition));
+				}
+			}
+			sb.Append("'>");
+			Form.SerializeSubmit(sb, true);
+
+			if (Node.HasChildren)
+			{
+				TaskCompletionSource<NodeInformation[]> NodesInformation = new TaskCompletionSource<NodeInformation[]>();
+
+				ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				{
+					if (e.Ok)
+						NodesInformation.TrySetResult(e.NodesInformation);
+					else
+						NodesInformation.TrySetException(e.StanzaError ?? new Exception("Unable to get information about children."));
+
+					return Task.CompletedTask;
+
+				}, null);
+
+				NodeInformation[] Children = await NodesInformation.Task;
+
+				if (!(Children is null))
+				{
+					foreach (NodeInformation Child in Children)
+						await ExportToXml(FullJid, ConcentratorClient, Node, Child, sb);
+				}
+			}
+
+			sb.Append("</createNewNode>");
 		}
 
 	}

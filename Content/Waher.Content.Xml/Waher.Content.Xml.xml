@@ -502,6 +502,20 @@
             <param name="CurrentNamespace">Namespace at the encapsulating entity.</param>
             <param name="State">Normalization State</param>
         </member>
+        <member name="M:Waher.Content.Xml.XML.PrettyXml(System.String)">
+            <summary>
+            Reformats XML to make it easier to read.
+            </summary>
+            <param name="Xml">XML</param>
+            <returns>Reformatted XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.PrettyXml(System.Xml.XmlNode)">
+            <summary>
+            Reformats XML to make it easier to read.
+            </summary>
+            <param name="Xml">XML</param>
+            <returns>Reformatted XML.</returns>
+        </member>
         <member name="T:Waher.Content.Xml.XmlNormalizationState">
             <summary>
             Current state of XML normalization process.

@@ -1322,5 +1322,50 @@ namespace Waher.Content.Xml
 		}
 
 		#endregion
+
+		#region Pretty XML
+
+		/// <summary>
+		/// Reformats XML to make it easier to read.
+		/// </summary>
+		/// <param name="Xml">XML</param>
+		/// <returns>Reformatted XML.</returns>
+		public static string PrettyXml(string Xml)
+		{
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+
+			Doc.LoadXml(Xml);
+
+			StringBuilder sb = new StringBuilder();
+
+			using (XmlWriter w = XmlWriter.Create(sb, WriterSettings(true, true)))
+			{
+				Doc.WriteTo(w);
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Reformats XML to make it easier to read.
+		/// </summary>
+		/// <param name="Xml">XML</param>
+		/// <returns>Reformatted XML.</returns>
+		public static string PrettyXml(XmlNode Xml)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			using (XmlWriter w = XmlWriter.Create(sb, WriterSettings(true, true)))
+			{
+				Xml.WriteTo(w);
+			}
+
+			return sb.ToString();
+		}
+
+		#endregion
 	}
 }

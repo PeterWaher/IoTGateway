@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
@@ -39,21 +37,7 @@ namespace Waher.Script.Xml.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-
-			Doc.LoadXml(Argument);
-
-			StringBuilder sb = new StringBuilder();
-
-			using (XmlWriter w = XmlWriter.Create(sb, XML.WriterSettings(true, true)))
-			{
-				Doc.WriteTo(w);
-			}
-
-			return new StringValue(sb.ToString());
+			return new StringValue(XML.PrettyXml(Argument));
 		}
 
 		/// <summary>
@@ -69,18 +53,9 @@ namespace Waher.Script.Xml.Functions
 			if (Obj is null)
 				return Argument;
 			else if (Obj is string s)
-				return this.EvaluateScalar(s, Variables);
+				return new StringValue(XML.PrettyXml(s));
 			else if (Obj is XmlNode N)
-			{
-				StringBuilder sb = new StringBuilder();
-
-				using (XmlWriter w = XmlWriter.Create(sb, XML.WriterSettings(true, true)))
-				{
-					N.WriteTo(w);
-				}
-
-				return new StringValue(sb.ToString());
-			}
+				return new StringValue(XML.PrettyXml(N));
 			else
 				return base.EvaluateScalar(Argument, Variables);
 		}
@@ -93,24 +68,7 @@ namespace Waher.Script.Xml.Functions
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
-		}
-
-		/// <summary>
-		/// Converts XML to an indented string representation.
-		/// </summary>
-		/// <param name="Xml">XML to convert.</param>
-		/// <returns>Prettified string representation of XML.</returns>
-		public static string ToString(XmlNode Xml)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			using (XmlWriter w = XmlWriter.Create(sb, XML.WriterSettings(true, true)))
-			{
-				Xml?.WriteTo(w);
-			}
-
-			return sb.ToString();
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 	}
 }

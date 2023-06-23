@@ -32,6 +32,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 		private NodeInformation nodeInfo;
 		private NodeCommand[] commands = null;
 
+		/// <summary>
+		/// Represents a node in a concentrator.
+		/// </summary>
+		/// <param name="Parent">Parent node</param>
+		/// <param name="NodeInfo">Node information</param>
 		public Node(TreeNode Parent, NodeInformation NodeInfo)
 			: base(Parent)
 		{
@@ -51,21 +56,53 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Node ID
+		/// </summary>
 		public string NodeId => this.nodeInfo.NodeId;
+
+		/// <summary>
+		/// Source ID
+		/// </summary>
 		public string SourceId => this.nodeInfo.SourceId;
+
+		/// <summary>
+		/// Partition ID
+		/// </summary>
 		public string Partition => this.nodeInfo.Partition;
 
+		/// <summary>
+		/// Key in parent child collection.
+		/// </summary>
 		public override string Key => this.nodeInfo.NodeId;
+
+		/// <summary>
+		/// Tree Node header text.
+		/// </summary>
 		public override string Header => this.nodeInfo.LocalId;
+
+		/// <summary>
+		/// Tool Tip for node.
+		/// </summary>
 		public override string ToolTip => "Node";
+
+		/// <summary>
+		/// If the node can be recycled.
+		/// </summary>
 		public override bool CanRecycle => false;
 
+		/// <summary>
+		/// Information about the node.
+		/// </summary>
 		public NodeInformation NodeInformation
 		{
 			get => this.nodeInfo;
 			internal set => this.nodeInfo = value;
 		}
 
+		/// <summary>
+		/// Node Type Name.
+		/// </summary>
 		public override string TypeName
 		{
 			get
@@ -81,6 +118,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Image resource for the node.
+		/// </summary>
 		public override ImageSource ImageResource
 		{
 			get
@@ -97,11 +137,18 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Saves the object to a file.
+		/// </summary>
+		/// <param name="Output">Output</param>
 		public override void Write(XmlWriter Output)
 		{
 			// Don't output.
 		}
 
+		/// <summary>
+		/// Reference to the concentrator node.
+		/// </summary>
 		public XmppConcentrator Concentrator
 		{
 			get
@@ -120,6 +167,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Reference to the data source node.
+		/// </summary>
 		public DataSource DataSource
 		{
 			get
@@ -140,6 +190,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private bool loadingChildren = false;
 
+		/// <summary>
+		/// Reference to the concentrator client
+		/// </summary>
 		public ConcentratorClient ConcentratorClient
 		{
 			get
@@ -156,6 +209,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Method is called to make sure children are loaded.
+		/// </summary>
 		protected override void LoadChildren()
 		{
 			if (!this.loadingChildren && !this.IsLoaded)
@@ -209,6 +265,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			base.LoadChildren();
 		}
 
+		/// <summary>
+		/// Method is called to notify children can be unloaded.
+		/// </summary>
 		protected override void UnloadChildren()
 		{
 			base.UnloadChildren();
@@ -227,9 +286,19 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If it's possible to read sensor data from the node.
+		/// </summary>
 		public override bool CanReadSensorData => this.nodeInfo.IsReadable && this.IsOnline;
+
+		/// <summary>
+		/// If it's possible to subscribe to sensor data from the node.
+		/// </summary>
 		public override bool CanSubscribeToSensorData => this.nodeInfo.IsReadable && this.Concentrator.SupportsEvents && this.IsOnline;
 
+		/// <summary>
+		/// Starts readout of momentary sensor data values.
+		/// </summary>
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -245,6 +314,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				return null;
 		}
 
+		/// <summary>
+		/// Starts readout of all sensor data values.
+		/// </summary>
 		public override SensorDataClientRequest StartSensorDataFullReadout()
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -260,6 +332,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				throw new NotSupportedException();
 		}
 
+		/// <summary>
+		/// Starts subscription of momentary sensor data values.
+		/// </summary>
 		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -269,15 +344,26 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) },
+					new ThingReference[] 
+					{ 
+						new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) 
+					},
 					FieldType.Momentary, Rules, Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 			}
 			else
 				return null;
 		}
 
+		/// <summary>
+		/// If it's possible to configure control parameters on the node.
+		/// </summary>
 		public override bool CanConfigure => this.nodeInfo.IsControllable && this.IsOnline;
 
+		/// <summary>
+		/// Gets the configuration form for the node.
+		/// </summary>
+		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -293,6 +379,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				throw new NotSupportedException();
 		}
 
+		/// <summary>
+		/// If the concentrator hosting the node is online.
+		/// </summary>
 		public bool IsOnline
 		{
 			get
@@ -310,10 +399,24 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If children can be added to the node.
+		/// </summary>
 		public override bool CanAddChildren => this.IsOnline;
+
+		/// <summary>
+		/// If the node can be edited.
+		/// </summary>
 		public override bool CanEdit => this.IsOnline;
+
+		/// <summary>
+		/// If the node can be deleted.
+		/// </summary>
 		public override bool CanDelete => this.IsOnline;
 
+		/// <summary>
+		/// Is called when the user wants to add a node to the current node.
+		/// </summary>
 		public override void Add()
 		{
 			string FullJid = this.Concentrator?.FullJid;
@@ -434,6 +537,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Method called when a node is to be deleted.
+		/// </summary>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
 		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			string FullJid = this.Concentrator?.FullJid;
@@ -467,6 +575,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Is called when the user wants to edit a node.
+		/// </summary>
 		public override void Edit()
 		{
 			string FullJid = this.Concentrator?.FullJid;
@@ -516,8 +627,15 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If the node can be sniffed.
+		/// </summary>
 		public override bool IsSniffable => this.nodeInfo.Sniffable && this.IsOnline;
 
+		/// <summary>
+		/// Adds a sniffer to the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer object.</param>
 		public override void AddSniffer(ISniffer Sniffer)
 		{
 			string FullJid = this.Concentrator?.FullJid;
@@ -546,6 +664,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Removes a sniffer from the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer object.</param>
+		/// <returns>If the sniffer was found and removed.</returns>
 		public override bool RemoveSniffer(ISniffer Sniffer)
 		{
 			string FullJid = this.Concentrator?.FullJid;
@@ -568,6 +691,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				return false;
 		}
 
+		/// <summary>
+		/// Method called when selection has been changed.
+		/// </summary>
 		public override void SelectionChanged()
 		{
 			base.SelectionChanged();
@@ -595,6 +721,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Adds context sensitive menu items to a context menu.
+		/// </summary>
+		/// <param name="CurrentGroup">Current group.</param>
+		/// <param name="Menu">Menu being built.</param>
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
 			if (Node == this && !(this.commands is null))
@@ -753,6 +884,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If it's possible to search for data on the node.
+		/// </summary>
 		public override bool CanSearch
 		{
 			get
@@ -770,6 +904,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// Performs a search on the node.
+		/// </summary>
 		public override void Search()
 		{
 			if (!(this.commands is null))
@@ -794,8 +931,14 @@ namespace Waher.Client.WPF.Model.Concentrator
 			base.Search();
 		}
 
+		/// <summary>
+		/// If node can be copied to clipboard.
+		/// </summary>
 		public override bool CanCopy => this.IsOnline;
 
+		/// <summary>
+		/// Is called when the user wants to copy the node to the clipboard.
+		/// </summary>
 		public override async void Copy()
 		{
 			string FullJid = this.Concentrator?.FullJid;

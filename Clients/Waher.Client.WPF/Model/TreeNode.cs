@@ -857,11 +857,17 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		/// <summary>
+		/// Method called when selection has been changed.
+		/// </summary>
 		public virtual void SelectionChanged()
 		{
 			// Do nothing by default.
 		}
 
+		/// <summary>
+		/// Method called when the view has been closed.
+		/// </summary>
 		public virtual void ViewClosed()
 		{
 			// Do nothing by default.

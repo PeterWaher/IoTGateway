@@ -728,7 +728,7 @@ namespace Waher.Client.WPF.Model
 				{
 					if (this.children.TryGetValue(Item.BareJid, out TreeNode Node))
 					{
-						if ((Contact = Node as XmppContact) != null)
+						if (!((Contact = Node as XmppContact) is null))
 							Contact.RosterItem = Item;
 					}
 					else

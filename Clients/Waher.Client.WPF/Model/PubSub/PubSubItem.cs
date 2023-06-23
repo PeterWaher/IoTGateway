@@ -60,7 +60,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				this.xml.LoadXml(Payload);
 
-				if (!(this.xml is null) && (E = this.xml.DocumentElement) != null)
+				if (!(this.xml is null) && !((E = this.xml.DocumentElement) is null))
 				{
 					if (E.LocalName == "entry" && E.NamespaceURI == "http://www.w3.org/2005/Atom")
 					{
@@ -112,7 +112,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			if (!string.IsNullOrEmpty(this.title))
 				Parameters.Add(new StringParameter("Title", "Title", this.title));
 
-			if (!(published is null))
+			if (!(this.published is null))
 				Parameters.Add(new DateTimeParameter("Published", "Published", this.published.Value));
 
 			this.parameters = new DisplayableParameters(Parameters.ToArray());

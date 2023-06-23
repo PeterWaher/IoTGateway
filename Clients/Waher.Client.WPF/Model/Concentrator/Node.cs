@@ -953,7 +953,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					StringBuilder sb = new StringBuilder();
 					await ExportToXml(FullJid, ConcentratorClient, (this.Parent as Node)?.nodeInfo, this.nodeInfo, sb);
-					System.Windows.Clipboard.SetText(sb.ToString());
+					System.Windows.Clipboard.SetText(XML.PrettyXml(sb.ToString()));
 					MainWindow.MouseDefault();
 				}
 				catch (Exception ex)

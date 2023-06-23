@@ -159,7 +159,7 @@ namespace Waher.Things.Modbus
 			try
 			{
 				ushort[] Values = await Client.ReadInputRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 2);
-				float Raw = ModbusUnitHoldingFloatingPointRegisterNode.CheckOrder(this.ByteOrder, Values[0], Values[1]);
+				float Raw = ModbusUnitHoldingFloatingPointRegisterNode.ToFloat(this.ByteOrder, Values[0], Values[1]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
 				int NrDec = this.FixNrDecimals ? this.NrDecimals : Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor)))) + CommonTypes.GetNrDecimals(Value);
 				DateTime TP = DateTime.UtcNow;

@@ -6,6 +6,7 @@ using Waher.Networking.Modbus;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
@@ -40,7 +41,7 @@ namespace Waher.Things.Modbus
 	/// <summary>
 	/// Represents a floating-point holding register on a Modbus unit node.
 	/// </summary>
-	public class ModbusUnitHoldingFloatingPointRegisterNode : ModbusUnitChildNode, ISensor
+	public class ModbusUnitHoldingFloatingPointRegisterNode : ModbusUnitChildNode, ISensor, IActuator
 	{
 		/// <summary>
 		/// Represents a floating-point register on a Modbus unit node.
@@ -185,7 +186,7 @@ namespace Waher.Things.Modbus
 			try
 			{
 				ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 2);
-				float Raw = CheckOrder(this.ByteOrder, Values[0], Values[1]);
+				float Raw = ToFloat(this.ByteOrder, Values[0], Values[1]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
 				int NrDec = this.FixNrDecimals ? this.NrDecimals : Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor)))) + CommonTypes.GetNrDecimals(Value);
 				DateTime TP = DateTime.UtcNow;
@@ -219,7 +220,7 @@ namespace Waher.Things.Modbus
 				return this.FieldName;
 		}
 
-		internal static float CheckOrder(FloatByteOrder Order, ushort Value1, ushort Value2)
+		internal static float ToFloat(FloatByteOrder Order, ushort Value1, ushort Value2)
 		{
 			byte A = (byte)(Value1 >> 8);
 			byte B = (byte)Value1;
@@ -261,5 +262,137 @@ namespace Waher.Things.Modbus
 
 			return BitConverter.ToSingle(Bin, 0);
 		}
+
+		internal static void FromFloat(FloatByteOrder Order, float Value,
+			out ushort Value1, out ushort Value2)
+		{
+			byte[] Bin = BitConverter.GetBytes(Value);
+			byte A, B, C, D;
+
+			switch (Order)
+			{
+				case FloatByteOrder.NetworkOrder:
+				default:
+					A = Bin[0];
+					B = Bin[1];
+					C = Bin[2];
+					D = Bin[3];
+					break;
+
+				case FloatByteOrder.ByteSwap:
+					B = Bin[0];
+					A = Bin[1];
+					D = Bin[2];
+					C = Bin[3];
+					break;
+
+				case FloatByteOrder.WordSwap:
+					C = Bin[0];
+					D = Bin[1];
+					A = Bin[2];
+					B = Bin[3];
+					break;
+
+				case FloatByteOrder.ByteAndWordSwap:
+					D = Bin[0];
+					C = Bin[1];
+					B = Bin[2];
+					A = Bin[3];
+					break;
+			}
+
+			Value1 = A;
+			Value1 <<= 8;
+			Value1 |= B;
+
+			Value2 = C;
+			Value2 <<= 8;
+			Value2 |= D;
+		}
+
+		/// <summary>
+		/// Get control parameters for the actuator.
+		/// </summary>
+		/// <returns>Collection of control parameters for actuator.</returns>
+		public Task<ControlParameter[]> GetControlParameters()
+		{
+			List<ControlParameter> Parameters = new List<ControlParameter>()
+			{
+				new DoubleControlParameter("Value", "Modbus", this.GetFieldName(), "Register output",
+					this.Offset, ((65535 * this.Multiplier) / this.Divisor) + this.Offset,
+					async (Node) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 2);
+							float Raw = ToFloat(this.ByteOrder, Values[0], Values[1]);
+							double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
+							return Value;
+						}
+						finally
+						{
+							await Client.Leave();
+						}
+					},
+					async (Node, Value) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							double Raw = ((Value - this.Offset) * this.Divisor) / this.Multiplier;
+							FromFloat(this.ByteOrder, (float)Raw, out ushort Value1, out ushort Value2);
+							await Client.WriteMultipleRegisters(
+								(byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+								Value1, Value2);
+						}
+						finally
+						{
+							await Client.Leave();
+						}
+					})
+			};
+
+			if (!string.IsNullOrEmpty(this.RawName))
+			{
+				Parameters.Add(new DoubleControlParameter("Value", "Modbus", this.RawName, "Raw register output", 0, 65535,
+					async (Node) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+							float Raw = ToFloat(this.ByteOrder, Values[0], Values[1]);
+							return Raw;
+						}
+						finally
+						{
+							await Client.Leave();
+						}
+					},
+					async (Node, Value) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							FromFloat(this.ByteOrder, (float)Value, out ushort Value1, out ushort Value2);
+							await Client.WriteMultipleRegisters(
+								(byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+								Value1, Value2);
+						}
+						finally
+						{
+							await Client.Leave();
+						}
+					}));
+			}
+
+			return Task.FromResult(Parameters.ToArray());
+		}
+
 	}
 }

@@ -447,6 +447,8 @@ namespace Waher.Client.WPF
 				return;
 
 			Node.Copy();
+
+			CommandManager.InvalidateRequerySuggested();
 		}
 
 		private void Paste_CanExecute(object sender, CanExecuteRoutedEventArgs e)

@@ -344,9 +344,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] 
-					{ 
-						new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) 
+					new ThingReference[]
+					{
+						new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition)
 					},
 					FieldType.Momentary, Rules, Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 			}
@@ -1045,6 +1045,226 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			sb.Append("</createNewNode>");
+		}
+
+		/// <summary>
+		/// If node can be pasted to, from the clipboard.
+		/// </summary>
+		public override bool CanPaste
+		{
+			get
+			{
+				string FullJid = this.Concentrator?.FullJid;
+				if (string.IsNullOrEmpty(FullJid))
+					return false;
+
+				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+				if (ConcentratorClient is null)
+					return false;
+
+				if (!this.IsOnline)
+					return false;
+
+				if (!System.Windows.Clipboard.ContainsText())
+					return false;
+
+				string s = System.Windows.Clipboard.GetText();
+				if (!XML.IsValidXml(s))
+					return false;
+
+				try
+				{
+					XmlDocument Doc = new XmlDocument();
+					Doc.LoadXml(s);
+
+					return
+						!(Doc.DocumentElement is null) &&
+						Doc.DocumentElement.LocalName == "createNewNode" &&
+						Doc.DocumentElement.NamespaceURI == ConcentratorServer.NamespaceConcentrator;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Is called when the user wants to paste data from the clipboard to the node.
+		/// </summary>
+		public override async void Paste()
+		{
+			bool Error = false;
+
+			try
+			{
+				string FullJid = this.Concentrator?.FullJid;
+				if (string.IsNullOrEmpty(FullJid))
+					return;
+
+				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+				if (ConcentratorClient is null)
+					return;
+
+				if (!this.IsOnline)
+					return;
+
+				if (!System.Windows.Clipboard.ContainsText())
+					return;
+
+				string s = System.Windows.Clipboard.GetText();
+				if (string.IsNullOrEmpty(s))
+					return;
+
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(s);
+
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				await ImportFromXml(FullJid, ConcentratorClient, this, Doc.DocumentElement);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+				Error = true;
+			}
+			finally
+			{
+				MainWindow.MouseDefault();
+
+				if (!Error)
+					MainWindow.ShowStatus("Contents of clipboard pasted to node.");
+			}
+		}
+
+		private static async Task ImportFromXml(string FullJid, ConcentratorClient ConcentratorClient,
+			Node Parent, XmlElement Xml)
+		{
+			if (Xml is null ||
+				Xml.LocalName != "createNewNode" ||
+				Xml.NamespaceURI != ConcentratorServer.NamespaceConcentrator)
+			{
+				throw new Exception("Clipboard does not contain node information.");
+			}
+
+			string NodeType = XML.Attribute(Xml, "type");
+			if (string.IsNullOrEmpty(NodeType))
+				throw new Exception("Node type missing.");
+
+			DataForm ImportForm = null;
+			LinkedList<XmlElement> ChildElements = null;
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
+				{
+					case "x":
+						if (ImportForm is null)
+							ImportForm = new DataForm(ConcentratorClient.Client, E, null, null, string.Empty, string.Empty);
+						else
+							throw new Exception("Multiple form elements in XML.");
+						break;
+
+					case "createNewNode":
+						if (ChildElements is null)
+							ChildElements = new LinkedList<XmlElement>();
+
+						ChildElements.AddLast(E);
+						break;
+
+					default:
+						throw new Exception("Unrecognized XML element: " + E.LocalName);
+				}
+			}
+
+			if (ImportForm is null)
+				throw new Exception("Parameter form element missing from XML.");
+
+			MainWindow.ShowStatus("Adding " + NodeType + " to " + Parent.NodeId + "...");
+
+			TaskCompletionSource<Node> Request = new TaskCompletionSource<Node>();
+			int IdCounter = 0;
+
+			ConcentratorClient.GetParametersForNewNode(FullJid, Parent.nodeInfo, NodeType, "en", string.Empty, string.Empty, string.Empty,
+				(object Sender, DataFormEventArgs e) =>
+				{
+					try
+					{
+						if (e.Ok)
+						{
+							foreach (Networking.XMPP.DataForms.Field Field in e.Form.Fields)
+							{
+								Networking.XMPP.DataForms.Field InputField = ImportForm[Field.Var];
+
+								if (Field.HasError)
+								{
+									if (InputField is null)
+									{
+										Request.TrySetException(new Exception("Unable to add node of type " +
+											NodeType + " to node " + Parent.NodeId + ". Required field " + Field.Var +
+											" did not have a value in the node being pasted from the clipboard. " +
+											"Error reported: " + Field.Error));
+										return Task.CompletedTask;
+									}
+									else if (Field.Var == "NodeId")
+									{
+										if (IdCounter++ == 0)
+											Field.SetValue(InputField.ValueString);
+										else
+											Field.SetValue(InputField.ValueString + " (" + IdCounter.ToString() + ")");
+									}
+									else if (IdCounter > 1)
+									{
+										Request.TrySetException(new Exception("Unable to add node of type " +
+											NodeType + " to node " + Parent.NodeId + ". Value in clipboard for field " +
+											Field.Var + " was not acceptable. Error reported: " + Field.Error));
+										return Task.CompletedTask;
+									}
+									else
+										Field.SetValue(InputField.ValueStrings);
+								}
+								else if (!(InputField is null))
+									Field.SetValue(InputField.ValueStrings);
+							}
+
+							e.Form.Submit();
+						}
+						else
+						{
+							Request.TrySetException(e.StanzaError ?? new Exception("Unable to add a node of type " +
+								NodeType + " to node " + Parent.NodeId + "."));
+						}
+					}
+					catch (Exception ex)
+					{
+						Request.TrySetException(ex);
+					}
+
+					return Task.CompletedTask;
+				}, (object Sender, NodeInformationEventArgs e) =>
+				{
+					if (e.Ok)
+					{
+						Node NewNode = new Node(Parent, e.NodeInformation);
+						Parent.Add(NewNode);
+						Request.TrySetResult(NewNode);
+					}
+					else if (!string.IsNullOrEmpty(e.From))
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set parameters." : e.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+
+			Node CreatedNode = await Request.Task;
+
+			if (!(ChildElements is null))
+			{
+				foreach (XmlElement Child in ChildElements)
+					await ImportFromXml(FullJid, ConcentratorClient, CreatedNode, Child);
+			}
 		}
 
 	}

@@ -11,7 +11,6 @@ namespace Waher.Content.Semantic.Model.Literals
         /// <summary>
         /// Represents a 32-bit integer literal.
         /// </summary>
-        /// <param name="Value">Literal value</param>
         public Int32Literal()
             : base()
         {

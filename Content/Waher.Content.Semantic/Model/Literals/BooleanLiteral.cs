@@ -11,7 +11,6 @@ namespace Waher.Content.Semantic.Model.Literals
         /// <summary>
         /// Represents a bool literal.
         /// </summary>
-        /// <param name="Value">Literal value</param>
         public BooleanLiteral()
             : base()
         {

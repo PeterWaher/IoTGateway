@@ -58,7 +58,7 @@
 		/// return value has these meanings: Value Meaning Less than zero This instance precedes
 		/// obj in the sort order. Zero This instance occurs in the same position in the
 		/// sort order as obj. Greater than zero This instance follows obj in the sort order.</returns>
-		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
+		/// <exception cref="System.ArgumentException">obj is not the same type as this instance.</exception>
 		public override int CompareTo(object obj)
 		{
 			if (obj is BlankNode Typed)

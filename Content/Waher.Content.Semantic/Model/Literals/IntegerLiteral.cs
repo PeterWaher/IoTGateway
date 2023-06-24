@@ -14,7 +14,6 @@ namespace Waher.Content.Semantic.Model.Literals
         /// <summary>
         /// Represents an integer literal of undefined size.
         /// </summary>
-        /// <param name="Value">Literal value</param>
         public IntegerLiteral()
             : base()
         {

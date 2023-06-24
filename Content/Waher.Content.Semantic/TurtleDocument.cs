@@ -27,9 +27,9 @@ namespace Waher.Content.Semantic
 
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
+	/// https://www.w3.org/TeamSubmission/turtle/
+	/// https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html
 	/// </summary>
-	/// <seealso cref="https://www.w3.org/TeamSubmission/turtle/"/>
-	/// <seealso cref="https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html"/>
 	public class TurtleDocument : InMemorySemanticCube
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>

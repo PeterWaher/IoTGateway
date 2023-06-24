@@ -17,8 +17,8 @@ namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Contains the results of a SPARQL query.
+	/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 	/// </summary>
-	/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 	public class SparqlResultSet : IToMatrix, IToVector
 	{
 		/// <summary>
@@ -36,9 +36,9 @@ namespace Waher.Content.Semantic
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
+		/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 		/// </summary>
 		/// <param name="Xml">Query results in XML format.</param>
-		/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 		public SparqlResultSet(XmlDocument Xml)
 			: this(Xml, null)
 		{
@@ -46,9 +46,9 @@ namespace Waher.Content.Semantic
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
+		/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 		/// </summary>
 		/// <param name="Xml">Query results in XML format.</param>
-		/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 		public SparqlResultSet(string Xml)
 			: this(Xml, null)
 		{
@@ -56,10 +56,10 @@ namespace Waher.Content.Semantic
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
+		/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 		/// </summary>
 		/// <param name="Xml">Query results in XML format.</param>
 		/// <param name="BaseUri">Base URI of document.</param>
-		/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 		public SparqlResultSet(string Xml, Uri BaseUri)
 			: this(RdfDocument.ToXml(Xml), BaseUri)
 		{
@@ -67,10 +67,10 @@ namespace Waher.Content.Semantic
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
+		/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 		/// </summary>
 		/// <param name="Xml">Query results in XML format.</param>
 		/// <param name="BaseUri">Base URI of document.</param>
-		/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 		public SparqlResultSet(XmlDocument Xml, Uri BaseUri)
 		{
 			if (Xml is null ||

@@ -12,8 +12,8 @@ namespace Waher.Content.Semantic
 {
 	/// <summary>
 	/// Encoder and Decoder of semantic information from SPARQL queries.
+	/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
 	/// </summary>
-	/// <seealso cref="https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/"/>
 	public class SparqlResultSetCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>

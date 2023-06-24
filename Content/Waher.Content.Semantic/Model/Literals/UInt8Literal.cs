@@ -11,7 +11,6 @@ namespace Waher.Content.Semantic.Model.Literals
         /// <summary>
         /// Represents a 8-bit unsigned integer literal.
         /// </summary>
-        /// <param name="Value">Literal value</param>
         public UInt8Literal()
             : base()
         {

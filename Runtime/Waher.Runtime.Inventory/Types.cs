@@ -793,7 +793,7 @@ namespace Waher.Runtime.Inventory
 									if (types.TryGetValue(TypeAlias, out Type T2))
 										Log.Error("Type alias conflicts with registered type.", TypeAlias, T2.FullName);
 									else
-										types[TypeAlias] = T2;
+										types[TypeAlias] = T;
 								}
 							}
 

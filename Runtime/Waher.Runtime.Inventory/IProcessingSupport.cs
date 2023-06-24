@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Runtime.Inventory
+﻿namespace Waher.Runtime.Inventory
 {
 	/// <summary>
 	/// Interface for detecting interfaces supporting objects with predefined features.

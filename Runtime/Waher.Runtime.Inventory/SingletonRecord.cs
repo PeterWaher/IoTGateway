@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Runtime.Inventory
+﻿namespace Waher.Runtime.Inventory
 {
 	/// <summary>
 	/// A record of a singleton instance in memory.

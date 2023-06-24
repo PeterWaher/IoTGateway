@@ -4,23 +4,6 @@
         <name>Waher.Runtime.Inventory</name>
     </assembly>
     <members>
-        <member name="T:Waher.Runtime.Inventory.AliasAttribute">
-            <summary>
-            Lets the inventory know the type is also known by other names. This attribute can be used when changing
-            name of type or namespace, and allow for backwards compatibility.
-            </summary>
-        </member>
-        <member name="M:Waher.Runtime.Inventory.AliasAttribute.#ctor(System.String[])">
-            <summary>
-            Lets the inventory know the type is also known by other names. This attribute can be used when changing
-            name of type or namespace, and allow for backwards compatibility.
-            </summary>
-        </member>
-        <member name="P:Waher.Runtime.Inventory.AliasAttribute.TypeNames">
-            <summary>
-            Fully qualified alias type names
-            </summary>
-        </member>
         <member name="T:Waher.Runtime.Inventory.DefaultImplementationAttribute">
             <summary>
             Defines a default implementation for an interface. If a request to instantiate an interface is made,
@@ -174,6 +157,26 @@
             <param name="ModuleType">Module Type</param>
             <returns>If a dependency exists.</returns>
         </member>
+        <member name="T:Waher.Runtime.Inventory.NamespaceAliasAttribute">
+            <summary>
+            Lets the inventory know a namespace is also known by an other name. This attribute can be used when changing
+            the name of a namespace, and allow for backwards compatibility. The attribute can be used multiple times
+            on an assembly.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.NamespaceAliasAttribute.#ctor(System.String)">
+            <summary>
+            Lets the inventory know the type is also known by other names. This attribute can be used when changing
+            name of type or namespace, and allow for backwards compatibility. The attribute can be used multiple times
+            on each type.
+            </summary>
+            <param name="Namespace">Fully qualified alias namespace</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.NamespaceAliasAttribute.Namespace">
+            <summary>
+            Fully qualified alias namespace
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Inventory.SingletonAttribute">
             <summary>
             Defines a class or struct as singleton. This means that when instantiated, using <see cref="M:Waher.Runtime.Inventory.Types.Instantiate(System.Type,System.Object[])"/>,
@@ -283,6 +286,26 @@
         <member name="P:Waher.Runtime.Inventory.SingletonRecord.Instance">
             <summary>
             Object instance.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.TypeAliasAttribute">
+            <summary>
+            Lets the inventory know the type is also known by another other name. This attribute can be used when changing
+            name of type or namespace, and allow for backwards compatibility. The attribute can be used multiple times
+            on each type.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.TypeAliasAttribute.#ctor(System.String)">
+            <summary>
+            Lets the inventory know the type is also known by another other name. This attribute can be used when changing
+            name of type or namespace, and allow for backwards compatibility. The attribute can be used multiple times
+            on each type.
+            </summary>
+            <param name="TypeName">Fully qualified alias type name</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.TypeAliasAttribute.TypeName">
+            <summary>
+            Fully qualified alias type name
             </summary>
         </member>
         <member name="T:Waher.Runtime.Inventory.Types">

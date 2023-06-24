@@ -583,7 +583,8 @@ namespace Waher.Runtime.Inventory
 		{
 			SortedDictionary<string, Type> Types;
 			SortedDictionary<string, Type> LastTypes = null;
-			Dictionary<string, Type> Aliases = null;
+			Dictionary<string, Type> TypeNameAliases = null;
+			Dictionary<string, Assembly> NamespaceAliases = null;
 			IEnumerable<Type> AssemblyTypes;
 			Assembly A;
 			string InterfaceName;
@@ -631,6 +632,17 @@ namespace Waher.Runtime.Inventory
 
 				foreach (Assembly Assembly in Assemblies)
 				{
+					foreach (NamespaceAliasAttribute Alias in Assembly.GetCustomAttributes<NamespaceAliasAttribute>())
+					{
+						if (NamespaceAliases is null)
+							NamespaceAliases = new Dictionary<string, Assembly>();
+
+						if (NamespaceAliases.ContainsKey(Alias.Namespace))
+							Log.Error("Namespace alias already registered.", Alias.Namespace, Assembly.FullName);
+						else
+							NamespaceAliases[Alias.Namespace] = Assembly;
+					}
+
 					try
 					{
 						AssemblyTypes = Assembly.ExportedTypes;
@@ -680,18 +692,15 @@ namespace Waher.Runtime.Inventory
 								Types[TypeName] = Type;
 							}
 
-							foreach (AliasAttribute Alias in TI.GetCustomAttributes<AliasAttribute>(false))
+							foreach (TypeAliasAttribute Alias in TI.GetCustomAttributes<TypeAliasAttribute>(false))
 							{
-								if (Aliases is null)
-									Aliases = new Dictionary<string, Type>();
+								if (TypeNameAliases is null)
+									TypeNameAliases = new Dictionary<string, Type>();
 
-								foreach (string AliasTypeName in Alias.TypeNames)
-								{
-									if (Aliases.ContainsKey(AliasTypeName))
-										Log.Error("Type alias already registered.", AliasTypeName, Type.FullName);
-									else
-										Aliases[AliasTypeName] = Type;
-								}
+								if (TypeNameAliases.ContainsKey(Alias.TypeName))
+									Log.Error("Type alias already registered.", Alias.TypeName, Type.FullName);
+								else
+									TypeNameAliases[Alias.TypeName] = Type;
 							}
 						}
 						catch (Exception)
@@ -749,14 +758,55 @@ namespace Waher.Runtime.Inventory
 					}
 				}
 
-				if (!(Aliases is null))
+				if (!(TypeNameAliases is null))
 				{
-					foreach (KeyValuePair<string, Type> P in Aliases)
+					foreach (KeyValuePair<string, Type> P in TypeNameAliases)
 					{
 						if (types.TryGetValue(P.Key, out Type T))
 							Log.Error("Type alias conflicts with registered type.", P.Key, T.FullName);
 						else
 							types[P.Key] = P.Value;
+					}
+				}
+
+				if (!(NamespaceAliases is null))
+				{
+					foreach (KeyValuePair<string, Assembly> P in NamespaceAliases)
+					{
+						LinkedList<KeyValuePair<string, string>> CheckNamespaces = new LinkedList<KeyValuePair<string, string>>();
+
+						CheckNamespaces.AddLast(new KeyValuePair<string, string>(P.Key, P.Value.FullName));
+
+						while (!(CheckNamespaces.First is null))
+						{
+							string MapToNamespace = CheckNamespaces.First.Value.Value;
+							string Alias = CheckNamespaces.First.Value.Key;
+
+							CheckNamespaces.RemoveFirst();
+
+							if (typesPerNamespace.TryGetValue(MapToNamespace, out Types))
+							{
+								foreach (Type T in Types.Values)
+								{
+									string TypeAlias = T.FullName.Replace(MapToNamespace, Alias);
+
+									if (types.TryGetValue(TypeAlias, out Type T2))
+										Log.Error("Type alias conflicts with registered type.", TypeAlias, T2.FullName);
+									else
+										types[TypeAlias] = T2;
+								}
+							}
+
+							if (namespacesPerNamespace.TryGetValue(MapToNamespace, out SortedDictionary<string, bool> Namespaces))
+							{
+								foreach (string Subnamespace in Namespaces.Keys)
+								{
+									i = Subnamespace.LastIndexOf('.');
+									if (i >= 0)
+										CheckNamespaces.AddLast(new KeyValuePair<string, string>(Alias + Subnamespace.Substring(i), Subnamespace));
+								}
+							}
+						}
 					}
 				}
 

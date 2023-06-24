@@ -775,7 +775,7 @@ namespace Waher.Runtime.Inventory
 					{
 						LinkedList<KeyValuePair<string, string>> CheckNamespaces = new LinkedList<KeyValuePair<string, string>>();
 
-						CheckNamespaces.AddLast(new KeyValuePair<string, string>(P.Key, P.Value.FullName));
+						CheckNamespaces.AddLast(new KeyValuePair<string, string>(P.Key, P.Value.GetName().Name));
 
 						while (!(CheckNamespaces.First is null))
 						{

@@ -583,6 +583,7 @@ namespace Waher.Runtime.Inventory
 		{
 			SortedDictionary<string, Type> Types;
 			SortedDictionary<string, Type> LastTypes = null;
+			Dictionary<string, Type> Aliases = null;
 			IEnumerable<Type> AssemblyTypes;
 			Assembly A;
 			string InterfaceName;
@@ -656,14 +657,15 @@ namespace Waher.Runtime.Inventory
 
 						types[TypeName] = Type;
 
-
 						i = TypeName.LastIndexOf('.');
 						if (i >= 0)
 							RegisterQualifiedName(TypeName.Substring(i + 1), TypeName);
 
 						try
 						{
-							foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
+							TypeInfo TI = Type.GetTypeInfo();
+
+							foreach (Type Interface in TI.ImplementedInterfaces)
 							{
 								InterfaceName = Interface.FullName;
 								if (InterfaceName is null)
@@ -676,6 +678,20 @@ namespace Waher.Runtime.Inventory
 								}
 
 								Types[TypeName] = Type;
+							}
+
+							foreach (AliasAttribute Alias in TI.GetCustomAttributes<AliasAttribute>(false))
+							{
+								if (Aliases is null)
+									Aliases = new Dictionary<string, Type>();
+
+								foreach (string AliasTypeName in Alias.TypeNames)
+								{
+									if (Aliases.ContainsKey(AliasTypeName))
+										Log.Error("Type alias already registered.", AliasTypeName, Type.FullName);
+									else
+										Aliases[AliasTypeName] = Type;
+								}
 							}
 						}
 						catch (Exception)
@@ -730,6 +746,17 @@ namespace Waher.Runtime.Inventory
 
 							Types[TypeName] = Type;
 						}
+					}
+				}
+
+				if (!(Aliases is null))
+				{
+					foreach (KeyValuePair<string, Type> P in Aliases)
+					{
+						if (types.TryGetValue(P.Key, out Type T))
+							Log.Error("Type alias conflicts with registered type.", P.Key, T.FullName);
+						else
+							types[P.Key] = P.Value;
 					}
 				}
 

@@ -4,6 +4,23 @@
         <name>Waher.Runtime.Inventory</name>
     </assembly>
     <members>
+        <member name="T:Waher.Runtime.Inventory.AliasAttribute">
+            <summary>
+            Lets the inventory know the type is also known by other names. This attribute can be used when changing
+            name of type or namespace, and allow for backwards compatibility.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.AliasAttribute.#ctor(System.String[])">
+            <summary>
+            Lets the inventory know the type is also known by other names. This attribute can be used when changing
+            name of type or namespace, and allow for backwards compatibility.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.AliasAttribute.TypeNames">
+            <summary>
+            Fully qualified alias type names
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Inventory.DefaultImplementationAttribute">
             <summary>
             Defines a default implementation for an interface. If a request to instantiate an interface is made,

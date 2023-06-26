@@ -13,7 +13,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
-using Waher.Script.Functions.Strings;
+using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Security;
 using static System.Environment;
@@ -33,6 +33,7 @@ namespace Waher.Content.Markdown.PlantUml
 		private static string contentRootFolder = null;
 		private static string defaultBgColor = null;
 		private static string defaultFgColor = null;
+		private static IMarkdownAsynchronousOutput asyncHtmlOutput = null;
 
 		/// <summary>
 		/// Class managing PlantUML integration into Markdown documents.
@@ -81,6 +82,9 @@ namespace Waher.Content.Markdown.PlantUml
 					Log.Informational("PlantUML found. Integration with Markdown added.",
 						new KeyValuePair<string, object>("Path", jarPath),
 						new KeyValuePair<string, object>("Java", javaPath));
+
+
+					asyncHtmlOutput = Types.FindBest<IMarkdownAsynchronousOutput, MarkdownOutputType>(MarkdownOutputType.Html);
 				}
 			}
 			catch (Exception ex)
@@ -246,10 +250,45 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
-			if (Info is null)
-				return false;
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null);
+			if (!(Info is null))
+			{
+				this.GenerateHTML(Output, Info);
+				return true;
+			}
 
+			string Title;
+			int i = Language.IndexOf(':');
+			if (i > 0)
+				Title = Language.Substring(i + 1).Trim();
+			else
+				Title = null;
+
+			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title);
+
+			Document.QueueAsyncTask(async () =>
+			{
+				Output = new StringBuilder();
+
+				try
+				{
+					Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
+					if (!(Info is null))
+						this.GenerateHTML(Output, Info);
+				}
+				catch (Exception ex)
+				{
+					await InlineScript.GenerateHTML(ex, Output, true, new Variables());
+				}
+
+				await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Output.ToString());
+			});
+
+			return true;
+		}
+
+		private void GenerateHTML(StringBuilder Output, GraphInfo Info)
+		{
 			Info.FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!Info.FileName.StartsWith("/"))
 				Info.FileName = "/" + Info.FileName;
@@ -277,8 +316,6 @@ namespace Waher.Content.Markdown.PlantUml
 			}
 
 			Output.AppendLine("</figure>");
-
-			return true;
 		}
 
 		private enum ResultType
@@ -293,7 +330,7 @@ namespace Waher.Content.Markdown.PlantUml
 			public string Title;
 		}
 
-		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type)
+		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists)
 		{
 			GraphInfo Result = new GraphInfo();
 			string Graph = MarkdownDocument.AppendRows(Rows);
@@ -323,90 +360,91 @@ namespace Waher.Content.Markdown.PlantUml
 					break;
 			}
 
-			if (!File.Exists(Result.FileName))
+			if (File.Exists(Result.FileName))
+				return Result;
+
+			if (!GenerateIfNotExists)
+				return null;
+
+			string TxtFileName = ResultFileName + ".txt";
+			await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.UTF8);
+
+			StringBuilder Arguments = new StringBuilder();
+			Arguments.Append("-jar \"");
+			Arguments.Append(jarPath);
+			Arguments.Append("\" -charset UTF-8 -t");
+			Arguments.Append(Type.ToString().ToLower());
+
+			//if (!string.IsNullOrEmpty(defaultBgColor))
+			//{
+			//	Arguments.Append(" -SbackgroundColor=");
+			//	Arguments.Append(defaultBgColor);
+			//}
+			//
+			//if (!string.IsNullOrEmpty(defaultFgColor))
+			//{
+			//	Arguments.Append(" -SborderColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -SarrowColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -SarrowFontColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -SlabelFontColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -SlegendFontColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -StitleFontColor=");
+			//	Arguments.Append(defaultFgColor);
+			//	Arguments.Append(" -StimingFontColor=");
+			//	Arguments.Append(defaultFgColor);
+			//}
+
+			Arguments.Append(" -quiet \"");
+			Arguments.Append(TxtFileName);
+			Arguments.Append("\" \"");
+			Arguments.Append(Result.FileName);
+			Arguments.Append("\"");
+
+			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 			{
-				string TxtFileName = ResultFileName + ".txt";
-				await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.UTF8);
+				FileName = javaPath,
+				Arguments = Arguments.ToString(),
+				UseShellExecute = false,
+				RedirectStandardError = true,
+				RedirectStandardOutput = true,
+				WorkingDirectory = PlantUmlFolder,
+				CreateNoWindow = true,
+				WindowStyle = ProcessWindowStyle.Hidden
+			};
 
-				StringBuilder Arguments = new StringBuilder();
-				Arguments.Append("-jar \"");
-				Arguments.Append(jarPath);
-				Arguments.Append("\" -charset UTF-8 -t");
-				Arguments.Append(Type.ToString().ToLower());
+			Process P = new Process();
+			TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
 
-				//if (!string.IsNullOrEmpty(defaultBgColor))
-				//{
-				//	Arguments.Append(" -SbackgroundColor=");
-				//	Arguments.Append(defaultBgColor);
-				//}
-				//
-				//if (!string.IsNullOrEmpty(defaultFgColor))
-				//{
-				//	Arguments.Append(" -SborderColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -SarrowColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -SarrowFontColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -SlabelFontColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -SlegendFontColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -StitleFontColor=");
-				//	Arguments.Append(defaultFgColor);
-				//	Arguments.Append(" -StimingFontColor=");
-				//	Arguments.Append(defaultFgColor);
-				//}
+			P.ErrorDataReceived += (sender, e) =>
+			{
+				Log.Error("Unable to generate graph: " + e.Data);
+				ResultSource.TrySetResult(null);
+			};
 
-				Arguments.Append(" -quiet \"");
-				Arguments.Append(TxtFileName);
-				Arguments.Append("\" \"");
-				Arguments.Append(Result.FileName);
-				Arguments.Append("\"");
-
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+			P.Exited += async (sender, e) =>
+			{
+				if (P.ExitCode != 0)
 				{
-					FileName = javaPath,
-					Arguments = Arguments.ToString(),
-					UseShellExecute = false,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true,
-					WorkingDirectory = PlantUmlFolder,
-					CreateNoWindow = true,
-					WindowStyle = ProcessWindowStyle.Hidden
-				};
-
-				Process P = new Process();
-				TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
-
-				P.ErrorDataReceived += (sender, e) =>
-				{
-					Log.Error("Unable to generate graph: " + e.Data);
+					string ErrorText = await P.StandardError.ReadToEndAsync();
+					Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
 					ResultSource.TrySetResult(null);
-				};
+				}
+				else
+					ResultSource.TrySetResult(Result);
+			};
 
-				P.Exited += async (sender, e) =>
-				{
-					if (P.ExitCode != 0)
-					{
-						string ErrorText = await P.StandardError.ReadToEndAsync();
-						Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
-						ResultSource.TrySetResult(null);
-					}
-					else
-						ResultSource.TrySetResult(Result);
-				};
+			Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("PlantUml process did not terminate properly.")));
 
-				Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("PlantUml process did not terminate properly.")));
+			P.StartInfo = ProcessInformation;
+			P.EnableRaisingEvents = true;
+			P.Start();
 
-				P.StartInfo = ProcessInformation;
-				P.EnableRaisingEvents = true;
-				P.Start();
-
-				return await ResultSource.Task;
-			}
-
-			return Result;
+			return await ResultSource.Task;
 		}
 
 		/// <summary>
@@ -420,7 +458,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
 			if (Info is null)
 				return false;
 
@@ -441,7 +479,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -469,7 +507,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -492,7 +530,7 @@ namespace Waher.Content.Markdown.PlantUml
 		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");
@@ -523,7 +561,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return null;
 

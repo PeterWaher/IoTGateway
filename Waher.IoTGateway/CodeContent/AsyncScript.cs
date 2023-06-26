@@ -10,8 +10,6 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
-using Waher.Script.Operators;
-using Waher.Security;
 
 namespace Waher.IoTGateway.CodeContent
 {
@@ -20,6 +18,8 @@ namespace Waher.IoTGateway.CodeContent
 	/// </summary>
 	public class AsyncScript : ICodeContent
 	{
+		private static readonly AsyncMarkdownHtmlContent asyncHtmlOutput = new AsyncMarkdownHtmlContent();
+		
 		private MarkdownDocument document;
 
 		/// <summary>
@@ -101,26 +101,16 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string LoadingText;
+			string Title;
 			int i = Language.IndexOf(':');
 			if (i > 0)
-				LoadingText = Language.Substring(i + 1).Trim();
+				Title = Language.Substring(i + 1).Trim();
 			else
-				LoadingText = "&#8987;";
+				Title = null;
 
-			string Id = Hashes.BinaryToString(Gateway.NextBytes(32));
-
-			Output.Append("<div id=\"id");
-			Output.Append(Id);
-			Output.Append("\">");
-			Output.Append(LoadingText);
-			Output.AppendLine("</div>");
-			Output.Append("<script type=\"text/javascript\">LoadContent(\"");
-			Output.Append(Id);
-			Output.AppendLine("\");</script>");
-
+			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title);
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = new Variables();
 			StringBuilder ImplicitPrint = new StringBuilder();
@@ -130,7 +120,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, ImplicitPrint, Id));
 
-			return Task.FromResult(true);
+			return true;
 		}
 
 		private Expression BuildExpression(string[] Rows)
@@ -203,7 +193,7 @@ namespace Waher.IoTGateway.CodeContent
 				Variables.OnPreview -= Preview;
 			}
 
-			await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
+			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html.ToString());
 		}
 
 		/// <summary>

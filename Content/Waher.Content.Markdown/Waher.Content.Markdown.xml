@@ -593,6 +593,74 @@
             If typographical extensions should conform to XML entities (true), or if HTML entities can be used as well (false).
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.MarkdownOutputType">
+            <summary>
+            Markdown output type.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.PlainText">
+            <summary>
+            Plaint text
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.Markdown">
+            <summary>
+            Markdown
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.Html">
+            <summary>
+            HTML
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.Xaml">
+            <summary>
+            XAML (WPF version)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.XamarinForms">
+            <summary>
+            XAML (Xamarin.Forms version)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.SmartContract">
+            <summary>
+            Smart Contract XML
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.Latex">
+            <summary>
+            LaTeX
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.MarkdownOutputType.Xml">
+            <summary>
+            XML
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.IMarkdownAsynchronousOutput">
+            <summary>
+            Interface for classes that help output asynchronous markdown output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.IMarkdownAsynchronousOutput.GenerateStub(Waher.Content.Markdown.MarkdownOutputType,System.Text.StringBuilder,System.String)">
+            <summary>
+            Generates a stub in the output, that will be filled with the asynchronously generated
+            content, once it is reported.
+            </summary>
+            <param name="Type">Output type.</param>
+            <param name="Output">Output being generated.</param>
+            <param name="Title">Title of content.</param>
+            <returns>ID to report back, when content is completed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.IMarkdownAsynchronousOutput.ReportResult(Waher.Content.Markdown.MarkdownOutputType,System.String,System.String)">
+            <summary>
+            Method called when asynchronous result has been generated in a Markdown document.
+            </summary>
+            <param name="Type">Output type.</param>
+            <param name="Id">ID of generated content.</param>
+            <param name="Result">Generated content.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.LaTeXDocumentClass">
             <summary>
             Document class of LaTeX output.

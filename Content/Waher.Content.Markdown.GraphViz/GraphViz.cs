@@ -12,6 +12,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Security;
 
@@ -35,6 +36,7 @@ namespace Waher.Content.Markdown.GraphViz
 		private static bool supportsSfdp = false;
 		private static bool supportsTwopi = false;
 		private static bool supportsCirco = false;
+		private static IMarkdownAsynchronousOutput asyncHtmlOutput = null;
 
 		/// <summary>
 		/// Class managing GraphViz integration into Markdown documents.
@@ -86,6 +88,8 @@ namespace Waher.Content.Markdown.GraphViz
 						new KeyValuePair<string, object>("sfdp", supportsSfdp),
 						new KeyValuePair<string, object>("twopi", supportsTwopi),
 						new KeyValuePair<string, object>("circo", supportsCirco));
+
+					asyncHtmlOutput = Types.FindBest<IMarkdownAsynchronousOutput, MarkdownOutputType>(MarkdownOutputType.Html);
 				}
 			}
 			catch (Exception ex)
@@ -350,10 +354,45 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
-			if (Info is null)
-				return false;
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null);
+			if (!(Info is null))
+			{
+				await this.GenerateHTML(Output, Info);
+				return true;
+			}
 
+			string Title;
+			int i = Language.IndexOf(':');
+			if (i > 0)
+				Title = Language.Substring(i + 1).Trim();
+			else
+				Title = null;
+
+			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title);
+
+			Document.QueueAsyncTask(async () =>
+			{
+				Output = new StringBuilder();
+
+				try
+				{
+					Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
+					if (!(Info is null))
+						await this.GenerateHTML(Output, Info);
+				}
+				catch (Exception ex)
+				{
+					await InlineScript.GenerateHTML(ex, Output, true, new Variables());
+				}
+
+				await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Output.ToString());
+			});
+
+			return true;
+		}
+
+		private async Task GenerateHTML(StringBuilder Output, GraphInfo Info)
+		{
 			Info.FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!Info.FileName.StartsWith("/"))
 				Info.FileName = "/" + Info.FileName;
@@ -405,8 +444,6 @@ namespace Waher.Content.Markdown.GraphViz
 
 				Output.AppendLine("</map>");
 			}
-
-			return true;
 		}
 
 		private enum ResultType
@@ -423,7 +460,7 @@ namespace Waher.Content.Markdown.GraphViz
 			public string Hash;
 		}
 
-		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type)
+		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists)
 		{
 			GraphInfo Result = new GraphInfo();
 			string Graph = MarkdownDocument.AppendRows(Rows);
@@ -460,112 +497,113 @@ namespace Waher.Content.Markdown.GraphViz
 			{
 				if (!File.Exists(Result.MapFileName))
 					Result.MapFileName = null;
+
+				return Result;
 			}
-			else
+
+			if (!GenerateIfNotExists)
+				return null;
+
+			string TxtFileName = FileName + ".txt";
+			await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.Default);
+
+			StringBuilder Arguments = new StringBuilder();
+
+			Arguments.Append("-Tcmapx -o\"");
+			Arguments.Append(Result.MapFileName);
+			Arguments.Append("\" -T");
+			Arguments.Append(Type.ToString().ToLower());
+
+			if (!string.IsNullOrEmpty(defaultBgColor))
 			{
-				string TxtFileName = FileName + ".txt";
-				await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.Default);
-
-				StringBuilder Arguments = new StringBuilder();
-
-				Arguments.Append("-Tcmapx -o\"");
-				Arguments.Append(Result.MapFileName);
-				Arguments.Append("\" -T");
-				Arguments.Append(Type.ToString().ToLower());
-
-				if (!string.IsNullOrEmpty(defaultBgColor))
-				{
-					Arguments.Append(" -Gbgcolor=\"");
-					Arguments.Append(defaultBgColor);
-					Arguments.Append('"');
-				}
-
-				if (!string.IsNullOrEmpty(defaultFgColor))
-				{
-					Arguments.Append(" -Gcolor=\"");
-					Arguments.Append(defaultFgColor);
-					//Arguments.Append("\" -Nfillcolor=\"");
-					//Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Nfontcolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Nlabelfontcolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Npencolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Efontcolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Elabelfontcolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\" -Epencolor=\"");
-					Arguments.Append(defaultFgColor);
-					Arguments.Append("\"");
-				}
-
-				Arguments.Append(" -q -o\"");
-				Arguments.Append(Result.FileName);
-				Arguments.Append("\" \"");
-				Arguments.Append(TxtFileName + "\"");
-
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
-				{
-					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
-					Arguments = Arguments.ToString(),
-					UseShellExecute = false,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true,
-					WorkingDirectory = GraphVizFolder,
-					CreateNoWindow = true,
-					WindowStyle = ProcessWindowStyle.Hidden
-				};
-
-				Process P = new Process();
-				TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
-
-				P.ErrorDataReceived += (sender, e) =>
-				{
-					Log.Error("Unable to generate graph: " + e.Data);
-					ResultSource.TrySetResult(null);
-				};
-
-				P.Exited += async (sender, e) =>
-				{
-					try
-					{
-						if (P.ExitCode != 0)
-						{
-							string ErrorText = await P.StandardError.ReadToEndAsync();
-							Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
-							ResultSource.TrySetResult(null);
-						}
-						else
-						{
-							string Map = await Resources.ReadAllTextAsync(Result.MapFileName);
-							string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
-							if (MapRows.Length <= 2)
-							{
-								File.Delete(Result.MapFileName);
-								Result.MapFileName = null;
-							}
-
-							ResultSource.TrySetResult(Result);
-						}
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				};
-
-				Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("GraphViz process did not terminate properly.")));
-
-				P.StartInfo = ProcessInformation;
-				P.EnableRaisingEvents = true;
-				P.Start();
-
-				return await ResultSource.Task;
+				Arguments.Append(" -Gbgcolor=\"");
+				Arguments.Append(defaultBgColor);
+				Arguments.Append('"');
 			}
 
-			return Result;
+			if (!string.IsNullOrEmpty(defaultFgColor))
+			{
+				Arguments.Append(" -Gcolor=\"");
+				Arguments.Append(defaultFgColor);
+				//Arguments.Append("\" -Nfillcolor=\"");
+				//Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Nfontcolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Nlabelfontcolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Npencolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Efontcolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Elabelfontcolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\" -Epencolor=\"");
+				Arguments.Append(defaultFgColor);
+				Arguments.Append("\"");
+			}
+
+			Arguments.Append(" -q -o\"");
+			Arguments.Append(Result.FileName);
+			Arguments.Append("\" \"");
+			Arguments.Append(TxtFileName + "\"");
+
+			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+			{
+				FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
+				Arguments = Arguments.ToString(),
+				UseShellExecute = false,
+				RedirectStandardError = true,
+				RedirectStandardOutput = true,
+				WorkingDirectory = GraphVizFolder,
+				CreateNoWindow = true,
+				WindowStyle = ProcessWindowStyle.Hidden
+			};
+
+			Process P = new Process();
+			TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
+
+			P.ErrorDataReceived += (sender, e) =>
+			{
+				Log.Error("Unable to generate graph: " + e.Data);
+				ResultSource.TrySetResult(null);
+			};
+
+			P.Exited += async (sender, e) =>
+			{
+				try
+				{
+					if (P.ExitCode != 0)
+					{
+						string ErrorText = await P.StandardError.ReadToEndAsync();
+						Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
+						ResultSource.TrySetResult(null);
+					}
+					else
+					{
+						string Map = await Resources.ReadAllTextAsync(Result.MapFileName);
+						string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+						if (MapRows.Length <= 2)
+						{
+							File.Delete(Result.MapFileName);
+							Result.MapFileName = null;
+						}
+
+						ResultSource.TrySetResult(Result);
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			};
+
+			Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("GraphViz process did not terminate properly.")));
+
+			P.StartInfo = ProcessInformation;
+			P.EnableRaisingEvents = true;
+			P.Start();
+
+			return await ResultSource.Task;
 		}
 
 		/// <summary>
@@ -579,7 +617,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
 			if (Info is null)
 				return false;
 
@@ -600,7 +638,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -628,7 +666,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -651,7 +689,7 @@ namespace Waher.Content.Markdown.GraphViz
 		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");
@@ -682,7 +720,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return null;
 

@@ -289,7 +289,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (Where is null)
 					Where = Values;
 				else
-					Where = new IntersectionPattern(Where, Values);
+					Where = new IntersectionPattern(Values, Where);
 
 				s = Parser.PeekNextToken().ToUpper();
 			}
@@ -735,7 +735,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (this.currentPattern.IsEmpty)
 						this.currentPattern = Values;
 					else
-						this.currentPattern = new IntersectionPattern(this.currentPattern, Values);
+						this.currentPattern = new IntersectionPattern(Values, this.currentPattern);
 
 					return true;
 

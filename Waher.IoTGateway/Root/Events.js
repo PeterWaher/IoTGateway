@@ -345,42 +345,7 @@ function LoadContent(Id)
 				{
 					var Div = document.getElementById("id" + Id);
 					if (Div)
-					{
-						var Html = xhttp.responseText;
-						var Script = [];
-						var HtmlLower = Html.toLocaleLowerCase();
-						var i = HtmlLower.indexOf("<script>");
-
-						while (i >= 0)
-						{
-							var j = HtmlLower.indexOf("</script>", i + 8);
-							if (j < 0)
-								break;
-
-							Script.push(Html.substring(i + 8, j));
-
-							Html = Html.substring(0, i) + Html.substring(j + 9);
-							HtmlLower = HtmlLower.substring(0, i) + HtmlLower.substring(j + 9);
-
-							i = HtmlLower.indexOf("<script>", i);
-						}
-
-						Div.innerHTML = Html;
-
-						var c = Script.length;
-
-						for (i = 0; i < c; i++)
-						{
-							try
-							{
-								eval(Script[i]);
-							}
-							catch (e)
-							{
-								console.log(e);
-							}
-						}
-					}
+						SetDynamicHtml(Div, xhttp.responseText);
 
 					if (xhttp.getResponseHeader("X-More") === "1")
 					{
@@ -408,6 +373,43 @@ function LoadContent(Id)
 	}
 	else
 		ContentQueue.push(Id);
+}
+
+function SetDynamicHtml(ParentElement, Html)
+{
+	var Script = [];
+	var HtmlLower = Html.toLocaleLowerCase();
+	var i = HtmlLower.indexOf("<script");
+
+	while (i >= 0)
+	{
+		var j = HtmlLower.indexOf("</script>", i + 7);
+		if (j < 0)
+			break;
+
+		Script.push(Html.substring(i + 8, j));
+
+		Html = Html.substring(0, i) + Html.substring(j + 9);
+		HtmlLower = HtmlLower.substring(0, i) + HtmlLower.substring(j + 9);
+
+		i = HtmlLower.indexOf("<script", i);
+	}
+
+	ParentElement.innerHTML = Html;
+
+	var c = Script.length;
+
+	for (i = 0; i < c; i++)
+	{
+		try
+		{
+			eval(Script[i]);
+		}
+		catch (e)
+		{
+			console.log(e);
+		}
+	}
 }
 
 var ContentQueue = null;

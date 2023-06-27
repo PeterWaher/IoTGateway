@@ -4,6 +4,7 @@ Author: Peter Waher
 Date: 2021-03-31
 Master: /Master.md
 Javascript: PlantUmlLab.js
+Javascript: /Events.js
 CSS: PlantUmlLab.css
 UserVariable: User
 Privilege: Admin.Lab.PlantUml

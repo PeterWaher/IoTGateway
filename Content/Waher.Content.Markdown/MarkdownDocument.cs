@@ -31,6 +31,12 @@ namespace Waher.Content.Markdown
 	public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
 
 	/// <summary>
+	/// Delegate used for callback methods performing asynchronous Markdown processing
+	/// </summary>
+	/// <param name="State">State object.</param>
+	public delegate Task AsyncMarkdownProcessing(object State);
+
+	/// <summary>
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
 	/// See the markdown reference documentation provided with the library for more information.
 	/// </summary>
@@ -39,6 +45,7 @@ namespace Waher.Content.Markdown
 		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
 		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
+		private readonly List<KeyValuePair<AsyncMarkdownProcessing, object>> asyncTasks = new List<KeyValuePair<AsyncMarkdownProcessing, object>>();
 		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private readonly Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumbers = null;
@@ -62,7 +69,6 @@ namespace Waher.Content.Markdown
 		private bool includesTableOfContents = false;
 		private bool isDynamic = false;
 		private bool? allowScriptTag = null;
-		private Task asyncTasks = Task.CompletedTask;
 		private object tag = null;
 
 		/// <summary>
@@ -4636,6 +4642,8 @@ namespace Waher.Content.Markdown
 			}
 			else
 				await this.GenerateMarkdown(Output, false);
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -4691,6 +4699,8 @@ namespace Waher.Content.Markdown
 			}
 			else
 				await this.GenerateHTML(Output, false);
+
+			this.ProcessAsyncTasks();
 		}
 
 		private async Task LoadMasterIfNotLoaded(string MasterMetaValue)
@@ -5321,6 +5331,8 @@ namespace Waher.Content.Markdown
 					}
 				}
 			}
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -5364,15 +5376,19 @@ namespace Waher.Content.Markdown
 			{
 				await this.GenerateXAML(w, false);
 			}
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
 		/// Generates WPF XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">WPF XAML will be output here.</param>
-		public Task GenerateXAML(XmlWriter Output)
+		public async Task GenerateXAML(XmlWriter Output)
 		{
-			return this.GenerateXAML(Output, false);
+			await this.GenerateXAML(Output, false);
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -5528,15 +5544,19 @@ namespace Waher.Content.Markdown
 			{
 				await this.GenerateXamarinForms(w, false);
 			}
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
 		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		public Task GenerateXamarinForms(XmlWriter Output)
+		public async Task GenerateXamarinForms(XmlWriter Output)
 		{
-			return this.GenerateXamarinForms(Output, false);
+			await this.GenerateXamarinForms(Output, false);
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -5691,6 +5711,8 @@ namespace Waher.Content.Markdown
 			{
 				await this.GenerateSmartContractXml(w, null);
 			}
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -5698,9 +5720,11 @@ namespace Waher.Content.Markdown
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		public Task GenerateSmartContractXml(XmlWriter Output)
+		public async Task GenerateSmartContractXml(XmlWriter Output)
 		{
-			return this.GenerateSmartContractXml(Output, null);
+			await this.GenerateSmartContractXml(Output, null);
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
@@ -6807,12 +6831,60 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Queues an asynchronous task to be executed.
+		/// Queues an asynchronous task to be executed. Asynchronous tasks will be executed after the main document
+		/// has been generated.
 		/// </summary>
-		/// <param name="Action">Action</param>
-		public void QueueAsyncTask(Func<Task> Action)
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object.</param>
+		public void QueueAsyncTask(AsyncMarkdownProcessing Callback, object State)
 		{
-			this.asyncTasks = this.asyncTasks.ContinueWith(Prev => Task.Run(Action)).Unwrap();
+			lock (this.asyncTasks)
+			{
+				this.asyncTasks.Add(new KeyValuePair<AsyncMarkdownProcessing, object>(Callback, State));
+			}
+		}
+
+		/// <summary>
+		/// Enumerable set of asynchronous tasks that have been registered.
+		/// </summary>
+		public IEnumerable<KeyValuePair<AsyncMarkdownProcessing, object>> AsyncTasks
+		{
+			get
+			{
+				lock (this.asyncTasks)
+				{
+					return this.asyncTasks.ToArray();
+				}
+			}
+		}
+
+		private void ProcessAsyncTasks()
+		{
+			KeyValuePair<AsyncMarkdownProcessing, object>[] Tasks;
+
+			lock (this.asyncTasks)
+			{
+				if (this.asyncTasks.Count == 0)
+					return;
+
+				Tasks = this.asyncTasks.ToArray();
+				this.asyncTasks.Clear();
+			}
+
+			Task.Run(async () =>
+			{
+				foreach (KeyValuePair<AsyncMarkdownProcessing, object> P in Tasks)
+				{
+					try
+					{
+						await P.Key(P.Value);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			});
 		}
 
 		/// <summary>
@@ -6955,6 +7027,8 @@ namespace Waher.Content.Markdown
 			}
 			else
 				await this.GenerateLaTeX(Output, false);
+
+			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>

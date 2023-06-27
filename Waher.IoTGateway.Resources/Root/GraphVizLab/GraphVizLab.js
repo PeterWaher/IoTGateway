@@ -16,7 +16,7 @@ function UpdateGraph()
 		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
 			var GraphDiv = document.getElementById("GraphDiv");
-			GraphDiv.innerHTML = xhttp.responseText;
+			SetDynamicHtml(GraphDiv, xhttp.responseText);
 		};
 	}
 

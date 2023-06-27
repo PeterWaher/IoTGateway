@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
@@ -370,25 +371,40 @@ namespace Waher.Content.Markdown.GraphViz
 
 			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title);
 
-			Document.QueueAsyncTask(async () =>
+			Document.QueueAsyncTask(this.ExecuteGraphViz, new AsyncState()
 			{
-				Output = new StringBuilder();
-
-				try
-				{
-					Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
-					if (!(Info is null))
-						await this.GenerateHTML(Output, Info);
-				}
-				catch (Exception ex)
-				{
-					await InlineScript.GenerateHTML(ex, Output, true, new Variables());
-				}
-
-				await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Output.ToString());
+				Id = Id,
+				Language = Language,
+				Rows = Rows
 			});
 
 			return true;
+		}
+
+		private class AsyncState
+		{
+			public string Id;
+			public string Language;
+			public string[] Rows;
+		}
+
+		private async Task ExecuteGraphViz(object State)
+		{
+			AsyncState AsyncState = (AsyncState)State;
+			StringBuilder Output = new StringBuilder();
+
+			try
+			{
+				GraphInfo Info = await this.GetFileName(AsyncState.Language, AsyncState.Rows, ResultType.Svg, true);
+				if (!(Info is null))
+					await this.GenerateHTML(Output, Info);
+			}
+			catch (Exception ex)
+			{
+				await InlineScript.GenerateHTML(ex, Output, true, new Variables());
+			}
+
+			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, AsyncState.Id, Output.ToString());
 		}
 
 		private async Task GenerateHTML(StringBuilder Output, GraphInfo Info)
@@ -554,6 +570,7 @@ namespace Waher.Content.Markdown.GraphViz
 				UseShellExecute = false,
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
+				RedirectStandardInput = false,
 				WorkingDirectory = GraphVizFolder,
 				CreateNoWindow = true,
 				WindowStyle = ProcessWindowStyle.Hidden

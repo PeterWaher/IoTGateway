@@ -10,6 +10,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Operators;
 
 namespace Waher.IoTGateway.CodeContent
 {
@@ -19,7 +20,7 @@ namespace Waher.IoTGateway.CodeContent
 	public class AsyncScript : ICodeContent
 	{
 		private static readonly AsyncMarkdownHtmlContent asyncHtmlOutput = new AsyncMarkdownHtmlContent();
-		
+
 		private MarkdownDocument document;
 
 		/// <summary>
@@ -110,17 +111,34 @@ namespace Waher.IoTGateway.CodeContent
 			else
 				Title = null;
 
-			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title);
-			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = new Variables();
-			StringBuilder ImplicitPrint = new StringBuilder();
+			AsyncState State = new AsyncState()
+			{
+				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title),
+				Script = this.BuildExpression(Rows),
+				Variables = new Variables(),
+				ImplicitPrint = new StringBuilder()
+			};
 
-			Variables.ConsoleOut = new StringWriter(ImplicitPrint);
-			Document.Settings.Variables.CopyTo(Variables);
+			State.Variables.ConsoleOut = new StringWriter(State.ImplicitPrint);
+			Document.Settings.Variables.CopyTo(State.Variables);
 
-			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, ImplicitPrint, Id));
+			Document.QueueAsyncTask(this.ExecuteScript,State);
 
 			return true;
+		}
+
+		private class AsyncState
+		{
+			public string Id;
+			public Expression Script;
+			public Variables Variables;
+			public StringBuilder ImplicitPrint;
+		}
+
+		private Task ExecuteScript(object State)
+		{
+			AsyncState AsyncState = (AsyncState)State;
+			return this.Evaluate(AsyncState.Script, AsyncState.Variables, AsyncState.ImplicitPrint, AsyncState.Id);
 		}
 
 		private Expression BuildExpression(string[] Rows)

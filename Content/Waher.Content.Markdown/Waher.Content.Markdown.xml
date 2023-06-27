@@ -854,6 +854,12 @@
             <param name="State">State object.</param>
             <returns>If process should continue.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.AsyncMarkdownProcessing">
+            <summary>
+            Delegate used for callback methods performing asynchronous Markdown processing
+            </summary>
+            <param name="State">State object.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownDocument">
             <summary>
             Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -1441,11 +1447,18 @@
             <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
             <returns>Difference document</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.MarkdownDocument.QueueAsyncTask(System.Func{System.Threading.Tasks.Task})">
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.QueueAsyncTask(Waher.Content.Markdown.AsyncMarkdownProcessing,System.Object)">
             <summary>
-            Queues an asynchronous task to be executed.
+            Queues an asynchronous task to be executed. Asynchronous tasks will be executed after the main document
+            has been generated.
             </summary>
-            <param name="Action">Action</param>
+            <param name="Callback">Callback method.</param>
+            <param name="State">State object.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.AsyncTasks">
+            <summary>
+            Enumerable set of asynchronous tasks that have been registered.
+            </summary>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.TransformXml(System.Xml.XmlDocument,Waher.Script.Variables)">
             <summary>

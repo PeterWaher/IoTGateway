@@ -34,7 +34,7 @@ function UpdateHtml()
 		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
 			var HtmlDiv = document.getElementById("HtmlDiv");
-			HtmlDiv.innerHTML = xhttp.responseText;
+			SetDynamicHtml(HtmlDiv, xhttp.responseText);
 		};
 	}
 

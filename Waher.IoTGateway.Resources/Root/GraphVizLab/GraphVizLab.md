@@ -4,6 +4,7 @@ Author: Peter Waher
 Date: 2021-03-31
 Master: /Master.md
 Javascript: GraphVizLab.js
+Javascript: /Events.js
 CSS: GraphVizLab.css
 UserVariable: User
 Privilege: Admin.Lab.GraphViz

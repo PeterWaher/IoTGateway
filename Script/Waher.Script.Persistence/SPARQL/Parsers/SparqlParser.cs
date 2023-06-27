@@ -73,7 +73,23 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "DISTINCT", "FROM", "WHERE", "OPTIONAL", "UNION", "MINUS", "ORDER", "BY", "ASK", "CONSTRUCT" };
+		public string[] InternalKeywords => new string[] 
+		{ 
+			"DISTINCT", 
+			"FROM",
+			"WHERE", 
+			"OPTIONAL", 
+			"UNION", 
+			"MINUS", 
+			"ORDER", 
+			"BY", 
+			"ASK", 
+			"CONSTRUCT",
+			"ASC",
+			"DESC",
+			"VALUES",
+			"UNDEF"
+		};
 
 		/// <summary>
 		/// Tries to parse a script node.

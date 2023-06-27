@@ -28,7 +28,12 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "LAZY", "FROM", "WHERE" };
+		public string[] InternalKeywords => new string[] 
+		{ 
+			"LAZY", 
+			"FROM", 
+			"WHERE" 
+		};
 
 		/// <summary>
 		/// Tries to parse a script node.

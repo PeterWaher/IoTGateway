@@ -62,6 +62,8 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 			get => currentDefinition;
 			internal set
 			{
+				bool DeleteCahces = !(currentDefinition is null) && currentDefinition.Id != value.Id;
+
 				currentDefinition = value;
 
 				string Color = ColorToString(currentDefinition.GraphBgColor);
@@ -72,9 +74,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 				GraphViz.DefaultFgColor = Color;
 				PlantUml.DefaultFgColor = Color;
 
-				GraphViz.DeleteOldFiles(TimeSpan.Zero, false);
-				PlantUml.DeleteOldFiles(TimeSpan.Zero, false);
-				XmlLayout.DeleteOldFiles(TimeSpan.Zero, false);
+				if (DeleteCahces)
+				{
+					GraphViz.DeleteOldFiles(TimeSpan.Zero, false);
+					PlantUml.DeleteOldFiles(TimeSpan.Zero, false);
+					XmlLayout.DeleteOldFiles(TimeSpan.Zero, false);
+				}
 			}
 		}
 

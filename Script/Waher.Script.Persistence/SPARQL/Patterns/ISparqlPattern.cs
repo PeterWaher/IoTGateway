@@ -49,7 +49,5 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
         /// <param name="Order">Order to traverse the nodes.</param>
         /// <returns>If the process was completed.</returns>
         bool ForAll(ScriptNodeEventHandler Callback, object State, SearchMethod Order);
-
-
 	}
 }

@@ -634,13 +634,22 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					foreach (ISemanticTriple T in this.triples)
 					{
 						if (T.Subject is SemanticScriptElement S)
-							S.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!S.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 
 						if (T.Predicate is SemanticScriptElement P)
-							P.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!P.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 
 						if (T.Object is SemanticScriptElement O)
-							O.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!O.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 					}
 				}
 
@@ -675,13 +684,22 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					foreach (ISemanticTriple T in this.triples)
 					{
 						if (T.Subject is SemanticScriptElement S)
-							S.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!S.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 
 						if (T.Predicate is SemanticScriptElement P)
-							P.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!P.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 
 						if (T.Object is SemanticScriptElement O)
-							O.Node.ForAllChildNodes(Callback, State, Order);
+						{
+							if (!O.Node.ForAllChildNodes(Callback, State, Order))
+								return false;
+						}
 					}
 				}
 

@@ -18,6 +18,7 @@ using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SPARQL.Patterns;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -73,17 +74,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] 
-		{ 
-			"DISTINCT", 
+		public string[] InternalKeywords => new string[]
+		{
+			"DISTINCT",
 			"FROM",
-			"WHERE", 
-			"OPTIONAL", 
-			"UNION", 
-			"MINUS", 
-			"ORDER", 
-			"BY", 
-			"ASK", 
+			"WHERE",
+			"OPTIONAL",
+			"UNION",
+			"MINUS",
+			"ORDER",
+			"BY",
+			"ASK",
 			"CONSTRUCT",
 			"ASC",
 			"DESC",
@@ -483,23 +484,25 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'U':
 						case 'm':
 						case 'M':
+						case 'v':
+						case 'V':
 
 							if (!this.ParsePatternOperator(Parser))
 								break;
 
-							switch (Parser.NextNonWhitespaceChar())
+							Parser.SkipWhiteSpace();
+							switch (Parser.PeekNextChar())
 							{
 								case '.':
+									Parser.NextChar();
 									Subject = null;
 									Predicate = null;
 									TriplePosition = 0;
 									break;
 
 								case '}':
-									Parser.UndoChar();
 									return;
 							}
-
 							continue;
 					}
 				}
@@ -652,6 +655,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'O':
 						case 'm':
 						case 'M':
+						case 'v':
+						case 'V':
 							Parser.UndoChar();
 
 							if (!this.ParsePatternOperator(Parser))
@@ -706,8 +711,128 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					this.currentPattern = new ComplementPattern(Left, Pattern);
 					return true;
 
+				case "VALUES":
+					Parser.NextToken();
+
+					ValuesPattern Values = this.ParseValues(Parser);
+
+					this.currentRegularPattern = null;
+
+					if (this.currentPattern.IsEmpty)
+						this.currentPattern = Values;
+					else
+						this.currentPattern = new IntersectionPattern(this.currentPattern, Values);
+
+					return true;
+
 				default:
 					return false;
+			}
+		}
+
+		private ValuesPattern ParseValues(ScriptParser Parser)
+		{
+			Parser.SkipWhiteSpace();
+			switch (Parser.PeekNextChar())
+			{
+				case '?':
+					Parser.NextChar();
+
+					string s = this.ParseName(Parser);
+
+					if (Parser.NextNonWhitespaceChar() != '{')
+						throw Parser.SyntaxError("Expected {");
+
+					List<ISemanticElement> Values = new List<ISemanticElement>();
+
+					while (true)
+					{
+						Parser.SkipWhiteSpace();
+						switch (Parser.PeekNextChar())
+						{
+							case (char)0:
+								throw Parser.SyntaxError("Expected }");
+
+							case '}':
+								Parser.NextChar();
+
+								return new ValuesPattern(s, Values.ToArray());
+
+							default:
+								ISemanticElement Element = this.ParseElement(Parser, 2);
+								if (Element is UndefinedLiteral)
+									Values.Add(null);
+								else
+									Values.Add(Element);
+								break;
+						}
+					}
+
+				case '(':
+					Parser.NextChar();
+
+					List<string> Names = new List<string>();
+
+					while (true)
+					{
+						switch (Parser.NextNonWhitespaceChar())
+						{
+							case '?':
+								Names.Add(this.ParseName(Parser));
+								continue;
+
+							case ')':
+								break;
+
+							default:
+								throw Parser.SyntaxError("Expected ? or )");
+						}
+
+						break;
+					}
+
+					int i, c = Names.Count;
+					if (c == 0)
+						throw Parser.SyntaxError("Expected variable name.");
+
+					if (Parser.NextNonWhitespaceChar() != '{')
+						throw Parser.SyntaxError("Expected {");
+
+					List<ISemanticElement[]> Records = new List<ISemanticElement[]>();
+
+					while (true)
+					{
+						switch (Parser.NextNonWhitespaceChar())
+						{
+							case '(':
+								Values = new List<ISemanticElement>();
+
+								for (i = 0; i < c; i++)
+								{
+									ISemanticElement Element = this.ParseElement(Parser, 2);
+
+									if (Element is UndefinedLiteral)
+										Values.Add(null);
+									else
+										Values.Add(Element);
+								}
+
+								if (Parser.NextNonWhitespaceChar() != ')')
+									throw Parser.SyntaxError("Expected )");
+
+								Records.Add(Values.ToArray());
+								continue;
+
+							case '}':
+								return new ValuesPattern(Names.ToArray(), Records.ToArray());
+
+							default:
+								throw Parser.SyntaxError("Expected ( or }");
+						}
+					}
+
+				default:
+					throw Parser.SyntaxError("Expected ? or (");
 			}
 		}
 
@@ -1342,6 +1467,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 									if (TriplePosition == 2)
 										return new BooleanLiteral(false);
 									break;
+							}
+
+							if (string.Compare(s, "UNDEF", true) == 0)
+							{
+								if (TriplePosition != 2)
+									throw Parser.SyntaxError("UNDEF not permitted.");
+
+								return new UndefinedLiteral();
 							}
 
 							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start, true);

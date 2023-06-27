@@ -140,6 +140,13 @@
     <None Remove="Sparql\Test_32.srx" />
     <None Remove="Sparql\Test_32.ttl" />
     <None Remove="Sparql\Test_32b.rq" />
+    <None Remove="Sparql\Test_33.rq" />
+    <None Remove="Sparql\Test_33.srx" />
+    <None Remove="Sparql\Test_33.ttl" />
+    <None Remove="Sparql\Test_34.rq" />
+    <None Remove="Sparql\Test_34.srx" />
+    <None Remove="Sparql\Test_34.ttl" />
+    <None Remove="Sparql\Test_34b.rq" />
   </ItemGroup>
 
   <ItemGroup>
@@ -224,6 +231,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sparql\Test_34b.rq" />
+    <EmbeddedResource Include="Sparql\Test_34.srx" />
+    <EmbeddedResource Include="Sparql\Test_34.rq" />
+    <EmbeddedResource Include="Sparql\Test_34.ttl" />
+    <EmbeddedResource Include="Sparql\Test_33.srx" />
+    <EmbeddedResource Include="Sparql\Test_33.rq" />
+    <EmbeddedResource Include="Sparql\Test_33.ttl" />
     <EmbeddedResource Include="Sparql\Test_32.srx" />
     <EmbeddedResource Include="Sparql\Test_32b.rq" />
     <EmbeddedResource Include="Sparql\Test_32.rq" />

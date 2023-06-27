@@ -280,6 +280,20 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			else
 				Where = null;
 
+			if (s == "VALUES")
+			{
+				Parser.NextToken();
+
+				ValuesPattern Values = this.ParseValues(Parser);
+
+				if (Where is null)
+					Where = Values;
+				else
+					Where = new IntersectionPattern(Where, Values);
+
+				s = Parser.PeekNextToken().ToUpper();
+			}
+
 			if (s == "ORDER")
 			{
 				if (Columns is null)

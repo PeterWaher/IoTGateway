@@ -202,22 +202,29 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 
 				GroupResultSet GroupComparer = new GroupResultSet(this.groupBy, this.groupByNames);
-				SortedDictionary<ISparqlResultRecord, LinkedList<ISparqlResultRecord>> Groups =
-					new SortedDictionary<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>(GroupComparer);
+				SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>> Groups =
+					new SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>>(GroupComparer);
 				LinkedList<ISparqlResultRecord> LastList = null;
 				ISparqlResultRecord LastRecord = null;
+				bool First = false;
 
 				foreach (ISparqlResultRecord P in Possibilities)
 				{
 					if (LastRecord is null || GroupComparer.Compare(LastRecord, P) != 0)
 					{
-						if (!Groups.TryGetValue(P, out LastList))
+						if (Groups.TryGetValue(P, out KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>> P2))
+						{
+							LastRecord = P2.Key;
+							LastList = P2.Value;
+							First = false;
+						}
+						else
 						{
 							LastList = new LinkedList<ISparqlResultRecord>();
-							Groups[P] = LastList;
+							Groups[P] = new KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>(P, LastList);
+							LastRecord = P;
+							First = true;
 						}
-
-						LastRecord = P;
 					}
 
 					LastList.AddLast(P);
@@ -226,15 +233,21 @@ namespace Waher.Script.Persistence.SPARQL
 					{
 						foreach (string VectorProperty in VectorProperties)
 						{
-							if (!(LastRecord[VectorProperty] is SemanticElementVector Vector))
+							ISemanticElement Element = LastRecord[VectorProperty];
+							if (!(Element is SemanticElementVector Vector))
 							{
 								Vector = new SemanticElementVector();
 								LastRecord[VectorProperty] = Vector;
 							}
 
-							Vector.Add(P[VectorProperty]);
+							if (First)
+								Vector.Add(Element);
+							else
+								Vector.Add(P[VectorProperty]);
 						}
 					}
+
+					First = false;
 				}
 
 				Possibilities = Groups.Keys;
@@ -335,7 +348,7 @@ namespace Waher.Script.Persistence.SPARQL
 				foreach (ISparqlResultRecord P in Possibilities)
 				{
 					Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
-					
+
 					foreach (ISparqlResultItem Loop in P)
 					{
 						Name = Loop.Name;

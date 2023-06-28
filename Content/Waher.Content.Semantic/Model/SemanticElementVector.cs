@@ -120,7 +120,7 @@ namespace Waher.Content.Semantic.Model
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return Expression.ToString(this);
+			return Expression.ToString(this.elements);
 		}
 
 		/// <summary>

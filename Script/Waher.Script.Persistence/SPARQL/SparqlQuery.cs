@@ -45,8 +45,11 @@ namespace Waher.Script.Persistence.SPARQL
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
+		private readonly ScriptNode[] groupBy;
+		private readonly ScriptNode[] groupByNames;
 		private readonly ScriptNode from;
 		private readonly ISparqlPattern where;
+		private readonly ScriptNode having;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly SparqlRegularPattern construct;
 		private readonly QueryType queryType;
@@ -61,6 +64,9 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="ColumnNames">Names of selected columns.</param>
 		/// <param name="From">Data source.</param>
 		/// <param name="Where">Optional where clause</param>
+		/// <param name="GroupBy">Any GROUP BY rules.</param>
+		/// <param name="GroupByNames">Optional names for GROUP BY rules.</param>
+		/// <param name="Having">Any filter on groups.</param>
 		/// <param name="OrderBy">Order to present result set.</param>
 		/// <param name="Construct">Triples to construct.</param>
 		/// <param name="Start">Start position in script expression.</param>
@@ -68,6 +74,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Expression">Expression containing script.</param>
 		public SparqlQuery(QueryType QueryType, bool Distinct, ScriptNode[] Columns,
 			ScriptNode[] ColumnNames, ScriptNode From, ISparqlPattern Where,
+			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
 			KeyValuePair<ScriptNode, bool>[] OrderBy, SparqlRegularPattern Construct,
 			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
@@ -87,6 +94,15 @@ namespace Waher.Script.Persistence.SPARQL
 
 			this.where = Where;
 			this.where?.SetParent(this);
+
+			this.groupBy = GroupBy;
+			this.groupBy?.SetParent(this);
+
+			this.groupByNames = GroupByNames;
+			this.groupByNames?.SetParent(this);
+
+			this.having = Having;
+			this.having?.SetParent(this);
 
 			this.orderBy = OrderBy;
 

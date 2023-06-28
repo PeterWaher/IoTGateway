@@ -6,7 +6,6 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Model;
-using Waher.Runtime.Inventory;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Functions.Strings;
@@ -159,9 +158,12 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			List<ScriptNode> Columns = null;
 			List<ScriptNode> ColumnNames = null;
+			List<ScriptNode> GroupBy = null;
+			List<ScriptNode> GroupByNames = null;
 			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 			SparqlRegularPattern Construct = null;
 			ISparqlPattern Where;
+			ScriptNode Having;
 			ScriptNode From;
 
 			switch (s)
@@ -294,6 +296,43 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				s = Parser.PeekNextToken().ToUpper();
 			}
 
+			if (s == "GROUP")
+			{
+				Parser.NextToken();
+
+				if (Parser.NextToken().ToUpper() != "BY")
+					throw Parser.SyntaxError("Expected BY");
+
+				GroupBy = new List<ScriptNode>();
+				GroupByNames = new List<ScriptNode>();
+
+				while (!string.IsNullOrEmpty(s) && s != "ORDER" && s != "HAVING" && s != "ORDER" && s != ";")
+				{
+					Node = this.ParseNamedExpression(Parser);
+					if (Node is NamedNode NamedNode)
+					{
+						GroupBy.Add(NamedNode.LeftOperand);
+						GroupByNames.Add(NamedNode.RightOperand);
+					}
+					else
+					{
+						GroupBy.Add(Node);
+						GroupByNames.Add(null);
+					}
+
+					s = Parser.PeekNextToken().ToUpper();
+				}
+			}
+
+			if (s == "HAVING")
+			{
+				Parser.NextToken();
+				Having = this.ParseExpression(Parser, false);
+				s = Parser.PeekNextToken().ToUpper();
+			}
+			else
+				Having = null;
+
 			if (s == "ORDER")
 			{
 				if (Columns is null)
@@ -323,8 +362,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
-				ColumnNames?.ToArray(), From, Where, OrderBy?.ToArray(), Construct,
-				Parser.Start, Parser.Length, Parser.Expression);
+				ColumnNames?.ToArray(), From, Where, GroupBy?.ToArray(), GroupByNames?.ToArray(),
+				Having, OrderBy?.ToArray(), Construct, Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
 		}
@@ -1246,10 +1285,25 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				// Aggregates
 
 				case "COUNT":
+					Node = this.ParseArgument(Parser);
+					return new Count(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "SUM":
+					Node = this.ParseArgument(Parser);
+					return new Sum(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "MIN":
+					Node = this.ParseArgument(Parser);
+					return new Min(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "MAX":
+					Node = this.ParseArgument(Parser);
+					return new Max(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "AVG":
+					Node = this.ParseArgument(Parser);
+					return new Average(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "SAMPLE":
 				case "GROUP_CONCAT":
 

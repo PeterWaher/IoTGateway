@@ -1752,7 +1752,7 @@
             Executes a SPARQL query.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL query.
             </summary>
@@ -1762,6 +1762,9 @@
             <param name="ColumnNames">Names of selected columns.</param>
             <param name="From">Data source.</param>
             <param name="Where">Optional where clause</param>
+            <param name="GroupBy">Any GROUP BY rules.</param>
+            <param name="GroupByNames">Optional names for GROUP BY rules.</param>
+            <param name="Having">Any filter on groups.</param>
             <param name="OrderBy">Order to present result set.</param>
             <param name="Construct">Triples to construct.</param>
             <param name="Start">Start position in script expression.</param>

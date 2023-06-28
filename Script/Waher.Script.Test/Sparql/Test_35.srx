@@ -9,7 +9,7 @@
 
   <results>
 		<result>
-			<binding name="price">
+			<binding name="totalPrice">
 				<literal datatype="http://www.w3.org/2001/XMLSchema#double">21</literal>
 			</binding>
 		</result>

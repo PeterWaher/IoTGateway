@@ -166,14 +166,6 @@ namespace Waher.Script.Persistence.SPARQL
 			else
 				Possibilities = await this.where.Search(Cube, Variables, null, this);
 
-			if (this.queryType == QueryType.Ask)
-			{
-				if (!(Possibilities is null))
-					return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
-
-				return new ObjectValue(new SparqlResultSet(false));
-			}
-
 			if (!(this.groupBy is null) && !(Possibilities is null))
 			{
 				LinkedList<string> VectorProperties = null;
@@ -251,6 +243,41 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 
 				Possibilities = Groups.Keys;
+
+				if (!(this.having is null))
+				{
+					LinkedList<ISparqlResultRecord> Filtered = new LinkedList<ISparqlResultRecord>();
+					ObjectProperties RecordVariables = null;
+
+					foreach (ISparqlResultRecord Record in Possibilities)
+					{
+						try
+						{
+							if (RecordVariables is null)
+								RecordVariables = new ObjectProperties(Record, Variables);
+							else
+								RecordVariables.Object = Record;
+
+							object Value = await EvaluateValue(RecordVariables, this.having);
+							if (Value is bool b && b)
+								Filtered.AddLast(Record);
+						}
+						catch (Exception)
+						{
+							// Ignore record
+						}
+					}
+
+					Possibilities = Filtered;
+				}
+			}
+
+			if (this.queryType == QueryType.Ask)
+			{
+				if (!(Possibilities is null))
+					return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
+
+				return new ObjectValue(new SparqlResultSet(false));
 			}
 
 			if (this.queryType == QueryType.Construct)

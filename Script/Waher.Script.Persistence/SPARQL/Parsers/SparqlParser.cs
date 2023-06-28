@@ -306,7 +306,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				GroupBy = new List<ScriptNode>();
 				GroupByNames = new List<ScriptNode>();
 
-				while (!string.IsNullOrEmpty(s) && s != "ORDER" && s != "HAVING" && s != "ORDER" && s != ";")
+				while (!string.IsNullOrEmpty(s) && s != "HAVING" && s != "ORDER" && s != ";")
 				{
 					Node = this.ParseNamedExpression(Parser);
 					if (Node is NamedNode NamedNode)
@@ -322,13 +322,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					s = Parser.PeekNextToken().ToUpper();
 				}
-			}
 
-			if (s == "HAVING")
-			{
-				Parser.NextToken();
-				Having = this.ParseExpression(Parser, false);
-				s = Parser.PeekNextToken().ToUpper();
+				if (s == "HAVING")
+				{
+					Parser.NextToken();
+					Having = this.ParseExpression(Parser, false);
+					s = Parser.PeekNextToken().ToUpper();
+				}
+				else
+					Having = null;
 			}
 			else
 				Having = null;

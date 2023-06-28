@@ -57,7 +57,7 @@ namespace Waher.Script.Functions.Runtime
 		/// If argument is a named member reference. <see cref="VariableName"/> will contain
 		/// the name of a named member.
 		/// </summary>
-		public bool IsMember => this.IsMember;
+		public bool IsMember => this.isMember;
 
 		/// <summary>
 		/// Name of the function

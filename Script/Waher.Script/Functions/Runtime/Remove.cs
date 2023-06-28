@@ -50,7 +50,7 @@ namespace Waher.Script.Functions.Runtime
                     this.variableName = Member.Name;
                 }
                 else
-                    throw new SyntaxException("Variable reference or named property expected.", Argument.Start, string.Empty);
+                    throw new SyntaxException("Variable reference or named property expected.", this.Argument.Start, string.Empty);
             }
         }
 
@@ -90,9 +90,8 @@ namespace Waher.Script.Functions.Runtime
 			{
                 IElement Obj = this.@object.Evaluate(Variables);
                 Type T = Obj.AssociatedObjectValue.GetType();
-                MethodInfo MI = T.GetRuntimeMethod("Remove", stringArgument);
-                if (MI is null)
-                    throw new ScriptRuntimeException("Unable to remove property " + this.variableName + " from objects of type " + T.FullName + ".", this);
+                MethodInfo MI = T.GetRuntimeMethod("Remove", stringArgument)
+                    ?? throw new ScriptRuntimeException("Unable to remove property " + this.variableName + " from objects of type " + T.FullName + ".", this);
 
                 object Result = MI.Invoke(Obj.AssociatedObjectValue, new object[] { this.variableName });
 
@@ -122,9 +121,8 @@ namespace Waher.Script.Functions.Runtime
             {
                 IElement Obj = await this.@object.EvaluateAsync(Variables);
                 Type T = Obj.AssociatedObjectValue.GetType();
-                MethodInfo MI = T.GetRuntimeMethod("Remove", stringArgument);
-                if (MI is null)
-                    throw new ScriptRuntimeException("Unable to remove property " + this.variableName + " from objects of type " + T.FullName + ".", this);
+                MethodInfo MI = T.GetRuntimeMethod("Remove", stringArgument)
+                    ?? throw new ScriptRuntimeException("Unable to remove property " + this.variableName + " from objects of type " + T.FullName + ".", this);
 
                 object Result = MI.Invoke(Obj.AssociatedObjectValue, new object[] { this.variableName });
 

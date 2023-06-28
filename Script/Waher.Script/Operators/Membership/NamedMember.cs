@@ -107,7 +107,7 @@ namespace Waher.Script.Operators.Membership
 
 								foreach (MethodInfo MI in T.GetRuntimeMethods())
 								{
-									if (!MI.IsAbstract && MI.IsPublic && MI.Name == Name)
+									if (!MI.IsAbstract && MI.IsPublic && MI.Name == this.name)
 									{
 										if (Methods is null)
 											Methods = new List<MethodLambda>();

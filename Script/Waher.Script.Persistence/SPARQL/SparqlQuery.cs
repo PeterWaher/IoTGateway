@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
-using Waher.Content.Semantic.Model.Literals;
-using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -161,7 +159,7 @@ namespace Waher.Script.Persistence.SPARQL
 					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
 			}
 
-			IEnumerable<Possibility> Possibilities;
+			IEnumerable<ISparqlResultRecord> Possibilities;
 
 			if (this.where is null)
 				Possibilities = null;
@@ -176,6 +174,72 @@ namespace Waher.Script.Persistence.SPARQL
 				return new ObjectValue(new SparqlResultSet(false));
 			}
 
+			if (!(this.groupBy is null) && !(Possibilities is null))
+			{
+				LinkedList<string> VectorProperties = null;
+
+				if (!(this.columns is null))
+				{
+					foreach (ScriptNode Node in this.columns)
+					{
+						if (!(Node is VariableReference))
+						{
+							Node.ForAllChildNodes((ScriptNode Descendant, out ScriptNode NewNode, object State) =>
+							{
+								if (Descendant is VariableReference Ref)
+								{
+									if (VectorProperties is null)
+										VectorProperties = new LinkedList<string>();
+
+									VectorProperties.AddLast(Ref.VariableName);
+								}
+
+								NewNode = null;
+								return true;
+							}, null, SearchMethod.TreeOrder);
+						}
+					}
+				}
+
+				GroupResultSet GroupComparer = new GroupResultSet(this.groupBy, this.groupByNames);
+				SortedDictionary<ISparqlResultRecord, LinkedList<ISparqlResultRecord>> Groups =
+					new SortedDictionary<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>(GroupComparer);
+				LinkedList<ISparqlResultRecord> LastList = null;
+				ISparqlResultRecord LastRecord = null;
+
+				foreach (ISparqlResultRecord P in Possibilities)
+				{
+					if (LastRecord is null || GroupComparer.Compare(LastRecord, P) != 0)
+					{
+						if (!Groups.TryGetValue(P, out LastList))
+						{
+							LastList = new LinkedList<ISparqlResultRecord>();
+							Groups[P] = LastList;
+						}
+
+						LastRecord = P;
+					}
+
+					LastList.AddLast(P);
+
+					if (!(VectorProperties is null))
+					{
+						foreach (string VectorProperty in VectorProperties)
+						{
+							if (!(LastRecord[VectorProperty] is SemanticElementVector Vector))
+							{
+								Vector = new SemanticElementVector();
+								LastRecord[VectorProperty] = Vector;
+							}
+
+							Vector.Add(P[VectorProperty]);
+						}
+					}
+				}
+
+				Possibilities = Groups.Keys;
+			}
+
 			if (this.queryType == QueryType.Construct)
 			{
 				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
@@ -183,7 +247,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 				if (!(Possibilities is null))
 				{
-					foreach (Possibility P in Possibilities)
+					foreach (ISparqlResultRecord P in Possibilities)
 					{
 						if (RecordVariables is null)
 							RecordVariables = new ObjectProperties(P, Variables);
@@ -268,14 +332,13 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(Possibilities is null))
 			{
-				foreach (Possibility P in Possibilities)
+				foreach (ISparqlResultRecord P in Possibilities)
 				{
-					Dictionary<string, SparqlResultItem> Record = new Dictionary<string, SparqlResultItem>();
-					Possibility Loop = P;
-
-					while (!(Loop is null))
+					Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
+					
+					foreach (ISparqlResultItem Loop in P)
 					{
-						Name = Loop.VariableName;
+						Name = Loop.Name;
 
 						if (ColumnVariables.TryGetValue(Name, out i))
 							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
@@ -287,8 +350,6 @@ namespace Waher.Script.Persistence.SPARQL
 
 							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
 						}
-
-						Loop = Loop.NextVariable;
 					}
 
 					if (!(ColumnScript is null))
@@ -310,7 +371,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 						sb.Clear();
 
-						foreach (SparqlResultItem Value in Record.Values)
+						foreach (ISparqlResultItem Value in Record.Values)
 						{
 							if (First)
 								First = false;
@@ -335,23 +396,7 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			if (!(this.orderBy is null))
-			{
-				KeyValuePair<string, bool>[] Order = new KeyValuePair<string, bool>[c = this.orderBy.Length];
-
-				for (i = 0; i < c; i++)
-				{
-					ScriptNode Node = this.orderBy[i].Key;
-
-					if (Node is VariableReference Ref)
-						Name = Ref.VariableName;
-					else
-						Name = (await Node.EvaluateAsync(Variables)).AssociatedObjectValue?.ToString() ?? string.Empty;
-
-					Order[i] = new KeyValuePair<string, bool>(Name, this.orderBy[i].Value);
-				}
-
-				Records.Sort(new OrderResultSet(Order));
-			}
+				Records.Sort(new OrderResultSet(this.orderBy));
 
 			return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), new Uri[0],
 				Records.ToArray()));

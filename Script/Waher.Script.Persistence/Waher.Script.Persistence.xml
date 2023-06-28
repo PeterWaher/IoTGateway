@@ -882,6 +882,31 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.GroupResultSet">
+            <summary>
+            Comparer for grouping a SPARQL result set.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.GroupResultSet.#ctor(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
+            <summary>
+            Comparer for grouping a SPARQL result set.
+            </summary>
+            <param name="GroupBy">Group by-statement, containing a vector
+            of variable names (or expressions), and corresponding names (if provided).</param>
+            <param name="Names">Group alias names, if provided.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.GroupResultSet.Compare(Waher.Content.Semantic.ISparqlResultRecord,Waher.Content.Semantic.ISparqlResultRecord)">
+            <summary>
+            Compares two records.
+            </summary>
+            <param name="x">Record 1</param>
+            <param name="y">Record 2</param>
+            <returns>
+            Negative, if Record 1 is less than Record 2
+            Zero, if records are equal
+            Positive, if Record 1 is greated than Record 2
+            </returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.NamedNode">
             <summary>
             Represents a named node.
@@ -918,12 +943,12 @@
             Comparer for ordering a SPARQL result set.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.OrderResultSet.#ctor(System.Collections.Generic.KeyValuePair{System.String,System.Boolean}[])">
+        <member name="M:Waher.Script.Persistence.SPARQL.OrderResultSet.#ctor(System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[])">
             <summary>
             Comparer for ordering a SPARQL result set.
             </summary>
             <param name="OrderBy">Order by-statement, containing a vector
-            of variable names, and corresponding ascending (true) or
+            of variable names (or expressions), and corresponding ascending (true) or
             descending (false) direction.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.OrderResultSet.Compare(Waher.Content.Semantic.ISparqlResultRecord,Waher.Content.Semantic.ISparqlResultRecord)">
@@ -1505,7 +1530,7 @@
             <param name="Value">Variable value.</param>
             <param name="NextVariable">Previous linked list of variables in possibility.</param>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.VariableName">
+        <member name="P:Waher.Script.Persistence.SPARQL.Possibility.Name">
             <summary>
             Name of variable.
             </summary>
@@ -1534,6 +1559,13 @@
             <param name="VariableName">Variable name.</param>
             <returns>Value of variable, if found, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.SetValue(System.String,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Sets a variable value, given its variable name.
+            </summary>
+            <param name="VariableName">Variable name.</param>
+            <param name="Value">Value</param>
+        </member>
         <member name="M:Waher.Script.Persistence.SPARQL.Possibility.ToString">
             <summary>
             Shows the collection of possible values as a string.
@@ -1547,6 +1579,18 @@
             </summary>
             <param name="P">First possibility.</param>
             <returns>Sorted description.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.GetEnumerator">
+            <summary>
+            Gets an enumerator for all items in the possibility.
+            </summary>
+            <returns>Enumerator</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Possibility.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator for all items in the possibility.
+            </summary>
+            <returns>Enumerator</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.QueryTripleType">
             <summary>

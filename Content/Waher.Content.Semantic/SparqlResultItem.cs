@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Contains an item in a record from the results of a SPARQL query.
 	/// </summary>
-	public class SparqlResultItem
+	public class SparqlResultItem : ISparqlResultItem
 	{
 		/// <summary>
 		/// Contains an item in a record from the results of a SPARQL query.
@@ -26,7 +26,7 @@
 		/// <summary>
 		/// Value of item in record.
 		/// </summary>
-		public ISemanticElement Value { get; }
+		public ISemanticElement Value { get; set; }
 
 		/// <summary>
 		/// Column index.

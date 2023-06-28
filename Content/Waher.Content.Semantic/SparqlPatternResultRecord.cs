@@ -9,13 +9,13 @@ namespace Waher.Content.Semantic
 	/// </summary>
 	public class SparqlPatternResultRecord : ISparqlResultRecord
 	{
-		private readonly Dictionary<string, SparqlResultItem> items;
+		private readonly Dictionary<string, ISparqlResultItem> items;
 
 		/// <summary>
 		/// Contains a record from the results of a SPARQL query.
 		/// </summary>
 		/// <param name="Items">Items in record.</param>
-		public SparqlPatternResultRecord(Dictionary<string, SparqlResultItem> Items)
+		public SparqlPatternResultRecord(Dictionary<string, ISparqlResultItem> Items)
 		{
 			this.items = Items;
 		}
@@ -30,10 +30,18 @@ namespace Waher.Content.Semantic
 		{
 			get
 			{
-				if (this.items.TryGetValue(VariableName, out SparqlResultItem Result))
+				if (this.items.TryGetValue(VariableName, out ISparqlResultItem Result))
 					return Result.Value;
 				else
 					return null;
+			}
+
+			set
+			{
+				if (this.items.TryGetValue(VariableName, out ISparqlResultItem Existing))
+					Existing.Value = value;
+				else
+					this.items[VariableName] = new SparqlResultItem(VariableName, value, this.items.Count);
 			}
 		}
 
@@ -41,7 +49,7 @@ namespace Waher.Content.Semantic
 		/// Gets enumerator over items in record.
 		/// </summary>
 		/// <returns>Enumerator object.</returns>
-		public IEnumerator<SparqlResultItem> GetEnumerator()
+		public IEnumerator<ISparqlResultItem> GetEnumerator()
 		{
 			return this.items.Values.GetEnumerator();
 		}
@@ -61,7 +69,7 @@ namespace Waher.Content.Semantic
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
 
-			foreach (SparqlResultItem Item in this.items.Values)
+			foreach (ISparqlResultItem Item in this.items.Values)
 			{
 				if (First)
 					First = false;

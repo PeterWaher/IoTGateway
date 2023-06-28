@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
+using Waher.Script.Exceptions;
+using Waher.Script.Model;
+using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
 {
@@ -8,19 +14,42 @@ namespace Waher.Script.Persistence.SPARQL
 	/// </summary>
 	public class OrderResultSet : IComparer<ISparqlResultRecord>
 	{
-		private readonly KeyValuePair<string, bool>[] orderBy;
+		private readonly string[] variables;
+		private readonly ScriptNode[] expression;
+		private readonly bool[] ascending;
+		private readonly bool[] calculated;
 		private readonly int count;
 
 		/// <summary>
 		/// Comparer for ordering a SPARQL result set.
 		/// </summary>
 		/// <param name="OrderBy">Order by-statement, containing a vector
-		/// of variable names, and corresponding ascending (true) or
+		/// of variable names (or expressions), and corresponding ascending (true) or
 		/// descending (false) direction.</param>
-		public OrderResultSet(KeyValuePair<string, bool>[] OrderBy)
+		public OrderResultSet(KeyValuePair<ScriptNode, bool>[] OrderBy)
 		{
-			this.orderBy = OrderBy;
-			this.count = OrderBy?.Length ?? 0;
+			ScriptNode Node;
+			int i;
+
+			this.count = OrderBy.Length;
+			this.variables = new string[this.count];
+			this.expression = new ScriptNode[this.count];
+			this.ascending = new bool[this.count];
+			this.calculated = new bool[this.count];
+
+			for (i = 0; i < this.count; i++)
+			{
+				this.expression[i] = Node = OrderBy[i].Key;
+				this.ascending[i] = OrderBy[i].Value;
+
+				if (Node is VariableReference Ref)
+				{
+					this.variables[i] = Ref.VariableName;
+					this.calculated[i] = false;
+				}
+				else
+					this.calculated[i] = true;
+			}
 		}
 
 		/// <summary>
@@ -40,15 +69,57 @@ namespace Waher.Script.Persistence.SPARQL
 
 			for (i = 0; i < this.count; i++)
 			{
-				e1 = x[this.orderBy[i].Key];
-				e2 = y[this.orderBy[i].Key];
+				if (this.calculated[i])
+				{
+					Variables v = new Variables();
+					ObjectProperties v1 = new ObjectProperties(x, v);
+					ObjectProperties v2 = new ObjectProperties(y, v);
 
-				j = e1.CompareTo(e2);
-				if (j != 0)
-					return this.orderBy[i].Value ? j : -j;
+					e1 = EvaluateElement(this.expression[i], v1);
+					e2 = EvaluateElement(this.expression[i], v2);
+				}
+				else
+				{
+					e1 = x[this.variables[i]];
+					e2 = y[this.variables[i]];
+				}
+
+				if (e1 is null)
+				{
+					if (!(e2 is null))
+						return -1;
+				}
+				else if (e2 is null)
+					return 1;
+				else
+				{
+					j = e1.CompareTo(e2);
+					if (j != 0)
+						return this.ascending[i] ? j : -j;
+				}
 			}
 
 			return 0;
+		}
+
+		internal static ISemanticElement EvaluateElement(ScriptNode Expression, Variables Variables)
+		{
+			object Obj;
+
+			try
+			{
+				Obj = Expression.Evaluate(Variables)?.AssociatedObjectValue;
+			}
+			catch (ScriptReturnValueException ex)
+			{
+				Obj = ex.ReturnValue.AssociatedObjectValue;
+			}
+			catch (Exception ex)
+			{
+				return new StringLiteral(ex.Message);
+			}
+
+			return SemanticElements.Encapsulate(Obj);
 		}
 	}
 }

@@ -143,7 +143,7 @@ namespace Waher.Content.Semantic
 							switch (E2.LocalName)
 							{
 								case "result":
-									Dictionary<string, SparqlResultItem> Record = new Dictionary<string, SparqlResultItem>();
+									Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
 									int Index = 0;
 
 									foreach (XmlNode N3 in E2.ChildNodes)

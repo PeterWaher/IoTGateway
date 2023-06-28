@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model.Literals;
@@ -8,7 +9,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// <summary>
 	/// Represents a possible solution during SPARQL evaluation.
 	/// </summary>
-	public class Possibility
+	public class Possibility : ISparqlResultRecord, ISparqlResultItem
 	{
 		/// <summary>
 		/// Represents a possible solution during SPARQL evaluation.
@@ -28,7 +29,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="NextVariable">Previous linked list of variables in possibility.</param>
 		public Possibility(string VariableName, ISemanticElement Value, Possibility NextVariable)
 		{
-			this.VariableName = VariableName;
+			this.Name = VariableName;
 			this.Value = Value ?? new NullValue();
 			this.NextVariable = NextVariable;
 		}
@@ -36,17 +37,17 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <summary>
 		/// Name of variable.
 		/// </summary>
-		public string VariableName { get; }
+		public string Name { get; }
 
 		/// <summary>
 		/// Variable value.
 		/// </summary>
-		public ISemanticElement Value { get; }
+		public ISemanticElement Value { get; set; }
 
 		/// <summary>
 		/// Previous possiblity
 		/// </summary>
-		public Possibility NextVariable { get; }
+		public Possibility NextVariable { get; private set; }
 
 		/// <summary>
 		/// Access to possible variable values, given a variable name.
@@ -56,6 +57,7 @@ namespace Waher.Script.Persistence.SPARQL
 		public ISemanticElement this[string VariableName]
 		{
 			get => this.GetValue(VariableName);
+			set => this.SetValue(VariableName, value);
 		}
 
 		/// <summary>
@@ -65,19 +67,42 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>Value of variable, if found, null otherwise.</returns>
 		public ISemanticElement GetValue(string VariableName)
 		{
-			if (this.VariableName == VariableName)
+			if (this.Name == VariableName)
 				return this.Value;
 
 			Possibility Loop = this.NextVariable;
 			while (!(Loop is null))
 			{
-				if (Loop.VariableName == VariableName)
+				if (Loop.Name == VariableName)
 					return Loop.Value;
 
 				Loop = Loop.NextVariable;
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Sets a variable value, given its variable name.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Value">Value</param>
+		public void SetValue(string VariableName, ISemanticElement Value)
+		{
+			if (this.Name == VariableName)
+				this.Value = Value;
+			else
+			{
+				Possibility Loop = this;
+
+				while (!(Loop.NextVariable is null) && Loop.NextVariable.Name != VariableName)
+					Loop = Loop.NextVariable;
+
+				if (Loop.NextVariable is null)
+					Loop.NextVariable = new Possibility(VariableName, Value);
+				else
+					Loop.NextVariable.Value = Value;
+			}
 		}
 
 		/// <summary>
@@ -101,7 +126,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			while (!(P is null))
 			{
-				Sorted[P.VariableName] = P.Value;
+				Sorted[P.Name] = P.Value;
 				P = P.NextVariable;
 			}
 
@@ -123,5 +148,54 @@ namespace Waher.Script.Persistence.SPARQL
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Gets an enumerator for all items in the possibility.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public IEnumerator<ISparqlResultItem> GetEnumerator()
+		{
+			return new PossibilityEnumerator(this);
+		}
+
+		/// <summary>
+		/// Gets an enumerator for all items in the possibility.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new PossibilityEnumerator(this);
+		}
+
+		private class PossibilityEnumerator : IEnumerator<ISparqlResultItem>
+		{
+			private readonly Possibility first;
+			private Possibility current;
+
+			public PossibilityEnumerator(Possibility First)
+			{
+				this.first = First;
+				this.current = null;
+			}
+
+			public ISparqlResultItem Current => this.current;
+			object IEnumerator.Current => this.current;
+
+			public void Dispose() { }
+
+			public bool MoveNext()
+			{
+				if (this.current is null)
+					this.current = this.first;
+				else
+					this.current = this.current.NextVariable;
+
+				return !(this.current is null);
+			}
+
+			public void Reset()
+			{
+				this.current = null;
+			}
+		}
 	}
 }

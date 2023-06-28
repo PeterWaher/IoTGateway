@@ -926,7 +926,7 @@
             of variable names, and corresponding ascending (true) or
             descending (false) direction.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.OrderResultSet.Compare(Waher.Content.Semantic.SparqlResultRecord,Waher.Content.Semantic.SparqlResultRecord)">
+        <member name="M:Waher.Script.Persistence.SPARQL.OrderResultSet.Compare(Waher.Content.Semantic.ISparqlResultRecord,Waher.Content.Semantic.ISparqlResultRecord)">
             <summary>
             Compares two records.
             </summary>

@@ -1243,7 +1243,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "CONCAT":
 					int Start2 = Parser.Position;
-					ScriptNode[] Arguments = this.ParseArguments(Parser, 1, int.MaxValue, true);
+					ScriptNode[] Arguments = this.ParseArguments(Parser, 1, int.MaxValue);
 
 					VectorDefinition Vector = new VectorDefinition(Arguments,
 						Start2, Parser.Position - Start2, Parser.Expression);
@@ -1259,7 +1259,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new Desc(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "REGEX":
-					Arguments = this.ParseArguments(Parser, 2, 3, true);
+					Arguments = this.ParseArguments(Parser, 2, 3);
 					if (Arguments.Length == 2)
 					{
 						return new LikeWithOptions(Arguments[0], Arguments[1], null,
@@ -1388,8 +1388,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			return Argument;
 		}
 
-		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max,
-			bool ScriptValueNodes)
+		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max)
 		{
 			if (Parser.NextNonWhitespaceChar() != '(')
 				throw Parser.SyntaxError("Expected (");

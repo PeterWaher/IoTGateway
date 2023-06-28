@@ -7,7 +7,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains a record from the results of a SPARQL query.
 	/// </summary>
-	public class SparqlResultRecord : IEnumerable<SparqlResultItem>
+	public class SparqlPatternResultRecord : ISparqlResultRecord
 	{
 		private readonly Dictionary<string, SparqlResultItem> items;
 
@@ -15,7 +15,7 @@ namespace Waher.Content.Semantic
 		/// Contains a record from the results of a SPARQL query.
 		/// </summary>
 		/// <param name="Items">Items in record.</param>
-		public SparqlResultRecord(Dictionary<string, SparqlResultItem> Items)
+		public SparqlPatternResultRecord(Dictionary<string, SparqlResultItem> Items)
 		{
 			this.items = Items;
 		}

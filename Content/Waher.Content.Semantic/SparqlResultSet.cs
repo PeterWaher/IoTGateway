@@ -86,7 +86,7 @@ namespace Waher.Content.Semantic
 
 			List<string> Variables = new List<string>();
 			List<Uri> Links = new List<Uri>();
-			List<SparqlResultRecord> Records = new List<SparqlResultRecord>();
+			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
@@ -161,7 +161,7 @@ namespace Waher.Content.Semantic
 										}
 									}
 
-									Records.Add(new SparqlResultRecord(Record));
+									Records.Add(new SparqlPatternResultRecord(Record));
 									break;
 							}
 						}
@@ -293,7 +293,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Variables">Names of variables in result set.</param>
 		/// <param name="Links">Links to additional metadata about result set.</param>
 		/// <param name="Records">Records in result set.</param>
-		public SparqlResultSet(string[] Variables, Uri[] Links, SparqlResultRecord[] Records)
+		public SparqlResultSet(string[] Variables, Uri[] Links, ISparqlResultRecord[] Records)
 		{
 			this.Variables = Variables;
 			this.Links = Links;
@@ -320,7 +320,7 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// Records in result set.
 		/// </summary>
-		public SparqlResultRecord[] Records { get; }
+		public ISparqlResultRecord[] Records { get; }
 
 		/// <summary>
 		/// Converts the object to a matrix.
@@ -338,7 +338,7 @@ namespace Waher.Content.Semantic
 
 			for (y = 0; y < Rows; y++)
 			{
-				SparqlResultRecord Record = this.Records[y];
+				ISparqlResultRecord Record = this.Records[y];
 
 				for (x = 0; x < Columns; x++)
 					Elements[y, x] = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;

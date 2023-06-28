@@ -200,7 +200,7 @@ namespace Waher.Content.Semantic
 
 				if (!(Result.Records is null))
 				{
-					foreach (SparqlResultRecord Record in Result.Records)
+					foreach (ISparqlResultRecord Record in Result.Records)
 					{
 						w.WriteStartElement("result");
 

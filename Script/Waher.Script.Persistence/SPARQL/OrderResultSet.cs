@@ -6,7 +6,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// <summary>
 	/// Comparer for ordering a SPARQL result set.
 	/// </summary>
-	public class OrderResultSet : IComparer<SparqlResultRecord>
+	public class OrderResultSet : IComparer<ISparqlResultRecord>
 	{
 		private readonly KeyValuePair<string, bool>[] orderBy;
 		private readonly int count;
@@ -33,7 +33,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// Zero, if records are equal
 		/// Positive, if Record 1 is greated than Record 2
 		/// </returns>
-		public int Compare(SparqlResultRecord x, SparqlResultRecord y)
+		public int Compare(ISparqlResultRecord x, ISparqlResultRecord y)
 		{
 			ISemanticElement e1, e2;
 			int i, j;

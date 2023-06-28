@@ -125,8 +125,8 @@ namespace Waher.Script.Test
 
 					for (i = 0; i < c; i++)
 					{
-						SparqlResultRecord ExpectedRecord = Expected.Records[i];
-						SparqlResultRecord Record = ResultSet.Records[i];
+						ISparqlResultRecord ExpectedRecord = Expected.Records[i];
+						ISparqlResultRecord Record = ResultSet.Records[i];
 
 						foreach (string VariableName in Expected.Variables)
 						{

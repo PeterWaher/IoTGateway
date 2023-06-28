@@ -262,7 +262,7 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 			}
 
-			List<SparqlResultRecord> Records = new List<SparqlResultRecord>();
+			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
 			Dictionary<string, bool> Distinct = this.distinct ? new Dictionary<string, bool>() : null;
 			StringBuilder sb = this.distinct ? new StringBuilder() : null;
 
@@ -330,7 +330,7 @@ namespace Waher.Script.Persistence.SPARQL
 						Distinct[Key] = true;
 					}
 
-					Records.Add(new SparqlResultRecord(Record));
+					Records.Add(new SparqlPatternResultRecord(Record));
 				}
 			}
 

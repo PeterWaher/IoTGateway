@@ -69,7 +69,7 @@ namespace Waher.Content.Markdown.Model
 			{
 				if (this.extension is null)
 				{
-					int i = this.url.IndexOfAny(QuestionOrHash);
+					int i = this.url.IndexOfAny(questionOrHash);
 					if (i > 0)
 					{
 						this.extension = Path.GetExtension(this.url.Substring(0, i));
@@ -91,7 +91,7 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
-		private static readonly char[] QuestionOrHash = new char[] { '?', '#' };
+		private static readonly char[] questionOrHash = new char[] { '?', '#' };
 
 		/// <summary>
 		/// Content Type

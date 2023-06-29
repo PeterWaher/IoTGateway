@@ -53,7 +53,7 @@ namespace Waher.Script.Functions.Scalar
         {
             object Obj = Argument.AssociatedObjectValue;
 
-            if (Obj is Guid Guid)
+            if (Obj is Guid)
                 return Argument;
             else if (Obj is string s)
                 return this.EvaluateScalar(s, Variables);

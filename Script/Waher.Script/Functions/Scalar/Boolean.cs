@@ -87,7 +87,12 @@ namespace Waher.Script.Functions.Scalar
 				throw new ScriptException("Not a boolean value.");
 		}
 
-        internal static bool? ToBoolean(string Value)
+        /// <summary>
+        /// Converts a string to a boolean value, if possible.
+        /// </summary>
+        /// <param name="Value">String value.</param>
+        /// <returns>Boolean value, if converted, or null if not possible.</returns>
+        public static bool? ToBoolean(string Value)
 		{
             if (Value == "1" || Value == "true" || Value == "yes" || Value == "on")
                 return true;

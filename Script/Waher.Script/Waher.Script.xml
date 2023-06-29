@@ -6498,6 +6498,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.Boolean.ToBoolean(System.String)">
+            <summary>
+            Converts a string to a boolean value, if possible.
+            </summary>
+            <param name="Value">String value.</param>
+            <returns>Boolean value, if converted, or null if not possible.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.Boolean.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.

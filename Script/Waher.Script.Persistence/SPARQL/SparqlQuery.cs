@@ -467,7 +467,7 @@ namespace Waher.Script.Persistence.SPARQL
 			{
 				return ex.ReturnValue.AssociatedObjectValue;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return null;
 			}

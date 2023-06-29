@@ -25,15 +25,16 @@ using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Vectors;
 using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SPARQL.Functions;
+using Waher.Script.Persistence.SPARQL.Functions.Order;
 using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Statistics.Functions.RandomNumbers;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
-	/// <summary>
-	/// Parses a SPARQL statement
-	/// </summary>
-	public class SparqlParser : IKeyWord
+    /// <summary>
+    /// Parses a SPARQL statement
+    /// </summary>
+    public class SparqlParser : IKeyWord
 	{
 		/// <summary>
 		/// Reference instance of SPARQL parser.

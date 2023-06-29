@@ -20,6 +20,8 @@ using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Functions.Vectors;
 using Waher.Script.Functions.DateAndTime;
 using Waher.Script.Constants;
+using Waher.Script.Cryptography.Functions.Encoding;
+using Waher.Script.Cryptography.Functions.HashFunctions;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -1422,19 +1424,49 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new VariableReference("Now", Start, Parser.Position - Start, Parser.Expression);
 
 				case "MD5":
-					//Node = this.ParseArgument(Parser);
-					//NodeStart = Node.Start;
-					//NodeLen = Node.Length;
-					//Hashes.BinaryToString(MD5(Utf8Encode("abc")))
-					//
-					//return new NamedMethodCall(
-					//	new VariableReference
-					//	new Seconds(Node, Start, Parser.Position - Start, Parser.Expression);
+					Node = this.ParseArgument(Parser);
+					NodeStart = Node.Start;
+					NodeLen = Node.Length;
+
+					return new HexEncode(
+						new Md5(Node, NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
 
 				case "SHA1":
+					Node = this.ParseArgument(Parser);
+					NodeStart = Node.Start;
+					NodeLen = Node.Length;
+
+					return new HexEncode(
+						new Sha1(Node, NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
+
 				case "SHA256":
+					Node = this.ParseArgument(Parser);
+					NodeStart = Node.Start;
+					NodeLen = Node.Length;
+
+					return new HexEncode(
+						new Sha2_256(Node, NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
+
 				case "SHA384":
+					Node = this.ParseArgument(Parser);
+					NodeStart = Node.Start;
+					NodeLen = Node.Length;
+
+					return new HexEncode(
+						new Sha2_384(Node, NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
+
 				case "SHA512":
+					Node = this.ParseArgument(Parser);
+					NodeStart = Node.Start;
+					NodeLen = Node.Length;
+
+					return new HexEncode(
+						new Sha2_512(Node, NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
 
 				case "REPLACE":
 				case "TIMEZONE":

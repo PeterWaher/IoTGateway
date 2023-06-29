@@ -1961,25 +1961,25 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Ed448([PrivKey[,HashKey]])`                               | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
 | `HexDecode(Data)`                                          | Decodes binary data from a string using hexadecimal encoding. | [Example][HexDecodeExample] |
 | `HexEncode(Data)`                                          | Encodes binary data to a string using hexadecimal encoding. | [Example][HexEncodeExample] |
-| `Md5(Data)`                                                | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
+| `Md5(Data)`                                                | Calculates a MD5 Hash Digest of the binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Md5Example] |
 | `P192([PrivKey])`                                          | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
 | `P224([PrivKey])`                                          | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |
 | `P256([PrivKey])`                                          | Creates a NIST-P256 curve, with optional private key (`PrivKey`). | [Example][P256Example] |
 | `P384([PrivKey])`                                          | Creates a NIST-P384 curve, with optional private key (`PrivKey`). | [Example][P384Example] |
 | `P521([PrivKey])`                                          | Creates a NIST-P521 curve, with optional private key (`PrivKey`). | [Example][P521Example] |
 | `RandomBytes(NrBytes)`                                     | Generates an array of `N` random bytes. | [Example][RandomBytesExample] |
-| `Sha1(Data)`                                               | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
+| `Sha1(Data)`                                               | Calculates a SHA-1 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha1Example] |
 | `Sha1HMac(Data,Key)`                                       | Calculates a SHA-1 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha1HmacExample] |
-| `Sha2_256(Data)`                                           | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2256Example] |
+| `Sha2_256(Data)`                                           | Calculates a 256-bit SHA-2 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha2256Example] |
 | `Sha2_256HMac(Data,Key)`                                   | Calculates a 256-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2256HmacExample] |
-| `Sha2_384(Data)`                                           | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2384Example] |
+| `Sha2_384(Data)`                                           | Calculates a 384-bit SHA-2 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha2384Example] |
 | `Sha2_384HMac(Data,Key)`                                   | Calculates a 384-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2384HmacExample] |
-| `Sha2_512(Data)`                                           | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2512Example] |
+| `Sha2_512(Data)`                                           | Calculates a 512-bit SHA-2 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha2512Example] |
 | `Sha2_512HMac(Data,Key)`                                   | Calculates a 512-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2512HmacExample] |
-| `Sha3_224(Data)`                                           | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3224Example] |
-| `Sha3_256(Data)`                                           | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
-| `Sha3_384(Data)`                                           | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
-| `Sha3_512(Data)`                                           | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
+| `Sha3_224(Data)`                                           | Calculates a 224-bit SHA-3 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha3224Example] |
+| `Sha3_256(Data)`                                           | Calculates a 256-bit SHA-3 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha3256Example] |
+| `Sha3_384(Data)`                                           | Calculates a 384-bit SHA-3 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha3384Example] |
+| `Sha3_512(Data)`                                           | Calculates a 512-bit SHA-3 Hash Digest of binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Sha3512Example] |
 | `Shake128(Bits,Data)`                                      | Calculates a SHAKE128 (part of SHA-3) Hash Digest (having `Bits` number of bits) of `Data`.  | [Example][Shake128Example] |
 | `Shake256(Bits,Data)`                                      | Calculates a SHAKE256 (part of SHA-3) Hash Digest (having `Bits` number of bits) of `Data`.  | [Example][Shake256Example] |
 | `X25519([PrivKey])`                                        | Creates a Curve25519 curve, with optional private key (`PrivKey`). | [Example][X25519Example] |

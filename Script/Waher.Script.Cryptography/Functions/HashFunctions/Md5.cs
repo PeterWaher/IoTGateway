@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -42,7 +41,7 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 				if(!(Argument.AssociatedObjectValue is string s))
 					s = Expression.ToString(Argument.AssociatedObjectValue);
 
-				Bin = System.Text.Encoding.UTF8.GetBytes(s);
+				return this.EvaluateScalar(s, Variables);
 			}
 
 			return new ObjectValue(Hashes.ComputeMD5Hash(Bin));
@@ -56,7 +55,30 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			byte[] Bin = System.Text.Encoding.UTF8.GetBytes(Argument);
+			return new ObjectValue(Hashes.ComputeMD5Hash(Bin));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 	}

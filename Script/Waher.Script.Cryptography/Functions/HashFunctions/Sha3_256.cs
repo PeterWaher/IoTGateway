@@ -39,7 +39,12 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
 			if (!(Argument.AssociatedObjectValue is byte[] Bin))
-				throw new ScriptRuntimeException("Binary data expected.", this);
+			{
+				if (!(Argument.AssociatedObjectValue is string s))
+					s = Expression.ToString(Argument.AssociatedObjectValue);
+
+				return this.EvaluateScalar(s, Variables);
+			}
 
 			SHA3_256 H = new SHA3_256();
 
@@ -54,7 +59,32 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			byte[] Bin = System.Text.Encoding.UTF8.GetBytes(Argument);
+			SHA3_256 H = new SHA3_256();
+
+			return new ObjectValue(H.ComputeVariable(Bin));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 	}

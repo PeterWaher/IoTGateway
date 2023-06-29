@@ -4,24 +4,26 @@ using System.Numerics;
 using System.Text;
 using Waher.Content;
 using Waher.Content.Semantic;
-using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Model;
-using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Functions.Strings;
-using Waher.Script.Operators.Vectors;
-using Waher.Script.Persistence.SPARQL.Functions;
-using Waher.Script.Operators.Logical;
-using Waher.Script.Operators.Comparisons;
-using Waher.Script.Operators.Membership;
-using Waher.Script.Operators.Arithmetics;
-using Waher.Script.Persistence.SPARQL.Filters;
-using Waher.Script.Persistence.SPARQL.Patterns;
-using Waher.Script.Functions.Vectors;
-using Waher.Script.Functions.DateAndTime;
-using Waher.Script.Constants;
+using Waher.Content.Semantic.Model.Literals;
+using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.HashFunctions;
+using Waher.Script.Functions.DateAndTime;
+using Waher.Script.Functions.Scalar;
+using Waher.Script.Functions.Strings;
+using Waher.Script.Functions.Vectors;
+using Waher.Script.Model;
+using Waher.Script.Objects;
+using Waher.Script.Operators.Arithmetics;
+using Waher.Script.Operators.Comparisons;
+using Waher.Script.Operators.Conditional;
+using Waher.Script.Operators.Logical;
+using Waher.Script.Operators.Membership;
+using Waher.Script.Operators.Vectors;
+using Waher.Script.Persistence.SPARQL.Filters;
+using Waher.Script.Persistence.SPARQL.Functions;
+using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Statistics.Functions.RandomNumbers;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
@@ -50,7 +52,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		private SparqlRegularPattern currentRegularPattern = null;
 		private ISparqlPattern currentPattern = null;
 		private int preamblePos;
-		private Uri baseUri = null;
+		private System.Uri baseUri = null;
 		private int blankNodeIndex = 0;
 
 		/// <summary>
@@ -1301,11 +1303,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "MIN":
 					Node = this.ParseArgument(Parser);
-					return new Min(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Script.Functions.Vectors.Min(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "MAX":
 					Node = this.ParseArgument(Parser);
-					return new Max(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Script.Functions.Vectors.Max(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "AVG":
 					Node = this.ParseArgument(Parser);
@@ -1330,19 +1332,19 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "ABS":
 					Node = this.ParseArgument(Parser);
-					return new Script.Functions.Scalar.Abs(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Abs(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "CEIL":
 					Node = this.ParseArgument(Parser);
-					return new Script.Functions.Scalar.Ceiling(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Ceiling(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "FLOOR":
 					Node = this.ParseArgument(Parser);
-					return new Script.Functions.Scalar.Floor(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Floor(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "ROUND":
 					Node = this.ParseArgument(Parser);
-					return new Script.Functions.Scalar.Round(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Round(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "STRLEN":
 					Node = this.ParseArgument(Parser);
@@ -1473,6 +1475,37 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					this.Parse0Arguments(Parser);
 					return new Uniform(Start, Parser.Position - Start, Parser.Expression);
 
+				case "ENCODE_FOR_URI":
+					Node = this.ParseArgument(Parser);
+					return new UrlEncode(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRUUID":
+					this.Parse0Arguments(Parser);
+					NodeLen = Parser.Position - Start;
+
+					return new Script.Functions.Scalar.String(
+						new NewGuid(Start, NodeLen, Parser.Expression),
+						Start, NodeLen, Parser.Expression);
+
+				case "IRI":
+				case "URI":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.Uri(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "IF":
+					Arguments = this.ParseArguments(Parser, 3, 3);
+					return new If(Arguments[0], Arguments[1], Arguments[2],
+						Start, Parser.Position - Start, Parser.Expression);
+
+				case "SAMETERM":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new EqualTo(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "BOUND":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Runtime.Exists(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "UUID":
 				case "REPLACE":
 				case "TIMEZONE":
 				case "TZ":
@@ -1480,18 +1513,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "LANG":
 				case "LANGMATCHES":
 				case "DATATYPE":
-				case "BOUND":
-				case "IRI":
-				case "URI":
 				case "BNODE":
-				case "ENCODE_FOR_URI":
-				case "UUID":
-				case "STRUUID":
 				case "COALESCE":
-				case "IF":
 				case "STRLANG":
 				case "STRDT":
-				case "SAMETERM":
 				case "ISIRI":
 				case "ISURI":
 				case "ISBLANK":
@@ -1858,7 +1883,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			string LocalName = this.ParseName(Parser);
 
-			return new UriNode(new Uri(Namespace + LocalName), Prefix + ":" + LocalName);
+			return new UriNode(new System.Uri(Namespace + LocalName), Prefix + ":" + LocalName);
 		}
 
 		private string ParseName(ScriptParser Parser)
@@ -2064,7 +2089,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			if (this.baseUri is null)
 			{
-				if (Uri.TryCreate(Short, UriKind.RelativeOrAbsolute, out Uri URI))
+				if (System.Uri.TryCreate(Short, UriKind.RelativeOrAbsolute, out System.Uri URI))
 					return new UriNode(URI, Short);
 				else
 					throw Parser.SyntaxError("Invalid URI.");
@@ -2073,7 +2098,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{
 				if (string.IsNullOrEmpty(Short))
 					return new UriNode(this.baseUri, Short);
-				else if (Uri.TryCreate(this.baseUri, Short, out Uri URI))
+				else if (System.Uri.TryCreate(this.baseUri, Short, out System.Uri URI))
 					return new UriNode(URI, Short);
 				else
 					throw Parser.SyntaxError("Invalid URI.");

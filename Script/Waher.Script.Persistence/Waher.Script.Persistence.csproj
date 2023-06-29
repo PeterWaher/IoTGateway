@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
@@ -37,6 +37,7 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />
+    <ProjectReference Include="..\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
   <ItemGroup>

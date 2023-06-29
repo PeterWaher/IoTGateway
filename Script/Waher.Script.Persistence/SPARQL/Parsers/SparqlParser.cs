@@ -22,6 +22,7 @@ using Waher.Script.Functions.DateAndTime;
 using Waher.Script.Constants;
 using Waher.Script.Cryptography.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.HashFunctions;
+using Waher.Script.Statistics.Functions.RandomNumbers;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -1468,6 +1469,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						new Sha2_512(Node, NodeStart, NodeLen, Parser.Expression),
 						NodeStart, NodeLen, Parser.Expression);
 
+				case "RAND":
+					this.Parse0Arguments(Parser);
+					return new Uniform(Start, Parser.Position - Start, Parser.Expression);
+
 				case "REPLACE":
 				case "TIMEZONE":
 				case "TZ":
@@ -1479,7 +1484,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "IRI":
 				case "URI":
 				case "BNODE":
-				case "RAND":
 				case "ENCODE_FOR_URI":
 				case "UUID":
 				case "STRUUID":

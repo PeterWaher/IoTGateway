@@ -31,6 +31,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		{
 			List<IElement> Elements = new List<IElement>();
 			Type T = Object.GetType();
+			IElement Value;
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
@@ -38,7 +39,17 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 					continue;
 
 				Elements.Add(new StringValue(PI.Name));
-				Elements.Add(Expression.Encapsulate(await ScriptNode.WaitPossibleTask(PI.GetValue(Object))));
+
+				try
+				{
+					Value = Expression.Encapsulate(await ScriptNode.WaitPossibleTask(PI.GetValue(Object)));
+				}
+				catch (Exception ex)
+				{
+					Value = new ObjectValue(ex);
+				}
+
+				Elements.Add(Value);
 			}
 
 			ObjectMatrix M = new ObjectMatrix(Elements.Count / 2, 2, Elements)

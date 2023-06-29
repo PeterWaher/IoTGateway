@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using Waher.Content;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Script.Content.Functions.Encoding;
@@ -1487,6 +1488,19 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						new NewGuid(Start, NodeLen, Parser.Expression),
 						Start, NodeLen, Parser.Expression);
 
+				case "UUID":
+					this.Parse0Arguments(Parser);
+					NodeLen = Parser.Position - Start;
+
+					return new Script.Functions.Scalar.Uri(
+						new Add(
+							new ConstantElement(new StringValue("urn:uuid:"), Start, NodeLen, Parser.Expression),
+							new Script.Functions.Scalar.String(
+								new NewGuid(Start, NodeLen, Parser.Expression),
+								Start, NodeLen, Parser.Expression),
+							Start, NodeLen, Parser.Expression),
+						Start, NodeLen, Parser.Expression);
+
 				case "IRI":
 				case "URI":
 					Node = this.ParseArgument(Parser);
@@ -1505,23 +1519,53 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					Node = this.ParseArgument(Parser);
 					return new Script.Functions.Runtime.Exists(Node, Start, Parser.Position - Start, Parser.Expression);
 
-				case "UUID":
+				case "ISIRI":
+				case "ISURI":
+					Node = this.ParseArgument(Parser);
+					return new IsUri(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ISBLANK":
+					Node = this.ParseArgument(Parser);
+					return new IsBlank(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ISNUMERIC":
+					Node = this.ParseArgument(Parser);
+					return new IsNumeric(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ISLITERAL":
+					Node = this.ParseArgument(Parser);
+					return new IsLiteral(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "LANG":
+					Node = this.ParseArgument(Parser);
+					return new Lang(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "DATATYPE":
+					Node = this.ParseArgument(Parser);
+					return new DataType(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "BNODE":
+					Arguments = this.ParseArguments(Parser, 0, 1);
+
+					if (Arguments.Length == 0)
+						return new BNode(Start, Parser.Position - Start, Parser.Expression);
+					else
+						return new BNode(Arguments[0], Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRDT":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new StrDt(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRLANG":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new StrLang(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
 				case "REPLACE":
 				case "TIMEZONE":
 				case "TZ":
 
-				case "LANG":
 				case "LANGMATCHES":
-				case "DATATYPE":
-				case "BNODE":
 				case "COALESCE":
-				case "STRLANG":
-				case "STRDT":
-				case "ISIRI":
-				case "ISURI":
-				case "ISBLANK":
-				case "ISLITERAL":
-				case "ISNUMERIC":
 				default:
 					// TODO: Extensible functions
 

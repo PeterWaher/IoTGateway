@@ -2090,6 +2090,23 @@ context-specific constants (read-only variables) are available in inline script:
 [ScriptFileExample]: Prompt.md?Expression=ScriptFile(%22Example.script%22)
 [InitScriptFileExample]: Prompt.md?Expression=InitScriptFile(%22InitExample.script%22)
 
+#### Semantic-web-related functions (Waher.Content.Semantic)
+
+The following functions are available in the `Waher.Content.Semantic` library.
+
+| Function          | Description                                                                                           |
+|-------------------|-------------------------------------------------------------------------------------------------------|
+| `BNode([Label])`  | Creates a blank node with a given label. If no label is provided, a distinct blank node is created.   |
+| `DataType(Term)`  | Returns the data type of the term, if available, or the empty string if not.                          |
+| `IsBlank(Term)`   | Checks if an RDF term is a Blank node.                                                                |
+| `IsIri(Term)`     | Alias for `IsUri`.                                                                                    |
+| `IsLiteral(Term)` | Checks if an RDF term is a literal.                                                                   |
+| `IsNumeric(Term)` | Checks if an RDF term is a numeric literal.                                                           |
+| `IsUri(Term)`     | Checks if an RDF term is a URI term.                                                                  |
+| `Lang(Term)`      | Returns the language of the term, if available, or the empty string if not.                           |
+| `StrDt(x,Type)`   | Returns a typed literal, with XML data type specified by `Type`, and string value represented by `x`. |
+| `StrLang(x,Lang)` | Returns a localized literal, with language specified by `Lang`, and string value represented by `x`.  |
+
 #### XSL-related functions (Waher.Content.Xsl)
 
 The following functions are available in the `Waher.Content.Xsl` library.

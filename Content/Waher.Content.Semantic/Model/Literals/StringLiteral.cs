@@ -41,10 +41,15 @@ namespace Waher.Content.Semantic.Model.Literals
 			this.language = Language;
         }
 
-        /// <summary>
-        /// Type name
-        /// </summary>
-        public override string StringType => string.Empty;
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#string
+		/// </summary>
+		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#string";
+
+		/// <summary>
+		/// Type name
+		/// </summary>
+		public override string StringType => string.Empty;
 
 		/// <summary>
 		/// How well the type supports a given value type.
@@ -68,7 +73,7 @@ namespace Waher.Content.Semantic.Model.Literals
         /// <returns>Support grade.</returns>
         public override Grade Supports(string DataType)
         {
-            return string.IsNullOrEmpty(DataType) || DataType == "http://www.w3.org/2001/XMLSchema#string" ? Grade.Ok : Grade.NotAtAll;
+            return string.IsNullOrEmpty(DataType) || DataType == TypeUri ? Grade.Ok : Grade.NotAtAll;
         }
 
 		/// <summary>

@@ -907,6 +907,96 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction">
+            <summary>
+            Abstract base class for semantic conversion functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.#ctor">
+            <summary>
+            Abstract base class for semantic conversion functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.MinArguments">
+            <summary>
+            Minimum number of arguments
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.MaxArguments">
+            <summary>
+            Maximum number of arguments
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.CreateFunction(Waher.Script.Model.ScriptNode[],System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Arguments">Parsed arguments.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.Supports(System.String)">
+            <summary>
+            How well the extension function supports an URI.
+            </summary>
+            <param name="Uri">Uri for function.</param>
+            <returns>Support grade.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.SemanticConversionFunction.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral">
             <summary>
             Converts a value to a boolean literal.
@@ -918,90 +1008,158 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a value to a boolean literal.
+            </summary>
             <param name="Argument">Argument.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.MinArguments">
-            <summary>
-            Minimum number of arguments
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.MaxArguments">
-            <summary>
-            Maximum number of arguments
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.CreateFunction(Waher.Script.Model.ScriptNode[],System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Creates a function node.
             </summary>
-            <param name="Arguments">Parsed arguments.</param>
+            <param name="Argument">Parsed argument.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
             <returns>Function script node.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.Supports(System.String)">
-            <summary>
-            How well the extension function supports an URI.
-            </summary>
-            <param name="Uri">Uri for function.</param>
-            <returns>Support grade.</returns>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalar(System.Double,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.Convert(System.Object)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts an object to the desired type.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a DateTime literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral.#ctor">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a DateTime literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalar(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a DateTime literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Creates a function node.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToBooleanLiteral.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral.FunctionName">
             <summary>
-            Evaluates the function on a scalar argument.
+            Name of the function
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDateTimeLiteral.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral">
+            <summary>
+            Converts a value to a decimal literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral.#ctor">
+            <summary>
+            Converts a value to a decimal literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a value to a decimal literal.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDecimalLiteral.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral">
+            <summary>
+            Converts a value to a double literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral.#ctor">
+            <summary>
+            Converts a value to a double literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a value to a double literal.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToDoubleLiteral.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral">
             <summary>
@@ -1014,82 +1172,117 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a value to a integer literal.
+            </summary>
             <param name="Argument">Argument.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.MinArguments">
-            <summary>
-            Minimum number of arguments
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.MaxArguments">
-            <summary>
-            Maximum number of arguments
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.CreateFunction(Waher.Script.Model.ScriptNode[],System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Creates a function node.
             </summary>
-            <param name="Arguments">Parsed arguments.</param>
+            <param name="Argument">Parsed argument.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
             <returns>Function script node.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.Supports(System.String)">
-            <summary>
-            How well the extension function supports an URI.
-            </summary>
-            <param name="Uri">Uri for function.</param>
-            <returns>Support grade.</returns>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.EvaluateScalar(System.Double,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.Convert(System.Object)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts an object to the desired type.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a single literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.EvaluateScalar(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral.#ctor">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a single literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Converts a value to a single literal.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToIntegerLiteral.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Creates a function node.
             </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToSingleLiteral.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral">
+            <summary>
+            Converts a value to a string literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral.#ctor">
+            <summary>
+            Converts a value to a string literal.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a value to a string literal.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral.CreateFunction(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Argument">Parsed argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.TypeConversion.ToStringLiteral.Convert(System.Object)">
+            <summary>
+            Converts an object to the desired type.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Converted value.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.GroupResultSet">
             <summary>

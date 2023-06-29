@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Waher.Content;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -6,26 +7,26 @@ using Waher.Script.Model;
 namespace Waher.Script.Persistence.SPARQL.Functions.TypeConversion
 {
 	/// <summary>
-	/// Converts a value to a integer literal.
+	/// Converts a value to a single literal.
 	/// </summary>
-	public class ToIntegerLiteral : SemanticConversionFunction
+	public class ToSingleLiteral : SemanticConversionFunction
 	{
 		/// <summary>
-		/// Converts a value to a integer literal.
+		/// Converts a value to a single literal.
 		/// </summary>
-		public ToIntegerLiteral()
+		public ToSingleLiteral()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Converts a value to a integer literal.
+		/// Converts a value to a single literal.
 		/// </summary>
 		/// <param name="Argument">Argument.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public ToIntegerLiteral(ScriptNode Argument, int Start, int Length, Expression Expression)
+		public ToSingleLiteral(ScriptNode Argument, int Start, int Length, Expression Expression)
 			: base(Argument, Start, Length, Expression)
 		{
 		}
@@ -40,13 +41,13 @@ namespace Waher.Script.Persistence.SPARQL.Functions.TypeConversion
 		/// <returns>Function script node.</returns>
 		public override ScriptNode CreateFunction(ScriptNode Argument, int Start, int Length, Expression Expression)
 		{
-			return new ToIntegerLiteral(Argument, Start, Length, Expression);
+			return new ToSingleLiteral(Argument, Start, Length, Expression);
 		}
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => IntegerLiteral.TypeUri;
+		public override string FunctionName => SingleLiteral.TypeUri;
 
 		/// <summary>
 		/// Converts an object to the desired type.
@@ -55,25 +56,25 @@ namespace Waher.Script.Persistence.SPARQL.Functions.TypeConversion
 		/// <returns>Converted value.</returns>
 		public override IElement Convert(object Value)
 		{
-			if (Value is BigInteger i)
-				return new IntegerLiteral(i);
-			else if (Value is double d)
-				return new IntegerLiteral((BigInteger)d);
+			if (Value is float d)
+				return new SingleLiteral(d);
 			else if (Value is bool b)
-				return new IntegerLiteral(b ? 1 : 0);
+				return new SingleLiteral(b ? 1 : 0);
 			else if (Value is string s)
 			{
-				if (BigInteger.TryParse(s, out i))
-					return new IntegerLiteral(i);
+				if (CommonTypes.TryParse(s, out d))
+					return new SingleLiteral(d);
 			}
+			else if (Value is BigInteger i)
+				return new SingleLiteral((float)i);
 			else if (Value is Complex z)
 			{
 				if (z.Imaginary == 0)
-					return new IntegerLiteral((BigInteger)z.Real);
+					return new SingleLiteral((float)z.Real);
 			}
-			
-			long l = System.Convert.ToInt64(Value);
-			return new IntegerLiteral(l);
+		
+			d = System.Convert.ToSingle(Value);
+			return new SingleLiteral(d);
 		}
 	}
 }

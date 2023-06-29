@@ -1830,16 +1830,21 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `GetSetting(Name,DefaultValue)`                          | Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned. | `GetSetting("Name","Kilroy")` |
 | `Pivot(Result)`                                          | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
 | `SaveNewObject(Obj)`                                     | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
-| `SetSetting(Name,Value) `                                | Sets a runtime setting with name `Name`. | `SetSetting("Name","Kilroy")` |
+| `SetSetting(Name,Value)`                                 | Sets a runtime setting with name `Name`. | `SetSetting("Name","Kilroy")` |
 | `UpdateObject(Obj)`                                      | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
 | `XPath(Expression)`                                      | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
 
-In addition to this, the following SPARQL extension functions are defined
+In addition to this, the following XPATH/SPARQL extension functions are defined
 
-| Function              | URI                                        | Description |
-|:----------------------|:-------------------------------------------|:------------|
-| `ToBooleanLiteral(x)` | `http://www.w3.org/2001/XMLSchema#boolean` | Converts a value to a Boolean literal value. |
-| `ToIntegerLiteral(x)` | `http://www.w3.org/2001/XMLSchema#integer` | Converts a value to an integer literal value. |
+| Function FQN                                | Description |
+|:--------------------------------------------|:------------|
+| `http://www.w3.org/2001/XMLSchema#boolean`  | Converts a value to a Boolean literal value. |
+| `http://www.w3.org/2001/XMLSchema#dateTime` | Converts a value to a date and time value. |
+| `http://www.w3.org/2001/XMLSchema#decimal`  | Converts a value to a decimal-precision floating point literal value. |
+| `http://www.w3.org/2001/XMLSchema#double`   | Converts a value to a double-precision floating point literal value. |
+| `http://www.w3.org/2001/XMLSchema#float`    | Converts a value to a single-precision floating point literal value. |
+| `http://www.w3.org/2001/XMLSchema#integer`  | Converts a value to an integer literal value. |
+| `http://www.w3.org/2001/XMLSchema#string`   | Converts a value to an string literal value. |
 
 #### Statistics-related functions (Waher.Script.Statistics)
 

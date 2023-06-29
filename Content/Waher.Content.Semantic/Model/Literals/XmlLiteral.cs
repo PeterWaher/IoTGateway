@@ -61,12 +61,15 @@ namespace Waher.Content.Semantic.Model.Literals
 			this.language = Language;
 		}
 
-		private const string RdfXmlLiteral = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
+		/// <summary>
+		/// http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral
+		/// </summary>
+		public const string TypeUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
 
 		/// <summary>
 		/// Type name
 		/// </summary>
-		public override string StringType => RdfXmlLiteral;
+		public override string StringType => TypeUri;
 
 		/// <summary>
 		/// How well the type supports a given value type.
@@ -144,7 +147,7 @@ namespace Waher.Content.Semantic.Model.Literals
 
 				s2 = Typed.NormalizedXml;
 			}
-			else if (obj is CustomLiteral Custom && Custom.StringType == RdfXmlLiteral)
+			else if (obj is CustomLiteral Custom && Custom.StringType == TypeUri)
 			{
 				if (this.language != Custom.Language)
 					return false;

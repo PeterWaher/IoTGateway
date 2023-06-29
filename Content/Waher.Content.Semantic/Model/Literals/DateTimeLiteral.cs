@@ -36,10 +36,15 @@ namespace Waher.Content.Semantic.Model.Literals
         {
         }
 
-        /// <summary>
-        /// Type name
-        /// </summary>
-        public override string StringType => "http://www.w3.org/2001/XMLSchema#dateTime";
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#boolean
+		/// </summary>
+		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#dateTime";
+
+		/// <summary>
+		/// Type name
+		/// </summary>
+		public override string StringType => TypeUri;
 
 		/// <summary>
 		/// How well the type supports a given value type.

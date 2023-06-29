@@ -35,10 +35,15 @@ namespace Waher.Content.Semantic.Model.Literals
         {
         }
 
-        /// <summary>
-        /// Type name
-        /// </summary>
-        public override string StringType => "http://www.w3.org/2001/XMLSchema#byte";
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#byte
+		/// </summary>
+		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#byte";
+
+		/// <summary>
+		/// Type name
+		/// </summary>
+		public override string StringType => TypeUri;
 
 		/// <summary>
 		/// How well the type supports a given value type.

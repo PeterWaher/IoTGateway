@@ -106,6 +106,9 @@ namespace Waher.Content.Semantic.Model
 		/// <returns>Encapsulated value.</returns>
 		public static ISemanticLiteral EncapsulateLiteral(object Value)
 		{
+			if (Value is null)
+				return new UndefinedLiteral();
+
 			Type T = Value?.GetType() ?? typeof(object);
 			ISemanticLiteral Literal;
 

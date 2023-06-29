@@ -190,14 +190,18 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							Name = Ref.VariableName;
 						else
 						{
-							Name = (await SparqlQuery.EvaluateValue(RecordVariables, P2.Value))?.ToString();
+							object Obj = await SparqlQuery.EvaluateValue(RecordVariables, P2.Value);
+							if (Obj is null)
+								continue;
+
+							Name = Obj.ToString();
 							if (string.IsNullOrEmpty(Name))
 								continue;
 						}
 
 						ISemanticElement Literal = await Query.EvaluateSemanticElement(RecordVariables, P2.Key);
-
-						P = new Possibility(Name, Literal, P);
+						if (!(Literal is null))
+							P = new Possibility(Name, Literal, P);
 					}
 
 					NewMatches.AddLast(P);

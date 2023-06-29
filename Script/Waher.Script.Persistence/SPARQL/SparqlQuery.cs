@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -168,7 +169,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(this.groupBy is null) && !(Possibilities is null))
 			{
-				LinkedList<string> VectorProperties = null;
+				Dictionary<string, bool> VectorProperties = null;
 
 				if (!(this.columns is null))
 				{
@@ -181,9 +182,9 @@ namespace Waher.Script.Persistence.SPARQL
 								if (Descendant is VariableReference Ref)
 								{
 									if (VectorProperties is null)
-										VectorProperties = new LinkedList<string>();
+										VectorProperties = new Dictionary<string, bool>();
 
-									VectorProperties.AddLast(Ref.VariableName);
+									VectorProperties[Ref.VariableName] = true;
 								}
 
 								NewNode = null;
@@ -223,7 +224,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 					if (!(VectorProperties is null))
 					{
-						foreach (string VectorProperty in VectorProperties)
+						foreach (string VectorProperty in VectorProperties.Keys)
 						{
 							ISemanticElement Element = LastRecord[VectorProperty];
 							if (!(Element is SemanticElementVector Vector))
@@ -297,8 +298,16 @@ namespace Waher.Script.Persistence.SPARQL
 						foreach (ISemanticTriple T in this.construct.Triples)
 						{
 							ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
+							if (Subject is null)
+								continue;
+
 							ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
+							if (Predicate is null)
+								continue;
+
 							ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
+							if (Object is null)
+								continue;
 
 							Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
 						}
@@ -372,6 +381,8 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (!(Possibilities is null))
 			{
+				ObjectProperties RecordVariables = null;
+
 				foreach (ISparqlResultRecord P in Possibilities)
 				{
 					Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
@@ -394,14 +405,18 @@ namespace Waher.Script.Persistence.SPARQL
 
 					if (!(ColumnScript is null))
 					{
-						Variables RecordVariables = new ObjectProperties(P, Variables);
+						if (RecordVariables is null)
+							RecordVariables = new ObjectProperties(P, Variables);
+						else
+							RecordVariables.Object = P;
 
 						foreach (KeyValuePair<ScriptNode, int> P2 in ColumnScript)
 						{
 							Name = ColumnNames[P2.Value];
 							ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
 
-							Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
+							if (!(Literal is null))
+								Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
 						}
 					}
 
@@ -454,7 +469,7 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			catch (Exception ex)
 			{
-				return ex;
+				return null;
 			}
 		}
 
@@ -486,7 +501,10 @@ namespace Waher.Script.Persistence.SPARQL
 		internal async Task<ISemanticElement> EvaluateSemanticElement(Variables RecordVariables, ScriptNode Node)
 		{
 			object Value = await EvaluateValue(RecordVariables, Node);
-			return SemanticElements.Encapsulate(Value);
+			if (Value is null)
+				return null;
+			else
+				return SemanticElements.Encapsulate(Value);
 		}
 
 		/// <summary>

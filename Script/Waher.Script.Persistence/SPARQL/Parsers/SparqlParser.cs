@@ -7,6 +7,7 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Runtime.Inventory;
 using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.HashFunctions;
@@ -38,6 +39,19 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// Reference instance of SPARQL parser.
 		/// </summary>
 		public static readonly SparqlParser RefInstance = new SparqlParser(string.Empty);
+
+		private static readonly Dictionary<string, IExtensionFunction> functionsPerUri = new Dictionary<string, IExtensionFunction>(StringComparer.CurrentCultureIgnoreCase);
+
+		static SparqlParser()
+		{
+			Types.OnInvalidated += (Sender, e) =>
+			{
+				lock (functionsPerUri)
+				{
+					functionsPerUri.Clear();
+				}
+			};
+		}
 
 		private readonly string preamble;
 		private readonly int preambleLen;
@@ -1292,8 +1306,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new NotExists(this.ParsePattern(Parser),
 						Start, Parser.Position - Start, Parser.Expression);
 
-				// Aggregates
-
 				case "COUNT":
 					Node = this.ParseArgument(Parser);
 					return new Count(Node, Start, Parser.Position - Start, Parser.Expression);
@@ -1324,8 +1336,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "SAMPLE":
 					Node = this.ParseArgument(Parser);
 					return new Sample(Node, Start, Parser.Position - Start, Parser.Expression);
-
-				// Built-in functions
 
 				case "STR":
 					Node = this.ParseArgument(Parser);
@@ -1590,7 +1600,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return new Coalesce(Arguments, Start, Parser.Position - Start, Parser.Expression);
 
 				default:
-					// TODO: Extensible functions
+					if (Parser.PeekNextChar() == ':')
+					{
+						s = this.ParsePrefixedToken(Parser, s).Uri.AbsoluteUri;
+
+						IExtensionFunction Function;
+
+						lock (functionsPerUri)
+						{
+							if (!functionsPerUri.TryGetValue(s, out Function))
+							{
+								Function = Types.FindBest<IExtensionFunction, string>(s);
+								functionsPerUri[s] = Function;
+							}
+						}
+
+						if (Function is null)
+							throw Parser.SyntaxError("Function not found.");
+
+						Arguments = this.ParseArguments(Parser, Function.MinArguments, Function.MaxArguments);
+						return Function.CreateFunction(Arguments, Start, Parser.Position - Start, Parser.Expression);
+					}
 
 					if (Optional)
 					{

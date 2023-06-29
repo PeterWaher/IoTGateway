@@ -882,6 +882,31 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Functions.IExtensionFunction">
+            <summary>
+            Interface for extension functions
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.IExtensionFunction.MinArguments">
+            <summary>
+            Minimum number of arguments
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Functions.IExtensionFunction.MaxArguments">
+            <summary>
+            Maximum number of arguments
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Functions.IExtensionFunction.CreateFunction(Waher.Script.Model.ScriptNode[],System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a function node.
+            </summary>
+            <param name="Arguments">Parsed arguments.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+            <returns>Function script node.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.GroupResultSet">
             <summary>
             Comparer for grouping a SPARQL result set.

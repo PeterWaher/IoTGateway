@@ -52,8 +52,11 @@ namespace Waher.Script.Objects.VectorSpaces
 					double[] v = new double[this.dimension];
 					int i = 0;
 
-					foreach (DoubleNumber Element in this.elements)
-						v[i++] = Element.Value;
+					foreach (IElement Element in this.elements)
+					{
+						if (Element.AssociatedObjectValue is double d)
+							v[i++] = d;
+					}
 
 					this.values = v;
 				}

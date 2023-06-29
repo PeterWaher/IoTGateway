@@ -123,7 +123,7 @@ namespace Waher.Script.Persistence.SPARQL.Functions.TypeConversion
 			else if (Obj is string s && BigInteger.TryParse(s, out Integer))
 				return new IntegerLiteral(Integer);
 			else
-				throw new ScriptRuntimeException("Unable to convert value to integer.");
+				throw new ScriptRuntimeException("Unable to convert value to integer.", this);
 		}
 
 		/// <summary>

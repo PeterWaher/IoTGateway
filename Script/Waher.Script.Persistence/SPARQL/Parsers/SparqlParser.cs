@@ -18,6 +18,8 @@ using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Functions.Vectors;
+using Waher.Script.Functions.DateAndTime;
+using Waher.Script.Constants;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
@@ -1320,6 +1322,124 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				// Built-in functions
 
 				case "STR":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.String(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ABS":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.Abs(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "CEIL":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.Ceiling(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "FLOOR":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.Floor(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ROUND":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Scalar.Round(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRLEN":
+					Node = this.ParseArgument(Parser);
+					return new Length(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "UCASE":
+					Node = this.ParseArgument(Parser);
+					return new UpperCase(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "LCASE":
+					Node = this.ParseArgument(Parser);
+					return new LowerCase(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "CONTAINS":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new Contains(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRSTARTS":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new StartsWith(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRENDS":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new EndsWith(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRBEFORE":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new Before(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "STRAFTER":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new After(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "SUBSTR":
+					Arguments = this.ParseArguments(Parser, 2, 3);
+					int NodeStart = Arguments[1].Start;
+					int NodeLen = Arguments[1].Length;
+
+					Arguments[1] = new Subtract(Arguments[1],
+						new ConstantElement(new DoubleNumber(1), NodeStart, NodeLen, Parser.Expression),
+						NodeStart, NodeLen, Parser.Expression);
+
+					if (Arguments.Length == 2)
+					{
+						return new Mid(Arguments[0], Arguments[1], null,
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+					else
+					{
+						return new Mid(Arguments[0], Arguments[1], Arguments[2],
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+
+				case "YEAR":
+					Node = this.ParseArgument(Parser);
+					return new Year(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "MONTH":
+					Node = this.ParseArgument(Parser);
+					return new Month(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "DAY":
+					Node = this.ParseArgument(Parser);
+					return new Day(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "HOURS":
+					Node = this.ParseArgument(Parser);
+					return new Hours(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "MINUTES":
+					Node = this.ParseArgument(Parser);
+					return new Minutes(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "SECONDS":
+					Node = this.ParseArgument(Parser);
+					return new Seconds(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "NOW":
+					this.Parse0Arguments(Parser);
+					return new VariableReference("Now", Start, Parser.Position - Start, Parser.Expression);
+
+				case "MD5":
+					//Node = this.ParseArgument(Parser);
+					//NodeStart = Node.Start;
+					//NodeLen = Node.Length;
+					//Hashes.BinaryToString(MD5(Utf8Encode("abc")))
+					//
+					//return new NamedMethodCall(
+					//	new VariableReference
+					//	new Seconds(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "SHA1":
+				case "SHA256":
+				case "SHA384":
+				case "SHA512":
+
+				case "REPLACE":
+				case "TIMEZONE":
+				case "TZ":
+
 				case "LANG":
 				case "LANGMATCHES":
 				case "DATATYPE":
@@ -1328,35 +1448,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "URI":
 				case "BNODE":
 				case "RAND":
-				case "ABS":
-				case "CEIL":
-				case "FLOOR":
-				case "ROUND":
-				case "STRLEN":
-				case "UCASE":
-				case "LCASE":
 				case "ENCODE_FOR_URI":
-				case "CONTAINS":
-				case "STRSTARTS":
-				case "STRENDS":
-				case "STRBEFORE":
-				case "STRAFTER":
-				case "YEAR":
-				case "MONTH":
-				case "DAY":
-				case "HOURS":
-				case "MINUTES":
-				case "SECONDS":
-				case "TIMEZONE":
-				case "TZ":
-				case "NOW":
 				case "UUID":
 				case "STRUUID":
-				case "MD5":
-				case "SHA1":
-				case "SHA256":
-				case "SHA384":
-				case "SHA512":
 				case "COALESCE":
 				case "IF":
 				case "STRLANG":
@@ -1367,8 +1461,6 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "ISBLANK":
 				case "ISLITERAL":
 				case "ISNUMERIC":
-				case "SUBSTR":
-				case "REPLACE":
 				default:
 					// TODO: Extensible functions
 
@@ -1385,6 +1477,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 		}
 
+		private void Parse0Arguments(ScriptParser Parser)
+		{
+			if (Parser.NextNonWhitespaceChar() != '(')
+				throw Parser.SyntaxError("Expected (");
+
+			if (Parser.NextNonWhitespaceChar() != ')')
+				throw Parser.SyntaxError("Expected )");
+		}
+
 		private ScriptNode ParseArgument(ScriptParser Parser)
 		{
 			if (Parser.NextNonWhitespaceChar() != '(')
@@ -1396,6 +1497,22 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				throw Parser.SyntaxError("Expected )");
 
 			return Argument;
+		}
+
+		private void Parse2Arguments(ScriptParser Parser, out ScriptNode Argument1, out ScriptNode Argument2)
+		{
+			if (Parser.NextNonWhitespaceChar() != '(')
+				throw Parser.SyntaxError("Expected (");
+
+			Argument1 = this.ParseExpression(Parser, false);
+
+			if (Parser.NextNonWhitespaceChar() != ',')
+				throw Parser.SyntaxError("Expected ,");
+
+			Argument2 = this.ParseExpression(Parser, false);
+
+			if (Parser.NextNonWhitespaceChar() != ')')
+				throw Parser.SyntaxError("Expected )");
 		}
 
 		private ScriptNode ParseArgumentOptionalScalarVal(ScriptParser Parser, string ExpectedScalarName, out ScriptNode ScalarVal)

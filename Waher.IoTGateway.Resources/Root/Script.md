@@ -1834,6 +1834,12 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `UpdateObject(Obj)`                                      | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
 | `XPath(Expression)`                                      | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
 
+In addition to this, the following SPARQL extension functions are defined
+
+| Function              | URI                                        | Description |
+|:----------------------|:-------------------------------------------|:------------|
+| `ToBooleanLiteral(x)` | `http://www.w3.org/2001/XMLSchema#boolean` | Converts a value to a Boolean literal value. |
+
 #### Statistics-related functions (Waher.Script.Statistics)
 
 The following functions are available in the `Waher.Script.Statistics` library.

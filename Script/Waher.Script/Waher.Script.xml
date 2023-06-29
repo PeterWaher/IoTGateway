@@ -5684,12 +5684,6 @@
             Name of variable.
             </summary>
         </member>
-        <member name="P:Waher.Script.Functions.Runtime.Destroy.IsMember">
-            <summary>
-            If argument is a named member reference. <see cref="P:Waher.Script.Functions.Runtime.Destroy.VariableName"/> will contain
-            the name of a named member.
-            </summary>
-        </member>
         <member name="P:Waher.Script.Functions.Runtime.Destroy.FunctionName">
             <summary>
             Name of the function
@@ -5698,12 +5692,6 @@
         <member name="P:Waher.Script.Functions.Runtime.Destroy.Aliases">
             <summary>
             Optional aliases. If there are no aliases for the function, null is returned.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Functions.Runtime.Destroy.IsAsynchronous">
-            <summary>
-            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-            <see cref="M:Waher.Script.Functions.Runtime.Destroy.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Destroy.Evaluate(Waher.Script.Variables)">

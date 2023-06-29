@@ -1959,6 +1959,8 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Aes256Encrypt(Content,Key,IV[,CipherMode[,PaddingMode]])` | Encrypts `Content` using AES 256, with the key `Key` and Initiation Vector `IV`. `CipherMode` is by default `CBC` and Padding is by default `PKCS7`. | [Example][Aes256EncryptExample] |
 | `Ed25519([PrivKey[,HashKey]])`                             | Creates an Edwards25519 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed25519Example] |
 | `Ed448([PrivKey[,HashKey]])`                               | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
+| `HexDecode(Data)`                                          | Decodes binary data from a string using hexadecimal encoding. | [Example][HexDecodeExample] |
+| `HexEncode(Data)`                                          | Encodes binary data to a string using hexadecimal encoding. | [Example][HexEncodeExample] |
 | `Md5(Data)`                                                | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
 | `P192([PrivKey])`                                          | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
 | `P224([PrivKey])`                                          | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |
@@ -1987,6 +1989,8 @@ The following functions are available in the `Waher.Script.Cryptography` library
 [Aes256DecryptExample]: Prompt.md?Expression=Decrypted%3A%3DAes256Decrypt%28Encrypted%2CKey%2CIV%2C%22CBC%22%2C%22PKCS7%22%29%3BUtf8Decode%28Decrypted%29
 [Ed25519Example]: Prompt.md?Expression=Ed25519()
 [Ed448Example]: Prompt.md?Expression=Ed448()
+[HexDecodeExample]: Prompt.md?Expression=Utf8Decode(HexDecode("48656c6c6f"))
+[HexEncodeExample]: Prompt.md?Expression=HexEncode(Utf8Encode("Hello"))
 [Md5Example]: Prompt.md?Expression=Md5(Utf8Encode(%22Hello%22))
 [P192Example]: Prompt.md?Expression=P192()
 [P224Example]: Prompt.md?Expression=P224()

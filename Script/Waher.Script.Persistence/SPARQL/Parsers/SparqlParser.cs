@@ -1306,8 +1306,16 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					Node = this.ParseArgument(Parser);
 					return new Average(Node, Start, Parser.Position - Start, Parser.Expression);
 
-				case "SAMPLE":
 				case "GROUP_CONCAT":
+					Node = this.ParseArgumentOptionalScalarVal(Parser, "separator", out ScriptNode Node2);
+					if (Node2 is null)
+						return new Concat(Node, Start, Parser.Position - Start, Parser.Expression);
+					else
+						return new Concat(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "SAMPLE":
+					Node = this.ParseArgument(Parser);
+					return new Sample(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				// Built-in functions
 
@@ -1388,6 +1396,39 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				throw Parser.SyntaxError("Expected )");
 
 			return Argument;
+		}
+
+		private ScriptNode ParseArgumentOptionalScalarVal(ScriptParser Parser, string ExpectedScalarName, out ScriptNode ScalarVal)
+		{
+			if (Parser.NextNonWhitespaceChar() != '(')
+				throw Parser.SyntaxError("Expected (");
+
+			ScriptNode Argument = this.ParseExpression(Parser, false);
+
+			switch (Parser.NextNonWhitespaceChar())
+			{
+				case ')':
+					ScalarVal = null;
+					return Argument;
+
+				case ';':
+					string s = this.ParseName(Parser);
+					if (s != ExpectedScalarName)
+						throw Parser.SyntaxError("Expected " + ExpectedScalarName);
+
+					if (Parser.NextNonWhitespaceChar() != '=')
+						throw Parser.SyntaxError("Expected =");
+
+					ScalarVal = this.ParseExpression(Parser, false);
+
+					if (Parser.NextNonWhitespaceChar() != ')')
+						throw Parser.SyntaxError("Expected )");
+
+					return Argument;
+
+				default:
+					throw Parser.SyntaxError("Expected ) or ;");
+			}
 		}
 
 		private ScriptNode[] ParseArguments(ScriptParser Parser, int Min, int Max)

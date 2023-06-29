@@ -1839,6 +1839,7 @@ In addition to this, the following SPARQL extension functions are defined
 | Function              | URI                                        | Description |
 |:----------------------|:-------------------------------------------|:------------|
 | `ToBooleanLiteral(x)` | `http://www.w3.org/2001/XMLSchema#boolean` | Converts a value to a Boolean literal value. |
+| `ToIntegerLiteral(x)` | `http://www.w3.org/2001/XMLSchema#integer` | Converts a value to an integer literal value. |
 
 #### Statistics-related functions (Waher.Script.Statistics)
 

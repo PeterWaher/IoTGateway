@@ -50,10 +50,15 @@ namespace Waher.Content.Semantic.Model.Literals
 			this.dataType = DataType;
         }
 
-        /// <summary>
-        /// Type name
-        /// </summary>
-        public override string StringType => this.dataType ?? "http://www.w3.org/2001/XMLSchema#integer";
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#byte
+		/// </summary>
+		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#integer";
+
+		/// <summary>
+		/// Type name
+		/// </summary>
+		public override string StringType => this.dataType ?? TypeUri;
 
 		/// <summary>
 		/// How well the type supports a given value type.

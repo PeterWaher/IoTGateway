@@ -7200,6 +7200,57 @@
             <param name="AlreadyFound">Variables already identified.</param>
             <returns>Pattern match result</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Scalar.Uri">
+            <summary>
+            Uri(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Uri.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Uri(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Scalar.Uri.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Uri.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Uri.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Uri.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Uri.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Strings.After">
             <summary>
             After(s,Delimiter)

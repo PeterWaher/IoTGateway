@@ -921,6 +921,7 @@ The following table lists available scalar functions:
 | `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | Asserts `z` is -1, 0 or 1.                              | `Sign(pi)`        |
 | `Str(x)`     | Alias for `String(x)`.                    | Asserts `x` is a string.                                | `Str(100)`        |
 | `String(x)`  | Converts `x` to a string.                 | Asserts `x` is a string.                                | `String(100)`     |
+| `Uri(x)`     | Converts `x` to an URI object value.      | Asserts `x` is a URI.                                   | `Uri(s)`          |
 
 ### Complex Functions
 

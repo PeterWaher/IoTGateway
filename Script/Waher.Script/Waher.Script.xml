@@ -7691,6 +7691,30 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="M:Waher.Script.Functions.Strings.Replace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Replaceenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+            <param name="String">String to operate on.</param>
+            <param name="From">Substring to replace.</param>
+            <param name="To">Substrings will be replaced with this.</param>
+            <param name="UseRegex">If <paramref name="From"/> is a regular expression.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Replace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Replaceenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+            <param name="String">String to operate on.</param>
+            <param name="From">Substring to replace.</param>
+            <param name="To">Substrings will be replaced with this.</param>
+            <param name="Options">Regex options</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
         <member name="P:Waher.Script.Functions.Strings.Replace.FunctionName">
             <summary>
             Name of the function
@@ -7708,6 +7732,16 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Replace.GetOptions(System.String,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Converts a string-representation of regex options into an
+            enumeration value.
+            </summary>
+            <param name="Options">String-representation of options.</param>
+            <param name="Node">Node performing the calcaultion.</param>
+            <returns>Options.</returns>
+            <exception cref="T:Waher.Script.Exceptions.ScriptRuntimeException">If options are not recognized.</exception>
         </member>
         <member name="T:Waher.Script.Functions.Strings.Split">
             <summary>

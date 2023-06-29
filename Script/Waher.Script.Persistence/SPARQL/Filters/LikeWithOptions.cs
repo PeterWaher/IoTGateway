@@ -5,6 +5,7 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Strings;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Comparisons;
@@ -104,31 +105,7 @@ namespace Waher.Script.Persistence.SPARQL.Filters
             if (!(Options.AssociatedObjectValue is string s))
                 throw new ScriptRuntimeException("Options argument to regex function must be a string.", this);
 
-            RegexOptions Result = RegexOptions.Singleline;
-
-            foreach (char ch in s)
-            {
-                switch (ch)
-                {
-                    case 'i':
-                        Result |= RegexOptions.IgnoreCase;
-                        break;
-
-                    case 'm':
-                        Result &= ~RegexOptions.Singleline;
-                        Result |= RegexOptions.Multiline;
-                        break;
-
-                    case 'x':
-                        Result |= RegexOptions.IgnorePatternWhitespace;
-                        break;
-
-                    default:
-                        throw new ScriptRuntimeException("Regular expression option not supported: " + ch, this);
-                }
-            }
-
-            this.Options = Result;
+            this.Options = Replace.GetOptions(s, this);
         }
 
         /// <summary>

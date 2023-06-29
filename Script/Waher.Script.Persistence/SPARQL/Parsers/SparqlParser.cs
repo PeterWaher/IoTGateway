@@ -1560,12 +1560,35 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					this.Parse2Arguments(Parser, out Node, out Node2);
 					return new StrLang(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
 
-				case "REPLACE":
-				case "TIMEZONE":
-				case "TZ":
-
 				case "LANGMATCHES":
+					this.Parse2Arguments(Parser, out Node, out Node2);
+					return new LangMatches(Node, Node2, Start, Parser.Position - Start, Parser.Expression);
+
+				case "REPLACE":
+					Arguments = this.ParseArguments(Parser, 3, 4);
+					if (Arguments.Length == 2)
+					{
+						return new Replace(Arguments[0], Arguments[1], Arguments[2], true,
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+					else
+					{
+						return new Replace(Arguments[0], Arguments[1], Arguments[2], Arguments[3],
+							Start, Parser.Position - Start, Parser.Expression);
+					}
+
+				case "TIMEZONE":
+					Node = this.ParseArgument(Parser);
+					return new TimeZone(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "TZ":
+					Node = this.ParseArgument(Parser);
+					return new Tz(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				case "COALESCE":
+					Arguments = this.ParseArguments(Parser, 1, int.MaxValue);
+					return new Coalesce(Arguments, Start, Parser.Position - Start, Parser.Expression);
+
 				default:
 					// TODO: Extensible functions
 

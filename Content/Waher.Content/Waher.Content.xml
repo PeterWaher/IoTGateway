@@ -943,6 +943,13 @@
             <param name="Seconds">Number of seconds.</param>
             <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
         </member>
+        <member name="M:Waher.Content.Duration.FromTimeSpan(System.TimeSpan)">
+            <summary>
+            Converts a TimeSpan to a Duration. (This will loose milliseconds.)
+            </summary>
+            <param name="TS">TimeSpan value.</param>
+            <returns>Duration value</returns>
+        </member>
         <member name="M:Waher.Content.Duration.CompareTo(Waher.Content.Duration)">
             <summary>
             Compares the current instance with another object of the same type and returns

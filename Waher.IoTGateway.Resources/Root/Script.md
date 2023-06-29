@@ -961,7 +961,7 @@ The following table lists available string-related functions:
 | `PadLeft(s,N)`                    | Returns the string `s` padded to the left with space characters, until it contains `N` characters. | `PadLeft("Hello",10)` |
 | `PadRight(s,N)`                   | Returns the string `s` padded to the right with space characters, until it contains `N` characters. | `PadRight("Hello",10)` |
 | `Parse(s)`                        | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
-| `Replace(s,From,To)`              | Replaces all occurrences of the `From` string in `s` with the `To` string. | `Replace(s,"Hello","Bye")` |
+| `Replace(s,From,To[,Options])`    | Replaces all occurrences of the `From` string in `s` with the `To` string. If `Options` are provided (can be empty string), `From` is treated as a regular expression. Supported options include combinations of letters `i`, `m` and `x`. | `Replace(s,"Hello","Bye")` |
 | `Right(s,N)`                      | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
 | `Split(s,Substring)`              | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
 | `StartsWith(s,Substring)`         | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
@@ -2094,18 +2094,22 @@ context-specific constants (read-only variables) are available in inline script:
 
 The following functions are available in the `Waher.Content.Semantic` library.
 
-| Function          | Description                                                                                           |
-|-------------------|-------------------------------------------------------------------------------------------------------|
-| `BNode([Label])`  | Creates a blank node with a given label. If no label is provided, a distinct blank node is created.   |
-| `DataType(Term)`  | Returns the data type of the term, if available, or the empty string if not.                          |
-| `IsBlank(Term)`   | Checks if an RDF term is a Blank node.                                                                |
-| `IsIri(Term)`     | Alias for `IsUri`.                                                                                    |
-| `IsLiteral(Term)` | Checks if an RDF term is a literal.                                                                   |
-| `IsNumeric(Term)` | Checks if an RDF term is a numeric literal.                                                           |
-| `IsUri(Term)`     | Checks if an RDF term is a URI term.                                                                  |
-| `Lang(Term)`      | Returns the language of the term, if available, or the empty string if not.                           |
-| `StrDt(x,Type)`   | Returns a typed literal, with XML data type specified by `Type`, and string value represented by `x`. |
-| `StrLang(x,Lang)` | Returns a localized literal, with language specified by `Lang`, and string value represented by `x`.  |
+| Function             | Description                                                                                           |
+|----------------------|-------------------------------------------------------------------------------------------------------|
+| `BNode([Label])`     | Creates a blank node with a given label. If no label is provided, a distinct blank node is created.   |
+| `Coalesce(Exp, ...)` | Returns the value of the first expression in the argument list, that evaluates without error.         |
+| `DataType(Term)`     | Returns the data type of the term, if available, or the empty string if not.                          |
+| `IsBlank(Term)`      | Checks if an RDF term is a Blank node.                                                                |
+| `IsIri(Term)`        | Alias for `IsUri`.                                                                                    |
+| `IsLiteral(Term)`    | Checks if an RDF term is a literal.                                                                   |
+| `IsNumeric(Term)`    | Checks if an RDF term is a numeric literal.                                                           |
+| `IsUri(Term)`        | Checks if an RDF term is a URI term.                                                                  |
+| `Lang(Term)`         | Returns the language of the term, if available, or the empty string if not.                           |
+| `LangMatches(x,y)`   | Checks if the language `x` matches the language `y`. `y` can be `*`, or unlocalized, while `x` is.    |
+| `StrDt(x,Type)`      | Returns a typed literal, with XML data type specified by `Type`, and string value represented by `x`. |
+| `StrLang(x,Lang)`    | Returns a localized literal, with language specified by `Lang`, and string value represented by `x`.  |
+| `TimeZone(x)`        | Returns the time zone of a date and time literal value, as a `xs:dayTimeDuration` literal value.      |
+| `Tz(x)`              | Returns the time zone of a date and time literal value, as a string literal value.                    |
 
 #### XSL-related functions (Waher.Content.Xsl)
 

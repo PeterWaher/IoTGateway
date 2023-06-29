@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -569,6 +570,20 @@ namespace Waher.Content
 		public static Duration FromSeconds(int Seconds)
 		{
 			return new Duration(Seconds < 0, 0, 0, 0, 0, 0, Math.Abs(Seconds));
+		}
+
+		/// <summary>
+		/// Converts a TimeSpan to a Duration. (This will loose milliseconds.)
+		/// </summary>
+		/// <param name="TS">TimeSpan value.</param>
+		/// <returns>Duration value</returns>
+		public static Duration FromTimeSpan(TimeSpan TS)
+		{
+			bool Sign = TS < TimeSpan.Zero;
+			if (Sign)
+				TS = -TS;
+
+			return new Duration(Sign, 0, 0, TS.Days, TS.Hours, TS.Minutes, TS.Seconds);
 		}
 
 		/// <summary>

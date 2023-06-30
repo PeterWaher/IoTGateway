@@ -104,6 +104,23 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Sets the <see cref="Start"/> and <see cref="Length"/> properties of the node.
+		/// </summary>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		protected void SetSubExpression(int Start, int Length)
+		{
+			if (Start < 0)
+				throw new ArgumentOutOfRangeException(nameof(Start), "Cannot be negative.");
+
+			if (Length < 0)
+				throw new ArgumentOutOfRangeException(nameof(Length), "Cannot be negative.");
+
+			this.start = Start;
+			this.length = Length;
+		}
+
+		/// <summary>
 		/// Parent node.
 		/// </summary>
 		public ScriptNode Parent => this.parent;

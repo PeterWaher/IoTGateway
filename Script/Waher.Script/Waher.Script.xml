@@ -11645,6 +11645,13 @@
             Length of expression covered by node.
             </summary>
         </member>
+        <member name="M:Waher.Script.Model.ScriptNode.SetSubExpression(System.Int32,System.Int32)">
+            <summary>
+            Sets the <see cref="P:Waher.Script.Model.ScriptNode.Start"/> and <see cref="P:Waher.Script.Model.ScriptNode.Length"/> properties of the node.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+        </member>
         <member name="P:Waher.Script.Model.ScriptNode.Parent">
             <summary>
             Parent node.

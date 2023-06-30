@@ -162,6 +162,12 @@
     <None Remove="Sparql\Test_036.rq" />
     <None Remove="Sparql\Test_036.srx" />
     <None Remove="Sparql\Test_036.ttl" />
+    <None Remove="Sparql\Test_037.rq" />
+    <None Remove="Sparql\Test_037.srx" />
+    <None Remove="Sparql\Test_037.ttl" />
+    <None Remove="Sparql\Test_038.rq" />
+    <None Remove="Sparql\Test_038.srx" />
+    <None Remove="Sparql\Test_038.ttl" />
     <None Remove="Sparql\Test_04.rq" />
     <None Remove="Sparql\Test_04.srx" />
     <None Remove="Sparql\Test_04.ttl" />
@@ -451,6 +457,12 @@
     <EmbeddedResource Include="Sparql\Test_035.rq" />
     <EmbeddedResource Include="Sparql\Test_035.srx" />
     <EmbeddedResource Include="Sparql\Test_035.ttl" />
+    <EmbeddedResource Include="Sparql\Test_038.srx" />
+    <EmbeddedResource Include="Sparql\Test_038.rq" />
+    <EmbeddedResource Include="Sparql\Test_038.ttl" />
+    <EmbeddedResource Include="Sparql\Test_037.srx" />
+    <EmbeddedResource Include="Sparql\Test_037.rq" />
+    <EmbeddedResource Include="Sparql\Test_037.ttl" />
     <EmbeddedResource Include="Sparql\Test_036.rq" />
     <EmbeddedResource Include="Sparql\Test_036.srx" />
     <EmbeddedResource Include="Sparql\Test_036.ttl" />

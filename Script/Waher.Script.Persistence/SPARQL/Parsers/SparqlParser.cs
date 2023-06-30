@@ -31,10 +31,10 @@ using Waher.Script.Statistics.Functions.RandomNumbers;
 
 namespace Waher.Script.Persistence.SPARQL.Parsers
 {
-    /// <summary>
-    /// Parses a SPARQL statement
-    /// </summary>
-    public class SparqlParser : IKeyWord
+	/// <summary>
+	/// Parses a SPARQL statement
+	/// </summary>
+	public class SparqlParser : IKeyWord
 	{
 		/// <summary>
 		/// Reference instance of SPARQL parser.
@@ -121,6 +121,18 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		/// <param name="Result">Parsed Script Node.</param>
 		/// <returns>If successful in parsing a script node.</returns>
 		public bool TryParse(ScriptParser Parser, out ScriptNode Result)
+		{
+			return this.TryParse(Parser, Parser.Start, out Result);
+		}
+
+		/// <summary>
+		/// Tries to parse a script node.
+		/// </summary>
+		/// <param name="Parser">Custom parser.</param>
+		/// <param name="Start">Start position of subquery.</param>
+		/// <param name="Result">Parsed Script Node.</param>
+		/// <returns>If successful in parsing a script node.</returns>
+		public bool TryParse(ScriptParser Parser, int Start, out ScriptNode Result)
 		{
 			Result = null;
 
@@ -277,11 +289,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				if (Parser.PeekNextChar() == '<')
 				{
-					int Start = Parser.Position;
+					int Start2 = Parser.Position;
 					Parser.NextChar();
 					UriNode FromUri = this.ParseUri(Parser);
 
-					From = new ConstantElement(FromUri, Start, Parser.Position - Start, Parser.Expression);
+					From = new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression);
 				}
 				else
 					From = Parser.ParseObject();
@@ -329,7 +341,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				GroupBy = new List<ScriptNode>();
 				GroupByNames = new List<ScriptNode>();
 
-				while (!string.IsNullOrEmpty(s) && s != "HAVING" && s != "ORDER" && s != ";")
+				while (!string.IsNullOrEmpty(s) && s != "HAVING" && s != "ORDER" && s != ";" && s != ")" && s != "}")
 				{
 					Node = this.ParseNamedExpression(Parser);
 					if (Node is NamedNode NamedNode)
@@ -388,7 +400,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
 				ColumnNames?.ToArray(), From, Where, GroupBy?.ToArray(), GroupByNames?.ToArray(),
-				Having, OrderBy?.ToArray(), Construct, Parser.Start, Parser.Length, Parser.Expression);
+				Having, OrderBy?.ToArray(), Construct, Start, Parser.Position - Start, Parser.Expression);
 
 			return true;
 		}
@@ -564,7 +576,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'M':
 						case 'v':
 						case 'V':
-
+						case 's':
+						case 'S':
 							if (!this.ParsePatternOperator(Parser))
 								break;
 
@@ -735,6 +748,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'M':
 						case 'v':
 						case 'V':
+						case 's':
+						case 'S':
 							Parser.UndoChar();
 
 							if (!this.ParsePatternOperator(Parser))
@@ -800,6 +815,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						this.currentPattern = Values;
 					else
 						this.currentPattern = new IntersectionPattern(Values, this.currentPattern);
+
+					return true;
+
+				case "SELECT":
+					SparqlParser SubParser = new SparqlParser(string.Empty);
+
+					foreach (KeyValuePair<string, string> P in this.namespaces)
+						SubParser.namespaces[P.Key] = P.Value;
+
+					if (!SubParser.TryParse(Parser, Parser.Position, out ScriptNode Node))
+						throw Parser.SyntaxError("Unable to parse subquery.");
+
+					if (!(Node is SparqlQuery SubQuery))
+						throw Parser.SyntaxError("Expected subquery.");
+
+					SubQueryPattern SubQueryPattern = new SubQueryPattern(SubQuery);
+
+					if (this.currentPattern.IsEmpty)
+						this.currentPattern = SubQueryPattern;
+					else
+						this.currentPattern = new IntersectionPattern(SubQueryPattern, this.currentPattern);
 
 					return true;
 
@@ -1273,7 +1309,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					VectorDefinition Vector = new VectorDefinition(Arguments,
 						Start2, Parser.Position - Start2, Parser.Expression);
 
-					return new Concat(Vector, Start, Parser.Position - Start, Parser.Expression);
+					return new Concat(Vector, Start2, Parser.Position - Start2, Parser.Expression);
 
 				case "ASC":
 					Node = this.ParseArgument(Parser);
@@ -1810,9 +1846,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					case '?':
 					case '$':
-						int Start = Parser.Position;
+						int Start2 = Parser.Position;
 						s = this.ParseName(Parser);
-						return new SemanticScriptElement(new VariableReference(s, Start, Parser.Position - Start, Parser.Expression));
+						return new SemanticScriptElement(new VariableReference(s, Start2, Parser.Position - Start2, Parser.Expression));
 
 					default:
 						if (char.IsWhiteSpace(ch))
@@ -1828,7 +1864,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						else if (char.IsLetter(ch) || ch == ':')
 						{
 							Parser.UndoChar();
-							Start = Parser.Position;
+							Start2 = Parser.Position;
 							s = this.ParseName(Parser);
 
 							if (Parser.PeekNextChar() == ':')
@@ -1863,7 +1899,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 								return new UndefinedLiteral();
 							}
 
-							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start, true);
+							ScriptNode ScriptNode = this.ParseFunction(Parser, s, Start2, true);
 
 							if (ScriptNode is null)
 							{

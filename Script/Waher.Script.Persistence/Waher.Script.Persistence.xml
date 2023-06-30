@@ -1404,6 +1404,15 @@
             <param name="Result">Parsed Script Node.</param>
             <returns>If successful in parsing a script node.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Parsers.SparqlParser.TryParse(Waher.Script.Model.ScriptParser,System.Int32,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Start">Start position of subquery.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Parsers.SparqlParserAsk">
             <summary>
             Parses a SPARQL statement that begins with the ASK keyword.
@@ -1826,6 +1835,62 @@
             </summary>
             <param name="Parent">Parent Node</param>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern">
+            <summary>
+            A sub-query
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.#ctor(Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            A sub-query
+            </summary>
+            <param name="SubQuery">Subquery</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.IsEmpty">
+            <summary>
+            If pattern is empty.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.Search(Waher.Content.Semantic.ISemanticCube,Waher.Script.Variables,System.Collections.Generic.IEnumerable{Waher.Script.Persistence.SPARQL.Possibility},Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            Searches for the pattern on information in a semantic cube.
+            </summary>
+            <param name="Cube">Semantic cube.</param>
+            <param name="Variables">Script variables.</param>
+            <param name="ExistingMatches">Existing matches.</param>
+            <param name="Query">SPARQL-query being executed.</param>
+            <returns>Matches.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.SetParent(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sets the parent node. Can only be used when expression is being parsed.
+            </summary>
+            <param name="Parent">Parent Node</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.ForAll(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.SubQueryPattern.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Patterns.UnionPattern">
             <summary>
             Union of two patterns.
@@ -2236,6 +2301,15 @@
             the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.EvaluateAsync(Waher.Script.Variables,System.Collections.Generic.IEnumerable{Waher.Script.Persistence.SPARQL.Possibility})">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <param name="ExistingMatches">Any existing matches the query needs to consider.</param>
             <returns>Result.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">

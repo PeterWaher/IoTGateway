@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
-using Waher.Content.Semantic.Model.Literals;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -134,7 +133,20 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return this.EvaluateAsync(Variables, null);
+		}
+
+		/// <summary>
+		/// Evaluates the node asynchronously, using the variables provided in 
+		/// the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <param name="ExistingMatches">Any existing matches the query needs to consider.</param>
+		/// <returns>Result.</returns>
+		public async Task<IElement> EvaluateAsync(Variables Variables,
+			IEnumerable<Possibility> ExistingMatches)
 		{
 			object From;
 
@@ -163,9 +175,9 @@ namespace Waher.Script.Persistence.SPARQL
 			IEnumerable<ISparqlResultRecord> Possibilities;
 
 			if (this.where is null)
-				Possibilities = null;
+				Possibilities = ExistingMatches;
 			else
-				Possibilities = await this.where.Search(Cube, Variables, null, this);
+				Possibilities = await this.where.Search(Cube, Variables, ExistingMatches, this);
 
 			if (!(this.groupBy is null) && !(Possibilities is null))
 			{

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="y"/>
+		<variable name="minName"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="y">
+				<uri>http://people.example/alice</uri>
+			</binding>
+			<binding name="minName">
+				<literal>A. Foo</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="y">
+				<uri>http://people.example/bob</uri>
+			</binding>
+			<binding name="minName">
+				<literal>B. Bar</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="y">
+				<uri>http://people.example/carol</uri>
+			</binding>
+			<binding name="minName">
+				<literal>C. Baz</literal>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

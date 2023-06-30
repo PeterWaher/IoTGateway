@@ -100,6 +100,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		{
 			"DISTINCT",
 			"FROM",
+			"NAMED",
 			"WHERE",
 			"OPTIONAL",
 			"UNION",
@@ -111,6 +112,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			"ASC",
 			"DESC",
 			"VALUES",
+			"GRAPH",
+			"SERVICE",
 			"UNDEF"
 		};
 
@@ -199,7 +202,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			SparqlRegularPattern Construct = null;
 			ISparqlPattern Where;
 			ScriptNode Having;
-			ScriptNode From;
+			List<ScriptNode> From;
 
 			switch (s)
 			{
@@ -282,8 +285,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					throw Parser.SyntaxError("Expected SELECT or ASK.");
 			}
 
-			if (s == "FROM")
+			From = null;
+
+			while (s == "FROM")
 			{
+				if (From is null)
+					From = new List<ScriptNode>();
+
 				Parser.NextToken();
 				Parser.SkipWhiteSpace();
 
@@ -293,15 +301,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					Parser.NextChar();
 					UriNode FromUri = this.ParseUri(Parser);
 
-					From = new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression);
+					From.Add(new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression));
 				}
 				else
-					From = Parser.ParseObject();
+					From.Add(Parser.ParseObject());
 
 				s = Parser.PeekNextToken().ToUpper();
 			}
-			else
-				From = null;
 
 			if (s == "WHERE")
 			{
@@ -399,7 +405,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
-				ColumnNames?.ToArray(), From, Where, GroupBy?.ToArray(), GroupByNames?.ToArray(),
+				ColumnNames?.ToArray(), From?.ToArray(), Where, GroupBy?.ToArray(), GroupByNames?.ToArray(),
 				Having, OrderBy?.ToArray(), Construct, Start, Parser.Position - Start, Parser.Expression);
 
 			return true;

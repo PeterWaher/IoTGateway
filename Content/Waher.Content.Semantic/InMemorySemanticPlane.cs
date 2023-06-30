@@ -43,6 +43,21 @@ namespace Waher.Content.Semantic
 		}
 
 		/// <summary>
+		/// Adds a set of triples to the plane.
+		/// </summary>
+		/// <param name="Triples">Enumerable set of triples.</param>
+		/// <param name="XIndex">X-coordinate index.</param>
+		/// <param name="YIndex">Y-coordinate index.</param>
+		internal void Add(IEnumerable<ISemanticTriple> Triples, int XIndex, int YIndex)
+		{
+			if (!(Triples is null))
+			{
+				foreach (ISemanticTriple Triple in Triples)
+					this.Add(Triple[XIndex], Triple[YIndex], Triple);
+			}
+		}
+
+		/// <summary>
 		/// Gets an enumerator over all elements in plance.
 		/// </summary>
 		/// <returns>Enumerator</returns>

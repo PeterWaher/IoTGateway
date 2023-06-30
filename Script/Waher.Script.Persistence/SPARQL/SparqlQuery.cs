@@ -45,7 +45,7 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupByNames;
-		private readonly ScriptNode from;
+		private readonly ScriptNode[] from;
 		private readonly ISparqlPattern where;
 		private readonly ScriptNode having;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
@@ -60,7 +60,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
 		/// <param name="Columns">Columns to select.</param>
 		/// <param name="ColumnNames">Names of selected columns.</param>
-		/// <param name="From">Data source.</param>
+		/// <param name="From">Data sources.</param>
 		/// <param name="Where">Optional where clause</param>
 		/// <param name="GroupBy">Any GROUP BY rules.</param>
 		/// <param name="GroupByNames">Optional names for GROUP BY rules.</param>
@@ -71,7 +71,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public SparqlQuery(QueryType QueryType, bool Distinct, ScriptNode[] Columns,
-			ScriptNode[] ColumnNames, ScriptNode From, ISparqlPattern Where,
+			ScriptNode[] ColumnNames, ScriptNode[] From, ISparqlPattern Where,
 			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
 			KeyValuePair<ScriptNode, bool>[] OrderBy, SparqlRegularPattern Construct,
 			int Start, int Length, Expression Expression)
@@ -148,28 +148,25 @@ namespace Waher.Script.Persistence.SPARQL
 		public async Task<IElement> EvaluateAsync(Variables Variables,
 			IEnumerable<Possibility> ExistingMatches)
 		{
+			SemanticDataSet DataSet = new SemanticDataSet();
 			object From;
 
-			if (!(this.from is null))
-				From = (await this.from.EvaluateAsync(Variables)).AssociatedObjectValue;
-			else if (Variables.TryGetVariable(" Default Graph ", out Variable v))
-				From = v.ValueObject;
-			else
-				throw new ScriptRuntimeException("Default graph not defined.", this);
-
-			if (From is UriNode UriNode)
-				From = await this.LoadResource(UriNode.Uri, Variables);
-			else if (From is Uri Uri)
-				From = await this.LoadResource(Uri, Variables);
-			else if (From is string s)
-				From = await this.LoadResource(new Uri(s, UriKind.RelativeOrAbsolute), Variables);
-
-			if (!(From is ISemanticCube Cube))
+			if (this.from is null)
 			{
-				if (From is ISemanticModel Model)
-					Cube = await InMemorySemanticCube.Create(Model);
+				if (Variables.TryGetVariable(" Default Graph ", out Variable v))
+					From = v.ValueObject;
 				else
-					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
+					throw new ScriptRuntimeException("Default graph not defined.", this);
+
+				DataSet.Add(await this.GetDataSource(From, Variables));
+			}
+			else
+			{
+				foreach (ScriptNode Source in this.from)
+				{
+					From = (await Source.EvaluateAsync(Variables)).AssociatedObjectValue;
+					DataSet.Add(await this.GetDataSource(From, Variables));
+				}
 			}
 
 			IEnumerable<ISparqlResultRecord> Possibilities;
@@ -177,7 +174,7 @@ namespace Waher.Script.Persistence.SPARQL
 			if (this.where is null)
 				Possibilities = ExistingMatches;
 			else
-				Possibilities = await this.where.Search(Cube, Variables, ExistingMatches, this);
+				Possibilities = await this.where.Search(DataSet, Variables, ExistingMatches, this);
 
 			if (!(this.groupBy is null) && !(Possibilities is null))
 			{
@@ -469,6 +466,26 @@ namespace Waher.Script.Persistence.SPARQL
 				Records.ToArray()));
 		}
 
+		private async Task<ISemanticCube> GetDataSource(object From, Variables Variables)
+		{
+			if (From is UriNode UriNode)
+				From = await LoadResource(UriNode.Uri, Variables);
+			else if (From is Uri Uri)
+				From = await LoadResource(Uri, Variables);
+			else if (From is string s)
+				From = await LoadResource(new Uri(s, UriKind.RelativeOrAbsolute), Variables);
+
+			if (!(From is ISemanticCube Cube))
+			{
+				if (From is ISemanticModel Model)
+					Cube = await InMemorySemanticCube.Create(Model);
+				else
+					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
+			}
+
+			return Cube;
+		}
+
 		internal static async Task<object> EvaluateValue(Variables RecordVariables, ScriptNode Node)
 		{
 			try
@@ -603,7 +620,7 @@ namespace Waher.Script.Persistence.SPARQL
 			return Result;
 		}
 
-		private async Task<object> LoadResource(Uri Uri, Variables Variables)
+		private static async Task<object> LoadResource(Uri Uri, Variables Variables)
 		{
 			if (Variables.TryGetVariable(" " + Uri.ToString() + " ", out Variable v))
 				return v.ValueObject;

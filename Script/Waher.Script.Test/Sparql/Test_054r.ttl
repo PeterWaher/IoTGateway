@@ -1,0 +1,9 @@
+﻿@prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+
+_:a vcard:N         _:v1 .
+_:v1 vcard:givenName  "Alice" .
+_:v1 vcard:familyName "Hacker" .
+
+_:b vcard:N         _:v2 .
+_:v2 vcard:givenName  "Bob" .
+_:v2 vcard:familyName "Hacker" .

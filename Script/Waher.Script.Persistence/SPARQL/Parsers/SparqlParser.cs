@@ -101,6 +101,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			"DISTINCT",
 			"REDUCED",
 			"FROM",
+			"AS",
 			"NAMED",
 			"WHERE",
 			"OPTIONAL",

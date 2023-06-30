@@ -313,6 +313,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			if (this.queryType == QueryType.Construct)
 			{
+				Dictionary<string, string> BlankNodeDictionary = null;
 				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
 				ObjectProperties RecordVariables = null;
 
@@ -320,6 +321,8 @@ namespace Waher.Script.Persistence.SPARQL
 				{
 					foreach (ISparqlResultRecord P in Possibilities)
 					{
+						BlankNodeDictionary?.Clear();
+
 						if (RecordVariables is null)
 							RecordVariables = new ObjectProperties(P, Variables);
 						else
@@ -330,14 +333,53 @@ namespace Waher.Script.Persistence.SPARQL
 							ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
 							if (Subject is null)
 								continue;
+							else if (Subject is BlankNode BnS)
+							{
+								if (BlankNodeDictionary is null)
+									BlankNodeDictionary = new Dictionary<string, string>();
+
+								if (!BlankNodeDictionary.TryGetValue(BnS.NodeId, out string NewLabel))
+								{
+									NewLabel = "n" + Guid.NewGuid().ToString();
+									BlankNodeDictionary[BnS.NodeId] = NewLabel;
+								}
+
+								Subject=new BlankNode(NewLabel);
+							}
 
 							ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
 							if (Predicate is null)
 								continue;
+							else if (Predicate is BlankNode BnP)
+							{
+								if (BlankNodeDictionary is null)
+									BlankNodeDictionary = new Dictionary<string, string>();
+
+								if (!BlankNodeDictionary.TryGetValue(BnP.NodeId, out string NewLabel))
+								{
+									NewLabel = "n" + Guid.NewGuid().ToString();
+									BlankNodeDictionary[BnP.NodeId] = NewLabel;
+								}
+
+								Predicate = new BlankNode(NewLabel);
+							}
 
 							ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
 							if (Object is null)
 								continue;
+							else if (Object is BlankNode BnO)
+							{
+								if (BlankNodeDictionary is null)
+									BlankNodeDictionary = new Dictionary<string, string>();
+
+								if (!BlankNodeDictionary.TryGetValue(BnO.NodeId, out string NewLabel))
+								{
+									NewLabel = "n" + Guid.NewGuid().ToString();
+									BlankNodeDictionary[BnO.NodeId] = NewLabel;
+								}
+
+								Object = new BlankNode(NewLabel);
+							}
 
 							Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
 						}

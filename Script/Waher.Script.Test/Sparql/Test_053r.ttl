@@ -1,0 +1,3 @@
+﻿@prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+
+<http://example.org/person#Alice> vcard:FN "Alice" .

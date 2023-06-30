@@ -98,6 +98,8 @@ namespace Waher.Script.Test
 		[DataRow("Test_050.ttl", "Test_050.rq", null, "Test_050.srx")]
 		[DataRow("Test_051.ttl", "Test_051.rq", null, "Test_051.srj")]
 		[DataRow("Test_052.ttl", "Test_052.rq", null, "Test_052.srj")]
+		[DataRow("Test_053.ttl", "Test_053.rq", null, "Test_053r.ttl")]
+		[DataRow("Test_054.ttl", "Test_054.rq", null, "Test_054r.ttl")]
 		public async Task SPARQL_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{

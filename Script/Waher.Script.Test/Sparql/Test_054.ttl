@@ -1,0 +1,7 @@
+﻿@prefix  foaf:  <http://xmlns.com/foaf/0.1/> .
+
+_:a    foaf:givenname   "Alice" .
+_:a    foaf:family_name "Hacker" .
+
+_:b    foaf:firstname   "Bob" .
+_:b    foaf:surname     "Hacker" .

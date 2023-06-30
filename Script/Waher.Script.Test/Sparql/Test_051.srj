@@ -1,0 +1,31 @@
+﻿{
+	"head": {
+		"vars": [ "title", "price" ]
+	},
+	"results": {
+		"bindings": [
+			{
+				"title": {
+					"type": "literal",
+					"value": "SPARQL Tutorial"
+				},
+				"price": {
+					"type": "literal",
+					"value": "33.6",
+					"datatype": "http://www.w3.org/2001/XMLSchema#double"
+				}
+			},
+			{
+				"title": {
+					"type": "literal",
+					"value": "The Semantic Web"
+				},
+				"price": {
+					"type": "literal",
+					"value": "17.25",
+					"datatype": "http://www.w3.org/2001/XMLSchema#double"
+				}
+			}
+		]
+	}
+}

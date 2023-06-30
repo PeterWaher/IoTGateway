@@ -388,6 +388,13 @@ namespace Waher.Script.Persistence.SPARQL
 							ColumnVariables[Name] = i;
 							ColumnNames.Add(Name);
 						}
+						else
+						{
+							if (ColumnScript is null)
+								ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+
+							ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(Ref, i));
+						}
 					}
 					else
 					{
@@ -449,7 +456,10 @@ namespace Waher.Script.Persistence.SPARQL
 							ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
 
 							if (!(Literal is null))
+							{
 								Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
+								P[Name] = Literal;
+							}
 						}
 					}
 

@@ -1,0 +1,41 @@
+﻿{
+	"head": {
+		"vars": [ "title", "fullPrice", "customerPrice" ]
+	},
+	"results": {
+		"bindings": [
+			{
+				"title": {
+					"type": "literal",
+					"value": "SPARQL Tutorial"
+				},
+				"fullPrice": {
+					"type": "literal",
+					"value": "42",
+					"datatype": "http://www.w3.org/2001/XMLSchema#integer"
+				},
+				"customerPrice": {
+					"type": "literal",
+					"value": "33.6",
+					"datatype": "http://www.w3.org/2001/XMLSchema#double"
+				}
+			},
+			{
+				"title": {
+					"type": "literal",
+					"value": "The Semantic Web"
+				},
+				"fullPrice": {
+					"type": "literal",
+					"value": "23",
+					"datatype": "http://www.w3.org/2001/XMLSchema#integer"
+				},
+				"customerPrice": {
+					"type": "literal",
+					"value": "17.25",
+					"datatype": "http://www.w3.org/2001/XMLSchema#double"
+				}
+			}
+		]
+	}
+}

@@ -2360,12 +2360,13 @@
             Executes a SPARQL query.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.Dictionary{Waher.Content.Semantic.Model.UriNode,Waher.Content.Semantic.ISemanticCube},Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.Dictionary{Waher.Content.Semantic.Model.UriNode,Waher.Content.Semantic.ISemanticCube},Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],System.Nullable{System.Int32},System.Nullable{System.Int32},Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL query.
             </summary>
             <param name="QueryType">Query type</param>
             <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+            <param name="Reduced">If duplicate rows rows are allowed to be removed.</param>
             <param name="Columns">Columns to select.</param>
             <param name="ColumnNames">Names of selected columns.</param>
             <param name="From">Data sources.</param>
@@ -2375,6 +2376,8 @@
             <param name="GroupByNames">Optional names for GROUP BY rules.</param>
             <param name="Having">Any filter on groups.</param>
             <param name="OrderBy">Order to present result set.</param>
+            <param name="Limit">Limit number of records to return, if defined.</param>
+            <param name="Offset">Offset into result set, for first record to return.</param>
             <param name="Construct">Triples to construct.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>

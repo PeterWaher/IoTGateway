@@ -99,6 +99,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		public string[] InternalKeywords => new string[]
 		{
 			"DISTINCT",
+			"REDUCED",
 			"FROM",
 			"NAMED",
 			"WHERE",
@@ -114,7 +115,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			"VALUES",
 			"GRAPH",
 			"SERVICE",
-			"UNDEF"
+			"UNDEF",
+			"LIMIT",
+			"OFFSET"
 		};
 
 		/// <summary>
@@ -142,6 +145,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			ScriptNode Node;
 			string s;
 			bool Distinct = false;
+			bool Reduced = false;
 			char ch;
 
 			s = this.PeekNextToken(Parser).ToUpper();
@@ -242,12 +246,21 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (string.IsNullOrEmpty(s))
 						return false;
 
-					if (s == "DISTINCT")
+					switch (s)
 					{
-						this.NextToken(Parser);
-						Distinct = true;
+						case "DISTINCT":
+							this.NextToken(Parser);
+							Distinct = true;
 
-						s = this.PeekNextToken(Parser).ToUpper();
+							s = this.PeekNextToken(Parser).ToUpper();
+							break;
+
+						case "REDUCED":
+							this.NextToken(Parser);
+							Reduced = true;
+
+							s = this.PeekNextToken(Parser).ToUpper();
+							break;
 					}
 
 					if (s == "*")
@@ -425,15 +438,35 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						OrderBy.Add(new KeyValuePair<ScriptNode, bool>(Node, true));
 				}
 
-				//s = Parser.PeekNextToken().ToUpper();
+				s = Parser.PeekNextToken().ToUpper();
 			}
 
-			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
-				ColumnNames?.ToArray(), From?.ToArray(), NamedGraphs, Where, 
-				GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(),
-				Construct, Start, Parser.Position - Start, Parser.Expression);
+			int? Offset = null;
+			int? Limit = null;
 
-			return true;
+			while (true)
+			{
+				switch (s)
+				{
+					case "LIMIT":
+						Parser.NextToken();
+						Limit = this.ParsePositiveInteger(Parser);
+						break;
+
+					case "OFFSET":
+						Parser.NextToken();
+						Offset = this.ParsePositiveInteger(Parser);
+						break;
+
+					default:
+						Result = new SparqlQuery(this.queryType, Distinct, Reduced, Columns?.ToArray(),
+							ColumnNames?.ToArray(), From?.ToArray(), NamedGraphs, Where,
+							GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(),
+							Limit, Offset, Construct, Start, Parser.Position - Start, Parser.Expression);
+
+						return true;
+				}
+			}
 		}
 
 		private char PeekNextChar(ScriptParser Parser)
@@ -2087,6 +2120,23 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				Parser.NextChar();
 
 			return Parser.Expression.Script.Substring(Start, Parser.Position - Start);
+		}
+
+		private int ParsePositiveInteger(ScriptParser Parser)
+		{
+			Parser.SkipWhiteSpace();
+
+			int Start = Parser.Position;
+
+			while (char.IsDigit(Parser.PeekNextChar()))
+				Parser.NextChar();
+
+			string s = Parser.Expression.Script.Substring(Start, Parser.Position - Start);
+
+			if (!int.TryParse(s, out int i))
+				throw Parser.SyntaxError("Expected non-negative integer.");
+
+			return i;
 		}
 
 		private SemanticLiteral ParseNumber(ScriptParser Parser)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Runtime.Inventory;
@@ -52,7 +51,10 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly SparqlRegularPattern construct;
 		private readonly QueryType queryType;
+		private readonly int? limit;
+		private readonly int? offset;
 		private readonly bool distinct;
+		private readonly bool reduced;
 		private Dictionary<UriNode, ISemanticCube> namedGraphs;
 		private UriNode[] namedGraphNames;
 
@@ -61,6 +63,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="QueryType">Query type</param>
 		/// <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+		/// <param name="Reduced">If duplicate rows rows are allowed to be removed.</param>
 		/// <param name="Columns">Columns to select.</param>
 		/// <param name="ColumnNames">Names of selected columns.</param>
 		/// <param name="From">Data sources.</param>
@@ -70,19 +73,24 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="GroupByNames">Optional names for GROUP BY rules.</param>
 		/// <param name="Having">Any filter on groups.</param>
 		/// <param name="OrderBy">Order to present result set.</param>
+		/// <param name="Limit">Limit number of records to return, if defined.</param>
+		/// <param name="Offset">Offset into result set, for first record to return.</param>
 		/// <param name="Construct">Triples to construct.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public SparqlQuery(QueryType QueryType, bool Distinct, ScriptNode[] Columns,
+		public SparqlQuery(QueryType QueryType, bool Distinct, bool Reduced, ScriptNode[] Columns,
 			ScriptNode[] ColumnNames, ScriptNode[] From, Dictionary<UriNode, ISemanticCube> NamedGraphs,
 			ISparqlPattern Where, ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
-			KeyValuePair<ScriptNode, bool>[] OrderBy, SparqlRegularPattern Construct,
-			int Start, int Length, Expression Expression)
+			KeyValuePair<ScriptNode, bool>[] OrderBy, int? Limit, int? Offset,
+			SparqlRegularPattern Construct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.queryType = QueryType;
 			this.distinct = Distinct;
+			this.reduced = Reduced;
+			this.limit = Limit;
+			this.offset = Offset;
 			this.construct = Construct;
 
 			this.columns = Columns;
@@ -398,8 +406,11 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 
 			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
-			Dictionary<string, bool> Distinct = this.distinct ? new Dictionary<string, bool>() : null;
-			StringBuilder sb = this.distinct ? new StringBuilder() : null;
+			bool MakeUnique = this.distinct || this.reduced;
+			Dictionary<string, bool> Distinct = MakeUnique ? new Dictionary<string, bool>() : null;
+			StringBuilder sb = MakeUnique ? new StringBuilder() : null;
+			int Offset = this.offset ?? 0;
+			int MaxCount = this.limit ?? int.MaxValue;
 
 			if (!(Possibilities is null))
 			{
@@ -442,7 +453,7 @@ namespace Waher.Script.Persistence.SPARQL
 						}
 					}
 
-					if (this.distinct)
+					if (MakeUnique)
 					{
 						bool First = true;
 
@@ -468,7 +479,14 @@ namespace Waher.Script.Persistence.SPARQL
 						Distinct[Key] = true;
 					}
 
-					Records.Add(new SparqlPatternResultRecord(Record));
+					if (Offset > 0)
+						Offset--;
+					else
+					{
+						Records.Add(new SparqlPatternResultRecord(Record));
+						if (--MaxCount <= 0)
+							break;
+					}
 				}
 			}
 
@@ -602,6 +620,7 @@ namespace Waher.Script.Persistence.SPARQL
 				((this.where is null) ^ (O.where is null)) ||
 				((this.construct is null) ^ (O.construct is null)) ||
 				this.distinct != O.distinct ||
+				this.reduced != O.reduced ||
 				!base.Equals(obj))
 			{
 				return false;
@@ -623,6 +642,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			Result ^= Result << 5 ^ GetHashCode(this.columns);
 			Result ^= Result << 5 ^ this.distinct.GetHashCode();
+			Result ^= Result << 5 ^ this.reduced.GetHashCode();
 
 			if (!(this.where is null))
 				Result ^= Result << 5 ^ this.where.GetHashCode();

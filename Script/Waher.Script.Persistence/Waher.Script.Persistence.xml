@@ -2348,7 +2348,7 @@
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SparqlQuery.NamedGraphNames">
             <summary>
-            Names of named graphs.
+            Names of named graphs, may be null.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.Evaluate(Waher.Script.Variables)">
@@ -2405,6 +2405,27 @@
             <param name="Uri">URI of named data source.</param>
             <param name="Variables">Current set of variables.</param>
             <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.RegisterNamedGraph(System.String[])">
+            <summary>
+            Registers implicitly defined named graphs, that may be used by
+            GRAPH patterns, even if they are not named in the query.
+            </summary>
+            <param name="Names">Graph names.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.RegisterNamedGraph(System.Uri[])">
+            <summary>
+            Registers implicitly defined named graphs, that may be used by
+            GRAPH patterns, even if they are not named in the query.
+            </summary>
+            <param name="Names">Graph names.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.RegisterNamedGraph(Waher.Content.Semantic.Model.UriNode[])">
+            <summary>
+            Registers implicitly defined named graphs, that may be used by
+            GRAPH patterns, even if they are not named in the query.
+            </summary>
+            <param name="Names">Graph names.</param>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>

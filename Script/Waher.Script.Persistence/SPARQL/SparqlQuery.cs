@@ -41,8 +41,6 @@ namespace Waher.Script.Persistence.SPARQL
 	/// </summary>
 	public class SparqlQuery : ScriptNode, IEvaluateAsync
 	{
-		private readonly Dictionary<UriNode, ISemanticCube> namedGraphs;
-		private readonly UriNode[] namedGraphNames;
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode[] groupBy;
@@ -54,6 +52,8 @@ namespace Waher.Script.Persistence.SPARQL
 		private readonly SparqlRegularPattern construct;
 		private readonly QueryType queryType;
 		private readonly bool distinct;
+		private Dictionary<UriNode, ISemanticCube> namedGraphs;
+		private UriNode[] namedGraphNames;
 
 		/// <summary>
 		/// Executes a SPARQL query.
@@ -125,9 +125,9 @@ namespace Waher.Script.Persistence.SPARQL
 		public override bool IsAsynchronous => true;
 
 		/// <summary>
-		/// Names of named graphs.
+		/// Names of named graphs, may be null.
 		/// </summary>
-		internal UriNode[] NamedGraphNames => this.namedGraphNames;
+		public UriNode[] NamedGraphNames => this.namedGraphNames;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -676,6 +676,9 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
 		internal async Task<ISemanticCube> GetNamedGraph(UriNode Uri, Variables Variables)
 		{
+			if (this.namedGraphs is null)
+				return null;
+
 			if (!this.namedGraphs.TryGetValue(Uri, out ISemanticCube Cube))
 				return null;
 
@@ -689,6 +692,63 @@ namespace Waher.Script.Persistence.SPARQL
 			this.namedGraphs[Uri] = Cube;
 
 			return Cube;
+		}
+
+		/// <summary>
+		/// Registers implicitly defined named graphs, that may be used by
+		/// GRAPH patterns, even if they are not named in the query.
+		/// </summary>
+		/// <param name="Names">Graph names.</param>
+		public void RegisterNamedGraph(params string[] Names)
+		{
+			int i, c = Names.Length;
+			UriNode[] Nodes = new UriNode[Names.Length];
+
+			for (i = 0; i < c; i++)
+			{
+				if (!Uri.TryCreate(Names[i], UriKind.RelativeOrAbsolute, out Uri Name))
+					throw new ArgumentException("Not a valid URI.", nameof(Names));
+
+				Nodes[i] = new UriNode(Name, Names[i]);
+			}
+
+			this.RegisterNamedGraph(Nodes);
+		}
+
+		/// <summary>
+		/// Registers implicitly defined named graphs, that may be used by
+		/// GRAPH patterns, even if they are not named in the query.
+		/// </summary>
+		/// <param name="Names">Graph names.</param>
+		public void RegisterNamedGraph(params Uri[] Names)
+		{
+			int i, c = Names.Length;
+			UriNode[] Nodes = new UriNode[Names.Length];
+
+			for (i = 0; i < c; i++)
+				Nodes[i] = new UriNode(Names[i], Names[i].ToString());
+
+			this.RegisterNamedGraph(Nodes);
+		}
+
+		/// <summary>
+		/// Registers implicitly defined named graphs, that may be used by
+		/// GRAPH patterns, even if they are not named in the query.
+		/// </summary>
+		/// <param name="Names">Graph names.</param>
+		public void RegisterNamedGraph(params UriNode[] Names)
+		{
+			if (this.namedGraphs is null)
+				this.namedGraphs = new Dictionary<UriNode, ISemanticCube>();
+
+			foreach (UriNode Name in Names)
+			{
+				if (!this.namedGraphs.ContainsKey(Name))
+					this.namedGraphs[Name] = null;
+			}
+
+			this.namedGraphNames = new UriNode[this.namedGraphs.Count];
+			this.namedGraphs.Keys.CopyTo(this.namedGraphNames, 0);
 		}
 
 	}

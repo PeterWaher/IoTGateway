@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Persistence.SPARQL;
 
 namespace Waher.Script.Test
 {
@@ -80,6 +81,9 @@ namespace Waher.Script.Test
 		[DataRow("Test_039.ttl", "Test_039.rq", "http://example.org/foaf/aliceFoaf", "Test_039.srx")]
 		[DataRow("Test_040.ttl|Test_040a.ttl|Test_040b.ttl", "Test_040.rq", "http://example.org/dft.ttl|http://example.org/bob|http://example.org/alice", "Test_040.srx")]
 		[DataRow("Test_041a.ttl|Test_041b.ttl", "Test_041.rq", "http://example.org/foaf/aliceFoaf|http://example.org/foaf/bobFoaf", "Test_041.srx")]
+		[DataRow("Test_042a.ttl|Test_042b.ttl", "Test_042.rq", "http://example.org/foaf/aliceFoaf|http://example.org/foaf/bobFoaf", "Test_042.srx")]
+		[DataRow("Test_043a.ttl|Test_043b.ttl", "Test_043.rq", "http://example.org/foaf/aliceFoaf|http://example.org/foaf/bobFoaf", "Test_043.srx")]
+		[DataRow("Test_044.ttl|Test_044a.ttl|Test_044b.ttl", "Test_044.rq", "|tag:example.org,2005-06-06:graph1|tag:example.org,2005-06-06:graph2", "Test_044.srx")]
 		public async Task SPARQL_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
@@ -102,14 +106,17 @@ namespace Waher.Script.Test
 					v[" " + SourceUris[i] + " "] = Doc;
 			}
 
-			await this.Test(v, QueryFileName, ResultName, Docs.ToArray());
+			await this.Test(v, QueryFileName, ResultName, SourceUris, Docs.ToArray());
 		}
 
 		private async Task Test(Variables v, string QueryFileName, string ResultName,
-			params TurtleDocument[] Docs)
+			string[] SourceUris, TurtleDocument[] Docs)
 		{
 			string Query = LoadTextResource(QueryFileName);
 			Expression Exp = new Expression(Query);
+
+			if (!(SourceUris is null) && Exp.Root is SparqlQuery SparqlQuery && SparqlQuery.NamedGraphNames.Length == 0)
+				SparqlQuery.RegisterNamedGraph(SourceUris);
 
 			object Result = await Exp.EvaluateAsync(v);
 			Assert.IsNotNull(Result);

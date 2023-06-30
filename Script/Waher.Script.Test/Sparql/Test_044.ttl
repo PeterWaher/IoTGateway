@@ -1,0 +1,9 @@
+﻿@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix g:  <tag:example.org,2005-06-06:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+g:graph1 dc:publisher "Bob" .
+g:graph1 dc:date "2004-12-06"^^xsd:date .
+
+g:graph2 dc:publisher "Bob" .
+g:graph2 dc:date "2005-01-10"^^xsd:date .

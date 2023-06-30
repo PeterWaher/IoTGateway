@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
@@ -11,15 +10,15 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Content.Semantic
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information from SPARQL queries.
-	/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
+	/// Encoder and Decoder of semantic information from SPARQL queries using JSON.
+	/// https://www.w3.org/TR/sparql11-results-json/
 	/// </summary>
-	public class SparqlResultSetCodec : IContentDecoder, IContentEncoder
+	public class SparqlResultSetJsonCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
 		/// Encoder and Decoder of semantic information from SPARQL queries.
 		/// </summary>
-		public SparqlResultSetCodec()
+		public SparqlResultSetJsonCodec()
 		{
 		}
 
@@ -30,7 +29,7 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] SparqlResultSetContentTypes = new string[]
 		{
-			"application/sparql-results+xml"
+			"application/sparql-results+json"
 		};
 
 		/// <summary>
@@ -40,7 +39,7 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] SparqlResultSetFileExtensions = new string[]
 		{
-			"srx"
+			"srj"
 		};
 
 		/// <summary>
@@ -53,7 +52,7 @@ namespace Waher.Content.Semantic
 		{
 			if (Array.IndexOf(SparqlResultSetContentTypes, ContentType) >= 0)
 			{
-				Grade = Grade.Ok;
+				Grade = Grade.Excellent;
 				return true;
 			}
 			else
@@ -75,7 +74,12 @@ namespace Waher.Content.Semantic
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
-			SparqlResultSet Parsed = new SparqlResultSet(s, BaseUri);
+			object Obj = JSON.Parse(s);
+
+			if (!(Obj is Dictionary<string, object> Doc))
+				throw new Exception("Unable to decode JSON.");
+
+			SparqlResultSet Parsed = new SparqlResultSet(Doc, BaseUri);
 			return Task.FromResult<object>(Parsed);
 		}
 
@@ -125,123 +129,88 @@ namespace Waher.Content.Semantic
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			StringBuilder sb = new StringBuilder();
-			sb.Append("<?xml version=\"1.0\" encoding=\"");
-			sb.Append(Encoding.WebName);
-			sb.AppendLine("\"?>");
+			object ResultObj;
 
-			XmlWriterSettings Settings = new XmlWriterSettings()
-			{
-				ConformanceLevel = ConformanceLevel.Document,
-				Encoding = Encoding,
-				Indent = false,
-				NamespaceHandling = NamespaceHandling.OmitDuplicates,
-				NewLineHandling = NewLineHandling.None,
-				NewLineOnAttributes = false,
-				OmitXmlDeclaration = true,
-				WriteEndDocumentOnClose = true
-			};
+			if (Object is SparqlResultSet Result)
+				ResultObj = this.EncodeAsync(Result);
+			else if (Object is ObjectMatrix M)
+				ResultObj = this.EncodeAsync(M);
+			else if (Object is bool b)
+				ResultObj = this.EncodeAsync(b);
+			else
+				throw new ArgumentException("Unable to encode object.", nameof(Object));
 
-			using (XmlWriter w = XmlWriter.Create(sb, Settings))
-			{
-				if (Object is SparqlResultSet Result)
-					this.EncodeAsync(Result, w);
-				else if (Object is ObjectMatrix M)
-					this.EncodeAsync(M, w);
-				else if (Object is bool b)
-					this.EncodeAsync(b, w);
-				else
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+			string Text = JSON.Encode(ResultObj, false);
+			byte[] Bin = Encoding.GetBytes(Text);
+			string ContentType = SparqlResultSetContentTypes[0] + "; charset=" + Encoding.WebName;
 
-				w.Flush();
-
-				string Text = sb.ToString();
-
-				byte[] Bin = Encoding.GetBytes(Text);
-				string ContentType = SparqlResultSetContentTypes[0] + "; charset=" + Encoding.WebName;
-
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
-			}
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
-		private void EncodeAsync(SparqlResultSet Result, XmlWriter w)
+		private Dictionary<string, object> EncodeAsync(SparqlResultSet Result)
 		{
-			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
-
-			w.WriteStartElement("head");
+			Dictionary<string, object> Head = new Dictionary<string, object>();
+			Dictionary<string, object> ResultObj = new Dictionary<string, object>()
+			{
+				{ "head", Head }
+			};
 
 			if (!(Result.Variables is null))
-			{
-				foreach (string Name in Result.Variables)
-				{
-					w.WriteStartElement("variable");
-					w.WriteAttributeString("name", Name);
-					w.WriteEndAttribute();
-				}
-			}
+				Head["vars"] = Result.Variables;
 
 			if (!(Result.Links is null))
 			{
+				List<string> Links = new List<string>();
+
 				foreach (Uri Link in Result.Links)
-				{
-					w.WriteStartElement("link");
-					w.WriteAttributeString("href", Link.ToString());
-					w.WriteEndAttribute();
-				}
+					Links.Add(Link.ToString());
+
+				Head["link"] = Links.ToArray();
 			}
 
-			w.WriteEndElement();
-
 			if (Result.BooleanResult.HasValue)
-				w.WriteElementString("boolean", CommonTypes.Encode(Result.BooleanResult.Value));
+				ResultObj["boolean"] = Result.BooleanResult.Value;
 			else
 			{
-				w.WriteStartElement("results");
+				Dictionary<string, object> Results = new Dictionary<string, object>();
+				ResultObj["results"] = Results;
 
 				if (!(Result.Records is null))
 				{
+					List<Dictionary<string, object>> Bindings = new List<Dictionary<string, object>>();
+
 					foreach (ISparqlResultRecord Record in Result.Records)
 					{
-						w.WriteStartElement("result");
+						Dictionary<string, object> Binding = new Dictionary<string, object>();
 
 						foreach (SparqlResultItem Item in Record)
-						{
-							w.WriteStartElement("binding");
-							w.WriteAttributeString("name", Item.Name);
+							Binding[Item.Name] = OutputValue(Item.Value);
 
-							OutputValue(w, Item.Value);
-
-							w.WriteEndElement();
-						}
-
-						w.WriteEndElement();
+						Bindings.Add(Binding);
 					}
-				}
 
-				w.WriteEndElement();
+					Results["bindings"] = Bindings.ToArray();
+				}
 			}
 
-			w.WriteEndElement();
+			return ResultObj;
 		}
 
-		private void EncodeAsync(ObjectMatrix Result, XmlWriter w)
+		private Dictionary<string, object> EncodeAsync(ObjectMatrix Result)
 		{
-			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
-
-			w.WriteStartElement("head");
+			Dictionary<string, object> Head = new Dictionary<string, object>();
+			Dictionary<string, object> ResultObj = new Dictionary<string, object>()
+			{
+				{ "head", Head }
+			};
 
 			if (!(Result.ColumnNames is null))
-			{
-				foreach (string Name in Result.ColumnNames)
-				{
-					w.WriteStartElement("variable");
-					w.WriteAttributeString("name", Name);
-					w.WriteEndAttribute();
-				}
-			}
+				Head["vars"] = Result.ColumnNames;
 
-			w.WriteEndElement();
-			w.WriteStartElement("results");
+			Dictionary<string, object> Results = new Dictionary<string, object>();
+			ResultObj["results"] = Results;
+
+			List<Dictionary<string, object>> Bindings = new List<Dictionary<string, object>>();
 
 			int x, y;
 			int NrRows = Result.Rows;
@@ -249,84 +218,108 @@ namespace Waher.Content.Semantic
 
 			for (y = 0; y < NrRows; y++)
 			{
-				w.WriteStartElement("result");
+				Dictionary<string, object> Binding = new Dictionary<string, object>();
 
 				for (x = 0; x < NrColumns; x++)
-				{
-					w.WriteStartElement("binding");
-					w.WriteAttributeString("name", Result.ColumnNames[x]);
+					Binding[Result.ColumnNames[x]] = OutputValue(Result.GetElement(x, y)?.AssociatedObjectValue);
 
-					OutputValue(w, Result.GetElement(x, y)?.AssociatedObjectValue);
-
-					w.WriteEndElement();
-				}
-
-				w.WriteEndElement();
+				Bindings.Add(Binding);
 			}
 
-			w.WriteEndElement();
-			w.WriteEndElement();
+			Results["bindings"] = Bindings.ToArray();
+
+			return ResultObj;
 		}
 
-		private void EncodeAsync(bool Result, XmlWriter w)
+		private Dictionary<string, object> EncodeAsync(bool Result)
 		{
-			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
-			w.WriteElementString("head", string.Empty);
-			w.WriteElementString("boolean", CommonTypes.Encode(Result));
-			w.WriteEndElement();
+			Dictionary<string, object> Head = new Dictionary<string, object>();
+			Dictionary<string, object> ResultObj = new Dictionary<string, object>()
+			{
+				{ "head", Head },
+				{ "boolean", Result }
+			};
+
+			return ResultObj;
 		}
 
-		private static void OutputValue(XmlWriter w, object Value)
+		private static Dictionary<string, object> OutputValue(object Value)
 		{
+			Dictionary<string, object> Result;
+
 			if (Value is ISemanticElement E)
 			{
 				if (E is ISemanticLiteral Literal)
 				{
-					w.WriteStartElement("literal");
+					Result = new Dictionary<string, object>()
+					{
+						{ "type", "literal" },
+						{ "value", Literal.Value }
+					};
 
 					if (!string.IsNullOrEmpty(Literal.StringType))
-						w.WriteAttributeString("datatype", Literal.StringType);
+						Result["datatype"] = Literal.StringType;
 
 					if (Literal is StringLiteral StringLiteral &&
 						!string.IsNullOrEmpty(StringLiteral.Language))
 					{
-						w.WriteAttributeString("xml:lang", StringLiteral.Language);
+						Result["xml:lang"] = StringLiteral.Language;
 					}
 					else if (Literal is CustomLiteral CustomLiteral &&
 						!string.IsNullOrEmpty(CustomLiteral.Language))
 					{
-						w.WriteAttributeString("xml:lang", CustomLiteral.Language);
+						Result["xml:lang"] = CustomLiteral.Language;
 					}
-
-					w.WriteEndElement();
 				}
 				else if (E is UriNode N)
-					w.WriteElementString("uri", N.Uri.ToString());
+				{
+					Result = new Dictionary<string, object>()
+					{
+						{ "type", "uri" },
+						{ "value", N.Uri.ToString() }
+					};
+				}
 				else if (E is BlankNode N2)
-					w.WriteElementString("bnode", N2.NodeId);
+				{
+					Result = new Dictionary<string, object>()
+					{
+						{ "type", "bnode" },
+						{ "value", N2.NodeId }
+					};
+				}
 				else if (E is ISemanticTriple T)
 				{
-					w.WriteStartElement("triple");
-
-					w.WriteStartElement("subject");
-					OutputValue(w, T.Subject);
-					w.WriteEndElement();
-
-					w.WriteStartElement("predicate");
-					OutputValue(w, T.Predicate);
-					w.WriteEndElement();
-
-					w.WriteStartElement("object");
-					OutputValue(w, T.Object);
-					w.WriteEndElement();
-
-					w.WriteEndElement();
+					Dictionary<string, object> Triple = new Dictionary<string, object>()
+					{
+						{ "subject", OutputValue(T.Subject) },
+						{ "predicate", OutputValue(T.Predicate) },
+						{ "object", OutputValue(T.Object) }
+					};
+					Result = new Dictionary<string, object>()
+					{
+						{ "type", "triple" },
+						{ "value", Triple }
+					};
 				}
 				else
-					w.WriteElementString("literal", Value?.ToString() ?? string.Empty);
+				{
+					Result = new Dictionary<string, object>()
+					{
+						{ "type", "literal" },
+						{ "value", Value?.ToString() }
+					};
+				}
 			}
 			else
-				w.WriteElementString("literal", Value?.ToString() ?? string.Empty);
+			{
+				Result = new Dictionary<string, object>()
+					{
+						{ "type", "literal" },
+						{ "value", Value?.ToString() }
+					};
+			}
+
+			return Result;
 		}
 
 		/// <summary>

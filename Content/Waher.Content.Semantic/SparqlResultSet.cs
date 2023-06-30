@@ -5,7 +5,6 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -18,6 +17,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains the results of a SPARQL query.
 	/// https://www.w3.org/TR/2023/WD-sparql12-results-xml-20230516/
+	/// https://www.w3.org/TR/sparql12-results-json/
 	/// </summary>
 	public class SparqlResultSet : IToMatrix, IToVector
 	{
@@ -155,7 +155,7 @@ namespace Waher.Content.Semantic
 										{
 											case "binding":
 												string Name = XML.Attribute(E3, "name");
-												ISemanticElement Value = this.ParseValue(E3);
+												ISemanticElement Value = this.ParseXmlValue(E3);
 												Record[Name] = new SparqlResultItem(Name, Value, Index++);
 												break;
 										}
@@ -174,7 +174,117 @@ namespace Waher.Content.Semantic
 			this.Records = Records.ToArray();
 		}
 
-		private ISemanticElement ParseValue(XmlElement Xml)
+		/// <summary>
+		/// Contains the results of a SPARQL query.
+		/// https://www.w3.org/TR/sparql12-results-json/
+		/// </summary>
+		/// <param name="Obj">Query results, parsed from JSON.</param>
+		/// <param name="BaseUri">Base URI of document.</param>
+		public SparqlResultSet(Dictionary<string, object> Obj, Uri BaseUri)
+		{
+			if (Obj is null)
+				throw new ArgumentException("Invalid SPARQL Result JSON document.", nameof(Obj));
+
+			this.baseUri = BaseUri;
+			this.BooleanResult = null;
+
+			List<string> Variables = new List<string>();
+			List<Uri> Links = new List<Uri>();
+			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
+
+			foreach (KeyValuePair<string, object> P in Obj)
+			{
+				switch (P.Key)
+				{
+					case "head":
+						if (!(P.Value is Dictionary<string, object> Head))
+							break;
+
+						foreach (KeyValuePair<string, object> P2 in Head)
+						{
+							switch (P2.Key)
+							{
+								case "vars":
+									if (P2.Value is Array VariableArray)
+									{
+										foreach (object Item in VariableArray)
+										{
+											if (Item is string Name)
+												Variables.Add(Name);
+										}
+									}
+									break;
+
+								case "link":
+									if (P2.Value is Array LinkArray)
+									{
+										foreach (object Item in LinkArray)
+										{
+											if (Item is string HRef &&
+												!string.IsNullOrEmpty(HRef))
+											{
+												if (this.baseUri is null)
+												{
+													if (Uri.TryCreate(HRef, UriKind.RelativeOrAbsolute, out Uri Link))
+														Links.Add(Link);
+												}
+												else
+												{
+													if (Uri.TryCreate(this.baseUri, HRef, out Uri Link))
+														Links.Add(Link);
+												}
+											}
+										}
+									}
+									break;
+							}
+						}
+						break;
+
+					case "boolean":
+						if (P.Value is bool b)
+							this.BooleanResult = b;
+						break;
+
+					case "results":
+						if (!(P.Value is Dictionary<string, object> Results))
+							break;
+
+						foreach (KeyValuePair<string, object> P2 in Results)
+						{
+							if (P2.Key != "bindings")
+								continue;
+
+							if (!(P2.Value is Array Bindings))
+								continue;
+
+							foreach (object BindingObj in Bindings)
+							{
+								if (!(BindingObj is Dictionary<string, object> Binding))
+									continue;
+
+								Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
+								int Index = 0;
+
+								foreach (KeyValuePair<string, object> P3 in Binding)
+								{
+									ISemanticElement Value = this.ParseJsonValue(P3.Value);
+									Record[P3.Key] = new SparqlResultItem(P3.Key, Value, Index++);
+								}
+
+								Records.Add(new SparqlPatternResultRecord(Record));
+							}
+						}
+						break;
+				}
+			}
+
+			this.Variables = Variables.ToArray();
+			this.Links = Links.ToArray();
+			this.Records = Records.ToArray();
+		}
+
+		private ISemanticElement ParseXmlValue(XmlElement Xml)
 		{
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -251,15 +361,15 @@ namespace Waher.Content.Semantic
 							switch (E2.LocalName)
 							{
 								case "subject":
-									Subject = this.ParseValue(E2);
+									Subject = this.ParseXmlValue(E2);
 									break;
 
 								case "predicate":
-									Predicate = this.ParseValue(E2);
+									Predicate = this.ParseXmlValue(E2);
 									break;
 
 								case "object":
-									Object = this.ParseValue(E2);
+									Object = this.ParseXmlValue(E2);
 									break;
 							}
 						}
@@ -272,6 +382,120 @@ namespace Waher.Content.Semantic
 			}
 
 			return null;
+		}
+
+		private ISemanticElement ParseJsonValue(object Obj)
+		{
+			if (!(Obj is Dictionary<string, object> Object) ||
+				!(Object.TryGetValue("type", out object TypeObject)) ||
+				!(TypeObject is string Type))
+			{
+				return null;
+			}
+
+			switch (Type)
+			{
+				case "uri":
+					if (!(Object.TryGetValue("value", out object ValueObject)) ||
+					   !(ValueObject is string Value))
+					{
+						return null;
+					}
+
+					if (this.baseUri is null)
+					{
+						if (Uri.TryCreate(Value, UriKind.RelativeOrAbsolute, out Uri UriValue))
+							return new UriNode(UriValue, Value);
+						else
+							return new StringLiteral(Value);
+					}
+					else
+					{
+						if (Uri.TryCreate(this.baseUri, Value, out Uri UriValue))
+							return new UriNode(UriValue, Value);
+						else
+							return new StringLiteral(Value);
+					}
+
+				case "bnode":
+					if (!(Object.TryGetValue("value", out ValueObject)) ||
+					   (Value = ValueObject as string) is null)
+					{
+						return null;
+					}
+
+					return new BlankNode(Value);
+
+				case "literal":
+					if (!(Object.TryGetValue("value", out ValueObject)) ||
+					   (Value = ValueObject as string) is null)
+					{
+						return null;
+					}
+
+					if (!Object.TryGetValue("datatype", out object DataTypeObject) ||
+						!(DataTypeObject is string DataType))
+					{
+						DataType = null;
+					}
+
+					if (!Object.TryGetValue("xml:lang", out object LanguageObject) ||
+						!(LanguageObject is string Language))
+					{
+						Language = null;
+					}
+
+					if (!string.IsNullOrEmpty(DataType))
+					{
+						if (!this.dataTypes.TryGetValue(DataType, out ISemanticLiteral LiteralType))
+						{
+							LiteralType = Types.FindBest<ISemanticLiteral, string>(DataType)
+								?? new CustomLiteral(string.Empty, DataType);
+
+							this.dataTypes[DataType] = LiteralType;
+						}
+
+						return LiteralType.Parse(Value, DataType, Language);
+					}
+					else if (!string.IsNullOrEmpty(Language))
+						return new StringLiteral(Value, Language);
+					else
+						return new StringLiteral(Value);
+
+				case "triple":
+					if (!(Object.TryGetValue("value", out ValueObject)) ||
+						!(ValueObject is Dictionary<string,object> Triple))
+					{
+						return null;
+					}
+
+					ISemanticElement TripleSubject = null;
+					ISemanticElement TriplePredicate = null;
+					ISemanticElement TripleObject = null;
+
+					foreach (KeyValuePair<string, object> P in Triple)
+					{
+						switch (P.Key)
+						{
+							case "subject":
+								TripleSubject = this.ParseJsonValue(P.Value);
+								break;
+
+							case "predicate":
+								TriplePredicate = this.ParseJsonValue(P.Value);
+								break;
+
+							case "object":
+								TripleObject = this.ParseJsonValue(P.Value);
+								break;
+						}
+					}
+
+					return new SemanticTriple(TripleSubject, TriplePredicate, TripleObject);
+
+				default:
+					return null;
+			}
 		}
 
 		/// <summary>

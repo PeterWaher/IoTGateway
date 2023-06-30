@@ -1634,6 +1634,63 @@
             <param name="Query">SPARQL-query being executed.</param>
             <returns>Matches.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern">
+            <summary>
+            A pattern referencing a named source.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern)">
+            <summary>
+            A pattern referencing a named source.
+            </summary>
+            <param name="Graph">Graph reference</param>
+            <param name="Pattern">Pattern</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.IsEmpty">
+            <summary>
+            If pattern is empty.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.Search(Waher.Content.Semantic.ISemanticCube,Waher.Script.Variables,System.Collections.Generic.IEnumerable{Waher.Script.Persistence.SPARQL.Possibility},Waher.Script.Persistence.SPARQL.SparqlQuery)">
+            <summary>
+            Searches for the pattern on information in a semantic cube.
+            </summary>
+            <param name="Cube">Semantic cube.</param>
+            <param name="Variables">Script variables.</param>
+            <param name="ExistingMatches">Existing matches.</param>
+            <param name="Query">SPARQL-query being executed.</param>
+            <returns>Matches.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.SetParent(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sets the parent node. Can only be used when expression is being parsed.
+            </summary>
+            <param name="Parent">Parent Node</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.ForAll(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Patterns.GraphPattern.GetHashCode">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Patterns.IntersectionPattern">
             <summary>
             Intersection of two patterns.
@@ -2263,7 +2320,7 @@
             Executes a SPARQL query.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.Dictionary{System.String,Waher.Content.Semantic.ISemanticCube},Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL query.
             </summary>
@@ -2272,6 +2329,7 @@
             <param name="Columns">Columns to select.</param>
             <param name="ColumnNames">Names of selected columns.</param>
             <param name="From">Data sources.</param>
+            <param name="NamedGraphs">Named graphs.</param>
             <param name="Where">Optional where clause</param>
             <param name="GroupBy">Any GROUP BY rules.</param>
             <param name="GroupByNames">Optional names for GROUP BY rules.</param>
@@ -2326,6 +2384,14 @@
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetHashCode">
             <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetNamedGraph(System.String,Waher.Script.Variables)">
+            <summary>
+            Gets a named source
+            </summary>
+            <param name="Uri">URI of named data source.</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="who"/>
+		<variable name="g"/>
+		<variable name="mbox"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="who">
+				<literal>Bob Hacker</literal>
+			</binding>
+			<binding name="g">
+				<uri>http://example.org/bob</uri>
+			</binding>
+			<binding name="mbox">
+				<uri>mailto:bob@oldcorp.example.org</uri>
+			</binding>
+		</result>
+		<result>
+			<binding name="who">
+				<literal>Alice Hacker</literal>
+			</binding>
+			<binding name="g">
+				<uri>http://example.org/alice</uri>
+			</binding>
+			<binding name="mbox">
+				<uri>mailto:alice@work.example.org</uri>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

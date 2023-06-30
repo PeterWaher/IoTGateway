@@ -41,6 +41,7 @@ namespace Waher.Script.Persistence.SPARQL
 	/// </summary>
 	public class SparqlQuery : ScriptNode, IEvaluateAsync
 	{
+		private readonly Dictionary<string, ISemanticCube> namedGraphs;
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
 		private readonly ScriptNode[] groupBy;
@@ -61,6 +62,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Columns">Columns to select.</param>
 		/// <param name="ColumnNames">Names of selected columns.</param>
 		/// <param name="From">Data sources.</param>
+		/// <param name="NamedGraphs">Named graphs.</param>
 		/// <param name="Where">Optional where clause</param>
 		/// <param name="GroupBy">Any GROUP BY rules.</param>
 		/// <param name="GroupByNames">Optional names for GROUP BY rules.</param>
@@ -71,8 +73,8 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public SparqlQuery(QueryType QueryType, bool Distinct, ScriptNode[] Columns,
-			ScriptNode[] ColumnNames, ScriptNode[] From, ISparqlPattern Where,
-			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
+			ScriptNode[] ColumnNames, ScriptNode[] From, Dictionary<string,ISemanticCube> NamedGraphs,
+			ISparqlPattern Where, ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
 			KeyValuePair<ScriptNode, bool>[] OrderBy, SparqlRegularPattern Construct,
 			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
@@ -89,6 +91,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 			this.from = From;
 			this.from?.SetParent(this);
+			this.namedGraphs = NamedGraphs;
 
 			this.where = Where;
 			this.where?.SetParent(this);
@@ -158,14 +161,14 @@ namespace Waher.Script.Persistence.SPARQL
 				else
 					throw new ScriptRuntimeException("Default graph not defined.", this);
 
-				DataSet.Add(await this.GetDataSource(From, Variables));
+				DataSet.Add(await this.GetDataSource(From, Variables, false));
 			}
 			else
 			{
 				foreach (ScriptNode Source in this.from)
 				{
 					From = (await Source.EvaluateAsync(Variables)).AssociatedObjectValue;
-					DataSet.Add(await this.GetDataSource(From, Variables));
+					DataSet.Add(await this.GetDataSource(From, Variables, false));
 				}
 			}
 
@@ -466,7 +469,8 @@ namespace Waher.Script.Persistence.SPARQL
 				Records.ToArray()));
 		}
 
-		private async Task<ISemanticCube> GetDataSource(object From, Variables Variables)
+		private async Task<ISemanticCube> GetDataSource(object From, Variables Variables,
+			bool NullIfNotFound)
 		{
 			if (From is UriNode UriNode)
 				From = await LoadResource(UriNode.Uri, Variables);
@@ -479,6 +483,8 @@ namespace Waher.Script.Persistence.SPARQL
 			{
 				if (From is ISemanticModel Model)
 					Cube = await InMemorySemanticCube.Create(Model);
+				else if (NullIfNotFound)
+					return null;
 				else
 					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
 			}
@@ -632,6 +638,29 @@ namespace Waher.Script.Persistence.SPARQL
 
 			return await InternetContent.GetAsync(Uri,
 				new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9"));
+		}
+
+		/// <summary>
+		/// Gets a named source
+		/// </summary>
+		/// <param name="Uri">URI of named data source.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
+		internal async Task<ISemanticCube> GetNamedGraph(string Uri, Variables Variables)
+		{
+			if (!this.namedGraphs.TryGetValue(Uri, out ISemanticCube Cube))
+				return null;
+
+			if (!(Cube is null))
+				return Cube;
+
+			Cube = await GetDataSource(Uri, Variables, true);
+			if (Cube is null)
+				Cube = new InMemorySemanticCube();
+
+			this.namedGraphs[Uri] = Cube;
+
+			return Cube;
 		}
 
 	}

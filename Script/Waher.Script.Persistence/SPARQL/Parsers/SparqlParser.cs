@@ -203,6 +203,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			ISparqlPattern Where;
 			ScriptNode Having;
 			List<ScriptNode> From;
+			Dictionary<string, ISemanticCube> NamedGraphs = null;
 
 			switch (s)
 			{
@@ -295,16 +296,39 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				Parser.NextToken();
 				Parser.SkipWhiteSpace();
 
-				if (Parser.PeekNextChar() == '<')
+				switch (Parser.PeekNextChar())
 				{
-					int Start2 = Parser.Position;
-					Parser.NextChar();
-					UriNode FromUri = this.ParseUri(Parser);
+					case '<':
+						int Start2 = Parser.Position;
+						Parser.NextChar();
+						UriNode FromUri = this.ParseUri(Parser);
 
-					From.Add(new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression));
+						From.Add(new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression));
+						break;
+
+					case 'n':
+					case 'N':
+						if (Parser.PeekNextToken().ToUpper() == "NAMED")
+						{
+							Parser.NextToken();
+							if (Parser.NextNonWhitespaceChar() != '<')
+								throw Parser.SyntaxError("Expected <");
+
+							FromUri = this.ParseUri(Parser);
+
+							if (NamedGraphs is null)
+								NamedGraphs = new Dictionary<string, ISemanticCube>(StringComparer.CurrentCultureIgnoreCase);
+
+							NamedGraphs[FromUri.Uri.AbsoluteUri] = null;
+						}
+						else
+							From.Add(Parser.ParseObject());
+						break;
+
+					default:
+						From.Add(Parser.ParseObject());
+						break;
 				}
-				else
-					From.Add(Parser.ParseObject());
 
 				s = Parser.PeekNextToken().ToUpper();
 			}
@@ -405,8 +429,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 
 			Result = new SparqlQuery(this.queryType, Distinct, Columns?.ToArray(),
-				ColumnNames?.ToArray(), From?.ToArray(), Where, GroupBy?.ToArray(), GroupByNames?.ToArray(),
-				Having, OrderBy?.ToArray(), Construct, Start, Parser.Position - Start, Parser.Expression);
+				ColumnNames?.ToArray(), From?.ToArray(), NamedGraphs, Where, 
+				GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(),
+				Construct, Start, Parser.Position - Start, Parser.Expression);
 
 			return true;
 		}
@@ -584,6 +609,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'V':
 						case 's':
 						case 'S':
+						case 'g':
+						case 'G':
 							if (!this.ParsePatternOperator(Parser))
 								break;
 
@@ -756,6 +783,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case 'V':
 						case 's':
 						case 'S':
+						case 'g':
+						case 'G':
 							Parser.UndoChar();
 
 							if (!this.ParsePatternOperator(Parser))
@@ -838,12 +867,32 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					SubQueryPattern SubQueryPattern = new SubQueryPattern(SubQuery);
 
+					this.currentRegularPattern = null;
+
 					if (this.currentPattern.IsEmpty)
 						this.currentPattern = SubQueryPattern;
 					else
-						this.currentPattern = new IntersectionPattern(SubQueryPattern, this.currentPattern);
+						this.currentPattern = new IntersectionPattern(this.currentPattern, SubQueryPattern);
 
 					return true;
+
+				case "GRAPH":
+					Parser.NextToken();
+
+					ScriptNode Graph = this.ParseExpression(Parser, false);
+					Pattern = this.ParsePattern(Parser);
+
+					GraphPattern GraphPattern = new GraphPattern(Graph, Pattern);
+
+					this.currentRegularPattern = null;
+
+					if (this.currentPattern.IsEmpty)
+						this.currentPattern = GraphPattern;
+					else
+						this.currentPattern = new IntersectionPattern(this.currentPattern, GraphPattern);
+
+					return true;
+
 
 				default:
 					return false;

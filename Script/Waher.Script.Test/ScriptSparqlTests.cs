@@ -78,18 +78,37 @@ namespace Waher.Script.Test
 		[DataRow("Test_037.ttl", "Test_037.rq", null, "Test_037.srx")]
 		[DataRow("Test_038.ttl", "Test_038.rq", null, "Test_038.srx")]
 		[DataRow("Test_039.ttl", "Test_039.rq", "http://example.org/foaf/aliceFoaf", "Test_039.srx")]
-		public async Task SPARQL_Tests(string DataSetFileName, string QueryFileName,
+		[DataRow("Test_040.ttl|Test_040a.ttl|Test_040b.ttl", "Test_040.rq", "http://example.org/dft.ttl|http://example.org/bob|http://example.org/alice", "Test_040.srx")]
+		public async Task SPARQL_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
-			TurtleDocument Doc = LoadTurtleResource(DataSetFileName);
+			List<TurtleDocument> Docs = new List<TurtleDocument>();
+			Variables v = new Variables();
+			string[] SourceFileNames = DataSetFileName.Split('|');
+			string[] SourceUris = SourceName?.Split('|');
+			int i, c;
+
+			Assert.AreEqual(c = SourceFileNames.Length, SourceUris?.Length ?? 1);
+
+			for (i = 0; i < c; i++)
+			{
+				TurtleDocument Doc = LoadTurtleResource(SourceFileNames[i]);
+				Docs.Add(Doc);
+
+				if (SourceUris is null || string.IsNullOrEmpty(SourceUris[i]))
+					v[" Default Graph "] = Doc;
+				else
+					v[" " + SourceUris[i] + " "] = Doc;
+			}
+
+			await this.Test(v, QueryFileName, ResultName, Docs.ToArray());
+		}
+
+		private async Task Test(Variables v, string QueryFileName, string ResultName,
+			params TurtleDocument[] Docs)
+		{
 			string Query = LoadTextResource(QueryFileName);
 			Expression Exp = new Expression(Query);
-			Variables v = new Variables();
-
-			if (string.IsNullOrEmpty(SourceName))
-				v[" Default Graph "] = Doc;
-			else
-				v[" " + SourceName + " "] = Doc;
 
 			object Result = await Exp.EvaluateAsync(v);
 			Assert.IsNotNull(Result);
@@ -102,8 +121,12 @@ namespace Waher.Script.Test
 				Console.Out.WriteLine(Expression.ToString(M));
 				Console.Out.WriteLine();
 				Console.Out.WriteLine(Query);
-				Console.Out.WriteLine();
-				Console.Out.WriteLine(Doc.Text);
+
+				foreach (TurtleDocument Doc in Docs)
+				{
+					Console.Out.WriteLine();
+					Console.Out.WriteLine(Doc.Text);
+				}
 
 				if (!string.IsNullOrEmpty(ResultName))
 				{
@@ -117,10 +140,10 @@ namespace Waher.Script.Test
 						Assert.AreEqual(Expected.BooleanResult.Value, ResultSet.BooleanResult.Value);
 
 					int i, c;// = Expected.Variables?.Length ?? 0;
-					//Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
-					//
-					//for (i = 0; i < c; i++)
-					//	Assert.AreEqual(Expected.Variables[i], ResultSet.Variables[i]);
+							 //Assert.AreEqual(c, ResultSet.Variables?.Length ?? 0, "Variable count not as expected.");
+							 //
+							 //for (i = 0; i < c; i++)
+							 //	Assert.AreEqual(Expected.Variables[i], ResultSet.Variables[i]);
 
 					c = Expected.Records?.Length ?? 0;
 					Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -482,23 +483,20 @@ namespace Waher.Script.Persistence.SPARQL
 			bool NullIfNotFound)
 		{
 			if (From is UriNode UriNode)
-				From = await LoadResource(UriNode.Uri, Variables);
+				return await this.LoadGraph(UriNode.Uri, Variables, NullIfNotFound);
 			else if (From is Uri Uri)
-				From = await LoadResource(Uri, Variables);
+				return await this.LoadGraph(Uri, Variables, NullIfNotFound);
 			else if (From is string s)
-				From = await LoadResource(new Uri(s, UriKind.RelativeOrAbsolute), Variables);
+				return await this.LoadGraph(new Uri(s, UriKind.RelativeOrAbsolute), Variables, NullIfNotFound);
+			else if (From is ISemanticCube Cube)
+				return Cube;
+			else if (From is ISemanticModel Model)
+				return await InMemorySemanticCube.Create(Model);
 
-			if (!(From is ISemanticCube Cube))
-			{
-				if (From is ISemanticModel Model)
-					Cube = await InMemorySemanticCube.Create(Model);
-				else if (NullIfNotFound)
-					return null;
-				else
-					throw new ScriptRuntimeException("Default graph not a semantic cube or semantic model.", this);
-			}
-
-			return Cube;
+			if (NullIfNotFound)
+				return null;
+			else
+				throw new ScriptRuntimeException("Graph not a semantic cube or semantic model.", this);
 		}
 
 		internal static async Task<object> EvaluateValue(Variables RecordVariables, ScriptNode Node)
@@ -635,18 +633,18 @@ namespace Waher.Script.Persistence.SPARQL
 			return Result;
 		}
 
-		private static async Task<object> LoadResource(Uri Uri, Variables Variables)
+		private async Task<ISemanticCube> LoadGraph(Uri Uri, Variables Variables, bool NullIfNotFound)
 		{
-			if (Variables.TryGetVariable(" " + Uri.ToString() + " ", out Variable v))
-				return v.ValueObject;
+			if (Variables.TryGetVariable(" " + Uri.ToString() + " ", out Variable v) &&
+				v.ValueObject is ISemanticCube Cube)
+			{
+				return Cube;
+			}
 
-			// TODO: Check locally hosted sources.
+			IGraphSource Source = Types.FindBest<IGraphSource, Uri>(Uri)
+				?? throw new InvalidOperationException("Unable to get access to graph source: " + Uri.ToString());
 
-			if (!Uri.IsAbsoluteUri)
-				throw new InvalidOperationException("URI not absolute.");
-
-			return await InternetContent.GetAsync(Uri,
-				new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9"));
+			return await Source.LoadGraph(Uri, this, NullIfNotFound);
 		}
 
 
@@ -676,14 +674,12 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
 		internal async Task<ISemanticCube> GetNamedGraph(UriNode Uri, Variables Variables)
 		{
-			if (this.namedGraphs is null)
-				return null;
-
-			if (!this.namedGraphs.TryGetValue(Uri, out ISemanticCube Cube))
-				return null;
-
-			if (!(Cube is null))
+			if (!(this.namedGraphs is null) &&
+				this.namedGraphs.TryGetValue(Uri, out ISemanticCube Cube) &&
+				!(Cube is null))
+			{
 				return Cube;
+			}
 
 			Cube = await this.GetDataSource(Uri, Variables, true);
 			if (Cube is null)

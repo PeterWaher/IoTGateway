@@ -1309,6 +1309,20 @@
             Positive, if Record 1 is greated than Record 2
             </returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.IGraphSource">
+            <summary>
+            Interface for graph sources.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.IGraphSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean)">
+            <summary>
+            Loads the graph
+            </summary>
+            <param name="Source">Source URI</param>
+            <param name="Node">Node performing the loading.</param>
+            <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+            <returns>Graph, if found, null if processed.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.NamedNode">
             <summary>
             Represents a named node.
@@ -2294,6 +2308,32 @@
             <param name="State">State object to pass on to the callback method.</param>
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource">
+            <summary>
+            Graph source on the Internet.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource.#ctor">
+            <summary>
+            Graph source on the Internet.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource.Supports(System.Uri)">
+            <summary>
+            How well a source with a given URI can be loaded by the class.
+            </summary>
+            <param name="Source">Source URI</param>
+            <returns>How well the class supports loading the graph.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean)">
+            <summary>
+            Loads the graph
+            </summary>
+            <param name="Source">Source URI</param>
+            <param name="Node">Node performing the loading.</param>
+            <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+            <returns>Graph, if found, null if processed.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.QueryType">
             <summary>

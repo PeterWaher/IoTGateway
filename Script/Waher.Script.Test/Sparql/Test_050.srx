@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+	<head>
+		<variable name="nameX"/>
+		<variable name="nameY"/>
+		<variable name="nickY"/>
+	</head>
+	<results>
+		<result>
+			<binding name="nameX">
+				<literal>Alice</literal>
+			</binding>
+			<binding name="nameY">
+				<literal>Bob</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="nameX">
+				<literal>Alice</literal>
+			</binding>
+			<binding name="nameY">
+				<literal>Clare</literal>
+			</binding>
+			<binding name="nickY">
+				<literal>CT</literal>
+			</binding>
+		</result>
+	</results>
+</sparql>

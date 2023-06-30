@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -27,8 +28,13 @@ namespace Waher.Script.Test
 
 		private static async Task<(string, SparqlResultSet)> LoadSparqlResultSet(string FileName)
 		{
+			string Extension = Path.GetExtension(FileName);
+			string ContentType = InternetContent.GetContentType(Extension);
+
+			Assert.IsFalse(string.IsNullOrEmpty(ContentType));
+
 			byte[] Bin = Resources.LoadResource(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
-			object Decoded = await InternetContent.DecodeAsync("application/sparql-results+xml", Bin, null);
+			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 			Assert.IsNotNull(Decoded);
 
 			SparqlResultSet Result = Decoded as SparqlResultSet;
@@ -84,6 +90,12 @@ namespace Waher.Script.Test
 		[DataRow("Test_042a.ttl|Test_042b.ttl", "Test_042.rq", "http://example.org/foaf/aliceFoaf|http://example.org/foaf/bobFoaf", "Test_042.srx")]
 		[DataRow("Test_043a.ttl|Test_043b.ttl", "Test_043.rq", "http://example.org/foaf/aliceFoaf|http://example.org/foaf/bobFoaf", "Test_043.srx")]
 		[DataRow("Test_044.ttl|Test_044a.ttl|Test_044b.ttl", "Test_044.rq", "|tag:example.org,2005-06-06:graph1|tag:example.org,2005-06-06:graph2", "Test_044.srx")]
+		[DataRow("Test_045.ttl", "Test_045.rq", null, "Test_045.srx")]
+		[DataRow("Test_046.ttl", "Test_046.rq", null, "Test_046.srx")]
+		[DataRow("Test_047.ttl", "Test_047.rq", null, "Test_047.srx")]
+		[DataRow("Test_048.ttl", "Test_048.rq", null, "Test_048.srx")]
+		[DataRow("Test_049.ttl", "Test_049.rq", null, "Test_049.srj")]
+		[DataRow("Test_050.ttl", "Test_050.rq", null, "Test_050.srx")]
 		public async Task SPARQL_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{

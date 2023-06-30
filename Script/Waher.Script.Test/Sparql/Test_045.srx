@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="name"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="name">
+				<literal>Alice</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="name">
+				<literal>Bob</literal>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

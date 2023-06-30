@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+
+  <head>
+		<variable name="src"/>
+		<variable name="bobNick"/>
+	</head>
+
+  <results>
+		<result>
+			<binding name="src">
+				<uri>http://example.org/foaf/aliceFoaf</uri>
+			</binding>
+			<binding name="bobNick">
+				<literal>Bobby</literal>
+			</binding>
+		</result>
+		<result>
+			<binding name="src">
+				<uri>http://example.org/foaf/bobFoaf</uri>
+			</binding>
+			<binding name="bobNick">
+				<literal>Robert</literal>
+			</binding>
+		</result>
+	</results>
+
+</sparql>

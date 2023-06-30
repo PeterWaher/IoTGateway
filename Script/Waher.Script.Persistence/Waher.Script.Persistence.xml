@@ -2320,7 +2320,7 @@
             Executes a SPARQL query.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.Dictionary{System.String,Waher.Content.Semantic.ISemanticCube},Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.#ctor(Waher.Script.Persistence.SPARQL.QueryType,System.Boolean,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],System.Collections.Generic.Dictionary{Waher.Content.Semantic.Model.UriNode,Waher.Content.Semantic.ISemanticCube},Waher.Script.Persistence.SPARQL.Patterns.ISparqlPattern,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Persistence.SPARQL.Patterns.SparqlRegularPattern,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SPARQL query.
             </summary>
@@ -2344,6 +2344,11 @@
             <summary>
             If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
             <see cref="M:Waher.Script.Persistence.SPARQL.SparqlQuery.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlQuery.NamedGraphNames">
+            <summary>
+            Names of named graphs.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.Evaluate(Waher.Script.Variables)">
@@ -2385,7 +2390,15 @@
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetHashCode">
             <inheritdoc/>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetNamedGraph(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetNamedGraph(System.Object,Waher.Script.Variables)">
+            <summary>
+            Gets a named source
+            </summary>
+            <param name="Name">URI of named data source.</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetNamedGraph(Waher.Content.Semantic.Model.UriNode,Waher.Script.Variables)">
             <summary>
             Gets a named source
             </summary>

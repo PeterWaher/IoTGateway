@@ -277,15 +277,29 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 				{
 					Value = P.GetValue(Name);
 					if (Value is null)
-						continue;
+					{
+						IEnumerable<ISemanticTriple> NewTriples = await Cube.GetTriples(
+							T[ValueIndex1], ValueIndex1, T[ValueIndex2], ValueIndex2);
 
-					if (await Cube.GetTriplesBySubjectAndPredicateAndObject(Value, T.Predicate, T.Object) is null)
-						continue;
+						if (NewTriples is null)
+							continue;
 
-					if (NewPossibilities is null)
-						NewPossibilities = new LinkedList<Possibility>();
+						if (NewPossibilities is null)
+							NewPossibilities = new LinkedList<Possibility>();
 
-					NewPossibilities.AddLast(P);
+						foreach (ISemanticTriple T2 in NewTriples)
+							NewPossibilities.AddLast(new Possibility(Name, T2[VariableIndex], P));
+					}
+					else
+					{
+						if (await Cube.GetTriplesBySubjectAndPredicateAndObject(Value, T.Predicate, T.Object) is null)
+							continue;
+
+						if (NewPossibilities is null)
+							NewPossibilities = new LinkedList<Possibility>();
+
+						NewPossibilities.AddLast(P);
+					}
 				}
 			}
 

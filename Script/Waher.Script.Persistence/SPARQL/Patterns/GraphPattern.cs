@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Model;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Functions.ComplexNumbers;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL;
 
@@ -15,6 +15,8 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 	{
 		private readonly ISparqlPattern pattern;
 		private ScriptNode graph;
+		private bool graphIsVariableRef;
+		private string graphVariableRef;
 
 		/// <summary>
 		/// A pattern referencing a named source.
@@ -25,6 +27,22 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		{
 			this.graph = Graph;
 			this.pattern = Pattern;
+
+			this.CheckGraphVariableReference();
+		}
+
+		private void CheckGraphVariableReference()
+		{
+			if (this.graph is VariableReference Ref)
+			{
+				this.graphIsVariableRef = true;
+				this.graphVariableRef = Ref.VariableName;
+			}
+			else
+			{
+				this.graphIsVariableRef = false;
+				this.graphVariableRef = null;
+			}
 		}
 
 		/// <summary>
@@ -43,17 +61,51 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		public async Task<IEnumerable<Possibility>> Search(ISemanticCube Cube,
 			Variables Variables, IEnumerable<Possibility> ExistingMatches, SparqlQuery Query)
 		{
+			ObjectProperties ObjectProperties = null;
 			IElement Graph;
 
 			if (ExistingMatches is null)
 			{
-				Graph = await this.graph.EvaluateAsync(Variables);
-				Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue?.ToString() ?? string.Empty, Variables);
-				return await this.pattern.Search(Cube, Variables, ExistingMatches, Query);
+				if (this.graphIsVariableRef &&
+					!Variables.ContainsVariable(this.graphVariableRef))
+				{
+					LinkedList<Possibility> Result = new LinkedList<Possibility>();
+
+					foreach (UriNode GraphName in Query.NamedGraphNames)
+					{
+						Cube = await Query.GetNamedGraph(GraphName, Variables);
+
+						if (!(Cube is null))
+						{
+							Possibility P = new Possibility(this.graphVariableRef, GraphName);
+
+							if (ObjectProperties is null)
+								ObjectProperties = new ObjectProperties(P, Variables);
+							else
+								ObjectProperties.Object = P;
+
+							IEnumerable<Possibility> PartResult = await this.pattern.Search(
+								Cube, ObjectProperties, new Possibility[] { P }, Query);
+
+							if (!(PartResult is null))
+							{
+								foreach (Possibility P2 in PartResult)
+									Result.AddLast(P2);
+							}
+						}
+					}
+
+					return Result;
+				}
+				else
+				{
+					Graph = await this.graph.EvaluateAsync(Variables);
+					Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue, Variables);
+					return await this.pattern.Search(Cube, Variables, ExistingMatches, Query);
+				}
 			}
 			else
 			{
-				ObjectProperties ObjectProperties = null;
 				LinkedList<Possibility> Result = new LinkedList<Possibility>();
 
 				foreach (Possibility P in ExistingMatches)
@@ -63,18 +115,44 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					else
 						ObjectProperties.Object = P;
 
-					Graph = await this.graph.EvaluateAsync(ObjectProperties);
-					Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue?.ToString() ?? string.Empty, Variables);
-
-					if (!(Cube is null))
+					if (!this.graphIsVariableRef ||
+						ObjectProperties.ContainsVariable(this.graphVariableRef))
 					{
-						IEnumerable<Possibility> PartResult = await this.pattern.Search(
-							Cube, ObjectProperties, new Possibility[] { P }, Query);
+						Graph = await this.graph.EvaluateAsync(ObjectProperties);
+						Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue, Variables);
 
-						if (!(PartResult is null))
+						if (!(Cube is null))
 						{
-							foreach (Possibility P2 in PartResult)
-								Result.AddLast(P2);
+							IEnumerable<Possibility> PartResult = await this.pattern.Search(
+								Cube, ObjectProperties, new Possibility[] { P }, Query);
+
+							if (!(PartResult is null))
+							{
+								foreach (Possibility P2 in PartResult)
+									Result.AddLast(P2);
+							}
+						}
+					}
+					else
+					{
+						foreach (UriNode GraphName in Query.NamedGraphNames)
+						{
+							Cube = await Query.GetNamedGraph(GraphName, Variables);
+
+							if (!(Cube is null))
+							{
+								IEnumerable<Possibility> PartResult = await this.pattern.Search(
+									Cube, ObjectProperties, new Possibility[]
+									{
+										new Possibility(this.graphVariableRef, GraphName, P)
+									}, Query);
+
+								if (!(PartResult is null))
+								{
+									foreach (Possibility P2 in PartResult)
+										Result.AddLast(P2);
+								}
+							}
 						}
 					}
 				}
@@ -132,7 +210,10 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 				return false;
 
 			if (!(NewNode is null))
+			{
 				this.graph = NewNode;
+				this.CheckGraphVariableReference();
+			}
 
 			if (!this.pattern.ForAll(Callback, State, Order))
 				return false;

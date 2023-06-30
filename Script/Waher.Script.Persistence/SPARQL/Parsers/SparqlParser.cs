@@ -203,7 +203,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			ISparqlPattern Where;
 			ScriptNode Having;
 			List<ScriptNode> From;
-			Dictionary<string, ISemanticCube> NamedGraphs = null;
+			Dictionary<UriNode, ISemanticCube> NamedGraphs = null;
 
 			switch (s)
 			{
@@ -317,9 +317,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 							FromUri = this.ParseUri(Parser);
 
 							if (NamedGraphs is null)
-								NamedGraphs = new Dictionary<string, ISemanticCube>(StringComparer.CurrentCultureIgnoreCase);
+								NamedGraphs = new Dictionary<UriNode, ISemanticCube>();
 
-							NamedGraphs[FromUri.Uri.AbsoluteUri] = null;
+							NamedGraphs[FromUri] = null;
 						}
 						else
 							From.Add(Parser.ParseObject());

@@ -1614,6 +1614,9 @@
 							<File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.js' />
 							<File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.md' />
 							<File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
+							<File Id='Sparql.css' Name='Sparql.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sparql.css'/>
+							<File Id='Sparql.js' Name='Sparql.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sparql.js'/>
+							<File Id='Sparql.md' Name='Sparql.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sparql.md'/>
 							<File Id='TargetBlank.js' Name='TargetBlank.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\TargetBlank.js'/>
 							<RemoveFile Id='RemoveAdmin.cssx' Name='Admin.cssx' On='uninstall'/>
 							<RemoveFile Id='RemoveAdmin.md' Name='Admin.md' On='uninstall'/>
@@ -1640,6 +1643,9 @@
 							<RemoveFile Id='RemoveSignatureRequest.js' Name='SignatureRequest.js' On='uninstall'/>
 							<RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
 							<RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
+							<RemoveFile Id='RemoveSparql.css' Name='Sparql.css' On='uninstall'/>
+							<RemoveFile Id='RemoveSparql.js' Name='Sparql.js' On='uninstall'/>
+							<RemoveFile Id='RemoveSparql.md' Name='Sparql.md' On='uninstall'/>
 							<RemoveFile Id='RemoveTargetBlank.js' Name='TargetBlank.js' On='uninstall'/>
 						</Component>
 						<Directory Id='Audio' Name='Audio'>

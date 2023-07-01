@@ -1,28 +1,33 @@
-﻿Title: Prompt
-Description: Prompt allowing the operator to evaluate script.
-Date: 2016-03-01
+﻿Title: SPARQL Endpoint
+Description: SPARQL Endpoint evaluating federated SPARQL queries
+Date: 2023-07-01
 Author: Peter Waher
 Master: /Master.md
-JavaScript: Prompt.js
-Parameter: Expression
+Javascript: Sparql.js
+CSS: Sparql.css
+Parameter: query
+Parameter: default-graph-uri
+Parameter: named-graph-uri
 UserVariable: User
 Privilege: Admin.Lab.Script
 Login: /Login.md
 
-Script prompt
-=============================
+=====================================================
 
-Below, you can enter script and ask the server to evaluate it. You can review the [script reference page](Script.md) for more information about 
-script syntax. Press `ENTER` evaluate the script you're writing. Press `SHIFT`+`ENTER` to add a newline to the script you're editing. The script 
-editor accepts `TAB` characters.
+SPARQL Endpoint
+==================
 
-Script:  
-<textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">{{Expression}}</textarea>
+Below, you can enter a SPARQL query and ask the server to evaluate it.
+Press `ENTER` evaluate the query you're writing. 
+Press `SHIFT`+`ENTER` to add a newline to the query you're editing.
+The query editor accepts `TAB` characters.
 
-<button type="submit" onclick="EvaluateExpression();">Evaluate</button>
+<form id="QueryForm" action="/sparql" method="post" enctype="application/x-www-form-urlencoded">
+
+Query:  
+<textarea id="query" name="query" autofocus="autofocus" wrap="hard" onkeydown="return QueryKeyDown(this,event);">{{query}}</textarea>
+
+<button type="submit">Execute</button>
 <button type="button" onclick="ClearAll();">Clear</button>
-<button type="button" onclick="ListVariables();">Variables</button>
 
-============================================================================================================================================
-
-<div id="Results"></div>
+</form>

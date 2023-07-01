@@ -92,5 +92,6 @@
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
     <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj" />
+    <ProjectReference Include="..\WebServices\Waher.WebService.Sparql\Waher.WebService.Sparql.csproj" />
   </ItemGroup>
 </Project>

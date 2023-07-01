@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Semantic;
+using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -47,16 +50,39 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <returns>Graph, if found, null if processed.</returns>
 		public async Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound)
 		{
+			object Result = null;
+
 			try
 			{
-				object Result = await InternetContent.GetAsync(Source,
-					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9"));
+				Result = await InternetContent.GetAsync(Source,
+					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, text/xml;q=0.2, text/plain;q=0.1"));
 
 				if (Result is ISemanticCube Cube)
 					return Cube;
 
 				if (Result is ISemanticModel Model)
 					return await InMemorySemanticCube.Create(Model);
+
+				if (Result is XmlDocument Xml)
+					return new RdfDocument(Xml);
+
+				if (Result is string s)
+				{
+					if (XML.IsValidXml(s))
+					{
+						Xml = new XmlDocument()
+						{
+							PreserveWhitespace = true
+						};
+
+						Xml.LoadXml(s);
+
+						return new RdfDocument(Xml);
+					}
+					else
+						return new TurtleDocument(s);
+				}
+
 			}
 			catch (Exception ex)
 			{
@@ -69,7 +95,16 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			if (NullIfNotFound)
 				return null;
 			else
-				throw new ScriptRuntimeException("Graph not a semantic cube or semantic model: " + Source.ToString(), Node);
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Graph not a semantic cube or semantic model: ");
+				sb.Append(Source.ToString());
+				sb.Append(" Type of content returned: ");
+				sb.Append(Result?.GetType().FullName);
+
+				throw new ScriptRuntimeException(sb.ToString(), Node);
+			}
 		}
 	}
 }

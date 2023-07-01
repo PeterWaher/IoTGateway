@@ -161,6 +161,9 @@
 		<Content fileName="Script.md"/>
 		<Content fileName="ScriptColors.md"/>
 		<Content fileName="Smileys.md"/>
+		<Content fileName="Sparql.css"/>
+		<Content fileName="Sparql.js"/>
+		<Content fileName="Sparql.md"/>
 		<Content fileName="TargetBlank.js"/>
 		<Folder name="Audio">
 			<Content fileName="glass_ping-Go445-1207030150.wav"/>

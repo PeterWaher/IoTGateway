@@ -321,8 +321,10 @@ namespace Waher.Script.Test
 				Result2 = ex;
 			}
 
-			Assert.IsFalse((Result1 is null) ^ (Result2 is null));
-			Assert.IsTrue(Result1?.Equals(Result2) ?? true);
+			if (Result1 is null)
+				Assert.IsTrue(Result2 is Exception);
+			else
+				Assert.IsTrue(Result1.Equals(Result2));
 		}
 
 		// TODO: Property paths.

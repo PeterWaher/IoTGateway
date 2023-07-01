@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
 
@@ -34,7 +33,19 @@ namespace Waher.Script.Model
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IElement L = this.left.Evaluate(Variables);
+			IElement L;
+			bool ScalarDirectly = false;
+
+			try
+			{
+				L = this.left.Evaluate(Variables);
+			}
+			catch (Exception exLeft)
+			{
+				L = new ObjectValue(exLeft);
+				ScalarDirectly = true;
+			}
+
 			BooleanValue BL = L as BooleanValue;
 			BooleanValue BR;
 			IElement Result;
@@ -47,7 +58,16 @@ namespace Waher.Script.Model
 				if (!(Result is null))
 					return Result;
 
-				R = this.right.Evaluate(Variables);
+				try
+				{
+					R = this.right.Evaluate(Variables);
+				}
+				catch (Exception exRight)
+				{
+					R = new ObjectValue(exRight);
+					ScalarDirectly = true;
+				}
+
 				BR = R as BooleanValue;
 
 				if (!(BR is null))
@@ -57,7 +77,16 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				R = this.right.Evaluate(Variables);
+				try
+				{
+					R = this.right.Evaluate(Variables);
+				}
+				catch (Exception exRight)
+				{
+					R = new ObjectValue(exRight);
+					ScalarDirectly = true;
+				}
+
 				BR = R as BooleanValue;
 
 				if (!(BL is null) && !(BR is null))
@@ -70,11 +99,18 @@ namespace Waher.Script.Model
 				else
 				{
 					this.bothBool = false;
-					return this.Evaluate(L, R, Variables);
+
+					if (ScalarDirectly)
+						return this.EvaluateScalar(L, R, Variables);
+					else
+						return this.Evaluate(L, R, Variables);
 				}
 			}
 
-			return this.Evaluate(L, R, Variables);
+			if (ScalarDirectly)
+				return this.EvaluateScalar(L, R, Variables);
+			else
+				return this.Evaluate(L, R, Variables);
 		}
 
 		/// <summary>

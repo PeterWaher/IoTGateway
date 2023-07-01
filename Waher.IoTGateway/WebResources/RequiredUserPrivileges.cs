@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -71,7 +70,7 @@ namespace Waher.IoTGateway.WebResources
 					return Task.FromResult<IUser>(null);
 			}
 
-			return Task.FromResult<IUser>(User);
+			return Task.FromResult(User);
 		}
 	}
 }

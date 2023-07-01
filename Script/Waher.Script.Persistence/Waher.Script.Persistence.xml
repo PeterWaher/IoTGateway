@@ -2470,6 +2470,80 @@
             </summary>
             <param name="Names">Graph names.</param>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.SparqlQueryCodec">
+            <summary>
+            Encoder and Decoder of semantic information from SPARQL queries using JSON.
+            https://www.w3.org/TR/sparql11-results-json/
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.#ctor">
+            <summary>
+            Encoder and Decoder of semantic information from SPARQL queries.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.ContentTypes">
+            <summary>
+            Supported Internet Content Types.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes content of a given Internet Content Type.
+            </summary>
+            <param name="ContentType">Content Type</param>
+            <param name="Grade">How well the decoder supports the given content type.</param>
+            <returns>If the decoder decodes the given content type.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object
+            </summary>
+            <param name="ContentType">Content Type</param>
+            <param name="Data">Binary representation of object.</param>
+            <param name="Encoding">Encoding</param>
+            <param name="Fields">Additional fields</param>
+            <param name="BaseUri">Base URI</param>
+            <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a specific object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder supports the given object.</param>
+            <param name="AcceptedContentTypes">Accepted content types.</param>
+            <returns>If the encoder encodes the given object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
+            <summary>
+            Encodes an object
+            </summary>
+            <param name="Object">Object to encode</param>
+            <param name="Encoding">Encoding</param>
+            <param name="AcceptedContentTypes">Accepted content types.</param>
+            <returns>Encoded object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of content of a given file extension.
+            </summary>
+            <param name="FileExtension">File Extension</param>
+            <param name="ContentType">Content Type, if recognized.</param>
+            <returns>If File Extension was recognized and Content Type found.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of content of a given content type.
+            </summary>
+            <param name="ContentType">Content Type</param>
+            <param name="FileExtension">File Extension, if recognized.</param>
+            <returns>If Content Type was recognized and File Extension found.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>
             Enumerator that only returns elements matching a set of conditions.

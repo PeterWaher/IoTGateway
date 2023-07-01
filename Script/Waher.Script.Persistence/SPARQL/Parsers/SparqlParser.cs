@@ -8,7 +8,6 @@ using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
-using Waher.Runtime.Profiling.Events;
 using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.HashFunctions;
@@ -1746,6 +1745,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "COALESCE":
 					Arguments = this.ParseArguments(Parser, 1, int.MaxValue);
 					return new Coalesce(Arguments, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ERROR":
+					Node = this.ParseArgument(Parser);
+					return new Script.Functions.Runtime.Error(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				default:
 					if (Parser.PeekNextChar() == ':')

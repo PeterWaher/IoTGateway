@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 using Waher.Script.Persistence.SPARQL;
 
 namespace Waher.Script.Test
@@ -17,12 +18,12 @@ namespace Waher.Script.Test
 	{
 		private static string LoadTextResource(string FileName)
 		{
-			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql.Query." + FileName);
+			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
 		}
 
 		private static TurtleDocument LoadTurtleResource(string FileName)
 		{
-			string Text = LoadTextResource(FileName);
+			string Text = LoadTextResource("Query." + FileName);
 			return new TurtleDocument(Text);
 		}
 
@@ -41,6 +42,19 @@ namespace Waher.Script.Test
 			Assert.IsNotNull(Result);
 
 			return (CommonTypes.GetString(Bin, Encoding.UTF8), Result);
+		}
+
+		private static Expression LoadSparqlExpression(string FileName)
+		{
+			string s = LoadTextResource("Expression." + FileName);
+			s = "SELECT ?x WHERE { VALUES ?y {1} BIND(" + s + " AS ?x) }";
+			return new Expression(s);
+		}
+
+		private static Expression LoadResultExpression(string FileName)
+		{
+			string s = LoadTextResource("Expression." + FileName);
+			return new Expression(s);
 		}
 
 		[DataTestMethod]
@@ -107,7 +121,7 @@ namespace Waher.Script.Test
 		[DataRow("Test_059.ttl", "Test_059.rq", null, "Test_059.srj")]
 		[DataRow("Test_060.ttl", "Test_060.rq", null, "Test_060.srj")]
 		[DataRow("Test_061.ttl", "Test_061.rq", null, "Test_061.srj")]
-		public async Task SPARQL_Test(string DataSetFileName, string QueryFileName,
+		public async Task Query_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
 			List<TurtleDocument> Docs = new List<TurtleDocument>();
@@ -135,7 +149,7 @@ namespace Waher.Script.Test
 		private async Task Test(Variables v, string QueryFileName, string ResultName,
 			string[] SourceUris, TurtleDocument[] Docs)
 		{
-			string Query = LoadTextResource(QueryFileName);
+			string Query = LoadTextResource("Query." + QueryFileName);
 			Expression Exp = new Expression(Query);
 
 			if (!(SourceUris is null) && Exp.Root is SparqlQuery SparqlQuery && SparqlQuery.NamedGraphNames.Length == 0)
@@ -246,6 +260,69 @@ namespace Waher.Script.Test
 			}
 			else
 				Assert.AreEqual(e1, e2);
+		}
+
+		[DataTestMethod]
+		[DataRow("Test_001.expression", "Test_001.result")]
+		[DataRow("Test_002.expression", "Test_002.result")]
+		[DataRow("Test_003.expression", "Test_003.result")]
+		[DataRow("Test_004.expression", "Test_004.result")]
+		[DataRow("Test_005.expression", "Test_005.result")]
+		[DataRow("Test_006.expression", "Test_006.result")]
+		[DataRow("Test_007.expression", "Test_007.result")]
+		[DataRow("Test_008.expression", "Test_008.result")]
+		[DataRow("Test_009.expression", "Test_009.result")]
+		[DataRow("Test_010.expression", "Test_010.result")]
+		[DataRow("Test_011.expression", "Test_011.result")]
+		[DataRow("Test_012.expression", "Test_012.result")]
+		[DataRow("Test_013.expression", "Test_013.result")]
+		[DataRow("Test_014.expression", "Test_014.result")]
+		[DataRow("Test_015.expression", "Test_015.result")]
+		[DataRow("Test_016.expression", "Test_016.result")]
+		[DataRow("Test_017.expression", "Test_017.result")]
+		[DataRow("Test_018.expression", "Test_018.result")]
+		public async Task Expression_Test(string SparqlExpressionFileName, string ResultExpression)
+		{
+			Expression Exp1 = LoadSparqlExpression(SparqlExpressionFileName);
+			Expression Exp2 = LoadResultExpression(ResultExpression);
+			object Result1;
+			object Result2;
+
+			try
+			{
+				Result1 = await Exp1.EvaluateAsync(new Variables
+				{
+					[" Default Graph "] = new InMemorySemanticCube()
+				});
+
+				if (Result1 is SparqlResultSet SparqlResult)
+				{
+					foreach (ISparqlResultRecord Record in SparqlResult.Records)
+					{
+						Result1 = Record["x"];
+						break;
+					}
+				}
+
+				if (Result1 is IElement E)
+					Result1 = E.AssociatedObjectValue;
+			}
+			catch (Exception ex)
+			{
+				Result1 = ex;
+			}
+
+			try
+			{
+				Result2 = await Exp2.EvaluateAsync(new Variables());
+			}
+			catch (Exception ex)
+			{
+				Result2 = ex;
+			}
+
+			Assert.IsFalse((Result1 is null) ^ (Result2 is null));
+			Assert.IsTrue(Result1?.Equals(Result2) ?? true);
 		}
 
 		// TODO: Property paths.

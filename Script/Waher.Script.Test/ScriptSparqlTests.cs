@@ -17,7 +17,7 @@ namespace Waher.Script.Test
 	{
 		private static string LoadTextResource(string FileName)
 		{
-			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
+			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql.Query." + FileName);
 		}
 
 		private static TurtleDocument LoadTurtleResource(string FileName)
@@ -33,7 +33,7 @@ namespace Waher.Script.Test
 
 			Assert.IsFalse(string.IsNullOrEmpty(ContentType));
 
-			byte[] Bin = Resources.LoadResource(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
+			byte[] Bin = Resources.LoadResource(typeof(ScriptSparqlTests).Namespace + ".Sparql.Query." + FileName);
 			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 			Assert.IsNotNull(Decoded);
 

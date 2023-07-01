@@ -1,0 +1,10 @@
+﻿SELECT ?a ?b ?c ?d ?e
+WHERE 
+{
+    VALUES ?x {2}
+    BIND(IF(?x = 2, "yes", "no") as ?a)
+    BIND(IF(bound(?y), "yes", "no") as ?b)
+    BIND(IF(?x=2, "yes", 1/?z) as ?c)
+    BIND(IF(?x=1, "yes", 1/?z) as ?d)
+    BIND(IF("2" > 1, "yes", "no") as ?e)
+ }

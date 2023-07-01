@@ -1,0 +1,23 @@
+﻿{
+	"head": {
+		"vars": [ "a", "b", "c", "d", "e" ]
+	},
+	"results": {
+		"bindings": [
+			{
+				"a": {
+					"type": "literal",
+					"value": "yes"
+				},
+				"b": {
+					"type": "literal",
+					"value": "no"
+				},
+				"c": {
+					"type": "literal",
+					"value": "yes"
+				}
+			}
+		]
+	}
+}

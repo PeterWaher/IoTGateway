@@ -121,6 +121,9 @@ namespace Waher.Script.Test
 		[DataRow("Test_059.ttl", "Test_059.rq", null, "Test_059.srj")]
 		[DataRow("Test_060.ttl", "Test_060.rq", null, "Test_060.srj")]
 		[DataRow("Test_061.ttl", "Test_061.rq", null, "Test_061.srj")]
+		[DataRow("Test_062.ttl", "Test_062.rq", null, "Test_062.srj")]
+		[DataRow("Test_063.ttl", "Test_063.rq", null, "Test_063.srj")]
+		[DataRow("Test_064.ttl", "Test_064.rq", null, "Test_064.srj")]
 		public async Task Query_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{

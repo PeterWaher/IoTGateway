@@ -497,6 +497,8 @@
 	<Assembly fileName='Waher.Things.Xmpp.pdb'/>
 	<Assembly fileName='Waher.WebService.Script.dll'/>
 	<Assembly fileName='Waher.WebService.Script.pdb'/>
+	<Assembly fileName='Waher.WebService.Sparql.dll'/>
+	<Assembly fileName='Waher.WebService.Sparql.pdb'/>
 	<Assembly fileName='Gateway.config'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>

@@ -502,6 +502,7 @@ The [WebServices](WebServices) folder contains modules that add web service capa
 | Project                        | Type         | Link  | Project description |
 |--------------------------------|--------------|-------|---------------------|
 | **Waher.WebService.Script**    | .NET Std 2.0 |       | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
+| **Waher.WebService.Sparql**    | .NET Std 2.0 |       | The [Waher.WebService.Sparql](WebServices/Waher.WebService.Sparql) project provides a SPARQL endpoint that can be used to execute federated queries on the server and across the network. |
 | **Waher.WebService.Tesseract** | .NET Std 2.0 |       | The [Waher.WebService.Tesseract](WebServices/Waher.WebService.Tesseract) project provides a web service that can act as a gateway to [Tesseract](https://tesseract-ocr.github.io/tessdoc/Downloads.html), installed on the server. |
 
 The folder also contains the following unit test projects:

@@ -1081,11 +1081,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (Left is null)
 				return null;
 
-			while (Parser.PeekNextToken() == "||")
+			Parser.SkipWhiteSpace();
+			while (Parser.PeekNextChars(2) == "||")
 			{
-				Parser.NextToken();
+				Parser.SkipChars(2);
 				ScriptNode Right = this.ParseAnds(Parser, false);
 				Left = new Operators.Logical.Or(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+				Parser.SkipWhiteSpace();
 			}
 
 			return Left;
@@ -1097,11 +1099,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (Left is null)
 				return null;
 
-			while (Parser.PeekNextToken() == "&&")
+			Parser.SkipWhiteSpace();
+			while (Parser.PeekNextChars(2) == "&&")
 			{
-				Parser.NextToken();
+				Parser.SkipChars(2);
 				ScriptNode Right = this.ParseComparisons(Parser, false);
 				Left = new Operators.Logical.And(Left, Right, Left.Start, Parser.Position - Left.Start, Parser.Expression);
+				Parser.SkipWhiteSpace();
 			}
 
 			return Left;
@@ -1356,7 +1360,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					{
 						Parser.NextChar();
 						UriNode Fqn = this.ParsePrefixedToken(Parser, s);
-						
+
 						Parser.SkipWhiteSpace();
 						if (Parser.PeekNextChar() == '(')
 							return this.ParseExtensionFunction(Fqn.Uri.AbsoluteUri, Parser, Start);

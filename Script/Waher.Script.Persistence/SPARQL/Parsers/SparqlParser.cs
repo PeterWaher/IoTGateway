@@ -224,20 +224,26 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					this.queryType = QueryType.Construct;
 					this.NextToken(Parser);
 
-					ISparqlPattern Pattern = this.ParsePattern(Parser)
-						?? throw Parser.SyntaxError("Expected pattern.");
-
-					if (!(Pattern is SparqlRegularPattern RegularPattern))
-						throw Parser.SyntaxError("Expected regular pattern.");
-
-					Construct = RegularPattern;
-					if (!(Construct.BoundVariables is null))
-						throw Parser.SyntaxError("Bound variables not permitted in construct statement.");
-
-					if (!(Construct.Filter is null))
-						throw Parser.SyntaxError("Filters not permitted in construct statement.");
-
 					s = Parser.PeekNextToken().ToUpper();
+					if (s == "WHERE")
+						Construct = null;
+					else
+					{
+						ISparqlPattern Pattern = this.ParsePattern(Parser)
+							?? throw Parser.SyntaxError("Expected pattern.");
+
+						if (!(Pattern is SparqlRegularPattern RegularPattern))
+							throw Parser.SyntaxError("Expected regular pattern.");
+
+						Construct = RegularPattern;
+						if (!(Construct.BoundVariables is null))
+							throw Parser.SyntaxError("Bound variables not permitted in construct statement.");
+
+						if (!(Construct.Filter is null))
+							throw Parser.SyntaxError("Filters not permitted in construct statement.");
+
+						s = Parser.PeekNextToken().ToUpper();
+					}
 					break;
 
 				case "SELECT":
@@ -360,6 +366,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 			else
 				Where = null;
+
+			if (this.queryType == QueryType.Construct && Construct is null)
+			{
+				if (Where is SparqlRegularPattern RegularPattern)
+					Construct = RegularPattern;
+				else
+					throw Parser.SyntaxError("CONSTRUCT WHERE queries require a regular WHERE pattern.");
+			}
 
 			if (s == "VALUES")
 			{

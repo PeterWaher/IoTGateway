@@ -9764,6 +9764,30 @@
             <param name="Right">Right value.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.Evaluate(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.Evaluate(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.Evaluate(System.Exception,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateOptimizedResultAsync(System.Boolean)">
             <summary>
             Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
@@ -9773,6 +9797,30 @@
             <returns>Optimized result, if possble, or null if both operands are required.</returns>
         </member>
         <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(System.Boolean,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(System.Exception,System.Exception)">
             <summary>
             Evaluates the boolean operator.
             </summary>
@@ -19537,6 +19585,30 @@
             <param name="Right">Right value.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Logical.And.Evaluate(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.And.Evaluate(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.And.Evaluate(System.Exception,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Logical.Equivalence">
             <summary>
             Equivalence.
@@ -19568,6 +19640,30 @@
             <param name="Right">Right value.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Logical.Equivalence.Evaluate(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Equivalence.Evaluate(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Equivalence.Evaluate(System.Exception,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Logical.Implication">
             <summary>
             Implication.
@@ -19592,6 +19688,30 @@
             <returns>Optimized result, if possble, or null if both operands are required.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Logical.Implication.Evaluate(System.Boolean,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Implication.Evaluate(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Implication.Evaluate(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Implication.Evaluate(System.Exception,System.Exception)">
             <summary>
             Evaluates the boolean operator.
             </summary>
@@ -19644,6 +19764,30 @@
             <returns>Optimized result, if possble, or null if both operands are required.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Logical.Or.Evaluate(System.Boolean,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Or.Evaluate(System.Exception,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Or.Evaluate(System.Boolean,System.Exception)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Logical.Or.Evaluate(System.Exception,System.Exception)">
             <summary>
             Evaluates the boolean operator.
             </summary>

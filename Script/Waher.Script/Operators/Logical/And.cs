@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -49,6 +50,46 @@ namespace Waher.Script.Operators.Logical
 				return BooleanValue.True;
 			else
 				return BooleanValue.False;
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(Exception Left, bool Right)
+		{
+			if (Right)
+				ExceptionDispatchInfo.Capture(Left).Throw();
+
+			return BooleanValue.False;
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(bool Left, Exception Right)
+		{
+			if (Left)
+				ExceptionDispatchInfo.Capture(Right).Throw();
+
+			return BooleanValue.False;
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(Exception Left, Exception Right)
+		{
+			ExceptionDispatchInfo.Capture(Left).Throw();
+			return ObjectValue.Null;
 		}
 
 	}

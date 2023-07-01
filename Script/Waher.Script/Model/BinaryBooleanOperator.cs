@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
 
@@ -86,7 +87,17 @@ namespace Waher.Script.Model
 			if (!this.isAsync)
 				return this.Evaluate(Variables);
 
-			IElement L = await this.left.EvaluateAsync(Variables);
+			IElement L;
+
+			try
+			{
+				L = await this.left.EvaluateAsync(Variables);
+			}
+			catch (Exception exLeft)
+			{
+				L = new ObjectValue(exLeft);
+			}
+
 			BooleanValue BL = L as BooleanValue;
 			BooleanValue BR;
 			IElement Result;
@@ -99,7 +110,15 @@ namespace Waher.Script.Model
 				if (!(Result is null))
 					return Result;
 
-				R = await this.right.EvaluateAsync(Variables);
+				try
+				{
+					R = await this.right.EvaluateAsync(Variables);
+				}
+				catch (Exception exRight)
+				{
+					R = new ObjectValue(exRight);
+				}
+
 				BR = R as BooleanValue;
 
 				if (!(BR is null))
@@ -109,7 +128,15 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				R = await this.right.EvaluateAsync(Variables);
+				try
+				{
+					R = await this.right.EvaluateAsync(Variables);
+				}
+				catch (Exception exRight)
+				{
+					R = new ObjectValue(exRight);
+				}
+
 				BR = R as BooleanValue;
 
 				if (!(BL is null) && !(BR is null))
@@ -138,19 +165,47 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			if (!(Left.AssociatedObjectValue is bool l) &&
-				!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+			if (Left.AssociatedObjectValue is Exception exLeft)
 			{
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
-			}
+				if (Right.AssociatedObjectValue is Exception exRight)
+					return this.Evaluate(exLeft, exRight);
+				else
+				{
+					if (!(Right.AssociatedObjectValue is bool r)
+						&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
+					{
+						throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					}
 
-			if (!(Right.AssociatedObjectValue is bool r)
-				&& !Expression.TryConvert<bool>(Right.AssociatedObjectValue, out r))
+					return this.Evaluate(exLeft, r);
+				}
+			}
+			else if (Right.AssociatedObjectValue is Exception exRight)
 			{
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
-			}
+				if (!(Left.AssociatedObjectValue is bool l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
 
-			return this.Evaluate(l, r);
+				return this.Evaluate(l, exRight);
+			}
+			else
+			{
+				if (!(Left.AssociatedObjectValue is bool l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
+
+				if (!(Right.AssociatedObjectValue is bool r)
+					&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
+
+				return this.Evaluate(l, r);
+			}
 		}
 
 		/// <summary>
@@ -162,19 +217,47 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override async Task<IElement> EvaluateScalarAsync(IElement Left, IElement Right, Variables Variables)
 		{
-			if (!(Left.AssociatedObjectValue is bool l) &&
-				!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+			if (Left.AssociatedObjectValue is Exception exLeft)
 			{
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
-			}
+				if (Right.AssociatedObjectValue is Exception exRight)
+					return await this.EvaluateAsync(exLeft, exRight);
+				else
+				{
+					if (!(Right.AssociatedObjectValue is bool r)
+						&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
+					{
+						throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					}
 
-			if (!(Right.AssociatedObjectValue is bool r)
-				&& !Expression.TryConvert<bool>(Right.AssociatedObjectValue, out r))
+					return await this.EvaluateAsync(exLeft, r);
+				}
+			}
+			else if (Right.AssociatedObjectValue is Exception exRight)
 			{
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
-			}
+				if (!(Left.AssociatedObjectValue is bool l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
 
-			return await this.EvaluateAsync(l, r);
+				return await this.EvaluateAsync(l, exRight);
+			}
+			else
+			{
+				if (!(Left.AssociatedObjectValue is bool l) &&
+					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
+
+				if (!(Right.AssociatedObjectValue is bool r)
+					&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
+				{
+					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				}
+
+				return await this.EvaluateAsync(l, r);
+			}
 		}
 
 		/// <summary>
@@ -194,6 +277,30 @@ namespace Waher.Script.Model
 		public abstract IElement Evaluate(bool Left, bool Right);
 
 		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public abstract IElement Evaluate(Exception Left, bool Right);
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public abstract IElement Evaluate(bool Left, Exception Right);
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public abstract IElement Evaluate(Exception Left, Exception Right);
+
+		/// <summary>
 		/// Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
 		/// if both operands evaluated to boolean values last time the operator was evaluated.
 		/// </summary>
@@ -201,7 +308,7 @@ namespace Waher.Script.Model
 		/// <returns>Optimized result, if possble, or null if both operands are required.</returns>
 		public virtual Task<IElement> EvaluateOptimizedResultAsync(bool Left)
 		{
-			return Task.FromResult<IElement>(this.EvaluateOptimizedResult(Left));
+			return Task.FromResult(this.EvaluateOptimizedResult(Left));
 		}
 
 		/// <summary>
@@ -212,8 +319,40 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public virtual Task<IElement> EvaluateAsync(bool Left, bool Right)
 		{
-			return Task.FromResult<IElement>(this.Evaluate(Left, Right));
+			return Task.FromResult(this.Evaluate(Left, Right));
 		}
 
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(Exception Left, bool Right)
+		{
+			return Task.FromResult(this.Evaluate(Left, Right));
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(bool Left, Exception Right)
+		{
+			return Task.FromResult(this.Evaluate(Left, Right));
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(Exception Left, Exception Right)
+		{
+			return Task.FromResult(this.Evaluate(Left, Right));
+		}
 	}
 }

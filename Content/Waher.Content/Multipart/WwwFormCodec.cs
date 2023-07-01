@@ -136,7 +136,7 @@ namespace Waher.Content.Multipart
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
 			if (Object is Dictionary<string, string> &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;

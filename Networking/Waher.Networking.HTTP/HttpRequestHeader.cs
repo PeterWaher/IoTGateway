@@ -13,6 +13,7 @@ namespace Waher.Networking.HTTP
 	public class HttpRequestHeader : HttpHeader
 	{
 		private Dictionary<string, string> query = null;
+		private KeyValuePair<string, string>[] queryParameters = null;
 		private HttpFieldAccept accept = null;
 		private HttpFieldAcceptCharset acceptCharset = null;
 		private HttpFieldAcceptEncoding acceptEncoding = null;
@@ -60,7 +61,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="UriScheme">URI scheme.</param>
 		/// <param name="VanityResources">Registered vanity resource.</param>
 		/// <param name="Headers">HTTP Header fields.</param>
-		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, VanityResources VanityResources, 
+		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, VanityResources VanityResources,
 			params KeyValuePair<string, string>[] Headers)
 			: base(Method + " " + Resource + " HTTP/" + Version, VanityResources, Headers)
 		{
@@ -102,15 +103,27 @@ namespace Waher.Networking.HTTP
 							}
 
 							this.query = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+							List<KeyValuePair<string, string>> Parameters = new List<KeyValuePair<string, string>>();
+							string Key, Name;
 
 							foreach (string Part in this.queryString.Split('&'))
 							{
 								i = Part.IndexOf('=');
 								if (i < 0)
+								{
 									this.query[Part] = string.Empty;
+									Parameters.Add(new KeyValuePair<string, string>(Part, string.Empty));
+								}
 								else
-									this.query[Part.Substring(0, i)] = Part.Substring(i + 1);
+								{
+									Key = Part.Substring(0, i);
+									Name = Part.Substring(i + 1);
+									this.query[Key] = Name;
+									Parameters.Add(new KeyValuePair<string, string>(Key, Name));
+								}
 							}
+
+							this.queryParameters = Parameters.ToArray();
 						}
 						else
 						{
@@ -183,31 +196,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// All query parameters.
 		/// </summary>
-		public KeyValuePair<string, string>[] QueryParameters
-		{
-			get
-			{
-				if (this.queryParameters is null)
-				{
-					if (this.query is null)
-						this.queryParameters = new KeyValuePair<string, string>[0];
-					else
-					{
-						KeyValuePair<string, string>[] P = new KeyValuePair<string, string>[this.query.Count];
-						int i = 0;
-
-						foreach (KeyValuePair<string, string> P2 in this.query)
-							P[i++] = P2;
-
-						this.queryParameters = P;
-					}
-				}
-
-				return this.queryParameters;
-			}
-		}
-
-		private KeyValuePair<string, string>[] queryParameters = null;
+		public KeyValuePair<string, string>[] QueryParameters => this.queryParameters;
 
 		/// <summary>
 		/// Parses a specific HTTP header field.

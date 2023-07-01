@@ -15,7 +15,7 @@ namespace Waher.WebService.Sparql
 	/// Pluggable module registering the SPARQL endpoint to the web server.
 	/// </summary>
 	[Singleton]
-	public class SparqlServiceModule : IConfigurableModule
+	public class SparqlServiceModule : IModule
 	{
 		private const string RequiredPrivileges = "Admin.Lab.Script";
 
@@ -72,18 +72,6 @@ namespace Waher.WebService.Sparql
 			}
 
 			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Gets an array of configurable pages for the module.
-		/// </summary>
-		/// <returns>Configurable pages</returns>
-		public Task<IConfigurablePage[]> GetConfigurablePages()
-		{
-			return Task.FromResult<IConfigurablePage[]>(new ConfigurablePage[]
-			{
-				new ConfigurablePage("SPARQL Endpoint", "/sparql", RequiredPrivileges)
-			});
 		}
 	}
 }

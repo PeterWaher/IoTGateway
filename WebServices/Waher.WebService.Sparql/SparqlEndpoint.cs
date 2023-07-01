@@ -69,12 +69,12 @@ namespace Waher.WebService.Sparql
 			State.Start();
 
 			(SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs) =
-				await this.GetQueryGraphs(Request, Request.Header.QueryParameters, State);
+				await this.GetQueryGraphs(Request.Header.QueryParameters, State);
 
 			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State));
 		}
 
-		private async Task<(SparqlQuery, ISemanticCube[], string[])> GetQueryGraphs(HttpRequest Request,
+		private async Task<(SparqlQuery, ISemanticCube[], string[])> GetQueryGraphs(
 			IEnumerable<KeyValuePair<string, string>> QueryParameters, State State)
 		{
 			SparqlQuery Query = null;
@@ -172,7 +172,7 @@ namespace Waher.WebService.Sparql
 			}
 			else if (Obj is Dictionary<string, string> Form)
 			{
-				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Request, Form, State);
+				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Form, State);
 			}
 			else
 				throw new BadRequestException("Content must be a SPARQL query or a web form containing a SPARQL query.");
@@ -184,7 +184,7 @@ namespace Waher.WebService.Sparql
 			SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs,
 			State State)
 		{
-			bool Error;
+			bool Error = false;
 
 			try
 			{
@@ -218,9 +218,8 @@ namespace Waher.WebService.Sparql
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
-
 				Error = true;
+				Log.Critical(ex);
 
 				if (!Response.ResponseSent)
 				{
@@ -241,10 +240,19 @@ namespace Waher.WebService.Sparql
 						new KeyValuePair<string, object>("Parsing ms", State.ParsingTimeMs),
 						new KeyValuePair<string, object>("Loading ms", State.LoadDefaultMs),
 						new KeyValuePair<string, object>("Evaluating ms", State.EvaluatingMs),
-						new KeyValuePair<string, object>("Returning ms", State.ReturningMs));
+						new KeyValuePair<string, object>("Returning ms", State.ReturningMs),
+						new KeyValuePair<string, object>("Error", Error));
 
-					Log.Notice("SPARQL evaluated.", Request.Resource.ResourceName, 
-						Request.User.UserName, "SparqlEval", Tags);
+					if (Error)
+					{
+						Log.Warning("SPARQL evaluated with errors.", Request.Resource.ResourceName,
+							Request.User.UserName, "SparqlEval", Tags);
+					}
+					else
+					{
+						Log.Notice("SPARQL evaluated.", Request.Resource.ResourceName,
+							Request.User.UserName, "SparqlEval", Tags);
+					}
 				}
 				catch (Exception ex)
 				{

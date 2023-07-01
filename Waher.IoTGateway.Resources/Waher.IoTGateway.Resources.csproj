@@ -230,6 +230,7 @@
     <None Remove="Root\Script.md" />
     <None Remove="Root\ScriptColors.md" />
     <None Remove="Root\Smileys.md" />
+    <None Remove="Root\Sparql.md" />
     <None Remove="Root\TargetBlank.js" />
     <None Remove="Root\Templates\Repeat.md" />
     <None Remove="Root\Video\small.3gp" />
@@ -792,6 +793,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\PlantUmlLab\PlantUmlLabGraph.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Sparql.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\RemoteEndpointClear.ws">

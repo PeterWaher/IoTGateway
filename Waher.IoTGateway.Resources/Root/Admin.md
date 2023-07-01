@@ -67,6 +67,7 @@ MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab
 MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);
 MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);
 MenuItem("Script","/Prompt.md","Admin.Lab.Script");
+MenuItem("SPARQL","/Sparql.md","Admin.Lab.Script");
 MenuFooter();
 
 MenuHeader("Legal");

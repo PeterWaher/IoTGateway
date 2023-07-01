@@ -303,250 +303,288 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 			}
 
-			if (this.queryType == QueryType.Ask)
+			switch (this.queryType)
 			{
-				if (!(Possibilities is null))
-					return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
+				case QueryType.Ask:
+					if (!(Possibilities is null))
+						return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
 
-				return new ObjectValue(new SparqlResultSet(false));
-			}
+					return new ObjectValue(new SparqlResultSet(false));
 
-			if (this.queryType == QueryType.Construct)
-			{
-				Dictionary<string, string> BlankNodeDictionary = null;
-				LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
-				ObjectProperties RecordVariables = null;
+				case QueryType.Select:
+					Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
+					LinkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
+					List<string> ColumnNames = new List<string>();
+					string Name;
+					int i, c;
+					bool AllNames;
 
-				if (!(Possibilities is null))
-				{
-					foreach (ISparqlResultRecord P in Possibilities)
-					{
-						BlankNodeDictionary?.Clear();
-
-						if (RecordVariables is null)
-							RecordVariables = new ObjectProperties(P, Variables);
-						else
-							RecordVariables.Object = P;
-
-						foreach (ISemanticTriple T in this.construct.Triples)
-						{
-							ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
-							if (Subject is null)
-								continue;
-							else if (Subject is BlankNode BnS)
-							{
-								if (BlankNodeDictionary is null)
-									BlankNodeDictionary = new Dictionary<string, string>();
-
-								if (!BlankNodeDictionary.TryGetValue(BnS.NodeId, out string NewLabel))
-								{
-									NewLabel = "n" + Guid.NewGuid().ToString();
-									BlankNodeDictionary[BnS.NodeId] = NewLabel;
-								}
-
-								Subject=new BlankNode(NewLabel);
-							}
-
-							ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
-							if (Predicate is null)
-								continue;
-							else if (Predicate is BlankNode BnP)
-							{
-								if (BlankNodeDictionary is null)
-									BlankNodeDictionary = new Dictionary<string, string>();
-
-								if (!BlankNodeDictionary.TryGetValue(BnP.NodeId, out string NewLabel))
-								{
-									NewLabel = "n" + Guid.NewGuid().ToString();
-									BlankNodeDictionary[BnP.NodeId] = NewLabel;
-								}
-
-								Predicate = new BlankNode(NewLabel);
-							}
-
-							ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
-							if (Object is null)
-								continue;
-							else if (Object is BlankNode BnO)
-							{
-								if (BlankNodeDictionary is null)
-									BlankNodeDictionary = new Dictionary<string, string>();
-
-								if (!BlankNodeDictionary.TryGetValue(BnO.NodeId, out string NewLabel))
-								{
-									NewLabel = "n" + Guid.NewGuid().ToString();
-									BlankNodeDictionary[BnO.NodeId] = NewLabel;
-								}
-
-								Object = new BlankNode(NewLabel);
-							}
-
-							Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
-						}
-					}
-				}
-
-				return new ObjectValue(new InMemorySemanticModel(Construction));
-			}
-
-			Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
-			LinkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
-			List<string> ColumnNames = new List<string>();
-			string Name;
-			int i, c;
-			bool AllNames;
-
-			if (this.columns is null)
-				AllNames = true;
-			else
-			{
-				AllNames = false;
-
-				int Columns = this.columns.Length;
-
-				c = this.columnNames?.Length ?? 0;
-
-				for (i = 0; i < Columns; i++)
-				{
-					if (i < c && !(this.columnNames[i] is null))
-					{
-						if (this.columnNames[i] is VariableReference Ref2)
-							Name = Ref2.VariableName;
-						else
-							Name = (await this.columnNames[i].EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
-
-						ColumnVariables[Name] = i;
-						ColumnNames.Add(Name);
-					}
-					else
-						Name = null;
-
-					if (this.columns[i] is VariableReference Ref)
-					{
-						if (Name is null)
-						{
-							Name = Ref.VariableName;
-
-							ColumnVariables[Name] = i;
-							ColumnNames.Add(Name);
-						}
-						else
-						{
-							if (ColumnScript is null)
-								ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
-
-							ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(Ref, i));
-						}
-					}
+					if (this.columns is null)
+						AllNames = true;
 					else
 					{
-						if (ColumnScript is null)
-							ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+						AllNames = false;
 
-						ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
+						int Columns = this.columns.Length;
 
-						if (Name is null)
+						c = this.columnNames?.Length ?? 0;
+
+						for (i = 0; i < Columns; i++)
 						{
-							Name = " c" + i.ToString();
-							ColumnNames.Add(Name);
-						}
-					}
-				}
-			}
-
-			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
-			bool MakeUnique = this.distinct || this.reduced;
-			Dictionary<string, bool> Distinct = MakeUnique ? new Dictionary<string, bool>() : null;
-			StringBuilder sb = MakeUnique ? new StringBuilder() : null;
-			int Offset = this.offset ?? 0;
-			int MaxCount = this.limit ?? int.MaxValue;
-
-			if (!(Possibilities is null))
-			{
-				ObjectProperties RecordVariables = null;
-
-				foreach (ISparqlResultRecord P in Possibilities)
-				{
-					Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
-
-					foreach (ISparqlResultItem Loop in P)
-					{
-						Name = Loop.Name;
-
-						if (ColumnVariables.TryGetValue(Name, out i))
-							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
-						else if (AllNames)
-						{
-							i = ColumnNames.Count;
-							ColumnNames.Add(Name);
-							ColumnVariables[Name] = i;
-
-							Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
-						}
-					}
-
-					if (!(ColumnScript is null))
-					{
-						if (RecordVariables is null)
-							RecordVariables = new ObjectProperties(P, Variables);
-						else
-							RecordVariables.Object = P;
-
-						foreach (KeyValuePair<ScriptNode, int> P2 in ColumnScript)
-						{
-							Name = ColumnNames[P2.Value];
-							ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
-
-							if (!(Literal is null))
+							if (i < c && !(this.columnNames[i] is null))
 							{
-								Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
-								P[Name] = Literal;
+								if (this.columnNames[i] is VariableReference Ref2)
+									Name = Ref2.VariableName;
+								else
+									Name = (await this.columnNames[i].EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
+
+								ColumnVariables[Name] = i;
+								ColumnNames.Add(Name);
 							}
-						}
-					}
-
-					if (MakeUnique)
-					{
-						bool First = true;
-
-						sb.Clear();
-
-						foreach (ISparqlResultItem Value in Record.Values)
-						{
-							if (First)
-								First = false;
 							else
-								sb.Append(';');
+								Name = null;
 
-							sb.Append(Value.Name);
-							sb.Append('=');
-							sb.Append(Value.Value?.ToString());
+							if (this.columns[i] is VariableReference Ref)
+							{
+								if (Name is null)
+								{
+									Name = Ref.VariableName;
+
+									ColumnVariables[Name] = i;
+									ColumnNames.Add(Name);
+								}
+								else
+								{
+									if (ColumnScript is null)
+										ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+
+									ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(Ref, i));
+								}
+							}
+							else
+							{
+								if (ColumnScript is null)
+									ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+
+								ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
+
+								if (Name is null)
+								{
+									Name = " c" + i.ToString();
+									ColumnNames.Add(Name);
+								}
+							}
+						}
+					}
+
+					List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
+					bool MakeUnique = this.distinct || this.reduced;
+					Dictionary<string, bool> Distinct = MakeUnique ? new Dictionary<string, bool>() : null;
+					StringBuilder sb = MakeUnique ? new StringBuilder() : null;
+					ObjectProperties RecordVariables = null;
+
+					if (!(Possibilities is null))
+					{
+						foreach (ISparqlResultRecord P in Possibilities)
+						{
+							Dictionary<string, ISparqlResultItem> Record = new Dictionary<string, ISparqlResultItem>();
+
+							foreach (ISparqlResultItem Loop in P)
+							{
+								Name = Loop.Name;
+
+								if (ColumnVariables.TryGetValue(Name, out i))
+									Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
+								else if (AllNames)
+								{
+									i = ColumnNames.Count;
+									ColumnNames.Add(Name);
+									ColumnVariables[Name] = i;
+
+									Record[Name] = new SparqlResultItem(Name, Loop.Value, i);
+								}
+							}
+
+							if (!(ColumnScript is null))
+							{
+								if (RecordVariables is null)
+									RecordVariables = new ObjectProperties(P, Variables);
+								else
+									RecordVariables.Object = P;
+
+								foreach (KeyValuePair<ScriptNode, int> P2 in ColumnScript)
+								{
+									Name = ColumnNames[P2.Value];
+									ISemanticElement Literal = await this.EvaluateSemanticElement(RecordVariables, P2.Key);
+
+									if (!(Literal is null))
+									{
+										Record[Name] = new SparqlResultItem(Name, Literal, P2.Value);
+										P[Name] = Literal;
+									}
+								}
+							}
+
+							if (MakeUnique)
+							{
+								bool First = true;
+
+								sb.Clear();
+
+								foreach (ISparqlResultItem Value in Record.Values)
+								{
+									if (First)
+										First = false;
+									else
+										sb.Append(';');
+
+									sb.Append(Value.Name);
+									sb.Append('=');
+									sb.Append(Value.Value?.ToString());
+								}
+
+								string Key = sb.ToString();
+
+								if (Distinct.ContainsKey(Key))
+									continue;
+
+								Distinct[Key] = true;
+							}
+
+							Records.Add(new SparqlPatternResultRecord(Record));
+						}
+					}
+
+					if (!(this.orderBy is null))
+						Records.Sort(new OrderResultSet(this.orderBy));
+
+					if (this.offset.HasValue || this.limit.HasValue)
+					{
+						int Offset = this.offset ?? 0;
+						int MaxCount = this.limit ?? int.MaxValue;
+						int Count = Records.Count;
+
+						while (Offset > 0 && Count > 0)
+						{
+							Records.RemoveAt(0);
+							Count--;
+							Offset--;
 						}
 
-						string Key = sb.ToString();
-
-						if (Distinct.ContainsKey(Key))
-							continue;
-
-						Distinct[Key] = true;
+						while (Count > MaxCount)
+						{
+							Records.RemoveAt(MaxCount);
+							Count--;
+						}
 					}
 
-					if (Offset > 0)
-						Offset--;
-					else
+					return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), new Uri[0],
+						Records.ToArray()));
+
+				case QueryType.Construct:
+					Dictionary<string, string> BlankNodeDictionary = null;
+					LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
+					IEnumerable<ISparqlResultRecord> Items = Possibilities;
+
+					RecordVariables = null;
+
+					if (!(Items is null))
 					{
-						Records.Add(new SparqlPatternResultRecord(Record));
-						if (--MaxCount <= 0)
-							break;
+						if (!(this.orderBy is null))
+						{
+							List<ISparqlResultRecord> Ordered = new List<ISparqlResultRecord>();
+
+							foreach (ISparqlResultRecord Record in Items)
+								Ordered.Add(Record);
+
+							Ordered.Sort(new OrderResultSet(this.orderBy));
+							Items = Ordered;
+						}
+
+						int Offset = this.offset ?? 0;
+						int MaxCount = this.limit ?? int.MaxValue;
+
+						foreach (ISparqlResultRecord P in Items)
+						{
+							if (Offset > 0)
+							{
+								Offset--;
+								continue;
+							}
+
+							if (--MaxCount < 0)
+								break;
+
+							BlankNodeDictionary?.Clear();
+
+							if (RecordVariables is null)
+								RecordVariables = new ObjectProperties(P, Variables);
+							else
+								RecordVariables.Object = P;
+
+							foreach (ISemanticTriple T in this.construct.Triples)
+							{
+								ISemanticElement Subject = await this.EvaluateSemanticElement(RecordVariables, T.Subject);
+								if (Subject is null)
+									continue;
+								else if (Subject is BlankNode BnS)
+								{
+									if (BlankNodeDictionary is null)
+										BlankNodeDictionary = new Dictionary<string, string>();
+
+									if (!BlankNodeDictionary.TryGetValue(BnS.NodeId, out string NewLabel))
+									{
+										NewLabel = "n" + Guid.NewGuid().ToString();
+										BlankNodeDictionary[BnS.NodeId] = NewLabel;
+									}
+
+									Subject = new BlankNode(NewLabel);
+								}
+
+								ISemanticElement Predicate = await this.EvaluateSemanticElement(RecordVariables, T.Predicate);
+								if (Predicate is null)
+									continue;
+								else if (Predicate is BlankNode BnP)
+								{
+									if (BlankNodeDictionary is null)
+										BlankNodeDictionary = new Dictionary<string, string>();
+
+									if (!BlankNodeDictionary.TryGetValue(BnP.NodeId, out string NewLabel))
+									{
+										NewLabel = "n" + Guid.NewGuid().ToString();
+										BlankNodeDictionary[BnP.NodeId] = NewLabel;
+									}
+
+									Predicate = new BlankNode(NewLabel);
+								}
+
+								ISemanticElement Object = await this.EvaluateSemanticElement(RecordVariables, T.Object);
+								if (Object is null)
+									continue;
+								else if (Object is BlankNode BnO)
+								{
+									if (BlankNodeDictionary is null)
+										BlankNodeDictionary = new Dictionary<string, string>();
+
+									if (!BlankNodeDictionary.TryGetValue(BnO.NodeId, out string NewLabel))
+									{
+										NewLabel = "n" + Guid.NewGuid().ToString();
+										BlankNodeDictionary[BnO.NodeId] = NewLabel;
+									}
+
+									Object = new BlankNode(NewLabel);
+								}
+
+								Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
+							}
+						}
 					}
-				}
+
+					return new ObjectValue(new InMemorySemanticModel(Construction));
+
+				default:
+					throw new ScriptRuntimeException("Query type not supported.", this);
 			}
-
-			if (!(this.orderBy is null))
-				Records.Sort(new OrderResultSet(this.orderBy));
-
-			return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), new Uri[0],
-				Records.ToArray()));
 		}
 
 		private async Task<ISemanticCube> GetDataSource(object From, Variables Variables,

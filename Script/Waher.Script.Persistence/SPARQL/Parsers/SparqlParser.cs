@@ -416,7 +416,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 			if (s == "ORDER")
 			{
-				if (Columns is null)
+				if (this.queryType == QueryType.Ask)
 					throw Parser.SyntaxError("ORDER BY not expected in ASK queries.");
 
 				Parser.NextToken();
@@ -467,6 +467,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 						return true;
 				}
+
+				s = Parser.PeekNextToken().ToUpper();
 			}
 		}
 

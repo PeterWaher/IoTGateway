@@ -1,0 +1,11 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix site: <http://example.org/stats#> .
+
+_:a foaf:name "Alice" .
+_:a site:hits 2349 .
+
+_:b foaf:name "Bob" .
+_:b site:hits 105 .
+
+_:c foaf:name "Eve" .
+_:c site:hits 181 .

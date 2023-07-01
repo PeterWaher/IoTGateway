@@ -183,7 +183,7 @@ namespace Waher.Content.Semantic
 					{
 						Dictionary<string, object> Binding = new Dictionary<string, object>();
 
-						foreach (SparqlResultItem Item in Record)
+						foreach (ISparqlResultItem Item in Record)
 							Binding[Item.Name] = OutputValue(Item.Value);
 
 						Bindings.Add(Binding);

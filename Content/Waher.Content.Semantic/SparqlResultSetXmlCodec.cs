@@ -204,7 +204,7 @@ namespace Waher.Content.Semantic
 					{
 						w.WriteStartElement("result");
 
-						foreach (SparqlResultItem Item in Record)
+						foreach (ISparqlResultItem Item in Record)
 						{
 							w.WriteStartElement("binding");
 							w.WriteAttributeString("name", Item.Name);

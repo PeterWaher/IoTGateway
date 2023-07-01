@@ -1,0 +1,15 @@
+﻿{
+	"head": {
+		"vars": [ "annot" ]
+	},
+	"results": {
+		"bindings": [
+			{
+				"annot": {
+					"type": "bnode",
+					"value": "b"
+				}
+			}
+		]
+	}
+}

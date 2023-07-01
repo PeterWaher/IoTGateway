@@ -8,6 +8,7 @@ using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling.Events;
 using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.HashFunctions;
@@ -1355,8 +1356,13 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Parser.PeekNextChar() == ':')
 					{
 						Parser.NextChar();
-						Element = this.ParsePrefixedToken(Parser, s);
-						return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
+						UriNode Fqn = this.ParsePrefixedToken(Parser, s);
+						
+						Parser.SkipWhiteSpace();
+						if (Parser.PeekNextChar() == '(')
+							return this.ParseExtensionFunction(Fqn.Uri.AbsoluteUri, Parser, Start);
+						else
+							return new ConstantElement(Fqn, Start, Parser.Position - Start, Parser.Expression);
 					}
 
 					return this.ParseFunction(Parser, s, Start, Optional);
@@ -1745,23 +1751,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Parser.PeekNextChar() == ':')
 					{
 						s = this.ParsePrefixedToken(Parser, s).Uri.AbsoluteUri;
-
-						IExtensionFunction Function;
-
-						lock (functionsPerUri)
-						{
-							if (!functionsPerUri.TryGetValue(s, out Function))
-							{
-								Function = Types.FindBest<IExtensionFunction, string>(s);
-								functionsPerUri[s] = Function;
-							}
-						}
-
-						if (Function is null)
-							throw Parser.SyntaxError("Function not found.");
-
-						Arguments = this.ParseArguments(Parser, Function.MinArguments, Function.MaxArguments);
-						return Function.CreateFunction(Arguments, Start, Parser.Position - Start, Parser.Expression);
+						return this.ParseExtensionFunction(s, Parser, Start);
 					}
 
 					if (Optional)
@@ -1775,6 +1765,27 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					throw Parser.SyntaxError("Unexpected token: " + s);
 			}
+		}
+
+		private ScriptNode ParseExtensionFunction(string FullyQualifiedName, ScriptParser Parser, int Start)
+		{
+			IExtensionFunction Function;
+
+			lock (functionsPerUri)
+			{
+				if (!functionsPerUri.TryGetValue(FullyQualifiedName, out Function))
+				{
+					Function = Types.FindBest<IExtensionFunction, string>(FullyQualifiedName);
+					functionsPerUri[FullyQualifiedName] = Function;
+				}
+			}
+
+			if (Function is null)
+				throw Parser.SyntaxError("Function not found.");
+
+			ScriptNode[] Arguments = this.ParseArguments(Parser, Function.MinArguments, Function.MaxArguments);
+
+			return Function.CreateFunction(Arguments, Start, Parser.Position - Start, Parser.Expression);
 		}
 
 		private void Parse0Arguments(ScriptParser Parser)

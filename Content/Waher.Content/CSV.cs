@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects;
+using Waher.Script.Functions.Runtime;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content
 {
+	/// <summary>
+	/// Delegate for callback methods that convert an element value to a string.
+	/// </summary>
+	/// <param name="Element">Element</param>
+	/// <returns>String representation of element.</returns>
+	public delegate string ToString(IElement Element);
+
 	/// <summary>
 	/// Helps with common CSV-related tasks.
 	/// </summary>
@@ -272,6 +279,28 @@ namespace Waher.Content
 		/// <returns>CSV-string</returns>
 		public static string Encode(IMatrix Matrix)
 		{
+			return Encode(Matrix, (E) =>
+			{
+				if (E.AssociatedObjectValue is string s)
+					return s;
+				else if (E.AssociatedObjectValue is double d)
+					return CommonTypes.Encode(d);
+				else
+					return E.AssociatedObjectValue?.ToString();
+			});
+		}
+
+		/// <summary>
+		/// Encodes a matrix as a Comma-separated values string.
+		/// </summary>
+		/// <param name="Matrix">Matrix</param>
+		/// <param name="ElementToString">Callback method that converts an individual element to a string.</param>
+		/// <returns>CSV-string</returns>
+		public static string Encode(IMatrix Matrix, ToString ElementToString)
+		{
+			if (ElementToString is null)
+				throw new ArgumentNullException(nameof(ElementToString));
+
 			List<string[]> Records = new List<string[]>();
 			List<string> Fields = new List<string>();
 
@@ -288,16 +317,7 @@ namespace Waher.Content
 			for (Row = 0; Row < NrRows; Row++)
 			{
 				for (Column = 0; Column < NrColumns; Column++)
-				{
-					E = Matrix.GetElement(Column, Row);
-
-					if (E.AssociatedObjectValue is string s)
-						Fields.Add(s);
-					else if (E.AssociatedObjectValue is double d)
-						Fields.Add(CommonTypes.Encode(d));
-					else
-						Fields.Add(E.AssociatedObjectValue?.ToString());
-				}
+					Fields.Add(ElementToString(Matrix.GetElement(Column, Row)));
 
 				Records.Add(Fields.ToArray());
 				Fields.Clear();

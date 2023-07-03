@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
-using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Semantic
@@ -88,7 +88,7 @@ namespace Waher.Content.Semantic
 					Text = CSV.Encode(Result.ToMatrix());
 			}
 			else if (Object is ObjectMatrix M)
-				Text = CSV.Encode(M);
+				Text = CSV.Encode(M, ElementToString);
 			else if (Object is bool b)
 			{
 				string[][] Records = new string[1][];
@@ -103,6 +103,32 @@ namespace Waher.Content.Semantic
 			string ContentType = CsvCodec.CsvContentTypes[0] + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+		}
+
+		private static string ElementToString(IElement E)
+		{
+			object Obj = E.AssociatedObjectValue;
+
+			if (Obj is string s)
+				return s;
+			else if (Obj is SemanticLiteral Literal)
+				return Literal.StringValue;
+			else if (Obj is SemanticTriple Triple)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("<<");
+				sb.Append(ElementToString(Triple.Subject));
+				sb.Append(' ');
+				sb.Append(ElementToString(Triple.Predicate));
+				sb.Append(' ');
+				sb.Append(ElementToString(Triple.Object));
+				sb.Append(">>");
+
+				return sb.ToString();
+			}
+			else
+				return Obj?.ToString() ?? string.Empty;
 		}
 
 		/// <summary>

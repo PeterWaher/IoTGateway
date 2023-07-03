@@ -633,6 +633,13 @@
             Can be null if there are no alternatives.
             </summary>
         </member>
+        <member name="T:Waher.Content.ToString">
+            <summary>
+            Delegate for callback methods that convert an element value to a string.
+            </summary>
+            <param name="Element">Element</param>
+            <returns>String representation of element.</returns>
+        </member>
         <member name="T:Waher.Content.CSV">
             <summary>
             Helps with common CSV-related tasks.
@@ -657,6 +664,14 @@
             Encodes a matrix as a Comma-separated values string.
             </summary>
             <param name="Matrix">Matrix</param>
+            <returns>CSV-string</returns>
+        </member>
+        <member name="M:Waher.Content.CSV.Encode(Waher.Script.Abstraction.Elements.IMatrix,Waher.Content.ToString)">
+            <summary>
+            Encodes a matrix as a Comma-separated values string.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <param name="ElementToString">Callback method that converts an individual element to a string.</param>
             <returns>CSV-string</returns>
         </member>
         <member name="T:Waher.Content.Deleters.DeleterBase">

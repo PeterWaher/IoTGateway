@@ -8,13 +8,13 @@ using Waher.Runtime.Inventory;
 namespace Waher.Script.Persistence.SPARQL
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information from SPARQL queries using JSON.
-	/// https://www.w3.org/TR/sparql11-results-json/
+	/// Encoder and Decoder of SPARQL queries.
+	/// https://www.w3.org/TR/sparql12-query/
 	/// </summary>
 	public class SparqlQueryCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Encoder and Decoder of semantic information from SPARQL queries.
+		/// Encoder and Decoder of SPARQL queries.
 		/// </summary>
 		public SparqlQueryCodec()
 		{

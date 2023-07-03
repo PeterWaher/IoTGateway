@@ -27,7 +27,15 @@ The query editor accepts `TAB` characters.
 Query:  
 <textarea id="query" name="query" autofocus="autofocus" wrap="hard" onkeydown="return QueryKeyDown(this,event);">{{query}}</textarea>
 
+Default Graph\(s): (Will be loaded before executing script. Can be omitted if specified in the query.)  
+<input type="text" id="defaultGraph1" name="default-graph-uri"/>
+
+Named Graph\(s): (Only loaded if used in query. Can be omitted if specified in the query.)  
+<input type="text" id="namedGraph1" name="named-graph-uri"/>
+
 <button type="submit">Execute</button>
 <button type="button" onclick="ClearAll();">Clear</button>
+<button type="button" onclick="AddDefaultGraph();">Add Default Graph</button>
+<button type="button" onclick="AddNamedGraph();">Add Named Graph</button>
 
 </form>

@@ -25,3 +25,36 @@ function ClearAll()
 	Script.value = "";
 	Script.focus();
 }
+
+function AddDefaultGraph()
+{
+	AddGraph("defaultGraph", "default-graph-uri");
+}
+
+function AddNamedGraph()
+{
+	AddGraph("namedGraph", "named-graph-uri");
+}
+
+function AddGraph(Id, Name)
+{
+	var Nr = 1;
+	var Suffix = "1";
+	var LastInput;
+	var Temp = document.getElementById(Id + Suffix);
+
+	while (Temp)
+	{
+		LastInput = Temp;
+		Nr++;
+		Suffix = Nr.toString();
+		Temp = document.getElementById(Id + Suffix);
+	}
+
+	Temp = document.createElement("INPUT");
+	Temp.setAttribute("id", Id + Suffix);
+	Temp.setAttribute("type", "text");
+	Temp.setAttribute("name", Name);
+
+	LastInput.parentNode.insertBefore(Temp, LastInput.nextSibling);
+}

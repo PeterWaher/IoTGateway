@@ -63,6 +63,9 @@ namespace Waher.WebService.Sparql
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			if (!Request.Header.TryGetQueryParameter("query", out _))
+				throw new SeeOtherException("/Sparql.md");
+
 			// TODO: Return page if empty GET.
 
 			State State = new State();
@@ -71,7 +74,7 @@ namespace Waher.WebService.Sparql
 			(SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs) =
 				await this.GetQueryGraphs(Request.Header.QueryParameters, State);
 
-			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State));
+			Task T = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State));
 		}
 
 		private async Task<(SparqlQuery, ISemanticCube[], string[])> GetQueryGraphs(
@@ -111,7 +114,7 @@ namespace Waher.WebService.Sparql
 			return (Query, DefaultGraphs, NamedGraphs);
 		}
 
-		private async Task<(ISemanticCube[], string[])> GetQueryGraphs(SparqlQuery Query, 
+		private async Task<(ISemanticCube[], string[])> GetQueryGraphs(SparqlQuery Query,
 			IEnumerable<KeyValuePair<string, string>> QueryParameters, State State)
 		{
 			List<ISemanticCube> DefaultGraphs = null;
@@ -122,23 +125,29 @@ namespace Waher.WebService.Sparql
 				switch (P.Key)
 				{
 					case "default-graph-uri":
-						Uri SourceUri = new Uri(P.Value);
-						IGraphSource Source = Types.FindBest<IGraphSource, Uri>(SourceUri)
-							?? throw new ServiceUnavailableException("Unable to get access to graph source: " + P.Value);
+						if (!string.IsNullOrEmpty(P.Value))
+						{
+							Uri SourceUri = new Uri(P.Value);
+							IGraphSource Source = Types.FindBest<IGraphSource, Uri>(SourceUri)
+								?? throw new ServiceUnavailableException("Unable to get access to graph source: " + P.Value);
 
-						ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false);
+							ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false);
 
-						if (DefaultGraphs is null)
-							DefaultGraphs = new List<ISemanticCube>();
+							if (DefaultGraphs is null)
+								DefaultGraphs = new List<ISemanticCube>();
 
-						DefaultGraphs.Add(Cube);
+							DefaultGraphs.Add(Cube);
+						}
 						break;
 
 					case "named-graph-uri":
-						if (NamedGraphs is null)
-							NamedGraphs = new List<string>();
+						if (!string.IsNullOrEmpty(P.Value))
+						{
+							if (NamedGraphs is null)
+								NamedGraphs = new List<string>();
 
-						NamedGraphs.Add(P.Value);
+							NamedGraphs.Add(P.Value);
+						}
 						break;
 				}
 			}
@@ -173,6 +182,18 @@ namespace Waher.WebService.Sparql
 			else if (Obj is Dictionary<string, string> Form)
 			{
 				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Form, State);
+			}
+			else if (Obj is Dictionary<string, string[]> Form2)
+			{
+				LinkedList<KeyValuePair<string, string>> Parameters = new LinkedList<KeyValuePair<string, string>>();
+
+				foreach (KeyValuePair<string, string[]> P in Form2)
+				{
+					foreach (string s2 in P.Value)
+						Parameters.AddLast(new KeyValuePair<string, string>(P.Key, s2));
+				}
+
+				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Parameters, State);
 			}
 			else
 				throw new BadRequestException("Content must be a SPARQL query or a web form containing a SPARQL query.");

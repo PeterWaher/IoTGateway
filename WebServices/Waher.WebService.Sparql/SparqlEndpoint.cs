@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
-using Waher.Runtime.Text;
 using Waher.Script;
 using Waher.Script.Persistence.SPARQL;
 using Waher.Security.LoginMonitor;
@@ -71,13 +71,13 @@ namespace Waher.WebService.Sparql
 			State State = new State();
 			State.Start();
 
-			(SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs) =
+			(SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs, bool Pretty) =
 				await this.GetQueryGraphs(Request.Header.QueryParameters, State);
 
-			Task T = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State));
+			Task T = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State, Pretty));
 		}
 
-		private async Task<(SparqlQuery, ISemanticCube[], string[])> GetQueryGraphs(
+		private async Task<(SparqlQuery, ISemanticCube[], string[], bool)> GetQueryGraphs(
 			IEnumerable<KeyValuePair<string, string>> QueryParameters, State State)
 		{
 			SparqlQuery Query = null;
@@ -96,6 +96,7 @@ namespace Waher.WebService.Sparql
 
 					case "default-graph-uri":
 					case "named-graph-uri":
+					case "pretty":
 						break;
 
 					default:
@@ -108,17 +109,18 @@ namespace Waher.WebService.Sparql
 
 			State.Parsed();
 
-			(ISemanticCube[] DefaultGraphs, string[] NamedGraphs) = await this.GetQueryGraphs(
-				Query, QueryParameters, State);
+			(ISemanticCube[] DefaultGraphs, string[] NamedGraphs, bool Pretty) = 
+				await this.GetQueryGraphs(Query, QueryParameters, State);
 
-			return (Query, DefaultGraphs, NamedGraphs);
+			return (Query, DefaultGraphs, NamedGraphs, Pretty);
 		}
 
-		private async Task<(ISemanticCube[], string[])> GetQueryGraphs(SparqlQuery Query,
+		private async Task<(ISemanticCube[], string[], bool)> GetQueryGraphs(SparqlQuery Query,
 			IEnumerable<KeyValuePair<string, string>> QueryParameters, State State)
 		{
 			List<ISemanticCube> DefaultGraphs = null;
 			List<string> NamedGraphs = null;
+			bool Pretty = false;
 
 			foreach (KeyValuePair<string, string> P in QueryParameters)
 			{
@@ -149,12 +151,18 @@ namespace Waher.WebService.Sparql
 							NamedGraphs.Add(P.Value);
 						}
 						break;
+
+					case "pretty":
+						if (!CommonTypes.TryParse(P.Value, out bool b))
+							throw new BadRequestException("Invalid boolean value.");
+						Pretty = b;
+						break;
 				}
 			}
 
 			State.DefaultLoaded();
 
-			return (DefaultGraphs?.ToArray(), NamedGraphs?.ToArray());
+			return (DefaultGraphs?.ToArray(), NamedGraphs?.ToArray(), Pretty);
 		}
 
 		/// <summary>
@@ -171,17 +179,18 @@ namespace Waher.WebService.Sparql
 			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;
 			ISemanticCube[] DefaultGraphs;
 			string[] NamedGraphs;
+			bool Pretty;
 
 			State.Parsed();
 
 			if (Obj is SparqlQuery Query)
 			{
-				(DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Query,
+				(DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Query,
 					Request.Header.QueryParameters, State);
 			}
 			else if (Obj is Dictionary<string, string> Form)
 			{
-				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Form, State);
+				(Query, DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Form, State);
 			}
 			else if (Obj is Dictionary<string, string[]> Form2)
 			{
@@ -193,17 +202,17 @@ namespace Waher.WebService.Sparql
 						Parameters.AddLast(new KeyValuePair<string, string>(P.Key, s2));
 				}
 
-				(Query, DefaultGraphs, NamedGraphs) = await this.GetQueryGraphs(Parameters, State);
+				(Query, DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Parameters, State);
 			}
 			else
 				throw new BadRequestException("Content must be a SPARQL query or a web form containing a SPARQL query.");
 
-			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State));
+			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State, Pretty));
 		}
 
 		private async void Process(HttpRequest Request, HttpResponse Response,
 			SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs,
-			State State)
+			State State, bool Pretty)
 		{
 			bool Error = false;
 
@@ -230,9 +239,11 @@ namespace Waher.WebService.Sparql
 					Query.RegisterNamedGraph(NamedGraphs);
 
 				object Result = await Query.Expression.EvaluateAsync(v);
-
 				State.Evaluated();
 
+				if (Result is SparqlResultSet ResultSet)
+					ResultSet.Pretty = Pretty;
+				
 				await Response.Return(Result);
 
 				State.Returned();

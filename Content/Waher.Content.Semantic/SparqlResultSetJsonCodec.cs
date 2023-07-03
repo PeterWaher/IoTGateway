@@ -130,9 +130,13 @@ namespace Waher.Content.Semantic
 				Encoding = Encoding.UTF8;
 
 			object ResultObj;
+			bool Pretty = false;
 
 			if (Object is SparqlResultSet Result)
+			{
 				ResultObj = this.EncodeAsync(Result);
+				Pretty = Result.Pretty;
+			}
 			else if (Object is ObjectMatrix M)
 				ResultObj = this.EncodeAsync(M);
 			else if (Object is bool b)
@@ -140,7 +144,7 @@ namespace Waher.Content.Semantic
 			else
 				throw new ArgumentException("Unable to encode object.", nameof(Object));
 
-			string Text = JSON.Encode(ResultObj, false);
+			string Text = JSON.Encode(ResultObj, Pretty);
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = SparqlResultSetContentTypes[0] + "; charset=" + Encoding.WebName;
 

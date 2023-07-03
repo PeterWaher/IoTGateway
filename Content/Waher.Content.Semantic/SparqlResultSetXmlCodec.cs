@@ -142,10 +142,16 @@ namespace Waher.Content.Semantic
 				WriteEndDocumentOnClose = true
 			};
 
+			if (Object is SparqlResultSet Result && Result.Pretty)
+			{
+				Settings.Indent = true;
+				Settings.IndentChars = "\t";
+			}
+
 			using (XmlWriter w = XmlWriter.Create(sb, Settings))
 			{
-				if (Object is SparqlResultSet Result)
-					this.EncodeAsync(Result, w);
+				if (Object is SparqlResultSet Result2)
+					this.EncodeAsync(Result2, w);
 				else if (Object is ObjectMatrix M)
 					this.EncodeAsync(M, w);
 				else if (Object is bool b)

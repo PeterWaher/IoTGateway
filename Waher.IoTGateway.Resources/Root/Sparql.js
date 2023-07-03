@@ -83,7 +83,7 @@ function ExecuteQuery()
 		}
 	};
 
-	var Form = "query=" + encodeURIComponent(document.getElementById("query").value);
+	var Form = "pretty=true&query=" + encodeURIComponent(document.getElementById("query").value);
 	var Input;
 	var Nr = 1;
 

@@ -547,6 +547,11 @@ namespace Waher.Content.Semantic
 		public ISparqlResultRecord[] Records { get; }
 
 		/// <summary>
+		/// If pretty output is desired.
+		/// </summary>
+		public bool Pretty { get; set; }
+
+		/// <summary>
 		/// Converts the object to a matrix.
 		/// </summary>
 		/// <returns>Matrix.</returns>

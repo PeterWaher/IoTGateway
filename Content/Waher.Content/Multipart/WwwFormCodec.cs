@@ -66,6 +66,7 @@ namespace Waher.Content.Multipart
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			Dictionary<string, string> Form = new Dictionary<string, string>();
+			Dictionary<string, List<string>> Form2 = null;
 			string s = CommonTypes.GetString(Data, Encoding);
 			string Key, Value;
 			int i;
@@ -77,13 +78,51 @@ namespace Waher.Content.Multipart
 
 				i = Parameter.IndexOf('=');
 
-				Key = Uri.UnescapeDataString(Parameter.Substring(0, i).Replace("+", " "));
-				Value = Uri.UnescapeDataString(Parameter.Substring(i + 1).Replace("+", " "));
+				if (i >= 0)
+				{
+					Key = Uri.UnescapeDataString(Parameter.Substring(0, i).Replace("+", " "));
+					Value = Uri.UnescapeDataString(Parameter.Substring(i + 1).Replace("+", " "));
+				}
+				else
+				{
+					Key = Parameter;
+					Value = string.Empty;
+				}
 
-				Form[Key] = Value;
+				if (Form2 is null)
+				{
+					if (Form.ContainsKey(Key))
+					{
+						Form2 = new Dictionary<string, List<string>>();
+
+						foreach (KeyValuePair<string, string> P in Form)
+							Form2[P.Key] = new List<string>() { P.Value };
+					}
+					else
+					{
+						Form[Key] = Value;
+						continue;
+					}
+				}
+
+				if (!Form2.TryGetValue(Key, out List<string> Values))
+				{
+					Values = new List<string>();
+					Form2[Key] = Values;
+				}
+
+				Values.Add(Value);
 			}
 
-			return Task.FromResult<object>(Form);
+			if (Form2 is null)
+				return Task.FromResult<object>(Form);
+
+			Dictionary<string, string[]> Form3 = new Dictionary<string, string[]>();
+
+			foreach (KeyValuePair<string, List<string>> P in Form2)
+				Form3[P.Key] = P.Value.ToArray();
+
+			return Task.FromResult<object>(Form3);
 		}
 
 		/// <summary>

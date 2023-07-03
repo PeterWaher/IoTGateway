@@ -2,38 +2,30 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Functions.Runtime;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content
 {
 	/// <summary>
-	/// Delegate for callback methods that convert an element value to a string.
+	/// Helps with common TSV-related tasks. (TSV=TAB Separated Values)
 	/// </summary>
-	/// <param name="Element">Element</param>
-	/// <returns>String representation of element.</returns>
-	public delegate string ToString(IElement Element);
-
-	/// <summary>
-	/// Helps with common CSV-related tasks. (CSV=Comma Separated Values)
-	/// </summary>
-	public static class CSV
+	public static class TSV
 	{
 		#region Encoding/Decoding
 
 		/// <summary>
-		/// Parses a CSV string.
+		/// Parses a TSV string.
 		/// </summary>
-		/// <param name="Csv">CSV</param>
+		/// <param name="Tsv">TSV</param>
 		/// <returns>Parsed content.</returns>
-		public static string[][] Parse(string Csv)
+		public static string[][] Parse(string Tsv)
 		{
 			int Pos = 0;
-			int Len = Csv.Length;
-			string[][] Result = Parse(Csv, ref Pos, Len);
+			int Len = Tsv.Length;
+			string[][] Result = Parse(Tsv, ref Pos, Len);
 			char ch;
 
-			while (Pos < Len && ((ch = Csv[Pos]) <= ' ' || ch == 160))
+			while (Pos < Len && ((ch = Tsv[Pos]) <= ' ' || ch == 160))
 				Pos++;
 
 			if (Pos < Len)
@@ -42,7 +34,7 @@ namespace Waher.Content
 			return Result;
 		}
 
-		private static string[][] Parse(string Csv, ref int Pos, int Len)
+		private static string[][] Parse(string Tsv, ref int Pos, int Len)
 		{
 			List<string[]> Records = new List<string[]>();
 			List<string> Fields = new List<string>();
@@ -54,13 +46,13 @@ namespace Waher.Content
 
 			while (Pos < Len)
 			{
-				ch = Csv[Pos++];
+				ch = Tsv[Pos++];
 				switch (State)
 				{
 					case 0:
 						if (ch == '"')
 							State += 2;
-						else if (ch == ',')
+						else if (ch == '\t')
 							Fields.Add(string.Empty);
 						else if (ch == '\r' || ch == '\n')
 						{
@@ -79,7 +71,7 @@ namespace Waher.Content
 						break;
 
 					case 1: // Undelimited string
-						if (ch == ',')
+						if (ch == '\t')
 						{
 							Fields.Add(sb.ToString());
 							sb.Clear();
@@ -205,8 +197,20 @@ namespace Waher.Content
 		/// Encodes records as a Comma-separated values string.
 		/// </summary>
 		/// <param name="Records">Records</param>
-		/// <returns>CSV-string</returns>
+		/// <returns>TSV-string</returns>
 		public static string Encode(string[][] Records)
+		{
+			return Encode(Records, true);
+		}
+
+		/// <summary>
+		/// Encodes records as a Comma-separated values string.
+		/// </summary>
+		/// <param name="Records">Records</param>
+		/// <param name="QuoteIllegalCharacters">If illegal characters (TAB, CR, LF, etc.) should be quoted (true), 
+		/// or if the caller has already quoted these characters (false).</param>
+		/// <returns>TSV-string</returns>
+		public static string Encode(string[][] Records, bool QuoteIllegalCharacters)
 		{
 			StringBuilder sb = new StringBuilder();
 			bool First;
@@ -217,29 +221,34 @@ namespace Waher.Content
 
 				foreach (string Field in Record)
 				{
-					bool Comma = false;
+					bool Tab = false;
 					bool Control = false;
 					bool Quote = false;
 
 					if (First)
 						First = false;
 					else
-						sb.Append(',');
+						sb.Append('\t');
 
 					if (Field is null)
 						continue;
 
 					foreach (char ch in Field)
 					{
-						if (ch == ',')
-							Comma = true;
-						else if (ch == '"')
+						if (ch == '\t' && QuoteIllegalCharacters)
+							Tab = true;
+						else if (ch == '"' && QuoteIllegalCharacters)
 							Quote = true;
 						else if (ch < ' ')
+						{
+							if (!QuoteIllegalCharacters)
+								throw new InvalidOperationException("String is not properly quoted.");
+
 							Control = true;
+						}
 					}
 
-					if (Comma || Quote || Control)
+					if (Tab || Quote || Control)
 					{
 						string Escaped = Field;
 
@@ -276,7 +285,7 @@ namespace Waher.Content
 		/// Encodes a matrix as a Comma-separated values string.
 		/// </summary>
 		/// <param name="Matrix">Matrix</param>
-		/// <returns>CSV-string</returns>
+		/// <returns>TSV-string</returns>
 		public static string Encode(IMatrix Matrix)
 		{
 			return Encode(Matrix, (E) =>
@@ -287,7 +296,7 @@ namespace Waher.Content
 					return CommonTypes.Encode(d);
 				else
 					return E.AssociatedObjectValue?.ToString();
-			});
+			}, true);
 		}
 
 		/// <summary>
@@ -295,8 +304,10 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="Matrix">Matrix</param>
 		/// <param name="ElementToString">Callback method that converts an individual element to a string.</param>
-		/// <returns>CSV-string</returns>
-		public static string Encode(IMatrix Matrix, ToString ElementToString)
+		/// <param name="QuoteIllegalCharacters">If illegal characters (TAB, CR, LF, etc.) should be quoted (true), 
+		/// or if the caller has already quoted these characters (false).</param>
+		/// <returns>TSV-string</returns>
+		public static string Encode(IMatrix Matrix, ToString ElementToString, bool QuoteIllegalCharacters)
 		{
 			if (ElementToString is null)
 				throw new ArgumentNullException(nameof(ElementToString));
@@ -312,7 +323,6 @@ namespace Waher.Content
 
 			int Row, NrRows = Matrix.Rows;
 			int Column, NrColumns = Matrix.Columns;
-			IElement E;
 
 			for (Row = 0; Row < NrRows; Row++)
 			{
@@ -323,7 +333,7 @@ namespace Waher.Content
 				Fields.Clear();
 			}
 
-			return Encode(Records.ToArray());
+			return Encode(Records.ToArray(), QuoteIllegalCharacters);
 		}
 
 		#endregion

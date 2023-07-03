@@ -642,7 +642,7 @@
         </member>
         <member name="T:Waher.Content.CSV">
             <summary>
-            Helps with common CSV-related tasks.
+            Helps with common CSV-related tasks. (CSV=Comma Separated Values)
             </summary>
         </member>
         <member name="M:Waher.Content.CSV.Parse(System.String)">
@@ -4466,6 +4466,136 @@
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Text.TsvCodec">
+            <summary>
+            TSV codec.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.#ctor">
+            <summary>
+            TSV codec.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.TsvCodec.TsvContentTypes">
+            <summary>
+            TSV content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.TsvCodec.TsvFileExtensions">
+            <summary>
+            TSV content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.TsvCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.TsvCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.TsvCodec.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.TSV">
+            <summary>
+            Helps with common TSV-related tasks. (TSV=TAB Separated Values)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.TSV.Parse(System.String)">
+            <summary>
+            Parses a TSV string.
+            </summary>
+            <param name="Tsv">TSV</param>
+            <returns>Parsed content.</returns>
+        </member>
+        <member name="M:Waher.Content.TSV.Encode(System.String[][])">
+            <summary>
+            Encodes records as a Comma-separated values string.
+            </summary>
+            <param name="Records">Records</param>
+            <returns>TSV-string</returns>
+        </member>
+        <member name="M:Waher.Content.TSV.Encode(System.String[][],System.Boolean)">
+            <summary>
+            Encodes records as a Comma-separated values string.
+            </summary>
+            <param name="Records">Records</param>
+            <param name="QuoteIllegalCharacters">If illegal characters (TAB, CR, LF, etc.) should be quoted (true), 
+            or if the caller has already quoted these characters (false).</param>
+            <returns>TSV-string</returns>
+        </member>
+        <member name="M:Waher.Content.TSV.Encode(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Encodes a matrix as a Comma-separated values string.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <returns>TSV-string</returns>
+        </member>
+        <member name="M:Waher.Content.TSV.Encode(Waher.Script.Abstraction.Elements.IMatrix,Waher.Content.ToString,System.Boolean)">
+            <summary>
+            Encodes a matrix as a Comma-separated values string.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <param name="ElementToString">Callback method that converts an individual element to a string.</param>
+            <param name="QuoteIllegalCharacters">If illegal characters (TAB, CR, LF, etc.) should be quoted (true), 
+            or if the caller has already quoted these characters (false).</param>
+            <returns>TSV-string</returns>
         </member>
         <member name="T:Waher.Content.Video.VideoDecoder">
             <summary>

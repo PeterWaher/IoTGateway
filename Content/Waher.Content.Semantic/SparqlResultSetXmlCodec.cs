@@ -176,7 +176,7 @@ namespace Waher.Content.Semantic
 				{
 					w.WriteStartElement("variable");
 					w.WriteAttributeString("name", Name);
-					w.WriteEndAttribute();
+					w.WriteEndElement();
 				}
 			}
 
@@ -186,7 +186,7 @@ namespace Waher.Content.Semantic
 				{
 					w.WriteStartElement("link");
 					w.WriteAttributeString("href", Link.ToString());
-					w.WriteEndAttribute();
+					w.WriteEndElement();
 				}
 			}
 

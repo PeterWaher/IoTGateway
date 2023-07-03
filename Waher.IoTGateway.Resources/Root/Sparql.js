@@ -11,8 +11,7 @@
 	}
 	else if (Event.keyCode === 13 && !Event.shiftKey)
 	{
-		var Form = document.getElementById("QueryForm");
-		Form.submit();
+		ExecuteQuery();
 		return false;
 	}
 }
@@ -57,4 +56,76 @@ function AddGraph(Id, Name)
 	Temp.setAttribute("name", Name);
 
 	LastInput.parentNode.insertBefore(Temp, LastInput.nextSibling);
+}
+
+function ExecuteQuery()
+{
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState == 4)
+		{
+			var Result = document.getElementById("Result");
+
+			Result.innerHTML = "";
+
+			var Pre = document.createElement("PRE");
+			Result.appendChild(Pre);
+
+			var Code = document.createElement("CODE");
+			Pre.appendChild(Code);
+
+			Code.innerText = xhttp.responseText;
+
+			Result.setAttribute("style", "display:inline");
+
+			delete xhttp;
+		}
+	};
+
+	var Form = "query=" + encodeURIComponent(document.getElementById("query").value);
+	var Input;
+	var Nr = 1;
+
+	while (Input = document.getElementById("defaultGraph" + Nr))
+	{
+		Form += "&default-graph-uri=" + encodeURIComponent(Input.value);
+		Nr++;
+	}
+
+	Nr = 1;
+
+	while (Input = document.getElementById("namedGraph" + Nr))
+	{
+		Form += "&named-graph-uri=" + encodeURIComponent(Input.value);
+		Nr++;
+	}
+
+	xhttp.open("POST", "/sparql", true);
+	xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	switch (document.getElementById("ReturnType").value)
+	{
+		case "Xml":
+			xhttp.setRequestHeader("Accept", "application/sparql-results+xml, application/rdf+xml;q=0.9, text/xml;q=0.1");
+			break;
+
+		case "Json":
+			xhttp.setRequestHeader("Accept", "application/sparql-results+json; application/json;q=0.1");
+			break;
+
+		case "Csv":
+			xhttp.setRequestHeader("Accept", "text/csv, text/plain;q=0.1");
+			break;
+
+		case "Tsv":
+			xhttp.setRequestHeader("Accept", "text/tab-separated-values, text/plain;q=0.1");
+			break;
+
+		case "Text":
+			xhttp.setRequestHeader("Accept", "text/turtle, text/csv;q=0.9, text/tab-separated-values;q=0.9, text/plain;q=0.2, text/*;q=0.1");
+			break;
+	}
+
+	xhttp.send(Form);
 }

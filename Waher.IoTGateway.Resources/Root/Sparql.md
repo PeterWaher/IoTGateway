@@ -33,9 +33,22 @@ Default Graph\(s): (Will be loaded before executing script. Can be omitted if sp
 Named Graph\(s): (Only loaded if used in query. Can be omitted if specified in the query.)  
 <input type="text" id="namedGraph1" name="named-graph-uri"/>
 
-<button type="submit">Execute</button>
+Return results as:  
+<select id="ReturnType">
+<option selected value="Xml">XML</option>
+<option value="Json">JSON</option>
+<option value="Csv">CSV</option>
+<option value="Tsv">TSV</option>
+<option value="Text">Text</option>
+</select>
+
+<button type="button" onclick="ExecuteQuery()">Execute</button>
 <button type="button" onclick="ClearAll();">Clear</button>
 <button type="button" onclick="AddDefaultGraph();">Add Default Graph</button>
 <button type="button" onclick="AddNamedGraph();">Add Named Graph</button>
 
 </form>
+
+<fieldset id="Result" style="display:none">
+<label>Result</label>
+</fieldset>

@@ -67,7 +67,7 @@ function ExecuteQuery()
 		{
 			var Result = document.getElementById("Result");
 
-			Result.innerHTML = "";
+			Result.innerHTML = "<legend>Result</legend>";
 
 			var Pre = document.createElement("PRE");
 			Result.appendChild(Pre);
@@ -77,7 +77,7 @@ function ExecuteQuery()
 
 			Code.innerText = xhttp.responseText;
 
-			Result.setAttribute("style", "display:inline");
+			Result.setAttribute("style", "display:block");
 
 			delete xhttp;
 		}

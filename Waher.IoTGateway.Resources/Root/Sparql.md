@@ -50,5 +50,5 @@ Return results as:
 </form>
 
 <fieldset id="Result" style="display:none">
-<label>Result</label>
+<legend>Result</legend>
 </fieldset>

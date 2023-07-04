@@ -17,7 +17,7 @@ namespace Waher.WebService.Sparql
 	[Singleton]
 	public class SparqlServiceModule : IModule
 	{
-		private const string RequiredPrivileges = "Admin.Lab.Script";
+		private const string QueryPrivileges = "Admin.Graphs.Query";
 
 		private SparqlEndpoint instance;
 
@@ -51,7 +51,7 @@ namespace Waher.WebService.Sparql
 				Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.MD5, Gateway.Domain, Users.Source));
 				Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA256, Gateway.Domain, Users.Source));
 				Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
-				Schemes.Add(new RequiredUserPrivileges(Gateway.HttpServer, RequiredPrivileges));
+				Schemes.Add(new RequiredUserPrivileges(Gateway.HttpServer, QueryPrivileges));
 
 				this.instance = new SparqlEndpoint("/sparql", Schemes.ToArray());
 				Gateway.HttpServer.Register(this.instance);

@@ -9,7 +9,7 @@ Parameter: query
 Parameter: default-graph-uri
 Parameter: named-graph-uri
 UserVariable: User
-Privilege: Admin.Lab.Script
+Privilege: Admin.Graphs.Query
 Login: /Login.md
 
 =====================================================

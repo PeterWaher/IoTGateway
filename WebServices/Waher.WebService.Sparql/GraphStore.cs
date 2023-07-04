@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -9,7 +8,6 @@ using Waher.Content.Multipart;
 using Waher.Content.Semantic;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.AuthenticationErrors;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Script.Persistence.SPARQL.Sources;

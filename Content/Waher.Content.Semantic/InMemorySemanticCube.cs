@@ -61,6 +61,16 @@ namespace Waher.Content.Semantic
 		}
 
 		/// <summary>
+		/// Adds a model to the cube.
+		/// </summary>
+		/// <param name="Model">Semantic model.</param>
+		public virtual void Add(ISemanticModel Model)
+		{
+			foreach (ISemanticTriple Triple in Model)
+				this.Add(Triple);
+		}
+
+		/// <summary>
 		/// Gets available triples in the cube, having a given subject.
 		/// </summary>
 		/// <param name="Subject">Subject</param>

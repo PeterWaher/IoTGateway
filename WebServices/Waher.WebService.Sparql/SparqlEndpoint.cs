@@ -63,6 +63,8 @@ namespace Waher.WebService.Sparql
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			CheckAuthorization(Request);
+
 			if (!Request.Header.TryGetQueryParameter("query", out _))
 				throw new SeeOtherException("/Sparql.md");
 
@@ -75,6 +77,12 @@ namespace Waher.WebService.Sparql
 				await this.GetQueryGraphs(Request.Header.QueryParameters, State);
 
 			Task T = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State, Pretty));
+		}
+
+		private static void CheckAuthorization(HttpRequest Request)
+		{
+			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.QueryPrivileges))
+				throw new ForbiddenException("Access denied.");
 		}
 
 		private async Task<(SparqlQuery, ISemanticCube[], string[], bool)> GetQueryGraphs(
@@ -130,9 +138,7 @@ namespace Waher.WebService.Sparql
 						if (!string.IsNullOrEmpty(P.Value))
 						{
 							Uri SourceUri = new Uri(P.Value);
-							IGraphSource Source = Types.FindBest<IGraphSource, Uri>(SourceUri)
-								?? throw new ServiceUnavailableException("Unable to get access to graph source: " + P.Value);
-
+							IGraphSource Source = await SparqlQuery.GetSourceHandler(SourceUri, false);
 							ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false);
 
 							if (DefaultGraphs is null)
@@ -173,6 +179,8 @@ namespace Waher.WebService.Sparql
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			CheckAuthorization(Request);
+
 			State State = new State();
 			State.Start();
 

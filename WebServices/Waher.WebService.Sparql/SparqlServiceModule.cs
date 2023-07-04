@@ -17,9 +17,14 @@ namespace Waher.WebService.Sparql
 	[Singleton]
 	public class SparqlServiceModule : IModule
 	{
-		private const string QueryPrivileges = "Admin.Graphs.Query";
+		internal const string QueryPrivileges = "Admin.Graphs.Query";
+		internal const string GetPrivileges = "Admin.Graphs.Get";
+		internal const string AddPrivileges = "Admin.Graphs.Add";
+		internal const string UpdatePrivileges = "Admin.Graphs.Update";
+		internal const string DeletePrivileges = "Admin.Graphs.Delete";
 
-		private SparqlEndpoint instance;
+		private SparqlEndpoint sparqlEndpoint;
+		private GraphStore graphStore;
 
 		/// <summary>
 		/// Pluggable module registering the SPARQL endpoint to the web server.
@@ -53,8 +58,11 @@ namespace Waher.WebService.Sparql
 				Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
 				Schemes.Add(new RequiredUserPrivileges(Gateway.HttpServer, QueryPrivileges));
 
-				this.instance = new SparqlEndpoint("/sparql", Schemes.ToArray());
-				Gateway.HttpServer.Register(this.instance);
+				this.sparqlEndpoint = new SparqlEndpoint("/sparql", Schemes.ToArray());
+				Gateway.HttpServer.Register(this.sparqlEndpoint);
+
+				this.graphStore = new GraphStore("/rdf-graph-store", Schemes.ToArray());
+				Gateway.HttpServer.Register(this.graphStore);
 			}
 
 			return Task.CompletedTask;
@@ -67,8 +75,11 @@ namespace Waher.WebService.Sparql
 		{
 			if (!(Gateway.HttpServer is null))
 			{
-				Gateway.HttpServer.Unregister(this.instance);
-				this.instance = null;
+				Gateway.HttpServer.Unregister(this.sparqlEndpoint);
+				this.sparqlEndpoint = null;
+
+				Gateway.HttpServer.Unregister(this.graphStore);
+				this.graphStore = null;
 			}
 
 			return Task.CompletedTask;

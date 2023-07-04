@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -11,6 +13,7 @@ using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SPARQL.Patterns;
+using Waher.Script.Persistence.SPARQL.Sources;
 using Waher.Script.Persistence.SQL;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -751,12 +754,35 @@ namespace Waher.Script.Persistence.SPARQL
 				return Cube;
 			}
 
-			IGraphSource Source = Types.FindBest<IGraphSource, Uri>(Uri)
-				?? throw new InvalidOperationException("Unable to get access to graph source: " + Uri.ToString());
+			IGraphSource Source = await GetSourceHandler(Uri, NullIfNotFound);
+			if (Source is null)
+				return null;
 
 			return await Source.LoadGraph(Uri, this, NullIfNotFound);
 		}
 
+		/// <summary>
+		/// Gets a graph source handler, given the Graph URI
+		/// </summary>
+		/// <param name="Uri">Graph URI</param>
+		/// <param name="NullIfNotFound">If null should be returned, if a handler is not found.</param>
+		/// <returns>Graph Source Handler.</returns>
+		/// <exception cref="InvalidOperationException"></exception>
+		public static async Task<IGraphSource> GetSourceHandler(Uri Uri, bool NullIfNotFound)
+		{
+			GraphReference Ref = await Database.FindFirstIgnoreRest<GraphReference>(
+				new FilterFieldEqualTo("GraphUri", Uri.AbsoluteUri));
+
+			if (!(Ref is null))
+				return new GraphStoreSource(Ref);
+
+			IGraphSource Source = Types.FindBest<IGraphSource, Uri>(Uri);
+
+			if (Source is null && !NullIfNotFound)
+				throw new InvalidOperationException("Unable to get access to graph source: " + Uri.ToString());
+
+			return Source;
+		}
 
 		/// <summary>
 		/// Gets a named source

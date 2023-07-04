@@ -2309,6 +2309,77 @@
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphReference">
+            <summary>
+            Contains a reference to a graph in the graph store.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphReference.#ctor">
+            <summary>
+            Contains a reference to a graph in the graph store.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.GraphUri">
+            <summary>
+            Graph URI
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.GraphDigest">
+            <summary>
+            Graph Digest, used to create file names.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.Folder">
+            <summary>
+            Folder where graph(s) are stored.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.Created">
+            <summary>
+            When graph was created in graph store.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.Updated">
+            <summary>
+            When graph was updated in graph store.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.NrFiles">
+            <summary>
+            Number of files used to define graph.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource">
+            <summary>
+            Graph source in the local graph store.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.#ctor(Waher.Script.Persistence.SPARQL.Sources.GraphReference)">
+            <summary>
+            Graph source in the local graph store.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.Supports(System.Uri)">
+            <summary>
+            How well a source with a given URI can be loaded by the class.
+            </summary>
+            <param name="_">Source URI</param>
+            <returns>How well the class supports loading the graph.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean)">
+            <summary>
+            Loads the graph
+            </summary>
+            <param name="Source">Source URI</param>
+            <param name="Node">Node performing the loading.</param>
+            <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+            <returns>Graph, if found, null if processed.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource">
             <summary>
             Graph source on the Internet.
@@ -2432,6 +2503,15 @@
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetHashCode">
             <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetSourceHandler(System.Uri,System.Boolean)">
+            <summary>
+            Gets a graph source handler, given the Graph URI
+            </summary>
+            <param name="Uri">Graph URI</param>
+            <param name="NullIfNotFound">If null should be returned, if a handler is not found.</param>
+            <returns>Graph Source Handler.</returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQuery.GetNamedGraph(System.Object,Waher.Script.Variables)">
             <summary>

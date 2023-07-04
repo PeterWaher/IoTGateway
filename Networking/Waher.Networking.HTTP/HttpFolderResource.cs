@@ -1174,9 +1174,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			Variables Session = Request.Session;
-			if (Session is null)
-				throw new MethodNotAllowedException(this.AllowedMethods);
+			Variables Session = Request.Session
+				?? throw new MethodNotAllowedException(this.AllowedMethods);
 
 			string Referer = Request.Header.Referer?.Value;
 

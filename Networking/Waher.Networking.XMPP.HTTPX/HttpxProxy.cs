@@ -563,8 +563,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				return;
 			}
 
-			if (State2.TempOutput != null)
-				State2.TempOutput.Write(Data, 0, Data.Length);
+			State2.TempOutput?.Write(Data, 0, Data.Length);
 
 			if (Last)
 			{

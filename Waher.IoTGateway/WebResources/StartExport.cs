@@ -74,7 +74,7 @@ namespace Waher.IoTGateway.WebResources
 				Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 				if (!Request.HasData || !(await Request.DecodeDataAsync() is Dictionary<string, object> RequestObj))
-					throw new BadRequestException("Invalid request.");
+					throw new UnsupportedMediaTypeException("Invalid request.");
 
 				if (!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile))
 					throw new BadRequestException("Missing: TypeOfFile");

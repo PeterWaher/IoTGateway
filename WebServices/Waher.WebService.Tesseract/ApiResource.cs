@@ -71,7 +71,7 @@ namespace Waher.WebService.Tesseract
 
 			string ContentType = Request.Header.ContentType?.Type;
 			if (string.IsNullOrEmpty(ContentType) || !ContentType.StartsWith("image/", StringComparison.InvariantCultureIgnoreCase))
-				throw new BadRequestException("Expected image content.");
+				throw new UnsupportedMediaTypeException("Expected image content.");
 
 			string Language = Request.Header["X-LANGUAGE"];
 			string PageSegmentationMode = Request.Header["X-PSM"];

@@ -109,7 +109,7 @@ namespace Waher.WebService.Sparql
 
 			State.Parsed();
 
-			(ISemanticCube[] DefaultGraphs, string[] NamedGraphs, bool Pretty) = 
+			(ISemanticCube[] DefaultGraphs, string[] NamedGraphs, bool Pretty) =
 				await this.GetQueryGraphs(Query, QueryParameters, State);
 
 			return (Query, DefaultGraphs, NamedGraphs, Pretty);
@@ -204,8 +204,32 @@ namespace Waher.WebService.Sparql
 
 				(Query, DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Parameters, State);
 			}
+			else if (Obj is Dictionary<string, object> Form3)
+			{
+				LinkedList<KeyValuePair<string, string>> Parameters = new LinkedList<KeyValuePair<string, string>>();
+
+				foreach (KeyValuePair<string, object> P in Form3)
+				{
+					if (P.Value is string s)
+						Parameters.AddLast(new KeyValuePair<string, string>(P.Key, s));
+					else if (P.Value is Array A)
+					{
+						foreach (object Item in A)
+						{
+							if (Item is string s2)
+								Parameters.AddLast(new KeyValuePair<string, string>(P.Key, s2));
+							else
+								throw new BadRequestException("Invalid form.");
+						}
+					}
+					else
+						throw new BadRequestException("Invalid form.");
+				}
+
+				(Query, DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Parameters, State);
+			}
 			else
-				throw new BadRequestException("Content must be a SPARQL query or a web form containing a SPARQL query.");
+				throw new UnsupportedMediaTypeException("Content must be a SPARQL query or a web form containing a SPARQL query.");
 
 			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State, Pretty));
 		}
@@ -243,7 +267,7 @@ namespace Waher.WebService.Sparql
 
 				if (Result is SparqlResultSet ResultSet)
 					ResultSet.Pretty = Pretty;
-				
+
 				await Response.Return(Result);
 
 				State.Returned();

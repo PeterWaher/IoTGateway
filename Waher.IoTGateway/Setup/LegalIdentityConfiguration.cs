@@ -1102,7 +1102,7 @@ namespace Waher.IoTGateway.Setup
 			string Password;
 			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException("Invalid content.");
+				throw new UnsupportedMediaTypeException("Invalid content.");
 
 			if (!Parameters.TryGetValue("requestId", out Obj) || !(Obj is string RequestId) ||
 				!Parameters.TryGetValue("sign", out Obj) || !(Obj is bool Sign) ||

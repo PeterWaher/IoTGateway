@@ -113,7 +113,7 @@ namespace Waher.IoTGateway.WebResources
 						PageVariables.Remove("Contract");
 				}
 				else
-					throw new BadRequestException("Invalid type of posted data.");
+					throw new UnsupportedMediaTypeException("Invalid type of posted data.");
 			}
 			catch (Exception ex)
 			{

@@ -25,7 +25,7 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] TurtleContentTypes = new string[]
 		{
-			"text/turtle",
+			DefaultContentType,
 			"application/x-turtle"
 		};
 
@@ -36,8 +36,18 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] TurtleFileExtensions = new string[]
 		{
-			"ttl"
+			DefaultExtension
 		};
+
+		/// <summary>
+		/// text/turtle
+		/// </summary>
+		public const string DefaultContentType = "text/turtle";
+
+		/// <summary>
+		/// ttl
+		/// </summary>
+		public const string DefaultExtension = "ttl";
 
 		/// <summary>
 		/// If the decoder decodes content of a given Internet Content Type.

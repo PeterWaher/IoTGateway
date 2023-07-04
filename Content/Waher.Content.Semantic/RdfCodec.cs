@@ -29,7 +29,7 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] RdfContentTypes = new string[]
 		{
-			"application/rdf+xml"
+			DefaultContentType
 		};
 
 		/// <summary>
@@ -39,8 +39,18 @@ namespace Waher.Content.Semantic
 
 		private static readonly string[] RdfFileExtensions = new string[]
 		{
-			"rdf"
+			DefaultExtension
 		};
+
+		/// <summary>
+		/// application/rdf+xml
+		/// </summary>
+		public const string DefaultContentType = "application/rdf+xml";
+
+		/// <summary>
+		/// rdf
+		/// </summary>
+		public const string DefaultExtension = "rdf";
 
 		/// <summary>
 		/// If the decoder decodes content of a given Internet Content Type.

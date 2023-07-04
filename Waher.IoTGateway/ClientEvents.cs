@@ -1420,7 +1420,8 @@ namespace Waher.IoTGateway
 		public async Task OPTIONS(HttpRequest Request, HttpResponse Response)
 		{
 			SetTransparentCorsHeaders(this, Request, Response);
-			Response.StatusCode = 204;  // No content
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No Content";
 
 			await Response.SendResponse();
 		}

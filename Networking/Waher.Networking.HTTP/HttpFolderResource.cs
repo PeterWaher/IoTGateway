@@ -1037,6 +1037,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			Response.StatusCode = 201;
+			Response.StatusMessage = "Created";
 			await Response.SendResponse();
 			Response.Dispose();
 		}
@@ -1088,6 +1089,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			Response.StatusCode = 201;
+			Response.StatusMessage = "Created";
 			await Response.SendResponse();
 			Response.Dispose();
 		}

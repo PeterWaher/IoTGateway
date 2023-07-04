@@ -2472,13 +2472,13 @@
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.SparqlQueryCodec">
             <summary>
-            Encoder and Decoder of semantic information from SPARQL queries using JSON.
-            https://www.w3.org/TR/sparql11-results-json/
+            Encoder and Decoder of SPARQL queries.
+            https://www.w3.org/TR/sparql12-query/
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.#ctor">
             <summary>
-            Encoder and Decoder of semantic information from SPARQL queries.
+            Encoder and Decoder of SPARQL queries.
             </summary>
         </member>
         <member name="P:Waher.Script.Persistence.SPARQL.SparqlQueryCodec.ContentTypes">

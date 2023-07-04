@@ -31,18 +31,7 @@ namespace Waher.Content.Semantic
 				return Result;
 
 			Result = new InMemorySemanticCube();
-			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
-
-			if (e is IAsyncEnumerator eAsync)
-			{
-				while (await eAsync.MoveNextAsync())
-					Result.Add(e.Current);
-			}
-			else
-			{
-				while (e.MoveNext())
-					Result.Add(e.Current);
-			}
+			await Result.Add(Model);
 
 			return Result;
 		}
@@ -64,10 +53,20 @@ namespace Waher.Content.Semantic
 		/// Adds a model to the cube.
 		/// </summary>
 		/// <param name="Model">Semantic model.</param>
-		public virtual void Add(ISemanticModel Model)
+		public virtual async Task Add(ISemanticModel Model)
 		{
-			foreach (ISemanticTriple Triple in Model)
-				this.Add(Triple);
+			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
+
+			if (e is IAsyncEnumerator eAsync)
+			{
+				while (await eAsync.MoveNextAsync())
+					this.Add(e.Current);
+			}
+			else
+			{
+				while (e.MoveNext())
+					this.Add(e.Current);
+			}
 		}
 
 		/// <summary>

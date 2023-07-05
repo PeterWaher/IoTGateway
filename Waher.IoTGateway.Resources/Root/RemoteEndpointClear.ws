@@ -1,5 +1,5 @@
-﻿if !exists(User) then
-	Forbidden("Access to resource is forbidden.");
+﻿AuthenticateSession(Request,"User");
+Authorize(User,"Admin.Communication.Endpoints");
 
 Waher.IoTGateway.Gateway.LoginAuditor.UnblockAndReset(Posted.endpoint);
 

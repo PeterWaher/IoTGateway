@@ -63,6 +63,7 @@ MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
 MenuFooter();
 
 MenuHeader("Lab");
+MenuItem("Graph Store","/GraphStore.md","Admin.Graphs.Get");
 MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);
 MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);
 MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);

@@ -2354,6 +2354,11 @@
             Number of files used to define graph.
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.Creators">
+            <summary>
+            Creators of graph
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource">
             <summary>
             Graph source in the local graph store.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,9 @@ using Waher.Content;
 using Waher.Content.Multipart;
 using Waher.Content.Semantic;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.IoTGateway;
+using Waher.Networking.CoAP.Options;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -86,15 +89,70 @@ namespace Waher.WebService.Sparql
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.GetPrivileges))
 				throw new ForbiddenException("Access denied.");
 
-			(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
+			ISemanticModel Graph;
 
-			Response.StatusCode = 200;
+			if (Request.Header.TryGetQueryParameter("default", out _))
+			{
+				StringBuilder sb = new StringBuilder();
 
-			if (Request.Header.Method == "HEAD")
-				return;
+				sb.AppendLine("@prefix dc: <http://purl.org/dc/terms/> .");
+				sb.AppendLine("@prefix dct: <http://purl.org/dc/dcmitype/> .");
+				sb.AppendLine("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .");
+				
+				sb.AppendLine();
 
-			GraphStoreSource Source = new GraphStoreSource(Reference);
-			ISemanticCube Graph = await Source.LoadGraph(GraphUri, null, false);
+				foreach (GraphReference Reference in await Database.Find<GraphReference>())
+				{
+					string GraphUriNode = "<" + Reference.GraphUri + ">";
+					bool First = true;
+
+					sb.Append(GraphUriNode);
+					sb.AppendLine(" dc:type dct:Dataset .");
+
+					sb.Append(GraphUriNode);
+					sb.Append(" dc:created \"");
+					sb.Append(XML.Encode(Reference.Created));
+					sb.AppendLine("\"^^xsd:dateTime .");
+
+					sb.Append(GraphUriNode);
+					sb.Append(" dc:updated \"");
+					sb.Append(XML.Encode(Reference.Created));
+					sb.AppendLine("\"^^xsd:dateTime .");
+
+					if (!(Reference.Creators is null))
+					{
+						foreach (string Creator in Reference.Creators)
+						{
+							sb.Append(GraphUriNode);
+
+							if (First)
+							{
+								First = false;
+								sb.Append(" dc:creator \"");
+							}
+							else
+								sb.Append(" dc:contributor \"");
+
+							sb.Append(XML.Encode(Creator));
+							sb.AppendLine("\" .");
+						}
+					}
+				}
+
+				Graph = new TurtleDocument(sb.ToString());
+			}
+			else
+			{
+				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
+
+				Response.StatusCode = 200;
+
+				if (Request.Header.Method == "HEAD")
+					return;
+
+				GraphStoreSource Source = new GraphStoreSource(Reference);
+				Graph = await Source.LoadGraph(GraphUri, null, false);
+			}
 
 			await Response.Return(Graph);
 		}
@@ -216,7 +274,8 @@ namespace Waher.WebService.Sparql
 					GraphUri = GraphUri.AbsoluteUri,
 					NrFiles = Files.Count,
 					GraphDigest = H,
-					Folder = Path.Combine(Gateway.AppDataFolder, "GraphStore", H)
+					Folder = Path.Combine(Gateway.AppDataFolder, "GraphStore", H),
+					Creators = new string[] { Request.User.UserName }
 				};
 
 				if (!Directory.Exists(Reference.Folder))
@@ -245,11 +304,13 @@ namespace Waher.WebService.Sparql
 						File.Delete(FileName2);
 
 					Reference.NrFiles = Files.Count;
+					Reference.Creators = new string[] { Request.User.UserName };
 				}
 				else
 				{
 					i = Reference.NrFiles;
 					Reference.NrFiles += Files.Count;
+					Reference.Creators = AddIfNotIncluded(Reference.Creators, Request.User.UserName);
 				}
 
 				foreach (KeyValuePair<string, string> P in Files)
@@ -264,6 +325,20 @@ namespace Waher.WebService.Sparql
 
 				Response.StatusCode = 200;  // OK
 			}
+		}
+
+		private static string[] AddIfNotIncluded(string[] Values, string Value)
+		{
+			if (Array.IndexOf(Values, Value) >= 0)
+				return Values;
+
+			int c = Values.Length;
+			string[] Result = new string[c + 1];
+
+			Array.Copy(Values, 0, Result, 0, c);
+			Result[c] = Value;
+
+			return Result;
 		}
 
 		/// <summary>

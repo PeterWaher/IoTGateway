@@ -23,7 +23,8 @@ Upload Graph
 ===============
 
 To upload a new semantic graph to the graph store, enter the URI of the graph, select a *Turtle* or *RDF/XML* file, and the 
-*upload method* desired, and press the *Upload Graph* button below. You cal also browse through the existing graphs below, or
+*upload method* desired, and press the *Upload Graph* button below. This information is also available via the
+[*default graph*](/rdf-graph-store?default), in semantic form. You can also browse through the existing graphs below, or
 use the [SPARQL Endpoint](/Sparql.md) to query the graphs in the graph store (or external graphs, or a combination of both).
 
 <form>
@@ -57,8 +58,8 @@ Upload mode:
 Graph Store
 ===============
 
-| Graph URI | Created || Updated || \#Files |
-|:----------|----:|---:|----:|---:|--------:|
+| Graph URI | Creator\(s) | Created || Updated || \#Files |
+|:----------|:------------|----:|---:|----:|---:|--------:|
 {{
 DTMin:=System.DateTime.MinValue;
 
@@ -80,7 +81,7 @@ order by
 	Created desc;
 
 foreach Ref in References do
-	]]| <a href="/rdf-graph-store?graph=((UrlEncode(Ref.GraphUri) ))" target="_blank">`((Ref.GraphUri))`</a> | ((DateToStr(Ref.Created) )) | ((TimeToStr(Ref.Created) )) | ((DateToStr(Ref.Updated) )) | ((TimeToStr(Ref.Updated) )) | ((Ref.NrFiles)) |
+	]]| <a href="/rdf-graph-store?graph=((UrlEncode(Ref.GraphUri) ))" target="_blank">`((Ref.GraphUri))`</a> | ((Concat(Ref.Creators??"",", ") )) | ((DateToStr(Ref.Created) )) | ((TimeToStr(Ref.Created) )) | ((DateToStr(Ref.Updated) )) | ((TimeToStr(Ref.Updated) )) | ((Ref.NrFiles)) |
 [[;
 
 if count(References)==20 then ]]

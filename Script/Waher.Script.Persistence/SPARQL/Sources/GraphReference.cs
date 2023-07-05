@@ -55,5 +55,10 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// Number of files used to define graph.
 		/// </summary>
 		public int NrFiles { get; set; }
+
+		/// <summary>
+		/// Creators of graph
+		/// </summary>
+		public string[] Creators { get; set; }
 	}
 }

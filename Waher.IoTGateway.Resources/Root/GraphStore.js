@@ -43,6 +43,11 @@
 						"\" target=\"_blank\"><code>" + Ref.graphUri + "</code></a>";
 
 					Td = document.createElement("TD");
+					Td.setAttribute("style", "text-align:left");
+					Tr.appendChild(Td);
+					Td.innerText = Token.creators;
+
+					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
 					Td.innerText = Token.createdDate;

@@ -27,6 +27,7 @@ TimeToStr(DT):=
 [foreach Ref in Tokens do
 {
 	"graphUri": Ref.GraphUri,
+	"creators": Concat(Ref.Creators??"",", "),
 	"createdDate": DateToStr(Ref.Created),
 	"createdTime": TimeToStr(Ref.Created),
 	"updatedDate": DateToStr(Ref.Updated),

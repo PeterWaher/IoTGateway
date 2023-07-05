@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -59,6 +58,15 @@ namespace Waher.Content.Semantic
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.triples.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Triple">Semantic triple to add.</param>
+		public void Add(ISemanticTriple Triple)
+		{
+			this.triples.AddLast(Triple);
 		}
 
 		/// <summary>

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Waher.Content;
 using Waher.Content.Multipart;
 using Waher.Content.Semantic;
+using Waher.Content.Xml;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
@@ -100,7 +102,9 @@ namespace Waher.WebService.Sparql
 		private static async Task<(GraphReference, Uri)> GetGraphReference(HttpRequest Request, bool NullIfNotFound)
 		{
 			if (!Request.Header.TryGetQueryParameter("graph", out string GraphUri))
-				throw new BadRequestException("Missing graph URI.");
+				throw new SeeOtherException("/GraphStore.md");
+
+			GraphUri = HttpUtility.UrlDecode(GraphUri);
 
 			if (!Uri.TryCreate(GraphUri, UriKind.RelativeOrAbsolute, out Uri ParsedUri))
 				throw new BadRequestException("Invalid graph URI.");
@@ -131,8 +135,8 @@ namespace Waher.WebService.Sparql
 			return this.Update(Request, Response, true);
 		}
 
-		private async Task Update(HttpRequest Request, HttpResponse Response, bool DeleteOld) 
-		{ 
+		private async Task Update(HttpRequest Request, HttpResponse Response, bool DeleteOld)
+		{
 			if (!Request.HasData)
 				throw new BadRequestException("No data in request.");
 
@@ -155,7 +159,7 @@ namespace Waher.WebService.Sparql
 						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
 				}
 			}
-			else if (Decoded is Content.Multipart.MultipartContent Form2)
+			else if (Decoded is MultipartContent Form2)
 			{
 				foreach (EmbeddedContent P in Form2.Content)
 				{
@@ -165,6 +169,33 @@ namespace Waher.WebService.Sparql
 						Files.Add(new KeyValuePair<string, string>(RdfDoc2.Text, RdfCodec.DefaultExtension));
 					else
 						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
+				}
+			}
+			else if (Decoded is string s)
+			{
+				if (XML.IsValidXml(s))
+				{
+					try
+					{
+						new RdfDocument(s);
+						Files.Add(new KeyValuePair<string, string>(s, RdfCodec.DefaultExtension));
+					}
+					catch (Exception)
+					{
+						throw new BadRequestException("Unable to parse document as an RDF/XML document.");
+					}
+				}
+				else
+				{
+					try
+					{
+						new TurtleDocument(s);
+						Files.Add(new KeyValuePair<string, string>(s, TurtleCodec.DefaultExtension));
+					}
+					catch (Exception)
+					{
+						throw new BadRequestException("Unable to parse the document as a Turtle document.");
+					}
 				}
 			}
 			else
@@ -212,7 +243,7 @@ namespace Waher.WebService.Sparql
 				{
 					foreach (string FileName2 in Directory.GetFiles(Reference.Folder, "*.*", SearchOption.TopDirectoryOnly))
 						File.Delete(FileName2);
-				
+
 					Reference.NrFiles = Files.Count;
 				}
 				else

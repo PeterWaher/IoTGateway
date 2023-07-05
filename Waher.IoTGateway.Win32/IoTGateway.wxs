@@ -1596,6 +1596,9 @@
 							<File Id='Entities.md' Name='Entities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Entities.md'/>
 							<File Id='Events.js' Name='Events.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Events.js'/>
 							<File Id='favicon.ico' Name='favicon.ico' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\favicon.ico'/>
+							<File Id='GraphStore.js' Name='GraphStore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.js'/>
+							<File Id='GraphStore.md' Name='GraphStore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.md'/>
+							<File Id='GraphStore.ws' Name='GraphStore.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.ws'/>
 							<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md'/>
 							<File Id='Login.md' Name='Login.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md'/>
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
@@ -1625,6 +1628,9 @@
 							<RemoveFile Id='RemoveEntities.md' Name='Entities.md' On='uninstall'/>
 							<RemoveFile Id='RemoveEvents.js' Name='Events.js' On='uninstall'/>
 							<RemoveFile Id='Removefavicon.ico' Name='favicon.ico' On='uninstall'/>
+							<RemoveFile Id='RemoveGraphStore.js' Name='GraphStore.js' On='uninstall'/>
+							<RemoveFile Id='RemoveGraphStore.md' Name='GraphStore.md' On='uninstall'/>
+							<RemoveFile Id='RemoveGraphStore.ws' Name='GraphStore.ws' On='uninstall'/>
 							<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
 							<RemoveFile Id='RemoveLogin.md' Name='Login.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>

@@ -10,6 +10,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 	[CollectionName("GraphStore")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("GraphUri")]
+	[Index("Created")]
 	public class GraphReference
 	{
 		/// <summary>

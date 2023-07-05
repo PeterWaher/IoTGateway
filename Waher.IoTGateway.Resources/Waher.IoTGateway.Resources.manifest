@@ -152,6 +152,9 @@
 		<Content fileName="Emojis.md"/>
 		<Content fileName="Entities.md"/>
 		<Content fileName="favicon.ico"/>
+		<Content fileName="GraphStore.js"/>
+		<Content fileName="GraphStore.md"/>
+		<Content fileName="GraphStore.ws"/>
 		<Content fileName="Index.md"/>
 		<Content fileName="Markdown.md"/>
 		<Content fileName="Master.md"/>

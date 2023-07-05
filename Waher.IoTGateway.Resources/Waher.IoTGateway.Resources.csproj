@@ -171,6 +171,9 @@
     <None Remove="Root\Emojis.md" />
     <None Remove="Root\Entities.md" />
     <None Remove="Root\favicon.ico" />
+    <None Remove="Root\GraphStore.js" />
+    <None Remove="Root\GraphStore.md" />
+    <None Remove="Root\GraphStore.ws" />
     <None Remove="Root\GraphVizLab\Examples\Network.dot" />
     <None Remove="Root\GraphVizLab\GraphVizLab.css" />
     <None Remove="Root\GraphVizLab\GraphVizLab.js" />
@@ -795,6 +798,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\PlantUmlLab\PlantUmlLabGraph.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphStore.ws">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphStore.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphStore.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Sparql.css">

@@ -821,6 +821,9 @@ namespace Waher.Script.Persistence.SPARQL
 			if (Cube is null)
 				Cube = new InMemorySemanticCube();
 
+			if (this.namedGraphs is null)
+				this.namedGraphs = new Dictionary<UriNode, ISemanticCube>();
+
 			this.namedGraphs[Uri] = Cube;
 
 			return Cube;

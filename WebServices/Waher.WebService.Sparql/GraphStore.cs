@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Waher.Content;
 using Waher.Content.Multipart;
 using Waher.Content.Semantic;
 using Waher.Content.Xml;
-using Waher.Events;
 using Waher.IoTGateway;
-using Waher.Networking.CoAP.Options;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -26,6 +24,9 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	public class GraphStore : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
+		private static TurtleDocument defaultGraph = null;
+		private static readonly SemaphoreSlim defaultGraphSemaphore = new SemaphoreSlim(1);
+
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 
 		/// <summary>
@@ -92,13 +93,38 @@ namespace Waher.WebService.Sparql
 			ISemanticModel Graph;
 
 			if (Request.Header.TryGetQueryParameter("default", out _))
+				Graph = await GetDefaultSource();
+			else
 			{
+				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
+
+				Response.StatusCode = 200;
+
+				if (Request.Header.Method == "HEAD")
+					return;
+
+				GraphStoreSource Source = new GraphStoreSource(Reference);
+				Graph = await Source.LoadGraph(GraphUri, null, false);
+			}
+
+			await Response.Return(Graph);
+		}
+
+		internal static async Task<TurtleDocument> GetDefaultSource()
+		{
+			await defaultGraphSemaphore.WaitAsync();
+			try
+			{
+				TurtleDocument Doc = defaultGraph;
+				if (!(Doc is null))
+					return Doc;
+
 				StringBuilder sb = new StringBuilder();
 
 				sb.AppendLine("@prefix dc: <http://purl.org/dc/terms/> .");
 				sb.AppendLine("@prefix dct: <http://purl.org/dc/dcmitype/> .");
 				sb.AppendLine("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .");
-				
+
 				sb.AppendLine();
 
 				foreach (GraphReference Reference in await Database.Find<GraphReference>())
@@ -139,22 +165,15 @@ namespace Waher.WebService.Sparql
 					}
 				}
 
-				Graph = new TurtleDocument(sb.ToString());
+				Doc = new TurtleDocument(sb.ToString());
+				defaultGraph = Doc;
+
+				return Doc;
 			}
-			else
+			finally
 			{
-				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
-
-				Response.StatusCode = 200;
-
-				if (Request.Header.Method == "HEAD")
-					return;
-
-				GraphStoreSource Source = new GraphStoreSource(Reference);
-				Graph = await Source.LoadGraph(GraphUri, null, false);
+				defaultGraphSemaphore.Release();
 			}
-
-			await Response.Return(Graph);
 		}
 
 		private static async Task<(GraphReference, Uri)> GetGraphReference(HttpRequest Request, bool NullIfNotFound)
@@ -325,6 +344,8 @@ namespace Waher.WebService.Sparql
 
 				Response.StatusCode = 200;  // OK
 			}
+
+			defaultGraph = null;
 		}
 
 		private static string[] AddIfNotIncluded(string[] Values, string Value)

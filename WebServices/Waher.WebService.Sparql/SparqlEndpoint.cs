@@ -5,7 +5,6 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Persistence.SPARQL;
 using Waher.Security.LoginMonitor;
@@ -266,6 +265,8 @@ namespace Waher.WebService.Sparql
 						v[" Default Graph "] = DataSet;
 					}
 				}
+				else
+					v[" Default Graph "] = await GraphStore.GetDefaultSource();
 
 				if (!(NamedGraphs is null))
 					Query.RegisterNamedGraph(NamedGraphs);

@@ -58,8 +58,8 @@ Upload mode:
 Graph Store
 ===============
 
-| Graph URI | Creator\(s) | Created || Updated || \#Files |
-|:----------|:------------|----:|---:|----:|---:|--------:|
+| Graph URI | Creator\(s) | Created || Updated || \#Files |    |
+|:----------|:------------|----:|---:|----:|---:|--------:|:--:|
 {{
 DTMin:=System.DateTime.MinValue;
 
@@ -81,7 +81,7 @@ order by
 	Created desc;
 
 foreach Ref in References do
-	]]| <a href="/rdf-graph-store?graph=((UrlEncode(Ref.GraphUri) ))" target="_blank">`((Ref.GraphUri))`</a> | ((Concat(Ref.Creators??"",", ") )) | ((DateToStr(Ref.Created) )) | ((TimeToStr(Ref.Created) )) | ((DateToStr(Ref.Updated) )) | ((TimeToStr(Ref.Updated) )) | ((Ref.NrFiles)) |
+	]]| <a href="/rdf-graph-store?graph=((UrlEncode(Ref.GraphUri) ))" target="_blank">`((Ref.GraphUri))`</a> | ((Concat(Ref.Creators??"",", ") )) | ((DateToStr(Ref.Created) )) | ((TimeToStr(Ref.Created) )) | ((DateToStr(Ref.Updated) )) | ((TimeToStr(Ref.Updated) )) | ((Ref.NrFiles)) | ((CanDelete ? "<button type='button' class='negButtonSm' onclick='DeleteGraph(this,\""+Ref.GraphUri+"\")'>Delete</button>" : "")) |
 [[;
 
 if count(References)==20 then ]]

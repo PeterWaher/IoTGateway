@@ -45,32 +45,46 @@
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:left");
 					Tr.appendChild(Td);
-					Td.innerText = Token.creators;
+					Td.innerText = Ref.creators;
 
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
-					Td.innerText = Token.createdDate;
+					Td.innerText = Ref.createdDate;
 
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
-					Td.innerText = Token.createdTime;
+					Td.innerText = Ref.createdTime;
 
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
-					Td.innerText = Token.updatedDate;
+					Td.innerText = Ref.updatedDate;
 
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
-					Td.innerText = Token.updatedTime;
+					Td.innerText = Ref.updatedTime;
 
 					Td = document.createElement("TD");
 					Td.setAttribute("style", "text-align:right");
 					Tr.appendChild(Td);
-					Td.innerText = Token.nrFiles;
+					Td.innerText = Ref.nrFiles;
+
+					Td = document.createElement("TD");
+					Td.setAttribute("style", "text-align:center");
+					Tr.appendChild(Td);
+
+					if (Ref.canDelete)
+					{
+						var Button = document.createElement("BUTTON");
+						Button.setAttribute("type", "button");
+						Button.setAttribute("class", "negButtonSm");
+						Button.setAttribute("onclick", "DeleteGraph(this,'" + Ref.graphUri + "')");
+						Button.innerText = "Delete";
+						Td.appendChild(Button);
+					}
 				}
 
 				if (c < MaxCount)
@@ -151,6 +165,38 @@ function UploadFile()
 	});
 
 	Reader.readAsText(File);
+}
+
+function DeleteGraph(Control,GraphUri)
+{
+	if (!window.confirm("Are you sure you want to delete the graph <" + GraphUri + ">?"))
+		return;
+
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState === 4)
+		{
+			if (xhttp.status >= 200 && xhttp.status < 300)
+			{
+				try
+				{
+					var Td = Control.parentNode;
+					var Tr = Td.parentNode;
+					Tr.parentNode.removeChild(Tr);
+				}
+				catch
+				{
+					window.location.reload(false);
+				}
+			}
+			else
+				window.alert(xhttp.responseText);
+		}
+	};
+
+	xhttp.open("DELETE", "/rdf-graph-store?graph=" + encodeURIComponent(GraphUri), true);
+	xhttp.send("");
 }
 
 window.onscroll = function ()

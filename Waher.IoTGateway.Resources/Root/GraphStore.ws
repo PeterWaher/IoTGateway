@@ -24,6 +24,8 @@ TimeToStr(DT):=
 	DT>DTMin ? DT.ToLongTimeString() : ""
 );
 
+CanDelete:=User.HasPrivilege("Admin.Graphs.Delete");
+
 [foreach Ref in Tokens do
 {
 	"graphUri": Ref.GraphUri,
@@ -32,5 +34,6 @@ TimeToStr(DT):=
 	"createdTime": TimeToStr(Ref.Created),
 	"updatedDate": DateToStr(Ref.Updated),
 	"updatedTime": TimeToStr(Ref.Updated),
-	"nrFiles": Ref.NrFiles
+	"nrFiles": Ref.NrFiles,
+	"canDelete": CanDelete
 }]

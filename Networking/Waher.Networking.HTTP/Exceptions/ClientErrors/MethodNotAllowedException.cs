@@ -22,8 +22,9 @@ namespace Waher.Networking.HTTP
 		/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.
 		/// </summary>
 		/// <param name="AllowedMethods">Allowed methods.</param>
-		public MethodNotAllowedException(string[] AllowedMethods)
-			: base(Code, StatusMessage, new KeyValuePair<string, string>("Allow", Join(AllowedMethods)))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public MethodNotAllowedException(string[] AllowedMethods, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 
@@ -32,8 +33,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="AllowedMethods">Allowed methods.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public MethodNotAllowedException(string[] AllowedMethods, object ContentObject)
-			: base(Code, StatusMessage, ContentObject, new KeyValuePair<string, string>("Allow", Join(AllowedMethods)))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public MethodNotAllowedException(string[] AllowedMethods, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 
@@ -43,8 +45,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="AllowedMethods">Allowed methods.</param>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public MethodNotAllowedException(string[] AllowedMethods, byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType, new KeyValuePair<string, string>("Allow", Join(AllowedMethods)))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public MethodNotAllowedException(string[] AllowedMethods, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 

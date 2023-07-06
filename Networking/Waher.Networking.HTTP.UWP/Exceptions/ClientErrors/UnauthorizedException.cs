@@ -21,8 +21,9 @@ namespace Waher.Networking.HTTP
 		/// Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided. The response must include a WWW-Authenticate header field containing a challenge applicable to the requested resource. See Basic access authentication and Digest access authentication.[31] 401 semantically means "unauthorised",[32] the user does not have valid authentication credentials for the target resource.
 		/// </summary>
 		/// <param name="Challenges">Challenges to send to client.</param>
-		public UnauthorizedException(string[] Challenges)
-			: base(Code, StatusMessage, CreateChallengeHeaders(Challenges))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UnauthorizedException(string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
 		{
 		}
 
@@ -31,8 +32,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		/// <param name="Challenges">Challenges to send to client.</param>
-		public UnauthorizedException(object ContentObject, string[] Challenges)
-			: base(Code, StatusMessage, ContentObject, CreateChallengeHeaders(Challenges))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UnauthorizedException(object ContentObject, string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
 		{
 		}
 
@@ -42,8 +44,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		/// <param name="Challenges">Challenges to send to client.</param>
-		public UnauthorizedException(byte[] Content, string ContentType, string[] Challenges)
-			: base(Code, StatusMessage, Content, ContentType, CreateChallengeHeaders(Challenges))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UnauthorizedException(byte[] Content, string ContentType, string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
 		{
 		}
 

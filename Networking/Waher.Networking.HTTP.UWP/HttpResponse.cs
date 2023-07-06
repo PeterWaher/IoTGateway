@@ -449,7 +449,7 @@ namespace Waher.Networking.HTTP
 		[Obsolete("Use Flush() method instead.")]
 		public Task FlushAsync()
 		{
-			return Flush();
+			return this.Flush();
 		}
 
 		/// <summary>
@@ -501,8 +501,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.responseSent = true;
 
-				if (!(this.httpServer is null))
-					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
+				this.httpServer?.RequestResponded(this.httpRequest, this.statusCode);
 
 				if (this.transferEncoding is null)
 					this.StartSendResponse(false);

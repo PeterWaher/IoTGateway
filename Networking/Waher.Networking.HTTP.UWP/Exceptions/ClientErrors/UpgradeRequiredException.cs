@@ -21,8 +21,9 @@ namespace Waher.Networking.HTTP
 		/// The client should switch to a different protocol such as TLS/1.0, given in the Upgrade header field.
 		/// </summary>
 		/// <param name="Protocol">Protocol to upgrade to.</param>
-		public UpgradeRequiredException(string Protocol)
-			: base(Code, StatusMessage, new KeyValuePair<string, string>("Upgrade", Protocol))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UpgradeRequiredException(string Protocol, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Join(HeaderFields, new KeyValuePair<string, string>("Upgrade", Protocol)))
 		{
 		}
 
@@ -31,8 +32,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Protocol">Protocol to upgrade to.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public UpgradeRequiredException(string Protocol, object ContentObject)
-			: base(Code, StatusMessage, ContentObject, new KeyValuePair<string, string>("Upgrade", Protocol))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UpgradeRequiredException(string Protocol, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, new KeyValuePair<string, string>("Upgrade", Protocol)))
 		{
 		}
 
@@ -42,8 +44,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Protocol">Protocol to upgrade to.</param>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public UpgradeRequiredException(string Protocol, byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType, new KeyValuePair<string, string>("Upgrade", Protocol))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public UpgradeRequiredException(string Protocol, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Upgrade", Protocol)))
 		{
 		}
 	}

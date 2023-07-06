@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.HTTP
+﻿using System.Collections.Generic;
+
+namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// If the client has performed a conditional GET request and access is allowed, but the document has not been modified, the server SHOULD respond 
@@ -26,8 +28,9 @@
 		/// 
 		/// Note: 304 does not allow content in response.
 		/// </summary>
-		public NotModifiedException()
-			: base(Code, StatusMessage)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public NotModifiedException(params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, HeaderFields)
 		{
 		}
 	}

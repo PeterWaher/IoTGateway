@@ -23,8 +23,9 @@ namespace Waher.Networking.HTTP
 		/// to use the Request-URI for future requests. This response is only cacheable if indicated by a Cache-Control or Expires header field. 
 		/// </summary>
 		/// <param name="Location">Location.</param>
-		public TemporaryRedirectException(string Location)
-			: base(Code, StatusMessage, new KeyValuePair<string, string>("Location", Location))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public TemporaryRedirectException(string Location, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 
@@ -34,8 +35,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Location">Location.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public TemporaryRedirectException(string Location, object ContentObject)
-			: base(Code, StatusMessage, ContentObject, new KeyValuePair<string, string>("Location", Location))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public TemporaryRedirectException(string Location, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 
@@ -46,8 +48,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Location">Location.</param>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public TemporaryRedirectException(string Location, byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType, new KeyValuePair<string, string>("Location", Location))
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public TemporaryRedirectException(string Location, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 	}

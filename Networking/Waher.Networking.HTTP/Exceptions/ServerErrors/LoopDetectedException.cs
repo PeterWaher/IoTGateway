@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.HTTP
+﻿using System.Collections.Generic;
+
+namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server detected an infinite loop while processing the request.
@@ -18,8 +20,9 @@
 		/// <summary>
 		/// The server detected an infinite loop while processing the request.
 		/// </summary>
-		public LoopDetectedException()
-			: base(Code, StatusMessage)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public LoopDetectedException(params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, HeaderFields)
 		{
 		}
 
@@ -27,8 +30,9 @@
 		/// The server detected an infinite loop while processing the request.
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public LoopDetectedException(object ContentObject)
-			: base(Code, StatusMessage, ContentObject)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public LoopDetectedException(object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, HeaderFields)
 		{
 		}
 
@@ -37,8 +41,9 @@
 		/// </summary>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public LoopDetectedException(byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public LoopDetectedException(byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields)
 		{
 		}
 	}

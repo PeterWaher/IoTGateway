@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.HTTP
+﻿using System.Collections.Generic;
+
+namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The resource identified by the request is only capable of generating response entities which have content characteristics not acceptable 
@@ -20,8 +22,9 @@
 		/// The resource identified by the request is only capable of generating response entities which have content characteristics not acceptable 
 		/// according to the accept headers sent in the request. 
 		/// </summary>
-		public NotAcceptableException()
-			: base(Code, StatusMessage)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public NotAcceptableException(params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, HeaderFields)
 		{
 		}
 
@@ -30,8 +33,9 @@
 		/// according to the accept headers sent in the request. 
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public NotAcceptableException(object ContentObject)
-			: base(Code, StatusMessage, ContentObject)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public NotAcceptableException(object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, HeaderFields)
 		{
 		}
 
@@ -41,8 +45,9 @@
 		/// </summary>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public NotAcceptableException(byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public NotAcceptableException(byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields)
 		{
 		}
 	}

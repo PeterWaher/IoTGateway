@@ -27,8 +27,9 @@ namespace Waher.Networking.HTTP
 		/// reason for the refusal in the entity. If the server does not wish to make this information available to the client, the status code 404 
 		/// (Not Found) can be used instead. 
 		/// </summary>
-		public ForbiddenException()
-			: base(Code, StatusMessage)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public ForbiddenException(params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, HeaderFields)
 		{
 		}
 
@@ -39,8 +40,9 @@ namespace Waher.Networking.HTTP
 		/// (Not Found) can be used instead. 
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
-		public ForbiddenException(object ContentObject)
-			: base(Code, StatusMessage, ContentObject)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public ForbiddenException(object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, ContentObject, HeaderFields)
 		{
 		}
 
@@ -52,8 +54,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
-		public ForbiddenException(byte[] Content, string ContentType)
-			: base(Code, StatusMessage, Content, ContentType)
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public ForbiddenException(byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields)
 		{
 		}
 

@@ -40,9 +40,9 @@ namespace Waher.Content.Semantic
 		/// Adds a triple to the cube.
 		/// </summary>
 		/// <param name="Triple">Semantic triple.</param>
-		public virtual void Add(ISemanticTriple Triple)
+		public override void Add(ISemanticTriple Triple)
 		{
-			this.triples.AddLast(Triple);
+			base.Add(Triple);
 
 			this.subjects = null;
 			this.predicates = null;

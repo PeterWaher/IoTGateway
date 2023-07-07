@@ -5,7 +5,6 @@ using System.Text;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.Strings;
 
 namespace Waher.Content.Semantic
 {
@@ -249,6 +248,17 @@ namespace Waher.Content.Semantic
 
 						BlankNode Node = this.CreateBlankNode();
 						this.ParseTriples(Node);
+
+						if (TriplePosition == 0)
+						{
+							this.SkipWhiteSpace();
+							if (this.PeekNextChar() == '.')
+							{
+								this.pos++;
+								return this.ParseElement(0);
+							}
+						}
+
 						return Node;
 
 					case '(':
@@ -258,7 +268,7 @@ namespace Waher.Content.Semantic
 						return null;
 
 					case '<':
-						if (this.PeekNextChar() == '<')	// Quoted triples, part of RDF-star
+						if (this.PeekNextChar() == '<') // Quoted triples, part of RDF-star
 						{
 							this.pos++;
 

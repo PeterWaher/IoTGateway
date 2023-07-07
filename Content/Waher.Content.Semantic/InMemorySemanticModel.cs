@@ -64,7 +64,7 @@ namespace Waher.Content.Semantic
 		/// Adds a triple to the model.
 		/// </summary>
 		/// <param name="Triple">Semantic triple to add.</param>
-		public void Add(ISemanticTriple Triple)
+		public virtual void Add(ISemanticTriple Triple)
 		{
 			this.triples.AddLast(Triple);
 		}

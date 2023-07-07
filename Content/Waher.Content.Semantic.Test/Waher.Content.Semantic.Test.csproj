@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\JsonLd\example03.jsonld" />
+    <None Remove="Data\JsonLd\example03.ttl" />
     <None Remove="Data\Rdf\amp-in-url\test001.nt" />
     <None Remove="Data\Rdf\amp-in-url\test001.rdf" />
     <None Remove="Data\Rdf\datatypes-intensional\test001.nt" />
@@ -479,6 +481,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\JsonLd\example03.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example03.ttl" />
     <EmbeddedResource Include="Data\Rdf\amp-in-url\test001.nt" />
     <EmbeddedResource Include="Data\Rdf\amp-in-url\test001.rdf" />
     <EmbeddedResource Include="Data\Rdf\datatypes-intensional\test001.nt" />

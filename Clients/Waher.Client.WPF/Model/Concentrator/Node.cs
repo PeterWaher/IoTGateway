@@ -828,7 +828,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 									MainWindow.UpdateGui(async () =>
 									{
 										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
-										Dialog.ShowDialog();
+
+										if (Dialog.Empty)
+											e2.Form.Submit();
+										else
+											Dialog.ShowDialog();
 									});
 								}
 								else

@@ -21,12 +21,18 @@ namespace Waher.Client.WPF.Dialogs
 	{
 		private readonly DataForm form;
 		private FrameworkElement makeVisible = null;
+		private bool empty = true;
 
 		private ParameterDialog(DataForm Form)
 		{
 			this.form = Form;
-			InitializeComponent();
+			this.InitializeComponent();
 		}
+
+		/// <summary>
+		/// If the dialog is empty.
+		/// </summary>
+		public bool Empty => this.empty;
 
 		/// <summary>
 		/// Interaction logic for ParameterDialog.xaml
@@ -112,6 +118,7 @@ namespace Waher.Client.WPF.Dialogs
 						};
 
 						Container.Children.Add(TextBlock);
+						Result.empty = false;
 					}
 				}
 
@@ -126,8 +133,7 @@ namespace Waher.Client.WPF.Dialogs
 					TabItem.Focus();
 			}
 
-			if (!(First is null))
-				First.Focus();
+			First?.Focus();
 
 			Result.CheckOkButtonEnabled();
 
@@ -137,13 +143,25 @@ namespace Waher.Client.WPF.Dialogs
 		private async Task<Control> Layout(Panel Container, LayoutElement Element, DataForm Form)
 		{
 			if (Element is FieldReference FieldReference)
+			{
+				this.empty = false;
 				return await this.Layout(Container, FieldReference, Form);
+			}
 			else if (Element is Networking.XMPP.DataForms.Layout.TextElement TextElement)
+			{
+				this.empty = false;
 				this.Layout(Container, TextElement, Form);
+			}
 			else if (Element is Networking.XMPP.DataForms.Layout.Section Section)
+			{
+				this.empty = false;
 				return await this.Layout(Container, Section, Form);
+			}
 			else if (Element is ReportedReference ReportedReference)
-				this.Layout(Container, ReportedReference, Form);
+			{
+				if (this.Layout(Container, ReportedReference, Form))
+					this.empty = false;
+			}
 
 			return null;
 		}
@@ -330,7 +348,7 @@ namespace Waher.Client.WPF.Dialogs
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-
+		
 			return TextBox;
 		}
 
@@ -498,7 +516,7 @@ namespace Waher.Client.WPF.Dialogs
 				ComboBox.IsEditable = true;
 				ComboBox.Text = Field.ValueString;
 				ComboBox.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent,
-					new TextChangedEventHandler(ComboBox_TextChanged));
+					new TextChangedEventHandler(this.ComboBox_TextChanged));
 			}
 			else
 			{
@@ -549,10 +567,10 @@ namespace Waher.Client.WPF.Dialogs
 			else
 			{
 				ComboBox.Background = null;
-				
+
 				if (!(ErrorLabel is null))
 					ErrorLabel.Visibility = Visibility.Collapsed;
-				
+
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -592,10 +610,10 @@ namespace Waher.Client.WPF.Dialogs
 			else
 			{
 				ComboBox.Background = null;
-				
+
 				if (!(ErrorLabel is null))
 					ErrorLabel.Visibility = Visibility.Collapsed;
-				
+
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -950,10 +968,10 @@ namespace Waher.Client.WPF.Dialogs
 			else
 			{
 				PasswordBox.Background = null;
-				
+
 				if (!(ErrorLabel is null))
 					ErrorLabel.Visibility = Visibility.Collapsed;
-				
+
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -1060,18 +1078,18 @@ namespace Waher.Client.WPF.Dialogs
 			else
 			{
 				TextBox.Background = null;
-				
+
 				if (!(ErrorLabel is null))
 					ErrorLabel.Visibility = Visibility.Collapsed;
-				
+
 				this.CheckOkButtonEnabled();
 			}
 		}
 
-		private void Layout(Panel Container, ReportedReference _, DataForm Form)
+		private bool Layout(Panel Container, ReportedReference _, DataForm Form)
 		{
 			if (Form.Records.Length == 0 || Form.Header.Length == 0)
-				return;
+				return false;
 
 			Dictionary<string, int> VarIndex = new Dictionary<string, int>();
 			ColumnDefinition ColumnDefinition;
@@ -1099,7 +1117,7 @@ namespace Waher.Client.WPF.Dialogs
 				VarIndex[Field.Var] = i++;
 			}
 
-			RowDefinition = new System.Windows.Controls.RowDefinition()
+			RowDefinition = new RowDefinition()
 			{
 				Height = GridLength.Auto
 			};
@@ -1174,6 +1192,8 @@ namespace Waher.Client.WPF.Dialogs
 					Border.Child = TextBlock;
 				}
 			}
+
+			return true;
 		}
 
 		private void OkButton_Click(object sender, RoutedEventArgs e)

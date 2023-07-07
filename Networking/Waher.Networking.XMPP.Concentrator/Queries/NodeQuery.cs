@@ -136,10 +136,14 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		private async Task<bool> GetPaused()
 		{
 			await this.syncObj.BeginWrite();
-			bool Result = this.paused;
-			await this.syncObj.EndWrite();
-
-			return Result;
+			try
+			{
+				return this.paused;
+			}
+			finally
+			{
+				await this.syncObj.EndWrite();
+			}
 		}
 
 		/// <summary>
@@ -156,31 +160,35 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public async Task ResumeAsync()
 		{
-			await this.syncObj.BeginWrite();
-			try
+			while (true)
 			{
-				if (this.paused)
+				MessageEventArgs e;
+
+				await this.syncObj.BeginWrite();
+				try
 				{
-					this.paused = false;
+					if (!this.paused)
+						return;
 
-					MessageEventArgs e;
-
-					while (!((e = this.queuedMessages?.First?.Value.Value) is null))
+					if ((e = this.queuedMessages?.First?.Value.Value) is null)
 					{
-						if (await this.Process(e, false))
-							this.queuedMessages.RemoveFirst();
-						else
-							break;
+						this.paused = false;
+						return;
 					}
+
+					this.queuedMessages.RemoveFirst();
 				}
-			}
-			finally
-			{
-				await this.syncObj.EndWrite();
+				finally
+				{
+					await this.syncObj.EndWrite();
+				}
+
+				if (!await this.Process(e, true, true))
+					return;
 			}
 		}
 
-		internal async Task<bool> Process(MessageEventArgs e, bool CanQueue)
+		internal async Task<bool> Process(MessageEventArgs e, bool CanQueue, bool IsResuming)
 		{
 			int SequenceNr = XML.Attribute(e.Content, "seqNr", 0);
 
@@ -188,7 +196,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			if (SequenceNr < ExpectedSeqNr)
 				return true;
 
-			if (SequenceNr == ExpectedSeqNr && !this.paused)
+			if (SequenceNr == ExpectedSeqNr && (!this.paused || IsResuming))
 			{
 				this.NextSequenceNr();
 				await this.ProcessQueryProgress(e);
@@ -821,16 +829,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 						if (SequenceNr < Loop.Value.Key)
 						{
 							this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-							Loop = null;
-						}
-						else if (Loop.Next is null)
-						{
-							this.queuedMessages.AddAfter(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-							Loop = null;
+							return;
 						}
 						else
 							Loop = Loop.Next;
 					}
+
+					this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
 				}
 			}
 			finally
@@ -842,10 +847,14 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		internal async Task<bool> HasQueued()
 		{
 			await this.syncObj.BeginWrite();
-			bool Result = !(this.queuedMessages is null);
-			await this.syncObj.EndWrite();
-
-			return Result;
+			try
+			{
+				return !(this.queuedMessages is null);
+			}
+			finally
+			{
+				await this.syncObj.EndWrite();
+			}
 		}
 
 		internal int SequenceNr => this.seqNr;

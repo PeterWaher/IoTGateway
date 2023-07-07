@@ -2444,7 +2444,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Query.NodeID != NodeId || Query.SourceID != SourceId || Query.Partition != Partition)
 				return Task.CompletedTask;
 
-			return Query.Process(e, true, false);
+			return Query.Process(e);
 		}
 
 		/// <summary>

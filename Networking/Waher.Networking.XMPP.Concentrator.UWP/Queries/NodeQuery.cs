@@ -160,43 +160,38 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public async Task ResumeAsync()
 		{
-			while (true)
+			LinkedList<KeyValuePair<int, MessageEventArgs>> ToDo = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
+
+			await this.syncObj.BeginWrite();
+			try
 			{
-				MessageEventArgs e;
-
-				await this.syncObj.BeginWrite();
-				try
+				while (!(this.queuedMessages?.First is null))
 				{
-					if (!this.paused)
-						return;
-
-					if ((e = this.queuedMessages?.First?.Value.Value) is null)
-					{
-						this.paused = false;
-						return;
-					}
-
+					ToDo.AddLast(this.queuedMessages.First.Value);
 					this.queuedMessages.RemoveFirst();
 				}
-				finally
-				{
-					await this.syncObj.EndWrite();
-				}
 
-				if (!await this.Process(e, true))
-					return;
+				this.queuedMessages = null;
+				this.paused = false;
 			}
+			finally
+			{
+				await this.syncObj.EndWrite();
+			}
+
+			foreach (KeyValuePair<int, MessageEventArgs> P in ToDo)
+				await this.Process(P.Value);
 		}
 
-		internal async Task<bool> Process(MessageEventArgs e, bool CanQueue, bool IsResuming)
+		internal async Task Process(MessageEventArgs e)
 		{
 			int SequenceNr = XML.Attribute(e.Content, "seqNr", 0);
 
 			int ExpectedSeqNr = this.SequenceNr + 1;
 			if (SequenceNr < ExpectedSeqNr)
-				return true;
+				return;
 
-			if (SequenceNr == ExpectedSeqNr && (!this.paused || IsResuming))
+			if (SequenceNr == ExpectedSeqNr && !this.paused)
 			{
 				this.NextSequenceNr();
 				await this.ProcessQueryProgress(e);
@@ -214,15 +209,10 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 					}
 				}
 
-				return true;
+				return;
 			}
 			else
-			{
-				if (CanQueue)
-					await this.Queue(SequenceNr, e);
-
-				return false;
-			}
+				await this.Queue(SequenceNr, e);
 		}
 
 		private async Task ProcessQueryProgress(MessageEventArgs e)

@@ -149,7 +149,7 @@ namespace Waher.Content
 
 							while (true)
 							{
-								if (!(JSON.Parse(Json, ref Pos, Len) is string Key))
+								if (!(Parse(Json, ref Pos, Len) is string Key))
 									throw new Exception("Expected member name.");
 
 								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
@@ -174,7 +174,18 @@ namespace Waher.Content
 								if (ch == '}')
 									break;
 								else if (ch == ',')
+								{
 									Pos++;
+
+									while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
+										Pos++;
+
+									if (Pos >= Len)
+										throw new Exception("Unexpected end of JSON.");
+
+									if (ch == '}')
+										break;
+								}
 								else
 									throw new Exception("Invalid JSON.");
 							}

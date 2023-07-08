@@ -58,7 +58,7 @@ namespace Waher.Content.Semantic
 		{
 			if (Array.IndexOf(JsonLdContentTypes, ContentType) >= 0)
 			{
-				Grade = Grade.Ok;
+				Grade = Grade.Excellent;
 				return true;
 			}
 			else
@@ -77,11 +77,11 @@ namespace Waher.Content.Semantic
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
-			JsonLdDocument Parsed = new JsonLdDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
-			return Task.FromResult<object>(Parsed);
+			JsonLdDocument Parsed = await JsonLdDocument.CreateAsync(s, BaseUri, "n", BlankNodeIdMode.Guid);
+			return Parsed;
 		}
 
 		/// <summary>

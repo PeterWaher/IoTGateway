@@ -1,0 +1,8 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ [
+   foaf:name "Manu Sporny";
+   foaf:homepage <http://manu.sporny.org/>;
+   foaf:img <http://manu.sporny.org/images/manu.png>
+ ] .

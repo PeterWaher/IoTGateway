@@ -11,6 +11,7 @@ namespace Waher.Content.Semantic.Test
 		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
+				typeof(InternetContent).Assembly,
 				typeof(TurtleDocument).Assembly,
 				typeof(TurtleTests).Assembly);
 		}

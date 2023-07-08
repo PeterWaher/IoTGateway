@@ -7,7 +7,9 @@ namespace Waher.Content.Semantic.Test
 	public class JsonLdTests : SemanticTests
 	{
 		[DataTestMethod]
-		[DataRow("example03.jsonld", "example03.ttl", null)]
+		[DataRow("example003.jsonld", "example003.ttl", null)]
+		[DataRow("example005.jsonld", "example005.ttl", null)]
+		[DataRow("example007.jsonld", "example007.ttl", null)]
 		public async Task Test_01_ParsingTests(string FileName, string Expected, string BaseUri)
 		{
 			await PerformTest(FileName, Expected, BaseUri);
@@ -46,10 +48,10 @@ namespace Waher.Content.Semantic.Test
 
 			byte[] Data = Resources.LoadResource(typeof(JsonLdTests).Namespace + ".Data.JsonLd." + GetResourceName(FileName));
 			object Decoded = await InternetContent.DecodeAsync("application/ld+json", Data, BaseUri);
-			if (Decoded is not JsonLdDocument Parsed)
-				throw new Exception("Unable to decode RDF document.");
-
-			return Parsed;
+			if (Decoded is JsonLdDocument Parsed)
+				return Parsed;
+			else
+				throw new Exception("Unable to decode JSON-LD document.");
 		}
 
 		private static string GetResourceName(string FileName)

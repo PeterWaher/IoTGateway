@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence", "Persis
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{C488B94C-E8A0-43AD-8F14-17C12245C295}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{CA157051-0394-4936-9E4F-8F43B6E64328}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C488B94C-E8A0-43AD-8F14-17C12245C295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA157051-0394-4936-9E4F-8F43B6E64328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA157051-0394-4936-9E4F-8F43B6E64328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA157051-0394-4936-9E4F-8F43B6E64328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA157051-0394-4936-9E4F-8F43B6E64328}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

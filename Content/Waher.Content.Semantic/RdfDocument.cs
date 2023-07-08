@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
@@ -13,7 +16,7 @@ namespace Waher.Content.Semantic
 	/// 
 	/// Ref: https://www.w3.org/TR/rdf-syntax-grammar/
 	/// </summary>
-	public class RdfDocument : InMemorySemanticCube
+	public class RdfDocument : InMemorySemanticCube, IWebServerMetaContent
 	{
 		/// <summary>
 		/// http://www.w3.org/1999/02/22-rdf-syntax-ns#
@@ -127,6 +130,7 @@ namespace Waher.Content.Semantic
 		private readonly string text;
 		private Dictionary<Uri, XmlElement> aboutEach = null;
 		private Dictionary<Uri, XmlElement> aboutEachPrefix = null;
+		private DateTimeOffset? date = null;
 		private int blankNodeIndex = 0;
 
 		/// <summary>
@@ -337,6 +341,11 @@ namespace Waher.Content.Semantic
 		/// Text representation.
 		/// </summary>
 		public string Text => this.text;
+
+		/// <summary>
+		/// Server timestamp of document.
+		/// </summary>
+		public DateTimeOffset? Date => this.date;
 
 		private void ParseDescriptions(XmlElement E, string Language, Uri BaseUri)
 		{
@@ -968,6 +977,16 @@ namespace Waher.Content.Semantic
 		private Exception ParsingException(string Message)
 		{
 			return new Exception(Message);
+		}
+
+		/// <summary>
+		/// Decodes meta-information available in the HTTP Response.
+		/// </summary>
+		/// <param name="HttpResponse">HTTP Response.</param>
+		public Task DecodeMetaInformation(HttpResponseMessage HttpResponse)
+		{
+			this.date = HttpResponse.Headers.Date;
+			return Task.CompletedTask;
 		}
 	}
 }

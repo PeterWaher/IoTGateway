@@ -201,6 +201,9 @@ namespace Waher.Content.Getters
 				Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
 			}
 
+			if (Decoded is IWebServerMetaContent WebServerMetaContent)
+				await WebServerMetaContent.DecodeMetaInformation(Response);
+
 			if (!Response.IsSuccessStatusCode)
 			{
 				if (!(Decoded is string Message))

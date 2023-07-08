@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
+using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
@@ -29,7 +32,7 @@ namespace Waher.Content.Semantic
 	/// https://www.w3.org/TeamSubmission/turtle/
 	/// https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html
 	/// </summary>
-	public class TurtleDocument : InMemorySemanticCube
+	public class TurtleDocument : InMemorySemanticCube, IWebServerMetaContent
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
@@ -41,6 +44,7 @@ namespace Waher.Content.Semantic
 		private readonly string blankNodeIdPrefix;
 		private readonly int len;
 		private readonly BlankNodeIdMode blankNodeIdMode;
+		private DateTimeOffset? date = null;
 		private Uri baseUri = null;
 		private int blankNodeIndex = 0;
 		private int pos = 0;
@@ -100,6 +104,11 @@ namespace Waher.Content.Semantic
 		/// Original text of document.
 		/// </summary>
 		public string Text => this.text;
+
+		/// <summary>
+		/// Server timestamp of document.
+		/// </summary>
+		public DateTimeOffset? Date => this.date;
 
 		private void ParseTriples()
 		{
@@ -867,6 +876,16 @@ namespace Waher.Content.Semantic
 			while (ch != 0 && char.IsWhiteSpace(ch));
 
 			return ch;
+		}
+
+		/// <summary>
+		/// Decodes meta-information available in the HTTP Response.
+		/// </summary>
+		/// <param name="HttpResponse">HTTP Response.</param>
+		public Task DecodeMetaInformation(HttpResponseMessage HttpResponse)
+		{
+			this.date = HttpResponse.Headers.Date;
+			return Task.CompletedTask;
 		}
 	}
 }

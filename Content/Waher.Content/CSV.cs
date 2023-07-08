@@ -312,7 +312,6 @@ namespace Waher.Content
 
 			int Row, NrRows = Matrix.Rows;
 			int Column, NrColumns = Matrix.Columns;
-			IElement E;
 
 			for (Row = 0; Row < NrRows; Row++)
 			{

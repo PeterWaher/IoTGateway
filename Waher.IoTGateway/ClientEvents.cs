@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Json;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
@@ -165,7 +166,7 @@ namespace Waher.IoTGateway
 
 			SetTransparentCorsHeaders(this, Request, Response);
 
-			Response.ContentType = "application/json";
+			Response.ContentType = JsonCodec.DefaultContentType;
 
 			if (!await Queue.SyncObj.TryBeginWrite(10000))
 				throw new InternalServerErrorException("Unable to get access to queue.");

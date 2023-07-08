@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
@@ -1149,7 +1150,7 @@ namespace Waher.IoTGateway.Setup
 				await Database.Delete(SignatureRequest);
 
 			Response.StatusCode = 200;
-			Response.ContentType = "application/json";
+			Response.ContentType = JsonCodec.DefaultContentType;
 			await Response.Write(JSON.Encode(Sign, false));
 			await Response.SendResponse();
 		}

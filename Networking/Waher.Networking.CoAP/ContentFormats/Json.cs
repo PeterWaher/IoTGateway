@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Content.Json;
 
 namespace Waher.Networking.CoAP.ContentFormats
 {
@@ -32,7 +33,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public string ContentType
 		{
-			get { return "application/json"; }
+			get { return JsonCodec.DefaultContentType; }
 		}
 	}
 }

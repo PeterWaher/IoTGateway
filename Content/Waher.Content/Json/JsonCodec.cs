@@ -13,6 +13,16 @@ namespace Waher.Content.Json
     /// </summary>
     public class JsonCodec : IContentDecoder, IContentEncoder
     {
+		/// <summary>
+		/// application/json
+		/// </summary>
+		public const string DefaultContentType = "application/json";
+
+        /// <summary>
+        /// json
+        /// </summary>
+        public const string DefaultFileExtension = "json";
+
         /// <summary>
         /// JSON codec.
         /// </summary>
@@ -25,7 +35,7 @@ namespace Waher.Content.Json
         /// </summary>
         public static readonly string[] JsonContentTypes = new string[]
         {
-            "application/json",
+            DefaultContentType,
             "text/x-json"
         };
 
@@ -34,7 +44,7 @@ namespace Waher.Content.Json
         /// </summary>
         public static readonly string[] JsonFileExtensions = new string[]
         {
-            "json"
+            DefaultFileExtension
         };
 
         /// <summary>
@@ -55,7 +65,7 @@ namespace Waher.Content.Json
         /// <returns>If the decoder can decode an object with the given type.</returns>
         public bool Decodes(string ContentType, out Grade Grade)
         {
-            if (ContentType == "application/json" || ContentType == "text/x-json")
+            if (ContentType == DefaultContentType || ContentType == "text/x-json")
             {
                 Grade = Grade.Excellent;
                 return true;
@@ -98,7 +108,7 @@ namespace Waher.Content.Json
         {
             if (FileExtension.ToLower() == "json")
             {
-                ContentType = "application/json";
+                ContentType = DefaultContentType;
                 return true;
             }
             else
@@ -118,7 +128,7 @@ namespace Waher.Content.Json
         {
             ContentType = ContentType.ToLower();
 
-            if (Array.IndexOf(ContentTypes, ContentType) >= 0)
+            if (Array.IndexOf(JsonContentTypes, ContentType) >= 0)
             {
                 FileExtension = "json";
                 return true;
@@ -194,7 +204,7 @@ namespace Waher.Content.Json
         public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
         {
             string Json = JSON.Encode(Object, false);
-            string ContentType = "application/json";
+            string ContentType = DefaultContentType;
 
             if (Encoding is null)
             {

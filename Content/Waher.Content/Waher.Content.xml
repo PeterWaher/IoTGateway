@@ -1086,6 +1086,18 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded headers object.</returns>
         </member>
+        <member name="T:Waher.Content.Getters.IWebServerMetaContent">
+            <summary>
+            Interface for content classes, that process information available in
+            HTTP headers in the response.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.IWebServerMetaContent.DecodeMetaInformation(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Decodes meta-information available in the HTTP Response.
+            </summary>
+            <param name="HttpResponse">HTTP Response.</param>
+        </member>
         <member name="T:Waher.Content.Getters.WebException">
             <summary>
             Exception class for web exceptions.
@@ -2580,6 +2592,16 @@
         <member name="T:Waher.Content.Json.JsonCodec">
             <summary>
             JSON codec.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Json.JsonCodec.DefaultContentType">
+            <summary>
+            application/json
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Json.JsonCodec.DefaultFileExtension">
+            <summary>
+            json
             </summary>
         </member>
         <member name="M:Waher.Content.Json.JsonCodec.#ctor">

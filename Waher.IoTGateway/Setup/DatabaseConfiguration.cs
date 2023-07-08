@@ -12,6 +12,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.IoTGateway.Setup.Databases;
 using Waher.IoTGateway.Setup.Databases.Sniffing;
+using Waher.Content.Json;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -218,7 +219,7 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			Response.ContentType = "application/json";
+			Response.ContentType = JsonCodec.DefaultContentType;
 
 			string Html = string.Empty;
 			bool HasSettings = false;

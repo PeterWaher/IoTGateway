@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP;
@@ -539,7 +540,7 @@ namespace Waher.IoTGateway.Setup
 			sb.Append(Nr.ToString());
 			sb.Append("}");
 
-			Response.ContentType = "application/json";
+			Response.ContentType = JsonCodec.DefaultContentType;
 			await Response.Write(sb.ToString());
 		}
 

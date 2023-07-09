@@ -1,0 +1,9 @@
+﻿{
+  "@context": {
+    "homepage": {
+      "@id": "http://schema.org/url",
+      "@type": "@id"
+    }
+  },
+  "homepage": "http://manu.sporny.org/"
+}

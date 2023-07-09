@@ -1,0 +1,4 @@
+﻿@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/places#BrewEats> a schema:Person.

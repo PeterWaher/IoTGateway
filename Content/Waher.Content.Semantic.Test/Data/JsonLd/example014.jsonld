@@ -1,0 +1,10 @@
+﻿{
+  "@context": {
+    "givenName": "http://schema.org/givenName",
+    "familyName": "http://schema.org/familyName"
+  },
+  "@id": "http://me.markus-lanthaler.com/",
+  "@type": "http://schema.org/Person",
+  "givenName": "Markus",
+  "familyName": "Lanthaler"
+}

@@ -1,0 +1,7 @@
+﻿{
+  "@context": {
+    "Person": "http://schema.org/Person"
+  },
+  "@id": "http://example.org/places#BrewEats",
+  "@type": "Person"
+}

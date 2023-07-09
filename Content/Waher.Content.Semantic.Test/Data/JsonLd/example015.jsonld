@@ -1,0 +1,7 @@
+﻿{
+  "@id": "http://me.markus-lanthaler.com/",
+  "@type": [
+    "http://schema.org/Person",
+    "http://xmlns.com/foaf/0.1/Person"
+  ]
+}

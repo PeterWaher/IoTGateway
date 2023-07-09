@@ -1,0 +1,5 @@
+﻿@prefix schema: <http://schema.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://me.markus-lanthaler.com/> a schema:Person, foaf:Person.

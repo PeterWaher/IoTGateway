@@ -6,11 +6,19 @@ namespace Waher.Content.Semantic.Test
 	[TestClass]
 	public class JsonLdTests : SemanticTests
 	{
+		// Tests taken from: https://www.w3.org/TR/json-ld/
+
 		[DataTestMethod]
 		[DataRow("example003.jsonld", "example003.ttl", null)]
 		[DataRow("example005.jsonld", "example005.ttl", null)]
 		[DataRow("example007.jsonld", "example007.ttl", null)]
-		public async Task Test_01_ParsingTests(string FileName, string Expected, string BaseUri)
+		[DataRow("example011.jsonld", "example011.ttl", null)]
+		[DataRow("example012.jsonld", "example012.ttl", null)]
+		[DataRow("example013.jsonld", "example013.ttl", null)]
+		[DataRow("example014.jsonld", "example014.ttl", null)]
+		[DataRow("example015.jsonld", "example015.ttl", null)]
+		[DataRow("example016.jsonld", "example016.ttl", null)]
+		public async Task ParsingTests(string FileName, string Expected, string BaseUri)
 		{
 			await PerformTest(FileName, Expected, BaseUri);
 		}

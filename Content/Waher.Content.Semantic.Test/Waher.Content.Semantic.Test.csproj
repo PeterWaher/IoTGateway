@@ -16,6 +16,18 @@
     <None Remove="Data\JsonLd\example005.ttl" />
     <None Remove="Data\JsonLd\example007.jsonld" />
     <None Remove="Data\JsonLd\example007.ttl" />
+    <None Remove="Data\JsonLd\example011.jsonld" />
+    <None Remove="Data\JsonLd\example011.ttl" />
+    <None Remove="Data\JsonLd\example012.jsonld" />
+    <None Remove="Data\JsonLd\example012.ttl" />
+    <None Remove="Data\JsonLd\example013.jsonld" />
+    <None Remove="Data\JsonLd\example013.ttl" />
+    <None Remove="Data\JsonLd\example014.jsonld" />
+    <None Remove="Data\JsonLd\example014.ttl" />
+    <None Remove="Data\JsonLd\example015.jsonld" />
+    <None Remove="Data\JsonLd\example015.ttl" />
+    <None Remove="Data\JsonLd\example016.jsonld" />
+    <None Remove="Data\JsonLd\example016.ttl" />
     <None Remove="Data\Rdf\amp-in-url\test001.nt" />
     <None Remove="Data\Rdf\amp-in-url\test001.rdf" />
     <None Remove="Data\Rdf\datatypes-intensional\test001.nt" />
@@ -487,6 +499,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\JsonLd\example005.ttl" />
     <EmbeddedResource Include="Data\JsonLd\example005.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example016.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example016.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example015.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example015.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example014.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example014.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example013.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example013.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example012.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example012.jsonld" />
+    <EmbeddedResource Include="Data\JsonLd\example011.ttl" />
+    <EmbeddedResource Include="Data\JsonLd\example011.jsonld" />
     <EmbeddedResource Include="Data\JsonLd\example007.ttl" />
     <EmbeddedResource Include="Data\JsonLd\example007.jsonld" />
     <EmbeddedResource Include="Data\JsonLd\example003.jsonld" />

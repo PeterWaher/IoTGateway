@@ -1,0 +1,14 @@
+﻿{
+  "@context": [
+    "https://json-ld.org/contexts/person.jsonld",
+    {
+      "pic": {
+        "@id": "http://xmlns.com/foaf/0.1/depiction",
+        "@type": "@id"
+      }
+    }
+  ],
+  "name": "Manu Sporny",
+  "homepage": "http://manu.sporny.org/",
+  "pic": "http://twitter.com/account/profile_image/manusporny"
+}

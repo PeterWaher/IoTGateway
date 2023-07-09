@@ -1,0 +1,7 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+[
+  foaf:name "Manu Sporny";
+  foaf:homepage <http://manu.sporny.org/>;
+  foaf:depiction <http://twitter.com/account/profile_image/manusporny>
+] .

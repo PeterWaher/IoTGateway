@@ -18,7 +18,7 @@ namespace Waher.Content.Semantic
 		private static readonly Cache<string, KeyValuePair<DateTimeOffset, Dictionary<string, object>>> contextObjects =
 			new Cache<string, KeyValuePair<DateTimeOffset, Dictionary<string, object>>>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
 
-		private readonly Dictionary<string, object> json;
+		private readonly object parsedJson;
 		private readonly BlankNodeIdMode blankNodeIdMode;
 		private readonly string text;
 		private readonly string blankNodeIdPrefix;
@@ -32,9 +32,9 @@ namespace Waher.Content.Semantic
 		/// <param name="Text">Text representation of JSON-LD document.</param>
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
-		private JsonLdDocument(Dictionary<string, object> Doc, string Text, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
+		private JsonLdDocument(object Doc, string Text, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
 		{
-			this.json = Doc;
+			this.parsedJson = Doc;
 			this.text = Text;
 			this.blankNodeIdMode = BlankNodeIdMode;
 			this.blankNodeIdPrefix = BlankNodeIdPrefix;
@@ -46,7 +46,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Text">Text representation of JSON-LD document.</param>
 		public static Task<JsonLdDocument> CreateAsync(string Text)
 		{
-			return CreateAsync(ParseJson(Text), Text, null);
+			return CreateAsync(JSON.Parse(Text), Text, null);
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace Waher.Content.Semantic
 		/// <param name="BaseUri">Base URI</param>
 		public static Task<JsonLdDocument> CreateAsync(string Text, Uri BaseUri)
 		{
-			return CreateAsync(ParseJson(Text), Text, BaseUri, "n");
+			return CreateAsync(JSON.Parse(Text), Text, BaseUri, "n");
 		}
 
 		/// <summary>
@@ -67,7 +67,7 @@ namespace Waher.Content.Semantic
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		public static Task<JsonLdDocument> CreateAsync(string Text, Uri BaseUri, string BlankNodeIdPrefix)
 		{
-			return CreateAsync(ParseJson(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential);
+			return CreateAsync(JSON.Parse(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential);
 		}
 
 		/// <summary>
@@ -79,7 +79,7 @@ namespace Waher.Content.Semantic
 		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
 		public static Task<JsonLdDocument> CreateAsync(string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
 		{
-			return CreateAsync(ParseJson(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode);
+			return CreateAsync(JSON.Parse(Text), Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode);
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Doc">Parsed JSON object.</param>
 		/// <param name="Text">Text representation of JSON-LD document.</param>
-		public static Task<JsonLdDocument> CreateAsync(Dictionary<string, object> Doc, string Text)
+		public static Task<JsonLdDocument> CreateAsync(object Doc, string Text)
 		{
 			return CreateAsync(Doc, Text, null);
 		}
@@ -98,7 +98,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Doc">Parsed JSON object.</param>
 		/// <param name="Text">Text representation of JSON-LD document.</param>
 		/// <param name="BaseUri">Base URI</param>
-		public static Task<JsonLdDocument> CreateAsync(Dictionary<string, object> Doc, string Text, Uri BaseUri)
+		public static Task<JsonLdDocument> CreateAsync(object Doc, string Text, Uri BaseUri)
 		{
 			return CreateAsync(Doc, Text, BaseUri, "n");
 		}
@@ -110,7 +110,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Text">Text representation of JSON-LD document.</param>
 		/// <param name="BaseUri">Base URI</param>
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
-		public static Task<JsonLdDocument> CreateAsync(Dictionary<string, object> Doc, string Text, Uri BaseUri, string BlankNodeIdPrefix)
+		public static Task<JsonLdDocument> CreateAsync(object Doc, string Text, Uri BaseUri, string BlankNodeIdPrefix)
 		{
 			return CreateAsync(Doc, Text, BaseUri, BlankNodeIdPrefix, BlankNodeIdMode.Sequential);
 		}
@@ -123,21 +123,11 @@ namespace Waher.Content.Semantic
 		/// <param name="BaseUri">Base URI</param>
 		/// <param name="BlankNodeIdPrefix">Prefix to use when creating blank nodes.</param>
 		/// <param name="BlankNodeIdMode">How Blank Node IDs are generated</param>
-		public static async Task<JsonLdDocument> CreateAsync(Dictionary<string, object> Doc, string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
+		public static async Task<JsonLdDocument> CreateAsync(object Doc, string Text, Uri BaseUri, string BlankNodeIdPrefix, BlankNodeIdMode BlankNodeIdMode)
 		{
 			JsonLdDocument Result = new JsonLdDocument(Doc, Text, BlankNodeIdPrefix, BlankNodeIdMode);
 			await Result.Parse(Doc, null, BaseUri, Result.CreateBlankNode());
 			return Result;
-		}
-
-		internal static Dictionary<string, object> ParseJson(string Text)
-		{
-			object Parsed = JSON.Parse(Text);
-
-			if (Parsed is Dictionary<string, object> Obj)
-				return Obj;
-			else
-				throw new ArgumentException("Invalid JSON-LD document.", nameof(Text));
 		}
 
 		private BlankNode CreateBlankNode()
@@ -148,18 +138,32 @@ namespace Waher.Content.Semantic
 				return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
 		}
 
-		private UriNode CreateUriNode(string Reference, Uri BaseUri)
+		private UriNode CreateUriNode(string Reference, Uri BaseUri, Dictionary<string, object> Context)
 		{
-			return new UriNode(this.CreateUri(Reference, BaseUri), Reference);
+			return new UriNode(this.CreateUri(Reference, BaseUri, Context), Reference);
 		}
 
-		private UriNode CreateUriNode(string Reference, Uri BaseUri, string ShortName)
+		private UriNode CreateUriNode(string Reference, Uri BaseUri, string ShortName, Dictionary<string, object> Context)
 		{
-			return new UriNode(this.CreateUri(Reference, BaseUri), ShortName);
+			return new UriNode(this.CreateUri(Reference, BaseUri, Context), ShortName);
 		}
 
-		private Uri CreateUri(string Reference, Uri BaseUri)
+		private Uri CreateUri(string Reference, Uri BaseUri, Dictionary<string, object> Context)
 		{
+			int i = Reference.IndexOf(':');
+			if (i >= 0)
+			{
+				string Prefix = Reference.Substring(0, i);
+
+				if (!(Context is null) && Context.TryGetValue(Prefix, out object PrefixValue))
+				{
+					if (!(PrefixValue is string PrefixUrl))
+						throw this.ParsingException("Unrecognized prefix value: " + PrefixValue?.ToString());
+
+					Reference = PrefixUrl + Reference.Substring(i + 1);
+				}
+			}
+
 			if (BaseUri is null)
 			{
 				if (Uri.TryCreate(Reference, UriKind.Absolute, out Uri URI))
@@ -183,158 +187,224 @@ namespace Waher.Content.Semantic
 			return new Exception(Message);
 		}
 
-		private async Task Parse(Dictionary<string, object> Doc, Dictionary<string, object> Context, Uri BaseUri, ISemanticElement Subject)
+		private async Task Parse(object Doc, Dictionary<string, object> Context, Uri BaseUri, ISemanticElement Subject)
 		{
-			if (Doc is null)
-				return;
-
-			string Name;
-			object Value;
-			ISemanticElement ParsedValue;
-			Uri ParsedUri;
-			string s;
-
-			foreach (KeyValuePair<string, object> P in Doc)
+			if (Doc is Dictionary<string, object> DocObj)
 			{
-				Name = P.Key;
-				Value = P.Value;
+				string Name;
+				object Value;
+				ISemanticElement ParsedValue;
+				Uri ParsedUri;
+				string s;
 
-				if (Name.StartsWith("@"))
+				foreach (KeyValuePair<string, object> P in DocObj)
 				{
-					switch (Name)
+					Name = P.Key;
+					Value = P.Value;
+
+					if (Name.StartsWith("@"))
 					{
-						case "@context":
-							if (Value is Dictionary<string, object> ContextObj)
-								Context = ContextObj;
-							else
+						switch (Name)
+						{
+							case "@context":
+								Context = await this.GetContext(Value, BaseUri, Context);
+								break;
+
+							case "@id":
+								s = Value as string
+									?? throw this.ParsingException("Unsupported @id value: " + Value.ToString());
+
+								Subject = this.CreateUriNode(s, BaseUri, Context);
+								break;
+
+							case "@type":
+								this.AddType(Subject, Value, BaseUri, Context);
+								break;
+
+							case "@graph":
+								await this.Parse(P.Value, Context, BaseUri, Subject);
+								break;
+
+							case "@version":
+								break;
+
+							default:
+								throw this.ParsingException("Unrecognized keyword: " + Name);
+						}
+					}
+					else
+					{
+						ParsedUri = null;
+						ParsedValue = null;
+
+						if (!this.TryGetContextValue(Name, Context, out object ContextValue))
+						{
+							if (Uri.TryCreate(Name, UriKind.Absolute, out Uri UriValue))    // Not relative to base URI.
 							{
-								Uri ContextUri;
+								ContextValue = Name;
+								ParsedUri = UriValue;
+							}
+							else
+								continue;
+						}
+						else if (ContextValue is null)
+							continue;
 
-								if (Value is string Url)
-									ContextUri = this.CreateUri(Url, BaseUri);
-								else
+						s = ContextValue as string;
+						if (!(s is null))
+							Name = s;
+						else if (ContextValue is Dictionary<string, object> ContextValueObj)
+						{
+							foreach (KeyValuePair<string, object> P2 in ContextValueObj)
+							{
+								switch (P2.Key)
 								{
-									ParsedValue = this.ParseValue(BaseUri, Value);
-									if (ParsedValue is UriNode UriNode)
-										ContextUri = UriNode.Uri;
-									else
-										throw this.ParsingException("Expected context URI.");
-								}
+									case "@id":
+										s = P2.Value as string
+											?? throw this.ParsingException("Unsupported @id value: " + P2.Value.ToString());
 
-								if (contextObjects.TryGetValue(ContextUri.AbsolutePath, out KeyValuePair<DateTimeOffset, Dictionary<string, object>> P2))
-								{
-									try
-									{
-										object Obj = await InternetContent.GetAsync(ContextUri,
-											new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType),
-											new KeyValuePair<string, string>("If-Modified-Since", CommonTypes.EncodeRfc822(P2.Key)));
+										Name = s;
+										break;
 
-										if (Obj is JsonLdDocument ContextDoc &&
-											ContextDoc.json is Dictionary<string, object> ContextObj2 &&
-											ContextObj2.TryGetValue("@context", out Obj) &&
-											Obj is Dictionary<string, object> ContextObj3)
+									case "@type":
+										s = P2.Value as string
+											?? throw this.ParsingException("Unsupported @type value: " + P2.Value.ToString());
+
+										switch (s)
 										{
-											Context = ContextObj3;
-											contextObjects[ContextUri.AbsolutePath] = new KeyValuePair<DateTimeOffset, Dictionary<string, object>>(
-												ContextDoc.Date ?? DateTimeOffset.Now, Context);
-										}
-										else
-											Context = P2.Value;
-									}
-									catch (Exception)
-									{
-										Context = P2.Value;
-									}
-								}
-								else
-								{
-									object Obj = await InternetContent.GetAsync(ContextUri,
-										new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType));
+											case "@id":
+												Value = this.CreateUri(Value?.ToString(), BaseUri, Context);
+												break;
 
-									if (Obj is JsonLdDocument ContextDoc &&
-										ContextDoc.json is Dictionary<string, object> ContextObj2 &&
-										ContextObj2.TryGetValue("@context", out Obj) &&
-										Obj is Dictionary<string, object> ContextObj3)
-									{
-										Context = ContextObj3;
-										contextObjects[ContextUri.AbsolutePath] = new KeyValuePair<DateTimeOffset, Dictionary<string, object>>(
-											ContextDoc.Date ?? DateTimeOffset.Now, Context);
-									}
-									else
-										throw this.ParsingException("Context reference not a JSON-LD document. Expected Content-Type: " + JsonLdCodec.DefaultContentType);
+											default:
+												Uri TypeUri = this.CreateUri(s, BaseUri, Context);
+												ParsedValue = SemanticElements.Parse(Value?.ToString(), TypeUri.AbsoluteUri, string.Empty);
+												break;
+										}
+										break;
+
+									case "@vocab":
+										s = P2.Value as string
+											?? throw this.ParsingException("Unsupported @vocab value: " + P2.Value.ToString());
+
+										ParsedUri = this.CreateUri(s, BaseUri, Context);
+										break;
+
+									default:
+										throw this.ParsingException("Unhandled context keyword: " + P2.Key);
 								}
 							}
-							break;
 
-						case "@id":
-							s = Value as string
-								?? throw this.ParsingException("Unsupported @id value: " + Value.ToString());
+							if (ParsedUri is null &&
+								Context.TryGetValue("@vocab", out ContextValue) &&
+								!((s = ContextValue as string) is null))
+							{
+								Uri Vocabulary = this.CreateUri(s, BaseUri, Context);
+								ParsedUri = this.CreateUri(Name, Vocabulary, Context);
+							}
+						}
 
-							Subject = this.CreateUriNode(s, BaseUri);
-							break;
+						if (ParsedValue is null)
+							ParsedValue = await this.ParseValue(BaseUri, Value, Context);
 
-						case "@type":
-							this.AddType(Subject, Value, BaseUri, Context);
-							break;
+						if (!(ParsedUri is null) || Uri.TryCreate(BaseUri, Name, out ParsedUri))
+							this.Add(new SemanticTriple(Subject, new UriNode(ParsedUri, Name), ParsedValue));
+					}
+				}
+			}
+			else if (Doc is Array DocArray)
+			{
+				foreach (object DocItem in DocArray)
+					await this.Parse(DocItem, Context, BaseUri, this.CreateBlankNode());
+			}
+		}
 
-						default:
-							throw this.ParsingException("Unrecognized keyword: " + Name);
+		private async Task<Dictionary<string, object>> GetContext(object Value, Uri BaseUri, Dictionary<string, object> Context)
+		{
+			if (Value is Dictionary<string, object> ContextObj)
+				return ContextObj;
+			else if (Value is Array ContextArray)
+			{
+				Dictionary<string, object> Result = new Dictionary<string, object>();
+
+				foreach (object ContextItem in ContextArray)
+				{
+					Dictionary<string, object> Result2 = await this.GetContext(ContextItem, BaseUri, Context);
+
+					foreach (KeyValuePair<string, object> P in Result2)
+					{
+						if (!(Context is null) &&
+							Context.TryGetValue(P.Key, out object Prev) &&
+							Prev is string PrevString &&
+							Uri.TryCreate(BaseUri, PrevString, out Uri PrevUri) &&
+							Uri.TryCreate(PrevUri, P.Value?.ToString(),out Uri NewUri))
+						{
+							Result[P.Key] = NewUri.AbsoluteUri;
+						}
+						else
+							Result[P.Key] = P.Value;
+					}
+
+					Context = Result;
+				}
+
+				return Result;
+			}
+			else
+			{
+				Uri ContextUri;
+
+				if (Value is string Url)
+					ContextUri = this.CreateUri(Url, BaseUri, Context);
+				else if (Value is Uri Uri2)
+					ContextUri = Uri2;
+				else
+					throw this.ParsingException("Expected context URI.");
+
+				if (contextObjects.TryGetValue(ContextUri.AbsolutePath, out KeyValuePair<DateTimeOffset, Dictionary<string, object>> P2))
+				{
+					try
+					{
+						object Obj = await InternetContent.GetAsync(ContextUri,
+							new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType),
+							new KeyValuePair<string, string>("If-Modified-Since", CommonTypes.EncodeRfc822(P2.Key)));
+
+						if (Obj is JsonLdDocument ContextDoc &&
+							ContextDoc.parsedJson is Dictionary<string, object> ContextObj2 &&
+							ContextObj2.TryGetValue("@context", out Obj) &&
+							Obj is Dictionary<string, object> ContextObj3)
+						{
+							Context = ContextObj3;
+							contextObjects[ContextUri.AbsolutePath] = new KeyValuePair<DateTimeOffset, Dictionary<string, object>>(
+								ContextDoc.Date ?? DateTimeOffset.Now, Context);
+						}
+						else
+							Context = P2.Value;
+					}
+					catch (Exception)
+					{
+						return P2.Value;
 					}
 				}
 				else
 				{
-					ParsedUri = null;
+					object Obj = await InternetContent.GetAsync(ContextUri,
+						new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType));
 
-					if (Context is null || !Context.TryGetValue(Name, out object ContextValue))
+					if (Obj is JsonLdDocument ContextDoc &&
+						ContextDoc.parsedJson is Dictionary<string, object> ContextObj2 &&
+						ContextObj2.TryGetValue("@context", out Obj) &&
+						Obj is Dictionary<string, object> ContextObj3)
 					{
-						if (Uri.TryCreate(Name, UriKind.Absolute, out Uri UriValue))    // Not relative to base URI.
-						{
-							ContextValue = Name;
-							ParsedUri = UriValue;
-						}
-						else
-							continue;
+						Context = ContextObj3;
+						contextObjects[ContextUri.AbsolutePath] = new KeyValuePair<DateTimeOffset, Dictionary<string, object>>(
+							ContextDoc.Date ?? DateTimeOffset.Now, Context);
 					}
-
-					s = ContextValue as string;
-					if (!(s is null))
-						Name = s;
-					else if (ContextValue is Dictionary<string, object> ContextValueObj)
-					{
-						foreach (KeyValuePair<string, object> P2 in ContextValueObj)
-						{
-							switch (P2.Key)
-							{
-								case "@id":
-									s = P2.Value as string
-										?? throw this.ParsingException("Unsupported @id value: " + P2.Value.ToString());
-
-									Name = s;
-									break;
-
-								case "@type":
-									s = P2.Value as string
-										?? throw this.ParsingException("Unsupported @type value: " + P2.Value.ToString());
-
-									switch (s)
-									{
-										case "@id":
-											Value = this.CreateUri(Value?.ToString(), BaseUri);
-											break;
-
-										default:
-											throw this.ParsingException("Unsupported @type value: " + s);
-									}
-									break;
-							}
-						}
-					}
-
-					ParsedValue = this.ParseValue(BaseUri, Value);
-
-					if (!(ParsedUri is null) || Uri.TryCreate(BaseUri, Name, out ParsedUri))
-						this.Add(new SemanticTriple(Subject, new UriNode(ParsedUri, Name), ParsedValue));
+					else
+						throw this.ParsingException("Context reference not a JSON-LD document. Expected Content-Type: " + JsonLdCodec.DefaultContentType);
 				}
+
+				return Context;
 			}
 		}
 
@@ -342,15 +412,14 @@ namespace Waher.Content.Semantic
 		{
 			if (Value is string s)
 			{
-				if (!(Context is null) &&
-					Context.TryGetValue(s, out object ContextValue))
+				if (this.TryGetContextValue(s, Context, out object ContextValue))
 				{
 					s = ContextValue as string;
 					if (string.IsNullOrEmpty(s))
 						throw this.ParsingException("Invalid @type: " + ContextValue?.ToString());
 				}
 
-				this.Add(new SemanticTriple(Subject, RdfDocument.RdfType, this.CreateUriNode(s, BaseUri)));
+				this.Add(new SemanticTriple(Subject, RdfDocument.RdfType, this.CreateUriNode(s, BaseUri, Context)));
 			}
 			else if (Value is Array A)
 			{
@@ -361,14 +430,45 @@ namespace Waher.Content.Semantic
 				throw this.ParsingException("Unsupported @type: " + Value?.ToString());
 		}
 
-		private ISemanticElement ParseValue(Uri BaseUri, object Value)
+		private bool TryGetContextValue(string Name, Dictionary<string, object> Context, out object Value)
+		{
+			if (Context is null)
+			{
+				Value = null;
+				return false;
+			}
+			else if (Context.TryGetValue(Name, out Value))
+				return true;
+			else if (Context.TryGetValue("@vocab", out Value))
+			{
+				if (Value is string s)
+					Value = s + Name;
+				else
+					throw this.ParsingException("Unable to use @vocab: " + Value?.ToString());
+
+				return true;
+			}
+			else
+			{
+				Value = null;
+				return false;
+			}
+		}
+
+		private async Task<ISemanticElement> ParseValue(Uri BaseUri, object Value, Dictionary<string, object> Context)
 		{
 			if (Value is Dictionary<string, object> Obj)
 			{
+				ISemanticElement Object;
+
 				if (Obj.TryGetValue("@id", out Value) && Value is string s)
-					return this.CreateUriNode(s, BaseUri);
+					Object = this.CreateUriNode(s, BaseUri, Context);
 				else
-					throw new NotImplementedException();    // TODO
+					Object = this.CreateBlankNode();
+
+				await this.Parse(Obj, Context, BaseUri, Object);
+
+				return Object;
 			}
 			else if (Value is Uri Uri)
 				return new UriNode(Uri, Uri.ToString());
@@ -377,9 +477,9 @@ namespace Waher.Content.Semantic
 		}
 
 		/// <summary>
-		/// Original XML of document.
+		/// Original content, as parsed JSON.
 		/// </summary>
-		public Dictionary<string, object> JsonObject => this.json;
+		public object ParsedJson => this.parsedJson;
 
 		/// <summary>
 		/// Text representation.

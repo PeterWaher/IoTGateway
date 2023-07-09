@@ -1,0 +1,7 @@
+﻿@prefix person: <http://example.com/person#> .
+@prefix org: <http://example.com/organization#> .
+
+[
+  person:name "Markus Lanthaler";
+  person:details [org:name "Graz University of Technology"]
+] .

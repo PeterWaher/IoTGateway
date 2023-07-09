@@ -1,0 +1,4 @@
+﻿@prefix ex: <http://example.com/vocab/> .
+
+<http://example.org/places#BrewEats> a ex:Restaurant;
+  ex:name "Brew Eats" .

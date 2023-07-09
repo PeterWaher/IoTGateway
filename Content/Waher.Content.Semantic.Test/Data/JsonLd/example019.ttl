@@ -1,0 +1,20 @@
+﻿@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[
+  foaf:name "Manu Sporny";
+  foaf:homepage <http://manu.sporny.org/>;
+  foaf:depiction <http://twitter.com/account/profile_image/manusporny>
+] .
+
+[
+  dcterms:title "The Empire State Building";
+  dcterms:description "The Empire State Building is a 102-story landmark in New York City.";
+  schema:geo [
+    geo:lat 40.75;
+    geo:long 73.98
+  ]
+] .

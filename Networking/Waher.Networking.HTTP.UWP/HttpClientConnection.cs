@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using Waher.Content.Json;
 
 namespace Waher.Networking.HTTP
 {
@@ -273,7 +274,7 @@ namespace Waher.Networking.HTTP
 					switch (ContentType)
 					{
 						case "application/x-www-form-urlencoded":
-						case "application/json":
+						case JsonCodec.DefaultContentType:
 						case "application/xml":
 						case "application/link-format":
 						case "application/vnd.oma.lwm2m+json":

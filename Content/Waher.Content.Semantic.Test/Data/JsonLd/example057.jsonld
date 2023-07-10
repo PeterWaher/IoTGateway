@@ -1,0 +1,28 @@
+﻿{
+  "@context": [
+    {
+      "@version": 1.1,
+      "@protected": true,
+      "id": "@id",
+      "type": "@type",
+      "Organization": "http://example.org/orga/Organization",
+      "member": {
+        "@id": "http://example.org/orga/member",
+        "@type": "@id"
+      }
+    },
+    {
+      "id": "@id",
+      "type": "@type",
+      "Person": "http://schema.org/Person",
+      "name": "http://schema.org/name"
+    }
+  ],
+  "id": "https://digitalbazaar.com/",
+  "type": "Organization",
+  "member" : {
+    "id": "http://manu.sporny.org/about#manu",
+    "type": "Person",
+    "name": "Manu Sporny"
+  }
+}

@@ -1,0 +1,19 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "labels": "@nest",
+    "main_label": {
+      "@id": "skos:prefLabel",
+      "@nest": "labels"
+    },
+    "other_label": {
+      "@id": "skos:altLabel",
+      "@nest": "labels"
+    },
+    "homepage": {
+      "@id": "http://xmlns.com/foaf/0.1/homepage",
+      "@type": "@id"
+    }
+  }
+}

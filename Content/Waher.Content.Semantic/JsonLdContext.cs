@@ -197,5 +197,15 @@ namespace Waher.Content.Semantic
 				this.SetProperty(Name, Value, BaseUri);
 			}
 		}
+
+		/// <summary>
+		/// Appends a context object with the another.
+		/// </summary>
+		/// <param name="Context">Context object to append to this context.</param>
+		public void Append(JsonLdContext Context)
+		{
+			foreach (KeyValuePair<string, object> P in Context.context)
+				this.context[P.Key] = P.Value;
+		}
 	}
 }

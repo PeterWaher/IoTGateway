@@ -1,0 +1,6 @@
+﻿[
+  {
+    "http://example.com/vocab/property": [ { "@value": "property" } ],
+    "http://example.com/vocab/propertyOne": [ { "@value": "propertyOne" } ]
+  }
+]

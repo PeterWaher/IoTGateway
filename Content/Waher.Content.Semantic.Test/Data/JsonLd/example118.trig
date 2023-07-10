@@ -1,0 +1,8 @@
+﻿@prefix dbp: <http://dbpedia.org/resource/> .
+@prefix ex:  <http://example.com/> .
+
+dbp:William_Shakespeare ex:wrote _:b0 .
+
+_:b0 {
+  dbp:Richard_III_of_England ex:said "My kingdom for a horse" .
+}

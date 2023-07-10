@@ -1,0 +1,8 @@
+﻿{
+  "@context": {
+    "vocab": "http://example.com/vocab/",
+    "property": "http://example.com/vocab/property"
+  },
+  "property": "property",
+  "vocab:propertyOne": "propertyOne"
+}

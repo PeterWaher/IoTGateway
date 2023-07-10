@@ -1,0 +1,8 @@
+﻿@prefix ex: <http://example.org/> .
+
+<http://example.org/people#michael> ex:name
+  "Michael",
+  "Mike",
+  "Miguel"@es,
+  <https://www.wikidata.org/wiki/Q4927524>,
+  42 .

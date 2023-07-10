@@ -1,0 +1,14 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://example.com/",
+    "@language": "ja",
+    "details": {
+      "@context": {
+        "@language": null
+      }
+    }
+  },
+  "name": "花澄",
+  "details": { "occupation": "Ninja" }
+}

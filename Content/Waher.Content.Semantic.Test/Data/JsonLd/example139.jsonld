@@ -1,0 +1,13 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://example.org/"
+  },
+  "@type": "Library",
+  "contains": {
+    "@type": "Book",
+    "contains": {
+      "@type": "Chapter"
+    }
+  }
+}

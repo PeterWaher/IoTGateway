@@ -1,0 +1,7 @@
+﻿@prefix ex: <http://example.org/> .
+
+# Note that this version drops the base direction.
+[
+  ex:title "HTML و CSS: تصميم و إنشاء مواقع الويب"@ar-EG;
+  ex:publisher "مكتبة"@ar-EG
+] .

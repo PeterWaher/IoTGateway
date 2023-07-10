@@ -1,0 +1,10 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix schema: <http://schema.org/> .
+
+[
+  schema:name "Digital Bazaar";
+  schema:member [
+    a foaf:Person;
+    schema:name "Manu Sporny"
+  ]
+] .

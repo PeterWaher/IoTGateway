@@ -1,0 +1,10 @@
+﻿{
+  "@context": {
+    "title": "http://example.org/title",
+    "publisher": "http://example.org/publisher",
+    "@language": "ar-EG",
+    "@direction": "rtl"
+  },
+  "title": "HTML و CSS: تصميم و إنشاء مواقع الويب",
+  "publisher": "مكتبة"
+}

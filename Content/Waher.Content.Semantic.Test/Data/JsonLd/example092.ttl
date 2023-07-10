@@ -1,0 +1,7 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<http://example.org/myresource>
+  skos:prefLabel "This is the main label for my resource";
+  skos:altLabel "This is the other label";
+  foaf:homepage <http://example.org> .

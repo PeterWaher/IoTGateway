@@ -1,0 +1,14 @@
+﻿[
+  {
+    "@id": "http://example.org/myresource",
+    "http://xmlns.com/foaf/0.1/homepage": [
+      { "@id": "http://example.org" }
+    ],
+    "http://www.w3.org/2004/02/skos/core#prefLabel": [
+      { "@value": "This is the main label for my resource" }
+    ],
+    "http://www.w3.org/2004/02/skos/core#altLabel": [
+      { "@value": "This is the other label" }
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+﻿@prefix schema: <http://schema.org/> .
+
+<http://example.com/people/alice> schema:knows <http://example.com/people/bob>;
+  schema:name "Alice";
+  schema:gender "weiblich"@de, "female"@en .
+
+<http://example.com/graphs/1> {
+  <http://example.com/people/alice> schema:parent <http://example.com/people/bob> .
+  <http://example.com/people/bob> schema:name "Bob" .
+}
+
+<http://example.com/graphs/2> {
+  <http://example.com/people/bob> schema:sibling [
+    schema:name "Mary";
+    schema:sibling <http://example.com/people/bob>
+  ] .
+}

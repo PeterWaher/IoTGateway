@@ -1,0 +1,25 @@
+﻿{
+  "@context": [
+    {
+      "@version": 1.1,
+      "Person": "http://xmlns.com/foaf/0.1/Person",
+      "knows": "http://xmlns.com/foaf/0.1/knows",
+      "name": {
+        "@id": "http://xmlns.com/foaf/0.1/name",
+        "@protected": true
+      }
+    },
+    {
+      "name": "http://schema.org/name"
+    }
+  ],
+  "@type": "Person",
+  "name": "Manu Sporny",
+  "knows": {
+    "@context": [
+      null,
+      "http://schema.org/"
+    ],
+    "name": "Gregg Kellogg"
+  }
+}

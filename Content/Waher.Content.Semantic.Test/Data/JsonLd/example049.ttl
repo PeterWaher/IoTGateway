@@ -1,0 +1,8 @@
+﻿@prefix ex: <http://example.org/> .
+[
+  ex:original [
+    ex:non-propagated-term [
+      ex:original "This term is from the first context"
+    ]
+  ]
+] .

@@ -1,0 +1,13 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix schema: <http://schema.org/>.
+
+[
+  a schema:Organization;
+  schema:name "Digital Bazaar";
+  schema:employee [
+    schema:familyName "Sporny";
+    foaf:based_near [
+      foaf:name "Blacksburg, Virginia"
+    ];
+  ];
+] .

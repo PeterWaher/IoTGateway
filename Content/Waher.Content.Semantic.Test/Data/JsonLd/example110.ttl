@@ -1,0 +1,17 @@
+﻿@prefix ex: <http://example.org/> .
+
+ex:org-1 ex:members ex:person-3,
+    ex:person-1,
+    ex:person-2 .
+
+ex:person-1 ex:classification ex:employee;
+  ex:name "Manu Sporny" .
+
+ex:person-2 ex:classification ex:employee;
+  ex:name "Dave Longley" .
+
+ex:person-3 ex:classification ex:contractor;
+  ex:name "Gregg Kellogg" .
+
+ex:employee ex:label "An Employee" .
+ex:contractor ex:label "A Contractor" .

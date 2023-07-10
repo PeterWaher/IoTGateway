@@ -1,0 +1,17 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "e": {
+      "@id": "http://example.com/vocab/json",
+      "@type": "@json"
+    }
+  },
+  "e": [
+    56.0,
+    {
+      "d": true,
+      "10": null,
+      "1": []
+    }
+  ]
+}

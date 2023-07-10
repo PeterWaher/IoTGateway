@@ -1,0 +1,30 @@
+﻿{
+  "@context": {
+    "generatedAt": {
+      "@id": "http://www.w3.org/ns/prov#generatedAtTime",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "Person": "http://xmlns.com/foaf/0.1/Person",
+    "name": "http://xmlns.com/foaf/0.1/name",
+    "knows": {
+      "@id": "http://xmlns.com/foaf/0.1/knows",
+      "@type": "@id"
+    }
+  },
+  "@id": "http://example.org/foaf-graph",
+  "generatedAt": "2012-04-09T00:00:00",
+  "@graph": [
+    {
+      "@id": "http://manu.sporny.org/about#manu",
+      "@type": "Person",
+      "name": "Manu Sporny",
+      "knows": "https://greggkellogg.net/foaf#me"
+    },
+    {
+      "@id": "https://greggkellogg.net/foaf#me",
+      "@type": "Person",
+      "name": "Gregg Kellogg",
+      "knows": "http://manu.sporny.org/about#manu"
+    }
+  ]
+}

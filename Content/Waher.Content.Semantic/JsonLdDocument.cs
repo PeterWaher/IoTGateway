@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Runtime.Cache;
+using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Semantic
 {
@@ -150,15 +151,7 @@ namespace Waher.Content.Semantic
 
 		private Uri CreateUri(string Reference, Uri BaseUri, JsonLdContext Context)
 		{
-			int i = Reference.IndexOf(':');
-			if (i >= 0)
-			{
-				string Prefix = Reference.Substring(0, i);
-
-				if (!(Context is null) && Context.TryGetStringValue(Prefix, out string PrefixUrl))
-					Reference = PrefixUrl + Reference.Substring(i + 1);
-			}
-
+			ExpandPrefixes(ref Reference, Context);
 			BaseUri = Context?.Base ?? BaseUri;
 
 			if (BaseUri is null)
@@ -201,6 +194,11 @@ namespace Waher.Content.Semantic
 					Name = P.Key;
 					Value = P.Value;
 
+					if (!TryGetContextName(Name, Context, out object ContextValue))
+						ContextValue = null;
+					else if (ContextValue is string Alias)
+						Name = Alias;
+
 					if (Name.StartsWith("@"))
 					{
 						switch (Name)
@@ -217,7 +215,7 @@ namespace Waher.Content.Semantic
 								break;
 
 							case "@type":
-								this.AddType(Subject, Value, BaseUri, Context);
+								Context = await this.AddType(Subject, Value, BaseUri, Context);
 								break;
 
 							case "@graph":
@@ -247,7 +245,7 @@ namespace Waher.Content.Semantic
 						ParsedUri = null;
 						ParsedValue = null;
 
-						if (!this.TryGetContextName(Name, Context, out object ContextValue))
+						if (ContextValue is null)
 						{
 							if (Uri.TryCreate(Name, UriKind.Absolute, out Uri UriValue))    // Not relative to base URI.
 							{
@@ -257,13 +255,17 @@ namespace Waher.Content.Semantic
 							else
 								continue;
 						}
-						else if (ContextValue is null)
-							continue;
 
 						s = ContextValue as string;
 						if (!(s is null))
+						{
 							Name = s;
-						else if (ContextValue is Dictionary<string, object> ContextValueObj)
+
+							if (!TryGetContextName(Name, Context, out ContextValue))
+								ContextValue = Name;
+						}
+
+						if (ContextValue is Dictionary<string, object> ContextValueObj)
 						{
 							foreach (KeyValuePair<string, object> P2 in ContextValueObj)
 							{
@@ -274,6 +276,7 @@ namespace Waher.Content.Semantic
 											?? throw this.ParsingException("Unsupported @id value: " + P2.Value.ToString());
 
 										Name = s;
+										ExpandPrefixes(ref Name, Context);
 										break;
 
 									case "@type":
@@ -305,6 +308,17 @@ namespace Waher.Content.Semantic
 											?? throw this.ParsingException("Unsupported @base value: " + P2.Value.ToString());
 
 										BaseUri = this.CreateUri(s, BaseUri, Context);
+										break;
+
+									case "@prefix":
+										break;
+
+									case "@context":
+										JsonLdContext ScopedContext = await this.GetContext(P2.Value, BaseUri, Context);
+										if (!(Context is null))
+											ScopedContext.Append(Context);
+
+										Context = ScopedContext;
 										break;
 
 									default:
@@ -426,52 +440,113 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private void AddType(ISemanticElement Subject, object Value, Uri BaseUri, JsonLdContext Context)
+		private async Task<JsonLdContext> AddType(ISemanticElement Subject, object Value, Uri BaseUri, JsonLdContext Context)
 		{
 			if (Value is string s)
 			{
-				if (this.TryGetContextName(s, Context, out object ContextValue))
+				if (TryGetContextName(s, Context, out object ContextValue))
 				{
-					s = ContextValue as string;
-					if (string.IsNullOrEmpty(s))
-						throw this.ParsingException("Invalid @type: " + ContextValue?.ToString());
+					Context = await this.AddType(Subject, ContextValue, BaseUri, Context);
 				}
+				else
+					this.Add(new SemanticTriple(Subject, RdfDocument.RdfType, this.CreateUriNode(s, BaseUri, Context)));
+			}
+			else if (Value is Dictionary<string, object> TypeObj)
+			{
+				foreach (KeyValuePair<string, object> P in TypeObj)
+				{
+					switch (P.Key)
+					{
+						case "@id":
+							Context = await this.AddType(Subject, P.Value, BaseUri, Context);
+							break;
 
-				this.Add(new SemanticTriple(Subject, RdfDocument.RdfType, this.CreateUriNode(s, BaseUri, Context)));
+						case "@context":
+							JsonLdContext ScopedContext = await this.GetContext(P.Value, BaseUri, Context);
+							if (!(Context is null))
+								ScopedContext.Append(Context);
+
+							Context = ScopedContext;
+							break;
+					}
+				}
 			}
 			else if (Value is Array A)
 			{
 				foreach (object Item in A)
-					this.AddType(Subject, Item, BaseUri, Context);
+					await this.AddType(Subject, Item, BaseUri, Context);
 			}
 			else
 				throw this.ParsingException("Unsupported @type: " + Value?.ToString());
+
+			return Context;
 		}
 
-		private bool TryGetContextName(string Name, JsonLdContext Context, out object Value)
+		private static bool ExpandPrefixes(ref string Name, JsonLdContext Context)
 		{
+			if (Context is null)
+				return false;
+
+			int i = Name.IndexOf(':');
+			if (i < 0)
+				return false;
+
+			string Prefix = Name.Substring(0, i);
+
+			if (!Context.TryGetObjectValue(Prefix, out object Value))
+				return false;
+
+			if (Value is string PrefixUrl)
+			{
+				Name = PrefixUrl + Name.Substring(i + 1);
+				return true;
+			}
+
+			if (Value is Dictionary<string, object> Obj)
+			{
+				foreach (KeyValuePair<string, object> P in Obj)
+				{
+					switch (P.Key)
+					{
+						case "@id":
+							PrefixUrl = P.Value as string;
+							if (!(PrefixUrl is null))
+							{
+								Name = PrefixUrl + Name.Substring(i + 1);
+								return true;
+							}
+							break;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private static bool TryGetContextName(string Name, JsonLdContext Context, out object Value)
+		{
+			if (Name.StartsWith("@"))
+			{
+				Value = null;
+				return false;
+			}
+
 			if (Context is null)
 			{
 				Value = null;
 				return false;
 			}
 
-			int i = Name.IndexOf(':');
-			if (i >= 0)
+			if (ExpandPrefixes(ref Name, Context))
 			{
-				string Prefix = Name.Substring(0, i);
-
-				if (Context.TryGetStringValue(Prefix, out string PrefixUrl))
-				{
-					Value = PrefixUrl + Name.Substring(i + 1);
-					return true;
-				}
+				Value = Name;
+				return true;
 			}
 
 			if (Context.TryGetObjectValue(Name, out Value))
 				return true;
 
-			if (!(Context.Vocabulary is null))
+			if (!(Context.Vocabulary is null) && Name.IndexOf(':') < 0)
 			{
 				Value = Context.Vocabulary.AbsoluteUri + Name;
 				return true;

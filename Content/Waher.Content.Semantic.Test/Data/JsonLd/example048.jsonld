@@ -1,0 +1,24 @@
+﻿{
+  "@context": {
+    "@vocab": "http://example.com/vocab/",
+    "property": "http://example.com/vocab/property",
+    "Type1": "http://example.com/vocab/Type1",
+    "Type2": "http://example.com/vocab/Type2"
+  },
+  "property": {
+    "@context": [{
+        "term1": "http://example.com/vocab/term1"
+      }, {
+        "term2": "http://example.com/vocab/term2"
+      }, {
+        "term3": "http://example.com/vocab/term3"
+      }, {
+      "term4": "http://example.com/vocab/term4"
+    }],
+    "@type": ["Type2", "Type1"],
+    "term1": "a",
+    "term2": "b",
+    "term3": "c",
+    "term4": "d"
+  }
+}

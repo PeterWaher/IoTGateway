@@ -1,0 +1,4 @@
+﻿@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[ dcterms:modified "2010-05-29T14:17:39+02:00"^^xsd:dateTime ] .

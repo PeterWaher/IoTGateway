@@ -1,0 +1,32 @@
+﻿{
+  "@context": [
+    {
+      "@version": 1.1,
+      "@protected": true,
+      "Organization": "http://schema.org/Organization",
+      "name": "http://schema.org/name",
+      "employee": {
+        "@id": "http://schema.org/employee",
+        "@context": {
+          "@protected": true,
+          "name": "http://schema.org/familyName"
+        }
+      }
+    },
+    {
+      "location": {
+        "@id": "http://xmlns.com/foaf/0.1/based_near",
+        "@context": [
+          null,
+          { "@vocab": "http://xmlns.com/foaf/0.1/" }
+        ]
+      }
+    }
+  ],
+  "@type": "Organization",
+  "name": "Digital Bazaar",
+  "employee" : {
+    "name": "Sporny",
+    "location": {"name": "Blacksburg, Virginia"}
+  }
+}

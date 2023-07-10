@@ -1,0 +1,19 @@
+﻿@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://digitalbazaar.com/> a schema:Corporation;
+   schema:name "Digital Bazaar" .
+
+<https://spec-ops.io> a schema:ProfessionalService;
+   schema:name "Spec-Ops" .
+
+<https://greggkellogg.net/> schema:name "Gregg Kellogg" .
+
+[
+   schema:affiliation
+      <https://digitalbazaar.com/>,
+      <https://spec-ops.io>,
+      <https://greggkellogg.net/>;
+   schema:name "Manu Sporny"
+] .

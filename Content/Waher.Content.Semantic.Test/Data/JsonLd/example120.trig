@@ -1,0 +1,21 @@
+﻿@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.com/> a schema:Blog;
+   schema:blogPost _:b0,  _:b1;
+   schema:name "World Financial News" .
+
+_:b0 {
+  <http://example.com/posts/1/en>
+     schema:articleBody
+       "World commodities were up today with heavy trading of crude oil...";
+     schema:wordCount 1539 .
+}
+
+_:b1 {
+  <http://example.com/posts/1/no-language>
+     schema:articleBody
+       "Die Werte an Warenbörsen stiegen im Sog eines starken Handels von Rohöl...";
+     schema:wordCount 1204 .
+}

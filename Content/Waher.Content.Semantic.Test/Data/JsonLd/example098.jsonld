@@ -1,0 +1,32 @@
+﻿{
+  "@context": {
+     "@version": 1.1,
+    "schema": "http://schema.org/",
+    "name": "schema:name",
+    "body": "schema:articleBody",
+    "athletes": {
+      "@id": "schema:athlete",
+      "@container": "@index"
+    },
+    "position": "schema:jobTitle"
+  },
+  "@id": "http://example.com/",
+  "@type": "schema:SportsTeam",
+  "name": "San Francisco Giants",
+  "athletes": {
+    "catcher": {
+      "@type": "schema:Person",
+      "name": "Buster Posey",
+      "position": "Catcher"
+    },
+    "pitcher": {
+      "@type": "schema:Person",
+      "name": "Madison Bumgarner",
+      "position": "Starting Pitcher"
+    },
+    "@none": {
+      "name": "Lou Seal",
+      "position": "Mascot"
+    }
+  }
+}

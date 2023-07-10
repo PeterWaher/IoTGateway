@@ -1,0 +1,16 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "MyType": {
+      "@id": "http://example.com/vocab#MyType",
+      "@context": {
+        "@version": 1.1,
+        "Type1": "http://example.com/vocab/Type1",
+        "Type2": "http://example.com/vocab/Type2",
+        "term1": "http://example.com/vocab#term1",
+        "term2": "http://example.com/vocab#term2",
+        "@propagate": true
+      }
+    }
+  }
+}

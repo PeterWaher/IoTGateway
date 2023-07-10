@@ -1,0 +1,39 @@
+﻿[
+  {
+    "@id": "http://example.org/org-1",
+    "http://example.org/members": [
+      { "@id": "http://example.org/person-1" },
+      { "@id": "http://example.org/person-2" },
+      { "@id": "http://example.org/person-3" }
+    ]
+  },
+  {
+    "@id": "http://example.org/employee",
+    "http://example.org/label": [ { "@value": "An Employee" } ]
+  },
+  {
+    "@id": "http://example.org/contractor",
+    "http://example.org/label": [ { "@value": "A Contractor" } ]
+  },
+  {
+    "@id": "http://example.org/person-1",
+    "http://example.org/name": [ { "@value": "Manu Sporny" } ],
+    "http://example.org/classification": [
+      { "@id": "http://example.org/employee" }
+    ]
+  },
+  {
+    "@id": "http://example.org/person-2",
+    "http://example.org/name": [ { "@value": "Dave Longley" } ],
+    "http://example.org/classification": [
+      { "@id": "http://example.org/employee" }
+    ]
+  },
+  {
+    "@id": "http://example.org/person-3",
+    "http://example.org/name": [ { "@value": "Gregg Kellogg" } ],
+    "http://example.org/classification": [
+      { "@id": "http://example.org/contractor" }
+    ]
+  }
+]

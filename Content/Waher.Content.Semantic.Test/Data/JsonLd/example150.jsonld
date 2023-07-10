@@ -1,0 +1,43 @@
+﻿{
+  "@context": [
+    "http://schema.org/",
+    { "@base": "http://example.com/" }
+  ],
+  "@graph": [
+    {
+      "@id": "people/alice",
+      "gender": [
+        {
+          "@value": "weiblich",
+          "@language": "de"
+        },
+        {
+          "@value": "female",
+          "@language": "en"
+        }
+      ],
+      "knows": { "@id": "people/bob" },
+      "name": "Alice"
+    },
+    {
+      "@id": "graphs/1",
+      "@graph": {
+        "@id": "people/alice",
+        "parent": {
+          "@id": "people/bob",
+          "name": "Bob"
+        }
+      }
+    },
+    {
+      "@id": "graphs/2",
+      "@graph": {
+        "@id": "people/bob",
+        "sibling": {
+          "name": "Mary",
+          "sibling": { "@id": "people/bob" }
+        }
+      }
+    }
+  ]
+}

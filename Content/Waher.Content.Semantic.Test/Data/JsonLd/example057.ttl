@@ -1,0 +1,8 @@
+﻿@prefix o: <http://example.org/orga/>.
+@prefix schema: <http://schema.org/>.
+
+<https://digitalbazaar.com/> a o:Organization ;
+  o:member <http://manu.sporny.org/about#manu>.
+
+<http://manu.sporny.org/about#manu> a schema:Person ;
+  schema:name "Manu Sporny".

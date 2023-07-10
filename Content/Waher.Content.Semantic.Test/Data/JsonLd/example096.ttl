@@ -1,0 +1,7 @@
+﻿@prefix schema: <http://schema.org/> .
+
+_:b0 schema:name "Secret Agent 1";
+  schema:knows _:b1 .
+
+_:b1 schema:name "Secret Agent 2";
+  schema:knows _:b0 .

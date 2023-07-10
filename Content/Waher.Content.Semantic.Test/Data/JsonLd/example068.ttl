@@ -1,0 +1,6 @@
+﻿@prefix ex: <http://example.org/> .
+
+[
+  ex:name "花澄"@ja;
+  ex:occupation "科学者"@ja
+] .

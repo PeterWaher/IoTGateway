@@ -1,0 +1,19 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/foaf-graph> <http://example.org/graphMap> _:b0,  _:b1;
+   prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
+
+_:b0 {
+  <http://manu.sporny.org/about#manu> a foaf:Person;
+     foaf:name "Manu Sporny";
+     foaf:knows <https://greggkellogg.net/foaf#me> .
+}
+
+_:b1 {
+  <https://greggkellogg.net/foaf#me> a foaf:Person;
+     foaf:name "Gregg Kellogg";
+     foaf:knows <http://manu.sporny.org/about#manu> .
+}

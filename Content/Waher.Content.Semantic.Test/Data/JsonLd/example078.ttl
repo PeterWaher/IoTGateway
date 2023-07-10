@@ -1,0 +1,4 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<http://example.org/people#joebob> foaf:nick
+  "joe", "bob", "JB" .

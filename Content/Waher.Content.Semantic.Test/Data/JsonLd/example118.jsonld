@@ -1,0 +1,16 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "@base": "http://dbpedia.org/resource/",
+    "said": "http://example.com/said",
+    "wrote": {
+      "@id": "http://example.com/wrote",
+      "@container": "@graph"
+    }
+  },
+  "@id": "William_Shakespeare",
+  "wrote": {
+    "@id": "Richard_III_of_England",
+    "said": "My kingdom for a horse"
+  }
+}

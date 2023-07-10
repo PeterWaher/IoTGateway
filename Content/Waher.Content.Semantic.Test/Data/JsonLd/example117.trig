@@ -1,0 +1,9 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<https://greggkellogg.net/foaf#me> a foaf:Person;
+   foaf:knows <http://manu.sporny.org/about#manu>;
+   foaf:name "Gregg Kellogg" .
+
+<http://manu.sporny.org/about#manu> a foaf:Person;
+   foaf:knows <https://greggkellogg.net/foaf#me>;
+   foaf:name "Manu Sporny" .

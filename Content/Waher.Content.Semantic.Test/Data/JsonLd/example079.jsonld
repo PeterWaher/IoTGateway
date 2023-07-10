@@ -1,0 +1,14 @@
+﻿{
+  "@context": { "dcterms": "http://purl.org/dc/terms/" },
+  "@id": "http://example.org/articles/8",
+  "dcterms:title": [
+    {
+      "@value": "Das Kapital",
+      "@language": "de"
+    },
+    {
+      "@value": "Capital",
+      "@language": "en"
+    }
+  ]
+}

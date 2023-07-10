@@ -1,0 +1,12 @@
+﻿{
+  "@context": {
+    "@vocab": "http://xmlns.com/foaf/0.1/"
+  },
+  "@type": "Person",
+  "name": "Manu Sporny",
+  "knows": {
+    "@id": "https://greggkellogg.net/foaf#me",
+    "@type": "Person",
+    "name": "Gregg Kellogg"
+  }
+}

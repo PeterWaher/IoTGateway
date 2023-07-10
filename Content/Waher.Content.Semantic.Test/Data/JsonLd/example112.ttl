@@ -1,0 +1,8 @@
+﻿@base <http://example.org/> .
+<#homer> <http://example.com/vocab#name> "Homer" .
+
+<#bart> <http://example.com/vocab#name> "Bart";
+   <http://example.com/vocab#parent> <#homer> .
+
+<#lisa> <http://example.com/vocab#name> "Lisa";
+   <http://example.com/vocab#parent> <#homer> .

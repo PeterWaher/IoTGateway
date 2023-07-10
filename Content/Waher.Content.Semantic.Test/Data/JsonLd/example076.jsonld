@@ -1,0 +1,14 @@
+﻿{
+  "@context": {
+    "@version": 1.1,
+    "@language": "ar-EG",
+    "@direction": "rtl",
+    "ex": "http://example.com/vocab/",
+    "publisher": { "@id": "ex:publisher", "@direction": null },
+    "title": { "@id": "ex:title" },
+    "title_en": { "@id": "ex:title", "@language": "en", "@direction": "ltr" }
+  },
+  "publisher": "مكتبة",
+  "title": "HTML و CSS: تصميم و إنشاء مواقع الويب",
+  "title_en": "HTML and CSS: Design and Build Websites"
+}

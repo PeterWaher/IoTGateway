@@ -1,0 +1,10 @@
+﻿{
+  "@context": {
+    "name": "http://example.org/name",
+    "occupation": "http://example.org/occupation",
+    "...": null,
+    "@language": "ja"
+  },
+  "name": "花澄",
+  "occupation": "科学者"
+}

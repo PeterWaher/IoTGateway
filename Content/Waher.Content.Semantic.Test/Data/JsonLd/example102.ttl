@@ -1,0 +1,7 @@
+﻿@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<http://example.com/queen> <http://example.com/vocab/label>
+     "Ihre Majestät"@de,
+     "Die Königin"@de,
+     "The Queen"@en,
+     "The Queen" .

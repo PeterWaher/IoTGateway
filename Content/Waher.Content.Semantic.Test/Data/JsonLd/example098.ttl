@@ -1,0 +1,17 @@
+﻿@prefix schema: <http://schema.org/> .
+
+<http://example.com/> a schema:SportsTeam;
+  schema:name "San Francisco Giants";
+  schema:athlete [
+    a schema:Person;
+    schema:jobTitle "Catcher";
+    schema:name "Buster Posey"
+  ], [
+    a schema:Person;
+    schema:jobTitle "Starting Pitcher";
+    schema:name "Madison Bumgarner"
+  ], [
+    schema:jobTitle "Mascot";
+    schema:name "Lou Seal"
+  ]
+  .

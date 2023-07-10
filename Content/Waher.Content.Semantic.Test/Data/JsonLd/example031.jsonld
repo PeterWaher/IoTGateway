@@ -1,0 +1,7 @@
+﻿{
+  "@context": {
+    "foaf": "http://xmlns.com/foaf/0.1/"
+  },
+  "@type": "foaf:Person",
+  "foaf:name": "Dave Longley"
+}

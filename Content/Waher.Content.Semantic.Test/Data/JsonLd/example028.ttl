@@ -1,0 +1,4 @@
+﻿@base <http://example.com/document.jsonld> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> rdfs:label "Just a simple document" .

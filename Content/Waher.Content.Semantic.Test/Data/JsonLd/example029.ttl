@@ -1,0 +1,2 @@
+﻿<http://example.org/places#BrewEats> a <http://example/document#Restaurant>;
+  <http://example/document#name> "Brew Eats" .

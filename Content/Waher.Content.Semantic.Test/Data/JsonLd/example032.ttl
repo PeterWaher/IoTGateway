@@ -1,0 +1,7 @@
+﻿@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://me.markus-lanthaler.com/> a foaf:Person;
+  foaf:name "Markus Lanthaler";
+  foaf:homepage <http://www.markus-lanthaler.com/>;
+  foaf:depiction <http://twitter.com/account/profile_image/markuslanthaler> .

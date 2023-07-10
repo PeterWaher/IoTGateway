@@ -27,6 +27,12 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("example024.jsonld", "example024.ttl", null)]
 		[DataRow("example025.jsonld", "example025.ttl", null)]
 		[DataRow("example026.jsonld", "example026.ttl", null)]
+		[DataRow("example027.jsonld", "example027.ttl", null)]
+		[DataRow("example028.jsonld", "example028.ttl", null)]
+		[DataRow("example029.jsonld", "example029.ttl", null)]
+		[DataRow("example030.jsonld", "example030.ttl", null)]
+		[DataRow("example031.jsonld", "example031.ttl", null)]
+		[DataRow("example032.jsonld", "example032.ttl", null)]
 		public async Task ParsingTests(string FileName, string Expected, string BaseUri)
 		{
 			await PerformTest(FileName, Expected, BaseUri);

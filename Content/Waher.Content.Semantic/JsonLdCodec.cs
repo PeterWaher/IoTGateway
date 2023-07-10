@@ -39,12 +39,12 @@ namespace Waher.Content.Semantic
 		};
 
 		/// <summary>
-		/// text/turtle
+		/// application/ld+json
 		/// </summary>
 		public const string DefaultContentType = "application/ld+json";
 
 		/// <summary>
-		/// ttl
+		/// jsonld
 		/// </summary>
 		public const string DefaultExtension = "jsonld";
 

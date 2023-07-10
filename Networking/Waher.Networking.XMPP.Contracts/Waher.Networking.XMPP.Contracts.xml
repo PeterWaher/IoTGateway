@@ -676,6 +676,19 @@
             <param name="Address">Address of server (component).</param>
             <returns>Local key.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetIdApplicationAttributes(Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventHandler,System.Object)">
+            <summary>
+            Gets attributes relevant for application for legal identities on the broker.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetIdApplicationAttributesAsync">
+            <summary>
+            Gets attributes relevant for application for legal identities on the broker.
+            </summary>
+            <returns>ID Application attributes</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Apply(Waher.Networking.XMPP.Contracts.Property[],Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
             Applies for a legal identity to be registered.
@@ -4274,6 +4287,49 @@
         <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings.SimpleEscape">
             <summary>
             If simple Markdown escaping rules apply.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventHandler">
+            <summary>
+            Delegate for ID Application attributes callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs">
+            <summary>
+            Event arguments for callback methods to ID Application attributes queries.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs)">
+            <summary>
+            Event arguments for callback methods to ID Application attributes queries.
+            </summary>
+            <param name="e">IQ Response</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.PeerReview">
+            <summary>
+            If peer-review is allowed as a mechanism to approve ID applications.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.NrReviewers">
+            <summary>
+            Number of peer reviewers required to get an ID approved using peer review.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.NrPhotos">
+            <summary>
+            Number of photos required in a peer-review.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.Iso3166">
+            <summary>
+            If ISO 3166 country codes are mandated in peer-review.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.IdApplicationAttributesEventArgs.RequiredProperties">
+            <summary>
+            Required properties in an ID application for peer-review.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IServiceProvider">

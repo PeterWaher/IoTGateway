@@ -853,6 +853,54 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region ID Application Attributes
+
+		/// <summary>
+		/// Gets attributes relevant for application for legal identities on the broker.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetIdApplicationAttributes(IdApplicationAttributesEventHandler Callback, object State)
+		{
+			this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentities + "'/>", (sender, e) =>
+			{
+				try
+				{
+					Callback?.Invoke(this, new IdApplicationAttributesEventArgs(e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+				return Task.CompletedTask;
+
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets attributes relevant for application for legal identities on the broker.
+		/// </summary>
+		/// <returns>ID Application attributes</returns>
+		public Task<IdApplicationAttributesEventArgs> GetIdApplicationAttributesAsync()
+		{
+			TaskCompletionSource<IdApplicationAttributesEventArgs> Result = new TaskCompletionSource<IdApplicationAttributesEventArgs>();
+
+			this.GetIdApplicationAttributes((sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get ID Application attributes."));
+
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 		#region Apply for a Legal Identity
 
 		/// <summary>

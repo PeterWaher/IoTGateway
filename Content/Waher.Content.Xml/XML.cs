@@ -228,7 +228,7 @@ namespace Waher.Content.Xml
 					Indent++;
 
 				foreach (KeyValuePair<string, object> Member in Object)
-					EncodeChildElement(Member.Key, Member.Value, Indent, Xml);
+					EncodeChildElement(Member.Key, Member.Value, false, Indent, Xml);
 
 				if (Indent.HasValue)
 				{
@@ -257,39 +257,8 @@ namespace Waher.Content.Xml
 			if (Value is null)
 				return false;
 
-			Type T = Value.GetType();
-			TypeInfo TI = T.GetTypeInfo();
-			string ValueString;
-
-			if (TI.IsValueType)
-			{
-				if (Value is bool b)
-					ValueString = CommonTypes.Encode(b);
-				else if (Value is char ch)
-					ValueString = Encode(new string(ch, 1));
-				else if (Value is double dbl)
-					ValueString = CommonTypes.Encode(dbl);
-				else if (Value is float fl)
-					ValueString = CommonTypes.Encode(fl);
-				else if (Value is decimal dec)
-					ValueString = CommonTypes.Encode(dec);
-				else if (TI.IsEnum)
-					ValueString = Encode(Value.ToString());
-				else if (Value is DateTime TP)
-					ValueString = XML.Encode(TP);
-				else if (Value is DateTimeOffset TPO)
-					ValueString = XML.Encode(TPO);
-				else if (Value is int || Value is long || Value is short || Value is byte ||
-					Value is uint || Value is ulong || Value is ushort || Value is sbyte)
-				{
-					ValueString = Value.ToString();
-				}
-				else
-					ValueString = Encode(Value.ToString());
-			}
-			else if (Value is string s)
-				ValueString = XML.Encode(s);
-			else
+			string ValueString = EncodeValue(Value);
+			if (ValueString is null)
 				return false;
 
 			Xml.Append(' ');
@@ -301,15 +270,53 @@ namespace Waher.Content.Xml
 			return true;
 		}
 
+		private static string EncodeValue(object Value)
+		{
+			Type T = Value.GetType();
+			TypeInfo TI = T.GetTypeInfo();
+
+			if (TI.IsValueType)
+			{
+				if (Value is bool b)
+					return CommonTypes.Encode(b);
+				else if (Value is char ch)
+					return Encode(new string(ch, 1));
+				else if (Value is double dbl)
+					return CommonTypes.Encode(dbl);
+				else if (Value is float fl)
+					return CommonTypes.Encode(fl);
+				else if (Value is decimal dec)
+					return CommonTypes.Encode(dec);
+				else if (TI.IsEnum)
+					return Encode(Value.ToString());
+				else if (Value is DateTime TP)
+					return XML.Encode(TP);
+				else if (Value is DateTimeOffset TPO)
+					return XML.Encode(TPO);
+				else if (Value is int || Value is long || Value is short || Value is byte ||
+					Value is uint || Value is ulong || Value is ushort || Value is sbyte)
+				{
+					return Value.ToString();
+				}
+				else
+					return Encode(Value.ToString());
+			}
+			else if (Value is string s)
+				return Encode(s);
+			else
+				return null;
+		}
+
 		/// <summary>
 		/// Encodes a property as an XML attribute.
 		/// </summary>
 		/// <param name="Key">Parameter key.</param>
 		/// <param name="Value">Parameter value.</param>
+		/// <param name="EncodeValues">If values should be encoded.</param>
 		/// <param name="Indent">If XML should be indented.</param>
 		/// <param name="Xml">XML Output.</param>
 		/// <returns>If value was encoded.</returns>
-		private static bool EncodeChildElement(string Key, object Value,
+		private static bool EncodeChildElement(string Key, object Value, bool EncodeValues,
 			int? Indent, StringBuilder Xml)
 		{
 			if (Value is null)
@@ -322,7 +329,26 @@ namespace Waher.Content.Xml
 			TypeInfo TI = T.GetTypeInfo();
 
 			if (TI.IsValueType || Value is string)
-				return false;
+			{
+				if (EncodeValues)
+				{
+					string s = EncodeValue(Value);
+					if (s is null)
+						return false;
+
+					Xml.Append('<');
+					Xml.Append(Key);
+					Xml.Append('>');
+					Xml.Append(s);
+					Xml.Append("</");
+					Xml.Append(Key);
+					Xml.Append('>');
+
+					return true;
+				}
+				else
+					return false;
+			}
 
 			if (Indent.HasValue)
 			{
@@ -377,7 +403,7 @@ namespace Waher.Content.Xml
 							Xml.Append(new string('\t', Indent.Value));
 						}
 
-						EncodeChildElement(Encode(Names[x]), M.GetElement(x, y).AssociatedObjectValue, Indent, Xml);
+						EncodeChildElement(Encode(Names[x]), M.GetElement(x, y).AssociatedObjectValue, true, Indent, Xml);
 					}
 
 					if (Indent.HasValue)
@@ -431,7 +457,7 @@ namespace Waher.Content.Xml
 					if (Obj3 is NamedDictionary<string, object> Named)
 						Encode(Named, Indent, Xml);
 					else
-						EncodeChildElement("Item", Obj3, Indent, Xml);
+						EncodeChildElement("Item", Obj3, true, Indent, Xml);
 				}
 
 				if (HashItems && Indent.HasValue)
@@ -488,7 +514,7 @@ namespace Waher.Content.Xml
 					if (Obj3 is NamedDictionary<string, object> Named)
 						Encode(Named, Indent, Xml);
 					else
-						EncodeChildElement("Item", Obj3, Indent, Xml);
+						EncodeChildElement("Item", Obj3, true, Indent, Xml);
 				}
 
 				if (HashItems && Indent.HasValue)

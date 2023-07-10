@@ -22,8 +22,8 @@ if CanAdd or CanUpdate then ]]
 Upload Graph
 ===============
 
-To upload a new semantic graph to the graph store, enter the URI of the graph, select a *Turtle* or *RDF/XML* file, and the 
-*upload method* desired, and press the *Upload Graph* button below. This information is also available via the
+To upload a new semantic graph to the graph store, enter the URI of the graph, select a *Turtle*, *RDF/XML* or *JSON-LD* file, 
+and the *upload method* desired, and press the *Upload Graph* button below. This information is also available via the
 [*default graph*](/rdf-graph-store?default), in semantic form. You can also browse through the existing graphs below, or
 use the [SPARQL Endpoint](/Sparql.md) to query the graphs in the graph store (or external graphs, or a combination of both).
 
@@ -36,7 +36,7 @@ Graph URI:
 
 <p>
 File to upload:  
-<input type="file" id="GraphFile" name="File" title="Select either a Turtle or RDF/XML file." accept="text/turtle, application/rdf+xml" required/>
+<input type="file" id="GraphFile" name="File" title="Select either a Turtle, RDF/XML or JSON-LD file." accept="text/turtle, application/rdf+xml, application/ld+json" required/>
 </p>
 
 <p>

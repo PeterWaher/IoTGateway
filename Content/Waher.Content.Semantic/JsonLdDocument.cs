@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Runtime.Cache;
-using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Semantic
 {

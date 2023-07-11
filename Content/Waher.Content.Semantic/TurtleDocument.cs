@@ -29,7 +29,7 @@ namespace Waher.Content.Semantic
 
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
-	/// https://www.w3.org/TeamSubmission/turtle/
+	/// https://www.w3.org/TR/rdf12-turtle/
 	/// https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html
 	/// </summary>
 	public class TurtleDocument : InMemorySemanticCube, IWebServerMetaContent

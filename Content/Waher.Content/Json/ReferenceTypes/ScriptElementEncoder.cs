@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Json.ReferenceTypes
 {
@@ -27,81 +27,16 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			ObjectMatrix M = (ObjectMatrix)Object;
-			string[] Names;
-			int Rows = M.Rows;
-			int Columns = M.Columns;
-			int x, y;
+			IElement E = (IElement)Object;
+			object Obj = E.AssociatedObjectValue;
 
-			if (!(M.ColumnNames is null))
-				Names = M.ColumnNames;
+			if (E.Equals(Obj))
+			{
+				string s = Expression.ToString(Obj);
+				JSON.Encode(s, Indent, Json);
+			}
 			else
-			{
-				Names = new string[Columns];
-
-				for (x = 0; x < Columns; x++)
-					Names[x] = "C" + (x + 1).ToString();
-			}
-
-			Json.Append('[');
-
-			if (Indent.HasValue)
-				Indent++;
-
-			for (y = 0; y < Rows; y++)
-			{
-				if (y > 0)
-					Json.Append(',');
-
-				if (Indent.HasValue)
-				{
-					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
-					Indent++;
-				}
-
-				Json.Append('{');
-
-				for (x = 0; x < Columns; x++)
-				{
-					if (x > 0)
-						Json.Append(',');
-
-					if (Indent.HasValue)
-					{
-						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
-					}
-
-					Json.Append('"');
-					Json.Append(JSON.Encode(Names[x]));
-					Json.Append("\":");
-					JSON.Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Json);
-				}
-
-				if (Indent.HasValue)
-				{
-					Indent--;
-					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
-				}
-
-				Json.Append('}');
-			}
-
-
-			if (Indent.HasValue)
-			{
-				Indent--;
-
-				if (Rows > 0 && Columns > 0)
-				{
-					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
-				}
-			}
-
-			Json.Append(']');
+				JSON.Encode(Obj, Indent, Json);
 		}
 
 		/// <summary>

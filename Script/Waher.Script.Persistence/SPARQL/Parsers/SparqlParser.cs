@@ -1754,6 +1754,26 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					Node = this.ParseArgument(Parser);
 					return new Script.Functions.Runtime.Error(Node, Start, Parser.Position - Start, Parser.Expression);
 
+				case "TRIPLE":
+					Arguments = this.ParseArguments(Parser, 3, 3);
+					return new Triple(Arguments[0], Arguments[1], Arguments[2], Start, Parser.Position - Start, Parser.Expression);
+
+				case "SUBJECT":
+					Node = this.ParseArgument(Parser);
+					return new Subject(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "PREDICATE":
+					Node = this.ParseArgument(Parser);
+					return new Predicate(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "OBJECT":
+					Node = this.ParseArgument(Parser);
+					return new Waher.Content.Semantic.Functions.Object(Node, Start, Parser.Position - Start, Parser.Expression);
+
+				case "ISTRIPLE":
+					Node = this.ParseArgument(Parser);
+					return new IsTriple(Node, Start, Parser.Position - Start, Parser.Expression);
+
 				default:
 					if (Parser.PeekNextChar() == ':')
 					{

@@ -2115,12 +2115,17 @@ The following functions are available in the `Waher.Content.Semantic` library.
 | `IsIri(Term)`        | Alias for `IsUri`.                                                                                    |
 | `IsLiteral(Term)`    | Checks if an RDF term is a literal.                                                                   |
 | `IsNumeric(Term)`    | Checks if an RDF term is a numeric literal.                                                           |
+| `IsTriple(Term)`     | Checks if an RDF term is a quoted semantic triple.                                                    |
 | `IsUri(Term)`        | Checks if an RDF term is a URI term.                                                                  |
 | `Lang(Term)`         | Returns the language of the term, if available, or the empty string if not.                           |
 | `LangMatches(x,y)`   | Checks if the language `x` matches the language `y`. `y` can be `*`, or unlocalized, while `x` is.    |
+| `Object(Triple)`     | Returns the object part of a semantic triple.                                                         |
+| `Predicate(Triple)`  | Returns the predicate part of a semantic triple.                                                      |
 | `StrDt(x,Type)`      | Returns a typed literal, with XML data type specified by `Type`, and string value represented by `x`. |
 | `StrLang(x,Lang)`    | Returns a localized literal, with language specified by `Lang`, and string value represented by `x`.  |
+| `Subject(Triple)`    | Returns the subject part of a semantic triple.                                                        |
 | `TimeZone(x)`        | Returns the time zone of a date and time literal value, as a `xs:dayTimeDuration` literal value.      |
+| `Triple(s,p,o)`      | Returns a semantic triple, given the subject (`s`), predicate (`p`) and object (`o`).                 |
 | `Tz(x)`              | Returns the time zone of a date and time literal value, as a string literal value.                    |
 
 #### XSL-related functions (Waher.Content.Xsl)

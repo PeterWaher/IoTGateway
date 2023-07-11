@@ -57,7 +57,10 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Source);
 
 				if (!(Result is null))
-					Union = await InMemorySemanticCube.Create(Result);
+				{
+					Union = new InMemorySemanticCube();
+					await Union.Add(Result);
+				}
 
 				if (Union is null)
 				{

@@ -707,6 +707,10 @@
     <None Remove="Data\Rdf\xmlsch-02\test001.rdf" />
     <None Remove="Data\Rdf\xmlsch-02\test002.rdf" />
     <None Remove="Data\Rdf\xmlsch-02\test003.rdf" />
+    <None Remove="Data\Turtle\example3.1.ttl" />
+    <None Remove="Data\Turtle\test-31.ttl" />
+    <None Remove="Data\Turtle\test-32.out" />
+    <None Remove="Data\Turtle\test-32.ttl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -1425,6 +1429,7 @@
     <EmbeddedResource Include="Data\Turtle\bad-12.ttl" />
     <EmbeddedResource Include="Data\Turtle\bad-13.ttl" />
     <EmbeddedResource Include="Data\Turtle\bad-14.ttl" />
+    <EmbeddedResource Include="Data\Turtle\example3.1.ttl" />
     <EmbeddedResource Include="Data\Turtle\example3.ttl" />
     <EmbeddedResource Include="Data\Turtle\example2_Short.ttl" />
     <EmbeddedResource Include="Data\Turtle\example2.ttl" />
@@ -1499,6 +1504,9 @@
     <EmbeddedResource Include="Data\Turtle\test-28.ttl" />
     <EmbeddedResource Include="Data\Turtle\test-29.out" />
     <EmbeddedResource Include="Data\Turtle\test-29.ttl" />
+    <EmbeddedResource Include="Data\Turtle\test-32.out" />
+    <EmbeddedResource Include="Data\Turtle\test-32.ttl" />
+    <EmbeddedResource Include="Data\Turtle\test-31.ttl" />
     <EmbeddedResource Include="Data\Turtle\test-30.out" />
     <EmbeddedResource Include="Data\Turtle\test-30.ttl" />
     <EmbeddedResource Include="Data\Turtle\test.nt" />

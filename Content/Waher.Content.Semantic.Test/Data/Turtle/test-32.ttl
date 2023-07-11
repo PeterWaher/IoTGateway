@@ -1,0 +1,3 @@
+@PREFIX : <http://example.com/> .
+
+:a :name "Alice" {| :statedBy :bob ; :recorded "2021-07-07"^^xsd:date |} .

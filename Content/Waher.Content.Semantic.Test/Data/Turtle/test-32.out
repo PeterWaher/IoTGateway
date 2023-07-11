@@ -1,0 +1,5 @@
+@PREFIX : <http://example.com/> .
+
+<< :a :name "Alice" >> :statedBy :bob .
+<< :a :name "Alice" >> :recorded "2021-07-07"^^xsd:date .
+:a :name "Alice" .

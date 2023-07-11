@@ -134,11 +134,13 @@ namespace Waher.Content.Semantic.Model
 		{
 			StringBuilder sb = new StringBuilder();
 
+			sb.Append("<< ");
 			sb.Append(this.Subject);
 			sb.Append('\t');
 			sb.Append(this.Predicate);
 			sb.Append('\t');
 			sb.Append(this.Object);
+			sb.Append(" >>");
 
 			return sb.ToString();
 		}

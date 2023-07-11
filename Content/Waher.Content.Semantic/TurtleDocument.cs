@@ -30,7 +30,7 @@ namespace Waher.Content.Semantic
 	/// <summary>
 	/// Contains semantic information stored in a turtle document.
 	/// https://www.w3.org/TR/rdf12-turtle/
-	/// https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html
+	/// https://w3c.github.io/rdf-star/cg-spec/20	21-12-17.html
 	/// </summary>
 	public class TurtleDocument : InMemorySemanticCube, IWebServerMetaContent
 	{
@@ -188,6 +188,7 @@ namespace Waher.Content.Semantic
 							break;
 
 						case ']':
+						case '|':
 							return;
 
 						default:
@@ -197,6 +198,30 @@ namespace Waher.Content.Semantic
 								throw this.ParsingException("Expected triple delimiter . ; or ,");
 					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Adds a triple to the cube.
+		/// </summary>
+		/// <param name="Triple">Semantic triple.</param>
+		public override void Add(ISemanticTriple Triple)
+		{
+			base.Add(Triple);
+
+			this.SkipWhiteSpace();
+			if (this.PeekNextChars(2) == "{|")
+			{
+				this.pos += 2;
+
+				if (!(Triple is SemanticTriple T))
+					T = new SemanticTriple(Triple.Subject, Triple.Predicate, Triple.Object);
+
+				this.ParseTriples(T);
+
+				this.SkipWhiteSpace();
+				if (this.NextChar() != '}')
+					throw this.ParsingException("Expected }");
 			}
 		}
 
@@ -214,7 +239,7 @@ namespace Waher.Content.Semantic
 					case '@':
 						string s = this.ParseName();
 
-						switch (s)
+						switch (s.ToLower())
 						{
 							case "base":
 								ch = this.NextNonWhitespaceChar();
@@ -297,16 +322,17 @@ namespace Waher.Content.Semantic
 							return this.ParseUri();
 
 					case '"':
+					case '\'':
 						if (TriplePosition != 2)
 							throw this.ParsingException("Literals can only occur in object position.");
 
-						if (this.pos < this.len - 1 && this.text[this.pos] == '"' && this.text[this.pos + 1] == '"')
+						if (this.pos < this.len - 1 && this.text[this.pos] == ch && this.text[this.pos + 1] == ch)
 						{
 							this.pos += 2;
-							s = this.ParseString('"', true, true);
+							s = this.ParseString(ch, true, true);
 						}
 						else
-							s = this.ParseString('"', false, true);
+							s = this.ParseString(ch, false, true);
 
 						string Language = null;
 
@@ -843,6 +869,14 @@ namespace Waher.Content.Semantic
 				return this.text[this.pos];
 			else
 				return (char)0;
+		}
+
+		private string PeekNextChars(int NrChars)
+		{
+			if (this.pos + NrChars <= this.len)
+				return this.text.Substring(this.pos, NrChars);
+			else
+				return string.Empty;
 		}
 
 		private char NextChar()

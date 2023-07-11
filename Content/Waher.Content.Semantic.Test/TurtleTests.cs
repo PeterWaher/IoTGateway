@@ -21,7 +21,9 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("example2.ttl")]
 		[DataRow("example2_Short.ttl")]
 		[DataRow("example3.ttl")]
+		[DataRow("example3.1.ttl")]
 		[DataRow("test.nt")]
+		[DataRow("test-31.ttl")]
 		public async Task Test_01_Examples(string FileName)
 		{
 			await PerformTest(FileName);
@@ -59,6 +61,7 @@ namespace Waher.Content.Semantic.Test
 		[DataRow("test-28.ttl", "test-28.out", "http://www.w3.org/2281/sw/DataAccess/df1/tests/")]
 		[DataRow("test-29.ttl", "test-29.out", "http://www.w3.org/2291/sw/DataAccess/df1/tests/")]
 		[DataRow("test-30.ttl", "test-30.out", "http://www.w3.org/2001/sw/DataAccess/df1/tests/")]
+		[DataRow("test-32.ttl", "test-32.out", "http://www.w3.org/2001/sw/DataAccess/df1/tests/")]
 		public async Task Test_02_PassTests(string FileName, string Expected, string BaseUri)
 		{
 			await PerformTest(FileName, Expected, BaseUri);
@@ -107,6 +110,17 @@ namespace Waher.Content.Semantic.Test
 		{
 			TurtleDocument Parsed = await LoadTurtleDocument(FileName, null);
 			await Print(Parsed);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+			foreach (ISemanticTriple T in Parsed)
+			{
+				Console.Out.Write(T.Subject.ToString());
+				Console.Out.Write('\t');
+				Console.Out.Write(T.Predicate.ToString());
+				Console.Out.Write('\t');
+				Console.Out.WriteLine(T.Object.ToString());
+			}
 		}
 
 		private static async Task PerformTest(string FileName, string BaseUri)

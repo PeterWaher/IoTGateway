@@ -129,9 +129,7 @@ namespace Waher.Security.Users
 					return Result;
 			}
 
-			Role[] Roles = this.roles;
-			if (Roles is null)
-				Roles = this.LoadRoles().Result;
+			Role[] Roles = this.roles ?? this.LoadRoles().Result;
 
 			bool HasPrivilege = false;
 

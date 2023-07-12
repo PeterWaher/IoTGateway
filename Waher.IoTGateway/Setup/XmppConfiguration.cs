@@ -559,7 +559,7 @@ namespace Waher.IoTGateway.Setup
 				H = Histogram.Compute(Proposal, 12, 0, 256);
 				MinH = Min.CalcMin(H, null);
 			}
-			while (MinH == 0);
+			while (MinH == 0);	// This condition approximately removes 1 in 2 generated passwords, reducing the strength from 256 bits to 255 bits.
 
 			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));
 		}

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Statistics.Functions
@@ -63,64 +61,140 @@ namespace Waher.Script.Statistics.Functions
 			if (Max <= Min)
 				throw new ScriptRuntimeException("Min must be smaller than Max.", this);
 
-			double[] Result = new double[N];
+			double[] Result;
 			double Diff = Max - Min;
-			double x;
-			int i, j, c;
 
 			if (Data is DoubleVector v)
-			{
-				double[] w = v.Values;
-				c = w.Length;
-
-				for (j = 0; j < c; j++)
-				{
-					x = w[j];
-
-					if (x >= Min && x <= Max)
-					{
-						i = (int)(((x - Min) * N) / Diff);
-						if (i == N)
-							i--;
-
-						Result[i]++;
-					}
-				}
-			}
+				Result = Compute(v.Values, N, Min, Max);
 			else
-			{
-				foreach (IElement E in Data.VectorElements)
-				{
-					if (E.AssociatedObjectValue is double x2)
-						x = x2;
-					else
-					{
-						try
-						{
-							x = Expression.ToDouble(E.AssociatedObjectValue);
-						}
-						catch (Exception)
-						{
-							continue;
-						}
-					}
-
-					if (x >= Min && x <= Max)
-					{
-						i = (int)(((x - Min) * N) / Diff);
-						if (i == N)
-							i--;
-
-						Result[i]++;
-					}
-				}
-			}
+				Result = Compute(Data, N, Min, Max);
 
 			return new ObjectVector(new IElement[]
 			{
 				new ObjectVector(GetLabels(N, Min, Diff)),
 				new DoubleVector(Result)
 			});
+		}
+
+		/// <summary>
+		/// Computes a Histogram over an array of floating-point values.
+		/// </summary>
+		/// <param name="Data">Values to process.</param>
+		/// <param name="N">Number of buckets.</param>
+		/// <param name="Min">Minimum value.</param>
+		/// <param name="Max">Maximum value.</param>
+		/// <returns>Histogram.</returns>
+		public static double[] Compute(double[] Data, int N, double Min, double Max)
+		{
+			double[] Result = new double[N];
+			double Diff = Max - Min;
+			double x;
+			int i, j;
+			int c = Data.Length;
+
+			for (j = 0; j < c; j++)
+			{
+				x = Data[j];
+
+				if (x >= Min && x <= Max)
+				{
+					i = (int)(((x - Min) * N) / Diff);
+					if (i == N)
+						i--;
+
+					Result[i]++;
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes a Histogram over an array of floating-point values.
+		/// </summary>
+		/// <param name="Data">Values to process.</param>
+		/// <param name="N">Number of buckets.</param>
+		/// <param name="Min">Minimum value.</param>
+		/// <param name="Max">Maximum value.</param>
+		/// <returns>Histogram.</returns>
+		public static double[] Compute(IVector Data, int N, double Min, double Max)
+		{
+			double[] Result = new double[N];
+			double Diff = Max - Min;
+			double x;
+			int i;
+
+			foreach (IElement E in Data.VectorElements)
+			{
+				if (E.AssociatedObjectValue is double x2)
+					x = x2;
+				else
+				{
+					try
+					{
+						x = Expression.ToDouble(E.AssociatedObjectValue);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+				}
+
+				if (x >= Min && x <= Max)
+				{
+					i = (int)(((x - Min) * N) / Diff);
+					if (i == N)
+						i--;
+
+					Result[i]++;
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes a Histogram over an array of floating-point values.
+		/// </summary>
+		/// <param name="Data">Values to process.</param>
+		/// <param name="N">Number of buckets.</param>
+		/// <param name="Min">Minimum value.</param>
+		/// <param name="Max">Maximum value.</param>
+		/// <returns>Histogram.</returns>
+		public static double[] Compute(Array Data, int N, double Min, double Max)
+		{
+			double[] Result = new double[N];
+			double Diff = Max - Min;
+			double x;
+			int i;
+
+			foreach (object Element in Data)
+			{
+				if (Element is double x2)
+					x = x2;
+				else
+				{
+					try
+					{
+						x = Expression.ToDouble(Element);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+				}
+
+				if (x >= Min && x <= Max)
+				{
+					i = (int)(((x - Min) * N) / Diff);
+					if (i == N)
+						i--;
+
+					Result[i]++;
+				}
+			}
+
+			return Result;
 		}
 
 		internal static string[] GetLabels(int N, double Min, double Diff)

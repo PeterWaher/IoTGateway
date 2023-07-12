@@ -559,7 +559,29 @@ namespace Waher.IoTGateway.Setup
 				H = Histogram.Compute(Proposal, 12, 0, 256);
 				MinH = Min.CalcMin(H, null);
 			}
-			while (MinH == 0);	// This condition approximately removes 1 in 2 generated passwords, reducing the strength from 256 bits to 255 bits.
+			while (MinH == 0);
+
+			/////////////////////////////////////////////////////////////////////
+			//
+			// This condition approximately removes 1 in 2 generated passwords, 
+			// reducing the strength from 256 bits to 255 bits.
+			//
+			// In a test of 100'000 randomly generated passwords, 42'973 passed
+			// (~43%), 57027 failed (~57%).
+			//
+			// Sample script:
+			//
+			//     NrPass:=0;
+			//     NrFail:=0;
+			//     foreach x in 1..100000 do
+			//     (
+			//         Bin:=Base64Decode(Base64Encode(Gateway.NextBytes(32)));
+			//         H:=Histogram([foreach x in Bin : x],0,256,12);
+			//         if (Min(H[1])>0) then NrPass++ else NrFail++
+			//     );
+			//     {"NrPass":NrPass,"NrFail":NrFail}
+			//
+			/////////////////////////////////////////////////////////////////////
 
 			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));
 		}

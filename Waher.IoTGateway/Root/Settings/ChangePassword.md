@@ -95,7 +95,11 @@ if exists(Posted) then
 				UpdateObject(Result.User);
 				WSU.Users.ClearCache();
 
-				LogInformational("Password changed by User, via Admin.", Result.User.UserName, User.UserName);
+				LogInformational("Password changed by User, via Admin.", 
+				{
+					"Object":Result.User.UserName, 
+					"Actor":User.UserName
+				});
 
 				]]<div class='result'>Password changed.</div>[[
 			)

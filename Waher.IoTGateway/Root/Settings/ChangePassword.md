@@ -91,7 +91,7 @@ if exists(Posted) then
 		(
 			try
 			(
-				Result.User.PasswordHash:=WSU.Users.ComputeHash(User.UserName,Posted.Password);
+				Result.User.PasswordHash:=Base64Encode(WSU.Users.ComputeHash(User.UserName,Posted.Password));
 				UpdateObject(Result.User);
 				WSU.Users.ClearCache();
 

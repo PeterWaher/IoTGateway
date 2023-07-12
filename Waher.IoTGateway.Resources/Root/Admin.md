@@ -88,6 +88,7 @@ MenuItem("Users","/Settings/Users.md","Admin.Security.Users");
 MenuFooter();
 
 MenuHeader("Session");
+MenuItem("Change Password","/Settings/ChangePassword.md","");
 MenuItem("Logout","/Logout","");
 MenuFooter();
 

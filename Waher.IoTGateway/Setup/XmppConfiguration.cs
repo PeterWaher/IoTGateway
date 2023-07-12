@@ -20,6 +20,8 @@ using Waher.Persistence.Attributes;
 using Waher.Security;
 using Waher.Security.Users;
 using Waher.Runtime.Language;
+using Waher.Script.Statistics.Functions;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -546,6 +548,19 @@ namespace Waher.IoTGateway.Setup
 		{
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
+
+			byte[] Proposal;
+			double[] H;
+			double MinH;
+
+			do
+			{
+				Proposal = Gateway.NextBytes(32);
+				H = Histogram.Compute(Proposal, 12, 0, 256);
+				MinH = Min.CalcMin(H, null);
+			}
+			while (MinH == 0);
+
 			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));
 		}
 

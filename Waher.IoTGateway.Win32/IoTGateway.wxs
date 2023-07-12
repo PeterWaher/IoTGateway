@@ -1824,6 +1824,7 @@
 								<RemoveFolder Id='SettingsFiles' On='uninstall' />
 								<File Id='Backup.js' Name='Backup.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.js' KeyPath='yes'/>
 								<File Id='Backup.md' Name='Backup.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.md'/>
+								<File Id='ChangePassword.md' Name='ChangePassword.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\ChangePassword.md'/>
 								<File Id='Config.cssx' Name='Config.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Config.cssx'/>
 								<File Id='Database.js' Name='Database.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.js'/>
 								<File Id='Database.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.md'/>
@@ -1859,6 +1860,7 @@
 								<File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
 								<RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
 								<RemoveFile Id='RemoveBackup.md' Name='Backup.md' On='uninstall'/>
+								<RemoveFile Id='RemoveChangePassword.md' Name='ChangePassword.md' On='uninstall'/>
 								<RemoveFile Id='RemoveConfig.cssx' Name='Config.cssx' On='uninstall'/>
 								<RemoveFile Id='RemoveDatabase.js' Name='Database.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDatabase.md' Name='Database.md' On='uninstall'/>

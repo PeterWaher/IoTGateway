@@ -13,8 +13,11 @@ using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Language;
 using Waher.Script.Persistence.SPARQL.Sources;
 using Waher.Security;
+using Waher.Things;
+using Waher.Things.Semantic.Sources;
 
 namespace Waher.WebService.Sparql
 {
@@ -119,18 +122,67 @@ namespace Waher.WebService.Sparql
 				if (!(Doc is null))
 					return Doc;
 
+				Language DefaultLanguage = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
 				StringBuilder sb = new StringBuilder();
+				string GraphUriNode;
+				bool First;
 
 				sb.AppendLine("@prefix dc: <http://purl.org/dc/terms/> .");
 				sb.AppendLine("@prefix dct: <http://purl.org/dc/dcmitype/> .");
+				sb.AppendLine("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .");
 				sb.AppendLine("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .");
-
+				sb.AppendLine("@prefix iotc: <urn:ieee:iot:concentrator:1.0:> .");
 				sb.AppendLine();
+
+				foreach (IDataSource Source in Gateway.ConcentratorServer.DataSources)
+				{
+					// TODO: Check access rights
+
+					string SourcePath = "/" + HttpUtility.UrlEncode(Source.SourceID);
+
+					GraphUriNode = "<" + Gateway.GetUrl(SourcePath) + ">";
+
+					sb.Append(GraphUriNode);
+					sb.AppendLine(" dc:type iotc:DataSource .");
+
+					sb.Append(GraphUriNode);
+					sb.Append(" rdfs:label \"");
+					sb.Append(JSON.Encode(await Source.GetNameAsync(DefaultLanguage)));
+					sb.AppendLine("\" .");
+
+					sb.Append(GraphUriNode);
+					sb.Append(" dc:updated \"");
+					sb.Append(XML.Encode(Source.LastChanged));
+					sb.AppendLine("\"^^xsd:dateTime .");
+
+					if (Source.HasChildren)
+					{
+						foreach (IDataSource ChildSource in Source.ChildSources)
+						{
+							sb.Append(GraphUriNode);
+							sb.Append(" iotc:childSource <");
+							sb.Append(Gateway.GetUrl("/" + HttpUtility.UrlEncode(ChildSource.SourceID)));
+							sb.AppendLine("> .");
+						}
+					}
+
+					IEnumerable<INode> RootNodes = Source.RootNodes;
+
+					if (!(RootNodes is null))
+					{
+						foreach (INode RootNode in RootNodes)
+						{
+							sb.Append(GraphUriNode);
+							sb.Append(" iotc:rootNode <");
+							sb.Append(Gateway.GetUrl(SourcePath + "/" + HttpUtility.UrlEncode(RootNode.NodeId)));
+							sb.AppendLine("> .");
+						}
+					}
+				}
 
 				foreach (GraphReference Reference in await Database.Find<GraphReference>())
 				{
-					string GraphUriNode = "<" + Reference.GraphUri + ">";
-					bool First = true;
+					GraphUriNode = "<" + Reference.GraphUri + ">";
 
 					sb.Append(GraphUriNode);
 					sb.AppendLine(" dc:type dct:Dataset .");
@@ -147,6 +199,8 @@ namespace Waher.WebService.Sparql
 
 					if (!(Reference.Creators is null))
 					{
+						First = true;
+
 						foreach (string Creator in Reference.Creators)
 						{
 							sb.Append(GraphUriNode);
@@ -189,6 +243,9 @@ namespace Waher.WebService.Sparql
 			if (!ParsedUri.IsAbsoluteUri)
 				throw new BadRequestException("Graph URI must be an absolute URI.");
 
+			if (DataSource.IsServerDomain(ParsedUri.Host, true))
+				throw new ForbiddenException("Unauthorized access to server domain.");
+
 			GraphReference Reference = await Database.FindFirstIgnoreRest<GraphReference>(
 				new FilterFieldEqualTo("GraphUri", GraphUri));
 
@@ -199,7 +256,7 @@ namespace Waher.WebService.Sparql
 		}
 
 		/// <summary>
-		/// Executes the POST method on the resource.
+		/// Executes the PUT method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
@@ -363,7 +420,7 @@ namespace Waher.WebService.Sparql
 		}
 
 		/// <summary>
-		/// Executes the POST method on the resource.
+		/// Executes the DELETE method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>

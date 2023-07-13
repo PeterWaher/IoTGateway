@@ -8,6 +8,8 @@ using System.Web;
 using Waher.Content;
 using Waher.Content.Multipart;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Xml;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
@@ -27,7 +29,7 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	public class GraphStore : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
-		private static TurtleDocument defaultGraph = null;
+		private static ISemanticModel defaultGraph = null;
 		private static readonly SemaphoreSlim defaultGraphSemaphore = new SemaphoreSlim(1);
 
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
@@ -113,26 +115,94 @@ namespace Waher.WebService.Sparql
 			await Response.Return(Graph);
 		}
 
-		internal static async Task<TurtleDocument> GetDefaultSource()
+		/// <summary>
+		/// http://purl.org/dc/terms/
+		/// </summary>
+		public static readonly Uri DublinCoreTerms = new Uri("http://purl.org/dc/terms/");
+
+		/// <summary>
+		/// http://purl.org/dc/terms/type
+		/// </summary>
+		public static readonly Uri DublinCoreTermsType = new Uri(DublinCoreTerms, "type");
+
+		/// <summary>
+		/// http://purl.org/dc/terms/created
+		/// </summary>
+		public static readonly Uri DublinCoreTermsCreated = new Uri(DublinCoreTerms, "created");
+
+		/// <summary>
+		/// http://purl.org/dc/terms/updated
+		/// </summary>
+		public static readonly Uri DublinCoreTermsUpdated = new Uri(DublinCoreTerms, "updated");
+
+		/// <summary>
+		/// http://purl.org/dc/terms/creator
+		/// </summary>
+		public static readonly Uri DublinCoreTermsCreator = new Uri(DublinCoreTerms, "creator");
+
+		/// <summary>
+		/// http://purl.org/dc/terms/contributor
+		/// </summary>
+		public static readonly Uri DublinCoreTermsContributor = new Uri(DublinCoreTerms, "contributor");
+
+		/// <summary>
+		/// http://purl.org/dc/dcmitype/
+		/// </summary>
+		public static readonly Uri DublinCoreMetadataInitiativeType = new Uri("http://purl.org/dc/dcmitype/");
+
+		/// <summary>
+		/// http://purl.org/dc/dcmitype/Dataset
+		/// </summary>
+		public static readonly Uri DublinCoreMetadataInitiativeTypeDataset = new Uri(DublinCoreMetadataInitiativeType, "Dataset");
+
+		/// <summary>
+		/// http://www.w3.org/2000/01/rdf-schema#
+		/// </summary>
+		public static readonly Uri RdfSchema = new Uri("http://www.w3.org/2000/01/rdf-schema#");
+
+		/// <summary>
+		/// http://www.w3.org/2000/01/rdf-schema#label
+		/// </summary>
+		public static readonly Uri RdfSchemaLabel = new Uri(RdfSchema, "label");
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#
+		/// </summary>
+		public static readonly Uri XmlSchema = new Uri("http://www.w3.org/2001/XMLSchema#");
+
+		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0:
+		/// </summary>
+		public static readonly Uri IotConcentrator = new Uri("urn:ieee:iot:concentrator:1.0:");
+
+		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0:DataSource
+		/// </summary>
+		public static readonly Uri IotConcentratorDataSource = new Uri(IotConcentrator, "DataSource");
+
+		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0:childSource
+		/// </summary>
+		public static readonly Uri IotConcentratorChildSource = new Uri(IotConcentrator, "childSource");
+
+		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0:rootNode
+		/// </summary>
+		public static readonly Uri IotConcentratorRootNode = new Uri(IotConcentrator, "rootNode");
+
+		internal static async Task<ISemanticModel> GetDefaultSource()
 		{
 			await defaultGraphSemaphore.WaitAsync();
 			try
 			{
-				TurtleDocument Doc = defaultGraph;
+				ISemanticModel Doc = defaultGraph;
 				if (!(Doc is null))
 					return Doc;
 
 				Language DefaultLanguage = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
-				StringBuilder sb = new StringBuilder();
-				string GraphUriNode;
+				InMemorySemanticCube Result = new InMemorySemanticCube();
+				UriNode GraphUriNode;
 				bool First;
-
-				sb.AppendLine("@prefix dc: <http://purl.org/dc/terms/> .");
-				sb.AppendLine("@prefix dct: <http://purl.org/dc/dcmitype/> .");
-				sb.AppendLine("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .");
-				sb.AppendLine("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .");
-				sb.AppendLine("@prefix iotc: <urn:ieee:iot:concentrator:1.0:> .");
-				sb.AppendLine();
 
 				foreach (IDataSource Source in Gateway.ConcentratorServer.RootDataSources)
 				{
@@ -140,29 +210,31 @@ namespace Waher.WebService.Sparql
 
 					string SourcePath = "/" + HttpUtility.UrlEncode(Source.SourceID);
 
-					GraphUriNode = "<" + Gateway.GetUrl(SourcePath) + ">";
+					GraphUriNode = new UriNode(new Uri(Gateway.GetUrl(SourcePath)));
 
-					sb.Append(GraphUriNode);
-					sb.AppendLine(" dc:type iotc:DataSource .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(DublinCoreTermsType),
+						new UriNode(IotConcentratorDataSource)));
 
-					sb.Append(GraphUriNode);
-					sb.Append(" rdfs:label \"");
-					sb.Append(JSON.Encode(await Source.GetNameAsync(DefaultLanguage)));
-					sb.AppendLine("\" .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(RdfSchemaLabel),
+						new StringLiteral(await Source.GetNameAsync(DefaultLanguage))));
 
-					sb.Append(GraphUriNode);
-					sb.Append(" dc:updated \"");
-					sb.Append(XML.Encode(Source.LastChanged));
-					sb.AppendLine("\"^^xsd:dateTime .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(DublinCoreTermsUpdated),
+						new DateTimeLiteral(Source.LastChanged)));
 
 					if (Source.HasChildren)
 					{
 						foreach (IDataSource ChildSource in Source.ChildSources)
 						{
-							sb.Append(GraphUriNode);
-							sb.Append(" iotc:childSource <");
-							sb.Append(Gateway.GetUrl("/" + HttpUtility.UrlEncode(ChildSource.SourceID)));
-							sb.AppendLine("> .");
+							Result.Add(new SemanticTriple(
+								GraphUriNode,
+								new UriNode(IotConcentratorChildSource),
+								new UriNode(new Uri(Gateway.GetUrl("/" + HttpUtility.UrlEncode(ChildSource.SourceID))))));
 						}
 					}
 
@@ -172,30 +244,32 @@ namespace Waher.WebService.Sparql
 					{
 						foreach (INode RootNode in RootNodes)
 						{
-							sb.Append(GraphUriNode);
-							sb.Append(" iotc:rootNode <");
-							sb.Append(Gateway.GetUrl(SourcePath + "/" + HttpUtility.UrlEncode(RootNode.NodeId)));
-							sb.AppendLine("> .");
+							Result.Add(new SemanticTriple(
+								GraphUriNode,
+								new UriNode(IotConcentratorRootNode),
+								new UriNode(new Uri(Gateway.GetUrl(SourcePath + "/" + HttpUtility.UrlEncode(RootNode.NodeId))))));
 						}
 					}
 				}
 
 				foreach (GraphReference Reference in await Database.Find<GraphReference>())
 				{
-					GraphUriNode = "<" + Reference.GraphUri + ">";
+					GraphUriNode = new UriNode(new Uri(Reference.GraphUri));
 
-					sb.Append(GraphUriNode);
-					sb.AppendLine(" dc:type dct:Dataset .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(DublinCoreTermsType),
+						new UriNode(DublinCoreMetadataInitiativeTypeDataset)));
 
-					sb.Append(GraphUriNode);
-					sb.Append(" dc:created \"");
-					sb.Append(XML.Encode(Reference.Created));
-					sb.AppendLine("\"^^xsd:dateTime .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(DublinCoreTermsCreated),
+						new DateTimeLiteral(Reference.Created)));
 
-					sb.Append(GraphUriNode);
-					sb.Append(" dc:updated \"");
-					sb.Append(XML.Encode(Reference.Created));
-					sb.AppendLine("\"^^xsd:dateTime .");
+					Result.Add(new SemanticTriple(
+						GraphUriNode,
+						new UriNode(DublinCoreTermsUpdated),
+						new DateTimeLiteral(Reference.Updated)));
 
 					if (!(Reference.Creators is null))
 					{
@@ -203,26 +277,29 @@ namespace Waher.WebService.Sparql
 
 						foreach (string Creator in Reference.Creators)
 						{
-							sb.Append(GraphUriNode);
-
 							if (First)
 							{
 								First = false;
-								sb.Append(" dc:creator \"");
+
+								Result.Add(new SemanticTriple(
+									GraphUriNode,
+									new UriNode(DublinCoreTermsCreator),
+									new StringLiteral(Creator)));
 							}
 							else
-								sb.Append(" dc:contributor \"");
-
-							sb.Append(XML.Encode(Creator));
-							sb.AppendLine("\" .");
+							{
+								Result.Add(new SemanticTriple(
+									GraphUriNode,
+									new UriNode(DublinCoreTermsContributor),
+									new StringLiteral(Creator)));
+							}
 						}
 					}
 				}
 
-				Doc = new TurtleDocument(sb.ToString());
-				defaultGraph = Doc;
+				defaultGraph = Result;
 
-				return Doc;
+				return Result;
 			}
 			finally
 			{
@@ -402,6 +479,15 @@ namespace Waher.WebService.Sparql
 				Response.StatusCode = 200;  // OK
 			}
 
+			InvalidateDefaultGrpah();
+		}
+
+		/// <summary>
+		/// Invalidates the default graph, triggering a re-generation of the default
+		/// graph the next time it is requested.
+		/// </summary>
+		internal static void InvalidateDefaultGrpah()
+		{
 			defaultGraph = null;
 		}
 

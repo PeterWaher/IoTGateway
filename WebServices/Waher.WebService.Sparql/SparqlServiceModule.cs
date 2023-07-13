@@ -5,6 +5,7 @@ using Waher.IoTGateway.WebResources;
 using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
+using Waher.Networking.XMPP.Concentrator;
 using Waher.Runtime.Inventory;
 using Waher.Security.JWT;
 using Waher.Security.Users;
@@ -65,6 +66,12 @@ namespace Waher.WebService.Sparql
 				Gateway.HttpServer.Register(this.graphStore);
 			}
 
+			if (!(Gateway.ConcentratorServer is null))
+			{
+				Gateway.ConcentratorServer.SourceRegistered += this.ConcentratorServer_SourceRegistered;
+				Gateway.ConcentratorServer.SourceUnregistered += this.ConcentratorServer_SourceUnregistered;
+			}
+
 			return Task.CompletedTask;
 		}
 
@@ -82,7 +89,23 @@ namespace Waher.WebService.Sparql
 				this.graphStore = null;
 			}
 
+			if (!(Gateway.ConcentratorServer is null))
+			{
+				Gateway.ConcentratorServer.SourceRegistered -= this.ConcentratorServer_SourceRegistered;
+				Gateway.ConcentratorServer.SourceUnregistered -= this.ConcentratorServer_SourceUnregistered;
+			}
+
 			return Task.CompletedTask;
+		}
+
+		private void ConcentratorServer_SourceRegistered(object sender, DataSourceEventArgs e)
+		{
+			GraphStore.InvalidateDefaultGrpah();
+		}
+
+		private void ConcentratorServer_SourceUnregistered(object sender, DataSourceEventArgs e)
+		{
+			GraphStore.InvalidateDefaultGrpah();
 		}
 	}
 }

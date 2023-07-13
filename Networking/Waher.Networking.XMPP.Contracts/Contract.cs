@@ -1608,27 +1608,27 @@ namespace Waher.Networking.XMPP.Contracts
 
 		internal string ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
 		{
-			return Select(Text, Language)?.GenerateMarkdown(this, Type);
+			return this.Select(Text, Language)?.GenerateMarkdown(this, Type);
 		}
 
 		internal Task<string> ToPlainText(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GeneratePlainText(this) ?? Task.FromResult<string>(null);
+			return this.Select(Text, Language)?.GeneratePlainText(this) ?? Task.FromResult<string>(null);
 		}
 
 		internal Task<string> ToHTML(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
+			return this.Select(Text, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
 		}
 
 		internal Task<string> ToXAML(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
+			return this.Select(Text, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
 		}
 
 		internal Task<string> ToXamarinForms(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
+			return this.Select(Text, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
 		}
 
 		internal HumanReadableText Select(HumanReadableText[] Text, string Language)

@@ -729,7 +729,7 @@ namespace Waher.Things.Virtual
 			};
 
 			object Payload = await Expression.EvalAsync(PayloadScript, v);
-			object Response = await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
+			await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
 		}
 
 	}

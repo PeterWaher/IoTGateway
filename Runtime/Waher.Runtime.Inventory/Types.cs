@@ -1059,7 +1059,7 @@ namespace Waher.Runtime.Inventory
 		public static InterfaceType FindBest<InterfaceType, ObjectType>(ObjectType Object)
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
-			return FindBest<InterfaceType, ObjectType>(Object, Types.GetTypesImplementingInterface(typeof(InterfaceType)));
+			return FindBest<InterfaceType, ObjectType>(Object, GetTypesImplementingInterface(typeof(InterfaceType)));
 		}
 
 		/// <summary>
@@ -1115,7 +1115,7 @@ namespace Waher.Runtime.Inventory
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport)
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
-			return FindSupport<InterfaceType, ObjectType>(Object, MinSupport, Types.GetTypesImplementingInterface(typeof(InterfaceType)));
+			return FindSupport<InterfaceType, ObjectType>(Object, MinSupport, GetTypesImplementingInterface(typeof(InterfaceType)));
 		}
 
 		/// <summary>

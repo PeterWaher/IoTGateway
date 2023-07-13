@@ -6,6 +6,7 @@ using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.Users;
+using Waher.Things;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -153,35 +154,23 @@ namespace Waher.IoTGateway.WebResources
 				throw new SeeOtherException(From);
 		}
 
-		private class InternalUser : IUser
+		private class InternalUser : IUser, IRequestOrigin
 		{
-			public string PasswordHash
-			{
-				get
-				{
-					return string.Empty;
-				}
-			}
-
-			public string PasswordHashType
-			{
-				get
-				{
-					return string.Empty;
-				}
-			}
-
-			public string UserName
-			{
-				get
-				{
-					return Gateway.XmppClient?.UserName;
-				}
-			}
+			public string PasswordHash => string.Empty;
+			public string PasswordHashType => string.Empty;
+			public string UserName => Gateway.XmppClient?.UserName;
 
 			public bool HasPrivilege(string Privilege)
 			{
 				return true;
+			}
+
+			public RequestOrigin Origin
+			{
+				get
+				{
+					return new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null);
+				}
 			}
 		}
 

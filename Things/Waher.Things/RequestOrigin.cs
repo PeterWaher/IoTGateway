@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Waher.Things
+﻿namespace Waher.Things
 {
 	/// <summary>
 	/// Tokens available in request.
 	/// </summary>
-	public class RequestOrigin
+	public class RequestOrigin : IRequestOrigin
 	{
 		/// <summary>
 		/// Empty request origin.
@@ -54,5 +49,10 @@ namespace Waher.Things
 		/// User tokens, or null.
 		/// </summary>
 		public string[] UserTokens => this.userTokens;
+
+		/// <summary>
+		/// Origin of request.
+		/// </summary>
+		public RequestOrigin Origin => this;
 	}
 }

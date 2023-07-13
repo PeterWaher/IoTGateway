@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
+using Waher.Things;
 
 namespace Waher.Security.Users
 {
@@ -11,7 +12,7 @@ namespace Waher.Security.Users
 	[TypeName(TypeNameSerialization.None)]
 	[Index("UserName")]
 	[ArchivingTime]
-	public class User : IUser
+	public class User : IUser, IRequestOrigin
 	{
 		private readonly Dictionary<string, bool> privileges = new Dictionary<string, bool>();
 		private string objectId = null;
@@ -150,6 +151,17 @@ namespace Waher.Security.Users
 			Task.Run(() => Privileges.GetPrivilege(Privilege));
 
 			return HasPrivilege;
+		}
+
+		/// <summary>
+		/// Origin of request.
+		/// </summary>
+		public RequestOrigin Origin
+		{
+			get
+			{
+				return new RequestOrigin(this.userName, null, null, null);
+			}
 		}
 	}
 }

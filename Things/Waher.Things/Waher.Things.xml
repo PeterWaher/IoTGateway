@@ -2182,6 +2182,16 @@
             Available command objects. If no commands are available, null is returned.
             </summary>
         </member>
+        <member name="T:Waher.Things.IRequestOrigin">
+            <summary>
+            Interface for requestors that can act as an origin for distributed requests.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.IRequestOrigin.Origin">
+            <summary>
+            Origin of request.
+            </summary>
+        </member>
         <member name="T:Waher.Things.ISensor">
             <summary>
             Interface for sensor nodes.
@@ -2976,6 +2986,11 @@
         <member name="P:Waher.Things.RequestOrigin.UserTokens">
             <summary>
             User tokens, or null.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.RequestOrigin.Origin">
+            <summary>
+            Origin of request.
             </summary>
         </member>
         <member name="T:Waher.Things.ScriptExtensions.AddableTypes">

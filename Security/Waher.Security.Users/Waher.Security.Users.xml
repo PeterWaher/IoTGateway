@@ -283,6 +283,11 @@
             <param name="Privilege">Privilege.</param>
             <returns>If the user has the corresponding privilege.</returns>
         </member>
+        <member name="P:Waher.Security.Users.User.Origin">
+            <summary>
+            Origin of request.
+            </summary>
+        </member>
         <member name="T:Waher.Security.Users.UserMetaData">
             <summary>
             Contains a piece of meta-data information about a user.

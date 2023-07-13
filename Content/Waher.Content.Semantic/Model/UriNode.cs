@@ -24,12 +24,21 @@ namespace Waher.Content.Semantic.Model
 		/// Represents a URI
 		/// </summary>
 		/// <param name="Uri">URI</param>
+		public UriNode(Uri Uri)
+			: this(Uri, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents a URI
+		/// </summary>
+		/// <param name="Uri">URI</param>
 		/// <param name="Short">Short name</param>
 		public UriNode(Uri Uri, string Short)
 		{
 			this.parsed = Uri;
 			this.uri = Uri.ToString();
-			this.shortName = Short;
+			this.shortName = Short ?? this.uri;
 		}
 
 		/// <summary>
@@ -65,7 +74,7 @@ namespace Waher.Content.Semantic.Model
 		/// <summary>
 		/// URI string
 		/// </summary>
-		public string UriString 
+		public string UriString
 		{
 			get => this.uri;
 			set

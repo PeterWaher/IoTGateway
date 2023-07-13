@@ -134,7 +134,7 @@ namespace Waher.WebService.Sparql
 				sb.AppendLine("@prefix iotc: <urn:ieee:iot:concentrator:1.0:> .");
 				sb.AppendLine();
 
-				foreach (IDataSource Source in Gateway.ConcentratorServer.DataSources)
+				foreach (IDataSource Source in Gateway.ConcentratorServer.RootDataSources)
 				{
 					// TODO: Check access rights
 

@@ -29,7 +29,7 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	public class GraphStore : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
-		private static ISemanticModel defaultGraph = null;
+		private static readonly Dictionary<string, ISemanticModel> defaultGraphs = new Dictionary<string, ISemanticModel>();
 		private static readonly SemaphoreSlim defaultGraphSemaphore = new SemaphoreSlim(1);
 
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
@@ -98,7 +98,7 @@ namespace Waher.WebService.Sparql
 			ISemanticModel Graph;
 
 			if (Request.Header.TryGetQueryParameter("default", out _))
-				Graph = await GetDefaultSource();
+				Graph = await GetDefaultSource(GetOrigin(Request));
 			else
 			{
 				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
@@ -109,20 +109,32 @@ namespace Waher.WebService.Sparql
 					return;
 
 				GraphStoreSource Source = new GraphStoreSource(Reference);
-				Graph = await Source.LoadGraph(GraphUri, null, false);
+				Graph = await Source.LoadGraph(GraphUri, null, false, GetOrigin(Request));
 			}
 
 			await Response.Return(Graph);
 		}
 
-		internal static async Task<ISemanticModel> GetDefaultSource()
+		public static RequestOrigin GetOrigin(HttpRequest Request)
+		{
+			if (Request.User is IRequestOrigin RequestOrigin)
+				return RequestOrigin.Origin;
+			else
+				return new RequestOrigin(Request.RemoteEndPoint, null, null, null);
+		}
+
+		internal static async Task<ISemanticModel> GetDefaultSource(RequestOrigin Caller)
 		{
 			await defaultGraphSemaphore.WaitAsync();
 			try
 			{
-				ISemanticModel Doc = defaultGraph;
-				if (!(Doc is null))
-					return Doc;
+				string DefaultGraphKey = Caller?.From ?? string.Empty;
+
+				lock (defaultGraphs)
+				{
+					if (defaultGraphs.TryGetValue(DefaultGraphKey, out ISemanticModel Doc))
+						return Doc;
+				}
 
 				Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
 				InMemorySemanticCube Result = new InMemorySemanticCube();
@@ -130,7 +142,7 @@ namespace Waher.WebService.Sparql
 				bool First;
 
 				foreach (IDataSource Source in Gateway.ConcentratorServer.RootDataSources)
-					await DataSourceGraph.AppendSourceInformation(Result, Source, Language);
+					await DataSourceGraph.AppendSourceInformation(Result, Source, Language, Caller);
 
 				foreach (GraphReference Reference in await Database.Find<GraphReference>())
 				{
@@ -177,7 +189,10 @@ namespace Waher.WebService.Sparql
 					}
 				}
 
-				defaultGraph = Result;
+				lock (defaultGraphs)
+				{
+					defaultGraphs[DefaultGraphKey] = Result;
+				}
 
 				return Result;
 			}
@@ -368,7 +383,10 @@ namespace Waher.WebService.Sparql
 		/// </summary>
 		internal static void InvalidateDefaultGrpah()
 		{
-			defaultGraph = null;
+			lock (defaultGraphs)
+			{
+				defaultGraphs.Clear();
+			}
 		}
 
 		private static string[] AddIfNotIncluded(string[] Values, string Value)

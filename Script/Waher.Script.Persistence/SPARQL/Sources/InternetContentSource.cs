@@ -10,6 +10,7 @@ using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Things;
 
 namespace Waher.Script.Persistence.SPARQL.Sources
 {
@@ -47,13 +48,17 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <param name="Source">Source URI</param>
 		/// <param name="Node">Node performing the loading.</param>
 		/// <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+		/// <param name="Caller">Information about entity making the request.</param>
 		/// <returns>Graph, if found, null if not found, and null can be returned.</returns>
-		public async Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound)
+		public async Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound,
+			RequestOrigin Caller)
 		{
 			object Result = null;
 
 			try
 			{
+				// TODO: Include credentials in request, if available.
+
 				Result = await InternetContent.GetAsync(Source,
 					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, text/plain;q=0.1"));
 

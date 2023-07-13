@@ -69,7 +69,7 @@ namespace Waher.WebService.Sparql
 
 			// TODO: Return page if empty GET.
 
-			State State = new State();
+			State State = new State(Request);
 			State.Start();
 
 			(SparqlQuery Query, ISemanticCube[] DefaultGraphs, string[] NamedGraphs, bool Pretty) =
@@ -138,7 +138,7 @@ namespace Waher.WebService.Sparql
 						{
 							Uri SourceUri = new Uri(P.Value);
 							IGraphSource Source = await SparqlQuery.GetSourceHandler(SourceUri, false);
-							ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false);
+							ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false, State.Origin);
 
 							if (DefaultGraphs is null)
 								DefaultGraphs = new List<ISemanticCube>();
@@ -180,7 +180,7 @@ namespace Waher.WebService.Sparql
 		{
 			CheckAuthorization(Request);
 
-			State State = new State();
+			State State = new State(Request);
 			State.Start();
 
 			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;
@@ -266,7 +266,7 @@ namespace Waher.WebService.Sparql
 					}
 				}
 				else
-					v[" Default Graph "] = await GraphStore.GetDefaultSource();
+					v[" Default Graph "] = await GraphStore.GetDefaultSource(GraphStore.GetOrigin(Request));
 
 				if (!(NamedGraphs is null))
 					Query.RegisterNamedGraph(NamedGraphs);

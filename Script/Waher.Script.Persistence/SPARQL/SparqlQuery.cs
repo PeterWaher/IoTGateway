@@ -15,6 +15,7 @@ using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SPARQL.Patterns;
 using Waher.Script.Persistence.SPARQL.Sources;
 using Waher.Script.Persistence.SQL;
+using Waher.Things;
 
 namespace Waher.Script.Persistence.SPARQL
 {
@@ -758,7 +759,18 @@ namespace Waher.Script.Persistence.SPARQL
 			if (Source is null)
 				return null;
 
-			return await Source.LoadGraph(Uri, this, NullIfNotFound);
+			if (Variables.TryGetVariable("QuickLoginUser", out v) &&
+				v.ValueObject is IRequestOrigin Caller)
+			{
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, Caller.Origin);
+			}
+			else if (Variables.TryGetVariable("User", out v) &&
+				v.ValueObject is IRequestOrigin Caller2)
+			{
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, Caller2.Origin);
+			}
+			else
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, null);
 		}
 
 		/// <summary>

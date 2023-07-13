@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Waher.Networking.HTTP;
+using Waher.Things;
 
 namespace Waher.WebService.Sparql
 {
@@ -7,7 +9,9 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	internal class State
 	{
+		private readonly HttpRequest request;
 		private readonly Stopwatch watch;
+		private RequestOrigin origin;
 		private long lastTicks = 0;
 		private long parsingTicks = 0;
 		private long loadDefaultTicks = 0;
@@ -17,8 +21,10 @@ namespace Waher.WebService.Sparql
 		/// <summary>
 		/// Contains the internal state of a query.
 		/// </summary>
-		public State()
+		/// <param name="Request">Request performing query.</param>
+		public State(HttpRequest Request)
 		{
+			this.request = Request;
 			this.watch = new Stopwatch();
 		}
 
@@ -106,6 +112,20 @@ namespace Waher.WebService.Sparql
 			long l = this.watch.ElapsedTicks;
 			this.returningTicks += (l - this.lastTicks);
 			this.lastTicks = l;
+		}
+
+		/// <summary>
+		/// Origin of request.
+		/// </summary>
+		public RequestOrigin Origin
+		{
+			get
+			{
+				if (this.origin is null)
+					this.origin = new RequestOrigin(this.request.RemoteEndPoint, null, null, null);
+
+				return this.origin;
+			}
 		}
 	}
 }

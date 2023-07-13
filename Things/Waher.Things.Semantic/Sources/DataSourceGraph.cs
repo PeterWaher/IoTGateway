@@ -85,6 +85,11 @@ namespace Waher.Things.Semantic.Sources
 		public static readonly Uri IotConcentratorDataSource = new Uri(IotConcentrator, "DataSource");
 
 		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0:hasChildSource
+		/// </summary>
+		public static readonly Uri IotConcentratorHasChildSource = new Uri(IotConcentrator, "hasChildSource");
+
+		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0:childSource
 		/// </summary>
 		public static readonly Uri IotConcentratorChildSource = new Uri(IotConcentrator, "childSource");
@@ -164,8 +169,10 @@ namespace Waher.Things.Semantic.Sources
 		/// <param name="GraphUri">Graph URI</param>
 		/// <param name="Node">Node performing the loading.</param>
 		/// <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+		/// <param name="Caller">Information about entity making the request.</param>
 		/// <returns>Graph, if found, null if not found, and null can be returned.</returns>
-		public async Task<ISemanticCube> LoadGraph(Uri GraphUri, ScriptNode Node, bool NullIfNotFound)
+		public async Task<ISemanticCube> LoadGraph(Uri GraphUri, ScriptNode Node, bool NullIfNotFound,
+			RequestOrigin Caller)
 		{
 			if (!IsServerDomain(GraphUri.Host, true) ||
 				!string.IsNullOrEmpty(GraphUri.Query) ||
@@ -194,7 +201,7 @@ namespace Waher.Things.Semantic.Sources
 			switch (c)
 			{
 				case 2: // DOMAIN/Source
-					await AppendSourceInformation(Result, Source, Language);
+					await AppendSourceInformation(Result, Source, Language, Caller);
 					break;
 
 				case 3: // /DOMAIN/Source/NodeID
@@ -211,9 +218,10 @@ namespace Waher.Things.Semantic.Sources
 		}
 
 		public static async Task AppendSourceInformation(InMemorySemanticCube Result, 
-			IDataSource Source, Language Language)
+			IDataSource Source, Language Language, RequestOrigin Caller)
 		{
-			// TODO: Check access rights
+			if (Source is null || !await Source.CanViewAsync(Caller))
+				return;
 
 			string SourcePath = "/" + HttpUtility.UrlEncode(Source.SourceID);
 			UriNode GraphUriNode = new UriNode(new Uri(Gateway.GetUrl(SourcePath)));
@@ -232,6 +240,11 @@ namespace Waher.Things.Semantic.Sources
 				GraphUriNode,
 				new UriNode(DublinCoreTermsUpdated),
 				new DateTimeLiteral(Source.LastChanged)));
+
+			Result.Add(new SemanticTriple(
+				GraphUriNode,
+				new UriNode(IotConcentratorHasChildSource),
+				new BooleanLiteral(Source.HasChildren)));
 
 			if (Source.HasChildren)
 			{

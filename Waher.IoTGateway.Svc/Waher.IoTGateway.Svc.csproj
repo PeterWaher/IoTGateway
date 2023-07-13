@@ -153,6 +153,7 @@
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Modbus\Waher.Things.Modbus.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj" />
+    <ProjectReference Include="..\Things\Waher.Things.Semantic\Waher.Things.Semantic.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Snmp\Waher.Things.Snmp.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Virtual\Waher.Things.Virtual.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Xmpp\Waher.Things.Xmpp.csproj" />

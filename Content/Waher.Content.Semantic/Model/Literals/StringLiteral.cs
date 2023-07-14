@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
@@ -44,7 +45,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#string
 		/// </summary>
-		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#string";
+		public const string TypeUri = XmlSchema.Namespace + "string";
 
 		/// <summary>
 		/// Type name

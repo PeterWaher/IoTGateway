@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
@@ -38,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#unsignedByte
 		/// </summary>
-		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#unsignedByte";
+		public const string TypeUri = XmlSchema.Namespace + "unsignedByte";
 
 		/// <summary>
 		/// Type name

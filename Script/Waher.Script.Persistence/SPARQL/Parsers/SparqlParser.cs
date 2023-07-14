@@ -7,6 +7,7 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
@@ -58,9 +59,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 		private readonly int preambleLen;
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>()
 		{
-			{ "xsd", "http://www.w3.org/2001/XMLSchema#" },
-			{ "rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#" },
-			{ "rdfs", "http://www.w3.org/2000/01/rdf-schema#" },
+			{ "xsd", XmlSchema.Namespace },
+			{ "rdf", Rdf.Namespace },
+			{ "rdfs", RdfSchema.Namespace },
 			{ "fn", "http://www.w3.org/2005/xpath-functions#" },
 			{ "sfn", "http://www.w3.org/ns/sparql#" }
 		};

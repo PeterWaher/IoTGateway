@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -36,7 +37,7 @@ namespace Waher.Content.Semantic
 	{
 		private readonly Dictionary<string, string> namespaces = new Dictionary<string, string>
 		{
-			{ "xsd", "http://www.w3.org/2001/XMLSchema#" },
+			{ "xsd", XmlSchema.Namespace },
 			{ "ttl", "http://www.w3.org/2008/turtle#" }
 		};
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();

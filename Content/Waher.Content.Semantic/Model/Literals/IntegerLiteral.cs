@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
@@ -53,7 +54,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#byte
 		/// </summary>
-		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#integer";
+		public const string TypeUri = XmlSchema.Namespace + "integer";
 
 		/// <summary>
 		/// Type name
@@ -84,17 +85,43 @@ namespace Waher.Content.Semantic.Model.Literals
         {
             switch (DataType)
             {
-                case "http://www.w3.org/2001/XMLSchema#integer":
-                case "http://www.w3.org/2001/XMLSchema#negativeInteger":
-                case "http://www.w3.org/2001/XMLSchema#nonNegativeInteger":
-                case "http://www.w3.org/2001/XMLSchema#nonPositiveInteger":
-                case "http://www.w3.org/2001/XMLSchema#positiveInteger":
+				case IntegerUri:
+				case NegativeIntegerUri:
+				case NonNegativeIntegerUri:
+				case NonPositiveIntegerUri:
+				case PositiveIntegerUri:
                     return Grade.Ok;
 
                 default:
                     return Grade.NotAtAll;
             }
         }
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#integer
+		/// </summary>
+		public const string IntegerUri = XmlSchema.Namespace + "integer";
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#negativeInteger
+		/// </summary>
+		public const string NegativeIntegerUri = XmlSchema.Namespace + "negativeInteger";
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#nonNegativeInteger
+		/// </summary>
+		public const string NonNegativeIntegerUri = XmlSchema.Namespace + "nonNegativeInteger";
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#nonPositiveInteger
+		/// </summary>
+		public const string NonPositiveIntegerUri = XmlSchema.Namespace + "nonPositiveInteger";
+
+		/// <summary>
+		/// http://www.w3.org/2001/XMLSchema#positiveInteger
+		/// </summary>
+		public const string PositiveIntegerUri = XmlSchema.Namespace + "positiveInteger";
+
 
 		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..

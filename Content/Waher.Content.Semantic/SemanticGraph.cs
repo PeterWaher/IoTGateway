@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Ontologies;
 
 namespace Waher.Content.Semantic
 {
@@ -39,7 +40,7 @@ namespace Waher.Content.Semantic
 
 			if (!Triple.Object.IsLiteral &&
 				Triple.Predicate is UriNode Predicate &&
-				Predicate.Uri.ToString() != RdfDocument.UriRdfType.ToString())
+				Predicate.Uri != Rdf.Type)
 			{
 				this.nodes[Triple.Object] = true;
 				this.nodesStatic = null;
@@ -117,7 +118,7 @@ namespace Waher.Content.Semantic
 						if (Predicates.Current is UriNode UriNode)
 						{
 							PropertyName = UriNode.ShortName;
-							IsRdfType = UriNode.Uri.ToString() == RdfDocument.UriRdfType.ToString();
+							IsRdfType = UriNode.Uri == Rdf.Type;
 						}
 						else
 						{

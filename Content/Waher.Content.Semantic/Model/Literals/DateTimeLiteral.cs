@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 
@@ -39,7 +40,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#boolean
 		/// </summary>
-		public const string TypeUri = "http://www.w3.org/2001/XMLSchema#dateTime";
+		public const string TypeUri = XmlSchema.Namespace + "dateTime";
 
 		/// <summary>
 		/// Type name

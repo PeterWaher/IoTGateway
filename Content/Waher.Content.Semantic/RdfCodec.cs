@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -174,14 +175,14 @@ namespace Waher.Content.Semantic
 						List.AddLast(Triple);
 					}
 
-					w.WriteStartElement("rdf", "RDF", RdfDocument.RdfNamespace);
+					w.WriteStartElement("rdf", "RDF", Rdf.Namespace);
 
 					foreach (KeyValuePair<string, string> P in Prefixes)
 						w.WriteAttributeString("xmlns", P.Key, string.Empty, P.Value);
 
 					foreach (KeyValuePair<string, LinkedList<ISemanticTriple>> Subject in PerSubject)
 					{
-						w.WriteStartElement("rdf", "Description", RdfDocument.RdfNamespace);
+						w.WriteStartElement("rdf", "Description", Rdf.Namespace);
 
 						if (Subject.Value.First.Value is BlankNode SubjectBlankNode)
 							w.WriteAttributeString("rdf", "nodeID", string.Empty, SubjectBlankNode.NodeId);

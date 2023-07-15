@@ -10,6 +10,7 @@ using Waher.Content.Multipart;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Content.Xml;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
@@ -150,17 +151,17 @@ namespace Waher.WebService.Sparql
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DataSourceGraph.DublinCoreTermsType),
-						new UriNode(DataSourceGraph.DublinCoreMetadataInitiativeTypeDataset)));
+						new UriNode(DublinCore.Terms.Type),
+						new UriNode(DublinCore.MetadataInitiative.Type.Dataset)));
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DataSourceGraph.DublinCoreTermsCreated),
+						new UriNode(DublinCore.Terms.Created),
 						new DateTimeLiteral(Reference.Created)));
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DataSourceGraph.DublinCoreTermsUpdated),
+						new UriNode(DublinCore.Terms.Updated),
 						new DateTimeLiteral(Reference.Updated)));
 
 					if (!(Reference.Creators is null))
@@ -175,14 +176,14 @@ namespace Waher.WebService.Sparql
 
 								Result.Add(new SemanticTriple(
 									GraphUriNode,
-									new UriNode(DataSourceGraph.DublinCoreTermsCreator),
+									new UriNode(DublinCore.Terms.Creator),
 									new StringLiteral(Creator)));
 							}
 							else
 							{
 								Result.Add(new SemanticTriple(
 									GraphUriNode,
-									new UriNode(DataSourceGraph.DublinCoreTermsContributor),
+									new UriNode(DublinCore.Terms.Contributor),
 									new StringLiteral(Creator)));
 							}
 						}

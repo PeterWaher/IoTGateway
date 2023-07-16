@@ -50,8 +50,8 @@ namespace Waher.Networking.XMPP.Software
 			if (!Directory.Exists(PackageFolder))
 				Directory.CreateDirectory(PackageFolder);
 
-			Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
-			Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
+			this.Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
+			this.Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
 		}
 
 		/// <inheritdoc/>
@@ -59,8 +59,8 @@ namespace Waher.Networking.XMPP.Software
 		{
 			base.Dispose();
 
-			Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
-			Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
+			this.Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
+			this.Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
 		}
 
 		/// <summary>

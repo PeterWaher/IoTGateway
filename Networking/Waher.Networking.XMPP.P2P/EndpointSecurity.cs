@@ -104,9 +104,9 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				this.RegisterHandlers(this.client);
 
-				this.client.OnStateChanged += Client_OnStateChanged;
-				this.client.OnPresence += Client_OnPresence;
-				this.client.CustomPresenceXml += Client_CustomPresenceXml;
+				this.client.OnStateChanged += this.Client_OnStateChanged;
+				this.client.OnPresence += this.Client_OnPresence;
+				this.client.CustomPresenceXml += this.Client_CustomPresenceXml;
 			}
 		}
 
@@ -304,9 +304,9 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.client is null))
 			{
-				this.client.OnStateChanged -= Client_OnStateChanged;
-				this.client.OnPresence -= Client_OnPresence;
-				this.client.CustomPresenceXml -= Client_CustomPresenceXml;
+				this.client.OnStateChanged -= this.Client_OnStateChanged;
+				this.client.OnPresence -= this.Client_OnPresence;
+				this.client.CustomPresenceXml -= this.Client_CustomPresenceXml;
 
 				this.UnregisterHandlers(this.client);
 				this.client = null;

@@ -249,7 +249,7 @@ namespace Waher.WebService.Sparql
 
 			try
 			{
-				Variables v = new Variables();
+				Variables v = Request.Session ?? new Variables();
 
 				if (!(DefaultGraphs is null) && DefaultGraphs.Length > 0)
 				{

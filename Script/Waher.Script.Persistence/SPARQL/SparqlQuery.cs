@@ -770,7 +770,7 @@ namespace Waher.Script.Persistence.SPARQL
 				return await Source.LoadGraph(Uri, this, NullIfNotFound, Caller2.Origin);
 			}
 			else
-				return await Source.LoadGraph(Uri, this, NullIfNotFound, null);
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, new RequestOrigin(string.Empty, null, null, null));
 		}
 
 		/// <summary>

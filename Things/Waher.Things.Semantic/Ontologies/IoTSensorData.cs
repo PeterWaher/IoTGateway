@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace Waher.Things.Semantic.Ontologies
 {
@@ -33,34 +34,19 @@ namespace Waher.Things.Semantic.Ontologies
 		public static readonly Uri Errors = new Uri(Namespace + "errros");
 
 		/// <summary>
-		/// urn:ieee:iot:sd:1.0:module
+		/// urn:ieee:iot:sd:1.0:qos
 		/// </summary>
-		public static readonly Uri Module = new Uri(Namespace + "module");
+		public const string QoS = Namespace + "qos";
 
 		/// <summary>
 		/// urn:ieee:iot:sd:1.0:qos
 		/// </summary>
-		public static readonly Uri QoS = new Uri(Namespace + "qos");
+		public static readonly Uri QoSUri = new Uri(QoS);
 
 		/// <summary>
 		/// urn:ieee:iot:sd:1.0:fieldType
 		/// </summary>
 		public const string FieldType = Namespace + "fieldType";
-
-		/// <summary>
-		/// urn:ieee:iot:sd:1.0:localization
-		/// </summary>
-		public static readonly Uri Localization = new Uri(Namespace + "localization");
-
-		/// <summary>
-		/// urn:ieee:iot:sd:1.0:stringId
-		/// </summary>
-		public static readonly Uri StringId = new Uri(Namespace + "stringId");
-
-		/// <summary>
-		/// urn:ieee:iot:sd:1.0:seed
-		/// </summary>
-		public static readonly Uri Seed = new Uri(Namespace + "seed");
 
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0:value

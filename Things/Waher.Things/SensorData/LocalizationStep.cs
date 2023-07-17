@@ -1,5 +1,6 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Language;
 
 namespace Waher.Things.SensorData
 {
@@ -96,5 +97,43 @@ namespace Waher.Things.SensorData
 			set => this.seed = value;
 		}
 
+		/// <summary>
+		/// Tries to get the localization of a string, given a sequence of localization steps.
+		/// </summary>
+		/// <param name="Language">Language</param>
+		/// <param name="BaseModule">Base module to use, if another module is not specified.</param>
+		/// <param name="Steps">Sequence of steps.</param>
+		/// <returns>Localized result, if successful, null if not.</returns>
+		public static async Task<string> TryGetLocalization(Language Language, Namespace BaseModule, params LocalizationStep[] Steps)
+		{
+			if (Steps is null || Steps.Length == 0)
+				return null;
+
+			string Result = Steps[0].seed ?? string.Empty;
+
+			Namespace Namespace;
+
+			foreach (LocalizationStep Step in Steps)
+			{
+				if (!string.IsNullOrEmpty(Step.module))
+					Namespace = await Language.GetNamespaceAsync(Step.module);
+				else
+					Namespace = BaseModule;
+
+				if (Namespace is null)
+					return null;
+
+				LanguageString String = await BaseModule.GetStringAsync(Step.stringId);
+				if (String is null)
+					return null;
+
+				Result = String.Value.Replace("%0%", Result);
+
+				if (!string.IsNullOrEmpty(Step.seed))
+					Result = Result.Replace("%1%", Step.seed);
+			}
+
+			return Result;
+		}
 	}
 }

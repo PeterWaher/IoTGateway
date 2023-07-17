@@ -721,7 +721,7 @@ namespace Waher.Things.Semantic.Sources
 					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 					InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
 						new IThingReference[] { Node }, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
-						(sender, e) =>
+						async (sender, e) =>
 						{
 							foreach (Field F in e.Fields)
 							{
@@ -732,10 +732,48 @@ namespace Waher.Things.Semantic.Sources
 									new UriNode(Rdf.ListItem(++FieldIndex)),
 									FieldNode));
 
-								Result.Add(new SemanticTriple(
-									FieldNode,
-									new UriNode(RdfSchema.Label),
-									new StringLiteral(F.Name)));
+								string LocalizedName;
+
+								if (F.StringIdSteps is null || F.StringIdSteps.Length == 0)
+									LocalizedName = null;
+								else
+								{
+									Namespace BaseModule;
+
+									if (string.IsNullOrEmpty(F.Module))
+										BaseModule = null;
+									else
+										BaseModule = await Language.GetNamespaceAsync(F.Module);
+
+									LocalizedName = await LocalizationStep.TryGetLocalization(Language, BaseModule, F.StringIdSteps);
+								}
+
+								if (string.IsNullOrEmpty(LocalizedName))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(RdfSchema.Label),
+										new StringLiteral(F.Name)));
+								}
+								else if (LocalizedName == F.Name)
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(RdfSchema.Label),
+										new StringLiteral(F.Name, Language.Code)));
+								}
+								else
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(RdfSchema.Label),
+										new StringLiteral(F.Name)));
+
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(RdfSchema.Label),
+										new StringLiteral(LocalizedName, Language.Code)));
+								}
 
 								Result.Add(new SemanticTriple(
 									FieldNode,
@@ -747,124 +785,116 @@ namespace Waher.Things.Semantic.Sources
 									new UriNode(IoTSensorData.Timestamp),
 									new DateTimeLiteral(F.Timestamp)));
 
-								if (!string.IsNullOrEmpty(F.Module))
-								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.Module),
-										new StringLiteral(F.Module)));
-								}
-
 								if (F.QoS.HasFlag(FieldQoS.Missing))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.Missing), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.Missing), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.InProgress))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.InProgress), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.InProgress), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.AutomaticEstimate))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.AutomaticEstimate), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.AutomaticEstimate), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.ManualEstimate))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.ManualEstimate), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.ManualEstimate), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.ManualReadout))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.ManualReadout), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.ManualReadout), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.AutomaticReadout))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.AutomaticReadout), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.AutomaticReadout), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.TimeOffset))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.TimeOffset), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.TimeOffset), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Warning))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.Warning), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.Warning), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Error))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.Error), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.Error), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Signed))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.Signed), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.Signed), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Invoiced))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.Invoiced), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.Invoiced), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.EndOfSeries))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.EndOfSeries), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.EndOfSeries), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.PowerFailure))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.PowerFailure), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.PowerFailure), IoTSensorData.QoS)));
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.InvoiceConfirmed))
 								{
 									Result.Add(new SemanticTriple(
 										FieldNode,
-										new UriNode(IoTSensorData.QoS),
-										new StringLiteral(nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.QoS.AbsoluteUri)));
+										new UriNode(IoTSensorData.QoSUri),
+										new CustomLiteral(nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.QoS)));
 								}
 
 								Result.Add(new SemanticTriple(
@@ -877,7 +907,7 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Momentary), IoTSensorData.FieldType)));
+										new CustomLiteral(nameof(FieldType.Momentary), IoTSensorData.FieldType)));
 								}
 
 								if (F.Type.HasFlag(FieldType.Identity))
@@ -885,7 +915,7 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Identity), IoTSensorData.FieldType)));
+										new CustomLiteral(nameof(FieldType.Identity), IoTSensorData.FieldType)));
 								}
 
 								if (F.Type.HasFlag(FieldType.Status))
@@ -893,7 +923,7 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Status), IoTSensorData.FieldType)));
+										new CustomLiteral(nameof(FieldType.Status), IoTSensorData.FieldType)));
 								}
 
 								if (F.Type.HasFlag(FieldType.Computed))
@@ -901,7 +931,7 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Computed), IoTSensorData.FieldType)));
+										new CustomLiteral(nameof(FieldType.Computed), IoTSensorData.FieldType)));
 								}
 
 								if (F.Type.HasFlag(FieldType.Peak))
@@ -909,7 +939,7 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Peak), IoTSensorData.FieldType)));
+										new CustomLiteral(nameof(FieldType.Peak), IoTSensorData.FieldType)));
 								}
 
 								if (F.Type.HasFlag(FieldType.Historical))
@@ -917,58 +947,12 @@ namespace Waher.Things.Semantic.Sources
 									Result.Add(new SemanticTriple(
 										FieldNode,
 										new UriNode(Rdf.Type),
-										new StringLiteral(nameof(FieldType.Historical), IoTSensorData.FieldType)));
-								}
-
-								if (!(F.StringIdSteps is null))
-								{
-									// TODO: Localized name.
-
-									BlankNode Steps = new BlankNode("n" + Guid.NewGuid().ToString());
-									int StepIndex = 0;
-
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.Localization),
-										Steps));
-
-									foreach (LocalizationStep Step in F.StringIdSteps)
-									{
-										BlankNode StepNode = new BlankNode("n" + Guid.NewGuid().ToString());
-
-										Result.Add(new SemanticTriple(
-											Steps,
-											new UriNode(Rdf.ListItem(++StepIndex)),
-											StepNode));
-
-										Result.Add(new SemanticTriple(
-											StepNode,
-											new UriNode(IoTSensorData.StringId),
-											new Int32Literal(Step.StringId)));
-
-										if (!string.IsNullOrEmpty(Step.Module))
-										{
-											Result.Add(new SemanticTriple(
-												StepNode,
-												new UriNode(IoTSensorData.Module),
-												new StringLiteral(Step.Module)));
-										}
-
-										if (!string.IsNullOrEmpty(Step.Seed))
-										{
-											Result.Add(new SemanticTriple(
-												StepNode,
-												new UriNode(IoTSensorData.Seed),
-												new StringLiteral(Step.Seed)));
-										}
-									}
+										new CustomLiteral(nameof(FieldType.Historical), IoTSensorData.FieldType)));
 								}
 							}
 
 							if (e.Done)
 								ReadoutCompleted.TrySetResult(true);
-
-							return Task.CompletedTask;
 						},
 						(sender, e) =>
 						{

@@ -4459,6 +4459,15 @@
             Optional localization seed.
             </summary>
         </member>
+        <member name="M:Waher.Things.SensorData.LocalizationStep.TryGetLocalization(Waher.Runtime.Language.Language,Waher.Runtime.Language.Namespace,Waher.Things.SensorData.LocalizationStep[])">
+            <summary>
+            Tries to get the localization of a string, given a sequence of localization steps.
+            </summary>
+            <param name="Language">Language</param>
+            <param name="BaseModule">Base module to use, if another module is not specified.</param>
+            <param name="Steps">Sequence of steps.</param>
+            <returns>Localized result, if successful, null if not.</returns>
+        </member>
         <member name="T:Waher.Things.SensorData.QuantityField">
             <summary>
             Represents a physical quantity value.

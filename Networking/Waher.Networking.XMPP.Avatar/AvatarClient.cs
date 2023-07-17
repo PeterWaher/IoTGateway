@@ -494,7 +494,7 @@ namespace Waher.Networking.XMPP.Avatar
 				{
 					if (this.contactAvatars.TryGetValue(BareJid, out OldAvatar))
 					{
-						if (AreEqual(OldAvatar.Binary, Bin))
+						if (!(OldAvatar is null) && AreEqual(OldAvatar.Binary, Bin))
 							IsNew = false;
 						else
 							this.contactAvatars.Remove(BareJid);

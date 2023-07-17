@@ -568,7 +568,7 @@ namespace Waher.Persistence.Files
 			this.serializers?.Dispose();
 			this.serializers = null;
 
-			WriteTimestamp("Stop.txt");
+			this.WriteTimestamp("Stop.txt");
 		}
 
 		#endregion
@@ -1364,7 +1364,7 @@ namespace Waher.Persistence.Files
 				if (!CanRetry)
 					ExceptionDispatchInfo.Capture(ex).Throw();
 
-				return await GetIndexFile(File, false, RegenerationOptions, FieldNames);
+				return await this.GetIndexFile(File, false, RegenerationOptions, FieldNames);
 			}
 			finally
 			{
@@ -1625,7 +1625,7 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Name of collection.</param>
 		public async Task DropCollection(string CollectionName)
 		{
-			ObjectBTreeFile File = await GetFile(CollectionName, false);
+			ObjectBTreeFile File = await this.GetFile(CollectionName, false);
 			if (File is null)
 				return;
 
@@ -3101,7 +3101,7 @@ namespace Waher.Persistence.Files
 				else
 					Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
 
-				xsltPath = XsltPath;
+				this.xsltPath = XsltPath;
 			}
 
 			Output.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
@@ -3645,7 +3645,7 @@ namespace Waher.Persistence.Files
 		public Task<string[]> Repair(params string[] CollectionNames)
 		{
 			string ReportFileName = this.GetReportFileName();
-			return this.Repair(ReportFileName, xsltPath, CollectionNames);
+			return this.Repair(ReportFileName, this.xsltPath, CollectionNames);
 		}
 
 		/// <summary>
@@ -3657,7 +3657,7 @@ namespace Waher.Persistence.Files
 		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
 		{
 			string ReportFileName = this.GetReportFileName();
-			return this.Repair(Thread, ReportFileName, xsltPath, CollectionNames);
+			return this.Repair(Thread, ReportFileName, this.xsltPath, CollectionNames);
 		}
 
 		/// <summary>
@@ -3738,7 +3738,7 @@ namespace Waher.Persistence.Files
 		public async Task AddIndex(string CollectionName, string[] FieldNames)
 		{
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
-			await GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
+			await this.GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
 		}
 
 		/// <summary>
@@ -3816,7 +3816,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public Task Start()
 		{
-			WriteTimestamp("Start.txt");
+			this.WriteTimestamp("Start.txt");
 			return Task.CompletedTask;
 		}
 

@@ -16,7 +16,7 @@ namespace Waher.Content.Semantic
 	public class SparqlResultSetJsonCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Encoder and Decoder of semantic information from SPARQL queries.
+		/// Encoder and Decoder of semantic information from SPARQL queries using JSON.
 		/// </summary>
 		public SparqlResultSetJsonCodec()
 		{

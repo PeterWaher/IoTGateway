@@ -17,7 +17,7 @@ namespace Waher.Content.Semantic
 	public class SparqlResultSetCsvCodec : IContentEncoder
 	{
 		/// <summary>
-		/// Encoder and Decoder of semantic information from SPARQL queries.
+		/// Encoder and Decoder of semantic information from SPARQL queries using CSV.
 		/// </summary>
 		public SparqlResultSetCsvCodec()
 		{
@@ -46,6 +46,12 @@ namespace Waher.Content.Semantic
 				InternetContent.IsAccepted(CsvCodec.CsvContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
+				return true;
+			}
+			else if (Object is ObjectMatrix M && M.HasColumnNames &&
+				InternetContent.IsAccepted(CsvCodec.CsvContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Ok;
 				return true;
 			}
 			else if (Object is bool &&

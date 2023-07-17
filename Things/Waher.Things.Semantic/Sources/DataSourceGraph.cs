@@ -9,7 +9,6 @@ using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
 using Waher.Networking.XMPP.Sensor;
-using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Script.Model;
@@ -39,7 +38,7 @@ namespace Waher.Things.Semantic.Sources
 		/// <returns>How well the URI is supported.</returns>
 		public Grade Supports(Uri GraphUri)
 		{
-			if (!IsServerDomain(GraphUri.Host, true) ||
+			if (!Gateway.IsDomain(GraphUri.Host, true) ||
 				!string.IsNullOrEmpty(GraphUri.Query) ||
 				!string.IsNullOrEmpty(GraphUri.Fragment) ||
 				Gateway.ConcentratorServer is null)
@@ -57,36 +56,10 @@ namespace Waher.Things.Semantic.Sources
 			if (string.IsNullOrEmpty(Parts[c - 1]))
 				c--;
 
-			if (c <= 2 || !Gateway.ConcentratorServer.TryGetDataSource(Parts[1], out _))
-				return Grade.NotAtAll;
-
-			if (c > 4)
+			if (c <= 2 || !Gateway.ConcentratorServer.TryGetDataSource(HttpUtility.UrlDecode(Parts[1]), out _))
 				return Grade.NotAtAll;
 
 			return Grade.Excellent;
-		}
-
-		/// <summary>
-		/// Checks if a domain is the server domain, or optionally, an alternative domain.
-		/// </summary>
-		/// <param name="Domain">Domain to check.</param>
-		/// <param name="IncludeAlternativeDomains">If alternative domains are to be checked as well.</param>
-		/// <returns>If the domain to check is the server domain, or optionally, an alternative domain.</returns>
-		public static bool IsServerDomain(CaseInsensitiveString Domain, bool IncludeAlternativeDomains)
-		{
-			if (Domain == Gateway.Domain || (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain) && Domain == "localhost"))
-				return true;
-
-			if (IncludeAlternativeDomains)
-			{
-				foreach (CaseInsensitiveString s in Gateway.AlternativeDomains)
-				{
-					if (s == Domain)
-						return true;
-				}
-			}
-
-			return false;
 		}
 
 		/// <summary>
@@ -100,7 +73,7 @@ namespace Waher.Things.Semantic.Sources
 		public async Task<ISemanticCube> LoadGraph(Uri GraphUri, ScriptNode Node, bool NullIfNotFound,
 			RequestOrigin Caller)
 		{
-			if (!IsServerDomain(GraphUri.Host, true) ||
+			if (!Gateway.IsDomain(GraphUri.Host, true) ||
 				!string.IsNullOrEmpty(GraphUri.Query) ||
 				!string.IsNullOrEmpty(GraphUri.Fragment) ||
 				Gateway.ConcentratorServer is null)
@@ -121,7 +94,7 @@ namespace Waher.Things.Semantic.Sources
 			if (c <= 2)
 				return null;
 
-			string SourceID = Parts[1];
+			string SourceID = HttpUtility.UrlDecode(Parts[1]);
 			if (!Gateway.ConcentratorServer.TryGetDataSource(SourceID, out IDataSource Source))
 				return null;
 
@@ -138,7 +111,7 @@ namespace Waher.Things.Semantic.Sources
 					break;
 
 				case 3: // /DOMAIN/Source/NodeID
-					string NodeID = Parts[2];
+					string NodeID = HttpUtility.UrlDecode(Parts[2]);
 					INode NodeObj = await Source.GetNodeAsync(new ThingReference(NodeID, SourceID));
 					if (NodeObj is null)
 						return null;
@@ -147,8 +120,8 @@ namespace Waher.Things.Semantic.Sources
 					break;
 
 				case 4: // /DOMAIN/Source/Partition/NodeID
-					string Partition = Parts[2];
-					NodeID = Parts[3];
+					string Partition = HttpUtility.UrlDecode(Parts[2]);
+					NodeID = HttpUtility.UrlDecode(Parts[3]);
 					NodeObj = await Source.GetNodeAsync(new ThingReference(NodeID, SourceID, Partition));
 					if (NodeObj is null)
 						return null;
@@ -157,27 +130,29 @@ namespace Waher.Things.Semantic.Sources
 					break;
 
 				case 5: // /DOMAIN/Source/NodeID/Category/Action
-					NodeID = Parts[2];
+					NodeID = HttpUtility.UrlDecode(Parts[2]);
 					NodeObj = await Source.GetNodeAsync(new ThingReference(NodeID, SourceID));
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[3], Parts[4], Caller);
+					return await GetNodeActionGraph(Result, NodeObj, Language, HttpUtility.UrlDecode(Parts[3]), 
+						HttpUtility.UrlDecode(Parts[4]), Caller);
 
 				case 6: // /DOMAIN/Source/Partition/NodeID/Category/Action
-					Partition = Parts[2];
-					NodeID = Parts[3];
+					Partition = HttpUtility.UrlDecode(Parts[2]);
+					NodeID = HttpUtility.UrlDecode(Parts[3]);
 					NodeObj = await Source.GetNodeAsync(new ThingReference(NodeID, SourceID, Partition));
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[4], Parts[5], Caller);
+					return await GetNodeActionGraph(Result, NodeObj, Language, HttpUtility.UrlDecode(Parts[4]), 
+						HttpUtility.UrlDecode(Parts[5]), Caller);
 
 				default:
 					return null;
 			}
 
-			return null;
+			return Result;
 		}
 
 		/// <summary>
@@ -380,78 +355,88 @@ namespace Waher.Things.Semantic.Sources
 				new UriNode(IoTConcentrator.State),
 				new CustomLiteral(Node.State.ToString(), IoTConcentrator.NodeState.AbsoluteUri)));
 
-			BlankNode DisplayableParameters = new BlankNode("n" + Guid.NewGuid().ToString());
-			int ItemIndex = 0;
+			IEnumerable<DisplayableParameters.Parameter> Parameters = await Node.GetDisplayableParametersAsync(Language, Caller);
+			int ItemIndex;
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.DisplayableParameters),
-				DisplayableParameters));
-
-			foreach (DisplayableParameters.Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
+			if (!(Parameters is null))
 			{
-				BlankNode DisplayableParameter = new BlankNode("n" + Guid.NewGuid().ToString());
+				BlankNode DisplayableParameters = new BlankNode("n" + Guid.NewGuid().ToString());
+				ItemIndex = 0;
 
 				Result.Add(new SemanticTriple(
-					DisplayableParameters,
-					new UriNode(Rdf.ListItem(++ItemIndex)),
-					DisplayableParameter));
+					NodeGraphUriNode,
+					new UriNode(IoTConcentrator.DisplayableParameters),
+					DisplayableParameters));
 
-				Result.Add(new SemanticTriple(
-					DisplayableParameter,
-					new UriNode(RdfSchema.Label),
-					new StringLiteral(P.Name)));
+				foreach (DisplayableParameters.Parameter P in Parameters)
+				{
+					BlankNode DisplayableParameter = new BlankNode("n" + Guid.NewGuid().ToString());
 
-				Result.Add(new SemanticTriple(
-					DisplayableParameter,
-					new UriNode(IoTConcentrator.ParameterId),
-					new StringLiteral(P.Id)));
+					Result.Add(new SemanticTriple(
+						DisplayableParameters,
+						new UriNode(Rdf.ListItem(++ItemIndex)),
+						DisplayableParameter));
 
-				Result.Add(new SemanticTriple(
-					DisplayableParameter,
-					new UriNode(IoTSensorData.Value),
-					SemanticElements.Encapsulate(P.UntypedValue)));
+					Result.Add(new SemanticTriple(
+						DisplayableParameter,
+						new UriNode(RdfSchema.Label),
+						new StringLiteral(P.Name)));
+
+					Result.Add(new SemanticTriple(
+						DisplayableParameter,
+						new UriNode(IoTConcentrator.ParameterId),
+						new StringLiteral(P.Id)));
+
+					Result.Add(new SemanticTriple(
+						DisplayableParameter,
+						new UriNode(IoTSensorData.Value),
+						SemanticElements.Encapsulate(P.UntypedValue)));
+				}
 			}
 
-			BlankNode Messages = new BlankNode("n" + Guid.NewGuid().ToString());
-			ItemIndex = 0;
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.Messages),
-				Messages));
-
-			foreach (DisplayableParameters.Message M in await Node.GetMessagesAsync(Caller))
+			IEnumerable<DisplayableParameters.Message> NodeMessages = await Node.GetMessagesAsync(Caller);
+			if (!(NodeMessages is null))
 			{
-				BlankNode Message = new BlankNode("n" + Guid.NewGuid().ToString());
+				BlankNode Messages = new BlankNode("n" + Guid.NewGuid().ToString());
+				ItemIndex = 0;
 
 				Result.Add(new SemanticTriple(
-					Messages,
-					new UriNode(Rdf.ListItem(++ItemIndex)),
-					Message));
+					NodeGraphUriNode,
+					new UriNode(IoTConcentrator.Messages),
+					Messages));
 
-				Result.Add(new SemanticTriple(
-					Message,
-					new UriNode(IoTConcentrator.Body),
-					new StringLiteral(M.Body)));
-
-				Result.Add(new SemanticTriple(
-					Message,
-					new UriNode(IoTSensorData.Timestamp),
-					new DateTimeLiteral(M.Timestamp)));
-
-				if (!string.IsNullOrEmpty(M.EventId))
+				foreach (DisplayableParameters.Message M in NodeMessages)
 				{
+					BlankNode Message = new BlankNode("n" + Guid.NewGuid().ToString());
+
+					Result.Add(new SemanticTriple(
+						Messages,
+						new UriNode(Rdf.ListItem(++ItemIndex)),
+						Message));
+
 					Result.Add(new SemanticTriple(
 						Message,
-						new UriNode(IoTConcentrator.EventId),
-						new StringLiteral(M.EventId)));
-				}
+						new UriNode(IoTConcentrator.Body),
+						new StringLiteral(M.Body)));
 
-				Result.Add(new SemanticTriple(
-					Message,
-					new UriNode(Rdf.Type),
-					new CustomLiteral(M.Type.ToString(), IoTConcentrator.MessageType.AbsoluteUri)));
+					Result.Add(new SemanticTriple(
+						Message,
+						new UriNode(IoTSensorData.Timestamp),
+						new DateTimeLiteral(M.Timestamp)));
+
+					if (!string.IsNullOrEmpty(M.EventId))
+					{
+						Result.Add(new SemanticTriple(
+							Message,
+							new UriNode(IoTConcentrator.EventId),
+							new StringLiteral(M.EventId)));
+					}
+
+					Result.Add(new SemanticTriple(
+						Message,
+						new UriNode(Rdf.Type),
+						new CustomLiteral(M.Type.ToString(), IoTConcentrator.MessageType.AbsoluteUri)));
+				}
 			}
 
 			if (Node.HasChildren)

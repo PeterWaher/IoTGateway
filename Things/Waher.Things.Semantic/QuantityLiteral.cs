@@ -4,7 +4,6 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Script.Objects;
 using Waher.Script.Units;
 using Waher.Things.Semantic.Ontologies;
@@ -17,12 +16,13 @@ namespace Waher.Things.Semantic
 	public class QuantityLiteral : SemanticLiteral
 	{
 		private readonly PhysicalQuantity value;
+		private readonly string stringType;
 
 		/// <summary>
 		/// Semantic literal for physical quantities.
 		/// </summary>
 		public QuantityLiteral()
-			: base()
+			: base(string.Empty, string.Empty)
 		{
 		}
 
@@ -31,15 +31,16 @@ namespace Waher.Things.Semantic
 		/// </summary>
 		/// <param name="Value">Physical Quantity value.</param>
 		public QuantityLiteral(PhysicalQuantity Value)
-			: base(Value, Expression.ToString(Value.Magnitude))
+			: base(Value.Magnitude, CommonTypes.Encode(Value.Magnitude))
 		{
 			this.value = Value;
+			this.stringType = IoTSensorData.UnitNamespace + this.value?.Unit;
 		}
 
 		/// <summary>
 		/// Type name (or null if literal value is a string)
 		/// </summary>
-		public override string StringType => IoTSensorData.UnitNamespace + this.value?.Unit;
+		public override string StringType => this.stringType;
 
 		/// <summary>
 		/// Encapsulates an object value as a semantic literal value.
@@ -68,6 +69,11 @@ namespace Waher.Things.Semantic
 		}
 
 		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public override object AssociatedObjectValue => this.value;
+
+		/// <summary>
 		/// Tries to parse a string value of the type supported by the class..
 		/// </summary>
 		/// <param name="Value">String value.</param>
@@ -87,6 +93,22 @@ namespace Waher.Things.Semantic
 		}
 
 		/// <summary>
+		/// How well the type supports a given data type.
+		/// </summary>
+		/// <param name="DataType">Data type.</param>
+		/// <returns>Support grade.</returns>
+		public override Grade Supports(string DataType)
+		{
+			if (DataType.StartsWith(IoTSensorData.UnitNamespace, StringComparison.CurrentCultureIgnoreCase) &&
+				Unit.TryParse(DataType.Substring(IoTSensorData.UnitNamespace.Length), out _))
+			{
+				return Grade.Ok;
+			}
+			else
+				return Grade.NotAtAll;
+		}
+
+		/// <summary>
 		/// How well the type supports a given value type.
 		/// </summary>
 		/// <param name="ValueType">Value Type.</param>
@@ -94,6 +116,25 @@ namespace Waher.Things.Semantic
 		public override Grade Supports(Type ValueType)
 		{
 			return ValueType == typeof(PhysicalQuantity) ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Compares the current instance with another object of the same type and returns
+		/// an integer that indicates whether the current instance precedes, follows, or
+		/// occurs in the same position in the sort order as the other object.
+		/// </summary>
+		/// <param name="obj">An object to compare with this instance.</param>
+		/// <returns>A value that indicates the relative order of the objects being compared. The
+		/// return value has these meanings: Value Meaning Less than zero This instance precedes
+		/// obj in the sort order. Zero This instance occurs in the same position in the
+		/// sort order as obj. Greater than zero This instance follows obj in the sort order.</returns>
+		/// <exception cref="ArgumentException">obj is not the same type as this instance.</exception>
+		public override int CompareTo(object obj)
+		{
+			if (obj is QuantityLiteral Typed)
+				return this.value.CompareTo(Typed.value);
+
+			return base.CompareTo(obj);
 		}
 	}
 }

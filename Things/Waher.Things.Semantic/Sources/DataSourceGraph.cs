@@ -8,12 +8,15 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SPARQL;
+using Waher.Things.ControlParameters;
 using Waher.Things.Semantic.Ontologies;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Semantic.Sources
 {
@@ -159,7 +162,7 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[3], Parts[4]);
+					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[3], Parts[4], Caller);
 
 				case 6: // /DOMAIN/Source/Partition/NodeID/Category/Action
 					Partition = Parts[2];
@@ -168,7 +171,7 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[4], Parts[5]);
+					return await GetNodeActionGraph(Result, NodeObj, Language, Parts[4], Parts[5], Caller);
 
 				default:
 					return null;
@@ -377,8 +380,79 @@ namespace Waher.Things.Semantic.Sources
 				new UriNode(IoTConcentrator.State),
 				new CustomLiteral(Node.State.ToString(), IoTConcentrator.NodeState.AbsoluteUri)));
 
-			//Node.GetDisplayableParametersAsync();
-			//Node.GetMessagesAsync();
+			BlankNode DisplayableParameters = new BlankNode("n" + Guid.NewGuid().ToString());
+			int ItemIndex = 0;
+
+			Result.Add(new SemanticTriple(
+				NodeGraphUriNode,
+				new UriNode(IoTConcentrator.DisplayableParameters),
+				DisplayableParameters));
+
+			foreach (DisplayableParameters.Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
+			{
+				BlankNode DisplayableParameter = new BlankNode("n" + Guid.NewGuid().ToString());
+
+				Result.Add(new SemanticTriple(
+					DisplayableParameters,
+					new UriNode(Rdf.ListItem(++ItemIndex)),
+					DisplayableParameter));
+
+				Result.Add(new SemanticTriple(
+					DisplayableParameter,
+					new UriNode(RdfSchema.Label),
+					new StringLiteral(P.Name)));
+
+				Result.Add(new SemanticTriple(
+					DisplayableParameter,
+					new UriNode(IoTConcentrator.ParameterId),
+					new StringLiteral(P.Id)));
+
+				Result.Add(new SemanticTriple(
+					DisplayableParameter,
+					new UriNode(IoTSensorData.Value),
+					SemanticElements.Encapsulate(P.UntypedValue)));
+			}
+
+			BlankNode Messages = new BlankNode("n" + Guid.NewGuid().ToString());
+			ItemIndex = 0;
+
+			Result.Add(new SemanticTriple(
+				NodeGraphUriNode,
+				new UriNode(IoTConcentrator.Messages),
+				Messages));
+
+			foreach (DisplayableParameters.Message M in await Node.GetMessagesAsync(Caller))
+			{
+				BlankNode Message = new BlankNode("n" + Guid.NewGuid().ToString());
+
+				Result.Add(new SemanticTriple(
+					Messages,
+					new UriNode(Rdf.ListItem(++ItemIndex)),
+					Message));
+
+				Result.Add(new SemanticTriple(
+					Message,
+					new UriNode(IoTConcentrator.Body),
+					new StringLiteral(M.Body)));
+
+				Result.Add(new SemanticTriple(
+					Message,
+					new UriNode(IoTSensorData.Timestamp),
+					new DateTimeLiteral(M.Timestamp)));
+
+				if (!string.IsNullOrEmpty(M.EventId))
+				{
+					Result.Add(new SemanticTriple(
+						Message,
+						new UriNode(IoTConcentrator.EventId),
+						new StringLiteral(M.EventId)));
+				}
+
+				Result.Add(new SemanticTriple(
+					Message,
+					new UriNode(Rdf.Type),
+					new CustomLiteral(M.Type.ToString(), IoTConcentrator.MessageType.AbsoluteUri)));
+			}
 
 			if (Node.HasChildren)
 			{
@@ -394,7 +468,7 @@ namespace Waher.Things.Semantic.Sources
 			if (Node.HasCommands)
 			{
 				BlankNode Commands = new BlankNode("n" + Guid.NewGuid().ToString());
-				int CommandIndex = 0;
+				ItemIndex = 0;
 
 				Result.Add(new SemanticTriple(
 					NodeGraphUriNode,
@@ -410,7 +484,7 @@ namespace Waher.Things.Semantic.Sources
 
 					Result.Add(new SemanticTriple(
 						Commands,
-						new UriNode(Rdf.ListItem(++CommandIndex)),
+						new UriNode(Rdf.ListItem(++ItemIndex)),
 						CommandUriNode));
 
 					Result.Add(new SemanticTriple(
@@ -453,6 +527,53 @@ namespace Waher.Things.Semantic.Sources
 						await Command.GetConfirmationStringAsync(Language));
 				}
 			}
+
+			BlankNode Operations = new BlankNode("n" + Guid.NewGuid().ToString());
+			ItemIndex = 0;
+
+			Result.Add(new SemanticTriple(
+				NodeGraphUriNode,
+				new UriNode(IoTConcentrator.Operations),
+				Operations));
+
+			AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Edit, GetOperationUri(Node, "edit", "parameters"),
+				await Language.GetStringAsync(typeof(DataSourceGraph), 1, "Editable parameters for the node."));
+
+			if (Node.IsReadable && Node is ISensor)
+			{
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "all"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 2, "Read all available sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "momentary"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 3, "Read momentary sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "identity"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 4, "Read identity sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "status"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 5, "Read status sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "computed"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 6, "Read computed sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "peak"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 7, "Read peak sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "historical"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 8, "Read historical sensor data from node."));
+
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "nonHistorical"),
+					await Language.GetStringAsync(typeof(DataSourceGraph), 9, "Read all non-historical sensor data from node."));
+			}
+
+			if (Node.IsControllable && Node is IActuator Actuator)
+			{
+				foreach (ControlParameter P in await Actuator.GetControlParameters())
+				{
+					AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Control, GetOperationUri(Node, "control", P.Name),
+						string.IsNullOrEmpty(P.Description) ? await Language.GetStringAsync(typeof(DataSourceGraph), 10, "Control parameter.") : P.Description);
+				}
+			}
 		}
 
 		private static void AddOptionalStringLiteral(InMemorySemanticCube Result,
@@ -465,6 +586,26 @@ namespace Waher.Things.Semantic.Sources
 					new UriNode(PredicateUri),
 					new StringLiteral(Value)));
 			}
+		}
+
+		private static void AddOperation(InMemorySemanticCube Result, BlankNode Operations, ref int ItemIndex, Uri Predicate, Uri Graph, string Label)
+		{
+			BlankNode Operation = new BlankNode("n" + Guid.NewGuid().ToString());
+
+			Result.Add(new SemanticTriple(
+				Operations,
+				new UriNode(Rdf.ListItem(++ItemIndex)),
+				Operation));
+
+			Result.Add(new SemanticTriple(
+				Operation,
+				new UriNode(Predicate),
+				new UriNode(Graph)));
+
+			Result.Add(new SemanticTriple(
+				Operation,
+				new UriNode(RdfSchema.Label),
+				new StringLiteral(Label)));
 		}
 
 		/// <summary>
@@ -493,14 +634,443 @@ namespace Waher.Things.Semantic.Sources
 			sb.Append(HttpUtility.UrlEncode(Command.CommandID));
 		}
 
-		private static async Task<ISemanticCube> GetNodeActionGraph(InMemorySemanticCube Result,
-			INode Node, Language Language, string Category, string Action)
+		/// <summary>
+		/// Gets the Graph URI for a node operation.
+		/// </summary>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Category">Operation category.</param>
+		/// <param name="Action">Operation action</param>
+		private static Uri GetOperationUri(INode Node, string Category, string Action)
 		{
+			StringBuilder sb = new StringBuilder();
+			GetOperationUri(Node, Category, Action, sb);
+			return new Uri(Gateway.GetUrl(sb.ToString()));
+		}
+
+		/// <summary>
+		/// Gets the Graph URI for a node operation.
+		/// </summary>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Category">Operation category.</param>
+		/// <param name="Action">Operation action</param>
+		/// <param name="sb">URI building built.</param>
+		private static void GetOperationUri(INode Node, string Category, string Action, StringBuilder sb)
+		{
+			GetNodeUri(Node, sb);
+			sb.Append('/');
+			sb.Append(Category);
+			sb.Append('/');
+			sb.Append(Action);
+		}
+
+		private static async Task<ISemanticCube> GetNodeActionGraph(InMemorySemanticCube Result,
+			INode Node, Language Language, string Category, string Action, RequestOrigin Caller)
+		{
+			UriNode NodeGraphUriNode = new UriNode(GetNodeUri(Node));
+
 			switch (Category)
 			{
+				case "read":
+					if (!(Node is ISensor Sensor))
+						return null;
+
+					FieldType FieldTypes = 0;
+
+					foreach (string Part in Action.Split(' '))
+					{
+						switch (Part.Trim().ToLower())
+						{
+							case "all":
+								FieldTypes |= FieldType.All;
+								break;
+
+							case "momentary":
+								FieldTypes |= FieldType.Momentary;
+								break;
+
+							case "identity":
+								FieldTypes |= FieldType.Identity;
+								break;
+
+							case "status":
+								FieldTypes |= FieldType.Status;
+								break;
+
+							case "computed":
+								FieldTypes |= FieldType.Computed;
+								break;
+
+							case "peak":
+								FieldTypes |= FieldType.Peak;
+								break;
+
+							case "historical":
+								FieldTypes |= FieldType.Historical;
+								break;
+
+							case "nonhistorical":
+								FieldTypes |= FieldType.AllExceptHistorical;
+								break;
+						}
+					}
+
+					if (FieldTypes == 0)
+						return null;
+
+					BlankNode Fields = new BlankNode("n" + Guid.NewGuid().ToString());
+					int FieldIndex = 0;
+
+					Result.Add(new SemanticTriple(
+						NodeGraphUriNode,
+						new UriNode(IoTSensorData.Fields),
+						Fields));
+
+					BlankNode Errors = new BlankNode("n" + Guid.NewGuid().ToString());
+					int ErrorIndex = 0;
+
+					Result.Add(new SemanticTriple(
+						NodeGraphUriNode,
+						new UriNode(IoTSensorData.Errors),
+						Errors));
+
+					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
+					InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
+						new IThingReference[] { Node }, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+						(sender, e) =>
+						{
+							foreach (Field F in e.Fields)
+							{
+								BlankNode FieldNode = new BlankNode("n" + Guid.NewGuid().ToString());
+
+								Result.Add(new SemanticTriple(
+									Fields,
+									new UriNode(Rdf.ListItem(++FieldIndex)),
+									FieldNode));
+
+								Result.Add(new SemanticTriple(
+									FieldNode,
+									new UriNode(RdfSchema.Label),
+									new StringLiteral(F.Name)));
+
+								Result.Add(new SemanticTriple(
+									FieldNode,
+									new UriNode(IoTSensorData.Value),
+									SemanticElements.Encapsulate(F.ObjectValue)));
+
+								Result.Add(new SemanticTriple(
+									FieldNode,
+									new UriNode(IoTSensorData.Timestamp),
+									new DateTimeLiteral(F.Timestamp)));
+
+								if (!string.IsNullOrEmpty(F.Module))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.Module),
+										new StringLiteral(F.Module)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.Missing))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.Missing), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.InProgress))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.InProgress), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.AutomaticEstimate))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.AutomaticEstimate), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.ManualEstimate))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.ManualEstimate), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.ManualReadout))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.ManualReadout), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.AutomaticReadout))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.AutomaticReadout), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.TimeOffset))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.TimeOffset), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.Warning))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.Warning), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.Error))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.Error), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.Signed))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.Signed), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.Invoiced))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.Invoiced), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.EndOfSeries))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.EndOfSeries), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.PowerFailure))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.PowerFailure), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								if (F.QoS.HasFlag(FieldQoS.InvoiceConfirmed))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.QoS),
+										new StringLiteral(nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.QoS.AbsoluteUri)));
+								}
+
+								Result.Add(new SemanticTriple(
+									FieldNode,
+									new UriNode(IoTConcentrator.IsControllable),
+									new BooleanLiteral(F.Writable)));
+
+								if (F.Type.HasFlag(FieldType.Momentary))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Momentary), IoTSensorData.FieldType)));
+								}
+
+								if (F.Type.HasFlag(FieldType.Identity))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Identity), IoTSensorData.FieldType)));
+								}
+
+								if (F.Type.HasFlag(FieldType.Status))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Status), IoTSensorData.FieldType)));
+								}
+
+								if (F.Type.HasFlag(FieldType.Computed))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Computed), IoTSensorData.FieldType)));
+								}
+
+								if (F.Type.HasFlag(FieldType.Peak))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Peak), IoTSensorData.FieldType)));
+								}
+
+								if (F.Type.HasFlag(FieldType.Historical))
+								{
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(Rdf.Type),
+										new StringLiteral(nameof(FieldType.Historical), IoTSensorData.FieldType)));
+								}
+
+								if (!(F.StringIdSteps is null))
+								{
+									// TODO: Localized name.
+
+									BlankNode Steps = new BlankNode("n" + Guid.NewGuid().ToString());
+									int StepIndex = 0;
+
+									Result.Add(new SemanticTriple(
+										FieldNode,
+										new UriNode(IoTSensorData.Localization),
+										Steps));
+
+									foreach (LocalizationStep Step in F.StringIdSteps)
+									{
+										BlankNode StepNode = new BlankNode("n" + Guid.NewGuid().ToString());
+
+										Result.Add(new SemanticTriple(
+											Steps,
+											new UriNode(Rdf.ListItem(++StepIndex)),
+											StepNode));
+
+										Result.Add(new SemanticTriple(
+											StepNode,
+											new UriNode(IoTSensorData.StringId),
+											new Int32Literal(Step.StringId)));
+
+										if (!string.IsNullOrEmpty(Step.Module))
+										{
+											Result.Add(new SemanticTriple(
+												StepNode,
+												new UriNode(IoTSensorData.Module),
+												new StringLiteral(Step.Module)));
+										}
+
+										if (!string.IsNullOrEmpty(Step.Seed))
+										{
+											Result.Add(new SemanticTriple(
+												StepNode,
+												new UriNode(IoTSensorData.Seed),
+												new StringLiteral(Step.Seed)));
+										}
+									}
+								}
+							}
+
+							if (e.Done)
+								ReadoutCompleted.TrySetResult(true);
+
+							return Task.CompletedTask;
+						},
+						(sender, e) =>
+						{
+							foreach (ThingError Error in e.Errors)
+							{
+								BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
+
+								Result.Add(new SemanticTriple(
+									Errors,
+									new UriNode(Rdf.ListItem(++ErrorIndex)),
+									ErrorNode));
+
+								Result.Add(new SemanticTriple(
+									ErrorNode,
+									new UriNode(RdfSchema.Label),
+									new StringLiteral(Error.ErrorMessage)));
+
+								Result.Add(new SemanticTriple(
+									ErrorNode,
+									new UriNode(IoTSensorData.Timestamp),
+									new DateTimeLiteral(Error.Timestamp)));
+
+								if (!string.IsNullOrEmpty((Error.NodeId)))
+								{
+									Result.Add(new SemanticTriple(
+										ErrorNode,
+										new UriNode(IoTConcentrator.NodeId),
+										new StringLiteral(Error.NodeId)));
+								}
+
+								if (!string.IsNullOrEmpty((Error.SourceId)))
+								{
+									Result.Add(new SemanticTriple(
+										ErrorNode,
+										new UriNode(IoTConcentrator.SourceId),
+										new StringLiteral(Error.SourceId)));
+								}
+
+								if (!string.IsNullOrEmpty((Error.Partition)))
+								{
+									Result.Add(new SemanticTriple(
+										ErrorNode,
+										new UriNode(IoTConcentrator.Partition),
+										new StringLiteral(Error.Partition)));
+								}
+							}
+
+							if (e.Done)
+								ReadoutCompleted.TrySetResult(true);
+
+							return Task.CompletedTask;
+						}, null);
+
+					await Sensor.StartReadout(Request);
+
+					Task Timeout = Task.Delay(60000);
+					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
+
+					if (!ReadoutCompleted.Task.IsCompleted)
+					{
+						BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
+
+						Result.Add(new SemanticTriple(
+							Errors,
+							new UriNode(Rdf.ListItem(++ErrorIndex)),
+							ErrorNode));
+
+						Result.Add(new SemanticTriple(
+							ErrorNode,
+							new UriNode(RdfSchema.Label),
+							new StringLiteral("Timeout.")));
+
+						Result.Add(new SemanticTriple(
+							ErrorNode,
+							new UriNode(IoTSensorData.Timestamp),
+							new DateTimeLiteral(DateTime.UtcNow)));
+					}
+					break;
+
+				case "cmd":     // TODO
+				case "edit":    // TODO
+				case "control": // TODO
 				default:
 					return null;
 			}
+
+			return Result;
 		}
 
 	}

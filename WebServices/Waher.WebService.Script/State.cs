@@ -437,7 +437,7 @@ namespace Waher.WebService.Script
 
 					s = sb2.ToString();
 				}
-				else if (Result is ObjectMatrix M && M.ColumnNames != null)
+				else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 				{
 					StringBuilder Html = new StringBuilder();
 

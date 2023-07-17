@@ -31,32 +31,17 @@ namespace Waher.WebService.Script
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
 		/// </summary>
-		public bool AllowsPOST
-		{
-			get { return true; }
-		}
+		public bool AllowsPOST => true;
 
 		/// <summary>
 		/// Executes the POST method on the resource.

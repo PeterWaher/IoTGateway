@@ -39,6 +39,7 @@ Return results as:
 <option value="Json">JSON</option>
 <option value="Csv">CSV</option>
 <option value="Tsv">TSV</option>
+<option value="Html">HTML</option>
 <option value="Text">Text</option>
 </select>
 

@@ -61,21 +61,28 @@ function AddGraph(Id, Name)
 function ExecuteQuery()
 {
 	var xhttp = new XMLHttpRequest();
+	var IsHtml = false;
+
 	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState == 4)
 		{
 			var Result = document.getElementById("Result");
 
-			Result.innerHTML = "<legend>Result</legend>";
+			if (IsHtml)
+				Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
+			else
+			{
+				Result.innerHTML = "<legend>Result</legend>";
 
-			var Pre = document.createElement("PRE");
-			Result.appendChild(Pre);
+				var Pre = document.createElement("PRE");
+				Result.appendChild(Pre);
 
-			var Code = document.createElement("CODE");
-			Pre.appendChild(Code);
+				var Code = document.createElement("CODE");
+				Pre.appendChild(Code);
 
-			Code.innerText = xhttp.responseText;
+				Code.innerText = xhttp.responseText;
+			}
 
 			Result.setAttribute("style", "display:block");
 
@@ -115,11 +122,16 @@ function ExecuteQuery()
 			break;
 
 		case "Csv":
-			xhttp.setRequestHeader("Accept", "text/csv, text/plain;q=0.1");
+			xhttp.setRequestHeader("Accept", "text/csv, text/plain;q=0.2, text/*;q=0.1");
 			break;
 
 		case "Tsv":
-			xhttp.setRequestHeader("Accept", "text/tab-separated-values, text/plain;q=0.1");
+			xhttp.setRequestHeader("Accept", "text/tab-separated-values, text/plain;q=0.2, text/*;q=0.1");
+			break;
+
+		case "Html":
+			IsHtml = true;
+			xhttp.setRequestHeader("Accept", "text/html, text/plain;q=0.2, text/*;q=0.1");
 			break;
 
 		case "Text":

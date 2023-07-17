@@ -3748,6 +3748,49 @@ namespace Waher.IoTGateway
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// If a domain or host name represents the gateway.
+		/// </summary>
+		/// <param name="DomainOrHost">Domain or host name.</param>
+		/// <param name="IncludeAlternativeDomains">If alternative domains are to be checked as well.</param>
+		/// <returns>If the name represents the gateway.</returns>
+		public static bool IsDomain(string DomainOrHost, bool IncludeAlternativeDomains)
+		{
+			if (DomainConfiguration.Instance?.UseDomainName ?? false)
+			{
+				if (DomainOrHost == domain)
+					return true;
+
+				if (IncludeAlternativeDomains && !(alternativeDomains is null))
+				{
+					foreach (CaseInsensitiveString s in alternativeDomains)
+					{
+						if (s == DomainOrHost)
+							return true;
+					}
+				}
+			}
+			else
+			{
+				if (DomainOrHost == "localhost")
+					return true;
+
+				if (!(webServer is null))
+				{
+					foreach (IPAddress Addr in webServer.LocalIpAddresses)
+					{
+						if (Addr.ToString() == DomainOrHost)
+							return true;
+					}
+				}
+
+				if (DomainOrHost == Dns.GetHostName())
+					return true;
+			}
+
+			return false;
+		}
+
 		private static void Resend(object P)
 		{
 			object[] P2 = (object[])P;

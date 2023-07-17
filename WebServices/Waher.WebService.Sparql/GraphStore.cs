@@ -216,7 +216,7 @@ namespace Waher.WebService.Sparql
 			if (!ParsedUri.IsAbsoluteUri)
 				throw new BadRequestException("Graph URI must be an absolute URI.");
 
-			if (DataSourceGraph.IsServerDomain(ParsedUri.Host, true))
+			if (Gateway.IsDomain(ParsedUri.Host, true))
 				throw new ForbiddenException("Unauthorized access to server domain.");
 
 			GraphReference Reference = await Database.FindFirstIgnoreRest<GraphReference>(

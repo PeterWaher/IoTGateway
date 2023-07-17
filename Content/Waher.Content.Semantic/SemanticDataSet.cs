@@ -30,11 +30,14 @@ namespace Waher.Content.Semantic
 		{
 			foreach (ISemanticCube Source in Sources)
 			{
-				if (this.first is null)
-					this.first = Source;
+				if (!(Source is null))
+				{
+					if (this.first is null)
+						this.first = Source;
 
-				this.sources.AddLast(Source);
-				this.count++;
+					this.sources.AddLast(Source);
+					this.count++;
+				}
 			}
 		}
 
@@ -44,11 +47,14 @@ namespace Waher.Content.Semantic
 		/// <param name="Source">Source</param>
 		public void Add(ISemanticCube Source)
 		{
-			if (this.first is null)
-				this.first = Source;
+			if (!(Source is null))
+			{
+				if (this.first is null)
+					this.first = Source;
 
-			this.sources.AddLast(Source);
-			this.count++;
+				this.sources.AddLast(Source);
+				this.count++;
+			}
 		}
 
 		/// <summary>

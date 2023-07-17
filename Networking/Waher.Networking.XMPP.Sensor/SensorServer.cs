@@ -79,9 +79,9 @@ namespace Waher.Networking.XMPP.Sensor
 				this.client.RegisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
 				this.client.RegisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
 
-				this.client.OnPresenceUnsubscribe += Client_OnPresenceUnsubscribed;
-				this.client.OnPresenceUnsubscribed += Client_OnPresenceUnsubscribed;
-				this.client.OnPresence += Client_OnPresence;
+				this.client.OnPresenceUnsubscribe += this.Client_OnPresenceUnsubscribed;
+				this.client.OnPresenceUnsubscribed += this.Client_OnPresenceUnsubscribed;
+				this.client.OnPresence += this.Client_OnPresence;
 			}
 		}
 
@@ -275,9 +275,8 @@ namespace Waher.Networking.XMPP.Sensor
 							Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
 						else
 						{
-							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-							if (Ref is null)
-								throw new ItemNotFoundException("Node not found.", e.IQ);
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition)
+								?? throw new ItemNotFoundException("Node not found.", e.IQ);
 
 							Nodes.Add(Ref);
 						}
@@ -438,7 +437,7 @@ namespace Waher.Networking.XMPP.Sensor
 					Request = null;
 			}
 
-			if (Request != null && !Request.Started)
+			if (!(Request is null) && !Request.Started)
 				this.scheduler.Remove(Request.When);
 
 			e.IqResult(string.Empty);
@@ -565,9 +564,8 @@ namespace Waher.Networking.XMPP.Sensor
 							Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
 						else
 						{
-							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-							if (Ref is null)
-								throw new ItemNotFoundException("Node not found.", e.IQ);
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition)
+								?? throw new ItemNotFoundException("Node not found.", e.IQ);
 
 							Nodes.Add(Ref);
 						}
@@ -631,7 +629,7 @@ namespace Waher.Networking.XMPP.Sensor
 					{
 						if (e2.Ok && e2.CanRead)
 						{
-							if (e2.FieldsNames != null)
+							if (!(e2.FieldsNames is null))
 							{
 								if (Fields is null)
 								{
@@ -741,10 +739,10 @@ namespace Waher.Networking.XMPP.Sensor
 
 				foreach (IThingReference Thing in Nodes)
 				{
-					if (!subscriptionsByThing.TryGetValue(Thing, out LinkedList<Subscription> Subscriptions))
+					if (!this.subscriptionsByThing.TryGetValue(Thing, out LinkedList<Subscription> Subscriptions))
 					{
 						Subscriptions = new LinkedList<Subscription>();
-						subscriptionsByThing[Thing] = Subscriptions;
+						this.subscriptionsByThing[Thing] = Subscriptions;
 					}
 
 					LinkedListNode<Subscription> Next, Loop = Subscriptions.First;
@@ -767,10 +765,10 @@ namespace Waher.Networking.XMPP.Sensor
 					Subscriptions.AddLast(Subscription);
 				}
 
-				if (!subscriptionsByJID.TryGetValue(e.From, out Dictionary<string, Subscription> Subscriptions2))
+				if (!this.subscriptionsByJID.TryGetValue(e.From, out Dictionary<string, Subscription> Subscriptions2))
 				{
 					Subscriptions2 = new Dictionary<string, Subscription>();
-					subscriptionsByJID[e.From] = Subscriptions2;
+					this.subscriptionsByJID[e.From] = Subscriptions2;
 				}
 
 				Subscriptions2[Subscription.Id] = Subscription;

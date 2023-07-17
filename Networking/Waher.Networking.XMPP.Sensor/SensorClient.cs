@@ -484,10 +484,10 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Tuple<List<Field>, List<ThingError>> Response = ParseFields(Content, out bool Done);
 
-			if (Response.Item1 != null)
+			if (!(Response.Item1 is null))
 				await Request.LogFields(Response.Item1);
 
-			if (Response.Item2 != null)
+			if (!(Response.Item2 is null))
 				await Request.LogErrors(Response.Item2);
 
 			if (Done)
@@ -1197,7 +1197,7 @@ namespace Waher.Networking.XMPP.Sensor
 					Xml.Append("<f n='");
 					Xml.Append(XML.Encode(Field.FieldName));
 
-					if (Field.CurrentValue != null)
+					if (!(Field.CurrentValue is null))
 					{
 						Xml.Append("' v='");
 

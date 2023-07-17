@@ -248,7 +248,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 					if (LastThing is null || !LastThing.SameThing(Field.Thing))
 					{
-						if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						if (!(IsIncluded is null) && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 							continue;
 
 						Checked = true;
@@ -285,7 +285,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 					if (LastTimestamp != Field.Timestamp)
 					{
-						if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						if (!(IsIncluded is null) && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 							continue;
 
 						Checked = true;
@@ -304,7 +304,7 @@ namespace Waher.Networking.XMPP.Sensor
 						TimestampOpen = true;
 					}
 
-					if (!Checked && IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+					if (!Checked && !(IsIncluded is null) && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 						continue;
 
 					OutputField(Xml, Field);
@@ -411,7 +411,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!string.IsNullOrEmpty(Field.Module))
 				Xml.WriteAttributeString("lns", Field.Module);
 
-			if (Field.StringIdSteps != null && Field.StringIdSteps.Length > 0)
+			if (!(Field.StringIdSteps is null) && Field.StringIdSteps.Length > 0)
 			{
 				StringBuilder Value = new StringBuilder();
 

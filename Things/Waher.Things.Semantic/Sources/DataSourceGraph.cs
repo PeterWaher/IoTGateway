@@ -1006,8 +1006,6 @@ namespace Waher.Things.Semantic.Sources
 							return Task.CompletedTask;
 						}, null);
 
-					await Sensor.StartReadout(Request);
-
 					Task Timeout = Task.Delay(60000);
 					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
 

@@ -23,7 +23,7 @@
     };
 
     xhttp.open("POST", "/Settings/RandomizePassword", true);
-    xhttp.send("");
+    xhttp.send();
 }
 
 function Rx(Data)

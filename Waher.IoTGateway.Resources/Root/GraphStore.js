@@ -196,7 +196,7 @@ function DeleteGraph(Control,GraphUri)
 	};
 
 	xhttp.open("DELETE", "/rdf-graph-store?graph=" + encodeURIComponent(GraphUri), true);
-	xhttp.send("");
+	xhttp.send();
 }
 
 window.onscroll = function ()

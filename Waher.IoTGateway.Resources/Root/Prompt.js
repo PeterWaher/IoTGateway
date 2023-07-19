@@ -42,7 +42,7 @@
 				xhttp.open("POST", "/Evaluate", true);
 				xhttp.setRequestHeader("Content-Type", "text/plain");
 				xhttp.setRequestHeader("X-TAG", Tag);
-				xhttp.send("");
+				xhttp.send();
 			}
 		};
 	}
@@ -152,7 +152,7 @@ function GraphClicked(Image, Event, Tag)
 	xhttp.setRequestHeader("X-TAG", Tag);
 	xhttp.setRequestHeader("X-X", x);
 	xhttp.setRequestHeader("X-Y", y);
-	xhttp.send("");
+	xhttp.send();
 }
 
 var Expressions = {};

@@ -350,7 +350,7 @@ function LoadContent(Id)
 					if (xhttp.getResponseHeader("X-More") === "1")
 					{
 						xhttp.open("GET", "/ClientEvents/" + Id, true);
-						xhttp.send("");
+						xhttp.send();
 						return;
 					}
 				}
@@ -363,13 +363,13 @@ function LoadContent(Id)
 				{
 					Id = ContentQueue.shift();
 					xhttp.open("GET", "/ClientEvents/" + Id, true);
-					xhttp.send("");
+					xhttp.send();
 				}
 			};
 		}
 
 		xhttp.open("GET", "/ClientEvents/" + Id, true);
-		xhttp.send("");
+		xhttp.send();
 	}
 	else
 		ContentQueue.push(Id);

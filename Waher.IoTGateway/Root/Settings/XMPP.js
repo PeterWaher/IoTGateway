@@ -136,7 +136,7 @@ function RandomizePassword()
     };
 
     xhttp.open("POST", "/Settings/RandomizePassword", true);
-    xhttp.send("");
+    xhttp.send();
 }
 
 function GetInputValue(Id)

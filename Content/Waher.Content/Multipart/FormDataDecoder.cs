@@ -165,7 +165,7 @@ namespace Waher.Content.Multipart
 						k += 2;
 				}
 
-				if (i - j - 4 - k <= 0)
+				if (i - j - 4 - k < 0)
 					return;
 
 				string Header = Encoding.ASCII.GetString(Data, Start, j - Start);

@@ -5386,11 +5386,8 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			if (Content is null ||
-				string.Compare(e.FromBareJID, this.componentAddress, true) != 0)
-			{
+			if (Content is null)
 				return;
-			}
 
 			if (Identity is null)
 			{
@@ -5423,6 +5420,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (Identity is null)
 					return;
+			}
+
+			if (string.Compare(e.FromBareJID, this.componentAddress, true) != 0 &&
+				string.Compare(e.FromBareJID, XmppClient.GetDomain(Identity.Id), true) != 0)
+			{
+				return;
 			}
 
 			SignaturePetitionEventHandler h = PeerReview ? this.PetitionForPeerReviewIDReceived : this.PetitionForSignatureReceived;
@@ -6731,7 +6734,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SelectPeerReviewService(string ComponentAddress, string Provider, string ServiceId, 
+		public void SelectPeerReviewService(string ComponentAddress, string Provider, string ServiceId,
 			IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();

@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// <summary>
 	/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
 	/// </summary>
-	public partial class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
+	public partial class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod, IHttpDeleteMethod
 	{
 		private readonly XmppClient defaultXmppClient;
@@ -703,20 +703,12 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
-		/// If the OPTIONS method is allowed.
-		/// </summary>
-		public bool AllowsOPTIONS
-		{
-			get { return true; }
-		}
-
-		/// <summary>
 		/// Executes the OPTIONS method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		public override Task OPTIONS(HttpRequest Request, HttpResponse Response)
 		{
 			return this.Request("OPTIONS", Request, Response);
 		}

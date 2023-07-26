@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Base class for all HTTP resources.
 	/// </summary>
-	public abstract class HttpResource
+	public abstract class HttpResource : IHttpOptionsMethod
 	{
 		private readonly List<HttpServer> servers = new List<HttpServer>();
 		private readonly string[] allowedMethods;
@@ -57,7 +57,7 @@ namespace Waher.Networking.HTTP
 			this.put = this as IHttpPutMethod;
 			this.putRanges = this as IHttpPutRangesMethod;
 			this.delete = this as IHttpDeleteMethod;
-			this.options = this as IHttpOptionsMethod;
+			this.options = this;
 			this.trace = this as IHttpTraceMethod;
 
 			List<string> Methods = new List<string>();
@@ -420,6 +420,76 @@ namespace Waher.Networking.HTTP
 		public virtual HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
 			return null;
+		}
+
+		/// <summary>
+		/// If the OPTIONS method is allowed.
+		/// </summary>
+		public bool AllowsOPTIONS => true;
+
+		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async virtual Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		{
+			SetTransparentCorsHeaders(this, Request, Response);
+
+			bool First = true;
+			StringBuilder Options = new StringBuilder();
+
+			foreach (string Option in this.allowedMethods)
+			{
+				if (First)
+					First = false;
+				else
+					Options.Append(", ");
+
+				Options.Append(Option);
+			}
+
+			Response.SetHeader("Allow", Options.ToString());
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No Content";
+
+			await Response.SendResponse();
+		}
+
+		/// <summary>
+		/// Sets CORS headers for a resource, allowing it to be embedded in other sites.
+		/// </summary>
+		/// <param name="Resource">Resource being processed.</param>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Response">HTTP Response object.</param>
+		public static void SetTransparentCorsHeaders(HttpResource Resource, HttpRequest Request, HttpResponse Response)
+		{
+			if (Request.Header.TryGetHeaderField("Origin", out HttpField Origin))
+				Response.SetHeader("Access-Control-Allow-Origin", Origin.Value);
+			else
+				Response.SetHeader("Access-Control-Allow-Origin", "*");
+
+			if (Request.Header.TryGetHeaderField("Access-Control-Request-Headers", out HttpField AccessControlRequestHeaders))
+				Response.SetHeader("Access-Control-Allow-Headers", AccessControlRequestHeaders.Value);
+
+			if (Request.Header.TryGetHeaderField("Access-Control-Request-Method", out HttpField _))
+			{
+				StringBuilder Methods = new StringBuilder();
+				bool First = true;
+
+				foreach (string Method in Resource.AllowedMethods)
+				{
+					if (First)
+						First = false;
+					else
+						Methods.Append(", ");
+
+					Methods.Append(Method);
+				}
+
+				Response.SetHeader("Access-Control-Allow-Methods", Methods.ToString());
+			}
 		}
 
 	}

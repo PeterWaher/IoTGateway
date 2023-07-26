@@ -203,7 +203,7 @@ namespace Waher.Networking.HTTP
 		{
 			string s;
 
-			if (this.anonymousGET && ((s = Request.Header.Method) == "GET" || s == "HEAD"))
+			if (this.anonymousGET && ((s = Request.Header.Method) == "GET" || s == "HEAD" || s == "OPTIONS"))
 				return null;
 			else
 				return this.authenticationSchemes;

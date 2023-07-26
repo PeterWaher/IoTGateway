@@ -14,7 +14,7 @@ namespace Waher.IoTGateway
 	/// Web-socket binding method for the <see cref="ClientEvents"/> class. It allows clients connect to the gateway using web-sockets to
 	/// get events.
 	/// </summary>
-	public class ClientEventsWebSocket : WebSocketListener, IHttpOptionsMethod
+	public class ClientEventsWebSocket : WebSocketListener
 	{
 		private static readonly string serverId = Hashes.BinaryToString(Gateway.NextBytes(32));
 
@@ -36,14 +36,9 @@ namespace Waher.IoTGateway
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public override Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			ClientEvents.SetTransparentCorsHeaders(this, Request, Response);
+			SetTransparentCorsHeaders(this, Request, Response);
 			return base.GET(Request, Response);
 		}
-
-		/// <summary>
-		/// If the OPTIONS method is allowed.
-		/// </summary>
-		public bool AllowsOPTIONS => true;
 
 		private void ClientEventsWebSocket_Connected(object Sender, WebSocketEventArgs e)
 		{
@@ -148,21 +143,5 @@ namespace Waher.IoTGateway
 				return false;
 			}
 		}
-
-		/// <summary>
-		/// Executes the OPTIONS method on the resource.
-		/// </summary>
-		/// <param name="Request">HTTP Request</param>
-		/// <param name="Response">HTTP Response</param>
-		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task OPTIONS(HttpRequest Request, HttpResponse Response)
-		{
-			ClientEvents.SetTransparentCorsHeaders(this, Request, Response);
-			Response.StatusCode = 204;
-			Response.StatusMessage = "No Content";
-
-			await Response.SendResponse();
-		}
-
 	}
 }

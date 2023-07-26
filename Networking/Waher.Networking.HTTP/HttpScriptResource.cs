@@ -245,7 +245,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, ResourceName,
+						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, this.ResourceName,
 							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
 						if (await Converter.ConvertAsync(State))

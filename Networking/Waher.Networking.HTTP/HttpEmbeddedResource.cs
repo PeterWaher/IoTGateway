@@ -148,7 +148,7 @@ namespace Waher.Networking.HTTP
 		{
 			base.AddReference(Server);
 
-			Server.ETagSaltChanged += Server_ETagSaltChanged;
+			Server.ETagSaltChanged += this.Server_ETagSaltChanged;
 		}
 
 		/// <summary>
@@ -157,7 +157,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Server">Server</param>
 		public override bool RemoveReference(HttpServer Server)
 		{
-			Server.ETagSaltChanged -= Server_ETagSaltChanged;
+			Server.ETagSaltChanged -= this.Server_ETagSaltChanged;
 
 			return base.RemoveReference(Server);
 		}

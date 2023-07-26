@@ -16,6 +16,32 @@ namespace Waher.Networking.HTTP.Authentication
 		/// </summary>
 		/// <param name="Methods">Methods for which to use anonymous authentication.</param>
 		public AnonymousAuthentication(params string[] Methods)
+#if WINDOWS_UWP
+			: this(false, Methods)
+#else
+			: this(false, 0, Methods)
+#endif
+		{
+		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Anonymous access. Can be limited to certain HTTP methods.
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="Methods">Methods for which to use anonymous authentication.</param>
+		public AnonymousAuthentication(bool RequireEncryption, params string[] Methods)
+			: base(RequireEncryption)
+#else
+		/// <summary>
+		/// Anonymous access. Can be limited to certain HTTP methods.
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="MinStrength">Minimum security strength of algorithms used.</param>
+		/// <param name="Methods">Methods for which to use anonymous authentication.</param>
+		public AnonymousAuthentication(bool RequireEncryption, int MinStrength, params string[] Methods)
+			: base(RequireEncryption, MinStrength)
+#endif
 		{
 			this.methods = Methods;
 		}
@@ -24,6 +50,15 @@ namespace Waher.Networking.HTTP.Authentication
 		/// Methods for which to use anonymous authentication.
 		/// </summary>
 		public string[] Methods => this.methods;
+
+		/// <summary>
+		/// Gets a challenge for the authenticating client to respond to.
+		/// </summary>
+		/// <returns>Challenge string.</returns>
+		public override string GetChallenge()
+		{
+			return null;
+		}
 
 		/// <summary>
 		/// Checks if the request is authorized.

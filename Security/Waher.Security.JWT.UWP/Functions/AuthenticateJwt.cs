@@ -119,9 +119,8 @@ namespace Waher.Security.JWT.Functions
 				throw new UnauthorizedException("Unauthorized access prohibited.", new string[] { Mechanism.GetChallenge() });
 			else
 			{
-				IUser User = await Mechanism.IsAuthenticated(Request);
-				if (User is null)
-					throw new ForbiddenException("Invalid user name or password.");
+				IUser User = await Mechanism.IsAuthenticated(Request)
+					?? throw new ForbiddenException("Invalid user name or password.");
 
 				return new ObjectValue(User);
 			}

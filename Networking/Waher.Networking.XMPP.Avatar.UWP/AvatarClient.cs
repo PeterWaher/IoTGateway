@@ -72,14 +72,14 @@ namespace Waher.Networking.XMPP.Avatar
 			// XEP-0008: IQ-Based Avatars: http://xmpp.org/extensions/xep-0008.html
 			Client.RegisterIqGetHandler("query", "jabber:iq:avatar", this.QueryAvatarHandler, false);
 
-			Client.OnStateChanged += Client_OnStateChanged;
-			Client.OnPresence += Client_OnPresence;
-			Client.OnRosterItemRemoved += Client_OnRosterItemRemoved;
-			Client.OnRosterItemAdded += Client_OnRosterItemAdded;
-			Client.CustomPresenceXml += Client_CustomPresenceXml;
+			Client.OnStateChanged += this.Client_OnStateChanged;
+			Client.OnPresence += this.Client_OnPresence;
+			Client.OnRosterItemRemoved += this.Client_OnRosterItemRemoved;
+			Client.OnRosterItemAdded += this.Client_OnRosterItemAdded;
+			Client.CustomPresenceXml += this.Client_CustomPresenceXml;
 
 			if (!(this.pep is null))
-				this.pep.OnUserAvatarMetaData += Pep_OnUserAvatarMetaData;
+				this.pep.OnUserAvatarMetaData += this.Pep_OnUserAvatarMetaData;
 
 			byte[] Bin = Resources.LoadResource(typeof(AvatarClient).Namespace + ".Images.DefaultAvatar.png",
 				typeof(AvatarClient).GetTypeInfo().Assembly);
@@ -96,14 +96,14 @@ namespace Waher.Networking.XMPP.Avatar
 		{
 			this.client.UnregisterIqGetHandler("query", "jabber:iq:avatar", this.QueryAvatarHandler, false);
 
-			this.client.OnStateChanged -= Client_OnStateChanged;
-			this.client.OnPresence -= Client_OnPresence;
-			this.client.OnRosterItemRemoved -= Client_OnRosterItemRemoved;
-			this.client.OnRosterItemAdded -= Client_OnRosterItemAdded;
-			this.client.CustomPresenceXml -= Client_CustomPresenceXml;
+			this.client.OnStateChanged -= this.Client_OnStateChanged;
+			this.client.OnPresence -= this.Client_OnPresence;
+			this.client.OnRosterItemRemoved -= this.Client_OnRosterItemRemoved;
+			this.client.OnRosterItemAdded -= this.Client_OnRosterItemAdded;
+			this.client.CustomPresenceXml -= this.Client_CustomPresenceXml;
 
 			if (!(this.pep is null))
-				this.pep.OnUserAvatarMetaData -= Pep_OnUserAvatarMetaData;
+				this.pep.OnUserAvatarMetaData -= this.Pep_OnUserAvatarMetaData;
 
 			this.localAvatar = null;
 			this.defaultAvatar = null;
@@ -216,10 +216,7 @@ namespace Waher.Networking.XMPP.Avatar
 			if (!(h is null))
 				await h(this, e);
 
-			Avatar Avatar = this.localAvatar;
-
-			if (Avatar is null)
-				Avatar = this.defaultAvatar;
+			Avatar Avatar = this.localAvatar ?? this.defaultAvatar;
 
 			StringBuilder Response = new StringBuilder();
 			Response.Append("<query xmlns='jabber:iq:avatar'><data mimetype='");
@@ -494,7 +491,7 @@ namespace Waher.Networking.XMPP.Avatar
 				{
 					if (this.contactAvatars.TryGetValue(BareJid, out OldAvatar))
 					{
-						if (AreEqual(OldAvatar.Binary, Bin))
+						if (!(OldAvatar is null) && AreEqual(OldAvatar.Binary, Bin))
 							IsNew = false;
 						else
 							this.contactAvatars.Remove(BareJid);

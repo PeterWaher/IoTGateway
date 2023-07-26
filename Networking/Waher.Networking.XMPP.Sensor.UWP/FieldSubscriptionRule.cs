@@ -125,7 +125,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the rule triggers an event.</returns>
 		public bool TriggerEvent(object NewValue)
 		{
-			if (this.currentValue != null && this.currentValue.GetType() == NewValue.GetType())
+			if (!(this.currentValue is null) && this.currentValue.GetType() == NewValue.GetType())
 			{
 				double Diff;
 

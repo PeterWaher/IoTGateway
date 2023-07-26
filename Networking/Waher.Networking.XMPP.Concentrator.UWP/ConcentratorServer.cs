@@ -423,6 +423,19 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			DataSource.OnEvent += this.DataSource_OnEvent;
 
+			EventHandler<DataSourceEventArgs> h = this.SourceRegistered;
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new DataSourceEventArgs(DataSource));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
 			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
 			if (!(ChildSources is null))
 			{
@@ -432,6 +445,69 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			return true;
 		}
+
+		/// <summary>
+		/// Event raised when a data source has been registered.
+		/// </summary>
+		public event EventHandler<DataSourceEventArgs> SourceRegistered;
+
+		/// <summary>
+		/// Unregisters a data source from the concentrator.
+		/// </summary>
+		/// <param name="DataSource">Data Source.</param>
+		/// <returns>If the data source was unregistered (true), or if the data source was not found (false).</returns>
+		public bool UNregister(IDataSource DataSource)
+		{
+			return this.Unregister(DataSource, true);
+		}
+
+		private bool Unregister(IDataSource DataSource, bool Root)
+		{
+			DataSourceRec ExistingSource;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(DataSource.SourceID, out ExistingSource))
+					return false;
+
+				if (ExistingSource.Source != DataSource)
+					return false;
+
+				this.dataSources.Remove(DataSource.SourceID);
+
+				if (Root)
+					this.rootDataSources.Remove(DataSource.SourceID);
+			}
+
+			ExistingSource.Source.OnEvent -= this.DataSource_OnEvent;
+
+			EventHandler<DataSourceEventArgs> h = this.SourceUnregistered;
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new DataSourceEventArgs(DataSource));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
+			if (!(ChildSources is null))
+			{
+				foreach (IDataSource Child in ChildSources)
+					this.Unregister(Child, false);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Event raised when a data source has been unregistered.
+		/// </summary>
+		public event EventHandler<DataSourceEventArgs> SourceUnregistered;
 
 		private class DataSourceRec
 		{

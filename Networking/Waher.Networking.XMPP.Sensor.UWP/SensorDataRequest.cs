@@ -211,7 +211,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the corresponding field is included.</returns>
 		public bool IsIncluded(string FieldName, DateTime Timestamp, FieldType Type)
 		{
-			if (!string.IsNullOrEmpty(FieldName) && this.fieldsNames != null && this.fieldsNames.Length > 0)
+			if (!string.IsNullOrEmpty(FieldName) && !(this.fieldsNames is null) && this.fieldsNames.Length > 0)
 			{
 				lock (this.fieldsNames)
 				{

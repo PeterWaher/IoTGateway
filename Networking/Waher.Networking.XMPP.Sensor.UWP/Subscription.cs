@@ -235,7 +235,7 @@ namespace Waher.Networking.XMPP.Sensor
 			DateTime Now = DateTime.Now;
 			DateTime TP;
 
-			if (Trigger && this.minInterval != null && this.lastTrigger + this.minInterval > Now)
+			if (Trigger && !(this.minInterval is null) && this.lastTrigger + this.minInterval > Now)
 			{
 				this.supressedTrigger = true;
 				return false;

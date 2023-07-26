@@ -10,6 +10,7 @@ namespace Waher.Security.Users
 	[CollectionName("Privileges")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("LocalId", "ParentFullId")]
+	[Index("ParentFullId", "LocalId")]
 	[Index("FullId")]
 	[ArchivingTime]
 	public class Privilege

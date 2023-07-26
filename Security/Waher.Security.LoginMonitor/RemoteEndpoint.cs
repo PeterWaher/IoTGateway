@@ -12,6 +12,7 @@ namespace Waher.Security.LoginMonitor
 	[TypeName(TypeNameSerialization.None)]
 	[ArchivingTime("ArchiveDays")]
 	[Index("Endpoint", "Created")]
+	[Index("Blocked", "Endpoint", "Created")]
 	public class RemoteEndpoint
 	{
 		private string objectId = null;

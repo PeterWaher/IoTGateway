@@ -224,6 +224,10 @@
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj">
+      <Project>{2eb59799-b2b0-4550-85e7-75ca4f208071}</Project>
+      <Name>Waher.Content.Semantic</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
       <Name>Waher.Content.Xml</Name>

@@ -110,6 +110,8 @@
     <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonOutput.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
+    <Compile Include=".bak\Waher.Content\Text\TsvCodec.cs" />
+    <Compile Include=".bak\Waher.Content\TSV.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />
     <Compile Include=".bak\Waher.Events\GenericException.cs" />
@@ -130,9 +132,11 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IProcessingSupport.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\ModuleDependencyAttribute.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\NamespaceAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />

@@ -61,7 +61,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
 				object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Source);
 
-				if (!(Result is null))
+				if (Union is null && !(Result is null))
 				{
 					Union = new InMemorySemanticCube();
 					await Union.Add(Result);

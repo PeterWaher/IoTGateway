@@ -32,11 +32,6 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	public class GraphStore : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
-		/// <summary>
-		/// Number of files posted to a graph, before graph is converted to a database graph.
-		/// </summary>
-		public const int DatabaseMinFileCount = 10;
-
 		private static readonly Dictionary<string, ISemanticModel> defaultGraphs = new Dictionary<string, ISemanticModel>();
 		private static readonly SemaphoreSlim defaultGraphSemaphore = new SemaphoreSlim(1);
 
@@ -116,28 +111,7 @@ namespace Waher.WebService.Sparql
 				if (Request.Header.Method == "HEAD")
 					return;
 
-				IGraphSource Source;
-
-				if (Reference.InDatabase)
-					Source = new GraphStoreDbSource(Reference);
-				else
-				{
-					GraphStoreFileSource FileSource = new GraphStoreFileSource(Reference);
-					Source = FileSource;
-
-					if (Reference.NrFiles > DatabaseMinFileCount)
-					{
-						ISemanticCube Model = await FileSource.LoadGraph(new Uri(Reference.GraphUri), true);
-
-						Reference.DatabaseKey = await RuntimeCounters.IncrementCounter("GraphStore.LastGraphKey");
-						Reference.InDatabase = true;
-
-						await Database.Update(Reference);
-						await AddTriplesToDatabase(Reference.DatabaseKey, new IEnumerable<ISemanticTriple>[] { Model });
-
-						Source = new GraphStoreDbSource(Reference);
-					}
-				}
+				IGraphSource Source = await Reference.GetGraphSource();
 
 				Graph = await Source.LoadGraph(GraphUri, null, false, GetOrigin(Request));
 			}
@@ -425,65 +399,12 @@ namespace Waher.WebService.Sparql
 
 				await Database.Update(Reference);
 
-				if (!Reference.InDatabase && Reference.NrFiles > DatabaseMinFileCount)
-				{
-					GraphStoreFileSource FileSource = new GraphStoreFileSource(Reference);
-					ISemanticCube Model = await FileSource.LoadGraph(new Uri(Reference.GraphUri), true);
-
-					Reference.DatabaseKey = await RuntimeCounters.IncrementCounter("GraphStore.LastGraphKey");
-					Reference.InDatabase = true;
-
-					await Database.Update(Reference);
-
-					Models.Clear();
-					if (!(Model is null))
-						Models.AddLast(Model);
-				}
-
 				Response.StatusCode = 200;  // OK
 			}
 
-			if (Reference.InDatabase)
-				await AddTriplesToDatabase(Reference.DatabaseKey, Models);
+			await Reference.ModelsAdded(Models);
 
 			InvalidateDefaultGraph();
-		}
-
-		private static async Task AddTriplesToDatabase(long DatabaseKey, IEnumerable<IEnumerable<ISemanticTriple>> Models)
-		{
-			List<DatabaseTriple> ToSave = new List<DatabaseTriple>();
-			int c = 0;
-
-			foreach (IEnumerable<ISemanticTriple> Model in Models)
-			{
-				foreach (ISemanticTriple T in Model)
-				{
-					if (T.Subject is SemanticElement S &&
-						T.Predicate is SemanticElement P &&
-						T.Object is SemanticElement O)
-					{
-						ToSave.Add(new DatabaseTriple()
-						{
-							GraphKey = DatabaseKey,
-							S = S,
-							P = P,
-							O = O
-						});
-
-						c++;
-
-						if (c >= 1000)
-						{
-							await Database.Insert(ToSave.ToArray());
-							ToSave.Clear();
-							c = 0;
-						}
-					}
-				}
-			}
-
-			if (c > 0)
-				await Database.Insert(ToSave.ToArray());
 		}
 
 		/// <summary>

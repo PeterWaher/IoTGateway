@@ -786,12 +786,7 @@ namespace Waher.Script.Persistence.SPARQL
 				new FilterFieldEqualTo("GraphUri", Uri.AbsoluteUri));
 
 			if (!(Ref is null))
-			{
-				if (Ref.InDatabase)
-					return new GraphStoreDbSource(Ref);
-				else
-					return new GraphStoreFileSource(Ref);
-			}
+				return await Ref.GetGraphSource();
 
 			IGraphSource Source = Types.FindBest<IGraphSource, Uri>(Uri);
 

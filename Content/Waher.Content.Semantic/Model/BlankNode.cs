@@ -8,6 +8,14 @@
 		/// <summary>
 		/// Represents a blank node
 		/// </summary>
+		public BlankNode()
+			: this(null)
+		{
+		}
+
+		/// <summary>
+		/// Represents a blank node
+		/// </summary>
 		/// <param name="NodeId">Blank-node Node ID in document.</param>
 		public BlankNode(string NodeId)
 		{

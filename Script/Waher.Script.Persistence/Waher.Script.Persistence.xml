@@ -2372,6 +2372,11 @@
             Contains a reference to a graph in the graph store.
             </summary>
         </member>
+        <member name="F:Waher.Script.Persistence.SPARQL.Sources.GraphReference.DatabaseMinFileCount">
+            <summary>
+            Number of files posted to a graph, before graph is converted to a database graph.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphReference.#ctor">
             <summary>
             Contains a reference to a graph in the graph store.
@@ -2426,6 +2431,24 @@
             <summary>
             Graph key in database.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphReference.GetGraphSource">
+            <summary>
+            Gets a Graph Source object corresponding to the graph referenced by the object.
+            </summary>
+            <returns>Graph Source object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphReference.ModelsAdded(System.Collections.Generic.LinkedList{Waher.Content.Semantic.ISemanticModel})">
+            <summary>
+            Method called when new semantic models have been added to the graph.
+            </summary>
+            <param name="Models">Semantic models.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphReference.AddTriplesToDatabase(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{Waher.Content.Semantic.ISemanticTriple}})">
+            <summary>
+            Adds semantic triples to the database.
+            </summary>
+            <param name="Models">Semantic models to save.</param>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource">
             <summary>

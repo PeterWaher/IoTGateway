@@ -68,7 +68,7 @@ namespace Waher.Content.Semantic.Model
 		/// <summary>
 		/// String representation of value.
 		/// </summary>
-		public string StringValue { get; }
+		public string StringValue { get; set; }
 
 		/// <summary>
 		/// Associated Ring.

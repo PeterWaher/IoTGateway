@@ -4,12 +4,20 @@ using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Model.Literals
 {
-    /// <summary>
-    /// Represents a custom literal.
-    /// </summary>
-    public class CustomLiteral : SemanticLiteral
-    {
+	/// <summary>
+	/// Represents a custom literal.
+	/// </summary>
+	public class CustomLiteral : SemanticLiteral
+	{
 		private readonly string language;
+
+		/// <summary>
+		/// Represents a custom literal.
+		/// </summary>
+		public CustomLiteral()
+			: this(null, null)
+		{
+		}
 
 		/// <summary>
 		/// Represents a custom literal.
@@ -17,9 +25,9 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <param name="Value">Literal value</param>
 		/// <param name="Type">Data type.</param>
 		public CustomLiteral(string Value, string Type)
-            : base(Value, Value)
-        {
-            this.StringType = Type;
+			: base(Value, Value)
+		{
+			this.Type = Type;
 			this.language = null;
 		}
 
@@ -32,14 +40,19 @@ namespace Waher.Content.Semantic.Model.Literals
 		public CustomLiteral(string Value, string Type, string Language)
 			: base(Value, Value)
 		{
-			this.StringType = Type;
+			this.Type = Type;
 			this.language = Language;
 		}
 
 		/// <summary>
+		/// Type name of value.
+		/// </summary>
+		public string Type { get; set; }
+
+		/// <summary>
 		/// Type name
 		/// </summary>
-		public override string StringType { get; }
+		public override string StringType => this.Type;
 
 		/// <summary>
 		/// Language of string.
@@ -64,9 +77,9 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <param name="Language">Language code if available.</param>
 		/// <returns>Parsed literal.</returns>
 		public override ISemanticLiteral Parse(string Value, string DataType, string Language)
-        {
-            return new CustomLiteral(Value, DataType, Language);
-        }
+		{
+			return new CustomLiteral(Value, DataType, Language);
+		}
 
 		/// <summary>
 		/// Encapsulates an object value as a semantic literal value.
@@ -80,12 +93,12 @@ namespace Waher.Content.Semantic.Model.Literals
 
 		/// <inheritdoc/>
 		public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
+		{
+			StringBuilder sb = new StringBuilder();
 
-            sb.Append('"');
-            sb.Append(JSON.Encode(this.StringValue));
-            sb.Append('"');
+			sb.Append('"');
+			sb.Append(JSON.Encode(this.StringValue));
+			sb.Append('"');
 
 			if (!string.IsNullOrEmpty(this.language))
 			{
@@ -94,18 +107,18 @@ namespace Waher.Content.Semantic.Model.Literals
 			}
 
 			sb.Append("^^<");
-            sb.Append(this.StringType);
-            sb.Append('>');
+			sb.Append(this.StringType);
+			sb.Append('>');
 
-            return sb.ToString();
-        }
+			return sb.ToString();
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is CustomLiteral Typed &&
 				Typed.StringValue == this.StringValue &&
-                Typed.StringType == this.StringType &&
+				Typed.StringType == this.StringType &&
 				Typed.language == this.language;
 		}
 

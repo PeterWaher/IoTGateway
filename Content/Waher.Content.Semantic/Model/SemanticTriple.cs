@@ -15,6 +15,14 @@ namespace Waher.Content.Semantic.Model
 		/// <summary>
 		/// Implements a semantic triple.
 		/// </summary>
+		public SemanticTriple()
+			: this(null, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
 		/// <param name="Subject">Subject</param>
 		/// <param name="Predicate">Predicate</param>
 		/// <param name="Object">Object</param>
@@ -28,17 +36,17 @@ namespace Waher.Content.Semantic.Model
 		/// <summary>
 		/// Subject element
 		/// </summary>
-		public ISemanticElement Subject { get; }
+		public ISemanticElement Subject { get; set; }
 
 		/// <summary>
 		/// Predicate element
 		/// </summary>
-		public ISemanticElement Predicate { get; }
+		public ISemanticElement Predicate { get; set; }
 
 		/// <summary>
 		/// Object element
 		/// </summary>
-		public ISemanticElement Object { get; }
+		public ISemanticElement Object { get; set; }
 
 		/// <summary>
 		/// Property used by processor, to tag information to an element.
@@ -94,7 +102,7 @@ namespace Waher.Content.Semantic.Model
 					Subject = SemanticElement;
 				else if (Predicate is null)
 					Predicate = SemanticElement;
-				else 
+				else
 					Object = SemanticElement;
 			}
 

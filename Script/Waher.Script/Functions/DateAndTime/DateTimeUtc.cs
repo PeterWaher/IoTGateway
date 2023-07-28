@@ -176,7 +176,7 @@ namespace Waher.Script.Functions.DateAndTime
 
 			TP = TP.ToUniversalTime();
 
-			int c = Arguments.Length;
+			int c = this.Arguments.Length;
 			if (c == 1)
 				return this.Arguments[0].PatternMatch(new DateTimeValue(TP), AlreadyFound);
 

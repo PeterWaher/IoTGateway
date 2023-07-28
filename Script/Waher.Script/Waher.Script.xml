@@ -4523,6 +4523,97 @@
             <param name="AlreadyFound">Variables already identified.</param>
             <returns>Pattern match result</returns>
         </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.DateTimeOffset">
+            <summary>
+            Creates a DateTimeOffset value.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTimeOffset value.
+            </summary>
+            <param name="String">String representation to be parsed.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTimeOffset value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="TimeZone">Time-zone</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTimeOffset value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="TimeZone">Time-zone</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTimeOffset value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="MSecond">Millisecond</param>
+            <param name="TimeZone">Time-zone</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeOffset.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeOffset.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.TryParse(System.String,System.DateTimeOffset@)">
+            <summary>
+            Parses DateTimeOffset values from short forms of strings.
+            </summary>
+            <param name="s">String</param>
+            <param name="TP">Parsed DateTimeOffset value.</param>
+            <returns>If successful or not.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeOffset.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.DateTimeUtc">
             <summary>
             Creates a UTC DateTime value.

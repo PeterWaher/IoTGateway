@@ -96,7 +96,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			int i, c = Arguments.Length;
+			int i, c = this.Arguments.Length;
 
 			if (c == 1)
 			{

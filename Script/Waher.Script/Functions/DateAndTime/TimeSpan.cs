@@ -138,18 +138,32 @@ namespace Waher.Script.Functions.DateAndTime
 		{
 			s = s.Trim();
 
-			int c = s.Length;
+            int c = s.Length;
 			int Pos = 0;
+			bool Sign = false;
 
-			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Days) || Days < System.TimeSpan.MinValue.Days || Days > System.TimeSpan.MaxValue.Days)
+			if (c == 0)
+				return false;
+
+			if (s[0] == '+')
+				Pos++;
+			else if (s[0] == '-')
+			{
+				Sign = true;
+				Pos++;
+			}
+
+			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Days, out _) || Days < System.TimeSpan.MinValue.Days || Days > System.TimeSpan.MaxValue.Days)
 				Days = 0;
 			else if (Pos >= c)
 			{
 				TS = new System.TimeSpan(Days, 0, 0, 0);
+				if (Sign)
+					TS = -TS;
 				return true;
 			}
 
-			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Hour) || Hour < 0 || Hour > 23)
+			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Hour, out _) || Hour < 0 || Hour > 23)
 			{
 				TS = System.TimeSpan.Zero;
 				return false;
@@ -157,10 +171,12 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TS = new System.TimeSpan(Days, Hour, 0, 0);
+				if (Sign)
+					TS = -TS;
 				return true;
 			}
 
-			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Minute) || Minute < 0 || Minute > 59)
+			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Minute, out _) || Minute < 0 || Minute > 59)
 			{
 				TS = System.TimeSpan.Zero;
 				return false;
@@ -168,10 +184,12 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TS = new System.TimeSpan(Days, Hour, Minute, 0);
+				if (Sign)
+					TS = -TS;
 				return true;
 			}
 
-			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Second) || Second < 0 || Second > 59)
+			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Second, out _) || Second < 0 || Second > 59)
 			{
 				TS = System.TimeSpan.Zero;
 				return false;
@@ -179,16 +197,32 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TS = new System.TimeSpan(Days, Hour, Minute, Second);
+				if (Sign)
+					TS = -TS;
 				return true;
 			}
 
-			if (!DateTime.TryParseInt(s, ref Pos, '\x0', out int MilliSecond) || MilliSecond < 0 || MilliSecond > 999 || Pos < c)
+			if (!DateTime.TryParseInt(s, ref Pos, '\x0', out int MilliSecond, out int NrDigits) || Pos < c)
 			{
 				TS = System.TimeSpan.Zero;
 				return false;
 			}
 
+			if (NrDigits > 3)
+			{
+				while (NrDigits > 4)
+				{
+					MilliSecond /= 10;
+					NrDigits--;
+				}
+
+				MilliSecond += 5;
+				MilliSecond /= 10;
+			}
+
 			TS = new System.TimeSpan(Days, Hour, Minute, Second, MilliSecond);
+			if (Sign)
+				TS = -TS;
 			return true;
 		}
 
@@ -220,7 +254,7 @@ namespace Waher.Script.Functions.DateAndTime
 				}
 			}
 
-			switch (Arguments.Length)
+			switch (this.Arguments.Length)
 			{
 				case 1:
 					return this.Arguments[0].PatternMatch(new ObjectValue(TS), AlreadyFound);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -103,7 +102,9 @@ namespace Waher.Script.Functions.DateAndTime
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
 
-				if (Obj is long L)
+				if (Obj is System.DateTimeOffset TPO)
+					return new DateTimeValue(TPO.DateTime);
+				else if (Obj is long L)
 					return new DateTimeValue(FromInteger(L, DateTimeKind.Unspecified));
 				else if (Obj is double Dbl)
 					return new DateTimeValue(FromInteger((long)Dbl, DateTimeKind.Unspecified));
@@ -193,7 +194,7 @@ namespace Waher.Script.Functions.DateAndTime
 			int c = s.Length;
 			int Pos = 0;
 
-			if (!TryParseInt(s, ref Pos, '-', out int Year) || Year <= 0 || Year > 9999)
+			if (!TryParseInt(s, ref Pos, '-', out int Year, out _) || Year <= 0 || Year > 9999)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -204,7 +205,7 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, '-', out int Month) || Month < 1 || Month > 12)
+			if (!TryParseInt(s, ref Pos, '-', out int Month, out _) || Month < 1 || Month > 12)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -215,7 +216,7 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, 'T', out int Day) || Day < 1 || Day > System.DateTime.DaysInMonth(Year, Month))
+			if (!TryParseInt(s, ref Pos, 'T', out int Day, out _) || Day < 1 || Day > System.DateTime.DaysInMonth(Year, Month))
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -226,7 +227,7 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, ':', out int Hour) || Hour < 0 || Hour > 23)
+			if (!TryParseInt(s, ref Pos, ':', out int Hour, out _) || Hour < 0 || Hour > 23)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -237,7 +238,7 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, ':', out int Minute) || Minute < 0 || Minute > 59)
+			if (!TryParseInt(s, ref Pos, ':', out int Minute, out _) || Minute < 0 || Minute > 59)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -248,7 +249,7 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, '.', out int Second) || Second < 0 || Second > 59)
+			if (!TryParseInt(s, ref Pos, '.', out int Second, out _) || Second < 0 || Second > 59)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
@@ -259,29 +260,43 @@ namespace Waher.Script.Functions.DateAndTime
 				return true;
 			}
 
-			if (!TryParseInt(s, ref Pos, '\x0', out int MilliSecond) || MilliSecond < 0 || MilliSecond > 999 || Pos < c)
+			if (!TryParseInt(s, ref Pos, '\x0', out int MilliSecond, out int NrDigits) || Pos < c)
 			{
 				TP = System.DateTime.MinValue;
 				return false;
+			}
+
+			if (NrDigits > 3)
+			{
+				while (NrDigits > 4)
+				{
+					MilliSecond /= 10;
+					NrDigits--;
+				}
+
+				MilliSecond += 5;
+				MilliSecond /= 10;
 			}
 
 			TP = new System.DateTime(Year, Month, Day, Hour, Minute, Second, MilliSecond, Kind);
 			return true;
 		}
 
-		internal static bool TryParseInt(string s, ref int Index, char ExpectedDelimiter, out int i)
+		internal static bool TryParseInt(string s, ref int Index, char ExpectedDelimiter, out int i, out int Len)
 		{
 			int j = s.IndexOf(ExpectedDelimiter, Index);
 
 			if (j < 0)
 				j = s.Length;
-			else if (j == 0)
+			else if (j <= Index)
 			{
-				i = 0;
+				i = Len = 0;
 				return false;
 			}
 
-			if (!int.TryParse(s.Substring(Index, j - Index), out i))
+			Len = j - Index;
+
+			if (!int.TryParse(s.Substring(Index, Len), out i))
 				return false;
 
 			Index = j + 1;
@@ -301,7 +316,9 @@ namespace Waher.Script.Functions.DateAndTime
 
 			if (!(Obj is System.DateTime TP))
 			{
-				if (Obj is double d)
+				if (Obj is System.DateTimeOffset TPO)
+					TP = TPO.DateTime;
+				else if (Obj is double d)
 					TP = FromInteger((long)d, DateTimeKind.Unspecified);
 				else
 				{

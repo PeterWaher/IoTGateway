@@ -35,7 +35,7 @@ namespace Waher.Content.Semantic
 		/// <param name="X">X-coordinate.</param>
 		/// <param name="Y">Y-coordinate.</param>
 		/// <param name="Triple">Triple</param>
-		internal void Add(ISemanticElement X, ISemanticElement Y, ISemanticTriple Triple)
+		public void Add(ISemanticElement X, ISemanticElement Y, ISemanticTriple Triple)
 		{
 			this.elements.AddLast(new Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>(X, Y, Triple));
 			this.xPerY = null;
@@ -48,7 +48,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Triples">Enumerable set of triples.</param>
 		/// <param name="XIndex">X-coordinate index.</param>
 		/// <param name="YIndex">Y-coordinate index.</param>
-		internal void Add(IEnumerable<ISemanticTriple> Triples, int XIndex, int YIndex)
+		public void Add(IEnumerable<ISemanticTriple> Triples, int XIndex, int YIndex)
 		{
 			if (!(Triples is null))
 			{
@@ -173,7 +173,7 @@ namespace Waher.Content.Semantic
 					if ((LastPoint is null || !LastPoint.Equals(P.Item1)) &&
 						!Ordered.TryGetValue(P.Item1, out Last))
 					{
-						Last = new InMemorySemanticLine(P.Item1);
+						Last = new InMemorySemanticLine(P.Item1, P.Item2);
 						Ordered[P.Item1] = Last;
 					}
 
@@ -198,7 +198,7 @@ namespace Waher.Content.Semantic
 					if ((LastPoint is null || !LastPoint.Equals(P.Item2)) &&
 						!Ordered.TryGetValue(P.Item2, out Last))
 					{
-						Last = new InMemorySemanticLine(P.Item2);
+						Last = new InMemorySemanticLine(P.Item2, P.Item1);
 						Ordered[P.Item2] = Last;
 					}
 

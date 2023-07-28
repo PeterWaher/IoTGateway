@@ -336,51 +336,6 @@ namespace Waher.Content.Semantic
 		}
 
 		/// <summary>
-		/// Returns a new cube, with a subject restriction.
-		/// </summary>
-		/// <param name="Subject">Subject restriction.</param>
-		/// <returns>Restricted cube, or null if empty.</returns>
-		public async Task<ISemanticCube> RestrictSubject(ISemanticElement Subject)
-		{
-			this.CheckSubjectsOrdered();
-
-			if (this.subjects.TryGetValue(Subject, out InMemorySemanticPlane Plane))
-				return await Create(Plane);
-			else
-				return null;
-		}
-
-		/// <summary>
-		/// Returns a new cube, with a predicate restriction.
-		/// </summary>
-		/// <param name="Predicate">Predicate restriction.</param>
-		/// <returns>Restricted cube, or null if empty.</returns>
-		public async Task<ISemanticCube> RestrictPredicate(ISemanticElement Predicate)
-		{
-			this.CheckPredicatesOrdered();
-
-			if (this.predicates.TryGetValue(Predicate, out InMemorySemanticPlane Plane))
-				return await Create(Plane);
-			else
-				return null;
-		}
-
-		/// <summary>
-		/// Returns a new cube, with a object restriction.
-		/// </summary>
-		/// <param name="Object">Object restriction.</param>
-		/// <returns>Restricted cube, or null if empty.</returns>
-		public async Task<ISemanticCube> RestrictObject(ISemanticElement Object)
-		{
-			this.CheckObjectsOrdered();
-
-			if (this.objects.TryGetValue(Object, out InMemorySemanticPlane Plane))
-				return await Create(Plane);
-			else
-				return null;
-		}
-
-		/// <summary>
 		/// Gets available triples in the cube, having a given value, along a given axis.
 		/// </summary>
 		/// <param name="Value">Value</param>

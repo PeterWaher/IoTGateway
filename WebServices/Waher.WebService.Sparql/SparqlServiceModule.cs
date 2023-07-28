@@ -100,12 +100,12 @@ namespace Waher.WebService.Sparql
 
 		private void ConcentratorServer_SourceRegistered(object sender, DataSourceEventArgs e)
 		{
-			GraphStore.InvalidateDefaultGrpah();
+			GraphStore.InvalidateDefaultGraph();
 		}
 
 		private void ConcentratorServer_SourceUnregistered(object sender, DataSourceEventArgs e)
 		{
-			GraphStore.InvalidateDefaultGrpah();
+			GraphStore.InvalidateDefaultGraph();
 		}
 	}
 }

@@ -1,88 +1,56 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Content.Semantic;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
+using Waher.Script.Model;
+using Waher.Things;
 
-namespace Waher.Content.Semantic
+namespace Waher.Script.Persistence.SPARQL.Sources
 {
 	/// <summary>
-	/// In-memory semantic cube.
+	/// Graph source in the local graph store, based on triples persisted in the object database.
 	/// </summary>
-	public class SemanticDataSet : ISemanticCube
+	public class GraphStoreDbSource : IGraphSource, ISemanticCube
 	{
-		private readonly LinkedList<ISemanticCube> sources = new LinkedList<ISemanticCube>();
-		private ISemanticCube first = null;
-		private int count = 0;
+		private readonly GraphReference reference;
+		private ISemanticCube cube = null;
 
 		/// <summary>
-		/// In-memory semantic cube.
+		/// Graph source in the local graph store, based on triples persisted in the object database.
 		/// </summary>
-		/// <param name="Sources">Sources</param>
-		public SemanticDataSet(params ISemanticCube[] Sources)
-			: this((IEnumerable<ISemanticCube>)Sources)
+		public GraphStoreDbSource(GraphReference Reference)
 		{
+			this.reference = Reference;
 		}
 
 		/// <summary>
-		/// In-memory semantic cube.
+		/// How well a source with a given URI can be loaded by the class.
 		/// </summary>
-		/// <param name="Sources">Sources</param>
-		public SemanticDataSet(IEnumerable<ISemanticCube> Sources)
+		/// <param name="_">Source URI</param>
+		/// <returns>How well the class supports loading the graph.</returns>
+		public Grade Supports(Uri _)
 		{
-			foreach (ISemanticCube Source in Sources)
-			{
-				if (!(Source is null))
-				{
-					if (this.first is null)
-						this.first = Source;
-
-					this.sources.AddLast(Source);
-					this.count++;
-				}
-			}
+			return Grade.NotAtAll;  // Explicitly selected by processor.
 		}
 
 		/// <summary>
-		/// Adds a source to the data set.
+		/// Loads the graph
 		/// </summary>
-		/// <param name="Source">Source</param>
-		public void Add(ISemanticCube Source)
+		/// <param name="Source">Source URI</param>
+		/// <param name="Node">Node performing the loading.</param>
+		/// <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+		/// <param name="Caller">Information about entity making the request.</param>
+		/// <returns>Graph, if found, null if not found, and null can be returned.</returns>
+		public Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound,
+			RequestOrigin Caller)
 		{
-			if (!(Source is null))
-			{
-				if (this.first is null)
-					this.first = Source;
+			// TODO: Check access privileges
 
-				this.sources.AddLast(Source);
-				this.count++;
-			}
-		}
-
-		/// <summary>
-		/// Gets an enumerator of available data sources.
-		/// </summary>
-		/// <returns>Enumerator object.</returns>
-		public IEnumerator<ISemanticTriple> GetEnumerator()
-		{
-			return this.CreateJoinedEnumerator();
-		}
-
-		/// <summary>
-		/// Gets an enumerator of available data sources.
-		/// </summary>
-		/// <returns>Enumerator object.</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.CreateJoinedEnumerator();
-		}
-
-		private IEnumerator<ISemanticTriple> CreateJoinedEnumerator()
-		{
-			LinkedList<IEnumerator<ISemanticTriple>> Enumerators = new LinkedList<IEnumerator<ISemanticTriple>>();
-
-			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(Source.GetEnumerator());
-
-			return new JoinedTripleEnumerator(Enumerators, true);
+			return Task.FromResult<ISemanticCube>(this);
 		}
 
 		/// <summary>
@@ -92,20 +60,19 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by predicate (X) and object (Y), or null if none.</returns>
 		public async Task<ISemanticPlane> GetTriplesBySubject(ISemanticElement Subject)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesBySubject(Subject);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticPlane Result = new InMemorySemanticPlane(Subject);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("S", Subject)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesBySubject(Subject), 1, 2);
+				Result.Add(Triples, 1, 2);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesBySubject(Subject);
 		}
 
 		/// <summary>
@@ -115,20 +82,19 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by subject (X) and object (Y), or null if none.</returns>
 		public async Task<ISemanticPlane> GetTriplesByPredicate(ISemanticElement Predicate)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByPredicate(Predicate);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticPlane Result = new InMemorySemanticPlane(Predicate);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("P", Predicate)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByPredicate(Predicate), 0, 2);
+				Result.Add(Triples, 0, 2);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByPredicate(Predicate);
 		}
 
 		/// <summary>
@@ -138,20 +104,19 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, ordered by subject (X) and predicate (Y), or null if none.</returns>
 		public async Task<ISemanticPlane> GetTriplesByObject(ISemanticElement Object)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByObject(Object);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticPlane Result = new InMemorySemanticPlane(Object);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("O", Object)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByObject(Object), 0, 1);
+				Result.Add(Triples, 0, 1);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByObject(Object);
 		}
 
 		/// <summary>
@@ -162,20 +127,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesBySubjectAndPredicate(ISemanticElement Subject, ISemanticElement Predicate)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesBySubjectAndPredicate(Subject, Predicate);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Subject, Predicate);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("S", Subject),
+					new FilterFieldEqualTo("P", Predicate)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesBySubjectAndPredicate(Subject, Predicate), 2);
+				Result.Add(Triples, 2);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesBySubjectAndPredicate(Subject, Predicate);
 		}
 
 		/// <summary>
@@ -186,20 +151,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesBySubjectAndObject(ISemanticElement Subject, ISemanticElement Object)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesBySubjectAndObject(Subject, Object);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Subject, Object);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("S", Subject),
+					new FilterFieldEqualTo("O", Object)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesBySubjectAndObject(Subject, Object), 1);
+				Result.Add(Triples, 1);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesBySubjectAndObject(Subject, Object);
 		}
 
 		/// <summary>
@@ -210,20 +175,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesByPredicateAndSubject(ISemanticElement Predicate, ISemanticElement Subject)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByPredicateAndSubject(Predicate, Subject);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Predicate, Subject);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("P", Predicate),
+					new FilterFieldEqualTo("S", Subject)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByPredicateAndSubject(Predicate, Subject), 2);
+				Result.Add(Triples, 2);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByPredicateAndSubject(Predicate, Subject);
 		}
 
 		/// <summary>
@@ -234,20 +199,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesByPredicateAndObject(ISemanticElement Predicate, ISemanticElement Object)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByPredicateAndObject(Predicate, Object);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Predicate, Object);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("P", Predicate),
+					new FilterFieldEqualTo("O", Object)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByPredicateAndObject(Predicate, Object), 0);
+				Result.Add(Triples, 0);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByPredicateAndObject(Predicate, Object);
 		}
 
 		/// <summary>
@@ -258,20 +223,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesByObjectAndSubject(ISemanticElement Object, ISemanticElement Subject)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByObjectAndSubject(Object, Subject);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Object, Subject);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("O", Object),
+					new FilterFieldEqualTo("S", Subject)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByObjectAndSubject(Object, Subject), 1);
+				Result.Add(Triples, 1);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByObjectAndSubject(Object, Subject);
 		}
 
 		/// <summary>
@@ -282,20 +247,20 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<ISemanticLine> GetTriplesByObjectAndPredicate(ISemanticElement Object, ISemanticElement Predicate)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesByObjectAndPredicate(Object, Predicate);
-			else
+			if (this.cube is null)
 			{
 				InMemorySemanticLine Result = new InMemorySemanticLine(Object, Predicate);
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+					new FilterFieldEqualTo("O", Object),
+					new FilterFieldEqualTo("P", Predicate)));
 
-				foreach (ISemanticCube Source in this.sources)
-					Result.Add(await Source.GetTriplesByObjectAndPredicate(Object, Predicate), 0);
+				Result.Add(Triples, 2);
 
 				return Result;
 			}
+			else
+				return await this.cube.GetTriplesByObjectAndPredicate(Object, Predicate);
 		}
 
 		/// <summary>
@@ -307,27 +272,35 @@ namespace Waher.Content.Semantic
 		/// <returns>Available triples, or null if none.</returns>
 		public async Task<IEnumerable<ISemanticTriple>> GetTriplesBySubjectAndPredicateAndObject(ISemanticElement Subject, ISemanticElement Predicate, ISemanticElement Object)
 		{
-			if (this.first is null)
-				return null;
-
-			if (this.count <= 1)
-				return await this.first.GetTriplesBySubjectAndPredicateAndObject(Subject, Predicate, Object);
-			else
+			if (this.cube is null)
 			{
-				LinkedList<ISemanticTriple> Result = new LinkedList<ISemanticTriple>();
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(new FilterAnd(
+				new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey),
+				new FilterFieldEqualTo("S", Subject),
+				new FilterFieldEqualTo("P", Predicate),
+				new FilterFieldEqualTo("O", Object)));
 
-				foreach (ISemanticCube Source in this.sources)
-				{
-					IEnumerable<ISemanticTriple> Part = await this.first.GetTriplesBySubjectAndPredicateAndObject(Subject, Predicate, Object);
-					if (Part is null)
-						continue;
-
-					foreach (ISemanticTriple Triple in Part)
-						Result.AddLast(Triple);
-				}
-
-				return Result;
+				return Triples;
 			}
+			else
+				return await this.cube.GetTriplesBySubjectAndPredicateAndObject(Subject, Predicate, Object);
+		}
+
+		private async Task<ISemanticCube> GetCube()
+		{
+			if (this.cube is null)
+			{
+				IEnumerable<DatabaseTriple> Triples = await Database.Find<DatabaseTriple>(
+					new FilterFieldEqualTo("GraphKey", this.reference.DatabaseKey));
+				InMemorySemanticCube Cube = new InMemorySemanticCube();
+
+				foreach (DatabaseTriple T in Triples)
+					Cube.Add(T);
+
+				this.cube = Cube;
+			}
+
+			return this.cube;
 		}
 
 		/// <summary>
@@ -336,12 +309,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetSubjectEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
-
-			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetSubjectEnumerator());
-
-			return new JoinedElementEnumerator(Enumerators, true);
+			ISemanticCube Cube = await this.GetCube();
+			return await Cube.GetSubjectEnumerator();
 		}
 
 		/// <summary>
@@ -350,12 +319,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetPredicateEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
-
-			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetPredicateEnumerator());
-
-			return new JoinedElementEnumerator(Enumerators, true);
+			ISemanticCube Cube = await this.GetCube();
+			return await Cube.GetPredicateEnumerator();
 		}
 
 		/// <summary>
@@ -364,12 +329,8 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetObjectEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
-
-			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetObjectEnumerator());
-
-			return new JoinedElementEnumerator(Enumerators, true);
+			ISemanticCube Cube = await this.GetCube();
+			return await Cube.GetObjectEnumerator();
 		}
 
 		/// <summary>
@@ -437,5 +398,24 @@ namespace Waher.Content.Semantic
 
 			return null;
 		}
+
+		/// <summary>
+		/// Gets an enumerator of available triples.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		public IEnumerator<ISemanticTriple> GetEnumerator()
+		{
+			return this.GetCube().Result.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Gets an enumerator of available triples.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetCube().Result.GetEnumerator();
+		}
+
 	}
 }

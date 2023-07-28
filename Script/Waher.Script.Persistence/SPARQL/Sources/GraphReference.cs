@@ -60,5 +60,17 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// Creators of graph
 		/// </summary>
 		public string[] Creators { get; set; }
+
+		/// <summary>
+		/// If triples are persisted in database.
+		/// </summary>
+		[DefaultValue(false)]
+		public bool InDatabase { get; set; }
+
+		/// <summary>
+		/// Graph key in database.
+		/// </summary>
+		[DefaultValue(0L)]
+		public long DatabaseKey { get; set; }
 	}
 }

@@ -2310,6 +2310,63 @@
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple">
+            <summary>
+            Contains a reference to a graph in the graph store.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.#ctor">
+            <summary>
+            Contains a reference to a graph in the graph store.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.GraphKey">
+            <summary>
+            Graph key
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.S">
+            <summary>
+            Subject element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.P">
+            <summary>
+            Predicate element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.O">
+            <summary>
+            Object element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.Subject">
+            <summary>
+            Subject element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.Predicate">
+            <summary>
+            Predicate element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.Object">
+            <summary>
+            Object element
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.DatabaseTriple.Item(System.Int32)">
+            <summary>
+            Access to elements: 0=Subject, 1=Predicate, 2=Object.
+            </summary>
+            <param name="Index">0=Subject, 1=Predicate, 2=Object</param>
+            <returns>Corresponding semantic element.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphReference">
             <summary>
             Contains a reference to a graph in the graph store.
@@ -2360,24 +2417,34 @@
             Creators of graph
             </summary>
         </member>
-        <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource">
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.InDatabase">
             <summary>
-            Graph source in the local graph store.
+            If triples are persisted in database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.#ctor(Waher.Script.Persistence.SPARQL.Sources.GraphReference)">
+        <member name="P:Waher.Script.Persistence.SPARQL.Sources.GraphReference.DatabaseKey">
             <summary>
-            Graph source in the local graph store.
+            Graph key in database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.Supports(System.Uri)">
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource">
+            <summary>
+            Graph source in the local graph store, based on triples persisted in the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.#ctor(Waher.Script.Persistence.SPARQL.Sources.GraphReference)">
+            <summary>
+            Graph source in the local graph store, based on triples persisted in the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.Supports(System.Uri)">
             <summary>
             How well a source with a given URI can be loaded by the class.
             </summary>
             <param name="_">Source URI</param>
             <returns>How well the class supports loading the graph.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean,Waher.Things.RequestOrigin)">
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean,Waher.Things.RequestOrigin)">
             <summary>
             Loads the graph
             </summary>
@@ -2385,6 +2452,167 @@
             <param name="Node">Node performing the loading.</param>
             <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
             <param name="Caller">Information about entity making the request.</param>
+            <returns>Graph, if found, null if not found, and null can be returned.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesBySubject(Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given subject.
+            </summary>
+            <param name="Subject">Subject</param>
+            <returns>Available triples, ordered by predicate (X) and object (Y), or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByPredicate(Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given predicate.
+            </summary>
+            <param name="Predicate">Predicate</param>
+            <returns>Available triples, ordered by subject (X) and object (Y), or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByObject(Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Available triples, ordered by subject (X) and predicate (Y), or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesBySubjectAndPredicate(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given subject and predicate.
+            </summary>
+            <param name="Subject">Subject</param>
+            <param name="Predicate">Predicate</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesBySubjectAndObject(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given subject and object.
+            </summary>
+            <param name="Subject">Subject</param>
+            <param name="Object">Object</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByPredicateAndSubject(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given predicate and subject.
+            </summary>
+            <param name="Predicate">Predicate</param>
+            <param name="Subject">Subject</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByPredicateAndObject(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given predicate and object.
+            </summary>
+            <param name="Predicate">Predicate</param>
+            <param name="Object">Object</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByObjectAndSubject(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given object and subject.
+            </summary>
+            <param name="Object">Object</param>
+            <param name="Subject">Subject</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesByObjectAndPredicate(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given object and predicate.
+            </summary>
+            <param name="Object">Object</param>
+            <param name="Predicate">Predicate</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriplesBySubjectAndPredicateAndObject(Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement,Waher.Content.Semantic.ISemanticElement)">
+            <summary>
+            Gets available triples in the cube, having a given subject, predicate and object.
+            </summary>
+            <param name="Subject">Subject</param>
+            <param name="Predicate">Predicate</param>
+            <param name="Object">Object</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetSubjectEnumerator">
+            <summary>
+            Gets an enumerator of all subjects.
+            </summary>
+            <returns>Enumerator of semantic elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetPredicateEnumerator">
+            <summary>
+            Gets an enumerator of all predicates.
+            </summary>
+            <returns>Enumerator of semantic elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetObjectEnumerator">
+            <summary>
+            Gets an enumerator of all objects.
+            </summary>
+            <returns>Enumerator of semantic elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriples(Waher.Content.Semantic.ISemanticElement,System.Int32)">
+            <summary>
+            Gets available triples in the cube, having a given value, along a given axis.
+            </summary>
+            <param name="Value">Value</param>
+            <param name="AxisIndex">Axis Index: 0=Subject, 1=Predicate, 2=Object.</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetTriples(Waher.Content.Semantic.ISemanticElement,System.Int32,Waher.Content.Semantic.ISemanticElement,System.Int32)">
+            <summary>
+            Gets available triples in the cube, having two given values, along two given axes.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Axis1Index">Axis 1 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+            <param name="Value2">Value 2</param>
+            <param name="Axis2Index">Axis 2 Index: 0=Subject, 1=Predicate, 2=Object.</param>
+            <returns>Available triples, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.GetEnumerator">
+            <summary>
+            Gets an enumerator of available triples.
+            </summary>
+            <returns>Enumerator object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreDbSource.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator of available triples.
+            </summary>
+            <returns>Enumerator object.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SPARQL.Sources.GraphStoreFileSource">
+            <summary>
+            Graph source in the local graph store, based on files.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreFileSource.#ctor(Waher.Script.Persistence.SPARQL.Sources.GraphReference)">
+            <summary>
+            Graph source in the local graph store, based on files.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreFileSource.Supports(System.Uri)">
+            <summary>
+            How well a source with a given URI can be loaded by the class.
+            </summary>
+            <param name="_">Source URI</param>
+            <returns>How well the class supports loading the graph.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreFileSource.LoadGraph(System.Uri,Waher.Script.Model.ScriptNode,System.Boolean,Waher.Things.RequestOrigin)">
+            <summary>
+            Loads the graph
+            </summary>
+            <param name="Source">Source URI</param>
+            <param name="Node">Node performing the loading.</param>
+            <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+            <param name="Caller">Information about entity making the request.</param>
+            <returns>Graph, if found, null if not found, and null can be returned.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SPARQL.Sources.GraphStoreFileSource.LoadGraph(System.Uri,System.Boolean)">
+            <summary>
+            Loads the graph
+            </summary>
+            <param name="Source">Source URI</param>
+            <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
             <returns>Graph, if found, null if not found, and null can be returned.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SPARQL.Sources.InternetContentSource">

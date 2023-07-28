@@ -23,8 +23,8 @@
 		/// <summary>
 		/// Access to elements: 0=Subject, 1=Predicate, 2=Object.
 		/// </summary>
-		/// <param name="Index"></param>
-		/// <returns></returns>
+		/// <param name="Index">0=Subject, 1=Predicate, 2=Object</param>
+		/// <returns>Corresponding semantic element.</returns>
 		ISemanticElement this[int Index]
 		{
 			get;

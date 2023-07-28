@@ -16,7 +16,9 @@ using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Counters;
 using Waher.Runtime.Language;
+using Waher.Script.Persistence.SPARQL;
 using Waher.Script.Persistence.SPARQL.Sources;
 using Waher.Security;
 using Waher.Things;
@@ -30,6 +32,11 @@ namespace Waher.WebService.Sparql
 	/// </summary>
 	public class GraphStore : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
+		/// <summary>
+		/// Number of files posted to a graph, before graph is converted to a database graph.
+		/// </summary>
+		public const int DatabaseMinFileCount = 10;
+
 		private static readonly Dictionary<string, ISemanticModel> defaultGraphs = new Dictionary<string, ISemanticModel>();
 		private static readonly SemaphoreSlim defaultGraphSemaphore = new SemaphoreSlim(1);
 
@@ -109,7 +116,29 @@ namespace Waher.WebService.Sparql
 				if (Request.Header.Method == "HEAD")
 					return;
 
-				GraphStoreSource Source = new GraphStoreSource(Reference);
+				IGraphSource Source;
+
+				if (Reference.InDatabase)
+					Source = new GraphStoreDbSource(Reference);
+				else
+				{
+					GraphStoreFileSource FileSource = new GraphStoreFileSource(Reference);
+					Source = FileSource;
+
+					if (Reference.NrFiles > DatabaseMinFileCount)
+					{
+						ISemanticCube Model = await FileSource.LoadGraph(new Uri(Reference.GraphUri), true);
+
+						Reference.DatabaseKey = await RuntimeCounters.IncrementCounter("GraphStore.LastGraphKey");
+						Reference.InDatabase = true;
+
+						await Database.Update(Reference);
+						await AddTriplesToDatabase(Reference.DatabaseKey, new IEnumerable<ISemanticTriple>[] { Model });
+
+						Source = new GraphStoreDbSource(Reference);
+					}
+				}
+
 				Graph = await Source.LoadGraph(GraphUri, null, false, GetOrigin(Request));
 			}
 
@@ -249,19 +278,32 @@ namespace Waher.WebService.Sparql
 
 			object Decoded = await Request.DecodeDataAsync();
 			List<KeyValuePair<string, string>> Files = new List<KeyValuePair<string, string>>();
+			LinkedList<ISemanticModel> Models = new LinkedList<ISemanticModel>();
 
 			if (Decoded is TurtleDocument TurtleDoc)
+			{
 				Files.Add(new KeyValuePair<string, string>(TurtleDoc.Text, TurtleCodec.DefaultExtension));
+				Models.AddLast(TurtleDoc);
+			}
 			else if (Decoded is RdfDocument RdfDoc)
+			{
 				Files.Add(new KeyValuePair<string, string>(RdfDoc.Text, RdfCodec.DefaultExtension));
+				Models.AddLast(RdfDoc);
+			}
 			else if (Decoded is Dictionary<string, object> Form)
 			{
 				foreach (KeyValuePair<string, object> P in Form)
 				{
 					if (P.Value is TurtleDocument TurtleDoc2)
+					{
 						Files.Add(new KeyValuePair<string, string>(TurtleDoc2.Text, TurtleCodec.DefaultExtension));
+						Models.AddLast(TurtleDoc2);
+					}
 					else if (P.Value is RdfDocument RdfDoc2)
+					{
 						Files.Add(new KeyValuePair<string, string>(RdfDoc2.Text, RdfCodec.DefaultExtension));
+						Models.AddLast(RdfDoc2);
+					}
 					else
 						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
 				}
@@ -271,9 +313,15 @@ namespace Waher.WebService.Sparql
 				foreach (EmbeddedContent P in Form2.Content)
 				{
 					if (P.Decoded is TurtleDocument TurtleDoc2)
+					{
 						Files.Add(new KeyValuePair<string, string>(TurtleDoc2.Text, TurtleCodec.DefaultExtension));
+						Models.AddLast(TurtleDoc2);
+					}
 					else if (P.Decoded is RdfDocument RdfDoc2)
+					{
 						Files.Add(new KeyValuePair<string, string>(RdfDoc2.Text, RdfCodec.DefaultExtension));
+						Models.AddLast(RdfDoc2);
+					}
 					else
 						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
 				}
@@ -284,7 +332,7 @@ namespace Waher.WebService.Sparql
 				{
 					try
 					{
-						new RdfDocument(s);
+						Models.AddLast(new RdfDocument(s));
 						Files.Add(new KeyValuePair<string, string>(s, RdfCodec.DefaultExtension));
 					}
 					catch (Exception)
@@ -296,7 +344,7 @@ namespace Waher.WebService.Sparql
 				{
 					try
 					{
-						new TurtleDocument(s);
+						Models.AddLast(new TurtleDocument(s));
 						Files.Add(new KeyValuePair<string, string>(s, TurtleCodec.DefaultExtension));
 					}
 					catch (Exception)
@@ -324,7 +372,9 @@ namespace Waher.WebService.Sparql
 					NrFiles = Files.Count,
 					GraphDigest = H,
 					Folder = Path.Combine(Gateway.AppDataFolder, "GraphStore", H),
-					Creators = new string[] { Request.User.UserName }
+					Creators = new string[] { Request.User.UserName },
+					InDatabase = false,
+					DatabaseKey = 0
 				};
 
 				if (!Directory.Exists(Reference.Folder))
@@ -354,6 +404,9 @@ namespace Waher.WebService.Sparql
 
 					Reference.NrFiles = Files.Count;
 					Reference.Creators = new string[] { Request.User.UserName };
+
+					if (Reference.InDatabase)
+						await Database.FindDelete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
 				}
 				else
 				{
@@ -372,17 +425,72 @@ namespace Waher.WebService.Sparql
 
 				await Database.Update(Reference);
 
+				if (!Reference.InDatabase && Reference.NrFiles > DatabaseMinFileCount)
+				{
+					GraphStoreFileSource FileSource = new GraphStoreFileSource(Reference);
+					ISemanticCube Model = await FileSource.LoadGraph(new Uri(Reference.GraphUri), true);
+
+					Reference.DatabaseKey = await RuntimeCounters.IncrementCounter("GraphStore.LastGraphKey");
+					Reference.InDatabase = true;
+
+					await Database.Update(Reference);
+
+					Models.Clear();
+					if (!(Model is null))
+						Models.AddLast(Model);
+				}
+
 				Response.StatusCode = 200;  // OK
 			}
 
-			InvalidateDefaultGrpah();
+			if (Reference.InDatabase)
+				await AddTriplesToDatabase(Reference.DatabaseKey, Models);
+
+			InvalidateDefaultGraph();
+		}
+
+		private static async Task AddTriplesToDatabase(long DatabaseKey, IEnumerable<IEnumerable<ISemanticTriple>> Models)
+		{
+			List<DatabaseTriple> ToSave = new List<DatabaseTriple>();
+			int c = 0;
+
+			foreach (IEnumerable<ISemanticTriple> Model in Models)
+			{
+				foreach (ISemanticTriple T in Model)
+				{
+					if (T.Subject is SemanticElement S &&
+						T.Predicate is SemanticElement P &&
+						T.Object is SemanticElement O)
+					{
+						ToSave.Add(new DatabaseTriple()
+						{
+							GraphKey = DatabaseKey,
+							S = S,
+							P = P,
+							O = O
+						});
+
+						c++;
+
+						if (c >= 1000)
+						{
+							await Database.Insert(ToSave.ToArray());
+							ToSave.Clear();
+							c = 0;
+						}
+					}
+				}
+			}
+
+			if (c > 0)
+				await Database.Insert(ToSave.ToArray());
 		}
 
 		/// <summary>
 		/// Invalidates the default graph, triggering a re-generation of the default
 		/// graph the next time it is requested.
 		/// </summary>
-		internal static void InvalidateDefaultGrpah()
+		internal static void InvalidateDefaultGraph()
 		{
 			lock (defaultGraphs)
 			{
@@ -423,6 +531,9 @@ namespace Waher.WebService.Sparql
 				File.Delete(FileName2);
 				FilesDeleted = true;
 			}
+
+			if (Reference.InDatabase)
+				await Database.FindDelete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
 
 			await Database.Delete(Reference);
 

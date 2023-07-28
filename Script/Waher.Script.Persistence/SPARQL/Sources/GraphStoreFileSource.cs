@@ -10,16 +10,16 @@ using Waher.Things;
 namespace Waher.Script.Persistence.SPARQL.Sources
 {
 	/// <summary>
-	/// Graph source in the local graph store.
+	/// Graph source in the local graph store, based on files.
 	/// </summary>
-	public class GraphStoreSource : IGraphSource
+	public class GraphStoreFileSource : IGraphSource
 	{
 		private readonly GraphReference reference;
 
 		/// <summary>
-		/// Graph source in the local graph store.
+		/// Graph source in the local graph store, based on files.
 		/// </summary>
-		public GraphStoreSource(GraphReference Reference)
+		public GraphStoreFileSource(GraphReference Reference)
 		{
 			this.reference = Reference;
 		}
@@ -42,11 +42,22 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
 		/// <param name="Caller">Information about entity making the request.</param>
 		/// <returns>Graph, if found, null if not found, and null can be returned.</returns>
-		public async Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound,
+		public Task<ISemanticCube> LoadGraph(Uri Source, ScriptNode Node, bool NullIfNotFound,
 			RequestOrigin Caller)
 		{
 			// TODO: Check access privileges
 
+			return this.LoadGraph(Source, NullIfNotFound);
+		}
+
+		/// <summary>
+		/// Loads the graph
+		/// </summary>
+		/// <param name="Source">Source URI</param>
+		/// <param name="NullIfNotFound">If null should be returned, if graph is not found.</param>
+		/// <returns>Graph, if found, null if not found, and null can be returned.</returns>
+		public async Task<ISemanticCube> LoadGraph(Uri Source, bool NullIfNotFound)
+		{ 
 			string[] Files = Directory.GetFiles(this.reference.Folder, "*.*", SearchOption.TopDirectoryOnly);
 			ISemanticCube Result = null;
 			InMemorySemanticCube Union = null;

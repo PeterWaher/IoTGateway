@@ -10,29 +10,37 @@ namespace Waher.Content.Semantic
 	public class InMemorySemanticLine : ISemanticLine
 	{
 		private readonly LinkedList<KeyValuePair<ISemanticElement, ISemanticTriple>> elements = new LinkedList<KeyValuePair<ISemanticElement, ISemanticTriple>>();
-		private readonly ISemanticElement reference;
+		private readonly ISemanticElement reference1;
+		private readonly ISemanticElement reference2;
 		private SortedDictionary<ISemanticElement, LinkedList<ISemanticTriple>> points = null;
 
 		/// <summary>
 		/// In-memory semantic line.
 		/// </summary>
-		/// <param name="Reference">Reference</param>
-		public InMemorySemanticLine(ISemanticElement Reference)
+		/// <param name="Reference1">Reference 1</param>
+		/// <param name="Reference2">Reference 2</param>
+		public InMemorySemanticLine(ISemanticElement Reference1, ISemanticElement Reference2)
 		{
-			this.reference = Reference;
+			this.reference1 = Reference1;
+			this.reference2 = Reference2;
 		}
 
 		/// <summary>
-		/// Line reference.
+		/// Line reference 1.
 		/// </summary>
-		public ISemanticElement Reference => this.reference;
+		public ISemanticElement Reference1 => this.reference1;
+
+		/// <summary>
+		/// Line reference 2.
+		/// </summary>
+		public ISemanticElement Reference2 => this.reference2;
 
 		/// <summary>
 		/// Adds an element to the line.
 		/// </summary>
 		/// <param name="Point">Coordinate.</param>
 		/// <param name="Triple">Triple</param>
-		internal void Add(ISemanticElement Point, ISemanticTriple Triple)
+		public void Add(ISemanticElement Point, ISemanticTriple Triple)
 		{
 			this.points = null;
 			this.elements.AddLast(new KeyValuePair<ISemanticElement, ISemanticTriple>(Point, Triple));
@@ -43,7 +51,7 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Triples">Enumerable set of triples.</param>
 		/// <param name="ZIndex">Z-coordinate index.</param>
-		internal void Add(IEnumerable<ISemanticTriple> Triples, int ZIndex)
+		public void Add(IEnumerable<ISemanticTriple> Triples, int ZIndex)
 		{
 			if (!(Triples is null))
 			{

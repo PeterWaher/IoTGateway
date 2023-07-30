@@ -362,6 +362,12 @@
             <paramref name="PaginationStrategy"/>, null items may be returned
             if underlying object is not compatible with <typeparamref name="T"/>.</returns>
         </member>
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.ProcessObjectUpdate(System.Object)">
+            <summary>
+            Processes an object that has been updated.
+            </summary>
+            <param name="Object">Updated object.</param>
+        </member>
         <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.ReindexCollection(System.String)">
             <summary>
             Reindexes the full-text-search index for a database collection.

@@ -17,6 +17,7 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
+using Waher.Script.Model;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -523,6 +524,8 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> Prepare(object Object)
 		{
+			Object = await ScriptNode.WaitPossibleTask(Object);
+
 			await synchObj.BeginWrite();
 			try
 			{
@@ -1137,18 +1140,22 @@ namespace Waher.Persistence.FullTextSearch
 
 		private void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
-			Task.Run(() => this.ObjectUpdated(e));
+			Task.Run(() => ProcessObjectUpdate(e.Object));
 		}
 
-		private async Task ObjectUpdated(ObjectEventArgs e)
+		/// <summary>
+		/// Processes an object that has been updated.
+		/// </summary>
+		/// <param name="Object">Updated object.</param>
+		public static async Task ProcessObjectUpdate(object Object)
 		{
 			try
 			{
-				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(e.Object);
+				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(Object);
 				if (P is null)
 					return;
 
-				object ObjectId = await Database.TryGetObjectId(e.Object);
+				object ObjectId = await Database.TryGetObjectId(Object);
 				if (ObjectId is null)
 					return;
 
@@ -1158,7 +1165,7 @@ namespace Waher.Persistence.FullTextSearch
 				TokenCount[] Tokens;
 
 				if (GenObj is null)
-					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.Properties);
+					Tokens = await TypeInfo.Tokenize(Object, CollectionInfo.Properties);
 				else
 					Tokens = await Tokenize(GenObj, CollectionInfo.Properties);
 
@@ -1182,7 +1189,7 @@ namespace Waher.Persistence.FullTextSearch
 						string IndexName;
 
 						if (GenObj is null)
-							IndexName = TypeInfo.GetIndexCollection(e.Object);
+							IndexName = TypeInfo.GetIndexCollection(Object);
 						else
 							IndexName = CollectionInfo.IndexCollectionName;
 
@@ -1221,9 +1228,9 @@ namespace Waher.Persistence.FullTextSearch
 				queryCache.Clear();
 
 				if (Added)
-					await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));
+					await Search.RaiseObjectAddedToIndex(instance, new ObjectReferenceEventArgs(Ref));
 				else
-					await Search.RaiseObjectUpdatedInIndex(this, new ObjectReferenceEventArgs(Ref));
+					await Search.RaiseObjectUpdatedInIndex(instance, new ObjectReferenceEventArgs(Ref));
 			}
 			catch (Exception ex)
 			{
@@ -1423,7 +1430,9 @@ namespace Waher.Persistence.FullTextSearch
 				if (Object is null)
 					continue;
 
-				Type T = Object.GetType();
+				object Object2 = await ScriptNode.WaitPossibleTask(Object);
+
+				Type T = Object2.GetType();
 				ITokenizer Tokenizer;
 				bool Found;
 
@@ -1444,11 +1453,11 @@ namespace Waher.Persistence.FullTextSearch
 
 				if (Tokenizer is null)
 				{
-					Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(Object);
+					Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(Object2);
 					if (P is null)
 						continue;
 
-					object ObjectId = await Database.TryGetObjectId(Object);
+					object ObjectId = await Database.TryGetObjectId(Object2);
 					if (ObjectId is null)
 						return;
 
@@ -1457,12 +1466,12 @@ namespace Waher.Persistence.FullTextSearch
 					GenericObject GenObj = P.Item3;
 
 					if (GenObj is null)
-						await TypeInfo.Tokenize(Object, Process, CollectionInfo.Properties);
+						await TypeInfo.Tokenize(Object2, Process, CollectionInfo.Properties);
 					else
 						await Tokenize(GenObj, Process, CollectionInfo.Properties);
 				}
 				else
-					await Tokenizer.Tokenize(Object, Process);
+					await Tokenizer.Tokenize(Object2, Process);
 
 				Process.DocumentIndexOffset++;
 			}

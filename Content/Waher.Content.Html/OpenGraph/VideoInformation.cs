@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Html.OpenGraph
+﻿namespace Waher.Content.Html.OpenGraph
 {
 	/// <summary>
 	/// Video information, as defined by the Open Graph protocol.

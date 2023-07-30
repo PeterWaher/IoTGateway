@@ -488,13 +488,13 @@ namespace Waher.Content.Html
 
 			if (!(this.audio is null))
 			{
-				foreach (ImageInformation Obj in this.audio)
+				foreach (AudioInformation Obj in this.audio)
 					Result ^= Result << 5 ^ Obj.GetHashCode();
 			}
 
 			if (!(this.video is null))
 			{
-				foreach (ImageInformation Obj in this.video)
+				foreach (VideoInformation Obj in this.video)
 					Result ^= Result << 5 ^ Obj.GetHashCode();
 			}
 

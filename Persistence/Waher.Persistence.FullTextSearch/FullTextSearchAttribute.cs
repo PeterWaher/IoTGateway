@@ -66,7 +66,7 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			this.indexCollection = IndexCollection;
 			this.properties = new PropertyDefinition[0];
-			this.hasPropertyDefinitions = (Properties?.Length ?? 0) > 0;
+			this.hasPropertyDefinitions = (this.Properties?.Length ?? 0) > 0;
 			this.isPropertyReference = PropertyReference;
 		}
 
@@ -83,9 +83,8 @@ namespace Waher.Persistence.FullTextSearch
 			if (this.isPropertyReference)
 			{
 				Type T = Reference.GetType();
-				PropertyInfo PI = T.GetRuntimeProperty(this.indexCollection);
-				if (PI is null)
-					throw new ArgumentException("Object lacks a property named " + this.indexCollection, nameof(Reference));
+				PropertyInfo PI = T.GetRuntimeProperty(this.indexCollection)
+					?? throw new ArgumentException("Object lacks a property named " + this.indexCollection, nameof(Reference));
 
 				object Obj = PI.GetValue(Reference);
 

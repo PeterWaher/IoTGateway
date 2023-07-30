@@ -1712,7 +1712,7 @@
             Contains information about a type, in relation to full-text-search.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.#ctor(System.Type,System.Reflection.TypeInfo,System.String,Waher.Persistence.FullTextSearch.CollectionInformation,Waher.Persistence.FullTextSearch.ITokenizer,Waher.Persistence.FullTextSearch.FullTextSearchAttribute)">
+        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.#ctor(System.Type,System.Reflection.TypeInfo,System.String,Waher.Persistence.FullTextSearch.CollectionInformation,Waher.Persistence.FullTextSearch.ITokenizer,System.Collections.Generic.IEnumerable{Waher.Persistence.FullTextSearch.FullTextSearchAttribute})">
             <summary>
             Contains information about a type, in relation to full-text-search.
             </summary>
@@ -1722,7 +1722,7 @@
             <param name="CollectionInformation">Indexing information for a collection.</param>
             <param name="CustomTokenizer">Optional custom tokenizer creating tokens for objects
             of this type.</param>
-            <param name="SearchAttribute">Full-text-search attribute.</param>
+            <param name="SearchAttributes">Full-text-search attributes.</param>
         </member>
         <member name="P:Waher.Persistence.FullTextSearch.TypeInformation.Type">
             <summary>
@@ -1762,6 +1762,16 @@
         <member name="P:Waher.Persistence.FullTextSearch.TypeInformation.DynamicIndexCollection">
             <summary>
             If the index collection is dynamic (i.e. depends on object instance).
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FullTextSearch.TypeInformation.HasPropertyDefinitions">
+            <summary>
+            If the type has property definitions.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FullTextSearch.TypeInformation.Properties">
+            <summary>
+            Property definitions.
             </summary>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.GetIndexCollection(System.Object)">

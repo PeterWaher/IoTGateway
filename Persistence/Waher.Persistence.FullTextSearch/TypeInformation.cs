@@ -11,9 +11,12 @@ namespace Waher.Persistence.FullTextSearch
 	/// </summary>
 	internal class TypeInformation
 	{
-		private readonly FullTextSearchAttribute searchAttribute;
+		private readonly IEnumerable<FullTextSearchAttribute> searchAttributes;
 		private readonly ITokenizer customTokenizer;
+		private readonly PropertyDefinition[] properties;
 		private readonly bool hasCustomTokenizer;
+		private readonly bool hasPropertyDefinitions;
+		private readonly bool dynamicIndexCollection;
 
 		/// <summary>
 		/// Contains information about a type, in relation to full-text-search.
@@ -24,10 +27,10 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionInformation">Indexing information for a collection.</param>
 		/// <param name="CustomTokenizer">Optional custom tokenizer creating tokens for objects
 		/// of this type.</param>
-		/// <param name="SearchAttribute">Full-text-search attribute.</param>
+		/// <param name="SearchAttributes">Full-text-search attributes.</param>
 		public TypeInformation(Type Type, TypeInfo TypeInfo, string CollectionName,
 			CollectionInformation CollectionInformation, ITokenizer CustomTokenizer,
-			FullTextSearchAttribute SearchAttribute)
+			IEnumerable<FullTextSearchAttribute> SearchAttributes)
 		{
 			this.Type = Type;
 			this.TypeInfo = TypeInfo;
@@ -36,7 +39,44 @@ namespace Waher.Persistence.FullTextSearch
 			this.CollectionInformation = CollectionInformation;
 			this.customTokenizer = CustomTokenizer;
 			this.hasCustomTokenizer = !(CustomTokenizer is null);
-			this.searchAttribute = SearchAttribute;
+			this.searchAttributes = SearchAttributes;
+
+			this.dynamicIndexCollection = false;
+			this.hasPropertyDefinitions = false;
+
+			if (!(this.searchAttributes is null))
+			{
+				Dictionary<string, bool> HasPropertyDefinition = null;
+				List<PropertyDefinition> PropertyDefinitions = null;
+
+				foreach (FullTextSearchAttribute Attribute in this.searchAttributes)
+				{
+					if (Attribute.DynamicIndexCollection)
+						this.dynamicIndexCollection = true;
+
+					if (Attribute.HasPropertyDefinitions)
+					{
+						this.hasPropertyDefinitions = true;
+
+						if (PropertyDefinitions is null)
+						{
+							HasPropertyDefinition = new Dictionary<string, bool>();
+							PropertyDefinitions = new List<PropertyDefinition>();
+						}
+
+						foreach (PropertyDefinition PDef in Attribute.Properties)
+						{
+							if (!HasPropertyDefinition.ContainsKey(PDef.Definition))
+							{
+								HasPropertyDefinition[PDef.Definition] = true;
+								PropertyDefinitions.Add(PDef);
+							}
+						}
+					}
+				}
+
+				this.properties = PropertyDefinitions?.ToArray();
+			}
 		}
 
 		/// <summary>
@@ -77,14 +117,30 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// If the index collection is dynamic (i.e. depends on object instance).
 		/// </summary>
-		public bool DynamicIndexCollection => this.searchAttribute?.DynamicIndexCollection ?? false;
+		public bool DynamicIndexCollection => this.dynamicIndexCollection;
+
+		/// <summary>
+		/// If the type has property definitions.
+		/// </summary>
+		public bool HasPropertyDefinitions => this.hasPropertyDefinitions;
+
+		/// <summary>
+		/// Property definitions.
+		/// </summary>
+		public PropertyDefinition[] Properties => this.properties;
 
 		/// <summary>
 		/// Name of full-text-search index collection.
 		/// </summary>
 		public string GetIndexCollection(object Reference)
 		{
-			return this.searchAttribute?.GetIndexCollection(Reference) ?? this.CollectionInformation.IndexCollectionName;
+			if (!(this.searchAttributes is null))
+			{
+				foreach (FullTextSearchAttribute Attribute in this.searchAttributes)
+					return Attribute.GetIndexCollection(Reference);
+			}
+
+			return this.CollectionInformation.IndexCollectionName;
 		}
 
 		/// <summary>

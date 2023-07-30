@@ -553,7 +553,7 @@ namespace Waher.Persistence.FullTextSearch
 				return Result;
 
 			TypeInfo TI = T.GetTypeInfo();
-			FullTextSearchAttribute SearchAttr = TI.GetCustomAttribute<FullTextSearchAttribute>(true);
+			IEnumerable<FullTextSearchAttribute> SearchAttrs = TI.GetCustomAttributes<FullTextSearchAttribute>(true);
 			CollectionNameAttribute CollectionAttr = TI.GetCustomAttribute<CollectionNameAttribute>(true);
 			ITokenizer CustomTokenizer = Types.FindBest<ITokenizer, Type>(T);
 
@@ -562,19 +562,40 @@ namespace Waher.Persistence.FullTextSearch
 			else
 			{
 				string CollectionName = CollectionAttr.Name;
-				bool DynamicIndex = SearchAttr?.DynamicIndexCollection ?? false;
-				string IndexName = DynamicIndex ? null : SearchAttr?.GetIndexCollection(Instance) ?? CollectionName;
+				bool DynamicIndex = false;
+				string IndexName;
+
+				if (!(SearchAttrs is null))
+				{
+					foreach (FullTextSearchAttribute Attribute in SearchAttrs)
+					{
+						if (Attribute.DynamicIndexCollection)
+						{
+							DynamicIndex = true;
+							break;
+						}
+					}
+				}
+
+				if (DynamicIndex)
+					IndexName = null;
+				else
+				{
+					IndexName = CollectionName;
+
+					foreach (FullTextSearchAttribute Attribute in SearchAttrs)
+					{
+						IndexName = Attribute.GetIndexCollection(Instance);
+						break;
+					}
+				}
 
 				CollectionInformation Info = await GetCollectionInfoLocked(IndexName, CollectionName, true);
 
-				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer, SearchAttr);
+				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer, SearchAttrs);
 
-				if (!(SearchAttr is null) &&
-					SearchAttr.HasPropertyDefinitions &&
-					Info.AddIndexableProperties(SearchAttr.Properties))
-				{
+				if (Result.HasPropertyDefinitions && Info.AddIndexableProperties(Result.Properties))
 					await collectionInformation.AddAsync(CollectionName, Info, true);
-				}
 				else if (!(CustomTokenizer is null) && !Info.IndexForFullTextSearch)
 				{
 					Info.IndexForFullTextSearch = true;

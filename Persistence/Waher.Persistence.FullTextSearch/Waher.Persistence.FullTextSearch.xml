@@ -1145,7 +1145,7 @@
         </member>
         <member name="P:Waher.Persistence.FullTextSearch.PropertyDefinition.Type">
             <summary>
-            
+            Type of property definition
             </summary>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.GetValue(System.Object)">

@@ -6,7 +6,7 @@ namespace Waher.Persistence.FullTextSearch
 	/// <summary>
 	/// This attribute defines that objects of this type should be indexed in the full-text-search index.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = true)]
 	public class FullTextSearchAttribute : Attribute
 	{
 		private readonly string indexCollection;

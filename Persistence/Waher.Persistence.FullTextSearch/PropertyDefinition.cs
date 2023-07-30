@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -30,10 +31,9 @@ namespace Waher.Persistence.FullTextSearch
 	[TypeName(TypeNameSerialization.None)]
 	public class PropertyDefinition
 	{
-		private PropertyInfo propertyInfo;
-		private FieldInfo fieldInfo;
+		private readonly Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>> memberInfo = new Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>>();
 		private IPropertyEvaluator evaluator;
-		private bool initialized = false;
+		private bool initialized;
 
 		/// <summary>
 		/// Defines an indexable property.
@@ -93,7 +93,7 @@ namespace Waher.Persistence.FullTextSearch
 		public string ExternalSource { get; set; }
 
 		/// <summary>
-		/// 
+		/// Type of property definition
 		/// </summary>
 		public PropertyType Type { get; set; }
 
@@ -104,19 +104,47 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Property value to index.</returns>
 		public async Task<object> GetValue(object Instance)
 		{
-			if (!this.initialized)
+			if (Instance is null)
+				return null;
+
+			Type T;
+
+			switch (this.Type)
 			{
-				this.initialized = true;
+				case PropertyType.Label:
+					KeyValuePair<PropertyInfo, FieldInfo> P;
 
-				switch (this.Type)
-				{
-					case PropertyType.Label:
-						Type T = Instance.GetType();
-						this.propertyInfo = T.GetRuntimeProperty(this.Definition);
-						this.fieldInfo = T.GetRuntimeField(this.Definition);
-						break;
+					T = Instance.GetType();
 
-					case PropertyType.External:
+					lock (this.memberInfo)
+					{
+						if (!this.memberInfo.TryGetValue(T.FullName, out P))
+						{
+							P = new KeyValuePair<PropertyInfo, FieldInfo>(
+								T.GetRuntimeProperty(this.Definition),
+								T.GetRuntimeField(this.Definition));
+
+							this.memberInfo[T.FullName] = P;
+						}
+					}
+
+					if (!(P.Key is null))
+					{
+						if (P.Key.DeclaringType.IsAssignableFrom(Instance.GetType()))
+							return P.Key.GetValue(Instance);
+					}
+					else if (!(P.Value is null))
+					{
+						if (P.Value.DeclaringType.IsAssignableFrom(Instance.GetType()))
+							return P.Value.GetValue(Instance);
+					}
+					break;
+
+				case PropertyType.External:
+					if (!this.initialized)
+					{
+						this.initialized = true;
+
 						T = Types.GetType(this.ExternalSource);
 						if (!(T is null))
 						{
@@ -124,20 +152,9 @@ namespace Waher.Persistence.FullTextSearch
 							if (!(this.evaluator is null))
 								await this.evaluator.Prepare(this.Definition);
 						}
-						break;
-				}
-			}
 
-			switch (this.Type)
-			{
-				case PropertyType.Label:
-					if (!(this.propertyInfo is null))
-						return this.propertyInfo.GetValue(Instance);
-					else if (!(this.fieldInfo is null))
-						return this.fieldInfo.GetValue(Instance);
-					break;
+					}
 
-				case PropertyType.External:
 					if (!(this.evaluator is null))
 					{
 						try

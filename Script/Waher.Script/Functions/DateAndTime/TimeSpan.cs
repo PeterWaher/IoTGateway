@@ -143,7 +143,10 @@ namespace Waher.Script.Functions.DateAndTime
 			bool Sign = false;
 
 			if (c == 0)
+			{
+				TS = default;
 				return false;
+			}
 
 			if (s[0] == '+')
 				Pos++;
@@ -165,7 +168,7 @@ namespace Waher.Script.Functions.DateAndTime
 
 			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Hour, out _) || Hour < 0 || Hour > 23)
 			{
-				TS = System.TimeSpan.Zero;
+				TS = default;
 				return false;
 			}
 			else if (Pos >= c)
@@ -178,7 +181,7 @@ namespace Waher.Script.Functions.DateAndTime
 
 			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Minute, out _) || Minute < 0 || Minute > 59)
 			{
-				TS = System.TimeSpan.Zero;
+				TS = default;
 				return false;
 			}
 			else if (Pos >= c)
@@ -191,7 +194,7 @@ namespace Waher.Script.Functions.DateAndTime
 
 			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Second, out _) || Second < 0 || Second > 59)
 			{
-				TS = System.TimeSpan.Zero;
+				TS = default;
 				return false;
 			}
 			else if (Pos >= c)
@@ -204,7 +207,7 @@ namespace Waher.Script.Functions.DateAndTime
 
 			if (!DateTime.TryParseInt(s, ref Pos, '\x0', out int MilliSecond, out int NrDigits) || Pos < c)
 			{
-				TS = System.TimeSpan.Zero;
+				TS = default;
 				return false;
 			}
 

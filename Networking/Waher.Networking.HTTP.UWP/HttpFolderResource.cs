@@ -33,11 +33,11 @@ namespace Waher.Networking.HTTP
 	}
 
 	/// <summary>
-	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
-	/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT, PATCH and DELETE.
+	/// If PUT, PATCH and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 	/// </summary>
 	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod,
-		IHttpPutMethod, IHttpPutRangesMethod, IHttpDeleteMethod, IHttpPostMethod
+		IHttpPutMethod, IHttpPutRangesMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpDeleteMethod, IHttpPostMethod
 	{
 		private const int BufferSize = 32768;
 
@@ -48,68 +48,68 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, bool> allowTypeConversionFrom = null;
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 		private readonly HostDomainOptions domainOptions;
-		private readonly bool allowPut;
+		private readonly bool allowPutPatch;
 		private readonly bool allowDelete;
 		private readonly bool anonymousGET;
 		private readonly bool userSessions;
 		private string folderPath;
 
 		/// <summary>
-		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
-		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT, PATCH and DELETE.
+		/// If PUT, PATCH and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="FolderPath">Full path to folder to publish.</param>
-		/// <param name="AllowPut">If the PUT method should be allowed.</param>
+		/// <param name="AllowPutPatch">If the PUT and PATCH methods should be allowed.</param>
 		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
 		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPutPatch, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
-			: this(ResourceName, FolderPath, AllowPut, AllowDelete, AnonymousGET, UserSessions,
+			: this(ResourceName, FolderPath, AllowPutPatch, AllowDelete, AnonymousGET, UserSessions,
 				  HostDomainOptions.SameForAllDomains, AuthenticationSchemes)
 		{
 		}
 
 		/// <summary>
-		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
-		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT, PATCH and DELETE.
+		/// If PUT, PATCH and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="FolderPath">Full path to folder to publish.</param>
-		/// <param name="AllowPut">If the PUT method should be allowed.</param>
+		/// <param name="AllowPutPatch">If the PUT and PATCH methods should be allowed.</param>
 		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
 		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="DomainOptions">Options on how to handle the Host header.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPutPatch, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, HostDomainOptions DomainOptions, params HttpAuthenticationScheme[] AuthenticationSchemes)
-			: this(ResourceName, FolderPath, AllowPut, AllowDelete, AnonymousGET, UserSessions,
+			: this(ResourceName, FolderPath, AllowPutPatch, AllowDelete, AnonymousGET, UserSessions,
 				  DomainOptions, new string[0], AuthenticationSchemes)
 		{
 		}
 
 		/// <summary>
-		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
-		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT, PATCH and DELETE.
+		/// If PUT, PATCH and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="FolderPath">Full path to folder to publish.</param>
-		/// <param name="AllowPut">If the PUT method should be allowed.</param>
+		/// <param name="AllowPutPatch">If the PUT and PATCH methods should be allowed.</param>
 		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
 		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="DomainOptions">Options on how to handle the Host header.</param>
 		/// <param name="DomainNames">Pre-defined host names.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPutPatch, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, HostDomainOptions DomainOptions, string[] DomainNames, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.authenticationSchemes = AuthenticationSchemes;
-			this.allowPut = AllowPut;
+			this.allowPutPatch = AllowPutPatch;
 			this.allowDelete = AllowDelete;
 			this.anonymousGET = AnonymousGET;
 			this.userSessions = UserSessions;
@@ -183,7 +183,12 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the PUT method is allowed.
 		/// </summary>
-		public bool AllowsPUT => this.allowPut;
+		public bool AllowsPUT => this.allowPutPatch;
+
+		/// <summary>
+		/// If the PATCH method is allowed.
+		/// </summary>
+		public bool AllowsPATCH => this.allowPutPatch;
 
 		/// <summary>
 		/// If the DELETE method is allowed.
@@ -238,7 +243,8 @@ namespace Waher.Networking.HTTP
 			switch (Request.Header.Method)
 			{
 				case "PUT":
-					if (!this.allowPut)
+				case "PATCH":
+					if (!this.allowPutPatch)
 						throw new MethodNotAllowedException(this.AllowedMethods);
 
 					break;
@@ -1020,12 +1026,35 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task PUT(HttpRequest Request, HttpResponse Response)
+		public Task PUT(HttpRequest Request, HttpResponse Response)
+		{
+			return this.PUTPATCH(Request, Response);
+		}
+
+
+		/// <summary>
+		/// Executes the PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public Task PATCH(HttpRequest Request, HttpResponse Response)
+		{
+			return this.PUTPATCH(Request, Response);
+		}
+
+		/// <summary>
+		/// Executes the PUT or PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task PUTPATCH(HttpRequest Request, HttpResponse Response)
 		{
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, false, out bool _);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in PUT request.");
+				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -1049,12 +1078,36 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		public Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		{
+			return this.PUTPATCH(Request, Response, Interval);
+		}
+
+		/// <summary>
+		/// Executes the ranged PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="Interval">Content byte range.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public Task PATCH(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		{
+			return this.PUTPATCH(Request, Response, Interval);
+		}
+
+		/// <summary>
+		/// Executes the ranged PUT or PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="Interval">Content byte range.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task PUTPATCH(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, false, out bool Exists);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in PUT request.");
+				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
 
 			if (!Exists)
 			{

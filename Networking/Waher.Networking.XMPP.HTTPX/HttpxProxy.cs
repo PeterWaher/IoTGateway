@@ -13,7 +13,8 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
 	/// </summary>
 	public partial class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod,
-		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod, IHttpDeleteMethod
+		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpPatchMethod, IHttpPatchRangesMethod, 
+		IHttpTraceMethod, IHttpDeleteMethod
 	{
 		private readonly XmppClient defaultXmppClient;
 		private HttpxClient httpxClient;
@@ -773,6 +774,37 @@ namespace Waher.Networking.XMPP.HTTPX
 		public Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
 			return this.Request("PUT", Request, Response);
+		}
+
+		/// <summary>
+		/// If the PATCH method is allowed.
+		/// </summary>
+		public bool AllowsPATCH
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Executes the PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public Task PATCH(HttpRequest Request, HttpResponse Response)
+		{
+			return this.Request("PATCH", Request, Response);
+		}
+
+		/// <summary>
+		/// Executes the ranged PATCH method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="Interval">Content byte range.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public Task PATCH(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		{
+			return this.Request("PATCH", Request, Response);
 		}
 
 		/// <summary>

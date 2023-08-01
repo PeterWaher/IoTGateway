@@ -37,6 +37,8 @@ namespace Waher.Networking.HTTP
 		private readonly IHttpPostRangesMethod postRanges;
 		private readonly IHttpPutMethod put;
 		private readonly IHttpPutRangesMethod putRanges;
+		private readonly IHttpPatchMethod patch;
+		private readonly IHttpPatchRangesMethod patchRanges;
 		private readonly IHttpDeleteMethod delete;
 		private readonly IHttpOptionsMethod options;
 		private readonly IHttpTraceMethod trace;
@@ -56,6 +58,8 @@ namespace Waher.Networking.HTTP
 			this.postRanges = this as IHttpPostRangesMethod;
 			this.put = this as IHttpPutMethod;
 			this.putRanges = this as IHttpPutRangesMethod;
+			this.patch = this as IHttpPatchMethod;
+			this.patchRanges = this as IHttpPatchRangesMethod;
 			this.delete = this as IHttpDeleteMethod;
 			this.options = this;
 			this.trace = this as IHttpTraceMethod;
@@ -73,6 +77,9 @@ namespace Waher.Networking.HTTP
 
 			if ((!(this.put is null) && this.put.AllowsPUT) || (this.putRanges != null && this.putRanges.AllowsPUT))
 				Methods.Add("PUT");
+
+			if ((!(this.patch is null) && this.patch.AllowsPATCH) || (this.patchRanges != null && this.patchRanges.AllowsPATCH))
+				Methods.Add("PATCH");
 
 			if (!(this.delete is null) && this.delete.AllowsDELETE)
 				Methods.Add("DELETE");
@@ -381,6 +388,42 @@ namespace Waher.Networking.HTTP
 						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
 
+				case "PATCH":
+					if (!(this.patchRanges is null))
+					{
+						if (!(Header.ContentRange is null))
+						{
+							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+							if (Interval is null)
+								throw new RangeNotSatisfiableException();
+							else
+								await this.patchRanges.PATCH(Request, Response, Interval);
+						}
+						else
+						{
+							if (!(this.patch is null))
+								await this.patch.PATCH(Request, Response);
+							else
+							{
+								long Total;
+
+								if (!(Header.ContentLength is null))
+									Total = Header.ContentLength.ContentLength;
+								else if (!(Request.DataStream is null))
+									Total = Request.DataStream.Position;
+								else
+									Total = 0;
+
+								await this.patchRanges.PATCH(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+							}
+						}
+					}
+					else if (!(this.patch is null))
+						await this.patch.PATCH(Request, Response);
+					else
+						throw new MethodNotAllowedException(this.allowedMethods);
+					break;
+
 				case "DELETE":
 					if (this.delete is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
@@ -490,6 +533,16 @@ namespace Waher.Networking.HTTP
 
 				Response.SetHeader("Access-Control-Allow-Methods", Methods.ToString());
 			}
+		}
+
+		/// <summary>
+		/// Returns default content for an error, for the resource. If returning null, server will choose default content.
+		/// </summary>
+		/// <param name="StatusCode">Status code.</param>
+		/// <returns>Default content, or null if resource lets server choose.</returns>
+		public virtual Task<object> DefaultErrorContent(int StatusCode)
+		{
+			return Task.FromResult<object>(null);
 		}
 
 	}

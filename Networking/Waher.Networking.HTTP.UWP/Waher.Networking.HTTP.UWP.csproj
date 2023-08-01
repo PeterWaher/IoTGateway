@@ -203,12 +203,15 @@
     <Compile Include="HttpRequestHeader.cs" />
     <Compile Include="HttpResource.cs" />
     <Compile Include="HttpResponse.cs" />
+    <Compile Include="HttpScriptResource.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="HttpSynchronousResource.cs" />
     <Compile Include="Interfaces\IHttpDeleteMethod.cs" />
     <Compile Include="Interfaces\IHttpGetMethod.cs" />
     <Compile Include="Interfaces\IHttpGetRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpOptionsMethod.cs" />
+    <Compile Include="Interfaces\IHttpPatchMethod.cs" />
+    <Compile Include="Interfaces\IHttpPatchRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpPostMethod.cs" />
     <Compile Include="Interfaces\IHttpPostRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpPutMethod.cs" />

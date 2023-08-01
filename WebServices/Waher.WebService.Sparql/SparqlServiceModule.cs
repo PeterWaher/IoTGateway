@@ -44,7 +44,7 @@ namespace Waher.WebService.Sparql
 			bool RequireEncryption;
 			int MinSecurityStrength;
 
-			if (DomainConfiguration.Instance.UseEncryption)
+			if (DomainConfiguration.Instance.UseEncryption && !string.IsNullOrEmpty(DomainConfiguration.Instance.Domain))
 			{
 				RequireEncryption = true;
 				MinSecurityStrength = 128;

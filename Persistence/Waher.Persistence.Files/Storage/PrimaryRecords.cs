@@ -154,7 +154,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Output">XML Output.</param>
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
-			Output.WriteAttributeString("objectId", ObjectId.ToString());
+			Output.WriteAttributeString("objectId", FilesProvider.ObjectIdToString(ObjectId));
 		}
 
 		/// <summary>

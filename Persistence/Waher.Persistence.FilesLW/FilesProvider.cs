@@ -2806,7 +2806,7 @@ namespace Waher.Persistence.Files
 								{
 									Obj = e.Current;
 
-									await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+									await Output.StartObject(ObjectIdToString(Obj.ObjectId), Obj.TypeName);
 									try
 									{
 										foreach (KeyValuePair<string, object> P in Obj)
@@ -2822,7 +2822,7 @@ namespace Waher.Persistence.Files
 									}
 								}
 								else if (!(e.CurrentObjectId is null))
-									await Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
+									await Output.ReportError("Unable to load object " + ObjectIdToString(e.CurrentObjectId) + ".");
 							}
 						}
 						finally
@@ -2851,6 +2851,14 @@ namespace Waher.Persistence.Files
 				Thread?.Idle();
 				Thread?.Stop();
 			}
+		}
+
+		internal static string ObjectIdToString(object ObjectId)
+		{
+			if (ObjectId is byte[] Bin)
+				return Convert.ToBase64String(Bin);
+			else
+				return ObjectId.ToString();
 		}
 
 		private void ReportException(Exception ex, IDatabaseExport Output)

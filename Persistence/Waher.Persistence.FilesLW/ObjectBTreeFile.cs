@@ -1038,7 +1038,10 @@ namespace Waher.Persistence.Files
 				while (i < Len)
 				{
 					if (BlobBlockIndex == uint.MaxValue)
-						throw Database.FlagForRepair(this.collectionName, "BLOB " + ObjectId.ToString() + " ended prematurely.");
+					{
+						throw Database.FlagForRepair(this.collectionName, "BLOB " +
+							FilesProvider.ObjectIdToString(ObjectId) + " ended prematurely.");
+					}
 
 					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
 					this.nrBlobBlockLoads++;
@@ -1057,8 +1060,9 @@ namespace Waher.Persistence.Files
 					ObjectId2 = this.recordHandler.GetKey(Reader);
 					if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
 					{
-						throw Database.FlagForRepair(this.collectionName, "Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
-							") was actually marked as " + ObjectId2.ToString() + ".");
+						throw Database.FlagForRepair(this.collectionName, "Block linked to by BLOB " +
+							FilesProvider.ObjectIdToString(ObjectId) + " (" + this.collectionName +
+							") was actually marked as " + FilesProvider.ObjectIdToString(ObjectId2) + ".");
 					}
 
 					Prev = Reader.ReadUInt32();
@@ -1081,10 +1085,16 @@ namespace Waher.Persistence.Files
 				}
 
 				if (BlobBlockIndex != uint.MaxValue)
-					throw Database.FlagForRepair(this.collectionName, "BLOB " + ObjectId.ToString() + " did not end when expected.");
+				{
+					throw Database.FlagForRepair(this.collectionName, "BLOB " + FilesProvider.ObjectIdToString(ObjectId) +
+						" did not end when expected.");
+				}
 
 				if (!(BlobBlocksReferenced is null) && ChainError)
-					throw Database.FlagForRepair(this.collectionName, "Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.");
+				{
+					throw Database.FlagForRepair(this.collectionName, "Doubly linked list for BLOB " +
+						FilesProvider.ObjectIdToString(ObjectId) + " is corrupt.");
+				}
 
 				Reader.Restart(Result, Bookmark);
 
@@ -4160,13 +4170,15 @@ namespace Waher.Persistence.Files
 
 				if (!(MinExclusive is null) && this.recordHandler.Compare(ObjectId, MinExclusive) <= 0)
 				{
-					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" + ObjectId.ToString() +
+					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" +
+						FilesProvider.ObjectIdToString(ObjectId) +
 						") that is smaller or equal to the smallest allowed value (" + MinExclusive.ToString() + ").");
 				}
 
 				if (!(MaxExclusive is null) && this.recordHandler.Compare(ObjectId, MaxExclusive) >= 0)
 				{
-					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" + ObjectId.ToString() +
+					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" +
+						FilesProvider.ObjectIdToString(ObjectId) +
 						") that is larger or equal to the largest allowed value (" + MaxExclusive.ToString() + ").");
 				}
 
@@ -4248,8 +4260,8 @@ namespace Waher.Persistence.Files
 
 						if (Len2 != 0)
 						{
-							Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object (" + ObjectId.ToString() +
-								") that is not serialized correctly.");
+							Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object (" +
+								FilesProvider.ObjectIdToString(ObjectId) + ") that is not serialized correctly.");
 							break;
 						}
 					}

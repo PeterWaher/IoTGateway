@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,7 +9,6 @@ using Waher.Script.Objects;
 using IdApp.Test.Serialization;
 using Waher.Content;
 using Waher.Events;
-using Waher.Script.Model;
 using Waher.Security;
 
 #if !LW
@@ -2494,6 +2492,68 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 			Assert.AreEqual(Obj.Function, Obj2.Function);
 			Assert.AreEqual(Convert.ToBase64String(Obj.Digest), Convert.ToBase64String(Obj2.Digest));
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_28_BinaryNull()
+		{
+			DockerBlob Obj = new DockerBlob()
+			{
+				ObjectId = Guid.NewGuid().ToString(),
+				FileName = "Some file",
+				AccountName = "Some user"
+			};
+
+			ObjectSerializer S = (ObjectSerializer)await provider.GetObjectSerializer(typeof(DockerBlob));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			DockerBlob Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
+			Assert.AreEqual(Obj.Function.ToString(), GenObj["Function"]);
+			Assert.AreEqual(Obj.Digest, GenObj["Digest"]);
+			Assert.AreEqual(Obj.FileName, GenObj["FileName"]);
+			Assert.AreEqual(Obj.AccountName, GenObj["AccountName"]);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Obj.Digest, Obj2.Digest);
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 

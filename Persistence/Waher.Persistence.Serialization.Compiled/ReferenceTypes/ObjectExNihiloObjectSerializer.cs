@@ -63,102 +63,102 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			if (!DataType.HasValue)
 			{
 				DataType = Reader.ReadBits(6);
-				if (DataType.Value == ObjectSerializer.TYPE_NULL)
+				if (DataType.Value == TYPE_NULL)
 					return null;
 			}
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_OBJECT:
+				case TYPE_OBJECT:
 					if (Embedded && Reader.BitOffset > 0 && Reader.ReadBit())
 						ObjectId = Reader.ReadGuid();
 					break;
 
-				case ObjectSerializer.TYPE_BOOLEAN:
+				case TYPE_BOOLEAN:
 					return Reader.ReadBit();
 
-				case ObjectSerializer.TYPE_BYTE:
+				case TYPE_BYTE:
 					return Reader.ReadByte();
 
-				case ObjectSerializer.TYPE_INT16:
+				case TYPE_INT16:
 					return Reader.ReadInt16();
 
-				case ObjectSerializer.TYPE_INT32:
+				case TYPE_INT32:
 					return Reader.ReadInt32();
 
-				case ObjectSerializer.TYPE_INT64:
+				case TYPE_INT64:
 					return Reader.ReadInt64();
 
-				case ObjectSerializer.TYPE_SBYTE:
+				case TYPE_SBYTE:
 					return Reader.ReadSByte();
 
-				case ObjectSerializer.TYPE_UINT16:
+				case TYPE_UINT16:
 					return Reader.ReadUInt16();
 
-				case ObjectSerializer.TYPE_UINT32:
+				case TYPE_UINT32:
 					return Reader.ReadUInt32();
 
-				case ObjectSerializer.TYPE_UINT64:
+				case TYPE_UINT64:
 					return Reader.ReadUInt64();
 
-				case ObjectSerializer.TYPE_VARINT16:
+				case TYPE_VARINT16:
 					return Reader.ReadVariableLengthInt16();
 
-				case ObjectSerializer.TYPE_VARINT32:
+				case TYPE_VARINT32:
 					return Reader.ReadVariableLengthInt32();
 
-				case ObjectSerializer.TYPE_VARINT64:
+				case TYPE_VARINT64:
 					return Reader.ReadVariableLengthInt64();
 
-				case ObjectSerializer.TYPE_VARUINT16:
+				case TYPE_VARUINT16:
 					return Reader.ReadVariableLengthUInt16();
 
-				case ObjectSerializer.TYPE_VARUINT32:
+				case TYPE_VARUINT32:
 					return Reader.ReadVariableLengthUInt32();
 
-				case ObjectSerializer.TYPE_VARUINT64:
+				case TYPE_VARUINT64:
 					return Reader.ReadVariableLengthUInt64();
 
-				case ObjectSerializer.TYPE_DECIMAL:
+				case TYPE_DECIMAL:
 					return Reader.ReadDecimal();
 
-				case ObjectSerializer.TYPE_DOUBLE:
+				case TYPE_DOUBLE:
 					return Reader.ReadDouble();
 
-				case ObjectSerializer.TYPE_SINGLE:
+				case TYPE_SINGLE:
 					return Reader.ReadSingle();
 
-				case ObjectSerializer.TYPE_DATETIME:
+				case TYPE_DATETIME:
 					return Reader.ReadDateTime();
 
-				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+				case TYPE_DATETIMEOFFSET:
 					return Reader.ReadDateTimeOffset();
 
-				case ObjectSerializer.TYPE_TIMESPAN:
+				case TYPE_TIMESPAN:
 					return Reader.ReadTimeSpan();
 
-				case ObjectSerializer.TYPE_CHAR:
+				case TYPE_CHAR:
 					return Reader.ReadChar();
 
-				case ObjectSerializer.TYPE_STRING:
+				case TYPE_STRING:
 					return Reader.ReadString();
 
-				case ObjectSerializer.TYPE_CI_STRING:
+				case TYPE_CI_STRING:
 					return Reader.ReadCaseInsensitiveString();
 
-				case ObjectSerializer.TYPE_ENUM:
+				case TYPE_ENUM:
 					return Reader.ReadString();
 
-				case ObjectSerializer.TYPE_BYTEARRAY:
+				case TYPE_BYTEARRAY:
 					return Reader.ReadByteArray();
 
-				case ObjectSerializer.TYPE_GUID:
+				case TYPE_GUID:
 					return Reader.ReadGuid();
 
-				case ObjectSerializer.TYPE_NULL:
+				case TYPE_NULL:
 					return null;
 
-				case ObjectSerializer.TYPE_ARRAY:
+				case TYPE_ARRAY:
 					throw new Exception("Arrays must be embedded in objects.");
 
 				default:
@@ -250,120 +250,120 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 				switch (FieldDataType)
 				{
-					case ObjectSerializer.TYPE_BOOLEAN:
+					case TYPE_BOOLEAN:
 						Properties[FieldName] = new BooleanValue(Reader.ReadBoolean());
 						break;
 
-					case ObjectSerializer.TYPE_BYTE:
+					case TYPE_BYTE:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadByte());
 						break;
 
-					case ObjectSerializer.TYPE_INT16:
+					case TYPE_INT16:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadInt16());
 						break;
 
-					case ObjectSerializer.TYPE_INT32:
+					case TYPE_INT32:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadInt32());
 						break;
 
-					case ObjectSerializer.TYPE_INT64:
+					case TYPE_INT64:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadInt64());
 						break;
 
-					case ObjectSerializer.TYPE_SBYTE:
+					case TYPE_SBYTE:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadSByte());
 						break;
 
-					case ObjectSerializer.TYPE_UINT16:
+					case TYPE_UINT16:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadUInt16());
 						break;
 
-					case ObjectSerializer.TYPE_UINT32:
+					case TYPE_UINT32:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadUInt32());
 						break;
 
-					case ObjectSerializer.TYPE_UINT64:
+					case TYPE_UINT64:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadUInt64());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT16:
+					case TYPE_VARINT16:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthInt16());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT32:
+					case TYPE_VARINT32:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthInt32());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT64:
+					case TYPE_VARINT64:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthInt64());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT16:
+					case TYPE_VARUINT16:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthUInt16());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT32:
+					case TYPE_VARUINT32:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthUInt32());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT64:
+					case TYPE_VARUINT64:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadVariableLengthUInt64());
 						break;
 
-					case ObjectSerializer.TYPE_DECIMAL:
+					case TYPE_DECIMAL:
 						Properties[FieldName] = new DoubleNumber((double)Reader.ReadDecimal());
 						break;
 
-					case ObjectSerializer.TYPE_DOUBLE:
+					case TYPE_DOUBLE:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadDouble());
 						break;
 
-					case ObjectSerializer.TYPE_SINGLE:
+					case TYPE_SINGLE:
 						Properties[FieldName] = new DoubleNumber(Reader.ReadSingle());
 						break;
 
-					case ObjectSerializer.TYPE_DATETIME:
+					case TYPE_DATETIME:
 						Properties[FieldName] = new DateTimeValue(Reader.ReadDateTime());
 						break;
 
-					case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					case TYPE_DATETIMEOFFSET:
 						Properties[FieldName] = new ObjectValue(Reader.ReadDateTimeOffset());
 						break;
 
-					case ObjectSerializer.TYPE_TIMESPAN:
+					case TYPE_TIMESPAN:
 						Properties[FieldName] = new ObjectValue(Reader.ReadTimeSpan());
 						break;
 
-					case ObjectSerializer.TYPE_CHAR:
+					case TYPE_CHAR:
 						Properties[FieldName] = new StringValue(new string(Reader.ReadChar(), 1));
 						break;
 
-					case ObjectSerializer.TYPE_STRING:
-					case ObjectSerializer.TYPE_ENUM:
+					case TYPE_STRING:
+					case TYPE_ENUM:
 						Properties[FieldName] = new StringValue(Reader.ReadString());
 						break;
 
-					case ObjectSerializer.TYPE_CI_STRING:
+					case TYPE_CI_STRING:
 						Properties[FieldName] = new StringValue(Reader.ReadString(), true);
 						break;
 
-					case ObjectSerializer.TYPE_BYTEARRAY:
+					case TYPE_BYTEARRAY:
 						Properties[FieldName] = new ObjectValue(Reader.ReadByteArray());
 						break;
 
-					case ObjectSerializer.TYPE_GUID:
+					case TYPE_GUID:
 						Properties[FieldName] = new ObjectValue(Reader.ReadGuid());
 						break;
 
-					case ObjectSerializer.TYPE_NULL:
+					case TYPE_NULL:
 						Properties[FieldName] = ObjectValue.Null;
 						break;
 
-					case ObjectSerializer.TYPE_ARRAY:
+					case TYPE_ARRAY:
 						Properties[FieldName] = VectorDefinition.Encapsulate(await this.ReadGenericArray(Reader), false, null);
 						break;
 
-					case ObjectSerializer.TYPE_OBJECT:
+					case TYPE_OBJECT:
 						Properties[FieldName] = Expression.Encapsulate(await this.Deserialize(Reader, FieldDataType, true));
 						break;
 
@@ -388,7 +388,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			if (Value is null)
 			{
 				if (WriteTypeCode)
-					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					Writer.WriteBits(TYPE_NULL, 6);
 				else
 					throw new NullReferenceException("Value cannot be null.");
 			}
@@ -402,7 +402,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 					Writer = Writer.CreateNew();
 
 				if (WriteTypeCode)
-					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
+					Writer.WriteBits(TYPE_OBJECT, 6);
 
 				if (!TypedValue.TryGetValue("ObjectId", out IElement PropertyValue) ||
 					!(PropertyValue.AssociatedObjectValue is Guid ObjectId))
@@ -468,7 +468,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 					Obj = Property.Value.AssociatedObjectValue;
 
 					if (Obj is null)
-						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+						Writer.WriteBits(TYPE_NULL, 6);
 					else if (Obj is ICollection<KeyValuePair<string, IElement>>)
 						await this.Serialize(Writer, true, true, Obj, State);
 					else

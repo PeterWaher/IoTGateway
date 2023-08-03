@@ -55,6 +55,5 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Object">Object.</param>
 		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
 		Task<object> TryGetFieldValue(string FieldName, object Object);
-
 	}
 }

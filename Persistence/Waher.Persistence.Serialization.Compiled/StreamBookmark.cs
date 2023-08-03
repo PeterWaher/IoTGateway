@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Persistence.Serialization
+﻿namespace Waher.Persistence.Serialization
 {
 	/// <summary>
 	/// Serialization bookmark.

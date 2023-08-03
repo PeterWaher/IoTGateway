@@ -1062,6 +1062,7 @@ namespace Waher.Persistence.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_BYTEARRAY: return Reader.ReadByteArray();
+				case ObjectSerializer.TYPE_NULL: return null;
 				default:
 					throw new ArgumentException("Expected a byte array value, but was a " +
 						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));

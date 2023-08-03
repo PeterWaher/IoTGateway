@@ -20,7 +20,7 @@ using Waher.Script.Abstraction.Elements;
 namespace Waher.Persistence.Serialization
 {
 	/// <summary>
-	/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
+	/// Serializes a class, taking into account attributes defined in <see cref="Attributes"/>.
 	/// </summary>
 	public class ObjectSerializer : IObjectSerializer
 	{
@@ -1504,7 +1504,7 @@ namespace Waher.Persistence.Serialization
 										{
 											CSharp.Append("\t\t\t\t\t\tResult.");
 											CSharp.Append(Member.Name);
-											CSharp.AppendLine(" = Reader.ReadByteArray();");
+											CSharp.AppendLine(" = ReadByteArray(Reader, FieldDataType);");
 										}
 										else if (MemberType == typeof(KeyValuePair<string, object>[]))
 										{
@@ -4068,7 +4068,7 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							case TYPE_BYTEARRAY:
-								Member.Set(Result, Reader.ReadByteArray());
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadByteArray(Reader, FieldDataType));
 								break;
 
 							case TYPE_ENUM:

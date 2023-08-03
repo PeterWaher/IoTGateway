@@ -3365,7 +3365,7 @@ namespace Waher.Persistence.Serialization
 						AppendType(Type, sb);
 
 						Log.Warning(ex.Message, sb.ToString());
-						this.customSerializer = await ObjectSerializer.Create(Type, Context, false);
+						this.customSerializer = await Create(Type, Context, false);
 					}
 				}
 			}
@@ -3897,7 +3897,7 @@ namespace Waher.Persistence.Serialization
 								sb.Append("Value expected for ");
 								sb.Append(FieldName);
 								sb.Append(". Data Type read: ");
-								sb.Append(ObjectSerializer.GetFieldDataTypeName(FieldDataType));
+								sb.Append(GetFieldDataTypeName(FieldDataType));
 
 								throw new SerializationException(sb.ToString(), this.type);
 						}
@@ -4621,7 +4621,6 @@ namespace Waher.Persistence.Serialization
 								if (MemberValue is null)
 									Writer.WriteBits(TYPE_NULL, 6);
 								else
-
 								{
 									Writer.WriteBits(TYPE_BYTEARRAY, 6);
 									Writer.Write((byte[])MemberValue);
@@ -4647,7 +4646,7 @@ namespace Waher.Persistence.Serialization
 									if (Member.NestedSerializer is ObjectSerializer ObjectSerializer)
 									{
 										Writer.WriteBits(TYPE_GUID, 6);
-										Writer.Write(await ObjectSerializer.GetObjectId(MemberValue, true, State));
+										Writer.Write(await GetObjectId(MemberValue, true, State));
 									}
 									else
 									{
@@ -5158,36 +5157,36 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataTypeCode)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return typeof(bool);
-				case ObjectSerializer.TYPE_BYTE: return typeof(byte);
-				case ObjectSerializer.TYPE_INT16: return typeof(short);
-				case ObjectSerializer.TYPE_INT32: return typeof(int);
-				case ObjectSerializer.TYPE_INT64: return typeof(long);
-				case ObjectSerializer.TYPE_SBYTE: return typeof(sbyte);
-				case ObjectSerializer.TYPE_UINT16: return typeof(ushort);
-				case ObjectSerializer.TYPE_UINT32: return typeof(uint);
-				case ObjectSerializer.TYPE_UINT64: return typeof(ulong);
-				case ObjectSerializer.TYPE_VARINT16: return typeof(short);
-				case ObjectSerializer.TYPE_VARINT32: return typeof(int);
-				case ObjectSerializer.TYPE_VARINT64: return typeof(long);
-				case ObjectSerializer.TYPE_VARUINT16: return typeof(ushort);
-				case ObjectSerializer.TYPE_VARUINT32: return typeof(uint);
-				case ObjectSerializer.TYPE_VARUINT64: return typeof(ulong);
-				case ObjectSerializer.TYPE_DECIMAL: return typeof(decimal);
-				case ObjectSerializer.TYPE_DOUBLE: return typeof(double);
-				case ObjectSerializer.TYPE_SINGLE: return typeof(float);
-				case ObjectSerializer.TYPE_DATETIME: return typeof(DateTime);
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return typeof(DateTimeOffset);
-				case ObjectSerializer.TYPE_TIMESPAN: return typeof(TimeSpan);
-				case ObjectSerializer.TYPE_CHAR: return typeof(char);
-				case ObjectSerializer.TYPE_STRING: return typeof(string);
-				case ObjectSerializer.TYPE_CI_STRING: return typeof(CaseInsensitiveString);
-				case ObjectSerializer.TYPE_ENUM: return typeof(Enum);
-				case ObjectSerializer.TYPE_BYTEARRAY: return typeof(byte[]);
-				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
-				case ObjectSerializer.TYPE_ARRAY: return typeof(Array);
-				case ObjectSerializer.TYPE_NULL:
-				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
+				case TYPE_BOOLEAN: return typeof(bool);
+				case TYPE_BYTE: return typeof(byte);
+				case TYPE_INT16: return typeof(short);
+				case TYPE_INT32: return typeof(int);
+				case TYPE_INT64: return typeof(long);
+				case TYPE_SBYTE: return typeof(sbyte);
+				case TYPE_UINT16: return typeof(ushort);
+				case TYPE_UINT32: return typeof(uint);
+				case TYPE_UINT64: return typeof(ulong);
+				case TYPE_VARINT16: return typeof(short);
+				case TYPE_VARINT32: return typeof(int);
+				case TYPE_VARINT64: return typeof(long);
+				case TYPE_VARUINT16: return typeof(ushort);
+				case TYPE_VARUINT32: return typeof(uint);
+				case TYPE_VARUINT64: return typeof(ulong);
+				case TYPE_DECIMAL: return typeof(decimal);
+				case TYPE_DOUBLE: return typeof(double);
+				case TYPE_SINGLE: return typeof(float);
+				case TYPE_DATETIME: return typeof(DateTime);
+				case TYPE_DATETIMEOFFSET: return typeof(DateTimeOffset);
+				case TYPE_TIMESPAN: return typeof(TimeSpan);
+				case TYPE_CHAR: return typeof(char);
+				case TYPE_STRING: return typeof(string);
+				case TYPE_CI_STRING: return typeof(CaseInsensitiveString);
+				case TYPE_ENUM: return typeof(Enum);
+				case TYPE_BYTEARRAY: return typeof(byte[]);
+				case TYPE_GUID: return typeof(Guid);
+				case TYPE_ARRAY: return typeof(Array);
+				case TYPE_NULL:
+				case TYPE_OBJECT: return typeof(object);
 				default:
 					StringBuilder sb = new StringBuilder();
 
@@ -5206,7 +5205,7 @@ namespace Waher.Persistence.Serialization
 		public static uint GetFieldDataTypeCode(object Value)
 		{
 			if (Value is null)
-				return ObjectSerializer.TYPE_NULL;
+				return TYPE_NULL;
 			else
 				return GetFieldDataTypeCode(Value.GetType());
 		}
@@ -5222,66 +5221,66 @@ namespace Waher.Persistence.Serialization
 			if (TI.IsEnum)
 			{
 				if (TI.IsDefined(typeof(FlagsAttribute), false))
-					return ObjectSerializer.TYPE_INT32;
+					return TYPE_INT32;
 				else
-					return ObjectSerializer.TYPE_ENUM;
+					return TYPE_ENUM;
 			}
 
 			if (FieldDataType == typeof(bool))
-				return ObjectSerializer.TYPE_BOOLEAN;
+				return TYPE_BOOLEAN;
 			else if (FieldDataType == typeof(byte))
-				return ObjectSerializer.TYPE_BYTE;
+				return TYPE_BYTE;
 			else if (FieldDataType == typeof(short))
-				return ObjectSerializer.TYPE_INT16;
+				return TYPE_INT16;
 			else if (FieldDataType == typeof(int))
-				return ObjectSerializer.TYPE_INT32;
+				return TYPE_INT32;
 			else if (FieldDataType == typeof(long))
-				return ObjectSerializer.TYPE_INT64;
+				return TYPE_INT64;
 			else if (FieldDataType == typeof(sbyte))
-				return ObjectSerializer.TYPE_SBYTE;
+				return TYPE_SBYTE;
 			else if (FieldDataType == typeof(ushort))
-				return ObjectSerializer.TYPE_UINT16;
+				return TYPE_UINT16;
 			else if (FieldDataType == typeof(uint))
-				return ObjectSerializer.TYPE_UINT32;
+				return TYPE_UINT32;
 			else if (FieldDataType == typeof(ulong))
-				return ObjectSerializer.TYPE_UINT64;
+				return TYPE_UINT64;
 			else if (FieldDataType == typeof(decimal))
-				return ObjectSerializer.TYPE_DECIMAL;
+				return TYPE_DECIMAL;
 			else if (FieldDataType == typeof(double))
-				return ObjectSerializer.TYPE_DOUBLE;
+				return TYPE_DOUBLE;
 			else if (FieldDataType == typeof(float))
-				return ObjectSerializer.TYPE_SINGLE;
+				return TYPE_SINGLE;
 			else if (FieldDataType == typeof(DateTime))
-				return ObjectSerializer.TYPE_DATETIME;
+				return TYPE_DATETIME;
 			else if (FieldDataType == typeof(DateTimeOffset))
-				return ObjectSerializer.TYPE_DATETIMEOFFSET;
+				return TYPE_DATETIMEOFFSET;
 			else if (FieldDataType == typeof(char))
-				return ObjectSerializer.TYPE_CHAR;
+				return TYPE_CHAR;
 			else if (FieldDataType == typeof(string))
-				return ObjectSerializer.TYPE_STRING;
+				return TYPE_STRING;
 			else if (FieldDataType == typeof(CaseInsensitiveString))
-				return ObjectSerializer.TYPE_CI_STRING;
+				return TYPE_CI_STRING;
 			else if (FieldDataType == typeof(TimeSpan))
-				return ObjectSerializer.TYPE_TIMESPAN;
+				return TYPE_TIMESPAN;
 			else if (FieldDataType == typeof(byte[]))
-				return ObjectSerializer.TYPE_BYTEARRAY;
+				return TYPE_BYTEARRAY;
 			else if (FieldDataType == typeof(Guid))
-				return ObjectSerializer.TYPE_GUID;
+				return TYPE_GUID;
 			else if (FieldDataType == typeof(CaseInsensitiveString))
-				return ObjectSerializer.TYPE_CI_STRING;
+				return TYPE_CI_STRING;
 			else if (TI.IsArray)
 			{
 				if (FieldDataType == typeof(KeyValuePair<string, object>[]) ||
 					FieldDataType == typeof(KeyValuePair<string, IElement>[]))
 				{
-					return ObjectSerializer.TYPE_OBJECT;
+					return TYPE_OBJECT;
 				}
-				else return ObjectSerializer.TYPE_ARRAY;
+				else return TYPE_ARRAY;
 			}
 			else if (FieldDataType == typeof(void))
-				return ObjectSerializer.TYPE_NULL;
+				return TYPE_NULL;
 			else
-				return ObjectSerializer.TYPE_OBJECT;
+				return TYPE_OBJECT;
 		}
 
 		#endregion
@@ -5300,42 +5299,42 @@ namespace Waher.Persistence.Serialization
 
 			switch (ElementDataType)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return await this.ReadArray<bool>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_BYTE: return await this.ReadArray<byte>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT16:
-				case ObjectSerializer.TYPE_VARINT16:
+				case TYPE_BOOLEAN: return await this.ReadArray<bool>(Reader, NrElements, ElementDataType);
+				case TYPE_BYTE: return await this.ReadArray<byte>(Reader, NrElements, ElementDataType);
+				case TYPE_INT16:
+				case TYPE_VARINT16:
 					return await this.ReadArray<short>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT32:
-				case ObjectSerializer.TYPE_VARINT32:
+				case TYPE_INT32:
+				case TYPE_VARINT32:
 					return await this.ReadArray<int>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT64:
-				case ObjectSerializer.TYPE_VARINT64:
+				case TYPE_INT64:
+				case TYPE_VARINT64:
 					return await this.ReadArray<long>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_SBYTE: return await this.ReadArray<sbyte>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT16:
-				case ObjectSerializer.TYPE_VARUINT16:
+				case TYPE_SBYTE: return await this.ReadArray<sbyte>(Reader, NrElements, ElementDataType);
+				case TYPE_UINT16:
+				case TYPE_VARUINT16:
 					return await this.ReadArray<ushort>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT32:
-				case ObjectSerializer.TYPE_VARUINT32:
+				case TYPE_UINT32:
+				case TYPE_VARUINT32:
 					return await this.ReadArray<uint>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT64:
-				case ObjectSerializer.TYPE_VARUINT64:
+				case TYPE_UINT64:
+				case TYPE_VARUINT64:
 					return await this.ReadArray<ulong>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DECIMAL: return await this.ReadArray<decimal>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DOUBLE: return await this.ReadArray<double>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_SINGLE: return await this.ReadArray<float>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DATETIME: return await this.ReadArray<DateTime>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return await this.ReadArray<DateTimeOffset>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_TIMESPAN: return await this.ReadArray<TimeSpan>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_CHAR: return await this.ReadArray<char>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_ENUM: return await this.ReadArray<string>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_CI_STRING: return await this.ReadArray<CaseInsensitiveString>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_BYTEARRAY: return await this.ReadArray<byte[]>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_GUID: return await this.ReadArray<Guid>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_ARRAY: return await this.ReadArrayOfArrays(Reader, NrElements);
-				case ObjectSerializer.TYPE_OBJECT: return await this.ReadArrayOfObjects(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_NULL: return await this.ReadArrayOfNullableElements(Reader, NrElements);
+				case TYPE_DECIMAL: return await this.ReadArray<decimal>(Reader, NrElements, ElementDataType);
+				case TYPE_DOUBLE: return await this.ReadArray<double>(Reader, NrElements, ElementDataType);
+				case TYPE_SINGLE: return await this.ReadArray<float>(Reader, NrElements, ElementDataType);
+				case TYPE_DATETIME: return await this.ReadArray<DateTime>(Reader, NrElements, ElementDataType);
+				case TYPE_DATETIMEOFFSET: return await this.ReadArray<DateTimeOffset>(Reader, NrElements, ElementDataType);
+				case TYPE_TIMESPAN: return await this.ReadArray<TimeSpan>(Reader, NrElements, ElementDataType);
+				case TYPE_CHAR: return await this.ReadArray<char>(Reader, NrElements, ElementDataType);
+				case TYPE_STRING:
+				case TYPE_ENUM: return await this.ReadArray<string>(Reader, NrElements, ElementDataType);
+				case TYPE_CI_STRING: return await this.ReadArray<CaseInsensitiveString>(Reader, NrElements, ElementDataType);
+				case TYPE_BYTEARRAY: return await this.ReadArray<byte[]>(Reader, NrElements, ElementDataType);
+				case TYPE_GUID: return await this.ReadArray<Guid>(Reader, NrElements, ElementDataType);
+				case TYPE_ARRAY: return await this.ReadArrayOfArrays(Reader, NrElements);
+				case TYPE_OBJECT: return await this.ReadArrayOfObjects(Reader, NrElements, ElementDataType);
+				case TYPE_NULL: return await this.ReadArrayOfNullableElements(Reader, NrElements);
 				default:
 					StringBuilder sb = new StringBuilder();
 
@@ -5394,120 +5393,120 @@ namespace Waher.Persistence.Serialization
 
 				switch (ElementDataType)
 				{
-					case ObjectSerializer.TYPE_BOOLEAN:
+					case TYPE_BOOLEAN:
 						Elements.Add(Reader.ReadBoolean());
 						break;
 
-					case ObjectSerializer.TYPE_BYTE:
+					case TYPE_BYTE:
 						Elements.Add(Reader.ReadByte());
 						break;
 
-					case ObjectSerializer.TYPE_INT16:
+					case TYPE_INT16:
 						Elements.Add(Reader.ReadInt16());
 						break;
 
-					case ObjectSerializer.TYPE_INT32:
+					case TYPE_INT32:
 						Elements.Add(Reader.ReadInt32());
 						break;
 
-					case ObjectSerializer.TYPE_INT64:
+					case TYPE_INT64:
 						Elements.Add(Reader.ReadInt64());
 						break;
 
-					case ObjectSerializer.TYPE_SBYTE:
+					case TYPE_SBYTE:
 						Elements.Add(Reader.ReadSByte());
 						break;
 
-					case ObjectSerializer.TYPE_UINT16:
+					case TYPE_UINT16:
 						Elements.Add(Reader.ReadUInt16());
 						break;
 
-					case ObjectSerializer.TYPE_UINT32:
+					case TYPE_UINT32:
 						Elements.Add(Reader.ReadUInt32());
 						break;
 
-					case ObjectSerializer.TYPE_UINT64:
+					case TYPE_UINT64:
 						Elements.Add(Reader.ReadUInt64());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT16:
+					case TYPE_VARINT16:
 						Elements.Add(Reader.ReadVariableLengthInt16());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT32:
+					case TYPE_VARINT32:
 						Elements.Add(Reader.ReadVariableLengthInt32());
 						break;
 
-					case ObjectSerializer.TYPE_VARINT64:
+					case TYPE_VARINT64:
 						Elements.Add(Reader.ReadVariableLengthInt64());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT16:
+					case TYPE_VARUINT16:
 						Elements.Add(Reader.ReadVariableLengthUInt16());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT32:
+					case TYPE_VARUINT32:
 						Elements.Add(Reader.ReadVariableLengthUInt32());
 						break;
 
-					case ObjectSerializer.TYPE_VARUINT64:
+					case TYPE_VARUINT64:
 						Elements.Add(Reader.ReadVariableLengthUInt64());
 						break;
 
-					case ObjectSerializer.TYPE_DECIMAL:
+					case TYPE_DECIMAL:
 						Elements.Add(Reader.ReadDecimal());
 						break;
 
-					case ObjectSerializer.TYPE_DOUBLE:
+					case TYPE_DOUBLE:
 						Elements.Add(Reader.ReadDouble());
 						break;
 
-					case ObjectSerializer.TYPE_SINGLE:
+					case TYPE_SINGLE:
 						Elements.Add(Reader.ReadSingle());
 						break;
 
-					case ObjectSerializer.TYPE_DATETIME:
+					case TYPE_DATETIME:
 						Elements.Add(Reader.ReadDateTime());
 						break;
 
-					case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					case TYPE_DATETIMEOFFSET:
 						Elements.Add(Reader.ReadDateTimeOffset());
 						break;
 
-					case ObjectSerializer.TYPE_TIMESPAN:
+					case TYPE_TIMESPAN:
 						Elements.Add(Reader.ReadTimeSpan());
 						break;
 
-					case ObjectSerializer.TYPE_CHAR:
+					case TYPE_CHAR:
 						Elements.Add(Reader.ReadChar());
 						break;
 
-					case ObjectSerializer.TYPE_STRING:
-					case ObjectSerializer.TYPE_ENUM:
+					case TYPE_STRING:
+					case TYPE_ENUM:
 						Elements.Add(Reader.ReadString());
 						break;
 
-					case ObjectSerializer.TYPE_CI_STRING:
+					case TYPE_CI_STRING:
 						Elements.Add(Reader.ReadCaseInsensitiveString());
 						break;
 
-					case ObjectSerializer.TYPE_BYTEARRAY:
+					case TYPE_BYTEARRAY:
 						Elements.Add(Reader.ReadByteArray());
 						break;
 
-					case ObjectSerializer.TYPE_GUID:
+					case TYPE_GUID:
 						Elements.Add(Reader.ReadGuid());
 						break;
 
-					case ObjectSerializer.TYPE_ARRAY:
+					case TYPE_ARRAY:
 						Elements.Add(await this.ReadGenericArray(Reader));
 						break;
 
-					case ObjectSerializer.TYPE_OBJECT:
+					case TYPE_OBJECT:
 						Elements.Add(await this.Deserialize(Reader, ElementDataType, true));
 						break;
 
-					case ObjectSerializer.TYPE_NULL:
+					case TYPE_NULL:
 						Elements.Add(null);
 						break;
 

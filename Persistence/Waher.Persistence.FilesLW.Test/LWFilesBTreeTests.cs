@@ -11,6 +11,7 @@ using Waher.Persistence.Files.Statistics;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Content;
+using Waher.Security;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -1274,6 +1275,41 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(0, await this.file.GetObjectCount(0, true));
 			AssertEx.Same(1, Stat.NrBlocks);
 			AssertEx.Same(0, Stat.NrBlobBlocks);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_BTree_Test_37_BinaryLifeCycle()
+		{
+			DockerBlob Obj = new DockerBlob()
+			{
+				AccountName = "Some user",
+				FileName = "Some file"
+			};
+
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
+
+			await AssertConsistent(this.file, this.provider, 1, Obj, true);
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+
+			Obj.Function = HashFunction.SHA256;
+			Obj.Digest = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes("Hello World."));
+
+			await this.file.UpdateObject(Obj, false, null);
+
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
+
+			DockerBlob Obj2 = await this.file.LoadObject<DockerBlob>(ObjectId);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Convert.ToBase64String(Obj.Digest), Convert.ToBase64String(Obj2.Digest));
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			await AssertConsistent(this.file, this.provider, null, null, true);
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+
 		}
 
 		// TODO: Delete Object (check if rare error persists.)

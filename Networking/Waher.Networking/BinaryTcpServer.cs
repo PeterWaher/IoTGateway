@@ -586,10 +586,10 @@ namespace Waher.Networking
 
 				if (this.HasSniffers)
 				{
-					this.Information("TLS established. " +
-						"Cipher Strength: " + Connection.Client.CipherStrength.ToString() +
-						"Hash Strength: " + Connection.Client.HashStrength.ToString() +
-						"Key Exchange Strength: " + Connection.Client.KeyExchangeStrength.ToString());
+					this.Information("TLS established" +
+						". Cipher Strength: " + Connection.Client.CipherStrength.ToString() +
+						", Hash Strength: " + Connection.Client.HashStrength.ToString() +
+						", Key Exchange Strength: " + Connection.Client.KeyExchangeStrength.ToString());
 
 					if (!(Connection.Client.RemoteCertificate is null))
 					{

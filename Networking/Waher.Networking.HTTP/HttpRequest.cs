@@ -201,7 +201,7 @@ namespace Waher.Networking.HTTP
 			get
 			{
 				BinaryTcpClient Client = this.clientConnection.Client;
-				return Client is null ? 0 : Math.Min(Math.Min(Client.CipherStrength, Client.HashStrength), Client.KeyExchangeStrength);
+				return Client is null ? 0 : Math.Min(Client.CipherStrength, Client.KeyExchangeStrength);
 			}
 		}
 #endif

@@ -586,7 +586,10 @@ namespace Waher.Networking
 
 				if (this.HasSniffers)
 				{
-					this.Information("TLS established.");
+					this.Information("TLS established. " +
+						"Cipher Strength: " + Connection.Client.CipherStrength.ToString() +
+						"Hash Strength: " + Connection.Client.HashStrength.ToString() +
+						"Key Exchange Strength: " + Connection.Client.KeyExchangeStrength.ToString());
 
 					if (!(Connection.Client.RemoteCertificate is null))
 					{
@@ -716,7 +719,7 @@ namespace Waher.Networking
 		internal async Task DataReceived(ServerTcpConnection Connection, byte[] Buffer,
 			int Offset, int Count)
 		{
-			this.connections?.ContainsKey(Connection.Id);	// Refreshes timer for connection.
+			this.connections?.ContainsKey(Connection.Id);   // Refreshes timer for connection.
 
 			lock (this.synchObj)
 			{

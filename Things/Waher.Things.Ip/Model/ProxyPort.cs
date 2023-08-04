@@ -327,7 +327,10 @@ namespace Waher.Things.Ip.Model
 
 					if (this.HasSniffers)
 					{
-						this.Information("TLS established.");
+						this.Information("TLS established. " +
+							"Cipher Strength: " + Incoming.CipherStrength.ToString() +
+							"Hash Strength: " + Incoming.HashStrength.ToString() +
+							"Key Exchange Strength: " + Incoming.KeyExchangeStrength.ToString());
 
 						if (!(Incoming.RemoteCertificate is null))
 						{

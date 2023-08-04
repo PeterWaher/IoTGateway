@@ -6,7 +6,7 @@
 	public class HttpField
 	{
 		private readonly string key;
-		private readonly string value;
+		private string value;
 
 		/// <summary>
 		/// Base class for all HTTP fields.
@@ -27,6 +27,10 @@
 		/// <summary>
 		/// HTTP Field Value
 		/// </summary>
-		public string Value => this.value;
+		public string Value
+		{
+			get => this.value;
+			protected set => this.value = value;
+		}
 	}
 }

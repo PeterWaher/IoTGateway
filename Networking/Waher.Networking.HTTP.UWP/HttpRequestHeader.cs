@@ -209,10 +209,31 @@ namespace Waher.Networking.HTTP
 		{
 			switch (KeyLower)
 			{
-				case "accept": return this.accept = new HttpFieldAccept(Key, Value);
+				case "accept":
+					if (this.accept is null)
+						this.accept = new HttpFieldAccept(Key, Value);
+					else
+						this.accept.AppendRecords(Value);
+					
+					return this.accept;
+
+				case "accept-encoding":
+					if (this.acceptEncoding is null)
+						this.acceptEncoding = new HttpFieldAcceptEncoding(Key, Value);
+					else
+						this.acceptEncoding.AppendRecords(Value);
+
+					return this.acceptEncoding;
+
+				case "accept-language":
+					if (this.acceptLanguage is null)
+						this.acceptLanguage = new HttpFieldAcceptLanguage(Key, Value);
+					else
+						this.acceptLanguage.AppendRecords(Value);
+
+					return this.acceptLanguage;
+
 				case "accept-charset": return this.acceptCharset = new HttpFieldAcceptCharset(Key, Value);
-				case "accept-encoding": return this.acceptEncoding = new HttpFieldAcceptEncoding(Key, Value);
-				case "accept-language": return this.acceptLanguage = new HttpFieldAcceptLanguage(Key, Value);
 				case "authorization": return this.authorization = new HttpFieldAuthorization(Key, Value);
 				case "cookie": return this.cookie = new HttpFieldCookie(Key, Value);
 				case "expect": return this.expect = new HttpFieldExpect(Key, Value);

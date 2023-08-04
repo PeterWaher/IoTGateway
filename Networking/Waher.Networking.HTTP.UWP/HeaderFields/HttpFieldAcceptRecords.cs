@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
 
@@ -45,6 +46,31 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public HttpFieldAcceptRecords(string Key, string Value)
 			: base(Key, Value)
 		{
+		}
+
+		/// <summary>
+		/// Appends records to the header.
+		/// </summary>
+		/// <param name="Value"></param>
+		public void AppendRecords(string Value)
+		{
+			if (string.IsNullOrEmpty(this.Value))
+				this.Value = Value;
+			else
+				this.Value = this.Value + ", " + Value;
+
+			if (!(this.records is null))
+			{
+				AcceptRecord[] NewRecords = Parse(Value);
+				int c = this.records.Length;
+				int d = NewRecords.Length;
+				AcceptRecord[] Joined = new AcceptRecord[c + d];
+
+				Array.Copy(this.records, 0, Joined, 0, c);
+				Array.Copy(NewRecords, 0, Joined, c, d);
+
+				this.records = Joined;
+			}
 		}
 
 		/// <summary>

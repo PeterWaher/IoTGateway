@@ -1000,7 +1000,10 @@ namespace Waher.Networking.HTTP
 
 					if (this.HasSniffers)
 					{
-						this.Information("TLS established.");
+						this.Information("TLS established" +
+							". Cipher Strength: " + Client.CipherStrength.ToString() +
+							", Hash Strength: " + Client.HashStrength.ToString() +
+							", Key Exchange Strength: " + Client.KeyExchangeStrength.ToString());
 
 						if (!(Client.RemoteCertificate is null))
 						{

@@ -570,8 +570,7 @@ namespace Waher.Networking.HTTP
 							bool Encrypted = this.client.IsEncrypted;
 #if !WINDOWS_UWP
 							int Strength = Encrypted ? Math.Min(
-								Math.Min(this.client.CipherStrength, this.client.HashStrength),
-								this.client.KeyExchangeStrength) : 0;
+								this.client.CipherStrength, this.client.KeyExchangeStrength) : 0;
 #endif
 
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)

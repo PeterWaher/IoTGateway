@@ -107,7 +107,7 @@
         </member>
         <member name="M:Waher.Script.Persistence.Functions.Generalize.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Saves an object to the object database.
+            Creates a generalized representation of an object.
             </summary>
             <param name="Argument">Argument.</param>
             <param name="Start">Start position in script expression.</param>
@@ -373,6 +373,66 @@
             <param name="Argument2">Function argument 2.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.Functions.Specialize">
+            <summary>
+            Creates a specialized representation of an object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Specialize.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a specialized representation of an object.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.Specialize.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.Specialize.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.Specialize.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Specialize.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Specialize.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Specialize.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Generalizes the object in <paramref name="E"/>.
+            </summary>
+            <param name="E">Element</param>
+            <returns>Generaized object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Specialize.EvaluateAsync(System.Object)">
+            <summary>
+            Generalizes the object in <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generaized object.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.Functions.UpdateObject">
             <summary>

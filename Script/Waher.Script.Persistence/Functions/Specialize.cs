@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Persistence;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
-	/// Creates a generalized representation of an object.
+	/// Creates a specialized representation of an object.
 	/// </summary>
-	public class Generalize : FunctionOneVariable
+	public class Specialize : FunctionOneVariable
 	{
 		/// <summary>
-		/// Creates a generalized representation of an object.
+		/// Creates a specialized representation of an object.
 		/// </summary>
 		/// <param name="Argument">Argument.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Generalize(ScriptNode Argument, int Start, int Length, Expression Expression)
+		public Specialize(ScriptNode Argument, int Start, int Length, Expression Expression)
 			: base(Argument, Start, Length, Expression)
 		{
 		}
@@ -27,7 +27,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(Generalize);
+		public override string FunctionName => nameof(Specialize);
 
 		/// <summary>
 		/// Default Argument names
@@ -79,14 +79,10 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Generaized object.</returns>
 		public static async Task<IElement> EvaluateAsync(object Object)
 		{
-			if (Object is ICollection<KeyValuePair<string, IElement>> GenObj)
-				return new ObjectValue(GenObj);
-
-			if (!(Object is ICollection<KeyValuePair<string, object>> GenObj2))
-				GenObj2 = await Database.Generalize(Object);
-
-			return new ObjectValue(GenObj2);
+			if (Object is GenericObject GenObj)
+				return new ObjectValue(await Database.Specialize(GenObj));
+			else
+				return new ObjectValue(Object);
 		}
-
 	}
 }

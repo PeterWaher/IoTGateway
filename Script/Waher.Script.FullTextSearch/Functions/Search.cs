@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Waher.Persistence.Filters;
-using Waher.Persistence;
 using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;

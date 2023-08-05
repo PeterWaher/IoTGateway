@@ -345,36 +345,41 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override async Task GeneratePlainText(StringBuilder Output)
 		{
-			if (!(this.handler is null) && this.handler.HandlesPlainText)
+			if (!(this.handler is null))
 			{
-				try
+				if (this.handler.HandlesPlainText)
 				{
-					if (await this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-
-					if (ex is AggregateException ex2)
+					try
 					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-							Output.AppendLine(ex3.Message);
+						if (await this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
+							return;
 					}
-					else
-						Output.AppendLine(ex.Message);
+					catch (Exception ex)
+					{
+						ex = Log.UnnestException(ex);
+
+						if (ex is AggregateException ex2)
+						{
+							foreach (Exception ex3 in ex2.InnerExceptions)
+								Output.AppendLine(ex3.Message);
+						}
+						else
+							Output.AppendLine(ex.Message);
+					}
 				}
 			}
-
-			int i;
-
-			for (i = this.start; i <= this.end; i++)
+			else
 			{
-				Output.Append(this.indentString);
-				Output.AppendLine(this.rows[i]);
-			}
+				int i;
 
-			Output.AppendLine();
+				for (i = this.start; i <= this.end; i++)
+				{
+					Output.Append(this.indentString);
+					Output.AppendLine(this.rows[i]);
+				}
+
+				Output.AppendLine();
+			}
 		}
 
 		/// <summary>

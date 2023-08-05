@@ -71,31 +71,34 @@ namespace Waher.Content.Markdown.Web.WebScript
 
 			object Result = await Exp.EvaluateAsync(State.Session ?? new Variables());
 
-			if (!InternetContent.Encodes(Result, out Grade _, out IContentEncoder Encoder, State.ToContentType))
+			if (!(Result is null))
 			{
-				bool AlternativeFound = false;
-
-				if (!(State.PossibleContentTypes is null))
+				if (!InternetContent.Encodes(Result, out Grade _, out IContentEncoder Encoder, State.ToContentType))
 				{
-					foreach (string Alternative in State.PossibleContentTypes)
+					bool AlternativeFound = false;
+
+					if (!(State.PossibleContentTypes is null))
 					{
-						if (Alternative != State.ToContentType &&
-							InternetContent.Encodes(Result, out Grade _, out Encoder, Alternative))
+						foreach (string Alternative in State.PossibleContentTypes)
 						{
-							State.ToContentType = Alternative;
-							AlternativeFound = true;
-							break;
+							if (Alternative != State.ToContentType &&
+								InternetContent.Encodes(Result, out Grade _, out Encoder, Alternative))
+							{
+								State.ToContentType = Alternative;
+								AlternativeFound = true;
+								break;
+							}
 						}
 					}
+
+					if (!AlternativeFound)
+						throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + State.ToContentType);
 				}
 
-				if (!AlternativeFound)
-					throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + State.ToContentType);
+				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
+				await State.To.WriteAsync(P.Key, 0, P.Key.Length);
+				State.ToContentType += "; charset=utf-8";
 			}
-
-			KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
-			await State.To.WriteAsync(P.Key, 0, P.Key.Length);
-			State.ToContentType += "; charset=utf-8";
 
 			return true;
 		}

@@ -82,10 +82,10 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				if (sniffableDatabase is null)
-					sniffableDatabase = new SniffableDatabase();
+				if (this.sniffableDatabase is null)
+					this.sniffableDatabase = new SniffableDatabase();
 
-				return sniffableDatabase;
+				return this.sniffableDatabase;
 			}
 		}
 
@@ -96,10 +96,10 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				if (sniffableLedger is null)
-					sniffableLedger = new SniffableLedger();
+				if (this.sniffableLedger is null)
+					this.sniffableLedger = new SniffableLedger();
 
-				return sniffableLedger;
+				return this.sniffableLedger;
 			}
 		}
 
@@ -197,9 +197,8 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string PluginName))
 				throw new BadRequestException();
 
-			Type PluginType = Types.GetType(PluginName);
-			if (PluginType is null)
-				throw new NotFoundException("Database plugin not found: " + PluginName);
+			Type PluginType = Types.GetType(PluginName)
+				?? throw new NotFoundException("Database plugin not found: " + PluginName);
 
 			if (!(Types.Instantiate(PluginType) is IDatabasePlugin Plugin))
 				throw new BadRequestException();

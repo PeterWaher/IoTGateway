@@ -1,23 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Net.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Xml;
-using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Xml;
-using Waher.Events;
+﻿using System.Threading.Tasks;
 using Waher.Networking.HTTP;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.ServiceDiscovery;
-using Waher.Persistence;
-using Waher.Persistence.Attributes;
-using Waher.Security;
 using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup

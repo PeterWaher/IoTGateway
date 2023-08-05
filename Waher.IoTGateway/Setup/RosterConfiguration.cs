@@ -81,12 +81,12 @@ namespace Waher.IoTGateway.Setup
 				this.handlersAdded = true;
 				this.prevClient = Gateway.XmppClient;
 
-				Gateway.XmppClient.OnRosterItemAdded += XmppClient_OnRosterItemAdded;
-				Gateway.XmppClient.OnRosterItemRemoved += XmppClient_OnRosterItemRemoved;
-				Gateway.XmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
-				Gateway.XmppClient.OnPresence += XmppClient_OnPresence;
-				Gateway.XmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
-				Gateway.XmppClient.OnStateChanged += XmppClient_OnStateChanged;
+				Gateway.XmppClient.OnRosterItemAdded += this.XmppClient_OnRosterItemAdded;
+				Gateway.XmppClient.OnRosterItemRemoved += this.XmppClient_OnRosterItemRemoved;
+				Gateway.XmppClient.OnRosterItemUpdated += this.XmppClient_OnRosterItemUpdated;
+				Gateway.XmppClient.OnPresence += this.XmppClient_OnPresence;
+				Gateway.XmppClient.OnPresenceSubscribe += this.XmppClient_OnPresenceSubscribe;
+				Gateway.XmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
 			}
 		}
 
@@ -444,9 +444,8 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 
 			XmppClient Client = Gateway.XmppClient;
-			RosterItem Contact = Client.GetRosterItem(BareJid);
-			if (Contact is null)
-				throw new NotFoundException();
+			RosterItem Contact = Client.GetRosterItem(BareJid)
+				?? throw new NotFoundException();
 
 			SortedDictionary<string, bool> Groups = new SortedDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 			string[] GroupsArray;

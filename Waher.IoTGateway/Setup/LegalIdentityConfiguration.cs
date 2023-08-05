@@ -1433,5 +1433,14 @@ namespace Waher.IoTGateway.Setup
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Simplified configuration by configuring simple default values.
+		/// </summary>
+		/// <returns>If the configuration was changed.</returns>
+		public override Task<bool> SimplifiedConfiguration()
+		{
+			return Task.FromResult(true);
+		}
+
 	}
 }

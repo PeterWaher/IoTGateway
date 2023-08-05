@@ -979,6 +979,13 @@
             <param name="Object">Object</param>
             <returns>Generalized representation.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Specialize(Waher.Persistence.Serialization.GenericObject)">
+            <summary>
+            Creates a specialized representation of a generic object.
+            </summary>
+            <param name="Object">Generic object.</param>
+            <returns>Specialized representation.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetExcludedCollections">
             <summary>
             Gets an array of collections that should be excluded from backups.

@@ -18,6 +18,7 @@ using Waher.Persistence.MongoDB.Serialization.ValueTypes;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Inventory;
+using System.Text;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -2083,6 +2084,37 @@ namespace Waher.Persistence.MongoDB
 				return Task.FromResult<GenericObject>(Obj);
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
+		}
+
+		/// <summary>
+		/// Creates a specialized representation of a generic object.
+		/// </summary>
+		/// <param name="Object">Generic object.</param>
+		/// <returns>Specialized representation.</returns>
+		public Task<object> Specialize(GenericObject Object)
+		{
+			if (Object is null)
+				return Task.FromResult<object>(null);
+
+			Type T = Types.GetType(Object.TypeName);
+			if (T is null)
+				return Task.FromResult<object>(Object);
+
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
+			string CollectionName = Serializer.CollectionName(Object);
+
+			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
+
+			Serializer = this.GetObjectSerializerEx(T);
+
+			BsonDocumentReader Reader = new BsonDocumentReader(Doc);
+			BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+			BsonDeserializationArgs Args = new BsonDeserializationArgs()
+			{
+				NominalType = typeof(GenericObject)
+			};
+
+			return Task.FromResult<object>(Serializer.Deserialize(Context, Args));
 		}
 
 		/// <summary>

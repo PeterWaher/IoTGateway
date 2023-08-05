@@ -646,6 +646,13 @@ namespace Waher.Persistence
 		public Task<GenericObject> Generalize(object Object) => Task.FromResult<GenericObject>(null);
 
 		/// <summary>
+		/// Creates a specialized representation of a generic object.
+		/// </summary>
+		/// <param name="Object">Generic object.</param>
+		/// <returns>Specialized representation.</returns>
+		public Task<object> Specialize(GenericObject Object) => Task.FromResult<object>(null);
+
+		/// <summary>
 		/// Gets an array of collections that should be excluded from backups.
 		/// </summary>
 		/// <returns>Array of excluded collections.</returns>

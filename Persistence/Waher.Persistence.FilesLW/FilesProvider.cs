@@ -14,6 +14,7 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
 {
@@ -2646,6 +2647,37 @@ namespace Waher.Persistence.Files
 				return GenObj;
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
+		}
+
+		/// <summary>
+		/// Creates a specialized representation of a generic object.
+		/// </summary>
+		/// <param name="Object">Generic object.</param>
+		/// <returns>Specialized representation.</returns>
+		public async Task<object> Specialize(GenericObject Object)
+		{
+			if (Object is null)
+				return null;
+
+			Type T = Types.GetType(Object.TypeName);
+			if (T is null)
+				return Object;
+
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(GenericObject));
+			string CollectionName = await Serializer.CollectionName(Object);
+			BinarySerializer Output = new BinarySerializer(CollectionName, Encoding.UTF8);
+
+			await Serializer.Serialize(Output, true, false, Object, null);
+
+			Output.FlushBits();
+			byte[] Bin = Output.GetSerialization();
+
+			Serializer = await this.GetObjectSerializerEx(T);
+
+			BinaryDeserializer Input = new BinaryDeserializer(CollectionName, Encoding.UTF8, Bin, 0);
+			object Result = await Serializer.Deserialize(Input, null, false);
+
+			return Result;
 		}
 
 		/// <summary>

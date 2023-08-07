@@ -5134,11 +5134,14 @@ namespace Waher.Script
 					return false;
 			}
 
-			if (!Callback(this.root, out ScriptNode NewRoot, State))
-				return false;
+			if (!(this.root is null))
+			{
+				if (!Callback(this.root, out ScriptNode NewRoot, State))
+					return false;
 
-			if (!(NewRoot is null))
-				this.root = NewRoot;
+				if (!(NewRoot is null))
+					this.root = NewRoot;
+			}
 
 			if (Order != SearchMethod.DepthFirst)
 			{

@@ -4997,6 +4997,63 @@
             If parts having this role, can revoke their signature, once signed.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.RoleParameter">
+            <summary>
+            Role-reference contractual parameter
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.ObjectValue">
+            <summary>
+            Parameter value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.Role">
+            <summary>
+            Name of role the parameter references.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.Index">
+            <summary>
+            1-based Role index. 1=First signatory having the rolw, 2=second, etc.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.Property">
+            <summary>
+            Name of property of signatory having the corresponding role.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.Required">
+            <summary>
+            If parameter is required to exist for contract to be valid.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
+            <summary>
+            Serializes the parameter, in normalized form.
+            </summary>
+            <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>Error message, if parameter value is not valid, null if valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaDigest">
             <summary>
             Contains a schema digest

@@ -242,6 +242,34 @@ purposes.
 						<xs:documentation>Authorized clients can get the latest version of the contract by requesting it from the trust provider, given the id of the contract.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
+						<xs:sequence>
+							<xs:element name='roleParameters' minOccurs='0' maxOccurs='1'>
+								<xs:annotation>
+									<xs:documentation>Optional element containing role-reference parameter values of signatories.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name='parameter' minOccurs='0' maxOccurs='unbounded'>
+											<xs:annotation>
+												<xs:documentation>Contains the value of a role reference parameter.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name='name' type='xs:string' use='required'>
+													<xs:annotation>
+														<xs:documentation>The name of the role reference parameter.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name='value' type='xs:string' use='required'>
+													<xs:annotation>
+														<xs:documentation>The value of the role reference parameter.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
 						<xs:attribute name='provider' type='NonEmptyString' use='required'>
 							<xs:annotation>
 								<xs:documentation>JID of Trust Provider validating the correctness of the contract.</xs:documentation>
@@ -382,6 +410,11 @@ purposes.
 				<xs:element name='calcParameter' type='CalcParameter'>
 					<xs:annotation>
 						<xs:documentation>Calculation parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='roleParameter' type='RoleParameter'>
+					<xs:annotation>
+						<xs:documentation>Role reference parameter.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
@@ -676,6 +709,39 @@ purposes.
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base='Parameter'/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='RoleParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a contractual parameter based on a property in one of the signatories identities.</xs:documentation>
+			<xs:documentation>The role attribute is used to reference the role the party uses when signing the contract.</xs:documentation>
+			<xs:documentation>The index attribute references the order (first being 1) of the role of the signatory.</xs:documentation>
+			<xs:documentation>The identity property is indicated by the property attribute.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='role' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>Name of the role of the signatory.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='index' type='xs:positiveInteger' use='required'>
+					<xs:annotation>
+						<xs:documentation>Index of signature of the of the signatory for the corresponding role.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='property' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>Name of the ID property of the signatory.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='required' type='xs:boolean' use='optional' default='false'>
+					<xs:annotation>
+						<xs:documentation>If existance of the signatory and property value is required or not for the contract to be complete.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 

@@ -332,7 +332,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="Exception">If XML is invalid.</exception>
 		public static Task<ParsedContract> Parse(XmlDocument Xml)
 		{
-			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, 
+			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts,
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
 			return Parse(Xml.DocumentElement);
@@ -941,6 +941,36 @@ namespace Waher.Networking.XMPP.Contracts
 										return null;
 							}
 						}
+
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (N2 is XmlElement E2 &&
+								E2.LocalName == "roleParameters" &&
+								E2.NamespaceURI == E.NamespaceURI)
+							{
+								Dictionary<string, RoleParameter> RoleParameters = new Dictionary<string, RoleParameter>();
+
+								foreach (Parameter P in Parameters)
+								{
+									if (P is RoleParameter RoleParameter)
+										RoleParameters[RoleParameter.Name] = RoleParameter;
+								}
+
+								foreach (XmlNode N3 in E2.ChildNodes)
+								{
+									if (N3 is XmlElement E3 &&
+										E3.LocalName == "parameter" &&
+										E3.NamespaceURI == E2.NamespaceURI)
+									{
+										string Name = XML.Attribute(E3, "name");
+										if (!RoleParameters.TryGetValue(Name, out RoleParameter RoleParameter))
+											return null;
+
+										RoleParameter.SetValue(XML.Attribute(E3, "value"));
+									}
+								}
+							}
+						}
 						break;
 
 					case "serverSignature":
@@ -1304,12 +1334,26 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
+			LinkedList<RoleParameter> RoleParameters = null;
+
 			if (!(this.parameters is null) && this.parameters.Length > 0)
 			{
 				Xml.Append("<parameters>");
 
 				foreach (Parameter Parameter in this.parameters)
+				{
 					Parameter.Serialize(Xml, false);
+
+					if (Parameter is RoleParameter RoleParameter &&
+						RoleParameter.ObjectValue is string RoleParameterValue &&
+						!string.IsNullOrEmpty(RoleParameterValue))
+					{
+						if (RoleParameters is null)
+							RoleParameters = new LinkedList<RoleParameter>();
+
+						RoleParameters.AddLast(RoleParameter);
+					}
+				}
 
 				Xml.Append("</parameters>");
 			}
@@ -1390,7 +1434,23 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(XML.Encode(this.updated));
 				}
 
-				Xml.Append("\"/>");
+				if (RoleParameters is null)
+					Xml.Append("\"/>");
+				else
+				{
+					Xml.Append("><roleParameters>");
+
+					foreach (RoleParameter RoleParameter in RoleParameters)
+					{
+						Xml.Append("<parameter name=\"");
+						Xml.Append(XML.Encode(RoleParameter.Name));
+						Xml.Append("\" value=\"");
+						Xml.Append(XML.Encode(RoleParameter.ObjectValue?.ToString()));
+						Xml.Append("\"/>");
+					}
+
+					Xml.Append("</roleParameters></status>");
+				}
 			}
 
 			if (IncludeServerSignature)

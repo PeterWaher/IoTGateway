@@ -17,8 +17,8 @@ namespace Waher.Networking.XMPP.Contracts
 	public class LegalIdentityState
 	{
 		private string objectId = null;
-		private CaseInsensitiveString bareJid = string.Empty;
-		private CaseInsensitiveString legalId = string.Empty;
+		private CaseInsensitiveString bareJid = CaseInsensitiveString.Empty;
+		private CaseInsensitiveString legalId = CaseInsensitiveString.Empty;
 		private byte[] publicKey = null;
 		private IdentityState state = IdentityState.Created;
 		private DateTime timestamp = DateTime.MinValue;

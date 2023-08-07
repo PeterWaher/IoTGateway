@@ -46,7 +46,6 @@ namespace Waher.Content.Json.ReferenceTypes
 			{
 				if (PI.CanRead && 
 					PI.GetMethod.IsPublic && 
-					!PI.GetMethod.IsSpecialName &&
 					PI.GetIndexParameters().Length == 0)
 				{
 					Value = PI.GetValue(Object, null);

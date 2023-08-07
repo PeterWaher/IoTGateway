@@ -4646,7 +4646,7 @@ namespace Waher.Persistence.Serialization
 									if (Member.NestedSerializer is ObjectSerializer ObjectSerializer)
 									{
 										Writer.WriteBits(TYPE_GUID, 6);
-										Writer.Write(await GetObjectId(MemberValue, true, State));
+										Writer.Write(await this.GetObjectId(MemberValue, true, State));
 									}
 									else
 									{

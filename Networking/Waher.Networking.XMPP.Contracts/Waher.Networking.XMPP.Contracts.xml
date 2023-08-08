@@ -453,6 +453,22 @@
             <param name="Language">Desired language</param>
             <returns>Markdown</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.TrySetRoleParameters(System.String,System.Int32,Waher.Networking.XMPP.Contracts.LegalIdentity)">
+            <summary>
+            Tries to set role parameters.
+            </summary>
+            <param name="Role">Role</param>
+            <param name="RoleIndex">Role index.</param>
+            <param name="Identity">Corresponding identity of signatory.</param>
+            <returns>null if OK, name of role parameter that could not be set if failed.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ClearRoleParameters(System.String,System.Int32)">
+            <summary>
+            Clears role-reference parameter values.
+            </summary>
+            <param name="Role">Role</param>
+            <param name="RoleIndex">Role index.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractsClient">
             <summary>
             Adds support for legal identities, smart contracts and signatures to an XMPP client.

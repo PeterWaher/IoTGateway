@@ -1710,5 +1710,67 @@ namespace Waher.Networking.XMPP.Contracts
 			return First;
 		}
 
+		/// <summary>
+		/// Tries to set role parameters.
+		/// </summary>
+		/// <param name="Role">Role</param>
+		/// <param name="RoleIndex">Role index.</param>
+		/// <param name="Identity">Corresponding identity of signatory.</param>
+		/// <returns>null if OK, name of role parameter that could not be set if failed.</returns>
+		public string TrySetRoleParameters(string Role, int RoleIndex, LegalIdentity Identity)
+		{
+			if (this.parameters is null)
+				return null;
+
+			// Check all first, without setting role reference values.
+			foreach (Parameter P2 in this.parameters)
+			{
+				if (P2 is RoleParameter RoleParameter &&
+					RoleParameter.Role == Role &&
+					RoleParameter.Index == RoleIndex)
+				{
+					string s = Identity[RoleParameter.Property];
+					if (RoleParameter.Required && string.IsNullOrEmpty(s))
+						return RoleParameter.Property;
+				}
+			}
+
+			// If all role reference parameters OK, setting role reference values in contract.
+			foreach (Parameter P2 in this.parameters)
+			{
+				if (P2 is RoleParameter RoleParameter &&
+					RoleParameter.Role == Role &&
+					RoleParameter.Index == RoleIndex)
+				{
+					string s = Identity[RoleParameter.Property];
+					RoleParameter.SetValue(s);
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Clears role-reference parameter values.
+		/// </summary>
+		/// <param name="Role">Role</param>
+		/// <param name="RoleIndex">Role index.</param>
+		public void ClearRoleParameters(string Role, int RoleIndex)
+		{
+			if (this.parameters is null)
+				return;
+
+			// Check all first, without setting role reference values.
+			foreach (Parameter P2 in this.parameters)
+			{
+				if (P2 is RoleParameter RoleParameter &&
+					RoleParameter.Role == Role &&
+					RoleParameter.Index == RoleIndex)
+				{
+					RoleParameter.SetValue(string.Empty);
+				}
+			}
+		}
+
 	}
 }

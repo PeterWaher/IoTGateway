@@ -225,9 +225,7 @@ namespace Waher.Persistence.Serialization
 
 			if (this.returnTypedObjects && !string.IsNullOrEmpty(TypeName))
 			{
-				Type DesiredType = Types.GetType(TypeName);
-				if (DesiredType is null)
-					DesiredType = typeof(GenericObject);
+				Type DesiredType = Types.GetType(TypeName) ?? typeof(GenericObject);
 
 				if (DesiredType != typeof(GenericObject))
 				{

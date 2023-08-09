@@ -139,7 +139,7 @@ namespace Waher.Security.JWT
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Unable to parse JWT token.", ex);
+				throw new Exception("Unable to parse JWT token: " + Token, ex);
 			}
 		}
 

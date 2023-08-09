@@ -61,6 +61,11 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Role parameter value.
+		/// </summary>
+		public string Value => this.value;
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
@@ -111,12 +116,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>Error message, if parameter value is not valid, null if valid.</returns>
-		public override async Task<bool> IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables)
 		{
-			if (this.required && string.IsNullOrEmpty(this.value))
-				return false;
-			else
-				return await base.IsParameterValid(Variables);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>

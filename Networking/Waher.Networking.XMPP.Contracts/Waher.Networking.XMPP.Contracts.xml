@@ -5043,6 +5043,11 @@
             If parameter is required to exist for contract to be valid.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.RoleParameter.Value">
+            <summary>
+            Role parameter value.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.

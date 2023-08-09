@@ -794,6 +794,20 @@ namespace Waher.Networking.XMPP.Contracts
 										});
 										break;
 
+									case "roleParameter":
+										Parameters.Add(new RoleParameter()
+										{
+											Name = Name,
+											Role = XML.Attribute(E2, "role"),
+											Index = XML.Attribute(E2, "index", 0),
+											Property = XML.Attribute(E2, "property"),
+											Required = XML.Attribute(E2, "required", false),
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
 									default:
 										return null;
 								}
@@ -1438,7 +1452,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append("\"/>");
 				else
 				{
-					Xml.Append("><roleParameters>");
+					Xml.Append("\"><roleParameters>");
 
 					foreach (RoleParameter RoleParameter in RoleParameters)
 					{

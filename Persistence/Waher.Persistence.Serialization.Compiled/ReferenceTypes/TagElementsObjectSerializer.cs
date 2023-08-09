@@ -202,9 +202,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 			if (!string.IsNullOrEmpty(TypeName))
 			{
-				Type DesiredType = Types.GetType(TypeName);
-				if (DesiredType is null)
-					DesiredType = typeof(KeyValuePair<string, IElement>[]);
+				Type DesiredType = Types.GetType(TypeName) ?? typeof(KeyValuePair<string, IElement>[]);
 
 				if (DesiredType != typeof(KeyValuePair<string, IElement>[]))
 				{

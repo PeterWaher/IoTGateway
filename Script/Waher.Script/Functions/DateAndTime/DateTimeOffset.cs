@@ -100,21 +100,27 @@ namespace Waher.Script.Functions.DateAndTime
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			int i, c = Arguments.Length;
+			object Obj;
 
 			if (c == 1)
 			{
-				object Obj = Arguments[0].AssociatedObjectValue;
+				Obj = Arguments[0].AssociatedObjectValue;
+				string s = Obj?.ToString() ?? string.Empty;
 
-				if (!(Obj is null) && TryParse(Obj.ToString(), out System.DateTimeOffset TP))
+				if (TryParse(s, out System.DateTimeOffset TP))
 					return new ObjectValue(TP);
 				else
-					throw new ScriptRuntimeException("Unable to parse DateTimeOffset value.", this);
+					throw new ScriptRuntimeException("Unable to parse DateTimeOffset value: " + s, this);
 			}
 
-			if (!(Arguments[c - 1].AssociatedObjectValue is System.TimeSpan TimeZone))
+			Obj = Arguments[c - 1].AssociatedObjectValue;
+
+			if (!(Obj is System.TimeSpan TimeZone))
 			{
-				if (!TimeSpan.TryParse(Arguments[c - 1].AssociatedObjectValue?.ToString() ?? string.Empty, out TimeZone))
-					throw new ScriptRuntimeException("Unable to parse Time-Zone value.", this);
+				string s = Obj?.ToString() ?? string.Empty;
+
+				if (!TimeSpan.TryParse(s, out TimeZone))
+					throw new ScriptRuntimeException("Unable to parse Time-Zone value: " + s, this);
 			}
 
 			c--;

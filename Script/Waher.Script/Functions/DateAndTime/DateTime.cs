@@ -108,10 +108,15 @@ namespace Waher.Script.Functions.DateAndTime
 					return new DateTimeValue(FromInteger(L, DateTimeKind.Unspecified));
 				else if (Obj is double Dbl)
 					return new DateTimeValue(FromInteger((long)Dbl, DateTimeKind.Unspecified));
-				else if (!(Obj is null) && TryParse(Obj.ToString(), out System.DateTime TP))
-					return new DateTimeValue(TP);
 				else
-					throw new ScriptRuntimeException("Unable to parse DateTime value.", this);
+				{
+					string s = Obj?.ToString() ?? string.Empty;
+
+					if (TryParse(s, out System.DateTime TP))
+						return new DateTimeValue(TP);
+					else
+						throw new ScriptRuntimeException("Unable to parse DateTime value: " + s, this);
+				}
 			}
 
 			double[] d = new double[c];

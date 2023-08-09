@@ -58,7 +58,7 @@ namespace Waher.Script.Graphs.Functions.Colors
 			if (TryParse(Argument, out SKColor Color))
 				return new ObjectValue(Color);
 			else
-				throw new ScriptRuntimeException("Unable to parse color.", this);
+				throw new ScriptRuntimeException("Unable to parse color: " + Argument, this);
 		}
 
 		/// <summary>

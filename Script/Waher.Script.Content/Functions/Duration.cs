@@ -67,11 +67,12 @@ namespace Waher.Script.Content.Functions
 			if (c == 1)
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
+				string s = Obj?.ToString() ?? string.Empty;
 
-				if (!(Obj is null) && Waher.Content.Duration.TryParse(Obj.ToString(), out Waher.Content.Duration D))
+				if (Waher.Content.Duration.TryParse(s, out Waher.Content.Duration D))
 					return new ObjectValue(D);
 				else
-					throw new ScriptRuntimeException("Unable to parse Duration value.", this);
+					throw new ScriptRuntimeException("Unable to parse Duration value: " + s, this);
 			}
 
 			int[] d = new int[c];

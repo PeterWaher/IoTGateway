@@ -94,10 +94,12 @@ namespace Waher.Script.Functions.DateAndTime
 			if (c == 1)
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
-				if (!(Obj is null) && TryParse(Obj.ToString(), out System.TimeSpan TS))
+				string s = Obj?.ToString() ?? string.Empty;
+
+				if (TryParse(s, out System.TimeSpan TS))
 					return new ObjectValue(TS);
 				else
-					throw new ScriptRuntimeException("Unable to parse TimeSpan value.", this);
+					throw new ScriptRuntimeException("Unable to parse TimeSpan value: " + s, this);
 			}
 
 			double[] d = new double[c];

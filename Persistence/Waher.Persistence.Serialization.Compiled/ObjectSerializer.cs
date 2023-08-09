@@ -2973,6 +2973,7 @@ namespace Waher.Persistence.Serialization
 											CSharp.Append("\tWriter.Write(Value.");
 											CSharp.Append(Member.Name);
 											CSharp.AppendLine(");");
+											CSharp.Append(Indent2);
 											CSharp.AppendLine("}");
 										}
 										else
@@ -3307,6 +3308,37 @@ namespace Waher.Persistence.Serialization
 				AppendType(this.type, sb);
 				sb.Append(this.context.Id);
 
+				string CsFolder;
+
+				if (Types.TryGetModuleParameter("Data", out object Obj) && Obj is string DataFolder)
+				{
+					try
+					{
+						CsFolder = Path.Combine(DataFolder, "CS");
+
+						if (!Directory.Exists(CsFolder))
+							Directory.CreateDirectory(CsFolder);
+
+						foreach (string Subnamespace in this.type.Namespace.Split('.'))
+						{
+							CsFolder = Path.Combine(CsFolder, Subnamespace);
+
+							if (!Directory.Exists(CsFolder))
+								Directory.CreateDirectory(CsFolder);
+						}
+
+						string FileName = Path.Combine(CsFolder, TypeName + ".cs");
+						File.WriteAllText(FileName, CSharpCode);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, TypeName);
+						CsFolder = null;
+					}
+				}
+				else
+					CsFolder = null;
+
 				CSharpCompilation Compilation = CSharpCompilation.Create(sb.ToString(),
 					new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode) },
 					References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
@@ -3340,7 +3372,35 @@ namespace Waher.Persistence.Serialization
 
 					throw new SerializationException(sb.ToString(), this.type);
 				}
+
+				if (!string.IsNullOrEmpty(CsFolder))
+				{
+					try
+					{
+						string FileName = Path.Combine(CsFolder, TypeName + ".dll");
+
+						using (FileStream fs = File.Create(FileName))
+						{
+							Output.Position = 0;
+							await Output.CopyToAsync(fs);
+						}
+
+						FileName = Path.Combine(CsFolder, TypeName + ".pdb");
+
+						using (FileStream fs = File.Create(FileName))
+						{
+							PdbOutput.Position = 0;
+							await PdbOutput.CopyToAsync(fs);
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, TypeName);
+					}
+				}
+
 				Output.Position = 0;
+				PdbOutput.Position = 0;
 				Assembly A;
 
 				try

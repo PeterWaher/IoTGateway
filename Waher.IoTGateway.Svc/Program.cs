@@ -422,6 +422,8 @@ namespace Waher.IoTGateway.Svc
 			bool Encrypted = XML.Attribute(DatabaseConfig, "encrypted", true);
 			bool Compiled = XML.Attribute(DatabaseConfig, "compiled", true);
 
+			Types.SetModuleParameter("Data", Folder);
+
 			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, 
 				Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
 		}

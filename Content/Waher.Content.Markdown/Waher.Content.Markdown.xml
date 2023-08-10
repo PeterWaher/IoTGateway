@@ -661,6 +661,15 @@
             <param name="Id">ID of generated content.</param>
             <param name="Result">Generated content.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.IMarkdownAsynchronousOutput.ReportResult(Waher.Content.Markdown.MarkdownOutputType,System.String,System.String,System.Boolean)">
+            <summary>
+            Method called when asynchronous result has been generated in a Markdown document.
+            </summary>
+            <param name="Type">Output type.</param>
+            <param name="Id">ID of generated content.</param>
+            <param name="Result">Generated content.</param>
+            <param name="More">If more information will be sent in another call.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.LaTeXDocumentClass">
             <summary>
             Document class of LaTeX output.

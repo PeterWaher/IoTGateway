@@ -66,8 +66,19 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Result">Generated content.</param>
 		public Task ReportResult(MarkdownOutputType Type, string Id, string Result)
 		{
-			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Result), false);
+			return this.ReportResult(Type, Id, Result, false);
 		}
 
+		/// <summary>
+		/// Method called when asynchronous result has been generated in a Markdown document.
+		/// </summary>
+		/// <param name="Type">Output type.</param>
+		/// <param name="Id">ID of generated content.</param>
+		/// <param name="Result">Generated content.</param>
+		/// <param name="More">If more information will be sent in another call.</param>
+		public Task ReportResult(MarkdownOutputType Type, string Id, string Result, bool More)
+		{
+			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Result), true);
+		}
 	}
 }

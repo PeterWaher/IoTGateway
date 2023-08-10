@@ -72,5 +72,14 @@ namespace Waher.Content.Markdown
 		/// <param name="Id">ID of generated content.</param>
 		/// <param name="Result">Generated content.</param>
 		Task ReportResult(MarkdownOutputType Type, string Id, string Result);
+
+		/// <summary>
+		/// Method called when asynchronous result has been generated in a Markdown document.
+		/// </summary>
+		/// <param name="Type">Output type.</param>
+		/// <param name="Id">ID of generated content.</param>
+		/// <param name="Result">Generated content.</param>
+		/// <param name="More">If more information will be sent in another call.</param>
+		Task ReportResult(MarkdownOutputType Type, string Id, string Result, bool More);
 	}
 }

@@ -166,7 +166,7 @@ namespace Waher.IoTGateway.CodeContent
 					StringBuilder Html2 = new StringBuilder();
 					await InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
 
-					await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
+					await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html2.ToString(), true);
 				}
 				catch (Exception ex)
 				{
@@ -210,7 +210,7 @@ namespace Waher.IoTGateway.CodeContent
 				Variables.OnPreview -= Preview;
 			}
 
-			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html.ToString());
+			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html.ToString(), false);
 		}
 
 		/// <summary>

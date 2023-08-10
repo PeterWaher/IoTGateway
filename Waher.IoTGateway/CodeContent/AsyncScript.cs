@@ -10,7 +10,6 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
-using Waher.Script.Operators;
 
 namespace Waher.IoTGateway.CodeContent
 {

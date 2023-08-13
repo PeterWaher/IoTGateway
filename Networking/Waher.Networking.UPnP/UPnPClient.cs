@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -31,8 +29,8 @@ namespace Waher.Networking.UPnP
 		private const int ssdpPort = 1900;
 		private const int defaultMaximumSearchTimeSeconds = 10;
 
-		private readonly LinkedList<KeyValuePair<UdpClient, IPEndPoint>> ssdpOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
-		private readonly LinkedList<UdpClient> ssdpIncoming = new LinkedList<UdpClient>();
+		private readonly List<KeyValuePair<UdpClient, IPEndPoint>> ssdpOutgoing = new List<KeyValuePair<UdpClient, IPEndPoint>>();
+		private readonly List<UdpClient> ssdpIncoming = new List<UdpClient>();
 		private bool disposed = false;
 
 		/// <summary>
@@ -97,7 +95,10 @@ namespace Waher.Networking.UPnP
 					Outgoing.JoinMulticastGroup(MulticastAddress);
 
 					IPEndPoint EP = new IPEndPoint(MulticastAddress, ssdpPort);
-					this.ssdpOutgoing.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
+					lock (this.ssdpOutgoing)
+					{
+						this.ssdpOutgoing.Add(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
+					}
 
 					this.BeginReceiveOutgoing(Outgoing);
 
@@ -111,7 +112,10 @@ namespace Waher.Networking.UPnP
 						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, ssdpPort));
 						this.BeginReceiveIncoming(Incoming);
 
-						this.ssdpIncoming.AddLast(Incoming);
+						lock (this.ssdpIncoming)
+						{
+							this.ssdpIncoming.Add(Incoming);
+						}
 					}
 					catch (Exception)
 					{
@@ -132,7 +136,10 @@ namespace Waher.Networking.UPnP
 							Incoming.JoinMulticastGroup(MulticastAddress);
 							this.BeginReceiveIncoming(Incoming);
 
-							this.ssdpIncoming.AddLast(Incoming);
+							lock (this.ssdpIncoming)
+							{
+								this.ssdpIncoming.Add(Incoming);
+							}
 						}
 						catch (Exception)
 						{
@@ -163,8 +170,8 @@ namespace Waher.Networking.UPnP
 
 						this.ReceiveText(Header);
 
-						if (Headers.Direction == HttpDirection.Response && 
-							Headers.HttpVersion >= 1.0 && 
+						if (Headers.Direction == HttpDirection.Response &&
+							Headers.HttpVersion >= 1.0 &&
 							Headers.ResponseCode == 200)
 						{
 							if (!string.IsNullOrEmpty(Headers.Location))
@@ -337,7 +344,7 @@ namespace Waher.Networking.UPnP
 		/// <param name="MaximumWaitTimeSeconds">Maximum Wait Time, in seconds. Default=10 seconds.</param>
 		public void StartSearch(string SearchTarget, int MaximumWaitTimeSeconds)
 		{
-			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.ssdpOutgoing)
+			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.GetOutgoing())
 			{
 				string MSearch = "M-SEARCH * HTTP/1.1\r\n" +
 					"HOST: " + P.Value.ToString() + "\r\n" +
@@ -347,6 +354,42 @@ namespace Waher.Networking.UPnP
 				byte[] Packet = Encoding.ASCII.GetBytes(MSearch);
 
 				this.SendPacket(P.Key, P.Value, Packet, MSearch);
+			}
+		}
+
+		private KeyValuePair<UdpClient, IPEndPoint>[] GetOutgoing()
+		{
+			return this.GetOutgoing(false);
+		}
+
+		private KeyValuePair<UdpClient, IPEndPoint>[] GetOutgoing(bool Clear)
+		{
+			lock (this.ssdpOutgoing)
+			{
+				KeyValuePair<UdpClient, IPEndPoint>[] Result = this.ssdpOutgoing.ToArray();
+				
+				if (Clear)
+					this.ssdpOutgoing.Clear();
+				
+				return Result;
+			}
+		}
+
+		private UdpClient[] GetIncoming()
+		{
+			return this.GetIncoming(false);
+		}
+
+		private UdpClient[] GetIncoming(bool Clear)
+		{
+			lock (this.ssdpIncoming)
+			{
+				UdpClient[] Result = this.ssdpIncoming.ToArray();
+
+				if (Clear)
+					this.ssdpIncoming.Clear();
+
+				return Result;
 			}
 		}
 
@@ -394,7 +437,7 @@ namespace Waher.Networking.UPnP
 		{
 			this.disposed = true;
 
-			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.ssdpOutgoing)
+			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.GetOutgoing(true))
 			{
 				try
 				{
@@ -406,9 +449,7 @@ namespace Waher.Networking.UPnP
 				}
 			}
 
-			this.ssdpOutgoing.Clear();
-
-			foreach (UdpClient Client in this.ssdpIncoming)
+			foreach (UdpClient Client in this.GetIncoming(true))
 			{
 				try
 				{
@@ -419,8 +460,6 @@ namespace Waher.Networking.UPnP
 					// Ignore
 				}
 			}
-
-			this.ssdpIncoming.Clear();
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{

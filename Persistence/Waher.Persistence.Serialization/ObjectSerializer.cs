@@ -2465,6 +2465,7 @@ namespace Waher.Persistence.Serialization
 							CSharp.AppendLine(", 6);");
 							CSharp.Append(Indent);
 							CSharp.AppendLine("else");
+							CSharp.Append(Indent);
 							CSharp.AppendLine("{");
 						}
 						else
@@ -3314,7 +3315,7 @@ namespace Waher.Persistence.Serialization
 				{
 					try
 					{
-						CsFolder = Path.Combine(DataFolder, "CS");
+						CsFolder = Path.Combine(DataFolder, this.normalized ? "IntNames" : "StrNames");
 
 						if (!Directory.Exists(CsFolder))
 							Directory.CreateDirectory(CsFolder);

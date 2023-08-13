@@ -81,22 +81,25 @@ namespace Waher.Persistence.FullTextSearch
 			await synchObj.BeginWrite();
 			try
 			{
-				foreach (IPersistentDictionary Index in indices.Values)
-					Index.Dispose();
-
-				queryCache.Dispose();
+				queryCache?.Dispose();
 				queryCache = null;
 
-				indices.Clear();
-				indices = null;
+				if (!(indices is null))
+				{
+					foreach (IPersistentDictionary Index in indices.Values)
+						Index.Dispose();
 
-				collectionInformation.Dispose();
+					indices.Clear();
+					indices = null;
+				}
+
+				collectionInformation?.Dispose();
 				collectionInformation = null;
 
-				collections.Clear();
+				collections?.Clear();
 				collections = null;
 
-				types.Clear();
+				types?.Clear();
 				types = null;
 
 			}

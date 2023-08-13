@@ -620,7 +620,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer</returns>
 		public Task<IObjectSerializer> GetObjectSerializer(Type Type)
 		{
-			return this.serializers.GetObjectSerializer(Type);
+			return this.serializers?.GetObjectSerializer(Type) 
+				?? throw new InvalidOperationException("Service is shutting down.");
 		}
 
 		/// <summary>
@@ -630,7 +631,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer if exists, or null if not.</returns>
 		public Task<IObjectSerializer> GetObjectSerializerNoCreate(Type Type)
 		{
-			return this.serializers.GetObjectSerializerNoCreate(Type);
+			return this.serializers?.GetObjectSerializerNoCreate(Type) 
+				?? throw new InvalidOperationException("Service is shutting down.");
 		}
 
 		/// <summary>
@@ -2686,7 +2688,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Array of excluded collections.</returns>
 		public string[] GetExcludedCollections()
 		{
-			return this.serializers.GetExcludedCollections();
+			return this.serializers?.GetExcludedCollections()
+				?? throw new InvalidOperationException("Service is shutting down.");
 		}
 
 		#endregion
@@ -3476,8 +3479,8 @@ namespace Waher.Persistence.Files
 							IndexStat.LogError("Too many objects in index.");
 
 						if (Repair && (
-							IndexStat.IsCorrupt || 
-							OldFileStat.IsCorrupt || 
+							IndexStat.IsCorrupt ||
+							OldFileStat.IsCorrupt ||
 							FileStat.IsCorrupt))
 						{
 							await Index.RegenerateLocked();

@@ -1578,6 +1578,38 @@ consisting of a single row of only tilde signs (`~`). Example:
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+### Footnotes
+
+You can include footnotes into a document in two ways. Either you insert one into the flowing text directly, or by reference. To include a footnote
+directly into the text you annotate, you include it as follows: `[^footnote text]`. Note that the foot note text can be formatted using inline constructs.
+Example:
+
+	In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+
+This becomes:
+
+In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+
+Note that footnotes in HTML are clickable, and shown at the bottom of the page.
+
+It's also possible to include a footnote through reference. This makes it possible to create a text that is more similar to the final output. However,
+footnotes are always displayed at the bottom of the page, not the place where you write them in the text. Example:
+
+	In this text we[^we] reference a footnote.
+
+This is transformed to:
+
+In this text we[^we] reference a footnote.
+
+We also need to write the actual footnote text somewhere in the document. This is done as follows:
+
+	[^we]: With **we**, *we* mean second-person plural
+
+[^we]: With **we**, *we* mean second-person plural
+
+**Note**: The numbers used in footnotes are automatically generated. If you create footnotes such as `[^1]: ...`, etc., there's no guarantee that the
+final footnote will actually get the number you used in the text.
+
 ### Tables
 
 Tables are formed by a collection of rows, each row having a given number of cells. A table can also have an optional caption and id. Each column is separated
@@ -1648,37 +1680,62 @@ This is transformed to:
 **Note**: It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
 reason for maintaining columns in the markdown text aligned, is to make it more readable.
 
-### Footnotes
+You can combine footnotes and tables as a way to create tables with cells that contain more
+complex content, that does not fit into simple short lines. If a cell has a single footnote
+reference, it will be assumed that the contents of that footnote should be rendered in the
+cell, instead of a reference. Example:
 
-You can include footnotes into a document in two ways. Either you insert one into the flowing text directly, or by reference. To include a footnote
-directly into the text you annotate, you include it as follows: `[^footnote text]`. Note that the foot note text can be formatted using inline constructs.
-Example:
+    | Table with complex cells ||
+    |:-------------|:-----------|
+    | [^e11]       | [^e12]     |
+    | [^e21]       | [^e22]     |
 
-	In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+    [^e11]:	| Info about cell ||
+	    |:--------|-------:|
+	    | Row     | 1      |
+	    | Column  | 1      |
 
-This becomes:
+    [^e12]:	| Info about cell ||
+	    |:--------|-------:|
+	    | Row     | 1      |
+	    | Column  | 2      |
 
-In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+    [^e21]:	| Info about cell ||
+	    |:--------|-------:|
+	    | Row     | 2      |
+	    | Column  | 1      |
 
-Note that footnotes in HTML are clickable, and shown at the bottom of the page.
+    [^e22]:	| Info about cell ||
+	    |:--------|-------:|
+	    | Row     | 2      |
+	    | Column  | 2      |
 
-It's also possible to include a footnote through reference. This makes it possible to create a text that is more similar to the final output. However,
-footnotes are always displayed at the bottom of the page, not the place where you write them in the text. Example:
+This is rendered as:
 
-	In this text we[^we] reference a footnote.
+| Table with complex cells ||
+|:-------------|:-----------|
+| [^e11]       | [^e12]     |
+| [^e21]       | [^e22]     |
 
-This is transformed to:
+[^e11]:	| Info about cell ||
+	|:--------|-------:|
+	| Row     | 1      |
+	| Column  | 1      |
 
-In this text we[^we] reference a footnote.
+[^e12]:	| Info about cell ||
+	|:--------|-------:|
+	| Row     | 1      |
+	| Column  | 2      |
 
-We also need to write the actual footnote text somewhere in the document. This is done as follows:
+[^e21]:	| Info about cell ||
+	|:--------|-------:|
+	| Row     | 2      |
+	| Column  | 1      |
 
-	[^we]: With **we**, *we* mean second-person plural
-
-[^we]: With **we**, *we* mean second-person plural
-
-**Note**: The numbers used in footnotes are automatically generated. If you create footnotes such as `[^1]: ...`, etc., there's no guarantee that the
-final footnote will actually get the number you used in the text.
+[^e22]:	| Info about cell ||
+	|:--------|-------:|
+	| Row     | 2      |
+	| Column  | 2      |
 
 ### Block-level HTML
 

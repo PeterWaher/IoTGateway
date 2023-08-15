@@ -2,10 +2,8 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
-using Waher.Script.Constants;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -623,6 +621,51 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				}
 
 				Output.WriteEndElement();   // Frame
+			}
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		{
+			foreach (MarkdownElement[] Row in this.headers)
+			{
+				foreach (MarkdownElement E in Row)
+				{
+					if (!(E is null))
+					{
+						if (E.InlineSpanElement)
+						{
+							Output.WriteStartElement("paragraph");
+							await E.GenerateSmartContractXml(Output, State);
+							Output.WriteEndElement();
+						}
+						else
+							await E.GenerateSmartContractXml(Output, State);
+					}
+				}
+			}
+
+			foreach (MarkdownElement[] Row in this.rows)
+			{
+				foreach (MarkdownElement E in Row)
+				{
+					if (!(E is null))
+					{
+						if (E.InlineSpanElement)
+						{
+							Output.WriteStartElement("paragraph");
+							await E.GenerateSmartContractXml(Output, State);
+							Output.WriteEndElement();
+						}
+						else
+							await E.GenerateSmartContractXml(Output, State);
+					}
+				}
 			}
 		}
 

@@ -11,6 +11,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	public class Footnote : BlockElementChildren
 	{
 		private readonly string key;
+		private bool referenced;
 
 		/// <summary>
 		/// Footnote reference
@@ -40,6 +41,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Footnote key
 		/// </summary>
 		public string Key => this.key;
+
+		/// <summary>
+		/// If the Footnote has been referenced during rendering, and therefore needs
+		/// to be shown at the end of the rendering process.
+		/// </summary>
+		internal bool Referenced
+		{
+			get => this.referenced;
+			set => this.referenced = value;
+		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.

@@ -59,69 +59,74 @@ namespace Waher.Content.Markdown.Model
 			int Pos;
 			bool FirstRow = true;
 
-			for (i = this.start; i <= this.end; i++)
+			if (d == 0 && NrCharacters <= 0)
+				Result.Add(this);
+			else
 			{
-				s = this.rows[i];
-				Pos = this.positions[i];
-
-				if (s.StartsWith(Prefix))
+				for (i = this.start; i <= this.end; i++)
 				{
-					s = s.Substring(d);
-					Pos += d;
-					j = d;
-				}
-				else
-					j = 0;
+					s = this.rows[i];
+					Pos = this.positions[i];
 
-				k = 0;
-				foreach (char ch in s)
-				{
-					if (ch > ' ' && ch != 160)
-						break;
-
-					k++;
-
-					if (ch == ' ' || ch == 160)
-						j++;
-					else if (ch == '\t')
-						j += 4;
-
-					if (!FirstRow && j >= NrCharacters)
-						break;
-				}
-
-				if (k > 0)
-				{
-					s = s.Substring(k);
-					Pos += k;
-				}
-
-				if (string.IsNullOrEmpty(s))
-				{
-					if (!FirstRow)
+					if (d > 0 && s.StartsWith(Prefix))
 					{
-						Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), Indent));
-						Rows.Clear();
-						Positions.Clear();
-						Indent = 0;
-						FirstRow = true;
+						s = s.Substring(d);
+						Pos += d;
+						j = d;
 					}
-				}
-				else
-				{
-					if (FirstRow)
+					else
+						j = 0;
+
+					k = 0;
+					foreach (char ch in s)
 					{
-						FirstRow = false;
-						Indent = (j - NrCharacters) / 4;
+						if (ch > ' ' && ch != 160)
+							break;
+
+						k++;
+
+						if (ch == ' ' || ch == 160)
+							j++;
+						else if (ch == '\t')
+							j += 4;
+
+						if (!FirstRow && j >= NrCharacters)
+							break;
 					}
 
-					Rows.Add(s);
-					Positions.Add(Pos);
+					if (k > 0)
+					{
+						s = s.Substring(k);
+						Pos += k;
+					}
+
+					if (string.IsNullOrEmpty(s))
+					{
+						if (!FirstRow)
+						{
+							Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), Indent));
+							Rows.Clear();
+							Positions.Clear();
+							Indent = 0;
+							FirstRow = true;
+						}
+					}
+					else
+					{
+						if (FirstRow)
+						{
+							FirstRow = false;
+							Indent = (j - NrCharacters) / 4;
+						}
+
+						Rows.Add(s);
+						Positions.Add(Pos);
+					}
 				}
+
+				if (!FirstRow)
+					Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), Indent));
 			}
-
-			if (!FirstRow)
-				Result.Add(new Block(Rows.ToArray(), Positions.ToArray(), Indent));
 
 			return Result;
 		}
@@ -205,6 +210,8 @@ namespace Waher.Content.Markdown.Model
 			int i, j;
 			int End = this.end;
 			bool IsUnderline;
+			bool LeftPipe = false;
+			bool RightPipe = false;
 			Match M;
 
 			TableInformation = null;
@@ -227,17 +234,57 @@ namespace Waher.Content.Markdown.Model
 				{
 					s = s.TrimEnd();
 
-					if (s.StartsWith("|"))
+					if (i == this.start)
 					{
-						if (s.EndsWith("|") && s != "|")
-							s = s.Substring(1, s.Length - 2);
-						else
-							s = s.Substring(1);
+						if (s.StartsWith("|"))
+						{
+							LeftPipe = true;
 
-						Pos++;
+							if (s.EndsWith("|") && s != "|")
+							{
+								RightPipe = true;
+								s = s.Substring(1, s.Length - 2);
+							}
+							else
+								s = s.Substring(1);
+
+							Pos++;
+						}
+						else if (s.EndsWith("|"))
+						{
+							RightPipe = true;
+							s = s.Substring(0, s.Length - 1);
+						}
+
+						if (LeftPipe ^ RightPipe)
+							return false;
 					}
-					else if (s.EndsWith("|"))
-						s = s.Substring(0, s.Length - 1);
+					else
+					{
+						if (LeftPipe && RightPipe)
+						{
+							if (!s.StartsWith("|") || !s.EndsWith("|") || s == "|")
+								return false;
+
+							s = s.Substring(1, s.Length - 2);
+							Pos++;
+						}
+						else if (LeftPipe)
+						{
+							if (!s.StartsWith("|"))
+								return false;
+
+							s = s.Substring(1);
+							Pos++;
+						}
+						else if (RightPipe)
+						{
+							if (!s.EndsWith("|"))
+								return false;
+
+							s = s.Substring(0, s.Length - 1);
+						}
+					}
 
 					Rows[i] = s;
 					Positions[i] = Pos;
@@ -387,12 +434,13 @@ namespace Waher.Content.Markdown.Model
 			return true;
 		}
 
-		public bool IsFootnote(out string Label)
+		public bool IsFootnote(out string Label, out int WhiteSparePrefix)
 		{
 			string s;
-			int i, j, c;
+			int i, c;
 			char ch;
 
+			WhiteSparePrefix = 0;
 			Label = null;
 			s = this.rows[this.start];
 
@@ -406,17 +454,16 @@ namespace Waher.Content.Markdown.Model
 			Label = s.Substring(2, i - 2);
 
 			i += 2;
-			j = 0;
 			c = s.Length;
 
-			while (i < c && j < 3 && ((ch = s[i]) <= ' ' || ch == 160))
+			while (i < c && WhiteSparePrefix < 3 && ((ch = s[i]) <= ' ' || ch == 160))
 			{
 				i++;
 
 				if (ch == ' ' || ch == 160)
-					j++;
+					WhiteSparePrefix++;
 				else if (ch == '\t')
-					j += 4;
+					WhiteSparePrefix += 4;
 			}
 
 			this.rows[this.start] = s.Substring(i);

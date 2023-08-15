@@ -3027,6 +3027,12 @@
             Footnote key
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.Footnote.Referenced">
+            <summary>
+            If the Footnote has been referenced during rendering, and therefore needs
+            to be shown at the end of the rendering process.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.GenerateHTML(System.Text.StringBuilder)">
             <summary>
             Generates HTML for the markdown element.
@@ -4469,6 +4475,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateLaTeX(System.Text.StringBuilder)">
             <summary>
@@ -7023,6 +7037,12 @@
         <member name="P:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.Key">
             <summary>
             Footnote key
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.AutoExpand">
+            <summary>
+            If the footnote should automatically be expanded when rendered,
+            if format supports auto-expansion.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.GenerateMarkdown(System.Text.StringBuilder)">

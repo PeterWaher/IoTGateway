@@ -12,3 +12,36 @@
 | New section| More| Data|
 [Prototype table][reference_table]
 
+| Table with complex cells||
+|:-------------|:-----------|
+| [^e11]| [^e12]|
+| [^e21]| [^e22]|
+
+
+
+[^e11]:	| Info about cell||
+|:--------|-------:|
+| Row| 1 |
+| Column| 1 |
+
+
+
+[^e12]:	| Info about cell||
+|:--------|-------:|
+| Row| 1 |
+| Column| 2 |
+
+
+
+[^e21]:	| Info about cell||
+|:--------|-------:|
+| Row| 2 |
+| Column| 1 |
+
+
+
+[^e22]:	| Info about cell||
+|:--------|-------:|
+| Row| 2 |
+| Column| 2 |
+

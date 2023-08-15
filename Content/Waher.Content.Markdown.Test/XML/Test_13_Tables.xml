@@ -107,6 +107,146 @@
 				</Cell>
 			</Row>
 		</Table>
+		<Table caption="" id="" columns="2">
+			<Column alignment="Left" />
+			<Column alignment="Left" />
+			<HeaderRow>
+				<HeaderCell>
+					<InlineText>Table with complex cells</InlineText>
+				</HeaderCell>
+				<Continue />
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<FootnoteReference nr="1" />
+				</Cell>
+				<Cell>
+					<FootnoteReference nr="2" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<FootnoteReference nr="3" />
+				</Cell>
+				<Cell>
+					<FootnoteReference nr="4" />
+				</Cell>
+			</Row>
+		</Table>
 	</elements>
 	<references />
+	<footnotes>
+		<Footnote nr="1">
+			<Table caption="" id="" columns="2">
+				<Column alignment="Left" />
+				<Column alignment="Right" />
+				<HeaderRow>
+					<HeaderCell>
+						<InlineText>Info about cell</InlineText>
+					</HeaderCell>
+					<Continue />
+				</HeaderRow>
+				<Row>
+					<Cell>
+						<InlineText>Row</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>1</InlineText>
+					</Cell>
+				</Row>
+				<Row>
+					<Cell>
+						<InlineText>Column</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>1</InlineText>
+					</Cell>
+				</Row>
+			</Table>
+		</Footnote>
+		<Footnote nr="2">
+			<Table caption="" id="" columns="2">
+				<Column alignment="Left" />
+				<Column alignment="Right" />
+				<HeaderRow>
+					<HeaderCell>
+						<InlineText>Info about cell</InlineText>
+					</HeaderCell>
+					<Continue />
+				</HeaderRow>
+				<Row>
+					<Cell>
+						<InlineText>Row</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>1</InlineText>
+					</Cell>
+				</Row>
+				<Row>
+					<Cell>
+						<InlineText>Column</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>2</InlineText>
+					</Cell>
+				</Row>
+			</Table>
+		</Footnote>
+		<Footnote nr="3">
+			<Table caption="" id="" columns="2">
+				<Column alignment="Left" />
+				<Column alignment="Right" />
+				<HeaderRow>
+					<HeaderCell>
+						<InlineText>Info about cell</InlineText>
+					</HeaderCell>
+					<Continue />
+				</HeaderRow>
+				<Row>
+					<Cell>
+						<InlineText>Row</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>2</InlineText>
+					</Cell>
+				</Row>
+				<Row>
+					<Cell>
+						<InlineText>Column</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>1</InlineText>
+					</Cell>
+				</Row>
+			</Table>
+		</Footnote>
+		<Footnote nr="4">
+			<Table caption="" id="" columns="2">
+				<Column alignment="Left" />
+				<Column alignment="Right" />
+				<HeaderRow>
+					<HeaderCell>
+						<InlineText>Info about cell</InlineText>
+					</HeaderCell>
+					<Continue />
+				</HeaderRow>
+				<Row>
+					<Cell>
+						<InlineText>Row</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>2</InlineText>
+					</Cell>
+				</Row>
+				<Row>
+					<Cell>
+						<InlineText>Column</InlineText>
+					</Cell>
+					<Cell>
+						<InlineText>2</InlineText>
+					</Cell>
+				</Row>
+			</Table>
+		</Footnote>
+	</footnotes>
 </parsedMakdown>

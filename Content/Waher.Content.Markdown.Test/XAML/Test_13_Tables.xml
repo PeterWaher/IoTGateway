@@ -99,4 +99,138 @@
 			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Data</TextBlock>
 		</Border>
 	</Grid>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Table with complex cells</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<Grid Margin="0,5,0,5">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Info about cell</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">1</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Column</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">1</TextBlock>
+					</Border>
+				</Grid>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<Grid Margin="0,5,0,5">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Info about cell</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">1</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Column</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">2</TextBlock>
+					</Border>
+				</Grid>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<Grid Margin="0,5,0,5">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Info about cell</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">2</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Column</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">1</TextBlock>
+					</Border>
+				</Grid>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<Grid Margin="0,5,0,5">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Info about cell</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">2</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Column</TextBlock>
+					</Border>
+					<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+						<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">2</TextBlock>
+					</Border>
+				</Grid>
+			</StackPanel>
+		</Border>
+	</Grid>
 </StackPanel>

@@ -1031,7 +1031,12 @@ namespace Waher.Content.Markdown
 								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
 
 								if (!(CellElements.First is null) && CellElements.First.Next is null)
+								{
+									if (CellElements.First.Value is FootnoteReference FRef)
+										FRef.AutoExpand = true;
+
 									Headers[j][i] = CellElements.First.Value;
+								}
 								else
 									Headers[j][i] = new NestedBlock(this, CellElements);
 							}
@@ -1055,7 +1060,12 @@ namespace Waher.Content.Markdown
 								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
 
 								if (!(CellElements.First is null) && CellElements.First.Next is null)
+								{
+									if (CellElements.First.Value is FootnoteReference FRef)
+										FRef.AutoExpand = true;
+
 									DataRows[j][i] = CellElements.First.Value;
+								}
 								else
 									DataRows[j][i] = new NestedBlock(this, CellElements);
 							}
@@ -1130,9 +1140,10 @@ namespace Waher.Content.Markdown
 
 					continue;
 				}
-				else if (Block.IsFootnote(out s))
+				else if (Block.IsFootnote(out s, out int WhiteSparePrefix))
 				{
-					Footnote Footnote = new Footnote(this, s, this.ParseBlocks(Blocks, BlockIndex, BlockIndex));
+					Footnote Footnote = new Footnote(this, s, 
+						this.ParseBlocks(Block.RemovePrefix(string.Empty, WhiteSparePrefix)));
 
 					i = BlockIndex;
 					while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
@@ -4653,6 +4664,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the Markdown is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal async Task GenerateMarkdown(StringBuilder Output, bool Inclusion)
 		{
+			this.ClearFootnoteReferences();
+
 			foreach (MarkdownElement E in this.elements)
 				await E.GenerateMarkdown(Output);
 
@@ -4661,7 +4674,8 @@ namespace Waher.Content.Markdown
 				foreach (string Key in this.footnoteOrder)
 				{
 					if (!Guid.TryParse(Key, out _) &&
-						this.footnotes.TryGetValue(Key, out Footnote Footnote))
+						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.AppendLine();
 						Output.AppendLine();
@@ -4672,6 +4686,15 @@ namespace Waher.Content.Markdown
 						await Footnote.GenerateMarkdown(Output);
 					}
 				}
+			}
+		}
+
+		private void ClearFootnoteReferences()
+		{
+			if (!(this.footnotes is null))
+			{
+				foreach (Footnote Footnote in this.footnotes.Values)
+					Footnote.Referenced = false;
 			}
 		}
 
@@ -4840,6 +4863,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal async Task GenerateHTML(StringBuilder Output, bool Inclusion)
 		{
+			this.ClearFootnoteReferences();
+
 			if (this.settings.HtmlSettings is null)
 				this.settings.HtmlSettings = new HtmlSettings();
 
@@ -5213,7 +5238,7 @@ namespace Waher.Content.Markdown
 			foreach (MarkdownElement E in this.elements)
 				await E.GenerateHTML(Output);
 
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			if (this.NeedsToDisplayFootnotes)
 			{
 				Output.AppendLine("<div class=\"footnotes\">");
 				Output.AppendLine("<hr />");
@@ -5253,6 +5278,23 @@ namespace Waher.Content.Markdown
 			{
 				Output.AppendLine("</body>");
 				Output.Append("</html>");
+			}
+		}
+
+		private bool NeedsToDisplayFootnotes
+		{
+			get
+			{
+				if (this.footnotes is null)
+					return false;
+
+				foreach (Footnote Footnote in this.footnotes.Values)
+				{
+					if (Footnote.Referenced)
+						return true;
+				}
+
+				return false;
 			}
 		}
 
@@ -5311,10 +5353,12 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">Plain Text will be output here.</param>
 		public async Task GeneratePlainText(StringBuilder Output)
 		{
+			this.ClearFootnoteReferences();
+
 			foreach (MarkdownElement E in this.elements)
 				await E.GeneratePlainText(Output);
 
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			if (this.NeedsToDisplayFootnotes)
 			{
 				Output.AppendLine(new string('-', 80));
 				Output.AppendLine();
@@ -5398,6 +5442,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the XAML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal async Task GenerateXAML(XmlWriter Output, bool Inclusion)
 		{
+			this.ClearFootnoteReferences();
+
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
 
@@ -5410,7 +5456,7 @@ namespace Waher.Content.Markdown
 			foreach (MarkdownElement E in this.elements)
 				await E.GenerateXAML(Output, TextAlignment.Left);
 
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			if (this.NeedsToDisplayFootnotes)
 			{
 				Footnote Footnote;
 				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
@@ -5566,6 +5612,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal async Task GenerateXamarinForms(XmlWriter Output, bool Inclusion)
 		{
+			this.ClearFootnoteReferences();
+
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
 
@@ -5581,7 +5629,7 @@ namespace Waher.Content.Markdown
 			foreach (MarkdownElement E in this.elements)
 				await E.GenerateXamarinForms(Output, State);
 
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			if (this.NeedsToDisplayFootnotes)
 			{
 				Footnote Footnote;
 				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
@@ -5735,6 +5783,8 @@ namespace Waher.Content.Markdown
 		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
 		internal async Task GenerateSmartContractXml(XmlWriter Output, string LocalName)
 		{
+			this.ClearFootnoteReferences();
+
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
 
@@ -5753,7 +5803,7 @@ namespace Waher.Content.Markdown
 				State.Level--;
 			}
 
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			if (this.NeedsToDisplayFootnotes)
 			{
 				foreach (string Key in this.footnoteOrder)
 				{
@@ -7038,6 +7088,8 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal async Task GenerateLaTeX(StringBuilder Output, bool Inclusion)
 		{
+			this.ClearFootnoteReferences();
+
 			if (this.settings.LaTeXSettings is null)
 				this.settings.LaTeXSettings = new LaTeXSettings();
 

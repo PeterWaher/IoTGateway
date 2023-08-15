@@ -12,6 +12,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	public class FootnoteReference : MarkdownElement
 	{
 		private readonly string key;
+		private bool autoExpand;
 
 		/// <summary>
 		/// Footnote reference
@@ -22,12 +23,23 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			: base(Document)
 		{
 			this.key = Key;
+			this.autoExpand = false;
 		}
 
 		/// <summary>
 		/// Footnote key
 		/// </summary>
 		public string Key => this.key;
+
+		/// <summary>
+		/// If the footnote should automatically be expanded when rendered,
+		/// if format supports auto-expansion.
+		/// </summary>
+		public bool AutoExpand
+		{
+			get => this.autoExpand;
+			internal set => this.autoExpand = value;
+		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
@@ -37,15 +49,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Output.Append("[^");
 
-			if (Guid.TryParse(this.key, out _) &&
-				this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+			if (!this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote = null;
+
+			if (Guid.TryParse(this.key, out _) && !(Footnote is null))
 			{
 				StringBuilder sb = new StringBuilder();
 				await Footnote.GenerateMarkdown(sb);
 				Output.Append(sb.ToString().TrimEnd());
 			}
 			else
+			{
 				Output.Append(this.key);
+
+				if (!(Footnote is null))
+					Footnote.Referenced = true;
+			}
 
 			Output.Append(']');
 		}
@@ -54,11 +73,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			string s;
 
-			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			if (!this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote = null;
+
+			if (this.autoExpand && !(Footnote is null))
+				await Footnote.GenerateHTML(Output);
+			else if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				s = Nr.ToString();
 
@@ -69,9 +93,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append("\" class=\"footnote-ref\">");
 				Output.Append(s);
 				Output.Append("</a></sup>");
-			}
 
-			return Task.CompletedTask;
+				if (!(Footnote is null))
+					Footnote.Referenced = true;
+			}
 		}
 
 		/// <summary>
@@ -80,6 +105,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override Task GeneratePlainText(StringBuilder Output)
 		{
+			if (this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote.Referenced = true;
+
 			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				Output.Append(" [");
@@ -101,9 +129,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			if (!this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote = null;
+
+			if (this.autoExpand && !(Footnote is null))
+				await Footnote.GenerateXAML(Output, TextAlignment);
+			else if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				XamlSettings Settings = this.Document.Settings.XamlSettings;
 				string s;
@@ -126,9 +159,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.WriteEndElement();
 				Output.WriteEndElement();
 				Output.WriteEndElement();
-			}
 
-			return Task.CompletedTask;
+				if (!(Footnote is null))
+					Footnote.Referenced = true;
+			}
 		}
 
 		/// <summary>
@@ -136,9 +170,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			if (!this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote = null;
+
+			if (this.autoExpand && !(Footnote is null))
+				await Footnote.GenerateXamarinForms(Output, State);
+			else if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				bool Bak = State.Superscript;
 				State.Superscript = true;
@@ -146,9 +185,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Paragraph.GenerateXamarinFormsSpan(Output, Nr.ToString(), State);
 
 				State.Superscript = Bak;
-			}
 
-			return Task.CompletedTask;
+				if (!(Footnote is null))
+					Footnote.Referenced = true;
+			}
 		}
 
 		/// <summary>
@@ -157,16 +197,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			if (!this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+				Footnote = null;
+
+			if (this.autoExpand && !(Footnote is null))
+				await Footnote.GenerateSmartContractXml(Output, State);
+			else if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
 				Output.WriteStartElement("super");
 				Output.WriteElementString("text", Nr.ToString());
 				Output.WriteEndElement();
-			}
 
-			return Task.CompletedTask;
+				if (!(Footnote is null))
+					Footnote.Referenced = true;
+			}
 		}
 
 		/// <summary>
@@ -177,25 +223,39 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			if (this.Document.TryGetFootnote(this.key, out Footnote Footnote))
 			{
-				Output.Append("\\footnote");
-
-				if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+				if (this.autoExpand)
+					await Footnote.GenerateLaTeX(Output);
+				else
 				{
-					Output.Append('[');
-					Output.Append(Nr.ToString());
-					Output.Append(']');
-				}
+					Output.Append("\\footnote");
 
-				Output.Append('{');
-				await Footnote.GenerateLaTeX(Output);
-				Output.Append('}');
+					if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+					{
+						Output.Append('[');
+						Output.Append(Nr.ToString());
+						Output.Append(']');
+					}
+
+					Output.Append('{');
+					await Footnote.GenerateLaTeX(Output);
+					Output.Append('}');
+				}
 			}
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
+		internal override bool InlineSpanElement
+		{
+			get
+			{
+				if (this.autoExpand && this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+					return Footnote.InlineSpanElement;
+				else
+					return true;
+			}
+		}
 
 		/// <summary>
 		/// Exports the element to XML.
@@ -222,6 +282,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			return obj is FootnoteReference x &&
 				this.key == x.key &&
+				this.autoExpand == x.autoExpand &&
 				base.Equals(obj);
 		}
 
@@ -233,8 +294,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			int h1 = base.GetHashCode();
 			int h2 = this.key?.GetHashCode() ?? 0;
+			int h3 = this.autoExpand.GetHashCode();
 
 			h1 = ((h1 << 5) + h1) ^ h2;
+			h1 = ((h1 << 5) + h1) ^ h3;
 
 			return h1;
 		}
@@ -247,6 +310,5 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Statistics.NrFootnoteReference++;
 		}
-
 	}
 }

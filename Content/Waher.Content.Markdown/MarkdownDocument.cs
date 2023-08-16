@@ -5246,7 +5246,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.Append("<li id=\"fn-");
 						Output.Append(Nr.ToString());
@@ -5365,7 +5367,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.Append('[');
 						Output.Append(Nr.ToString());
@@ -5485,7 +5489,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.WriteStartElement("RowDefinition");
 						Output.WriteAttributeString("Height", "Auto");
@@ -5497,7 +5503,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
+						this.footnotes.TryGetValue(Key, out Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.WriteStartElement("TextBlock");
 						Output.WriteAttributeString("Text", Nr.ToString());
@@ -5666,7 +5674,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.WriteStartElement("RowDefinition");
 						Output.WriteAttributeString("Height", "Auto");
@@ -5678,7 +5688,9 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.WriteStartElement("ContentView");
 						Output.WriteAttributeString("Margin", FootnoteMargin);
@@ -5807,7 +5819,9 @@ namespace Waher.Content.Markdown
 			{
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
+						Footnote.Referenced)
 					{
 						Output.WriteStartElement("paragraph");
 						Output.WriteElementString("text", "[" + Nr.ToString() + "] ");

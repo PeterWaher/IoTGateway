@@ -73,5 +73,9 @@ namespace Waher.Networking.HTTP.Vanity
 			});
 		}
 
+		public override string ToString()
+		{
+			return new string(this.Character, 1);
+		}
 	}
 }

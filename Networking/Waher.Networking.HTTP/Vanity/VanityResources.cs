@@ -204,6 +204,25 @@ namespace Waher.Networking.HTTP.Vanity
 
 					Step = Next;
 				}
+
+				if (!(Step.Next is null))
+					return false;
+
+				if (!(Step.Expressions is null))
+				{
+					foreach (VanityMap Map in Step.Expressions)
+					{
+						Match M = Map.Expression.Match(ResourceName);
+						if (M.Success && M.Index == 0 && M.Length == ResourceName.Length)
+						{
+							ResourceName = Map.MapSeed;
+							foreach (KeyValuePair<int, string> P in Map.Parameters)
+								ResourceName = ResourceName.Insert(P.Key, M.Groups[P.Value]?.Value ?? string.Empty);
+
+							return true;
+						}
+					}
+				}
 			}
 
 			return false;

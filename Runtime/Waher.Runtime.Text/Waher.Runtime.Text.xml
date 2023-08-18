@@ -97,6 +97,58 @@
             Second sequence of symbols.
             </summary>
         </member>
+        <member name="T:Waher.Runtime.Text.HarmonizedTextMap">
+            <summary>
+            Maps strings of text to a harmonized set of strings using collections of
+            regular expressions and parameters.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.#ctor">
+            <summary>
+            Maps strings of text to a harmonized set of strings using collections of
+            regular expressions and parameters.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.RegisterMapping(System.String,System.String)">
+            <summary>
+            Registers a mapping.
+            </summary>
+            <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+            <param name="MapTo">Strings matching <paramref name="RegexPattern"/> will be mapped to this string.
+            Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.RegisterMapping(System.String,System.String,System.Object)">
+            <summary>
+            Registers a mapping.
+            </summary>
+            <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+            <param name="MapTo">Strings matching <paramref name="RegexPattern"/> will be mapped to this string.
+            Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
+            <param name="Tag">Tags the expression with an object. This tag can be used when
+            unregistering all mappings tagged with the given tag.</param>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.UnregisterMapping(System.String)">
+            <summary>
+            Unregisters a mapping.
+            </summary>
+            <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+            <returns>If a mapping matching the parameters was found, and consequently removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.UnregisterMappings(System.Object)">
+            <summary>
+            Unregisters mappings tagged with a specific object.
+            </summary>
+            <param name="Tag">Remove all mappings tagged with this object.</param>
+            <returns>Number of mappings removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.HarmonizedTextMap.TryMap(System.String,System.String@)">
+            <summary>
+            Tries to map a string using registered mappings.
+            </summary>
+            <param name="InputString">String to map.</param>
+            <param name="Harmonized">Harmonized result, if found.</param>
+            <returns>If a mapping was found to map the string to a harmonized string.</returns>
+        </member>
         <member name="T:Waher.Runtime.Text.Step`1">
             <summary>
             Represents a sub-sequence of symbols.

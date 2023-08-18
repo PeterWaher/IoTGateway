@@ -8,7 +8,6 @@ namespace Waher.Networking.HTTP.Test
 	public class VanityTests
 	{
 		private static HttpServer server;
-		private static VanityResources resources;
 
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext _)
@@ -19,36 +18,6 @@ namespace Waher.Networking.HTTP.Test
 			server.RegisterVanityResource("/Test/(?'Op'print|export)/(?'Type'video|photo)/(?'Id'\\d+)", "/Test/Output.md?op={Op}&t={Type}&id={Id}");
 			server.RegisterVanityResource("/Test2/(?'Op'view|edit)/(?'Type'video|photo)/(?'Id'\\d+)", "/Test2/Display.md?op={Op}&t={Type}&id={Id}");
 			server.RegisterVanityResource("/Test/other/(?'Type'video|photo)/(?'Id'\\d+)", "/Test/Other.md?t={Type}&id={Id}");
-
-			// Tests taken from MicrosoftInterop repository.
-
-			resources = new VanityResources();
-
-			resources.RegisterVanityResource(@"H(EAD(ING)?)?\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"RUBRIK\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"RUBRIEK\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"ÜBERSCHRIFT\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"OVERSKRIFT\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"TITRE\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"TITOLO\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"TÍTULO\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"ЗАГОЛОВОК\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"OTSIKKO\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"NAGŁÓWEK\s*(?'N'\d+)", "H{N}");
-			resources.RegisterVanityResource(@"NADPIS\s*(?'N'\d+)", "H{N}");
-
-			resources.RegisterVanityResource(@"NORMAL", "NORMAL");
-			resources.RegisterVanityResource(@"SUBTITLE", "NORMAL");
-			resources.RegisterVanityResource(@"BODY TEXT(\s+\d+)", "NORMAL");
-
-			resources.RegisterVanityResource(@"TITLE", "TITLE");
-			resources.RegisterVanityResource(@"BOOK\s+TITLE", "TITLE");
-
-			resources.RegisterVanityResource(@"LIST PARAGRAPH", "UL");
-			resources.RegisterVanityResource(@"LISTSTYCKE", "UL");
-
-			resources.RegisterVanityResource(@"QUOTE", "QUOTE");
-			resources.RegisterVanityResource(@"INTENSE\s+QUOTE", "QUOTE");
 		}
 
 		[ClassCleanup]
@@ -104,16 +73,6 @@ namespace Waher.Networking.HTTP.Test
 		public void Test_07_Match_5()
 		{
 			this.Test("/Test/other/photo/345", "/Test/Other.md?t=photo&id=345");
-		}
-
-		[DataTestMethod]
-		[DataRow("RUBRIK1", "H1")]
-		[DataRow("RUBRIK2", "H2")]
-		[DataRow("LISTSTYCKE", "UL")]
-		public void Test_08_WordStyles(string Resource, string Expected)
-		{
-			Assert.IsTrue(resources.CheckVanityResource(ref Resource));
-			Assert.AreEqual(Expected, Resource);
 		}
 	}
 }

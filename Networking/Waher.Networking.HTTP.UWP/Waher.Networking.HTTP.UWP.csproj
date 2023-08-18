@@ -264,10 +264,7 @@
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
     <Compile Include="TransferEncodings\InternalTransfer.cs" />
-    <Compile Include="Vanity\VanityExpression.cs" />
-    <Compile Include="Vanity\VanityMap.cs" />
     <Compile Include="Vanity\VanityResources.cs" />
-    <Compile Include="Vanity\VanityStep.cs" />
     <Compile Include="WebSockets\WebSocket.cs" />
     <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
     <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />
@@ -301,6 +298,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj">
       <Project>{9641a3ba-2873-4e87-9302-dbaa950d9ca0}</Project>
       <Name>Waher.Runtime.Temporary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj">
+      <Project>{7289981d-1cfc-4428-80db-64c098ad5d94}</Project>
+      <Name>Waher.Runtime.Text</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>

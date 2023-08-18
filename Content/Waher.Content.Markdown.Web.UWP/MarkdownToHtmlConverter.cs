@@ -88,6 +88,9 @@ namespace Waher.Content.Markdown.Web
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
 		public async Task<bool> ConvertAsync(ConversionState State)
 		{
+			if (State is null)
+				return true;
+
 			HttpRequest Request = null;
 			string Markdown;
 			bool b;

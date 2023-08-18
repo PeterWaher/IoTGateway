@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -14,9 +14,8 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database full-text search</PackageTags>
-    <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
+    <AssemblyVersion>1.0.3</AssemblyVersion>
+    <FileVersion>1.0.3</FileVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.xml</DocumentationFile>
   </PropertyGroup>

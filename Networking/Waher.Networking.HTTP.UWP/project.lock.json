@@ -2695,6 +2695,13 @@
           "Waher.Events": "1.1.2"
         }
       },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Runtime.Threading/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -5454,6 +5461,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -8253,6 +8267,13 @@
           "Waher.Events": "1.1.2"
         }
       },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Runtime.Threading/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -11021,6 +11042,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -13829,6 +13857,13 @@
           "Waher.Events": "1.1.2"
         }
       },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Runtime.Threading/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -16597,6 +16632,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -19403,6 +19445,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Text/1.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -29363,6 +29412,11 @@
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
     },
+    "Waher.Runtime.Text/1.1.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj"
+    },
     "Waher.Runtime.Threading/1.2.1": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
@@ -29447,6 +29501,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Temporary\\Waher.Runtime.Temporary.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Temporary\\Waher.Runtime.Temporary.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Text\\Waher.Runtime.Text.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Text\\Waher.Runtime.Text.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"

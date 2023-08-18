@@ -2886,7 +2886,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -5793,7 +5793,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -8736,7 +8736,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -11652,7 +11652,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -14604,7 +14604,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -17520,7 +17520,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
@@ -20472,7 +20472,7 @@
       },
       "Waher.Runtime.Text/1.0.1": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }

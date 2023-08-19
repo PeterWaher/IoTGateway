@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Persistence;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Networking.SASL
 {

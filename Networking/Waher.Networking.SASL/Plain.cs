@@ -4,7 +4,6 @@ using System.IO;
 using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.SASL

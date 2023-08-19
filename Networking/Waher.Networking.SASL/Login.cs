@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.SASL
@@ -138,8 +137,8 @@ namespace Waher.Networking.SASL
 		/// <returns>If authentication was successful or not. If null is returned, the mechanism did not perform authentication.</returns>
 		public override async Task<bool?> Authenticate(string UserName, string Password, ISaslClientSide Connection)
 		{
-			string UserNameLabel = await Connection.Initiate(this, null);
-			string PasswordLabel = await Connection.ChallengeResponse(this, Convert.ToBase64String(Encoding.UTF8.GetBytes(UserName)));
+			/* string UserNameLabel = */ await Connection.Initiate(this, null);
+			/* string PasswordLabel = */ await Connection.ChallengeResponse(this, Convert.ToBase64String(Encoding.UTF8.GetBytes(UserName)));
 			await Connection.FinalResponse(this, Convert.ToBase64String(Encoding.UTF8.GetBytes(Password)));
 			return true;
 		}

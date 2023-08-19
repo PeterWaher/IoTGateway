@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.SASL
 {
@@ -46,7 +42,7 @@ namespace Waher.Networking.SASL
         {
             byte[] A1 = Key;
             if (A1.Length > 64)
-                A1 = H(A1);
+                A1 = this.H(A1);
 
             if (A1.Length < 64)
                 Array.Resize(ref A1, 64);
@@ -60,12 +56,12 @@ namespace Waher.Networking.SASL
                 A3[i] ^= 0x36;    // ipad
             }
 
-            return H(CONCAT(A1, H(CONCAT(A3, Text))));
+            return this.H(CONCAT(A1, this.H(CONCAT(A3, Text))));
         }
 
         protected byte[] KD(string k, string s)
         {
-            return H(CONCAT(k, ":", s));
+            return this.H(CONCAT(k, ":", s));
         }
     }
 }

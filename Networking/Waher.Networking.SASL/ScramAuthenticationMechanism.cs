@@ -4,7 +4,6 @@ using System.Net.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Runtime.Settings;
 using Waher.Security.LoginMonitor;
 
@@ -105,7 +104,7 @@ namespace Waher.Networking.SASL
 			string Request = Encoding.UTF8.GetString(Bin);
 			object[] P = (object[])Connection.Tag;
 			string UserName = (string)P[0];
-			string Nonce = (string)P[1];
+			//string Nonce = (string)P[1];
 			int NrIterations = (int)P[2];
 			string ServerNonce = (string)P[3];
 			string ClientRequest = (string)P[4];
@@ -161,9 +160,9 @@ namespace Waher.Networking.SASL
 				return null;
 			}
 
-			byte[] SaltedPassword = Hi(Encoding.UTF8.GetBytes(Account.Password.Normalize()), salt, NrIterations);
-			byte[] ClientKey = HMAC(SaltedPassword, clientKey);
-			byte[] StoredKey = H(ClientKey);
+			byte[] SaltedPassword = this.Hi(Encoding.UTF8.GetBytes(Account.Password.Normalize()), salt, NrIterations);
+			byte[] ClientKey = this.HMAC(SaltedPassword, clientKey);
+			byte[] StoredKey = this.H(ClientKey);
 			StringBuilder sb;
 
 			sb = new StringBuilder();
@@ -187,11 +186,11 @@ namespace Waher.Networking.SASL
 				sb.Append(Request.Substring(0, i));
 
 			byte[] AuthenticationMessage = Encoding.UTF8.GetBytes(sb.ToString());
-			byte[] ClientSignature = HMAC(StoredKey, AuthenticationMessage);
+			byte[] ClientSignature = this.HMAC(StoredKey, AuthenticationMessage);
 			byte[] ClientProof = XOR(ClientKey, ClientSignature);
 
-			byte[] ServerKey = HMAC(SaltedPassword, serverKey);
-			byte[] ServerSignature = HMAC(ServerKey, AuthenticationMessage);
+			byte[] ServerKey = this.HMAC(SaltedPassword, serverKey);
+			byte[] ServerSignature = this.HMAC(ServerKey, AuthenticationMessage);
 
 			string ClientProofStr = Convert.ToBase64String(ClientProof);
 			if (Proof == ClientProofStr)
@@ -216,14 +215,14 @@ namespace Waher.Networking.SASL
 
 		private byte[] Hi(byte[] String, byte[] Salt, int NrIterations)
 		{
-			byte[] U1 = HMAC(String, CONCAT(Salt, One));
-			byte[] U2 = HMAC(String, U1);
+			byte[] U1 = this.HMAC(String, CONCAT(Salt, One));
+			byte[] U2 = this.HMAC(String, U1);
 			byte[] Response = XOR(U1, U2);
 
 			while (NrIterations > 2)
 			{
 				U1 = U2;
-				U2 = HMAC(String, U1);
+				U2 = this.HMAC(String, U1);
 				Response = XOR(Response, U2);
 				NrIterations--;
 			}
@@ -272,7 +271,7 @@ namespace Waher.Networking.SASL
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
 			string ChallengeString = Encoding.UTF8.GetString(ChallengeBinary);
 			string ServerNonce = null;
-			string SaltString = null;
+			string SaltString;
 			int NrIterations = 0;
 			byte[] Salt = null;
 
@@ -298,10 +297,10 @@ namespace Waher.Networking.SASL
 			if (string.IsNullOrEmpty(ServerNonce) || !ServerNonce.StartsWith(Nonce) || Salt is null || NrIterations <= 0)
 				return null;
 
-			byte[] SaltedPassword = Hi(Encoding.UTF8.GetBytes(Password.Normalize()), Salt, NrIterations);
+			byte[] SaltedPassword = this.Hi(Encoding.UTF8.GetBytes(Password.Normalize()), Salt, NrIterations);
 
-			byte[] ClientKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Client Key"));
-			byte[] StoredKey = H(ClientKey);
+			byte[] ClientKey = this.HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Client Key"));
+			byte[] StoredKey = this.H(ClientKey);
 
 			StringBuilder sb;
 
@@ -316,11 +315,11 @@ namespace Waher.Networking.SASL
 			sb.Append(ServerNonce);
 
 			byte[] AuthenticationMessage = Encoding.UTF8.GetBytes(sb.ToString());
-			byte[] ClientSignature = HMAC(StoredKey, AuthenticationMessage);
+			byte[] ClientSignature = this.HMAC(StoredKey, AuthenticationMessage);
 			byte[] ClientProof = XOR(ClientKey, ClientSignature);
 
-			byte[] ServerKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Server Key"));
-			byte[] ServerSignatureBinary = HMAC(ServerKey, AuthenticationMessage);
+			byte[] ServerKey = this.HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Server Key"));
+			byte[] ServerSignatureBinary = this.HMAC(ServerKey, AuthenticationMessage);
 
 			string ServerSignature = Convert.ToBase64String(ServerSignatureBinary);
 

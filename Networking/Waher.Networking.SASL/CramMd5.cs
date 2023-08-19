@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
-using Waher.Runtime.Settings;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.SASL

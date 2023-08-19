@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Security;
-using System.Security;
-using System.Text;
+﻿using System.Net.Security;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.SASL

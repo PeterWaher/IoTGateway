@@ -6,9 +6,15 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Html;
+using Waher.Content.Markdown.Functions;
+using Waher.Content.Markdown;
+using Waher.Content.Multipart;
+using Waher.Content;
 using Waher.Networking.SASL;
 using Waher.Networking.SMTP.Exceptions;
 using Waher.Networking.Sniffers;
+using Waher.Content.Html.Elements;
 
 namespace Waher.Networking.SMTP
 {
@@ -331,7 +337,8 @@ namespace Waher.Networking.SMTP
 							if (int.TryParse(s.Substring(5).Trim(), out int i))
 								this.size = i;
 						}
-						else*/ if (s.StartsWith("AUTH "))
+						else*/
+						if (s.StartsWith("AUTH "))
 							this.authMechanisms = s.Substring(5).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
 						break;
 				}
@@ -398,7 +405,7 @@ namespace Waher.Networking.SMTP
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
-		
+
 		/// <summary>
 		/// Executes the VRFY command.
 		/// </summary>
@@ -548,6 +555,88 @@ namespace Waher.Networking.SMTP
 			await this.AssertOkResult();
 
 			return null;    // No response in SMTP
+		}
+
+		/// <summary>
+		/// Sends a formatted e-mail message.
+		/// </summary>
+		/// <param name="Sender">Sender of message.</param>
+		/// <param name="Recipient">Recipient of message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="MarkdownContent">Markdown content.</param>
+		/// <param name="Attachments">Any attachments.</param>
+		public async Task SendFormattedEMail(string Sender, string Recipient, string Subject,
+			string MarkdownContent, params object[] Attachments)
+		{
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(MarkdownContent);
+			string HTML = "<html><body>" + HtmlDocument.GetBody(await Doc.GenerateHTML()) + "</body></html>";
+			string PlainText = await Doc.GeneratePlainText();
+			ContentAlternatives Content = new ContentAlternatives(new EmbeddedContent[]
+			{
+				new EmbeddedContent()
+				{
+					ContentType = "text/html; charset=utf-8",
+					Raw = Encoding.UTF8.GetBytes(HTML)
+				},
+				new EmbeddedContent()
+				{
+					ContentType = "text/plain; charset=utf-8",
+					Raw = Encoding.UTF8.GetBytes(PlainText)
+				},
+				new EmbeddedContent()
+				{
+					ContentType = "text/markdown; charset=utf-8",
+					Raw = Encoding.UTF8.GetBytes(MarkdownContent)
+				}
+			});
+
+			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Content, Encoding.UTF8);
+
+			if (Attachments.Length > 0)
+			{
+				List<EmbeddedContent> Parts = new List<EmbeddedContent>()
+				{
+					new EmbeddedContent()
+					{
+						ContentType = P.Value,
+						Raw = P.Key
+					}
+				};
+
+				foreach (object Attachment in Attachments)
+				{
+					KeyValuePair<byte[], string> P2 = await InternetContent.EncodeAsync(Attachment, Encoding.UTF8);
+					Parts.Add(new EmbeddedContent()
+					{
+						ContentType = P2.Value,
+						Raw = P2.Key
+					});
+				}
+
+				MixedContent Mixed = new MixedContent(Parts.ToArray());
+
+				P = await InternetContent.EncodeAsync(Mixed, Encoding.UTF8);
+			}
+
+			byte[] BodyBin = P.Key;
+			string ContentType = P.Value;
+
+			List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>("MIME-VERSION", "1.0"),
+				new KeyValuePair<string, string>("FROM", Sender),
+				new KeyValuePair<string, string>("TO", Recipient),
+				new KeyValuePair<string, string>("SUBJECT", Subject),
+				new KeyValuePair<string, string>("DATE", CommonTypes.EncodeRfc822(DateTime.Now)),
+				new KeyValuePair<string, string>("IMPORTANCE", "normal"),
+				new KeyValuePair<string, string>("X-PRIORITY", "3"),
+				new KeyValuePair<string, string>("MESSAGE-ID", Guid.NewGuid().ToString()),
+				new KeyValuePair<string, string>("CONTENT-TYPE", ContentType)
+			};
+
+			await this.MAIL_FROM(Sender);
+			await this.RCPT_TO(Recipient);
+			await this.DATA(Headers.ToArray(), BodyBin);
 		}
 
 	}

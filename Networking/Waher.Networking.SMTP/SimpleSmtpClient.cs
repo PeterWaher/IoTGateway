@@ -36,11 +36,27 @@ namespace Waher.Networking.SMTP
 		private string[] authMechanisms = null;
 		private string[] permittedAuthenticationMechanisms = null;
 
+		/// <summary>
+		/// Simple SMTP Client
+		/// </summary>
+		/// <param name="Domain">Domain</param>
+		/// <param name="Host">Host name</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Sniffers">Sniffers</param>
 		public SimpleSmtpClient(string Domain, string Host, int Port, params ISniffer[] Sniffers)
 			: this(Domain, Host, Port, null, null, Sniffers)
 		{
 		}
 
+		/// <summary>
+		/// Simple SMTP Client
+		/// </summary>
+		/// <param name="Domain">Domain</param>
+		/// <param name="Host">Host name</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Sniffers">Sniffers</param>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
 		public SimpleSmtpClient(string Domain, string Host, int Port, string UserName, string Password, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
@@ -51,6 +67,10 @@ namespace Waher.Networking.SMTP
 			this.password = Password;
 		}
 
+		/// <summary>
+		/// Connects to the server.
+		/// </summary>
+		/// <returns></returns>
 		public async Task Connect()
 		{
 			this.client?.Dispose();
@@ -141,37 +161,65 @@ namespace Waher.Networking.SMTP
 			return Task.FromResult(true);
 		}
 
+		/// <summary>
+		/// Disposes of the client.
+		/// </summary>
 		public void Dispose()
 		{
 			this.client?.Dispose();
 			this.client = null;
 		}
 
+		/// <summary>
+		/// Domain
+		/// </summary>
 		public string Domain
 		{
 			get => this.domain;
 		}
 
+		/// <summary>
+		/// If server certificate should be trusted by default (default=false).
+		/// </summary>
 		public bool TrustCertificate
 		{
 			get => this.trustCertificate;
 			set => this.trustCertificate = value;
 		}
 
+		/// <summary>
+		/// Server certificate.
+		/// </summary>
 		public X509Certificate ServerCertificate => this.client.RemoteCertificate;
+
+		/// <summary>
+		/// If server certificate is valid.
+		/// </summary>
 		public bool ServerCertificateValid => this.client.RemoteCertificateValid;
 
+		/// <summary>
+		/// Permitted authentication mechanisms.
+		/// </summary>
 		public string[] PermittedAuthenticationMechanisms
 		{
 			get => this.permittedAuthenticationMechanisms;
 			set => this.permittedAuthenticationMechanisms = value;
 		}
 
+		/// <summary>
+		/// Reads a response from the server.
+		/// </summary>
+		/// <returns>Response codes, and messages</returns>
 		public Task<KeyValuePair<int, string>[]> ReadResponse()
 		{
 			return this.ReadResponse(10000);
 		}
 
+		/// <summary>
+		/// Reads a response from the server.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Response codes, and messages</returns>
 		public async Task<KeyValuePair<int, string>[]> ReadResponse(int Timeout)
 		{
 			TaskCompletionSource<KeyValuePair<int, string>[]> Source = this.responseSource;
@@ -229,6 +277,12 @@ namespace Waher.Networking.SMTP
 			return Response[0].Value;
 		}
 
+		/// <summary>
+		/// Sends the EHLO command.
+		/// </summary>
+		/// <param name="Domain">Domain</param>
+		/// <exception cref="IOException">If unable to execute command.</exception>
+		/// <exception cref="AuthenticationException">If transport authentication failed.</exception>
 		public async Task EHLO(string Domain)
 		{
 			this.startTls = false;
@@ -344,31 +398,49 @@ namespace Waher.Networking.SMTP
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
-
+		
+		/// <summary>
+		/// Executes the VRFY command.
+		/// </summary>
+		/// <param name="Account">Account name</param>
 		public async Task VRFY(string Account)
 		{
 			await this.WriteLine("VRFY " + Account);
 			await this.AssertOkResult();
 		}
 
+		/// <summary>
+		/// Executes the MAIL FROM command.
+		/// </summary>
+		/// <param name="Sender">Sender of mail.</param>
 		public async Task MAIL_FROM(string Sender)
 		{
 			await this.WriteLine("MAIL FROM: <" + Sender + ">");
 			await this.AssertOkResult();
 		}
 
+		/// <summary>
+		/// Executes the RCPT TO command.
+		/// </summary>
+		/// <param name="Receiver">Receiver of mail.</param>
 		public async Task RCPT_TO(string Receiver)
 		{
 			await this.WriteLine("RCPT TO: <" + Receiver + ">");
 			await this.AssertOkResult();
 		}
 
+		/// <summary>
+		/// Executes the QUIT command.
+		/// </summary>
 		public async Task QUIT()
 		{
 			await this.WriteLine("QUIT");
 			await this.AssertOkResult();
 		}
 
+		/// <summary>
+		/// Executes the DATA command.
+		/// </summary>
 		public async Task DATA(KeyValuePair<string, string>[] Headers, byte[] Body)
 		{
 			await this.WriteLine("DATA");

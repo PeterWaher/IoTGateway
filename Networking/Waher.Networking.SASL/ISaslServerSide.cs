@@ -67,8 +67,22 @@ namespace Waher.Networking.SASL
 		/// <param name="UserName">Name of user.</param>
 		Task SetUserIdentity(CaseInsensitiveString UserName);
 
+		/// <summary>
+		/// Reports the SASL error: Not Authorized
+		/// </summary>
+		/// <returns>If transmitted.</returns>
 		Task<bool> SaslErrorNotAuthorized();
+
+		/// <summary>
+		/// Reports the SASL error: Account disabled
+		/// </summary>
+		/// <returns>If transmitted.</returns>
 		Task<bool> SaslErrorAccountDisabled();
+
+		/// <summary>
+		/// Reports the SASL error: Malformed request
+		/// </summary>
+		/// <returns>If transmitted.</returns>
 		Task<bool> SaslErrorMalformedRequest();
 
 		/// <summary>

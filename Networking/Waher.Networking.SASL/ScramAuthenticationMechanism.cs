@@ -10,7 +10,7 @@ using Waher.Security.LoginMonitor;
 namespace Waher.Networking.SASL
 {
 	/// <summary>
-	/// Authentication done by SCRAM-* defined in RFC 5802 & 7677:
+	/// Authentication done by SCRAM-* defined in RFC 5802 &amp; 7677:
 	/// https://tools.ietf.org/html/rfc5802
 	/// https://tools.ietf.org/html/rfc7677
 	/// </summary>
@@ -23,7 +23,7 @@ namespace Waher.Networking.SASL
 		private static string saltBase64 = null;
 
 		/// <summary>
-		/// Authentication done by SCRAM-* defined in RFC 5802 & 7677:
+		/// Authentication done by SCRAM-* defined in RFC 5802 &amp; 7677:
 		/// https://tools.ietf.org/html/rfc5802
 		/// https://tools.ietf.org/html/rfc7677
 		/// </summary>

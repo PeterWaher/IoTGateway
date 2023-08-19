@@ -59,6 +59,12 @@ namespace Waher.Networking.SASL
             return this.H(CONCAT(A1, this.H(CONCAT(A3, Text))));
         }
 
+        /// <summary>
+        /// H(CONCAT(k:s))
+        /// </summary>
+        /// <param name="k">k</param>
+        /// <param name="s">s</param>
+        /// <returns>KD(k,s)</returns>
         protected byte[] KD(string k, string s)
         {
             return this.H(CONCAT(k, ":", s));

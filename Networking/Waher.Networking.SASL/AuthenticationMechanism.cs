@@ -4,6 +4,7 @@ using System.Net.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Security;
 
 namespace Waher.Networking.SASL
 {
@@ -127,6 +128,11 @@ namespace Waher.Networking.SASL
             return Result.ToArray();
         }
 
+        /// <summary>
+        /// Concatenates a sequence of byte arrays.
+        /// </summary>
+        /// <param name="Data">Byte arrays to concatenate.</param>
+        /// <returns>Concatenated byte array.</returns>
         protected static byte[] CONCAT(params byte[][] Data)
         {
             int c = 0;
@@ -148,6 +154,11 @@ namespace Waher.Networking.SASL
             return Result;
         }
 
+        /// <summary>
+        /// Concatenates a sequence of strings.
+        /// </summary>
+        /// <param name="Parameters">Strings.</param>
+        /// <returns>Concatenation of strings.</returns>
         protected static string CONCAT(params string[] Parameters)
         {
             StringBuilder sb = new StringBuilder();
@@ -158,21 +169,34 @@ namespace Waher.Networking.SASL
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Concatenates a byte array with a sequence of strings.
+        /// </summary>
+        /// <param name="Data">Byte array</param>
+        /// <param name="Parameters">Strings</param>
+        /// <returns>Byte array</returns>
         protected static byte[] CONCAT(byte[] Data, params string[] Parameters)
         {
-            return CONCAT(Data, System.Text.Encoding.UTF8.GetBytes(CONCAT(Parameters)));
+            return CONCAT(Data, Encoding.UTF8.GetBytes(CONCAT(Parameters)));
         }
 
+        /// <summary>
+        /// Converts a byte array to a hexadecimal string.
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <returns></returns>
         protected static string HEX(byte[] Data)
         {
-            StringBuilder sb = new StringBuilder();
-
-            foreach (byte b in Data)
-                sb.Append(b.ToString("x2"));
-
-            return sb.ToString();
+            return Hashes.BinaryToString(Data);
         }
 
+        /// <summary>
+        /// XORs two byte arrays.
+        /// </summary>
+        /// <param name="U1">Array 1</param>
+        /// <param name="U2">Array 2</param>
+        /// <returns>Byte array with individual elements XORed.</returns>
+        /// <exception cref="Exception">If arrays of different sizes.</exception>
         protected static byte[] XOR(byte[] U1, byte[] U2)
         {
             int i, c = U1.Length;

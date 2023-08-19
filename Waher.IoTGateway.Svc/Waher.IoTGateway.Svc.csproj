@@ -78,6 +78,7 @@
     <ProjectReference Include="..\Networking\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.SMTP\Waher.Networking.SMTP.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.UPnP\Waher.Networking.UPnP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.WHOIS\Waher.Networking.WHOIS.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.csproj" />

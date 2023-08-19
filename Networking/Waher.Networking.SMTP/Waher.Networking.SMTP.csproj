@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <Authors>Peter Waher</Authors>
+    <Product>Waher.IoTGateway</Product>
+    <Company>Waher Data AB</Company>
+    <Description>Implements a simple e-mail client based on the SMTP protocol.</Description>
+    <Copyright>Copyright © Waher Data AB 2017-2023. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.SMTP</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication eMail SMTP</PackageTags>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Networking.SASL\Waher.Networking.SASL.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -335,6 +335,8 @@
 	<Assembly fileName='Waher.Networking.PeerToPeer.pdb'/>
 	<Assembly fileName='Waher.Networking.SASL.dll'/>
 	<Assembly fileName='Waher.Networking.SASL.pdb'/>
+	<Assembly fileName='Waher.Networking.SMTP.dll'/>
+	<Assembly fileName='Waher.Networking.SMTP.pdb'/>
 	<Assembly fileName='Waher.Networking.UPnP.dll'/>
 	<Assembly fileName='Waher.Networking.UPnP.pdb'/>
 	<Assembly fileName='Waher.Networking.WHOIS.dll'/>

@@ -547,6 +547,10 @@
       <Project>{18dac659-05a0-4f9d-b14e-a43eb733a84c}</Project>
       <Name>Waher.Networking.PeerToPeer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj">
+      <Project>{c23a7907-417a-40d0-82aa-b430b7f6b7c2}</Project>
+      <Name>Waher.Networking.SASL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj">
       <Project>{3c8f09ed-99ae-425b-891f-74235a0bbb08}</Project>
       <Name>Waher.Networking.XMPP.BOSH</Name>

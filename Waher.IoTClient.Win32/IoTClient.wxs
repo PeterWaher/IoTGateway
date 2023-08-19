@@ -264,6 +264,7 @@
 							<File Id='Waher.Networking.DNS.dll' Name='Waher.Networking.DNS.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.DNS.dll' Vital='yes'/>
 							<File Id='Waher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.dll' Vital='yes'/>
 							<File Id='Waher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.dll' Vital='yes'/>
+							<File Id='Waher.Networking.SASL.dll' Name='Waher.Networking.SASL.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.SASL.dll' Vital='yes'/>
 							<File Id='Waher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.UPnP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.WHOIS.dll' Name='Waher.Networking.WHOIS.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.WHOIS.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
@@ -338,6 +339,7 @@
 							<RemoveFile Id='RemoveWaher.Networking.DNS.dll' Name='Waher.Networking.DNS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.SASL.dll' Name='Waher.Networking.SASL.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.WHOIS.dll' Name='Waher.Networking.WHOIS.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
@@ -419,6 +421,7 @@
 							<File Id='Waher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.xml' Vital='yes'/>
 							<File Id='Waher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.SASL.pdb' Name='Waher.Networking.SASL.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.SASL.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.UPnP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.WHOIS.pdb' Name='Waher.Networking.WHOIS.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.WHOIS.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
@@ -520,6 +523,7 @@
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.SASL.pdb' Name='Waher.Networking.SASL.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.WHOIS.pdb' Name='Waher.Networking.WHOIS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>

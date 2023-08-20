@@ -1058,7 +1058,7 @@ namespace Waher.IoTGateway.Setup
 					if (AcmeDirectory.ExternalAccountRequired)
 						await Status.Invoke(this, "An external account is required.");
 
-					if (AcmeDirectory.TermsOfService != null)
+					if (!(AcmeDirectory.TermsOfService is null))
 					{
 						URL = AcmeDirectory.TermsOfService.ToString();
 						await Status.Invoke(this, "Terms of service available on: " + URL);
@@ -1070,7 +1070,7 @@ namespace Waher.IoTGateway.Setup
 							return "You need to accept the terms of service.";
 					}
 
-					if (AcmeDirectory.Website != null)
+					if (!(AcmeDirectory.Website is null))
 						await Status.Invoke(this, "Web site available on: " + AcmeDirectory.Website.ToString());
 
 					await Status.Invoke(this, "Getting account.");
@@ -1103,7 +1103,7 @@ namespace Waher.IoTGateway.Setup
 
 						if (string.IsNullOrEmpty(this.contactEMail))
 						{
-							if (Account.Contact != null && Account.Contact.Length != 0)
+							if (!(Account.Contact is null) && Account.Contact.Length != 0)
 							{
 								await Status.Invoke(this, "Updating contact URIs in account.");
 								Account = await Account.Update(new string[0]);
@@ -1405,19 +1405,19 @@ namespace Waher.IoTGateway.Setup
 							}
 							finally
 							{
-								if (CertFileName != null && File.Exists(CertFileName))
+								if (!(CertFileName is null) && File.Exists(CertFileName))
 								{
 									await Status.Invoke(this, "Deleting temporary certificate file.");
 									File.Delete(CertFileName);
 								}
 
-								if (KeyFileName != null && File.Exists(KeyFileName))
+								if (!(KeyFileName is null) && File.Exists(KeyFileName))
 								{
 									await Status.Invoke(this, "Deleting temporary key file.");
 									File.Delete(KeyFileName);
 								}
 
-								if (CertFileName2 != null && File.Exists(CertFileName2))
+								if (!(CertFileName2 is null) && File.Exists(CertFileName2))
 								{
 									await Status.Invoke(this, "Deleting temporary pfx file.");
 									File.Delete(CertFileName2);

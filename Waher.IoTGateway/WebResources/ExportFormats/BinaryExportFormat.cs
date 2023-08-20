@@ -200,7 +200,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Flush();
 				this.output.Flush();
 
-				if (this.cs != null && this.blockSize > 1)
+				if (!(this.cs is null) && this.blockSize > 1)
 				{
 					Type T = typeof(CryptoStream);
 					int i;
@@ -305,7 +305,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				foreach (Exception ex in AggregateException.InnerExceptions)
 					this.OutputException(ex);
 			}
-			else if (Exception.InnerException != null)
+			else if (!(Exception.InnerException is null))
 				this.OutputException(Exception.InnerException);
 
 			this.w.Write(string.Empty);

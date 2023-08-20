@@ -43,7 +43,7 @@ namespace Waher.IoTGateway.Setup
 		public override Task Start()
 		{
 			PropertyInfo PI = Database.Provider.GetType().GetProperty("DeleteObsoleteKeys");
-			if (PI != null && PI.PropertyType == typeof(bool))
+			if (!(PI is null) && PI.PropertyType == typeof(bool))
 				PI.SetValue(Database.Provider, false);
 
 			return base.Start();
@@ -55,7 +55,7 @@ namespace Waher.IoTGateway.Setup
 		public override Task End()
 		{
 			PropertyInfo PI = Database.Provider.GetType().GetProperty("DeleteObsoleteKeys");
-			if (PI != null && PI.PropertyType == typeof(bool))
+			if (!(PI is null) && PI.PropertyType == typeof(bool))
 				PI.SetValue(Database.Provider, true);
 
 			return base.End();

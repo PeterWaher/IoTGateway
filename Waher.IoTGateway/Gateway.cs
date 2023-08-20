@@ -266,7 +266,7 @@ namespace Waher.IoTGateway
 				{
 					Initialize();
 
-					beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
+					beforeUninstallCommandNr = RegisterServiceCommand(BeforeUninstall);
 
 					if (!Directory.Exists(rootFolder))
 					{
@@ -411,7 +411,7 @@ namespace Waher.IoTGateway
 											exceptionFile.WriteLine(new string('-', 80));
 											exceptionFile.Write("Type: ");
 
-											if (e.Exception != null)
+											if (!(e.Exception is null))
 												exceptionFile.WriteLine(e.Exception.GetType().FullName);
 											else
 												exceptionFile.WriteLine("null");
@@ -419,12 +419,12 @@ namespace Waher.IoTGateway
 											exceptionFile.Write("Time: ");
 											exceptionFile.WriteLine(DateTime.Now.ToString());
 
-											if (e.Exception != null)
+											if (!(e.Exception is null))
 											{
 												LinkedList<Exception> Exceptions = new LinkedList<Exception>();
 												Exceptions.AddLast(e.Exception);
 
-												while (Exceptions.First != null)
+												while (!(Exceptions.First is null))
 												{
 													Exception ex = Exceptions.First.Value;
 													Exceptions.RemoveFirst();
@@ -441,7 +441,7 @@ namespace Waher.IoTGateway
 														foreach (Exception ex3 in ex2.InnerExceptions)
 															Exceptions.AddLast(ex3);
 													}
-													else if (ex.InnerException != null)
+													else if (!(ex.InnerException is null))
 														Exceptions.AddLast(ex.InnerException);
 												}
 											}
@@ -1123,10 +1123,10 @@ namespace Waher.IoTGateway
 			StringBuilder Link = new StringBuilder();
 			Link.Append("https://");
 
-			if (string.IsNullOrEmpty(Gateway.Domain))
-				Link.Append(Gateway.XmppClient.Domain);
+			if (string.IsNullOrEmpty(Domain))
+				Link.Append(XmppClient.Domain);
 			else
-				Link.Append(Gateway.Domain);
+				Link.Append(Domain);
 
 			Link.Append("/QR/");
 			Link.Append(WebUtility.UrlEncode(e.Text));
@@ -1180,7 +1180,7 @@ namespace Waher.IoTGateway
 
 			if (!(MI is null))
 			{
-				Task T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
+				Task T = MI.Invoke(DatabaseProvider, new object[] { AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
 
 				if (T is Task<string[]> StringArrayTask)
 					DatabaseConfiguration.RepairedCollections = await StringArrayTask;
@@ -1248,7 +1248,7 @@ namespace Waher.IoTGateway
 			Markdown.AppendLine(Log.CleanStackTrace(e.Trace.ToString()));
 			Markdown.AppendLine("```");
 
-			Gateway.SendNotification(Markdown.ToString());
+			SendNotification(Markdown.ToString());
 		}
 
 		private static void CheckContentFiles(string ManifestFileName, Dictionary<string, CopyOptions> ContentOptions)
@@ -1261,8 +1261,12 @@ namespace Waher.IoTGateway
 				};
 				Doc.Load(ManifestFileName);
 
-				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+				if (!(Doc.DocumentElement is null) &&
+					Doc.DocumentElement.LocalName == "Module" &&
+					Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+				{
 					CheckContentFiles(Doc.DocumentElement, runtimeFolder, runtimeFolder, appDataFolder, ContentOptions);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1349,7 +1353,9 @@ namespace Waher.IoTGateway
 				};
 				Doc.Load(ManifestFileName);
 
-				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
+				if (!(Doc.DocumentElement is null) && 
+					Doc.DocumentElement.LocalName == "Module" && 
+					Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
 				{
 					string InstallUtilityFolder = Path.Combine(runtimeFolder, "InstallUtility");
 					bool NoticeLogged = false;
@@ -1475,7 +1481,7 @@ namespace Waher.IoTGateway
 
 			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.SoftwareUpdates))
 			{
-				string PackagesFolder = Path.Combine(Gateway.appDataFolder, "Packages");
+				string PackagesFolder = Path.Combine(appDataFolder, "Packages");
 				if (!Directory.Exists(PackagesFolder))
 					Directory.CreateDirectory(PackagesFolder);
 
@@ -1517,8 +1523,8 @@ namespace Waher.IoTGateway
 				}
 
 				if (Configuration.UseEncryption &&
-					Configuration.Certificate != null &&
-					Configuration.PrivateKey != null)
+					!(Configuration.Certificate is null) &&
+					!(Configuration.PrivateKey is null))
 				{
 					UpdateCertificate(Configuration);
 
@@ -1559,7 +1565,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				if (Configuration.PFX != null)
+				if (!(Configuration.PFX is null))
 					certificate = new X509Certificate2(Configuration.PFX, Configuration.Password);
 				else
 				{
@@ -2186,7 +2192,9 @@ namespace Waher.IoTGateway
 			string BareJid = e.FromBareJID.ToLower();
 
 			if (string.IsNullOrEmpty(BareJid) ||
-				(xmppClient != null && (BareJid == xmppClient.Domain.ToLower() || BareJid == xmppClient.BareJID.ToLower())))
+				(!(xmppClient is null) && 
+				(BareJid == xmppClient.Domain.ToLower() || 
+				BareJid == xmppClient.BareJID.ToLower())))
 			{
 				e.Accept();
 			}
@@ -2266,7 +2274,7 @@ namespace Waher.IoTGateway
 
 					MarkdownToHtmlConverter.BareJID = xmppClient.BareJID;
 
-					if (!registered && thingRegistryClient != null)
+					if (!registered && !(thingRegistryClient is null))
 						Task.Run(Register);
 
 					if (!socksProxy.HasProxy)
@@ -2277,7 +2285,7 @@ namespace Waher.IoTGateway
 					immediateReconnect = connected;
 					connected = false;
 
-					if (immediateReconnect && xmppClient != null)
+					if (immediateReconnect && !(xmppClient is null))
 						xmppClient.Reconnect();
 					break;
 			}
@@ -3309,7 +3317,7 @@ namespace Waher.IoTGateway
 		public static Task SendNotification(Graph Graph, GraphSettings Settings)
 		{
 			PixelInformation Pixels = Graph.CreatePixels(Settings);
-			return Gateway.SendNotification(Pixels);
+			return SendNotification(Pixels);
 		}
 
 		/// <summary>
@@ -3425,9 +3433,9 @@ namespace Waher.IoTGateway
 
 		private static void SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
 		{
-			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
+			if (!(XmppClient is null) && XmppClient.State == XmppState.Connected)
 			{
-				RosterItem Item = Gateway.XmppClient.GetRosterItem(To);
+				RosterItem Item = XmppClient.GetRosterItem(To);
 				if (Item is null || (Item.State != SubscriptionState.To && Item.State != SubscriptionState.Both))
 				{
 					xmppClient.RequestPresenceSubscription(To);
@@ -3638,7 +3646,7 @@ namespace Waher.IoTGateway
 
 		private static void SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
 		{
-			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
+			if (!(XmppClient is null) && XmppClient.State == XmppState.Connected)
 			{
 				StringBuilder Xml = new StringBuilder();
 

@@ -893,7 +893,7 @@ namespace Waher.IoTGateway.Setup
 									};
 									Doc.LoadXml(XmlResponse);
 
-									if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "XRD")
+									if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "XRD")
 									{
 										string BoshUrl = null;
 										string WsUrl = null;

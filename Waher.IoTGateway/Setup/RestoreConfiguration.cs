@@ -1737,7 +1737,7 @@ namespace Waher.IoTGateway.Setup
 			};
 			Original.Load(OriginalFileName);
 
-			if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "GatewayConfiguration")
+			if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "GatewayConfiguration")
 			{
 				List<KeyValuePair<string, string>> DefaultPages = null;
 

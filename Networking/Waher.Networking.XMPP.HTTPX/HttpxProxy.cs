@@ -292,7 +292,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		public async Task<GetClientResponse> GetClientAsync(Uri Uri)
 		{
-			if (string.Compare(Uri.Scheme, "httpx", true) != 0)
+			if (string.Compare(Uri.Scheme, HttpxGetter.HttpxUriScheme, true) != 0)
 				throw new ArgumentException("URI must use URI Scheme HTTPX.", nameof(Uri));
 
 			string BareJID = Uri.UserInfo + "@" + Uri.Authority;

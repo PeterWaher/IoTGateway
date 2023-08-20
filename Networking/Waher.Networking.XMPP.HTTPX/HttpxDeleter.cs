@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// Supported URI schemes.
 		/// </summary>
-		public override string[] UriSchemes => new string[] { "httpx" };
+		public override string[] UriSchemes => new string[] { HttpxGetter.HttpxUriScheme };
 
 		/// <summary>
 		/// If the deleter is able to delete to a resource, given its URI.
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			switch (Uri.Scheme)
 			{
-				case "httpx":
+				case HttpxGetter.HttpxUriScheme:
 					Grade = Grade.Ok;
 					return true;
 

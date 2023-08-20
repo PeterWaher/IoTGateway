@@ -30,9 +30,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
+		/// httpx
+		/// </summary>
+		public const string HttpxUriScheme = "httpx";
+
+		/// <summary>
 		/// Supported URI schemes.
 		/// </summary>
-		public string[] UriSchemes => new string[] { "httpx" };
+		public string[] UriSchemes => new string[] { HttpxUriScheme };
 
 		/// <summary>
 		/// If the getter is able to get a resource, given its URI.
@@ -44,7 +49,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			switch (Uri.Scheme)
 			{
-				case "httpx":
+				case HttpxUriScheme:
 					Grade = Grade.Ok;
 					return true;
 

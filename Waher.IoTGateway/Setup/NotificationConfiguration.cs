@@ -143,8 +143,6 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 
 			string TabID = Request.Header["X-TabID"];
-			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
 
 			List<CaseInsensitiveString> Addresses = new List<CaseInsensitiveString>();
 
@@ -172,11 +170,15 @@ namespace Waher.IoTGateway.Setup
 				if (this.addresses.Length > 0)
 					await Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
 
-				await Response.Write(1);
+				if (!string.IsNullOrEmpty(TabID))
+					await Response.Write(1);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				await Response.Write(0);
+				if (!string.IsNullOrEmpty(TabID))
+					await Response.Write(0);
+				else
+					throw new BadRequestException(ex.Message);
 			}
 
 			await Response.SendResponse();

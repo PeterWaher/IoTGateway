@@ -7,14 +7,12 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Html;
-using Waher.Content.Markdown.Functions;
 using Waher.Content.Markdown;
 using Waher.Content.Multipart;
 using Waher.Content;
 using Waher.Networking.SASL;
 using Waher.Networking.SMTP.Exceptions;
 using Waher.Networking.Sniffers;
-using Waher.Content.Html.Elements;
 
 namespace Waher.Networking.SMTP
 {
@@ -23,6 +21,16 @@ namespace Waher.Networking.SMTP
 	/// </summary>
 	public class SimpleSmtpClient : Sniffable, ISaslClientSide, IDisposable
 	{
+		/// <summary>
+		/// 25
+		/// </summary>
+		public const int DefaultSmtpPort = 25;
+
+		/// <summary>
+		/// 587
+		/// </summary>
+		public const int AlternativeSmtpPort = 587;
+
 		private readonly List<KeyValuePair<int, string>> response = new List<KeyValuePair<int, string>>();
 		private TaskCompletionSource<KeyValuePair<int, string>[]> responseSource = new TaskCompletionSource<KeyValuePair<int, string>[]>();
 		private RowTcpClient client;

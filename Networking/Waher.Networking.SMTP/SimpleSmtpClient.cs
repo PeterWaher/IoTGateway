@@ -37,9 +37,9 @@ namespace Waher.Networking.SMTP
 		private readonly object synchObj = new object();
 		private readonly string userName;
 		private readonly string password;
-		private readonly string domain;
 		private readonly string host;
 		private readonly int port;
+		private string domain;
 		private bool startTls = false;
 		//private bool smptUtf8 = false;
 		//private bool eightBitMime = false;
@@ -297,7 +297,8 @@ namespace Waher.Networking.SMTP
 		/// <param name="Domain">Domain</param>
 		/// <exception cref="IOException">If unable to execute command.</exception>
 		/// <exception cref="AuthenticationException">If transport authentication failed.</exception>
-		public async Task EHLO(string Domain)
+		/// <returns>Domain name, as seen by server.</returns>
+		public async Task<string> EHLO(string Domain)
 		{
 			this.startTls = false;
 			//this.size = null;
@@ -307,11 +308,31 @@ namespace Waher.Networking.SMTP
 			//this.enhancedStatusCodes = false;
 			//this.help = false;
 
-			await this.WriteLine("EHLO " + Domain);
+			if (string.IsNullOrEmpty(Domain))
+				await this.WriteLine("EHLO");
+			else
+				await this.WriteLine("EHLO " + Domain);
 
 			KeyValuePair<int, string>[] Response = await this.ReadResponse();
 			if (Response[0].Key < 200 || Response[0].Key >= 300)
 				throw new IOException("Request rejected.");
+
+			int i = Response[0].Value.LastIndexOf('[');
+			int j = Response[0].Value.LastIndexOf(']');
+			string ResponseDomain;
+
+			if (i >= 0 && j > i)
+			{
+				ResponseDomain = Response[0].Value.Substring(i + 1, j - i - 1);
+
+				if (string.IsNullOrEmpty(Domain))
+					Domain = ResponseDomain;
+
+				if (string.IsNullOrEmpty(this.domain))
+					this.domain = ResponseDomain;
+			}
+			else
+				ResponseDomain = string.Empty;
 
 			foreach (KeyValuePair<int, string> P in Response)
 			{
@@ -364,7 +385,7 @@ namespace Waher.Networking.SMTP
 				this.Information("TLS handshake complete.");
 				this.client.Continue();
 
-				await this.EHLO(Domain);
+				ResponseDomain = await this.EHLO(Domain);
 			}
 			else if (!(this.authMechanisms is null) && !string.IsNullOrEmpty(this.userName) && !string.IsNullOrEmpty(this.password))
 			{
@@ -404,12 +425,14 @@ namespace Waher.Networking.SMTP
 						if (!b.Value)
 							throw new AuthenticationException("Unable to authenticate user.");
 
-						return;
+						return ResponseDomain;
 					}
 				}
 
 				throw new AuthenticationException("No suitable and supported authentication mechanism found.");
 			}
+
+			return ResponseDomain;
 		}
 
 		private static readonly char[] space = new char[] { ' ' };

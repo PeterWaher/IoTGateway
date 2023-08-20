@@ -2395,6 +2395,7 @@ The following table lists recognized URI schemes:
 
 | URI Scheme | Module                        | Description |
 |:-----------|:------------------------------|:------------|
+| `aes256`   | `Waher.Networking.XMPP.HTTPX` | Retrieves content that has been previously encrypted. |
 | `data`     | `Waher.Content`               | Resource retrieved using content embedded in the URI itself. |
 | `http`     | `Waher.Content`               | Resource retrieved using the HTTP protocol. |
 | `https`    | `Waher.Content`               | Resource retrieved using the HTTPS protocol (HTTP+SSL/TLS). |

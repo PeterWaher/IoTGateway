@@ -2508,9 +2508,33 @@ namespace Waher.IoTGateway
 		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
 		/// the given set of privileges.
 		/// </summary>
-		public static RequiredUserPrivileges LoggedIn(params string[] Privileges)
+		/// <param name="Privileges">Required user privileges.</param>
+		public static RequiredUserPrivileges LoggedIn(string[] Privileges)
 		{
 			return new RequiredUserPrivileges(webServer, Privileges);
+		}
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
+		/// the given set of privileges.
+		/// </summary>
+		/// <param name="UserVariable">Name of user variable.</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public static RequiredUserPrivileges LoggedIn(string UserVariable, string[] Privileges)
+		{
+			return new RequiredUserPrivileges(UserVariable, webServer, Privileges);
+		}
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
+		/// the given set of privileges.
+		/// </summary>
+		/// <param name="UserVariable">Name of user variable.</param>
+		/// <param name="LoginPage">Login page.</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public static RequiredUserPrivileges LoggedIn(string UserVariable, string LoginPage, string[] Privileges)
+		{
+			return new RequiredUserPrivileges(UserVariable, LoginPage, webServer, Privileges);
 		}
 
 		/// <summary>

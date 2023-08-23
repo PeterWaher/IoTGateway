@@ -227,7 +227,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			HttpAuthenticationScheme Auth = Gateway.LoggedIn(this.ConfigPrivilege);
+			HttpAuthenticationScheme Auth = Gateway.LoggedIn(new string[] { this.ConfigPrivilege });
 
 			this.connectToJID = WebServer.Register("/Settings/ConnectToJID", null, this.ConnectToJID, true, false, true, Auth);
 			this.removeContact = WebServer.Register("/Settings/RemoveContact", null, this.RemoveContact, true, false, true, Auth);

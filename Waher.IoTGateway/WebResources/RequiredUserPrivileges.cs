@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Web;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -14,6 +15,8 @@ namespace Waher.IoTGateway.WebResources
 	{
 		private readonly HttpServer server;
 		private readonly string[] privileges;
+		private readonly string userVariable;
+		private readonly string loginPage;
 
 		/// <summary>
 		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
@@ -22,7 +25,34 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Server">HTTP Server object.</param>
 		/// <param name="Privileges">Required user privileges.</param>
 		public RequiredUserPrivileges(HttpServer Server, params string[] Privileges)
+			: this("User", string.Empty, Server, Privileges)
 		{
+		}
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
+		/// holds a given set of privileges.
+		/// </summary>
+		/// <param name="UserVariable">Name of user variable.</param>
+		/// <param name="Server">HTTP Server object.</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public RequiredUserPrivileges(string UserVariable, HttpServer Server, params string[] Privileges)
+			: this(UserVariable, string.Empty, Server, Privileges)
+		{
+		}
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
+		/// holds a given set of privileges.
+		/// </summary>
+		/// <param name="UserVariable">Name of user variable.</param>
+		/// <param name="LoginPage">Login page.</param>
+		/// <param name="Server">HTTP Server object.</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public RequiredUserPrivileges(string UserVariable, string LoginPage, HttpServer Server, params string[] Privileges)
+		{
+			this.userVariable = UserVariable;
+			this.loginPage = LoginPage;
 			this.server = Server;
 			this.privileges = Privileges;
 		}
@@ -58,9 +88,12 @@ namespace Waher.IoTGateway.WebResources
 			}
 
 			if (Variables is null ||
-				!Variables.TryGetVariable("User", out Variable v) ||
+				!Variables.TryGetVariable(this.userVariable, out Variable v) ||
 				!(v.ValueObject is IUser User))
 			{
+				if (!string.IsNullOrEmpty(this.loginPage))
+					throw new SeeOtherException(this.loginPage + "?from=" + HttpUtility.UrlEncode(Request.Header.GetURL(true, true)));
+
 				return Task.FromResult<IUser>(null);
 			}
 

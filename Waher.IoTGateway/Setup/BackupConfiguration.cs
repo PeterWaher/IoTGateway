@@ -73,7 +73,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			HttpAuthenticationScheme Auth = Gateway.LoggedIn(this.ConfigPrivilege);
+			HttpAuthenticationScheme Auth = Gateway.LoggedIn(new string[] { this.ConfigPrivilege });
 
 			WebServer.Register(this.exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, HostDomainOptions.SameForAllDomains, Auth));
 			WebServer.Register(this.keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, HostDomainOptions.SameForAllDomains, Auth));

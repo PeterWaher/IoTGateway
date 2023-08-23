@@ -161,7 +161,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Response">HTTP Response</param>
 		protected virtual async Task ConfigComplete(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
+			Gateway.AssertUserAuthenticated(Request, new string[] { this.ConfigPrivilege });
 			
 			await this.MakeCompleted();
 			

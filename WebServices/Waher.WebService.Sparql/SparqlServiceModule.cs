@@ -71,7 +71,7 @@ namespace Waher.WebService.Sparql
 			Schemes.Add(new DigestAuthentication(RequireEncryption, MinSecurityStrength, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
 
 			if (!(Gateway.HttpServer is null))
-				Schemes.Add(new RequiredUserPrivileges(Gateway.HttpServer, QueryPrivileges));
+				Schemes.Add(new RequiredUserPrivileges("User", "/Login.md", Gateway.HttpServer, QueryPrivileges));
 
 			this.sparqlEndpoint = new SparqlEndpoint("/sparql", Schemes.ToArray());
 			Gateway.HttpServer?.Register(this.sparqlEndpoint);

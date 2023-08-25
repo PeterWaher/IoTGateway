@@ -314,28 +314,7 @@ namespace Waher.Networking.HTTP
 					Folder = this.folderPath;
 				}
 				else
-				{
-					lock (this.folders)
-					{
-						if (!this.folders.TryGetValue(Host, out Folder))
-						{
-							Folder = this.folderPath + Path.DirectorySeparatorChar + Host;
-							if (!Directory.Exists(Folder))
-							{
-								if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
-								{
-									Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
-									if (!Directory.Exists(Folder))
-										Folder = this.folderPath;
-								}
-								else
-									Folder = this.folderPath;
-							}
-
-							this.folders[Host] = Folder;
-						}
-					}
-				}
+					Folder = this.GetRootHostFolder(Host);
 
 				if (Found = File.Exists(s2 = Folder + s))
 					return s2;
@@ -344,6 +323,47 @@ namespace Waher.Networking.HTTP
 			s2 = this.folderPath + s;
 			Found = !MustExist || File.Exists(s2);
 			return s2;
+		}
+
+		private string GetRootHostFolder(string Host)
+		{
+			lock (this.folders)
+			{
+				if (this.folders.TryGetValue(Host, out string Folder))
+					return Folder;
+
+				Folder = this.folderPath + Path.DirectorySeparatorChar + Host;
+				if (Directory.Exists(Folder))
+				{
+					this.folders[Host] = Folder;
+					return Folder;
+				}
+
+				if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
+				{
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
+					if (Directory.Exists(Folder))
+					{
+						this.folders[Host] = Folder;
+						return Folder;
+					}
+				}
+
+				int i = Host.IndexOf('.');
+				if (i > 0)
+				{
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(0, i);
+					if (Directory.Exists(Folder))
+					{
+						this.folders[Host] = Folder;
+						return Folder;
+					}
+				}
+
+				Folder = this.folderPath;
+				this.folders[Host] = Folder;
+				return Folder;
+			}
 		}
 
 		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);

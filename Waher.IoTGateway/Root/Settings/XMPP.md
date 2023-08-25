@@ -114,6 +114,11 @@ Good. Successfully connected to server. Now, please provide user credentials.
 </p>
 
 <p>
+<input type="checkbox" name="CreateAccount" id="CreateAccount" {{Config.CreateAccount ? "checked" : ""}} onclick="ToggleCreateAccount()"/>
+<label for="CreateAccount" title="If an account should be created on the server.">Create account on server.</label>
+</p>
+
+<p>
 <label for="Account">Account:</label>  
 <input id="Account" name="Account" type="text" style="width:20em" value="{{Config.Account}}" {{Config.Step=1 ? "autofocus" : ""}}/>
 </p>
@@ -128,11 +133,6 @@ Account does not exist or password is incorrect. If the account does not exist, 
 </p>
 <p id="Fail2" class="error" style="display:none">
 Password is incorrect, or a new account was not permitted to be created.
-</p>
-
-<p>
-<input type="checkbox" name="CreateAccount" id="CreateAccount" {{Config.CreateAccount ? "checked" : ""}} onclick="ToggleCreateAccount()"/>
-<label for="CreateAccount" title="If an account should be created on the server.">Create account on server.</label>
 </p>
 
 <div id="Create" style="display:{{Config.CreateAccount ? "block" : "none"}}">

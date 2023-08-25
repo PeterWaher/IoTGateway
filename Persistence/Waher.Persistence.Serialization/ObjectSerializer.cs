@@ -1621,6 +1621,16 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append("\t\t\t\t\t\t\tcase ");
 										CSharp.Append(TYPE_OBJECT);
 										CSharp.AppendLine(":");
+
+										CSharp.Append("\t\t\t\t\t\t\t\tif (this.serializer");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(" is null)");
+										CSharp.Append("\t\t\t\t\t\t\t\t\tthis.serializer");
+										CSharp.Append(Member.Name);
+										CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
+										AppendType(MemberType, CSharp);
+										CSharp.AppendLine("));");
+
 										CSharp.Append("\t\t\t\t\t\t\t\tResult.");
 										CSharp.Append(Member.Name);
 										CSharp.Append(" = (");
@@ -3113,6 +3123,17 @@ namespace Waher.Persistence.Serialization
 									else
 									{
 										CSharp.Append(Indent2);
+										CSharp.Append("if (this.serializer");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(" is null)");
+										CSharp.Append(Indent2);
+										CSharp.Append("\tthis.serializer");
+										CSharp.Append(Member.Name);
+										CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
+										AppendType(MemberType, CSharp);
+										CSharp.AppendLine("));");
+
+										CSharp.Append(Indent2);
 										CSharp.Append("await this.serializer");
 										CSharp.Append(Member.Name);
 										CSharp.Append(".Serialize(Writer, true, true, Value.");
@@ -4266,6 +4287,9 @@ namespace Waher.Persistence.Serialization
 									switch (FieldDataType)
 									{
 										case TYPE_OBJECT:
+											if (Member.NestedSerializer is null)
+												Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
+
 											Member.Set(Result, await Member.NestedSerializer.Deserialize(Reader, FieldDataType, true));
 											break;
 
@@ -4721,7 +4745,12 @@ namespace Waher.Persistence.Serialization
 									}
 								}
 								else
+								{
+									if (Member.NestedSerializer is null)
+										Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
+
 									await Member.NestedSerializer.Serialize(Writer, true, true, MemberValue, State);
+								}
 								break;
 						}
 					}

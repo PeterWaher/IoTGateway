@@ -50,7 +50,7 @@ namespace Waher.Networking
 		private readonly bool tls;
 #endif
 		private Cache<Guid, ServerTcpConnection> connections;
-		private object synchObj = new object();
+		private readonly object synchObj = new object();
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private int port;
@@ -167,8 +167,12 @@ namespace Waher.Networking
 		/// Opens the server for incoming connection requests.
 		/// </summary>
 		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
-		public async Task Open(LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners)
+		/// <return>Number of network nterfaces where port was successfully opened, vs failed.</return>
+		public async Task<KeyValuePair<int, int>> Open(LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners)
 		{
+			int NrOpened = 0;
+			int NrFailed = 0;
+
 			try
 			{
 				StreamSocketListener Listener;
@@ -206,21 +210,28 @@ namespace Waher.Networking
 							await Listener.BindServiceNameAsync(this.port.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
 							Listener.ConnectionReceived += this.Listener_ConnectionReceived;
 
+							NrOpened++;
 							this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
 						}
 						catch (Exception ex)
 						{
+							NrFailed++;
 							Log.Critical(ex, Profile.ProfileName);
 						}
 					}
 					else
+					{
+						NrOpened++;
 						this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
+					}
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
+
+			return new KeyValuePair<int, int>(NrOpened, NrFailed);
 		}
 
 		/// <summary>
@@ -246,6 +257,20 @@ namespace Waher.Networking
 		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
 		public Task Open(LinkedList<TcpListener> Listeners)
 		{
+			return this.Open(Listeners, out _, out _);
+		}
+
+		/// <summary>
+		/// Opens the server for incoming connection requests.
+		/// </summary>
+		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
+		/// <param name="NrOpened">Number of network interfaces where the port was successfully opened.</param>
+		/// <param name="NrFailed">Number of network interfaces where the port was not possible to be opened.</param>
+		public Task Open(LinkedList<TcpListener> Listeners, out int NrOpened, out int NrFailed)
+		{
+			NrOpened = 0;
+			NrFailed = 0;
+
 			try
 			{
 				TcpListener Listener;
@@ -290,21 +315,27 @@ namespace Waher.Networking
 									Listener.Start(DefaultConnectionBacklog);
 									Task T = this.ListenForIncomingConnections(Listener);
 
+									NrOpened++;
 									this.listeners.AddLast(Listener);
 								}
 								catch (SocketException)
 								{
+									NrFailed++;
 									Log.Error("Unable to open port for listening.",
 										new KeyValuePair<string, object>("Address", UnicastAddress.Address.ToString()),
 										new KeyValuePair<string, object>("Port", this.port));
 								}
 								catch (Exception ex)
 								{
+									NrFailed++;
 									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + this.port);
 								}
 							}
 							else
+							{
+								NrOpened++;
 								this.listeners.AddLast(Listener);
+							}
 						}
 					}
 				}

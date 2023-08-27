@@ -503,6 +503,14 @@
             </summary>
             <param name="Listeners">Optional list of existing listeners to reuse.</param>
         </member>
+        <member name="M:Waher.Networking.BinaryTcpServer.Open(System.Collections.Generic.LinkedList{System.Net.Sockets.TcpListener},System.Int32@,System.Int32@)">
+            <summary>
+            Opens the server for incoming connection requests.
+            </summary>
+            <param name="Listeners">Optional list of existing listeners to reuse.</param>
+            <param name="NrOpened">Number of network interfaces where the port was successfully opened.</param>
+            <param name="NrFailed">Number of network interfaces where the port was not possible to be opened.</param>
+        </member>
         <member name="M:Waher.Networking.BinaryTcpServer.Close(System.Boolean)">
             <summary>
             Closes the server from incoming connection requests.

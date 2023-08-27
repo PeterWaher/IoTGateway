@@ -66,9 +66,9 @@ namespace Waher.Utility.Install
 	/// 
 	/// Waher.Utility.Install.exe -i -p Waher.IoTGateway.Svc.package -k Testing -v -d "\ProgramData\IoT Gateway Dev" -s Waher.IoTGateway.Svc.exe
 	/// </example>
-	class Program
+	public class Program
 	{
-		static int Main(string[] args)
+		public static int Main(string[] args)
 		{
 			try
 			{
@@ -285,7 +285,7 @@ namespace Waher.Utility.Install
 							if (UninstallService)
 								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
 							else
-								InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly);
+								InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly, true);
 						}
 						else if (Packages.Count == 1)
 							GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
@@ -305,7 +305,7 @@ namespace Waher.Utility.Install
 				}
 				finally
 				{
-					if (GatewayRunning != null)
+					if (!(GatewayRunning is null))
 					{
 						if (GatewayRunningLocked)
 							GatewayRunning.Release();
@@ -314,7 +314,7 @@ namespace Waher.Utility.Install
 						GatewayRunning = null;
 					}
 
-					if (StartingServer != null)
+					if (!(StartingServer is null))
 					{
 						if (StartingServerLocked)
 							StartingServer.Release();
@@ -339,7 +339,7 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static AssemblyName GetAssemblyName(string ServerApplication)
+		public static AssemblyName GetAssemblyName(string ServerApplication)
 		{
 			if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
 				ServerApplication = ServerApplication[0..^4] + ".dll";
@@ -347,7 +347,7 @@ namespace Waher.Utility.Install
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
 
-		private static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
+		public static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -450,7 +450,7 @@ namespace Waher.Utility.Install
 						Assembly A = Assembly.LoadFrom(SourceFileName);
 						AssemblyName AN = A.GetName();
 
-						if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 						{
 							foreach (KeyValuePair<string, object> P in Targets)
 							{
@@ -487,7 +487,7 @@ namespace Waher.Utility.Install
 							}
 						}
 
-						if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+						if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
 							foreach (KeyValuePair<string, object> P in Libraries)
 							{
@@ -688,7 +688,7 @@ namespace Waher.Utility.Install
 			return Result;
 		}
 
-		private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly)
+		public static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly)
 		{
 			// Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers
 
@@ -777,7 +777,7 @@ namespace Waher.Utility.Install
 						AssemblyName AN = A.GetName();
 						string Key = AN.Name + "/" + AN.Version.ToString();
 
-						if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 						{
 							Targets.Remove(Key);
 
@@ -800,7 +800,7 @@ namespace Waher.Utility.Install
 							}
 						}
 
-						if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+						if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
 							foreach (KeyValuePair<string, object> P in Libraries)
 							{
@@ -849,7 +849,7 @@ namespace Waher.Utility.Install
 			return true;
 		}
 
-		private static void GeneratePackage(string[] ManifestFiles, string PackageFile, string Key)
+		public static void GeneratePackage(string[] ManifestFiles, string PackageFile, string Key)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1121,18 +1121,48 @@ namespace Waher.Utility.Install
 		}
 
 		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication,
-			string ProgramDataFolder, bool ContentOnly)
+			string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
 			foreach (KeyValuePair<string, string> Package in Packages)
-				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, ContentOnly);
+				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
+		public static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
-			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
-
 			if (string.IsNullOrEmpty(PackageFile))
 				throw new Exception("Missing package file.");
+
+			using FileStream fs = File.OpenRead(PackageFile);
+			
+			if (string.IsNullOrEmpty(Key))
+				InstallPackage(fs, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
+			else
+			{
+				string LocalName = Path.GetFileName(PackageFile);
+				SHAKE256 H = new SHAKE256(384);
+				byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
+				byte[] AesKey = new byte[32];
+				byte[] IV = new byte[16];
+
+				Array.Copy(Digest, 0, AesKey, 0, 32);
+				Array.Copy(Digest, 32, IV, 0, 16);
+
+				using Aes Aes = Aes.Create();
+				Aes.BlockSize = 128;
+				Aes.KeySize = 256;
+				Aes.Mode = CipherMode.CBC;
+				Aes.Padding = PaddingMode.Zeros;
+
+				using ICryptoTransform AesTransform = Aes.CreateDecryptor(AesKey, IV);
+				using CryptoStream Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
+
+				InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
+			}
+		}
+
+		public static void InstallPackage(Stream PackageStream, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
 			if (string.IsNullOrEmpty(ServerApplication))
 				throw new Exception("Missing server application.");
@@ -1143,14 +1173,14 @@ namespace Waher.Utility.Install
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
-			if (!File.Exists(ServerApplication))
+			if (ServerExists && !File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
 
 			Dictionary<string, object> Deps;
 			string DepsJsonFileName;
 			AssemblyName ServerName;
 
-			if (ContentOnly)
+			if (ContentOnly || !ServerExists)
 			{
 				ServerName = null;
 				Deps = null;
@@ -1188,33 +1218,12 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Loading package file.");
 
-			string LocalName = Path.GetFileName(PackageFile);
-			SHAKE256 H = new SHAKE256(384);
-			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
-			byte[] AesKey = new byte[32];
-			byte[] IV = new byte[16];
-			byte[] Buffer = new byte[65536];
-			Aes Aes = null;
-			FileStream fs = null;
-			ICryptoTransform AesTransform = null;
-			CryptoStream Decrypted = null;
 			GZipStream Decompressed = null;
-
-			Array.Copy(Digest, 0, AesKey, 0, 32);
-			Array.Copy(Digest, 32, IV, 0, 16);
+			byte[] Buffer = new byte[65536];
 
 			try
 			{
-				Aes = Aes.Create();
-				Aes.BlockSize = 128;
-				Aes.KeySize = 256;
-				Aes.Mode = CipherMode.CBC;
-				Aes.Padding = PaddingMode.Zeros;
-
-				fs = File.OpenRead(PackageFile);
-				AesTransform = Aes.CreateDecryptor(AesKey, IV);
-				Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
-				Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
+				Decompressed = new GZipStream(PackageStream, CompressionMode.Decompress);
 
 				byte b = ReadByte(Decompressed);
 				byte[] Bin;
@@ -1229,11 +1238,9 @@ namespace Waher.Utility.Install
 				if (Encoding.ASCII.GetString(Bin) != "IoTGatewayPackage")
 					throw new Exception("Invalid package file.");
 
-				string SourceFolder = Path.GetDirectoryName(PackageFile);
 				string AppFolder = Path.GetDirectoryName(ServerApplication);
 				string ExternalFolder = AppFolder;
 
-				Log.Informational("Source folder: " + SourceFolder);
 				Log.Informational("App folder: " + AppFolder);
 
 				while ((b = ReadByte(Decompressed)) != 0)
@@ -1303,7 +1310,7 @@ namespace Waher.Utility.Install
 
 										AssemblyName AN = A.GetName();
 
-										if (Deps != null &&
+										if (!(Deps is null) &&
 											Deps.TryGetValue("targets", out object Obj) &&
 											Obj is Dictionary<string, object> Targets)
 										{
@@ -1342,7 +1349,7 @@ namespace Waher.Utility.Install
 											}
 										}
 
-										if (Deps != null &&
+										if (!(Deps is null) &&
 											Deps.TryGetValue("libraries", out object Obj3) &&
 											Obj3 is Dictionary<string, object> Libraries)
 										{
@@ -1409,10 +1416,6 @@ namespace Waher.Utility.Install
 			finally
 			{
 				Decompressed?.Dispose();
-				Decrypted?.Dispose();
-				AesTransform?.Dispose();
-				Aes?.Dispose();
-				fs?.Dispose();
 			}
 		}
 
@@ -1505,7 +1508,7 @@ namespace Waher.Utility.Install
 				UninstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, Remove, ContentOnly);
 		}
 
-		private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder,
+		public static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder,
 			bool Remove, bool ContentOnly)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -1645,7 +1648,7 @@ namespace Waher.Utility.Install
 										AssemblyName AN = A.GetName();
 										Key = AN.Name + "/" + AN.Version.ToString();
 
-										if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+										if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 										{
 											Targets.Remove(Key);
 
@@ -1668,7 +1671,7 @@ namespace Waher.Utility.Install
 											}
 										}
 
-										if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+										if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 										{
 											foreach (KeyValuePair<string, object> P in Libraries)
 											{

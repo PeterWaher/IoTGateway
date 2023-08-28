@@ -55,13 +55,13 @@ namespace Waher.IoTGateway.CodeContent
 			this.document = Document;
 
 			if (!Document.TryGetMetaData("JAVASCRIPT", out KeyValuePair<string, bool>[] Values) ||
-				!this.Contains(Values, "/Events.js"))
+				!Contains(Values, "/Events.js"))
 			{
 				Document.AddMetaData("JAVASCRIPT", "/Events.js");
 			}
 		}
 
-		private bool Contains(KeyValuePair<string, bool>[] Values, string Value)
+		private static bool Contains(KeyValuePair<string, bool>[] Values, string Value)
 		{
 			foreach (KeyValuePair<string, bool> P in Values)
 			{
@@ -121,7 +121,7 @@ namespace Waher.IoTGateway.CodeContent
 			State.Variables.ConsoleOut = new StringWriter(State.ImplicitPrint);
 			Document.Settings.Variables.CopyTo(State.Variables);
 
-			Document.QueueAsyncTask(this.ExecuteScript,State);
+			Document.QueueAsyncTask(this.ExecuteScript, State);
 
 			return true;
 		}

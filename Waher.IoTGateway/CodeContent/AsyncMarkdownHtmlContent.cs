@@ -78,7 +78,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="More">If more information will be sent in another call.</param>
 		public Task ReportResult(MarkdownOutputType Type, string Id, string Result, bool More)
 		{
-			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Result), true);
+			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Result), More);
 		}
 	}
 }

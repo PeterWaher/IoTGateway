@@ -1133,34 +1133,34 @@ namespace Waher.Utility.Install
 				throw new Exception("Missing package file.");
 
 			using FileStream fs = File.OpenRead(PackageFile);
-			
-			if (string.IsNullOrEmpty(Key))
-				InstallPackage(fs, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
-			else
-			{
-				string LocalName = Path.GetFileName(PackageFile);
-				SHAKE256 H = new SHAKE256(384);
-				byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
-				byte[] AesKey = new byte[32];
-				byte[] IV = new byte[16];
 
-				Array.Copy(Digest, 0, AesKey, 0, 32);
-				Array.Copy(Digest, 32, IV, 0, 16);
-
-				using Aes Aes = Aes.Create();
-				Aes.BlockSize = 128;
-				Aes.KeySize = 256;
-				Aes.Mode = CipherMode.CBC;
-				Aes.Padding = PaddingMode.Zeros;
-
-				using ICryptoTransform AesTransform = Aes.CreateDecryptor(AesKey, IV);
-				using CryptoStream Decrypted = new CryptoStream(fs, AesTransform, CryptoStreamMode.Read);
-
-				InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
-			}
+			InstallPackage(PackageFile, fs, Key, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(Stream PackageStream, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		{
+			string LocalName = Path.GetFileName(FileName);
+			SHAKE256 H = new SHAKE256(384);
+			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
+			byte[] AesKey = new byte[32];
+			byte[] IV = new byte[16];
+
+			Array.Copy(Digest, 0, AesKey, 0, 32);
+			Array.Copy(Digest, 32, IV, 0, 16);
+
+			using Aes Aes = Aes.Create();
+			Aes.BlockSize = 128;
+			Aes.KeySize = 256;
+			Aes.Mode = CipherMode.CBC;
+			Aes.Padding = PaddingMode.Zeros;
+
+			using ICryptoTransform AesTransform = Aes.CreateDecryptor(AesKey, IV);
+			using CryptoStream Decrypted = new CryptoStream(Encrypted, AesTransform, CryptoStreamMode.Read);
+
+			InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
+		}
+
+		public static void InstallPackage(Stream Decrypted, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1223,7 +1223,7 @@ namespace Waher.Utility.Install
 
 			try
 			{
-				Decompressed = new GZipStream(PackageStream, CompressionMode.Decompress);
+				Decompressed = new GZipStream(Decrypted, CompressionMode.Decompress);
 
 				byte b = ReadByte(Decompressed);
 				byte[] Bin;

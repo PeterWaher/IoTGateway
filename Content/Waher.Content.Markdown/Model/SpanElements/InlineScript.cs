@@ -4,14 +4,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Emoji;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
-using Waher.Script.Constants;
-using Waher.Script.Functions.Analytic;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -188,11 +185,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 			}
 			else if (Result is MarkdownDocument Doc)
-				await Doc.GenerateMarkdown(Output, true);
+			{
+				await Doc.GenerateMarkdown(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
 			else if (Result is MarkdownContent Markdown)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
-				await Doc.GenerateMarkdown(Output, true);
+				await Doc.GenerateMarkdown(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
 			}
 			else if (Result is Exception ex)
 			{
@@ -371,11 +372,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 			}
 			else if (Result is MarkdownDocument Doc)
-				await Doc.GenerateHTML(Output, true);
+			{
+				await Doc.GenerateHTML(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
 			else if (Result is MarkdownContent Markdown)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
-				await Doc.GenerateHTML(Output, true);
+				await Doc.GenerateHTML(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
 			}
 			else if (Result is Exception ex)
 			{
@@ -564,11 +569,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 			}
 			else if (Result is MarkdownDocument Doc)
-				await Doc.GenerateXAML(Output, true);
+			{
+				await Doc.GenerateXAML(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
 			else if (Result is MarkdownContent Markdown)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
-				await Doc.GenerateXAML(Output, true);
+				await Doc.GenerateXAML(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
 			}
 			else if (Result is Exception ex)
 			{
@@ -694,11 +703,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 			}
 			else if (Result is MarkdownDocument Doc)
-				await Doc.GenerateXamarinForms(Output, true);
+			{
+				await Doc.GenerateXamarinForms(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
 			else if (Result is MarkdownContent Markdown)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
-				await Doc.GenerateXamarinForms(Output, true);
+				await Doc.GenerateXamarinForms(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
 			}
 			else if (Result is Exception ex)
 			{
@@ -877,11 +890,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 			}
 			else if (Result is MarkdownDocument Doc)
-				await Doc.GenerateLaTeX(Output, true);
+			{
+				await Doc.GenerateLaTeX(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
 			else if (Result is MarkdownContent Markdown)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
-				await Doc.GenerateLaTeX(Output, true);
+				await Doc.GenerateLaTeX(Output, true);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
 			}
 			else if (Result is Exception ex)
 			{

@@ -6922,7 +6922,7 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		private void ProcessAsyncTasks()
+		internal void ProcessAsyncTasks()
 		{
 			KeyValuePair<AsyncMarkdownProcessing, object>[] Tasks;
 

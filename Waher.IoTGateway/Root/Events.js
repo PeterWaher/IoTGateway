@@ -343,36 +343,50 @@ function LoadContent(Id)
 			{
 				if (xhttp.status === 200)
 				{
+					console.log("Received asynchronous content " + Id);
+
 					var Div = document.getElementById("id" + Id);
 					if (Div)
 						SetDynamicHtml(Div, xhttp.responseText);
 
 					if (xhttp.getResponseHeader("X-More") === "1")
 					{
+						console.log("Loading more asynchronous content from " + Id);
 						xhttp.open("GET", "/ClientEvents/" + Id, true);
 						xhttp.send();
 						return;
 					}
 				}
 				else
+				{
+					console.log("Unable to receive asynchronous content " + Id);
 					ShowError(xhttp);
+				}
 
 				if (ContentQueue.length === 0)
+				{
+					console.log("Loading of asynchronous content completed.");
 					ContentQueue = null;
+				}
 				else
 				{
 					Id = ContentQueue.shift();
+					console.log("Loading asynchronous content " + Id);
 					xhttp.open("GET", "/ClientEvents/" + Id, true);
 					xhttp.send();
 				}
 			};
 		}
 
+		console.log("Loading asynchronous content " + Id);
 		xhttp.open("GET", "/ClientEvents/" + Id, true);
 		xhttp.send();
 	}
 	else
+	{
+		console.log("Queueing loading of asynchronous content " + Id);
 		ContentQueue.push(Id);
+	}
 }
 
 function SetDynamicHtml(ParentElement, Html)

@@ -583,6 +583,7 @@ There are various different membership operators. All have the same [order of pr
 | `IS`       | The `IS` operator checks if the left operand is of the same type as the right operand. | `Value is Type` |
 | `INHERITS` | The `INHERITS` operator checks if the left operand inherits the type defined by the right operand. | `Value inherits Type` |
 | `IN`       | The `IN` operator checks if the left operand is a member of the right operand. | `Value in Set` |
+| `MATCHES`  | The `MATCHES` operator checks if the left operand matches the construct of the right operand using [pattern matching](#assignmentPatternMatching), and return `true` of the left operand matches the right, and `false` otherwise. If there's a match, any implicit variables are set accordingly. | `v matches [a,b,c]` |
 | `NOT IN`   | The `NOT IN` or `NOTIN` operator checks if the left operand is not a member of the right operand. | `Value not in Set` |
 | `NOTIN`    | The `NOT IN` or `NOTIN` operator checks if the left operand is not a member of the right operand. | `Value notin Set` |
 
@@ -676,7 +677,7 @@ A variable assignment is defined using the `:=` operator. Example:
 #### Assignment, Pattern Matching
 
 If the left side is not a variable reference, a pattern matching algorithm is employed that tries to assign all implicitly available variable references
-by comparing both sides. 
+by comparing both sides.
 
 Examples:
 
@@ -691,6 +692,14 @@ a vector. If the result of the function call is not a vector, it is converted to
 example matches the 2x2 matrix result evaluated on the right, with the matrix notation on the left. The fourth example matches an
 object created ex-nihilo (such as a JSON object), with an object definition, including checks of data types (and possible conversions),
 tests of valid values, as well as checks for required and optional fields.
+
+The `MATCHES` operator can also be used. It returns `true` if there's a pattern match (and implicit variables are assigned 
+accordingly), or `false`if there's not a pattern match. The above examples become:
+
+	f(a,b,c) matches [x,y]
+	f(a,b,c) matches v[]
+	Identity(2) matches [[a11,a12],[a21,a22]]
+	Obj matches {"name":Str(Required(Name)),"age":Required(0 <= Int(Age) <= 100)),"profession":Optional(Str(Profession))}
 
 #### Special Assignment Operators
 

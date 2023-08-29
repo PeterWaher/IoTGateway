@@ -119,6 +119,7 @@ namespace Waher.Script
 				{ "INTERSECTION", true },
 				{ "IS", true },
 				{ "LIKE", true },
+				{ "MATCHES", true },
 				{ "MOD", true },
 				{ "NAND", true },
 				{ "NOR", true },
@@ -1537,6 +1538,7 @@ namespace Waher.Script
 				{
 					case 'A':
 					case 'I':
+					case 'M':
 					case 'N':
 					case '∈':
 					case '∉':
@@ -1558,6 +1560,12 @@ namespace Waher.Script
 								this.pos += 2;
 								Right = this.AssertRightOperandNotNull(this.ParseComparison());
 								Left = new As(Left, Right, Start, this.pos - Start, this);
+								continue;
+
+							case "MATCHES":
+								this.pos += 7;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new Matches(Left, Right, Start, this.pos - Start, this);
 								continue;
 
 							case "∈":

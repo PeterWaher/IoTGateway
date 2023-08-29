@@ -20527,6 +20527,35 @@
             How scalar operands of different types are to be treated. By default, scalar operands are required to be of the same type.
             </summary>
         </member>
+        <member name="T:Waher.Script.Operators.Membership.Matches">
+            <summary>
+            Matches operator
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Matches.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Matches operator.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Matches.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Matches.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Membership.NamedMember">
             <summary>
             Named member operator

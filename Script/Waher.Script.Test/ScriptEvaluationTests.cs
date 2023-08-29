@@ -421,6 +421,8 @@ namespace Waher.Script.Test
 			await Test("a INHERITS System.Double", true);
 			await Test("Waher.Runtime.Inventory.Grade INHERITS System.Enum", true);
 			await Test("Waher.Runtime.Inventory.Grade.Ok INHERITS System.Enum", true);
+
+			await Test("Identity(2) matches [[e11,e12],[e21,e22]] ? [e11,e12,e21,e22]", new object[] { 1, 0, 0, 1 });
 		}
 
 		[TestMethod]

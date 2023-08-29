@@ -48,8 +48,16 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 				!(v.ValueObject is string SubPath) ||
 				!Variables.TryGetVariable("Request", out v) ||
 				!(v.ValueObject is HttpRequest Request) ||
-				string.Compare(SubPath, Request.SubPath, true) != 0)
+				string.Compare(SubPath, Request.SubPath, true) != 0 ||
+				!Request.HasData)
 			{
+				if (!(v is null))
+				{
+					Variables.Remove(" LastPost ");
+					Variables.Remove(" LastPostResource ");
+					Variables.Remove(" LastPostReferer ");
+				}
+
 				return ObjectValue.Null;
 			}
 

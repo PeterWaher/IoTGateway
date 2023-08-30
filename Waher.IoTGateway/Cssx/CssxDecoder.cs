@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
@@ -69,7 +68,7 @@ namespace Waher.IoTGateway.Cssx
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, System.Text.Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			return Task.FromResult<object>(CommonTypes.GetString(Data, Encoding));
 		}

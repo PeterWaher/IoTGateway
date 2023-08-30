@@ -29,7 +29,7 @@ namespace Waher.IoTGateway.Exceptions
 			{
 				CloseOutput = true,
 				ConformanceLevel = ConformanceLevel.Document,
-				Encoding = Encoding.UTF8,
+				Encoding = System.Text.Encoding.UTF8,
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\n",
@@ -95,7 +95,7 @@ namespace Waher.IoTGateway.Exceptions
 							if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
 								Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
 							{
-								s = Encoding.Default.GetString(Buffer, Last, i - Last);
+								s = System.Text.Encoding.Default.GetString(Buffer, Last, i - Last);
 								Process(s, Statistics);
 
 								i += 5;
@@ -112,7 +112,7 @@ namespace Waher.IoTGateway.Exceptions
 
 					if (Last < NrRead)
 					{
-						s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
+						s = System.Text.Encoding.Default.GetString(Buffer, Last, NrRead - Last);
 						Process(s, Statistics);
 					}
 				}

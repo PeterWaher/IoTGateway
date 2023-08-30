@@ -1009,7 +1009,7 @@ namespace Waher.IoTGateway.Setup
 				sb.Append(P.Value);
 			}
 
-			byte[] Digest = Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(Password), Encoding.UTF8.GetBytes(sb.ToString()));
+			byte[] Digest = Hashes.ComputeHMACSHA256Hash(System.Text.Encoding.UTF8.GetBytes(Password), System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
 
 			return Convert.ToBase64String(Digest);
 		}

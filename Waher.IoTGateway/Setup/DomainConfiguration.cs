@@ -700,7 +700,7 @@ namespace Waher.IoTGateway.Setup
 					}
 
 					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-					string Token = Encoding.ASCII.GetString(Bin);
+					string Token = System.Text.Encoding.ASCII.GetString(Bin);
 
 					if (Token != this.token)
 						return "Unexpected response returned. Domain name does not point to this machine.";
@@ -1338,7 +1338,7 @@ namespace Waher.IoTGateway.Setup
 											PemOutput.AppendLine("-----END CERTIFICATE-----");
 
 											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
-											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), Encoding.ASCII);
+											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 
 											await Status.Invoke(this, "Generating temporary key file.");
 
@@ -1352,7 +1352,7 @@ namespace Waher.IoTGateway.Setup
 
 											KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
 
-											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
+											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 										}
 
 										await Status.Invoke(this, "Converting to PFX using " + OpenSslFile);
@@ -1456,7 +1456,7 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 			Response.ContentType = "application/octet-stream";
-			return Response.Write(Encoding.ASCII.GetBytes(this.token));
+			return Response.Write(System.Text.Encoding.ASCII.GetBytes(this.token));
 		}
 
 		private async Task SaveNames(HttpRequest Request, HttpResponse Response)

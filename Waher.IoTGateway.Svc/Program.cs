@@ -424,8 +424,8 @@ namespace Waher.IoTGateway.Svc
 
 			Types.SetModuleParameter("Data", Folder);
 
-			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, 
-				Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
+			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
+				System.Text.Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
 		}
 
 		internal static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

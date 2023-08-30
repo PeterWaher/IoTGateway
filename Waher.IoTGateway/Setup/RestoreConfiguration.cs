@@ -1066,7 +1066,7 @@ namespace Waher.IoTGateway.Setup
 								break;
 
 							case "S64":
-								Value = Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
+								Value = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
 								break;
 
 							case "Null":
@@ -1115,7 +1115,7 @@ namespace Waher.IoTGateway.Setup
 								break;
 
 							case "CIS64":
-								Value = (CaseInsensitiveString)Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
+								Value = (CaseInsensitiveString)System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(r.Value));
 								break;
 
 							case "DT":
@@ -1431,7 +1431,7 @@ namespace Waher.IoTGateway.Setup
 			bool ImportCollection = !OnlySelectedCollections;
 			bool ImportPart;
 
-			using (BinaryReader r = new BinaryReader(BackupFile, Encoding.UTF8, true))
+			using (BinaryReader r = new BinaryReader(BackupFile, System.Text.Encoding.UTF8, true))
 			{
 				string s = r.ReadString();
 				if (s != BinaryExportFormat.Preamble)

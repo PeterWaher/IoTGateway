@@ -151,7 +151,7 @@ namespace Waher.IoTGateway.Cssx
 			}
 		}
 
-		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
+		internal static readonly System.Text.Encoding Utf8WithBOM = new UTF8Encoding(true);
 
 	}
 }

@@ -1558,7 +1558,7 @@ namespace Waher.IoTGateway
 		public static byte[] ComputeUserPasswordHash(string UserName, string Password)
 		{
 			SHA3_256 H = new SHA3_256();
-			return H.ComputeVariable(Encoding.UTF8.GetBytes(UserName + ":" + domain + ":" + Password));
+			return H.ComputeVariable(System.Text.Encoding.UTF8.GetBytes(UserName + ":" + domain + ":" + Password));
 		}
 
 		internal static bool UpdateCertificate(DomainConfiguration Configuration)
@@ -4241,7 +4241,7 @@ namespace Waher.IoTGateway
 				string Html = await GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
 
 				if (!string.IsNullOrEmpty(Html))
-					e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
+					e.SetContent("text/html; charset=utf-8", System.Text.Encoding.UTF8.GetBytes(Html));
 			}
 		}
 
@@ -4323,7 +4323,7 @@ namespace Waher.IoTGateway
 						Detail = null;
 					else
 					{
-						Encoding Encoding = null;
+						System.Text.Encoding Encoding = null;
 						int i = ContentType.IndexOf(';');
 
 						if (i > 0)

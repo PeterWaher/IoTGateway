@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.IoTGateway;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -10,9 +9,10 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Things.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Functions
 {
 	/// <summary>
 	/// Reads sensor data from a sensor node.

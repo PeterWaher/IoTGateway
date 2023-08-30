@@ -3,8 +3,9 @@ using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Things;
 
-namespace Waher.Things.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Functions
 {
 	/// <summary>
 	/// Gets available sources of things.

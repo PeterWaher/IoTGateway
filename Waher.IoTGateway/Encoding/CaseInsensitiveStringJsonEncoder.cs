@@ -5,7 +5,7 @@ using Waher.Content.Json;
 using Waher.Persistence;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Script.Persistence.Encoding
+namespace Waher.IoTGateway.Encoding
 {
 	/// <summary>
 	/// Encodes <see cref="string"/> values.

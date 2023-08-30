@@ -5,9 +5,10 @@ using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Things;
 using Waher.Things.Metering;
 
-namespace Waher.Things.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Functions
 {
 	/// <summary>
 	/// Gets a node object on the gateway.

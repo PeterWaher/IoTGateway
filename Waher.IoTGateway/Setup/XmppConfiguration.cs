@@ -879,10 +879,10 @@ namespace Waher.IoTGateway.Setup
 									Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 									byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 									string CharSet = Response.Content.Headers.ContentType.CharSet;
-									Encoding Encoding;
+									System.Text.Encoding Encoding;
 
 									if (string.IsNullOrEmpty(CharSet))
-										Encoding = Encoding.UTF8;
+										Encoding = System.Text.Encoding.UTF8;
 									else
 										Encoding = InternetContent.GetEncoding(CharSet);
 

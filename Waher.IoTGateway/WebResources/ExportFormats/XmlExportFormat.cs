@@ -415,7 +415,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							}
 							catch (XmlException)
 							{
-								byte[] Bin = Encoding.UTF8.GetBytes(s);
+								byte[] Bin = System.Text.Encoding.UTF8.GetBytes(s);
 								s = Convert.ToBase64String(Bin);
 								await this.output.WriteStartElementAsync(string.Empty, "S64", Export.ExportNamepace);
 								if (!(PropertyName is null))
@@ -488,7 +488,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 								}
 								catch (XmlException)
 								{
-									byte[] Bin = Encoding.UTF8.GetBytes(s);
+									byte[] Bin = System.Text.Encoding.UTF8.GetBytes(s);
 									s = Convert.ToBase64String(Bin);
 									await this.output.WriteStartElementAsync(string.Empty, "CIS64", Export.ExportNamepace);
 									if (!(PropertyName is null))

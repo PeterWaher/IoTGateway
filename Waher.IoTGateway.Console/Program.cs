@@ -222,7 +222,7 @@ namespace Waher.IoTGateway.Console
 			Types.SetModuleParameter("Data", Folder);
 
 			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
-				Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
+				System.Text.Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
 		}
 
 		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

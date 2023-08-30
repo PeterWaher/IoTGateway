@@ -138,7 +138,7 @@ namespace Waher.IoTGateway.WebResources
 		private static bool analyzing = false;
 		private static readonly object synchObject = new object();
 		private static XslCompiledTransform xslt = null;
-		internal static Encoding utf8Bom = new UTF8Encoding(true);
+		internal static System.Text.Encoding utf8Bom = new UTF8Encoding(true);
 
 		/// <summary>
 		/// Analyzes the object database

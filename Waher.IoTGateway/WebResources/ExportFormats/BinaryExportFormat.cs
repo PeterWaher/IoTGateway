@@ -187,7 +187,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			: base(FileName, Created, File, OnlySelectedCollections, SelectedCollections)
 		{
 			this.output = Output;
-			this.w = new BinaryWriter(this.output, Encoding.UTF8);
+			this.w = new BinaryWriter(this.output, System.Text.Encoding.UTF8);
 			this.cs = CryptoStream;
 			this.blockSize = BlockSize;
 		}

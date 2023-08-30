@@ -2393,6 +2393,16 @@ about the script functions referenced in this section is available in the [Neuro
 | `BuyEDalerService(Definition)`   | Creates a script-based service for buying eDaler(R).  |
 | `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
 
+#### OpenAI Extensions (available in TAG.XmppOpenAIBridge.package)
+
+The following functions are available on systems with the `TAG.XmppOpenAIBridge.package` installed. A more detailed description
+about the OpenAI-related functions referenced in this section is available in the [XmppOpenAIBridge repository](https://github.com/Trust-Anchor-Group/XmppOpenAIBridge).
+
+| Function                                              | Description                                           |
+|-------------------------------------------------------|-------------------------------------------------------|
+| `ChatGptConfigured()`                                 | Checks if Chat GPT is configured correctly. It requires a Chat GPT<->XMPP Bridge node to be configured in the `MeteringTology` source, with the Node ID `ChatGPT`. |
+| `ChatGpt(Instruction[,Sender],Text,History[,Preview]) | Calls the chat completion API of OpenAI (ChatGPT). The `Instruction` argument contains initialization instructions. The optional `Sender` argument contains the JID of the sender. If not provided, the JID of the quick-login user will be used. Text is the chat message to send. `History` is a boolean parameter that indicates if the session history should be included in the query. The optional `Preview` argument indicates if intermediate responses are previewed during the execution of the query. |
+
 =========================================================================================================================================================
 
 URI Schemes

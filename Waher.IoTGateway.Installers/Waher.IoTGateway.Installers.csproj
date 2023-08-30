@@ -246,6 +246,7 @@
     <Compile Include=".bak\Waher.Script\Operators\CreateMeasurement.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Matrices\IToMatrix.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Membership\Inherits.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Membership\Matches.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\IToVector.cs" />

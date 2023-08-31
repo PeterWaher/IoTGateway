@@ -69,7 +69,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>Exception object.</returns>
 		public static ForbiddenException AccessDenied(string ObjectId, string ActorId, string MissingPrivilege)
 		{
-			return AccessDenied("Access denied.", ObjectId, ActorId, MissingPrivilege);
+			return AccessDenied("Access denied. Missing privileges.", ObjectId, ActorId, MissingPrivilege);
 		}
 
 		/// <summary>
@@ -85,7 +85,7 @@ namespace Waher.Networking.HTTP
 			Log.Notice(Message, ObjectId, ActorId, "AccessDenied",
 				new KeyValuePair<string, object>("MissingPrivilege", MissingPrivilege));
 
-			return new ForbiddenException("Access denied.");
+			return new ForbiddenException("Access denied. Missing privileges.");
 		}
 	}
 }

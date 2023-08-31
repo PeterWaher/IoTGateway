@@ -1965,7 +1965,7 @@ namespace Waher.Networking.XMPP
 										if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
 											this.ProcessIq(this.iqGetHandlers, ie);
 										else
-											ie.IqError(new ForbiddenException("Access denied.", E));
+											ie.IqError(new ForbiddenException("Access denied. Invalid sender.", E));
 									}
 									break;
 
@@ -1983,7 +1983,7 @@ namespace Waher.Networking.XMPP
 										if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
 											this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 										else
-											ie.IqError(new ForbiddenException("Access denied.", E));
+											ie.IqError(new ForbiddenException("Access denied. Invalid sender.", E));
 									}
 									break;
 

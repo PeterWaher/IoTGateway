@@ -81,7 +81,7 @@ namespace Waher.WebService.Sparql
 		private static void CheckAuthorization(HttpRequest Request)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.QueryPrivileges))
-				throw new ForbiddenException("Access denied.");
+				throw new ForbiddenException("Access to endpoint denied.");
 		}
 
 		private async Task<(SparqlQuery, ISemanticCube[], string[], bool)> GetQueryGraphs(

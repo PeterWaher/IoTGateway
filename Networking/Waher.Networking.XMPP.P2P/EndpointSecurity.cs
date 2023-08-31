@@ -1721,7 +1721,7 @@ namespace Waher.Networking.XMPP.P2P
 				Item.State == SubscriptionState.Remove ||
 				Item.State == SubscriptionState.Unknown))
 			{
-				throw new ForbiddenException("Access denied.", e.IQ);
+				throw new ForbiddenException("Access denied. Unable to synchronize E2EE.", e.IQ);
 			}
 
 			await this.ParseE2e(e.Query, e.From);

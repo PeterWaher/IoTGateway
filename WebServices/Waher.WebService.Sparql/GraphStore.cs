@@ -96,7 +96,7 @@ namespace Waher.WebService.Sparql
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.GetPrivileges))
-				throw new ForbiddenException("Access denied.");
+				throw new ForbiddenException("Access to store denied.");
 
 			ISemanticModel Graph;
 
@@ -240,7 +240,7 @@ namespace Waher.WebService.Sparql
 		public Task PUT(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.AddPrivileges))
-				throw new ForbiddenException("Access denied.");
+				throw new ForbiddenException("Access to store denied.");
 
 			return this.Update(Request, Response, true);
 		}
@@ -442,7 +442,7 @@ namespace Waher.WebService.Sparql
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.DeletePrivileges))
-				throw new ForbiddenException("Access denied.");
+				throw new ForbiddenException("Access to store denied.");
 
 			(GraphReference Reference, Uri _) = await GetGraphReference(Request, false);
 			bool FilesDeleted = false;
@@ -476,7 +476,7 @@ namespace Waher.WebService.Sparql
 		public Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.UpdatePrivileges))
-				throw new ForbiddenException("Access denied.");
+				throw new ForbiddenException("Access to store denied.");
 
 			return this.Update(Request, Response, false);
 		}

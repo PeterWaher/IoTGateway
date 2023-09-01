@@ -2398,47 +2398,78 @@ about the script functions referenced in this section is available in the [Neuro
 The following functions are available on systems with the `TAG.XmppOpenAIBridge.package` installed. A more detailed description
 about the OpenAI-related functions referenced in this section is available in the [XmppOpenAIBridge repository](https://github.com/Trust-Anchor-Group/XmppOpenAIBridge).
 
-| Function                                                                      | Description                                           |
-|-------------------------------------------------------------------------------|-------------------------------------------------------|
-| `ChatGpt(Instruction[,Sender],Text[,Functions],History[,Preview])             | Calls the chat completion API of OpenAI (ChatGPT). The `Instruction` argument contains initialization instructions. The optional `Sender` argument contains the JID of the sender. If not provided, the JID of the quick-login user will be used. Text is the chat message to send. `Functions` contains a single function definition or a vector of function definitions the API can call if it chooses to. `History` is a boolean parameter that indicates if the session history should be included in the query. The optional `Preview` argument indicates if intermediate responses are previewed during the execution of the query. The response to the call will be a message object containing either text content and/or information about a function to call. |
-| `ChatGptConfigured()`                                                         | Checks if Chat GPT is configured correctly. It requires a Chat GPT<->XMPP Bridge node to be configured in the `MeteringTology` source, with the Node ID `ChatGPT`. |
-| `ChatGptArray(Name,Description,Required,ItemParameter)                        | Creates an array parameter for callback functions. The `ItemParameter` argument contains definition of each item in the array. |
-| `ChatGptBoolean(Name,Description,Required)                                    | Creates a Boolean parameter for callback functions. |
-| `ChatGptEnum(Name,Description,Required,Values)                                | Creates an enumeration parameter for callback functions. The `Values` argument contains a vector of strings representing the possible values the argument can take. |
-| `ChatGptFunction(Name,Description,Parameters)                                 | Creates a function definition for callback functions. The `Parameters` argument contains a vector of parameter definitions representing the arguments of the function. |
-| `ChatGptInteger(Name,Description,Required[,MultipleOf])                       | Creates an integer parameter for callback functions, possibly requiring it to be a multiple of a given base value. |
-| `ChatGptInteger(Name,Description,Required[,Min,MinInc,Max,MaxInc])            | Creates an integer parameter for callback functions, possibly within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
-| `ChatGptInteger(Name,Description,Required[,MultipleOf,Min,MinInc,Max,MaxInc]) | Creates an integer parameter for callback functions, possibly requiring it to be a multiple of a given base value, as well as within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
-| `ChatGptNumber(Name,Description,Required[,MultipleOf])                        | Creates a number (float-point) parameter for callback functions, possibly requiring it to be a multiple of a given base value. |
-| `ChatGptNumber(Name,Description,Required[,Min,MinInc,Max,MaxInc])             | Creates a number (float-point) parameter for callback functions, possibly within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
-| `ChatGptNumber(Name,Description,Required[,MultipleOf,Min,MinInc,Max,MaxInc])  | Creates a number (float-point) parameter for callback functions, possibly requiring it to be a multiple of a given base value, as well as within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
-| `ChatGptObject(Name,Description,Required,Properties)                          | Creates an object parameter for callback functions. The `Properties` argument contains a vector of parameter definitions representing the properties of the object. |
-| `ChatGptString(Name,Description,Required[,Pattern])                           | Creates a string parameter for callback functions, having a regular expression to validate input. |
-| `ChatGptString(Name,Description,Required[,Format])                            | Creates a string parameter for callback functions, having a specific format, as given by the string format enumeration listed below. |
+| Function                                                                       | Description                                           |
+|--------------------------------------------------------------------------------|-------------------------------------------------------|
+| `ChatGpt(Instruction[,Sender],Text[,Functions],History[,Preview])`             | Calls the chat completion API of OpenAI (ChatGPT). The `Instruction` argument contains initialization instructions. The optional `Sender` argument contains the JID of the sender. If not provided, the JID of the quick-login user will be used. Text is the chat message to send. `Functions` contains a single function definition or a vector of function definitions the API can call if it chooses to. `History` is a boolean parameter that indicates if the session history should be included in the query. The optional `Preview` argument indicates if intermediate content responses are previewed during the execution of the query. The response to the call will be an object containing a `Content` property with textual content, a `Function` property with function call information if available, including a `Result` property, containing any results from a function call. If a function call is requested, available function definitions or lambda expressions will be checked. If available, they will be called, with the arguments available from the API. |
+| `ChatGptConfigured()`                                                          | Checks if Chat GPT is configured correctly. It requires a Chat GPT<->XMPP Bridge node to be configured in the `MeteringTology` source, with the Node ID `ChatGPT`. |
+| `ChatGptArray(Name,Description,Required,ItemParameter)`                        | Creates an array parameter for callback functions. The `ItemParameter` argument contains definition of each item in the array. |
+| `ChatGptBoolean(Name,Description,Required)`                                    | Creates a Boolean parameter for callback functions. |
+| `ChatGptEnum(Name,Description,Required,Values)`                                | Creates an enumeration parameter for callback functions. The `Values` argument contains a vector of strings representing the possible values the argument can take. |
+| `ChatGptFunction(Name,Description,Parameters)`                                 | Creates a function definition for callback functions. The `Parameters` argument contains a vector of parameter definitions representing the arguments of the function. |
+| `ChatGptInteger(Name,Description,Required[,MultipleOf])`                       | Creates an integer parameter for callback functions, possibly requiring it to be a multiple of a given base value. |
+| `ChatGptInteger(Name,Description,Required[,Min,MinInc,Max,MaxInc])`            | Creates an integer parameter for callback functions, possibly within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
+| `ChatGptInteger(Name,Description,Required[,MultipleOf,Min,MinInc,Max,MaxInc])` | Creates an integer parameter for callback functions, possibly requiring it to be a multiple of a given base value, as well as within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
+| `ChatGptNumber(Name,Description,Required[,MultipleOf])`                        | Creates a number (float-point) parameter for callback functions, possibly requiring it to be a multiple of a given base value. |
+| `ChatGptNumber(Name,Description,Required[,Min,MinInc,Max,MaxInc])`             | Creates a number (float-point) parameter for callback functions, possibly within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
+| `ChatGptNumber(Name,Description,Required[,MultipleOf,Min,MinInc,Max,MaxInc])`  | Creates a number (float-point) parameter for callback functions, possibly requiring it to be a multiple of a given base value, as well as within a specified range, between Min and Max, specifying also if the endpoints are included or not. |
+| `ChatGptObject(Name,Description,Required,Properties)`                          | Creates an object parameter for callback functions. The `Properties` argument contains a vector of parameter definitions representing the properties of the object. |
+| `ChatGptString(Name,Description,Required[,Pattern])`                           | Creates a string parameter for callback functions, having a regular expression to validate input. |
+| `ChatGptString(Name,Description,Required[,Format])`                            | Creates a string parameter for callback functions, having a specific format, as given by the string format enumeration listed below. |
 
 The String format enumeration can have the following values:
 
-| Enumeration Value     | Corresponding JSON Schema string | Description or example |
-|:----------------------|:---------------------------------|:-----------------------|
-| `DateTime`              | `date-time`                        | Date and time together, for example, 2018-11-13T20:20:39+00:00. |
-| `Time`                  | `time`                             | New in draft 7 Time, for example, 20:20:39+00:00 |
-| `Date`                  | `date`                             | New in draft 7 Date, for example, 2018-11-13. |
-| `Duration`              | `duration`                         | New in draft 2019-09 A duration as defined by the ISO 8601 ABNF for “duration”. For example, P3D expresses a duration of 3 days. |
-| `EMail`                 | `email`                            | Internet email address, see RFC 5321, section 4.1.2. |
-| `InternationalEMail`    | `idn-email`                        | New in draft 7 The internationalized form of an Internet email address, see RFC 6531. |
-| `HostName`              | `hostname`                         | Internet host name, see RFC 1123, section 2.1. |
-| `InternationalHostname` | `idn-hostname`                     | New in draft 7 An internationalized Internet host name, see RFC5890, section 2.3.2.3. |
-| `IPv4`                  | `ipv4`                             | IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2. |
-| `IPv6`                  | `ipv6`                             | IPv6 address, as defined in RFC 2373, section 2.2. |
-| `Uuid`                  | `uuid`                             | New in draft 2019-09 A Universally Unique Identifier as defined by RFC 4122. Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a |
-| `Uri`                   | `uri`                              | A universal resource identifier (URI), according to RFC3986. |
-| `UriReference`          | `uri-reference`                    | New in draft 6 A URI Reference (either a URI or a relative-reference), according to RFC3986, section 4.1. |
-| `Iri`                   | `iri`                              | New in draft 7 The internationalized equivalent of a “uri”, according to RFC3987. |
-| `IriReference`          | `iri-reference`                    | New in draft 7 The internationalized equivalent of a “uri-reference”, according to RFC3987 |
-| `UriTemplate`           | `uri-template`                     | New in draft 6 A URI Template (of any level) according to RFC6570. If you don’t already know what a URI Template is, you probably don’t need this value. |
-| `JsonPointer`           | `json-pointer`                     | New in draft 6 A JSON Pointer, according to RFC6901. There is more discussion on the use of JSON Pointer within JSON Schema in Structuring a complex schema. Note that this should be used only when the entire string contains only JSON Pointer content, e.g. /foo/bar. JSON Pointer URI fragments, e.g. #/foo/bar/ should use "uri-reference". |
-| `RelativeJsonPointer`   | `relative-json-pointer`            | New in draft 7 A relative JSON pointer. |
-| `RegEx`                 | `regex`                            | New in draft 7 A regular expression, which should be valid according to the ECMA 262 dialect. |
+| Enumeration Value       | Corresponding JSON Schema string | Description or example |
+|:------------------------|:---------------------------------|:-----------------------|
+| `DateTime`              | `date-time`                      | Date and time together, for example, 2018-11-13T20:20:39+00:00. |
+| `Time`                  | `time`                           | New in draft 7 Time, for example, 20:20:39+00:00 |
+| `Date`                  | `date`                           | New in draft 7 Date, for example, 2018-11-13. |
+| `Duration`              | `duration`                       | New in draft 2019-09 A duration as defined by the ISO 8601 ABNF for “duration”. For example, P3D expresses a duration of 3 days. |
+| `EMail`                 | `email`                          | Internet email address, see RFC 5321, section 4.1.2. |
+| `InternationalEMail`    | `idn-email`                      | New in draft 7 The internationalized form of an Internet email address, see RFC 6531. |
+| `HostName`              | `hostname`                       | Internet host name, see RFC 1123, section 2.1. |
+| `InternationalHostname` | `idn-hostname`                   | New in draft 7 An internationalized Internet host name, see RFC5890, section 2.3.2.3. |
+| `IPv4`                  | `ipv4`                           | IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2. |
+| `IPv6`                  | `ipv6`                           | IPv6 address, as defined in RFC 2373, section 2.2. |
+| `Uuid`                  | `uuid`                           | New in draft 2019-09 A Universally Unique Identifier as defined by RFC 4122. Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a |
+| `Uri`                   | `uri`                            | A universal resource identifier (URI), according to RFC3986. |
+| `UriReference`          | `uri-reference`                  | New in draft 6 A URI Reference (either a URI or a relative-reference), according to RFC3986, section 4.1. |
+| `Iri`                   | `iri`                            | New in draft 7 The internationalized equivalent of a “uri”, according to RFC3987. |
+| `IriReference`          | `iri-reference`                  | New in draft 7 The internationalized equivalent of a “uri-reference”, according to RFC3987 |
+| `UriTemplate`           | `uri-template`                   | New in draft 6 A URI Template (of any level) according to RFC6570. If you don’t already know what a URI Template is, you probably don’t need this value. |
+| `JsonPointer`           | `json-pointer`                   | New in draft 6 A JSON Pointer, according to RFC6901. There is more discussion on the use of JSON Pointer within JSON Schema in Structuring a complex schema. Note that this should be used only when the entire string contains only JSON Pointer content, e.g. /foo/bar. JSON Pointer URI fragments, e.g. #/foo/bar/ should use "uri-reference". |
+| `RelativeJsonPointer`   | `relative-json-pointer`          | New in draft 7 A relative JSON pointer. |
+| `RegEx`                 | `regex`                          | New in draft 7 A regular expression, which should be valid according to the ECMA 262 dialect. |
+
+Example:
+
+```
+ShowImage(Image):=
+(
+	Get(Image.Url) ??? "Image not available"
+);
+
+ShowImages(Images):=
+(
+	[foreach Image in Images do ShowImage(Image)]
+);
+
+R:=ChatGpt(
+	"You help users find images on the Internet, representative of the queries made by the user.",
+	"TestUser",
+	"Kan you find me some images of Kermit? If something is unclear, ask for additional information first. When ready to present images to the user, call available functions.",
+	ChatGptFunction("ShowImages", "Displays an array of images to the user.", [
+		ChatGptArray("Images", "Array of images to show.", true, 
+			ChatGptObject("Image", "Information about an image.", true, [
+				ChatGptString("Url", "URL to the image to show.", true),
+				ChatGptInteger("Width","Width of image, in pixels.", false, 0, false, null, false),
+				ChatGptInteger("Height","Height of image, in pixels.", false, 0, false, null, false),
+				ChatGptString("Alt", "Alternative textual description of image, in cases the image cannot be shown.", false)]))]),
+	false,
+	true)
+```
+
+**Note**: If running script with ChatGPT-services on a web server, you can use the associated script functions to push information
+asynchronously back to the web client using the `PushEvent` script function.
 
 =========================================================================================================================================================
 

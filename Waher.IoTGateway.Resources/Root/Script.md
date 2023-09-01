@@ -2400,7 +2400,7 @@ about the OpenAI-related functions referenced in this section is available in th
 
 | Function                                                                      | Description                                           |
 |-------------------------------------------------------------------------------|-------------------------------------------------------|
-| `ChatGpt(Instruction[,Sender],Text,History[,Preview])                         | Calls the chat completion API of OpenAI (ChatGPT). The `Instruction` argument contains initialization instructions. The optional `Sender` argument contains the JID of the sender. If not provided, the JID of the quick-login user will be used. Text is the chat message to send. `History` is a boolean parameter that indicates if the session history should be included in the query. The optional `Preview` argument indicates if intermediate responses are previewed during the execution of the query. |
+| `ChatGpt(Instruction[,Sender],Text[,Functions],History[,Preview])             | Calls the chat completion API of OpenAI (ChatGPT). The `Instruction` argument contains initialization instructions. The optional `Sender` argument contains the JID of the sender. If not provided, the JID of the quick-login user will be used. Text is the chat message to send. `Functions` contains a single function definition or a vector of function definitions the API can call if it chooses to. `History` is a boolean parameter that indicates if the session history should be included in the query. The optional `Preview` argument indicates if intermediate responses are previewed during the execution of the query. The response to the call will be a message object containing either text content and/or information about a function to call. |
 | `ChatGptConfigured()`                                                         | Checks if Chat GPT is configured correctly. It requires a Chat GPT<->XMPP Bridge node to be configured in the `MeteringTology` source, with the Node ID `ChatGPT`. |
 | `ChatGptArray(Name,Description,Required,ItemParameter)                        | Creates an array parameter for callback functions. The `ItemParameter` argument contains definition of each item in the array. |
 | `ChatGptBoolean(Name,Description,Required)                                    | Creates a Boolean parameter for callback functions. |
@@ -2420,25 +2420,25 @@ The String format enumeration can have the following values:
 
 | Enumeration Value     | Corresponding JSON Schema string | Description or example |
 |:----------------------|:---------------------------------|:-----------------------|
-| DateTime              | date-time                        | Date and time together, for example, 2018-11-13T20:20:39+00:00. |
-| Time                  | time                             | New in draft 7 Time, for example, 20:20:39+00:00 |
-| Date                  | date                             | New in draft 7 Date, for example, 2018-11-13. |
-| Duration              | duration                         | New in draft 2019-09 A duration as defined by the ISO 8601 ABNF for “duration”. For example, P3D expresses a duration of 3 days. |
-| EMail                 | email                            | Internet email address, see RFC 5321, section 4.1.2. |
-| InternationalEMail    | idn-email                        | New in draft 7 The internationalized form of an Internet email address, see RFC 6531. |
-| HostName              | hostname                         | Internet host name, see RFC 1123, section 2.1. |
-| InternationalHostname | idn-hostname                     | New in draft 7 An internationalized Internet host name, see RFC5890, section 2.3.2.3. |
-| IPv4                  | ipv4                             | IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2. |
-| IPv6                  | ipv6                             | IPv6 address, as defined in RFC 2373, section 2.2. |
-| Uuid                  | uuid                             | New in draft 2019-09 A Universally Unique Identifier as defined by RFC 4122. Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a |
-| Uri                   | uri                              | A universal resource identifier (URI), according to RFC3986. |
-| UriReference          | uri-reference                    | New in draft 6 A URI Reference (either a URI or a relative-reference), according to RFC3986, section 4.1. |
-| Iri                   | iri                              | New in draft 7 The internationalized equivalent of a “uri”, according to RFC3987. |
-| IriReference          | iri-reference                    | New in draft 7 The internationalized equivalent of a “uri-reference”, according to RFC3987 |
-| UriTemplate           | uri-template                     | New in draft 6 A URI Template (of any level) according to RFC6570. If you don’t already know what a URI Template is, you probably don’t need this value. |
-| JsonPointer           | json-pointer                     | New in draft 6 A JSON Pointer, according to RFC6901. There is more discussion on the use of JSON Pointer within JSON Schema in Structuring a complex schema. Note that this should be used only when the entire string contains only JSON Pointer content, e.g. /foo/bar. JSON Pointer URI fragments, e.g. #/foo/bar/ should use "uri-reference". |
-| RelativeJsonPointer   | relative-json-pointer            | New in draft 7 A relative JSON pointer. |
-| RegEx                 | regex                            | New in draft 7 A regular expression, which should be valid according to the ECMA 262 dialect. |
+| `DateTime`              | `date-time`                        | Date and time together, for example, 2018-11-13T20:20:39+00:00. |
+| `Time`                  | `time`                             | New in draft 7 Time, for example, 20:20:39+00:00 |
+| `Date`                  | `date`                             | New in draft 7 Date, for example, 2018-11-13. |
+| `Duration`              | `duration`                         | New in draft 2019-09 A duration as defined by the ISO 8601 ABNF for “duration”. For example, P3D expresses a duration of 3 days. |
+| `EMail`                 | `email`                            | Internet email address, see RFC 5321, section 4.1.2. |
+| `InternationalEMail`    | `idn-email`                        | New in draft 7 The internationalized form of an Internet email address, see RFC 6531. |
+| `HostName`              | `hostname`                         | Internet host name, see RFC 1123, section 2.1. |
+| `InternationalHostname` | `idn-hostname`                     | New in draft 7 An internationalized Internet host name, see RFC5890, section 2.3.2.3. |
+| `IPv4`                  | `ipv4`                             | IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2. |
+| `IPv6`                  | `ipv6`                             | IPv6 address, as defined in RFC 2373, section 2.2. |
+| `Uuid`                  | `uuid`                             | New in draft 2019-09 A Universally Unique Identifier as defined by RFC 4122. Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a |
+| `Uri`                   | `uri`                              | A universal resource identifier (URI), according to RFC3986. |
+| `UriReference`          | `uri-reference`                    | New in draft 6 A URI Reference (either a URI or a relative-reference), according to RFC3986, section 4.1. |
+| `Iri`                   | `iri`                              | New in draft 7 The internationalized equivalent of a “uri”, according to RFC3987. |
+| `IriReference`          | `iri-reference`                    | New in draft 7 The internationalized equivalent of a “uri-reference”, according to RFC3987 |
+| `UriTemplate`           | `uri-template`                     | New in draft 6 A URI Template (of any level) according to RFC6570. If you don’t already know what a URI Template is, you probably don’t need this value. |
+| `JsonPointer`           | `json-pointer`                     | New in draft 6 A JSON Pointer, according to RFC6901. There is more discussion on the use of JSON Pointer within JSON Schema in Structuring a complex schema. Note that this should be used only when the entire string contains only JSON Pointer content, e.g. /foo/bar. JSON Pointer URI fragments, e.g. #/foo/bar/ should use "uri-reference". |
+| `RelativeJsonPointer`   | `relative-json-pointer`            | New in draft 7 A relative JSON pointer. |
+| `RegEx`                 | `regex`                            | New in draft 7 A regular expression, which should be valid according to the ECMA 262 dialect. |
 
 =========================================================================================================================================================
 

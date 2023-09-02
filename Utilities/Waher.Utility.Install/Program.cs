@@ -1292,12 +1292,15 @@ namespace Waher.Utility.Install
 						{
 							case 1: // Program file in installation folder, not assembly file
 							case 2: // Assembly file
+								FileName = Path.Combine(AppFolder, RelativeName);
+
 								if (ContentOnly || b == 1)
+								{
+									Log.Notice("Skipping file: " + FileName);
 									SkipBytes(Decompressed, Bytes, Buffer);
+								}
 								else
 								{
-									FileName = Path.Combine(AppFolder, RelativeName);
-
 									if (b == 1)
 										Log.Informational("Application file: " + FileName);
 									else

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Events
+﻿namespace Waher.Events
 {
 	/// <summary>
 	/// Type of event.

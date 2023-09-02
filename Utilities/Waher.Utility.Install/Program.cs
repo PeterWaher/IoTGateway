@@ -999,13 +999,26 @@ namespace Waher.Utility.Install
 		private static byte[] ReadBin(Stream Input)
 		{
 			ulong Len = ReadVarLenUInt(Input);
+			return ReadBin(Input, Len);
+		}
+
+		private static byte[] ReadBin(Stream Input, ulong Len)
+		{
 			if (Len > int.MaxValue)
 				throw new Exception("Invalid package.");
 
 			int c = (int)Len;
 			byte[] Result = new byte[c];
-			if (Input.Read(Result, 0, c) != c)
-				throw new EndOfStreamException("Reading past end-of-file.");
+			int Pos = 0;
+
+			while (Pos < c)
+			{
+				int d = Input.Read(Result, Pos, c - Pos);
+				if (d <= 0)
+					throw new EndOfStreamException("Reading past end-of-file.");
+
+				Pos += d;
+			}
 
 			return Result;
 		}
@@ -1229,10 +1242,7 @@ namespace Waher.Utility.Install
 				byte[] Bin;
 
 				if (b > 0)
-				{
-					Bin = new byte[b];
-					Decompressed.Read(Bin, 0, b);
-				}
+					ReadBin(Decompressed, b);
 
 				Bin = ReadBin(Decompressed);
 				if (Encoding.ASCII.GetString(Bin) != "IoTGatewayPackage")
@@ -1404,7 +1414,7 @@ namespace Waher.Utility.Install
 					}
 				}
 
-				if (!ContentOnly)
+				if (!ContentOnly && !string.IsNullOrEmpty(DepsJsonFileName))
 				{
 					Log.Informational("Encoding JSON");
 					string s = JSON.Encode(Deps, true);
@@ -1462,12 +1472,13 @@ namespace Waher.Utility.Install
 					while (Bytes > 0)
 					{
 						int d = (int)Math.Min(Bytes, c);
+						int e = Input.Read(Buffer, 0, d);
 
-						if (Input.Read(Buffer, 0, d) != d)
+						if (e <= 0)
 							throw new EndOfStreamException("Reading past end-of-file.");
 
-						f.Write(Buffer, 0, d);
-						Bytes -= (uint)d;
+						f.Write(Buffer, 0, e);
+						Bytes -= (uint)e;
 					}
 				}
 				finally
@@ -1493,11 +1504,12 @@ namespace Waher.Utility.Install
 			while (Bytes > 0)
 			{
 				int d = (int)Math.Min(Bytes, (ulong)c);
+				int e = Input.Read(Buffer, 0, d);
 
-				if (Input.Read(Buffer, 0, d) != d)
+				if (e <= 0)
 					throw new EndOfStreamException("Reading past end-of-file.");
 
-				Bytes -= (uint)d;
+				Bytes -= (uint)e;
 			}
 		}
 
@@ -1602,10 +1614,7 @@ namespace Waher.Utility.Install
 				byte[] Bin;
 
 				if (b > 0)
-				{
-					Bin = new byte[b];
-					Decompressed.Read(Bin, 0, b);
-				}
+					ReadBin(Decompressed, b);
 
 				Bin = ReadBin(Decompressed);
 				if (Encoding.ASCII.GetString(Bin) != "IoTGatewayPackage")
@@ -1707,7 +1716,7 @@ namespace Waher.Utility.Install
 					}
 				}
 
-				if (!ContentOnly)
+				if (!ContentOnly && !string.IsNullOrEmpty(DepsJsonFileName))
 				{
 					Log.Informational("Encoding JSON");
 					string s = JSON.Encode(Deps, true);

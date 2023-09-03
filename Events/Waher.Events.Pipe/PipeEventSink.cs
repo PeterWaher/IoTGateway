@@ -10,17 +10,22 @@ using Waher.Content.Xml;
 namespace Waher.Events.Pipe
 {
 	/// <summary>
-	/// Writes logged events to an operating system pipe, of inter-process communication.
+	/// Writes logged events to an operating system pipe, for inter-process communication.
 	/// </summary>
 	public class PipeEventSink : EventSink
 	{
+		/// <summary>
+		/// http://waher.se/Schema/EventOutput.xsd
+		/// </summary>
+		public const string LogNamespace= "http://waher.se/Schema/EventOutput.xsd";
+
 		private readonly LinkedList<byte[]> pipeQueue = new LinkedList<byte[]>();
 		private readonly string pipeName;
 		private NamedPipeClientStream pipe;
 		private bool writing = false;
 
 		/// <summary>
-		/// Writes logged events to an operating system pipe, of inter-process communication.
+		/// Writes logged events to an operating system pipe, for inter-process communication.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="PipeName">Name of pipe.</param>
@@ -53,7 +58,9 @@ namespace Waher.Events.Pipe
 
 			sb.Append('<');
 			sb.Append(ElementName);
-			sb.Append(" timestamp='");
+			sb.Append(" xmlns='");
+			sb.Append(LogNamespace);
+			sb.Append("' timestamp='");
 			sb.Append(XML.Encode(Event.Timestamp));
 			sb.Append("' level='");
 			sb.Append(Event.Level.ToString());

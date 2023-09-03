@@ -190,6 +190,12 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.XMPP**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP/)            | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 | **Waher.Events.XMPP.UWP**        | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP.UWP/)        | The [Waher.Events.XMPP.UWP](Events/Waher.Events.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Events.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
+The folder also contains the following unit test projects:
+
+| Project                    | Type   | Project description |
+|----------------------------|--------|---------------------|
+| **Waher.Events.Pipe.Test** | .NET 6 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
+
 Layout
 ----------------------
 

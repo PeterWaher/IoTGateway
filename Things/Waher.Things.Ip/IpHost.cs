@@ -105,7 +105,7 @@ namespace Waher.Things.Ip
 			}
 			catch (PingException ex)
 			{
-				if (ex.InnerException != null)
+				if (!(ex.InnerException is null))
 					Request.ReportErrors(true, new ThingError(this, ex.InnerException.Message));
 				else
 					Request.ReportErrors(true, new ThingError(this, ex.Message));

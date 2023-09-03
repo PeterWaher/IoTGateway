@@ -584,7 +584,7 @@ namespace Waher.Utility.Extract.ExportFormats
 					foreach (Exception ex in AggregateException.InnerExceptions)
 						await this.ReportException(ex);
 				}
-				else if (Exception.InnerException != null)
+				else if (!(Exception.InnerException is null))
 					await this.ReportException(Exception.InnerException);
 
 				await this.output.WriteEndElementAsync();

@@ -51,7 +51,7 @@ namespace Waher.Networking.LWM2M
 		/// <returns></returns>
 		public override async Task WritePersistedValue()
 		{
-			if (this.value != null)
+			if (!(this.value is null))
 				await RuntimeSettings.SetAsync(this.Path, Hashes.BinaryToString(this.value));
 		}
 
@@ -105,7 +105,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Output">Output.</param>
 		public override void Write(ILwm2mWriter Output)
 		{
-			if (this.value != null)
+			if (!(this.value is null))
 				Output.Write(IdentifierType.Resource, this.ResourceId, this.value);
 			else
 				Output.Write(IdentifierType.Resource, this.ResourceId);

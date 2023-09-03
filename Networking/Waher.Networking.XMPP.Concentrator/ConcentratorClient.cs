@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					List<string> Capabilities = new List<string>();
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "strings" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "strings" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 					{
 						foreach (XmlNode N in E)
 						{
@@ -128,7 +128,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "dataSources" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "dataSources" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -336,7 +336,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "bools" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "bools" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -445,7 +445,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeInfo")
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeInfo")
 				NodeInfo = this.GetNodeInformation(E, Parameters, Messages);
 			else
 			{
@@ -658,7 +658,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 			NodeInformation[] NodeInfo;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeInfos")
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeInfos")
 			{
 				List<NodeInformation> Nodes = new List<NodeInformation>();
 
@@ -811,7 +811,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<string> BaseClasses = new List<string>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "inheritance" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "inheritance" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -1034,7 +1034,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<LocalizedString> Types = new List<LocalizedString>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeTypes" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeTypes" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -1171,7 +1171,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
 					Form = new DataForm(this.client, E, this.CreateNewNode, this.CancelCreateNewNode, e.From, e.To)
 					{
@@ -1181,7 +1181,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null)
+				if (!(FormCallback is null))
 				{
 					try
 					{
@@ -1228,7 +1228,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
-				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
+				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
 					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{
@@ -1423,7 +1423,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
 					Form = new DataForm(this.client, E, this.EditNode, this.CancelEditNode, e.From, e.To)
 					{
@@ -1433,7 +1433,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null)
+				if (!(FormCallback is null))
 				{
 					try
 					{
@@ -1477,7 +1477,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
-				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
+				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
 					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{
@@ -1584,7 +1584,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				string SnifferId = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "sniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					SnifferId = XML.Attribute(E, "snifferId");
 					Expires = XML.Attribute(E, "expires", DateTime.MinValue);
@@ -1799,7 +1799,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				List<NodeCommand> Commands = new List<NodeCommand>();
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "commands" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "commands" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2042,7 +2042,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 				{
 					Form = new DataForm(this.client, E, this.EditCommandParameters, this.CancelEditCommandParameters, e.From, e.To)
 					{
@@ -2052,7 +2052,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null)
+				if (!(FormCallback is null))
 				{
 					try
 					{
@@ -2334,7 +2334,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
-				if (!e.Ok && e.ErrorElement != null && e.ErrorType == ErrorType.Modify)
+				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
 					foreach (XmlNode N in e.ErrorElement.ChildNodes)
 					{

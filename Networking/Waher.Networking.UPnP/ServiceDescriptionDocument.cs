@@ -26,7 +26,7 @@ namespace Waher.Networking.UPnP
 			this.xml = Xml;
 			this.service = Service;
 
-			if (Xml.DocumentElement != null && Xml.DocumentElement.LocalName == "scpd" &&
+			if (!(Xml.DocumentElement is null) && Xml.DocumentElement.LocalName == "scpd" &&
 				Xml.DocumentElement.NamespaceURI == "urn:schemas-upnp-org:service-1-0")
 			{
 				foreach (XmlNode N in Xml.DocumentElement.ChildNodes)

@@ -177,7 +177,7 @@ namespace Waher.Networking.LWM2M
 					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
 					{
 						Lwm2mServerReference Ref = Instance.GetServerReference(true);
-						if (Ref != null)
+						if (!(Ref is null))
 						{
 							if (Instance.clientHoldOffTimeSeconds.IntegerValue.HasValue &&
 								Instance.clientHoldOffTimeSeconds.IntegerValue.Value > 0)
@@ -268,7 +268,7 @@ namespace Waher.Networking.LWM2M
 			CoapResponseEventHandler Callback = (CoapResponseEventHandler)P[0];
 			object State = P[1];
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -317,7 +317,7 @@ namespace Waher.Networking.LWM2M
 		/// <returns>If the request comes from the bootstrap server.</returns>
 		public bool IsFromBootstrapServer(CoapMessage Request)
 		{
-			return (this.bootstrapSeverIp != null &&
+			return (!(this.bootstrapSeverIp is null) &&
 				Array.IndexOf<IPEndPoint>(this.bootstrapSeverIp, Request.From) >= 0);
 		}
 
@@ -650,7 +650,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.coapEndpoint != null)
+			if (!(this.coapEndpoint is null))
 			{
 				if (this.state == Lwm2mState.Operation)
 					this.Deregister();

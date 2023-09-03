@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 			object[] Result = base.Validate(Value);
 
-			if (!this.HasError && Value != null)
+			if (!this.HasError && !(Value is null))
 			{
 				if (Value.Length == 1 && string.IsNullOrEmpty(Value[0]) && !this.Required)
 					return Result;

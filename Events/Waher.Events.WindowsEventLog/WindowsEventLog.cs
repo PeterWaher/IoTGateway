@@ -139,14 +139,14 @@ namespace Waher.Events.WindowsEventLog
 				Message.AppendLine(Event.Facility);
 			}
 
-			if (Event.Tags != null)
+			if (!(Event.Tags is null))
 			{
 				foreach (KeyValuePair<string, object> Tag in Event.Tags)
 				{
 					Message.AppendLine(Tag.Key);
 					Message.Append(": ");
 
-					if (Tag.Value != null)
+					if (!(Tag.Value is null))
 						Message.AppendLine(Tag.Value.ToString());
 				}
 			}

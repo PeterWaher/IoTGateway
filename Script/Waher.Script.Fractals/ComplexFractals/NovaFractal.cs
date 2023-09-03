@@ -116,7 +116,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             c = Arguments.Length;
             i = 5;
 
-			if (i < c && this.Arguments[i] != null && Arguments[i] is ObjectVector)
+			if (i < c && !(this.Arguments[i] is null) && Arguments[i] is ObjectVector)
 			{
 				ColorExpression = this.Arguments[i].SubExpression;
                 Palette = FractalGraph.ToPalette((ObjectVector)Arguments[i++]);

@@ -79,7 +79,7 @@ namespace Waher.Things.ControlParameters
 		{
 			try
 			{
-				if ((this.min != null && Value < this.min) || (this.max != null && Value > this.max))
+				if ((!(this.min is null) && Value < this.min) || (!(this.max is null) && Value > this.max))
 					return false;
 
 				await this.setHandler(Node, Value);

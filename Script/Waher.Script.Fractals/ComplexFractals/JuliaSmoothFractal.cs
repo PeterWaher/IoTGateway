@@ -104,7 +104,7 @@ namespace Waher.Script.Fractals.ComplexFractals
                 throw new ScriptRuntimeException("Insufficient parameters in call to JuliaSmoothFractal().", this);
 
             Obj = Arguments[i++].AssociatedObjectValue;
-            if ((f = Obj as ILambdaExpression) != null)
+            if (!((f = Obj as ILambdaExpression) is null))
             {
                 if (f.NrArguments != 1)
                     throw new ScriptRuntimeException("Lambda expression in calls to JuliaSmoothFractal() must be of one variable.", this);
@@ -134,7 +134,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             c = Arguments.Length;
 
-			if (i < c && this.Arguments[i] != null && Arguments[i] is ObjectVector)
+			if (i < c && !(this.Arguments[i] is null) && Arguments[i] is ObjectVector)
 			{
 				ColorExpression = this.Arguments[i].SubExpression;
                 Palette = FractalGraph.ToPalette((ObjectVector)Arguments[i++]);

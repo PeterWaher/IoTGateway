@@ -124,7 +124,7 @@ namespace Waher.Security.PKCS
 		{
 			this.AssertBegun();
 
-			if (this.stack != null && this.stack.First != null)
+			if (!(this.stack is null) && !(this.stack.First is null))
 				throw new InvalidOperationException("Stack not empty.");
 
 			this.der.StartSEQUENCE();   // macData:MacData

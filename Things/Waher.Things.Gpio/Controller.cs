@@ -38,7 +38,7 @@ namespace Waher.Things.Gpio
 
 		public override async Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return (Parent is Root) && (await GpioController.GetDefaultAsync() != null);
+			return (Parent is Root) && !((await GpioController.GetDefaultAsync() is null));
 		}
 
 		public override Task<string> GetTypeNameAsync(Language Language)

@@ -109,7 +109,7 @@ namespace Waher.Networking.CoAP.Test
 
 		private static void AssertNotNull(object Obj)
 		{
-			Assert.IsTrue(Obj != null);
+			Assert.IsTrue(!(Obj is null));
 		}
 
 		[TestMethod]

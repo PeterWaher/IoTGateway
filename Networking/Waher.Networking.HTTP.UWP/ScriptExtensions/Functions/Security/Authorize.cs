@@ -80,9 +80,9 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 					string Message;
 
 					if (Arguments.Length > 2)
-						Message = Arguments[2].AssociatedObjectValue?.ToString() ?? "Access denied.";
+						Message = Arguments[2].AssociatedObjectValue?.ToString() ?? "Access denied. Insufficient privileges.";
 					else
-						Message = "Access denied.";
+						Message = "Access denied. Insufficient privileges.";
 
 					throw ForbiddenException.AccessDenied(Message, string.Empty, User.UserName, Privilege);
 				}

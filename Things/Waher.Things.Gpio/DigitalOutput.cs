@@ -51,7 +51,7 @@ namespace Waher.Things.Gpio
 
 		private void SetDriveMode(OutputPinMode Mode)
 		{
-			if (this.pin != null)
+			if (!(this.pin is null))
 			{
 				switch (Mode)
 				{
@@ -144,7 +144,7 @@ namespace Waher.Things.Gpio
 
 		public override Task DestroyAsync()
 		{
-			if (this.pin != null)
+			if (!(this.pin is null))
 			{
 				this.pin.Dispose();
 				this.pin = null;

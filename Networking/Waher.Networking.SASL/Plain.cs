@@ -42,7 +42,7 @@ namespace Waher.Networking.SASL
 		/// <returns>If mechanism is allowed.</returns>
 		public override bool Allowed(SslStream SslStream)
 		{
-			return (SslStream != null && SslStream.IsEncrypted && SslStream.CipherStrength >= 128);
+			return (!(SslStream is null) && SslStream.IsEncrypted && SslStream.CipherStrength >= 128);
 		}
 
 		/// <summary>

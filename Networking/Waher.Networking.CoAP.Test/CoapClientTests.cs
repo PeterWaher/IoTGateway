@@ -49,13 +49,13 @@ namespace Waher.Networking.CoAP.Test
 		[AssemblyCleanup]
 		public static void AssemblyCleanup()
 		{
-			if (filesProvider != null)
+			if (!(filesProvider is null))
 			{
 				filesProvider.Dispose();
 				filesProvider = null;
 			}
 
-			if (consoleEventSink != null)
+			if (!(consoleEventSink is null))
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;
@@ -73,7 +73,7 @@ namespace Waher.Networking.CoAP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				ulong[] Tokens = this.client.GetActiveTokens();
 				ushort[] MessageIDs = this.client.GetActiveMessageIDs();
@@ -171,7 +171,7 @@ namespace Waher.Networking.CoAP.Test
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (Result != null)
+					if (!(Result is null))
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -193,7 +193,7 @@ namespace Waher.Networking.CoAP.Test
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (Result != null)
+					if (!(Result is null))
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -217,7 +217,7 @@ namespace Waher.Networking.CoAP.Test
 		//		if (e.Ok)
 		//		{
 		//			object Result = e.Message.Decode();
-		//			if (Result != null)
+		//			if (!(Result is null))
 		//				Console.Out.WriteLine(Result.ToString());
 		//
 		//			Done.Set();
@@ -306,7 +306,7 @@ namespace Waher.Networking.CoAP.Test
 
 		private static void AssertNotNull(object Obj)
 		{
-			Assert.IsTrue(Obj != null);
+			Assert.IsTrue(!(Obj is null));
 		}
 
 		[TestMethod]

@@ -109,7 +109,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			dr = Expression.ToDouble(Arguments[i++].AssociatedObjectValue);
 
-			if (i < c && this.Arguments[i] != null && Arguments[i] is ObjectVector)
+			if (i < c && !(this.Arguments[i] is null) && Arguments[i] is ObjectVector)
 			{
 				ColorExpression = this.Arguments[i].SubExpression;
                 Palette = FractalGraph.ToPalette((ObjectVector)Arguments[i++]);

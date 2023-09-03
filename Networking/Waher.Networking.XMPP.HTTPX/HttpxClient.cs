@@ -629,7 +629,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool HasData = false;
 			bool DisposeResponse = true;
 
-			if (e.Ok && E != null && E.LocalName == "resp" && E.NamespaceURI == Namespace)
+			if (e.Ok && !(E is null) && E.LocalName == "resp" && E.NamespaceURI == Namespace)
 			{
 				Version = XML.Attribute(E, "version", 0.0);
 				StatusCode = XML.Attribute(E, "statusCode", 0);

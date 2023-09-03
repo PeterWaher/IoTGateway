@@ -69,10 +69,10 @@ namespace Waher.Service.GPIO
 
 		private void Page_Unloaded(object sender, RoutedEventArgs e)
 		{
-			if (sniffer != null && sniffer.ListView == this.SnifferListView)
+			if (!(sniffer is null) && sniffer.ListView == this.SnifferListView)
 				sniffer = null;
 
-			if (eventSink != null && eventSink.ListView == this.EventsListView)
+			if (!(eventSink is null) && eventSink.ListView == this.EventsListView)
 			{
 				Log.Unregister(eventSink);
 				eventSink.Dispose();

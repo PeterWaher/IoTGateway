@@ -255,7 +255,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task DeleteBootstrapInfo()
 		{
-			if (this.ObjectId != null)
+			if (!(this.ObjectId is null))
 				await Database.Delete(this);
 		}
 
@@ -296,7 +296,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Output">Link output.</param>
 		public override void EncodeLinkParameters(StringBuilder Output)
 		{
-			if (this.shortServerId.Value != null)
+			if (!(this.shortServerId.Value is null))
 			{
 				Output.Append(";ssid=");
 				Output.Append(this.shortServerId.Value.ToString());

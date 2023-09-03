@@ -504,7 +504,7 @@ namespace Waher.Networking.PeerToPeer
 
 			try
 			{
-				while (!this.disposed && Datagram != null)
+				while (!this.disposed && !(Datagram is null))
 				{
 					await this.udpClient.SendAsync(Datagram, Datagram.Length, RemoteEndpoint);
 
@@ -523,7 +523,7 @@ namespace Waher.Networking.PeerToPeer
 
 					lock (this.writeQueue)
 					{
-						if (this.writeQueue.First != null)
+						if (!(this.writeQueue.First is null))
 						{
 							KeyValuePair<IPEndPoint, byte[]> Rec = this.writeQueue.First.Value;
 							this.writeQueue.RemoveFirst();

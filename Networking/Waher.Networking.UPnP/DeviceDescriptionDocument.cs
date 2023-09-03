@@ -21,7 +21,7 @@ namespace Waher.Networking.UPnP
 		{
 			this.xml = Xml;
 
-			if (Xml.DocumentElement != null && Xml.DocumentElement.LocalName == "root" &&
+			if (!(Xml.DocumentElement is null) && Xml.DocumentElement.LocalName == "root" &&
 				Xml.DocumentElement.NamespaceURI == "urn:schemas-upnp-org:device-1-0")
 			{
 				if (!string.IsNullOrEmpty(BaseUrl))

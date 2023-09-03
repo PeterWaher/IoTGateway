@@ -99,7 +99,7 @@ namespace Waher.Events.XMPP
 						this.connected = false;
 					}
 
-					if (ImmediateReconnect && this.timer != null)
+					if (ImmediateReconnect && !(this.timer is null))
 						this.client.Reconnect();
 					break;
 			}

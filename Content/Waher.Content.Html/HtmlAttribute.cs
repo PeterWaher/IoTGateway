@@ -96,7 +96,7 @@ namespace Waher.Content.Html
 
 		internal bool HasSegments
 		{
-			get { return this.segments != null; }
+			get { return !(this.segments is null); }
 		}
 
 		/// <summary>

@@ -127,7 +127,7 @@ namespace Waher.Mock.Temperature.UWP
 
 				xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
 
-				if (Credentials.Sniffer && MainPage.Sniffer != null)
+				if (Credentials.Sniffer && !(MainPage.Sniffer is null))
 					xmppClient.Add(MainPage.Sniffer);
 				
 				if (!string.IsNullOrEmpty(Credentials.Events))
@@ -188,7 +188,7 @@ namespace Waher.Mock.Temperature.UWP
 						case XmppState.Connected:
 							connected = true;
 
-							if (!registered && thingRegistryClient != null)
+							if (!registered && !(thingRegistryClient is null))
 								this.Register();
 							break;
 
@@ -499,49 +499,49 @@ namespace Waher.Mock.Temperature.UWP
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 
-			if (this.sampleTimer != null)
+			if (!(this.sampleTimer is null))
 			{
 				this.sampleTimer.Dispose();
 				this.sampleTimer = null;
 			}
 
-			if (this.interoperabilityServer != null)
+			if (!(this.interoperabilityServer is null))
 			{
 				this.interoperabilityServer.Dispose();
 				this.interoperabilityServer = null;
 			}
 
-			if (this.chatServer != null)
+			if (!(this.chatServer is null))
 			{
 				this.chatServer.Dispose();
 				this.chatServer = null;
 			}
 
-			if (this.bobClient != null)
+			if (!(this.bobClient is null))
 			{
 				this.bobClient.Dispose();
 				this.bobClient = null;
 			}
 
-			if (this.sensorServer != null)
+			if (!(this.sensorServer is null))
 			{
 				this.sensorServer.Dispose();
 				this.sensorServer = null;
 			}
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				this.provisioningClient.Dispose();
 				this.provisioningClient = null;
 			}
 
-			if (this.thingRegistryClient != null)
+			if (!(this.thingRegistryClient is null))
 			{
 				this.thingRegistryClient.Dispose();
 				this.thingRegistryClient = null;
 			}
 
-			if (this.xmppClient != null)
+			if (!(this.xmppClient is null))
 			{
 				this.xmppClient.Dispose();
 				this.xmppClient = null;
@@ -591,7 +591,7 @@ namespace Waher.Mock.Temperature.UWP
 		private void RaiseOwnershipChanged()
 		{
 			EventHandler h = OwnershipChanged;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

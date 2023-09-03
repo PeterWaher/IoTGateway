@@ -77,7 +77,7 @@ namespace Waher.Networking.CoAP
 		{
 			get
 			{
-				return this.get != null;
+				return !(this.get is null);
 			}
 		}
 

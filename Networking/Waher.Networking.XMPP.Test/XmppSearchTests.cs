@@ -64,7 +64,7 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("Nick Name:" + e.NickName);
 			Console.Out.WriteLine("EMail:" + e.EMail);
 
-			if (e.SearchForm != null)
+			if (!(e.SearchForm is null))
 			{
 				foreach (Field Field in e.SearchForm.Fields)
 					Console.Out.WriteLine(Field.Var + ": " + Field.ValueString + " (" + Field.GetType().Name + ")");

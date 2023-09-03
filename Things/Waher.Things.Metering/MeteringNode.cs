@@ -586,7 +586,7 @@ namespace Waher.Things.Metering
 				if (!this.childrenLoaded)
 					this.LoadChildren().Wait();
 
-				return this.children != null && this.children.Count > 0;
+				return !(this.children is null) && this.children.Count > 0;
 			}
 		}
 
@@ -1084,7 +1084,7 @@ namespace Waher.Things.Metering
 					Timestamp = DateTime.Now
 				};
 
-				if (this.ChildrenOrdered && After != null)
+				if (this.ChildrenOrdered && !(After is null))
 				{
 					Event.AfterNodeId = After.nodeId;
 					Event.AfterPartition = After.Partition;
@@ -1203,7 +1203,7 @@ namespace Waher.Things.Metering
 				{
 					lock (this.parent.synchObject)
 					{
-						if (this.parent.children != null)
+						if (!(this.parent.children is null))
 						{
 							this.parent.children.Remove(this);
 							if (this.parent.children.Count == 0)

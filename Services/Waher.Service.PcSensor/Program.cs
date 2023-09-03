@@ -117,7 +117,7 @@ namespace Waher.Service.PcSensor
 							case XmppState.Connected:
 								Connected = true;
 
-								if (!registered && thingRegistryClient != null)
+								if (!registered && !(thingRegistryClient is null))
 									Register();
 								break;
 
@@ -297,9 +297,9 @@ namespace Waher.Service.PcSensor
 										{
 											w.WriteStartElement("Category");
 											w.WriteAttributeString("name", P.Key);
-											w.WriteAttributeString("include", CommonTypes.Encode(P.Value != null));
+											w.WriteAttributeString("include", CommonTypes.Encode(!(P.Value is null)));
 
-											if (P.Value != null)
+											if (!(P.Value is null))
 											{
 												foreach (string InstanceName in P.Value)
 												{

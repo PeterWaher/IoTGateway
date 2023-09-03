@@ -53,7 +53,7 @@ namespace Waher.Networking.HTTP.Test
 			server?.Dispose();
 			server = null;
 
-			if (sink != null)
+			if (!(sink is null))
 			{
 				Log.Unregister(sink);
 				sink.Dispose();

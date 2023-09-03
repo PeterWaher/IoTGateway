@@ -34,13 +34,13 @@ namespace Waher.Networking.CoAP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.lwm2mClient != null)
+			if (!(this.lwm2mClient is null))
 			{
 				this.lwm2mClient.Dispose();
 				this.lwm2mClient = null;
 			}
 
-			if (this.coapClient != null)
+			if (!(this.coapClient is null))
 			{
 				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
 

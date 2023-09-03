@@ -71,7 +71,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.provider != null)
+			if (!(this.provider is null))
 			{
 				Database.Register(new NullDatabaseProvider(), false);
 
@@ -106,7 +106,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -122,7 +122,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Simple Obj = (Simple)e.Current;
 
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -138,7 +138,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Simple Obj = (Simple)e.Current;
 
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -198,7 +198,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -218,7 +218,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -238,7 +238,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -301,7 +301,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -329,7 +329,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -357,7 +357,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -422,7 +422,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsNotNull(Obj);
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -450,7 +450,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Greater(this.Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -478,7 +478,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Greater(this.Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -548,7 +548,7 @@ namespace Waher.Persistence.FilesLW.Test
 						{
 							Obj = e.Current;
 							Assert.IsNotNull(Obj);
-							if (Prev != null)
+							if (!(Prev is null))
 								AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
 
 							Prev = Obj;
@@ -577,7 +577,7 @@ namespace Waher.Persistence.FilesLW.Test
 						{
 							Obj = e.Current;
 							Assert.IsNotNull(Obj);
-							if (Prev != null)
+							if (!(Prev is null))
 								AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
 
 							Prev = Obj;
@@ -645,7 +645,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -662,7 +662,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (Prev != null)
+					if (!(Prev is null))
 						AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
@@ -749,7 +749,7 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Same(e.Current.ObjectId, e.CurrentObjectId);
 					Assert.IsTrue(Ordered.Remove(e.Current.ObjectId));
 
-					if (Obj != null)
+					if (!(Obj is null))
 						AssertEx.Less(this.Index1Compare(Obj, e.Current), 0);
 
 					Obj = e.Current;
@@ -1930,7 +1930,7 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					if (Prev != null)
+					if (!(Prev is null))
 					{
 						Assert.IsTrue(Prev.SByte < Obj.SByte ||
 							(Prev.SByte == Obj.SByte && string.Compare(Prev.ShortString, Obj.ShortString) <= 0));
@@ -2360,7 +2360,7 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					if (Prev != null)
+					if (!(Prev is null))
 					{
 						Assert.IsTrue(Prev.SByte < Obj.SByte ||
 							(Prev.SByte == Obj.SByte && string.Compare(Prev.CIString, Obj.CIString) <= 0));

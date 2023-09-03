@@ -50,7 +50,7 @@ namespace Waher.Networking.HTTP.Test
 			server?.Dispose();
 			server = null;
 
-			if (sink != null)
+			if (!(sink is null))
 			{
 				Log.Unregister(sink);
 				sink.Dispose();
@@ -68,7 +68,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.webSocketListener != null)
+			if (!(this.webSocketListener is null))
 			{
 				server.Unregister(this.webSocketListener);
 				this.webSocketListener.Dispose();

@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (sink != null)
+			if (!(sink is null))
 			{
 				Log.Unregister(sink);
 				sink.Dispose();
@@ -252,10 +252,10 @@ namespace Waher.Networking.XMPP.Test
 			this.client1?.Dispose();
 			this.client2?.Dispose();
 
-			if (this.ex1 != null)
+			if (!(this.ex1 is null))
 				throw new TargetInvocationException(this.ex1);
 
-			if (this.ex2 != null)
+			if (!(this.ex2 is null))
 				throw new TargetInvocationException(this.ex2);
 		}
 	}

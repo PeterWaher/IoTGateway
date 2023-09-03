@@ -42,13 +42,13 @@ namespace Waher.Security.DTLS.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.dtlsOverUdp != null)
+			if (!(this.dtlsOverUdp is null))
 			{
 				this.dtlsOverUdp.Dispose();
 				this.dtlsOverUdp = null;
 			}
 
-			if (this.udpClient != null)
+			if (!(this.udpClient is null))
 			{
 				this.udpClient.Dispose();
 				this.udpClient = null;

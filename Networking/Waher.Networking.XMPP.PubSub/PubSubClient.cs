@@ -414,7 +414,7 @@ namespace Waher.Networking.XMPP.PubSub
 				DataForm Form = null;
 				NodeConfiguration Configuration = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" &&
 					E.NamespaceURI == NamespacePubSubOwner)
 				{
 					foreach (XmlNode N in E.ChildNodes)
@@ -624,7 +624,7 @@ namespace Waher.Networking.XMPP.PubSub
 				DataForm Form = null;
 				NodeConfiguration Configuration = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" &&
 					E.NamespaceURI == NamespacePubSubOwner)
 				{
 					foreach (XmlNode N in E.ChildNodes)
@@ -863,7 +863,7 @@ namespace Waher.Networking.XMPP.PubSub
 				XmlElement E;
 				string SubscriptionId = string.Empty;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -1058,7 +1058,7 @@ namespace Waher.Networking.XMPP.PubSub
 				DataForm Form = null;
 				SubscriptionOptions Options = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" &&
 					E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
@@ -1288,7 +1288,7 @@ namespace Waher.Networking.XMPP.PubSub
 				DataForm Form = null;
 				SubscriptionOptions Options = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" &&
 					E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
@@ -1405,7 +1405,7 @@ namespace Waher.Networking.XMPP.PubSub
 				DataForm Form = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -1551,7 +1551,7 @@ namespace Waher.Networking.XMPP.PubSub
 				string NodeName = string.Empty;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" &&
 					E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N2 in E.ChildNodes)
@@ -1969,7 +1969,7 @@ namespace Waher.Networking.XMPP.PubSub
 				ResultPage ResultPage = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2165,7 +2165,7 @@ namespace Waher.Networking.XMPP.PubSub
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2282,7 +2282,7 @@ namespace Waher.Networking.XMPP.PubSub
 				List<Affiliation> Affiliations = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSubOwner)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2428,7 +2428,7 @@ namespace Waher.Networking.XMPP.PubSub
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2516,7 +2516,7 @@ namespace Waher.Networking.XMPP.PubSub
 				List<Affiliation> Affiliations = new List<Affiliation>();
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "pubsub" && E.NamespaceURI == NamespacePubSub)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{

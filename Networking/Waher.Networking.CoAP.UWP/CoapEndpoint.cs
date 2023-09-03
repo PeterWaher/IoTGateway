@@ -801,7 +801,7 @@ namespace Waher.Networking.CoAP
 				{
 					if (OutgoingMessage.token == Token)
 					{
-						if (Code == CoapCode.Continue && IncomingMessage.Block1 != null)
+						if (Code == CoapCode.Continue && !(IncomingMessage.Block1 is null))
 						{
 							if (IncomingMessage.Block1.Size < OutgoingMessage.blockSize)
 							{
@@ -827,7 +827,7 @@ namespace Waher.Networking.CoAP
 						}
 						else
 						{
-							if (IncomingMessage.Block2 != null)
+							if (!(IncomingMessage.Block2 is null))
 							{
 								OutgoingMessage.options = Remove(OutgoingMessage.options, 27);     // Remove Block1 option, if available.
 
@@ -867,7 +867,7 @@ namespace Waher.Networking.CoAP
 								this.activeTokens.Remove(Token);
 						}
 
-						if (OutgoingMessage.resource != null)
+						if (!(OutgoingMessage.resource is null))
 							OutgoingMessage.resource.UnregisterSubscription(IncomingMessage.From, Token);
 
 						this.Fail(Client, OutgoingMessage);
@@ -893,10 +893,10 @@ namespace Waher.Networking.CoAP
 							null, null, null, null, null, null);
 					}
 
-					if (IncomingMessage.Block2 != null)
+					if (!(IncomingMessage.Block2 is null))
 					{
 						IncomingMessage.Payload = OutgoingMessage.BlockReceived(Client, IncomingMessage);
-						if (IncomingMessage.Payload != null)
+						if (!(IncomingMessage.Payload is null))
 						{
 							if (!IncomingMessage.Observe.HasValue)
 							{
@@ -1041,7 +1041,7 @@ namespace Waher.Networking.CoAP
 			CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From,
 				IncomingMessage, Resource.Notifications, Resource, AdditionalResponseOptions);
 			string Key = IncomingMessage.From.Address.ToString() + " " + IncomingMessage.Token.ToString();
-			int Block2Nr = IncomingMessage.Block2 != null ? IncomingMessage.Block2.Number : 0;
+			int Block2Nr = !(IncomingMessage.Block2 is null) ? IncomingMessage.Block2.Number : 0;
 
 			Response.Responded = AlreadyResponded;
 
@@ -1463,7 +1463,7 @@ namespace Waher.Networking.CoAP
 				b2--;
 			}
 
-			if (Options != null && Options.Length > 0)
+			if (!(Options is null) && Options.Length > 0)
 			{
 				byte[] Value;
 				int LastNumber = 0;
@@ -1529,7 +1529,7 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			if (Payload != null && Payload.Length > 0)
+			if (!(Payload is null) && Payload.Length > 0)
 			{
 				ms.WriteByte(0xff);
 				ms.Write(Payload, 0, Payload.Length);
@@ -1652,7 +1652,7 @@ namespace Waher.Networking.CoAP
 			if (BlockNr * BlockSize > (Payload is null ? 0 : Payload.Length))
 				throw new ArgumentException("Invalid block number.", nameof(BlockNr));
 
-			if (Payload != null && Payload.Length > BlockSize)
+			if (!(Payload is null) && Payload.Length > BlockSize)
 			{
 				int Pos = BlockNr * BlockSize;
 				int NrLeft = Payload.Length - Pos;
@@ -1763,7 +1763,7 @@ namespace Waher.Networking.CoAP
 					}
 					while (this.outgoingMessages.ContainsKey(MessageID.Value));
 
-					if (Message.acknowledged || Message.callback != null)
+					if (Message.acknowledged || !(Message.callback is null))
 						this.outgoingMessages[MessageID.Value] = Message;
 				}
 			}
@@ -1783,7 +1783,7 @@ namespace Waher.Networking.CoAP
 				this.lastNonMsg = Message;
 				this.lastNonMsgId = Message.messageID;
 
-				if (Message.callback != null)
+				if (!(Message.callback is null))
 				{
 					Message.timeoutMilliseconds = 1000 * ACK_TIMEOUT;
 					Message.retryCount = MAX_RETRANSMIT;
@@ -1801,7 +1801,7 @@ namespace Waher.Networking.CoAP
 			{
 				Client.BeginTransmit(Message);
 
-				if (Message.acknowledged || Message.callback != null)
+				if (Message.acknowledged || !(Message.callback is null))
 				{
 					this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
 						this.CheckRetry, new object[] { Client, Message });
@@ -1821,7 +1821,7 @@ namespace Waher.Networking.CoAP
 
 					P.BeginTransmit(Message);
 
-					if (Message.acknowledged || Message.callback != null)
+					if (Message.acknowledged || !(Message.callback is null))
 					{
 						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
 							this.CheckRetry, new object[] { P, Message });

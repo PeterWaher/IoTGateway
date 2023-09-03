@@ -134,13 +134,13 @@ namespace Waher.Runtime.ServiceRegistration
 			w.WriteAttributeString("created", XML.Encode(Registration.Created));
 			w.WriteAttributeString("updated", XML.Encode(Registration.Updated));
 
-			if (Registration.Features != null)
+			if (!(Registration.Features is null))
 			{
 				foreach (string Feature in Registration.Features)
 					w.WriteElementString("Feature", Feature);
 			}
 
-			if (Registration.Annotations != null)
+			if (!(Registration.Annotations is null))
 			{
 				foreach (Annotation Annotation in Registration.Annotations)
 				{
@@ -151,7 +151,7 @@ namespace Waher.Runtime.ServiceRegistration
 				}
 			}
 
-			if (Registration.Assemblies != null)
+			if (!(Registration.Assemblies is null))
 			{
 				foreach (string QN in Registration.Assemblies)
 					w.WriteElementString("Assembly", QN);

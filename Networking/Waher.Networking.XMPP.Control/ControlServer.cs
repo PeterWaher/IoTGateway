@@ -556,7 +556,7 @@ namespace Waher.Networking.XMPP.Control
 							LinkedList<ControlOperation> Operations2 = null;
 							bool Restricted;
 
-							if (e2.Nodes != null || e2.ParameterNames != null)
+							if (!(e2.Nodes is null) || !(e2.ParameterNames is null))
 							{
 								Dictionary<IThingReference, bool> AllowedNodes = null;
 								Dictionary<string, bool> AllowedParameterNames = null;
@@ -564,14 +564,14 @@ namespace Waher.Networking.XMPP.Control
 								Operations2 = new LinkedList<ControlOperation>();
 								Restricted = false;
 
-								if (e2.Nodes != null)
+								if (!(e2.Nodes is null))
 								{
 									AllowedNodes = new Dictionary<IThingReference, bool>();
 									foreach (IThingReference Node in e2.Nodes)
 										AllowedNodes[Node] = true;
 								}
 
-								if (e2.ParameterNames != null)
+								if (!(e2.ParameterNames is null))
 								{
 									AllowedParameterNames = new Dictionary<string, bool>();
 									foreach (string ParameterName in e2.ParameterNames)
@@ -580,13 +580,13 @@ namespace Waher.Networking.XMPP.Control
 
 								foreach (ControlOperation Operation in Operations)
 								{
-									if (AllowedNodes != null && !AllowedNodes.ContainsKey(Operation.Node ?? ThingReference.Empty))
+									if (!(AllowedNodes is null) && !AllowedNodes.ContainsKey(Operation.Node ?? ThingReference.Empty))
 									{
 										Restricted = true;
 										continue;
 									}
 
-									if (AllowedParameterNames != null && !AllowedParameterNames.ContainsKey(Operation.ParameterName))
+									if (!(AllowedParameterNames is null) && !AllowedParameterNames.ContainsKey(Operation.ParameterName))
 									{
 										Restricted = true;
 										continue;
@@ -631,7 +631,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append("<resp xmlns=\"");
 			Xml.Append(ControlClient.NamespaceControl);
 
-			if (Nodes != null || ParameterNames != null)
+			if (!(Nodes is null) || !(ParameterNames is null))
 			{
 				Xml.Append("\">");
 
@@ -824,7 +824,7 @@ namespace Waher.Networking.XMPP.Control
 					{
 						if (e2.Ok && e2.CanControl)
 						{
-							if (e2.ParameterNames != null)
+							if (!(e2.ParameterNames is null))
 							{
 								List<ControlParameter> Parameters2 = new List<ControlParameter>();
 

@@ -252,7 +252,7 @@ namespace Waher.Script.Lab
 
 				return Last;
 			}
-			else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+			else if (Ans.AssociatedObjectValue is ObjectMatrix M && !(M.ColumnNames is null))
 			{
 				StringBuilder Markdown = new StringBuilder();
 
@@ -278,7 +278,7 @@ namespace Waher.Script.Lab
 						Markdown.Append("| ");
 
 						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (Item != null)
+						if (!(Item is null))
 						{
 							if (!(Item is string s2))
 								s2 = Expression.ToString(Item);
@@ -441,7 +441,7 @@ namespace Waher.Script.Lab
 				Point P = e.GetPosition(ImageBlock);
 				string Script;
 
-				if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image && Image.Item4 != null && Image.Item5 != null)
+				if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image && !(Image.Item4 is null) && !(Image.Item5 is null))
 				{
 					double X = ((double)P.X) * Image.Item2 / ImageBlock.ActualWidth;
 					double Y = ((double)P.Y) * Image.Item3 / ImageBlock.ActualHeight;
@@ -527,23 +527,23 @@ namespace Waher.Script.Lab
 			try
 			{
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int L)
+				if (!(Value is null) && Value is int L)
 					this.Left = L;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int T)
+				if (!(Value is null) && Value is int T)
 					this.Top = T;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int W)
+				if (!(Value is null) && Value is int W)
 					this.Width = W;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int H)
+				if (!(Value is null) && Value is int H)
 					this.Height = H;
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string s)
+				if (!(Value is null) && Value is string s)
 					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), s);
 			}
 			catch (Exception ex)

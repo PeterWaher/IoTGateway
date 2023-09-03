@@ -71,7 +71,7 @@ namespace Waher.Security.PKCS
 		/// <returns>Byte array.</returns>
 		public byte[] ToArray()
 		{
-			if (this.stack != null && this.stack.First != null)
+			if (!(this.stack is null) && !(this.stack.First is null))
 				throw new Exception("DER output not properly closed.");
 
 			return this.output.ToArray();

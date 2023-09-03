@@ -42,7 +42,7 @@ namespace Waher.Things.Arduino
 				foreach (INode Node in await MeteringTopology.Root.ChildNodes)
 				{
 					Port = Node as UsbConnectedDevice;
-					if (Port != null && Port.PortName == this.Name)
+					if (!(Port is null) && Port.PortName == this.Name)
 					{
 						Found = true;
 						break;
@@ -92,7 +92,7 @@ namespace Waher.Things.Arduino
 			{
 				Pin Pin = this.GetPin(pin.ToString());
 
-				if (Pin != null && Pin is DigitalPin DigitalPin)
+				if (!(Pin is null) && Pin is DigitalPin DigitalPin)
 					DigitalPin.Pin_ValueChanged(state);
 			}
 			catch (Exception ex)
@@ -107,7 +107,7 @@ namespace Waher.Things.Arduino
 			{
 				Pin Pin = this.GetPin(pin);
 
-				if (Pin != null && Pin is AnalogInput AnalogInput)
+				if (!(Pin is null) && Pin is AnalogInput AnalogInput)
 					await AnalogInput.Pin_ValueChanged(value);
 			}
 			catch (Exception ex)
@@ -129,13 +129,13 @@ namespace Waher.Things.Arduino
 
 		public void Dispose()
 		{
-			if (this.Device != null)
+			if (!(this.Device is null))
 			{
 				this.Device.Dispose();
 				this.Device = null;
 			}
 
-			if (this.SerialPort != null)
+			if (!(this.SerialPort is null))
 			{
 				this.SerialPort.Dispose();
 				this.SerialPort = null;

@@ -214,7 +214,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (MarkdownElement E in NewChildren)
 			{
-				if ((Last = this.LastChild) != null && Last is MarkdownElementChildren MarkdownElementChildren && Last.GetType() == E.GetType())
+				if (!((Last = this.LastChild) is null) && Last is MarkdownElementChildren MarkdownElementChildren && Last.GetType() == E.GetType())
 					MarkdownElementChildren.AddChildren(((MarkdownElementChildren)E).Children);
 				else
 					base.AddChildren((IEnumerable<MarkdownElement>)new MarkdownElement[] { E });

@@ -591,7 +591,7 @@ namespace Waher.Networking.XMPP.Control
 
 			if (e.Ok)
 			{
-				if (E != null && E.LocalName == "resp" && E.NamespaceURI == NamespaceControl)
+				if (!(E is null) && E.LocalName == "resp" && E.NamespaceURI == NamespaceControl)
 				{
 					List<ThingReference> Nodes = null;
 					List<string> ParameterNames = null;

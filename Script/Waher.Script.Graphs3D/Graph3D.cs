@@ -702,7 +702,7 @@ namespace Waher.Script.Graphs3D
 				Points = DrawingVolume.Scale(ex.Current, ey.Current, ez.Current);
 				Normals = eN.Current;
 
-				if (PrevPainter != null && ePainters.Current.GetType() == PrevPainter.GetType())
+				if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
 					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, PrevPoints, PrevNormals, PrevParameters, DrawingVolume);
 				else
 					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, null, null, null, DrawingVolume);

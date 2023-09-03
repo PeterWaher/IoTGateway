@@ -108,7 +108,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">Optional options.</param>
 		public void Respond(CoapCode Code, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			int BlockNr = this.request.Block2 != null ? this.request.Block2.Number : 0;
+			int BlockNr = !(this.request.Block2 is null) ? this.request.Block2.Number : 0;
 			this.Respond(Code, Payload, BlockNr, BlockSize, Options);
 		}
 

@@ -267,7 +267,7 @@ namespace Waher.Runtime.Language
 									while (Xml.MoveToNextAttribute());
 								}
 
-								if (Flag != null && FlagWidth.HasValue && FlagHeight.HasValue)
+								if (!(Flag is null) && FlagWidth.HasValue && FlagHeight.HasValue)
 									Language = await CreateLanguageAsync(Code, Name, Flag, FlagWidth.Value, FlagHeight.Value);
 								else
 									Language = await CreateLanguageAsync(Code, Name, null, 0, 0);

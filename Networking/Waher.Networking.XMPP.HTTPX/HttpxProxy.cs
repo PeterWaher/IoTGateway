@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			get => this.serverlessMessaging;
 			set
 			{
-				if (this.serverlessMessaging != null && this.serverlessMessaging != value)
+				if (!(this.serverlessMessaging is null) && this.serverlessMessaging != value)
 					throw new Exception("Property already set.");
 
 				this.serverlessMessaging = value;
@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			get => this.httpxCache;
 			set
 			{
-				if (this.httpxCache != null && this.httpxCache != value)
+				if (!(this.httpxCache is null) && this.httpxCache != value)
 					throw new Exception("Property already set.");
 
 				this.httpxCache = value;
@@ -211,16 +211,16 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				IHttpxCachedResource CachedResource;
 
-				if (Method == "GET" && this.httpxCache != null)
+				if (Method == "GET" && !(this.httpxCache is null))
 				{
-					if ((CachedResource = await this.httpxCache.TryGetCachedResource(BareJID, LocalUrl)) != null)
+					if (!((CachedResource = await this.httpxCache.TryGetCachedResource(BareJID, LocalUrl)) is null))
 					{
-						if (Request.Header.IfNoneMatch != null)
+						if (!(Request.Header.IfNoneMatch is null))
 						{
-							if (CachedResource.ETag != null && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
+							if (!(CachedResource.ETag is null) && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
 								throw new NotModifiedException();
 						}
-						else if (Request.Header.IfModifiedSince != null)
+						else if (!(Request.Header.IfModifiedSince is null))
 						{
 							DateTimeOffset? Limit;
 
@@ -431,7 +431,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			ReadoutState State = new ReadoutState(Response, BareJID, LocalUrl)
 			{
-				Cacheable = (Method == "GET" && this.httpxCache != null)
+				Cacheable = (Method == "GET" && !(this.httpxCache is null))
 			};
 
 			string s = LocalUrl;
@@ -479,7 +479,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			State2.Response.StatusCode = e.StatusCode;
 			State2.Response.StatusMessage = e.StatusMessage;
 
-			if (e.HttpResponse != null)
+			if (!(e.HttpResponse is null))
 			{
 				foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
 				{
@@ -540,7 +540,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					State2.TempOutput = new TemporaryStream();
 				}
 
-				if (e.Data != null)
+				if (!(e.Data is null))
 					await this.BinaryDataReceived(State2, true, e.Data);
 			}
 		}
@@ -577,7 +577,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			try
 			{
-				if (State.TempOutput != null)
+				if (!(State.TempOutput is null))
 				{
 					State.TempOutput.Position = 0;
 
@@ -655,7 +655,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 					}
 
-					if (this.Pragma != null && this.Pragma.Contains("no-cache"))
+					if (!(this.Pragma is null) && this.Pragma.Contains("no-cache"))
 						return false;
 
 					return true;

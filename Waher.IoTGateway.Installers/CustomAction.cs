@@ -896,7 +896,7 @@ namespace Waher.IoTGateway.Installers
 					Assembly A = Assembly.LoadFrom(SourceFileName);
 					AssemblyName AN = A.GetName();
 
-					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 					{
 						foreach (KeyValuePair<string, object> P in Targets)
 						{
@@ -933,7 +933,7 @@ namespace Waher.IoTGateway.Installers
 						}
 					}
 
-					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+					if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 					{
 						foreach (KeyValuePair<string, object> P in Libraries)
 						{
@@ -1239,7 +1239,7 @@ namespace Waher.IoTGateway.Installers
 					AssemblyName AN = A.GetName();
 					string Key = AN.Name + "/" + AN.Version.ToString();
 
-					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 					{
 						Targets.Remove(Key);
 
@@ -1262,7 +1262,7 @@ namespace Waher.IoTGateway.Installers
 						}
 					}
 
-					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+					if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 					{
 						foreach (KeyValuePair<string, object> P in Libraries)
 						{

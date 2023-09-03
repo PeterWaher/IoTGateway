@@ -51,13 +51,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (this.sensorServer != null)
+			if (!(this.sensorServer is null))
 			{
 				this.sensorServer.Dispose();
 				this.sensorServer = null;
 			}
 
-			if (this.sensorClient != null)
+			if (!(this.sensorClient is null))
 			{
 				this.sensorClient.Dispose();
 				this.sensorClient = null;

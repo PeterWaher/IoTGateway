@@ -109,7 +109,7 @@ namespace Waher.Events.Files
 						this.output.Write(Event.Facility);
 					}
 
-					if (Event.Tags != null && Event.Tags.Length > 0)
+					if (!(Event.Tags is null) && Event.Tags.Length > 0)
 					{
 						this.output.WriteLine("\r\n");
 
@@ -119,7 +119,7 @@ namespace Waher.Events.Files
 							this.output.Write(Tag.Key);
 							this.output.Write('=');
 
-							if (Tag.Value != null)
+							if (!(Tag.Value is null))
 								this.output.Write(Tag.Value.ToString());
 						}
 					}

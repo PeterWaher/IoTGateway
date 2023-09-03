@@ -172,7 +172,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		protected virtual Task ValueUpdated()
 		{
-			if (this.objInstance != null)
+			if (!(this.objInstance is null))
 				return this.objInstance.ValueUpdated(this);
 			else
 				return Task.CompletedTask;
@@ -216,7 +216,7 @@ namespace Waher.Networking.LWM2M
 				return Task.CompletedTask;
 			}
 
-			if (this.OnBeforeGet != null)
+			if (!(this.OnBeforeGet is null))
 			{
 				try
 				{
@@ -300,7 +300,7 @@ namespace Waher.Networking.LWM2M
 				return;
 			}
 
-			if (Request.UriQuery != null && Request.UriQuery.Count > 0)    // Write attributes
+			if (!(Request.UriQuery is null) && Request.UriQuery.Count > 0)    // Write attributes
 			{
 				if (!FromBootstrapServer)
 				{
@@ -327,7 +327,7 @@ namespace Waher.Networking.LWM2M
 				}
 			}
 
-			if (Request.ContentFormat != null)      // Write operation
+			if (!(Request.ContentFormat is null))      // Write operation
 			{
 				if (!this.canWrite && !FromBootstrapServer)
 				{

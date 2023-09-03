@@ -172,7 +172,7 @@ namespace Waher.Networking.UPnP
 					Soap.Append(">");
 
 					if (InputValues.TryGetValue(Argument.Name, out object Value) &&
-						(Variable = this.parent.GetVariable(Argument.RelatedStateVariable)) != null)
+						!((Variable = this.parent.GetVariable(Argument.RelatedStateVariable)) is null))
 					{
 						Soap.Append(XmlAttributeEncode(await Variable.ValueToXmlString(Value)));
 					}
@@ -284,7 +284,7 @@ namespace Waher.Networking.UPnP
 
 					if (this.argumentByName.TryGetValue(E.LocalName, out UPnPArgument Argument2))
 					{
-						if ((Variable = this.parent.GetVariable(Argument2.RelatedStateVariable)) != null)
+						if (!((Variable = this.parent.GetVariable(Argument2.RelatedStateVariable)) is null))
 						{
 							object Value2 = Variable.XmlStringToValue(E.InnerText);
 							OutputValues[E.LocalName] = Value2;

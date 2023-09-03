@@ -37,7 +37,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (provider != null)
+			if (!(provider is null))
 			{
 				provider.Dispose();
 				provider = null;

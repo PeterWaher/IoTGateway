@@ -390,7 +390,7 @@ namespace Waher.Utility.Acme
             }
             catch (Exception ex)
             {
-                while (ex != null && ex.InnerException != null)
+                while (!(ex is null) && !(ex.InnerException is null))
                 {
                     if (ex is System.Reflection.TargetInvocationException || ex is TypeInitializationException)
                         ex = ex.InnerException;
@@ -444,13 +444,13 @@ namespace Waher.Utility.Acme
                 if (AcmeDirectory.ExternalAccountRequired)
                     LogWarning("An external account is required.");
 
-                if (AcmeDirectory.TermsOfService != null)
+                if (!(AcmeDirectory.TermsOfService is null))
                 {
                     LogInformational("Terms of service available.",
                         new KeyValuePair<string, object>("URL", AcmeDirectory.TermsOfService.ToString()));
                 }
 
-                if (AcmeDirectory.Website != null)
+                if (!(AcmeDirectory.Website is null))
                 {
                     LogInformational("Web site available.",
                         new KeyValuePair<string, object>("URL", AcmeDirectory.Website.ToString()));
@@ -474,7 +474,7 @@ namespace Waher.Utility.Acme
                         new KeyValuePair<string, object>("Status", Account.Status),
                         new KeyValuePair<string, object>("Contact", Account.Contact));
 
-                    if (contactURLs != null && !AreEqual(Account.Contact, ContactURLs))
+                    if (!(contactURLs is null) && !AreEqual(Account.Contact, ContactURLs))
                     {
                         LogInformational("Updating contact URIs in account.");
 
@@ -517,7 +517,7 @@ namespace Waher.Utility.Acme
                 }
 
 
-                if (domainNames != null)
+                if (!(domainNames is null))
                 {
                     if (!string.IsNullOrEmpty(httpRootFolder))
                     {
@@ -863,7 +863,7 @@ namespace Waher.Utility.Acme
                     }
                     finally
                     {
-                        if (FileNames != null)
+                        if (!(FileNames is null))
                         {
                             foreach (string FileName2 in FileNames)
                                 File.Delete(FileName2);

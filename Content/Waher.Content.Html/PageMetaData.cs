@@ -57,7 +57,7 @@ namespace Waher.Content.Html
 			string Name;
 			string Value;
 
-			if (Doc.Meta != null)
+			if (!(Doc.Meta is null))
 			{
 				foreach (Meta Meta in Doc.Meta)
 				{
@@ -153,12 +153,12 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:image:width":
-							if (LastImage != null && int.TryParse(Value, out int i))
+							if (!(LastImage is null) && int.TryParse(Value, out int i))
 								LastImage.Width = i;
 							break;
 
 						case "og:image:height":
-							if (LastImage != null && int.TryParse(Value, out i))
+							if (!(LastImage is null) && int.TryParse(Value, out i))
 								LastImage.Height = i;
 							break;
 
@@ -242,19 +242,19 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:video:width":
-							if (LastVideo != null && int.TryParse(Value, out i))
+							if (!(LastVideo is null) && int.TryParse(Value, out i))
 								LastVideo.Width = i;
 							break;
 
 						case "og:video:height":
-							if (LastVideo != null && int.TryParse(Value, out i))
+							if (!(LastVideo is null) && int.TryParse(Value, out i))
 								LastVideo.Height = i;
 							break;
 					}
 				}
 			}
 
-			if (string.IsNullOrEmpty(this.title) && Doc.Title != null)
+			if (string.IsNullOrEmpty(this.title) && !(Doc.Title is null))
 				this.title = Doc.Title.InnerText.Trim();
 
 			this.images = Images?.ToArray();

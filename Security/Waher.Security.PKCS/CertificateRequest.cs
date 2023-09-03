@@ -327,7 +327,7 @@ namespace Waher.Security.PKCS
 
 			DER.StartContent(Asn1TypeClass.ContextSpecific);	// attributes
 
-			if (this.subjectAlternativeNames != null && this.subjectAlternativeNames.Length > 0)
+			if (!(this.subjectAlternativeNames is null) && this.subjectAlternativeNames.Length > 0)
 			{
 				DER.StartSEQUENCE();
 				DER.OBJECT_IDENTIFIER("1.2.840.113549.1.9.14");  // extensionRequest

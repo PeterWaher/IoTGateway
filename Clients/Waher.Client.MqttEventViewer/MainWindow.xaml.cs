@@ -102,13 +102,13 @@ namespace Waher.Client.MqttEventViewer
 			{
 				this.Message.Content = string.Empty;
 
-				if (this.receptor != null)
+				if (!(this.receptor is null))
 				{
 					this.receptor.Dispose();
 					this.receptor = null;
 				}
 
-				if (this.mqtt != null)
+				if (!(this.mqtt is null))
 				{
 					this.mqtt.Dispose();
 					this.mqtt = null;
@@ -168,51 +168,51 @@ namespace Waher.Client.MqttEventViewer
 			try
 			{
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int Left)
+				if (!(Value is null) && Value is int Left)
 					this.Left = Left;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int Top)
+				if (!(Value is null) && Value is int Top)
 					this.Top = Top;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int Width)
+				if (!(Value is null) && Value is int Width)
 					this.Width = Width;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int Height)
+				if (!(Value is null) && Value is int Height)
 					this.Height = Height;
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string WindowState)
+				if (!(Value is null) && Value is string WindowState)
 					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), WindowState);
 
 				Value = Registry.GetValue(registryKey, "Host", string.Empty);
-				if (Value != null && Value is string Host)
+				if (!(Value is null) && Value is string Host)
 					this.Host.Text = Host;
 
 				Value = Registry.GetValue(registryKey, "UserName", string.Empty);
-				if (Value != null && Value is string UserName)
+				if (!(Value is null) && Value is string UserName)
 					this.UserName.Text = UserName;
 
 				Value = Registry.GetValue(registryKey, "Password", string.Empty);
-				if (Value != null && Value is string Password)
+				if (!(Value is null) && Value is string Password)
 					this.Password.Password = Password;
 
 				Value = Registry.GetValue(registryKey, "Topic", string.Empty);
-				if (Value != null && Value is string Topic)
+				if (!(Value is null) && Value is string Topic)
 					this.Topic.Text = Topic;
 
 				Value = Registry.GetValue(registryKey, "Port", 0);
-				if (Value != null && Value is int Port)
+				if (!(Value is null) && Value is int Port)
 					this.Port.Text = Port.ToString();
 
 				Value = Registry.GetValue(registryKey, "Tls", 0);
-				if (Value != null && Value is int Tls)
+				if (!(Value is null) && Value is int Tls)
 					this.Tls.IsChecked = Tls != 0;
 
 				Value = Registry.GetValue(registryKey, "Trust", 0);
-				if (Value != null && Value is int Trust)
+				if (!(Value is null) && Value is int Trust)
 					this.Trust.IsChecked = Trust != 0;
 
 				GridView GridView = (GridView)this.EventListView.View;
@@ -221,7 +221,7 @@ namespace Waher.Client.MqttEventViewer
 				for (i = 0; i < 9; i++)
 				{
 					Value = Registry.GetValue(registryKey, "Col" + i.ToString(), GridView.Columns[i].Width);
-					if (Value != null && Value is int ColWidth)
+					if (!(Value is null) && Value is int ColWidth)
 						GridView.Columns[i].Width = ColWidth;
 				}
 			}

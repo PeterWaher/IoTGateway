@@ -157,7 +157,7 @@ namespace Waher.Networking.PeerToPeer
 					return;
 			}
 
-			if (Player.Connection != null)
+			if (!(Player.Connection is null))
 				await Player.Connection.UdpDatagramReceived(Sender, e);
 		}
 
@@ -606,7 +606,7 @@ namespace Waher.Networking.PeerToPeer
 			PeerConnection Connection;
 			foreach (Player Player in this.remotePlayers)
 			{
-				if ((Connection = Player.Connection) != null)
+				if (!((Connection = Player.Connection) is null))
 					Connection.SendTcp(Packet);
 			}
 		}
@@ -663,7 +663,7 @@ namespace Waher.Networking.PeerToPeer
 			PeerConnection Connection;
 			foreach (Player Player in this.remotePlayers)
 			{
-				if ((Connection = Player.Connection) != null)
+				if (!((Connection = Player.Connection) is null))
 					Connection.SendUdp(Packet, IncludeNrPreviousPackets);
 			}
 		}
@@ -1081,7 +1081,7 @@ namespace Waher.Networking.PeerToPeer
 
 					foreach (Player Player in this.remotePlayersByEndpoint.Values)
 					{
-						if (Player.Connection != null)
+						if (!(Player.Connection is null))
 							Player.Connection.Dispose();
 					}
 
@@ -1119,7 +1119,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private Task MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
 		{
-			if (this.mqttConnection != null && PacketIdentifier == this.mqttTerminatedPacketIdentifier)
+			if (!(this.mqttConnection is null) && PacketIdentifier == this.mqttTerminatedPacketIdentifier)
 			{
 				this.mqttConnection.Dispose();
 				this.mqttConnection = null;

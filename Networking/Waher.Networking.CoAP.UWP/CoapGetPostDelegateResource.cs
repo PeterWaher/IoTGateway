@@ -38,7 +38,7 @@ namespace Waher.Networking.CoAP
 		{
 			get
 			{
-				return this.post != null;
+				return !(this.post is null);
 			}
 		}
 

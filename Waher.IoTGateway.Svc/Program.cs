@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -56,7 +55,7 @@ namespace Waher.IoTGateway.Svc
 					using StreamWriter w = File.CreateText(FileName);
 					w.Write("Type: ");
 
-					if (e.ExceptionObject != null)
+					if (!(e.ExceptionObject is null))
 						w.WriteLine(e.ExceptionObject.GetType().FullName);
 					else
 						w.WriteLine("null");
@@ -79,7 +78,7 @@ namespace Waher.IoTGateway.Svc
 					}
 					else
 					{
-						if (e.ExceptionObject != null)
+						if (!(e.ExceptionObject is null))
 							w.WriteLine(e.ExceptionObject.ToString());
 
 						w.WriteLine();
@@ -91,7 +90,7 @@ namespace Waher.IoTGateway.Svc
 
 				if (e.ExceptionObject is Exception ex2)
 					Log.Critical(ex2);
-				else if (e.ExceptionObject != null)
+				else if (!(e.ExceptionObject is null))
 					Log.Critical(e.ExceptionObject.ToString());
 				else
 					Log.Critical("Unexpected null exception thrown.");

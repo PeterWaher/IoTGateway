@@ -286,7 +286,7 @@ namespace Waher.Networking.CoAP.Test
 
 		private void Cleanup(ref CoapEndpoint Client)
 		{
-			if (Client != null)
+			if (!(Client is null))
 			{
 				ulong[] Tokens = Client.GetActiveTokens();
 				ushort[] MessageIDs = Client.GetActiveMessageIDs();
@@ -379,7 +379,7 @@ namespace Waher.Networking.CoAP.Test
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (Result != null)
+					if (!(Result is null))
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -401,7 +401,7 @@ namespace Waher.Networking.CoAP.Test
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (Result != null)
+					if (!(Result is null))
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -423,7 +423,7 @@ namespace Waher.Networking.CoAP.Test
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (Result != null)
+					if (!(Result is null))
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();

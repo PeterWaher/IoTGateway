@@ -46,7 +46,7 @@ namespace Waher.Networking.Modbus.Test
 			filesProvider?.Dispose();
 			filesProvider = null;
 
-			if (consoleEventSink != null)
+			if (!(consoleEventSink is null))
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;

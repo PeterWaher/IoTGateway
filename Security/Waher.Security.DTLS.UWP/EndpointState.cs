@@ -85,7 +85,7 @@ namespace Waher.Security.DTLS
 			get
 			{
 				if (this.credentials is PresharedKey Psk)
-					return Psk.Identity != null && Psk.Key != null;
+					return !(Psk.Identity is null) && !(Psk.Key is null);
 				else
 					return false;
 			}

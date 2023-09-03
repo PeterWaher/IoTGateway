@@ -66,19 +66,19 @@ namespace Waher.Networking.HTTP
 
 			List<string> Methods = new List<string>();
 
-			if ((!(this.get is null) && this.get.AllowsGET) || (this.getRanges != null && this.getRanges.AllowsGET))
+			if ((!(this.get is null) && this.get.AllowsGET) || (!(this.getRanges is null) && this.getRanges.AllowsGET))
 			{
 				Methods.Add("GET");
 				Methods.Add("HEAD");
 			}
 
-			if ((!(this.post is null) && this.post.AllowsPOST) || (this.postRanges != null && this.postRanges.AllowsPOST))
+			if ((!(this.post is null) && this.post.AllowsPOST) || (!(this.postRanges is null) && this.postRanges.AllowsPOST))
 				Methods.Add("POST");
 
-			if ((!(this.put is null) && this.put.AllowsPUT) || (this.putRanges != null && this.putRanges.AllowsPUT))
+			if ((!(this.put is null) && this.put.AllowsPUT) || (!(this.putRanges is null) && this.putRanges.AllowsPUT))
 				Methods.Add("PUT");
 
-			if ((!(this.patch is null) && this.patch.AllowsPATCH) || (this.patchRanges != null && this.patchRanges.AllowsPATCH))
+			if ((!(this.patch is null) && this.patch.AllowsPATCH) || (!(this.patchRanges is null) && this.patchRanges.AllowsPATCH))
 				Methods.Add("PATCH");
 
 			if (!(this.delete is null) && this.delete.AllowsDELETE)

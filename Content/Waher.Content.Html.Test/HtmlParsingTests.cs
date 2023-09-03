@@ -74,7 +74,7 @@ namespace Waher.Content.Html.Test
 					if (E.HasChildren)
 						Todo.InsertRange(i, E.Children);
 
-					Assert.IsTrue(E.InnerHtml != null, "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
+					Assert.IsTrue(!(E.InnerHtml is null), "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
 				}
 				else
 					Last = N.EndPosition;
@@ -82,7 +82,7 @@ namespace Waher.Content.Html.Test
 
 			PageMetaData MetaData = Doc.GetMetaData();
 
-			if (Doc.Meta != null)
+			if (!(Doc.Meta is null))
 			{
 				foreach (Meta Meta in Doc.Meta)
 					Console.Out.WriteLine(Meta.OuterHtml);

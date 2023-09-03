@@ -137,7 +137,7 @@ namespace Waher.Networking.MQTT
 			this.password = string.Empty;
 			this.clientCertificate = ClientCertificate;
 			this.state = MqttState.Offline;
-			this.will = !string.IsNullOrEmpty(WillTopic) && WillData != null;
+			this.will = !string.IsNullOrEmpty(WillTopic) && !(WillData is null);
 			this.willTopic = WillTopic;
 			this.willQoS = WillQoS;
 			this.willRetain = WillRetain;
@@ -177,7 +177,7 @@ namespace Waher.Networking.MQTT
 			this.clientCertificate = null;
 #endif
 			this.state = MqttState.Offline;
-			this.will = !string.IsNullOrEmpty(WillTopic) && WillData != null;
+			this.will = !string.IsNullOrEmpty(WillTopic) && !(WillData is null);
 			this.willTopic = WillTopic;
 			this.willQoS = WillQoS;
 			this.willRetain = WillRetain;

@@ -377,7 +377,7 @@ namespace Waher.Networking.LWM2M
 				return;
 			}
 
-			if (Request.UriQuery != null && Request.UriQuery.Count > 0)    // Write attributes
+			if (!(Request.UriQuery is null) && Request.UriQuery.Count > 0)    // Write attributes
 			{
 				if (!FromBootstrapServer)
 				{
@@ -404,7 +404,7 @@ namespace Waher.Networking.LWM2M
 				}
 			}
 
-			if (Request.ContentFormat != null)      // Write operation
+			if (!(Request.ContentFormat is null))      // Write operation
 			{
 				object Decoded = await Request.DecodeAsync();
 

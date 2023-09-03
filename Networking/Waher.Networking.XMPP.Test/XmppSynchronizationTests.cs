@@ -30,13 +30,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (this.synchronizationClient2 != null)
+			if (!(this.synchronizationClient2 is null))
 			{
 				this.synchronizationClient2.Dispose();
 				this.synchronizationClient2 = null;
 			}
 
-			if (this.synchronizationClient1 != null)
+			if (!(this.synchronizationClient1 is null))
 			{
 				this.synchronizationClient1.Dispose();
 				this.synchronizationClient1 = null;

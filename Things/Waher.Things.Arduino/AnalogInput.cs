@@ -105,7 +105,7 @@ namespace Waher.Things.Arduino
 		{
 			RemoteDevice Device = this.Device;
 
-			if (Device != null)
+			if (!(Device is null))
 			{
 				switch (Mode)
 				{
@@ -169,7 +169,7 @@ namespace Waher.Things.Arduino
 			if (this.exp is null && !string.IsNullOrEmpty(this.expression))
 				this.exp = new Expression(this.expression);
 
-			if (this.exp != null)
+			if (!(this.exp is null))
 			{
 				Variables v = new Variables()
 				{

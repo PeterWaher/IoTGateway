@@ -157,7 +157,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryEventHandler Callback, QueryEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -230,7 +230,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryNewTableEventHandler Callback, QueryNewTableEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -265,7 +265,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryNewRecordsEventHandler Callback, QueryNewRecordsEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -299,7 +299,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryTableEventHandler Callback, QueryTableEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -333,7 +333,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryObjectEventHandler Callback, QueryObjectEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -369,7 +369,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryMessageEventHandler Callback, QueryMessageEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -403,7 +403,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryTitleEventHandler Callback, QueryTitleEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && Callback != null)
+			if (!this.isAborted && !this.isDone && !(Callback is null))
 			{
 				try
 				{
@@ -437,7 +437,7 @@ namespace Waher.Things.Queries
 
 		private async Task Raise(QueryStatusEventHandler h, QueryStatusEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && h != null)
+			if (!this.isAborted && !this.isDone && !(h is null))
 			{
 				try
 				{

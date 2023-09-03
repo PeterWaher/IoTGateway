@@ -115,7 +115,7 @@ namespace Waher.Mock.Lamp
 							case XmppState.Connected:
 								Connected = true;
 
-								if (!registered && thingRegistryClient != null)
+								if (!registered && !(thingRegistryClient is null))
 									Register();
 								break;
 

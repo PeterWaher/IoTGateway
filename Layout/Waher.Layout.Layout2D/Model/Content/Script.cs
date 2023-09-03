@@ -241,7 +241,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 						this.evaluated = Vertical;
 					}
-					else if (Result is ObjectMatrix M && M.ColumnNames != null)
+					else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 					{
 						// TODO
 					}

@@ -34,13 +34,13 @@ namespace Waher.Security.DTLS.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.Dispose();
 				this.client = null;
 			}
 
-			if (this.server != null)
+			if (!(this.server is null))
 			{
 				this.server.Dispose();
 				this.server = null;

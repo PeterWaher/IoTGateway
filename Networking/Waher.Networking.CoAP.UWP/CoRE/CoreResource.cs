@@ -133,7 +133,7 @@ namespace Waher.Networking.CoAP.CoRE
 				this.Append(sb, "if", Resource.InterfaceDescriptions);
 
 				int[] ContentFormats = Resource.ContentFormats;
-				if (ContentFormats != null && (c = ContentFormats.Length) > 0)
+				if (!(ContentFormats is null) && (c = ContentFormats.Length) > 0)
 				{
 					sb.Append(";ct=\"");
 
@@ -204,7 +204,7 @@ namespace Waher.Networking.CoAP.CoRE
 		{
 			int i, c;
 
-			if (Strings != null && (c = Strings.Length) > 0)
+			if (!(Strings is null) && (c = Strings.Length) > 0)
 			{
 				sb.Append(';');
 				sb.Append(Attribute);

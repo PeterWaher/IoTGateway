@@ -47,7 +47,7 @@ namespace Waher.Things.Arduino
 			Task Result = base.AddAsync(Child);
 
 			UsbState State = Module.GetState(this.portName);
-			if (State != null && Child is Pin Pin)
+			if (!(State is null) && Child is Pin Pin)
 				State.AddPin(Pin.PinNrStr, Pin);
 
 			return Result;
@@ -58,7 +58,7 @@ namespace Waher.Things.Arduino
 			bool Result = await base.RemoveAsync(Child);
 
 			UsbState State = Module.GetState(this.portName);
-			if (State != null && Child is Pin Pin)
+			if (!(State is null) && Child is Pin Pin)
 				State.RemovePin(Pin.PinNrStr, Pin);
 
 			return Result;
@@ -68,10 +68,10 @@ namespace Waher.Things.Arduino
 		{
 			base.SortChildrenAfterLoadLocked(Children);
 
-			if (Children != null)
+			if (!(Children is null))
 			{
 				UsbState State = Module.GetState(this.portName);
-				if (State != null)
+				if (!(State is null))
 				{
 					MeteringNode[] Children2 = Children.ToArray();
 

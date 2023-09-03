@@ -89,13 +89,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (this.controlServer != null)
+			if (!(this.controlServer is null))
 			{
 				this.controlServer.Dispose();
 				this.controlServer = null;
 			}
 
-			if (this.controlClient != null)
+			if (!(this.controlClient is null))
 			{
 				this.controlClient.Dispose();
 				this.controlClient = null;

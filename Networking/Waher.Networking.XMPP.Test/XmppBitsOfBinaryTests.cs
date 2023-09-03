@@ -26,13 +26,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (this.bobClient1 != null)
+			if (!(this.bobClient1 is null))
 			{
 				this.bobClient1.Dispose();
 				this.bobClient1 = null;
 			}
 
-			if (this.bobClient2 != null)
+			if (!(this.bobClient2 is null))
 			{
 				this.bobClient2.Dispose();
 				this.bobClient2 = null;

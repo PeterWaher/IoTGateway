@@ -56,7 +56,7 @@ namespace Waher.Networking.CoAP.Transport
 			if (this.payloadResponseStream is null)
 				this.payloadResponseStream = new MemoryStream();
 
-			if (IncomingMessage.Payload != null)
+			if (!(IncomingMessage.Payload is null))
 				this.payloadResponseStream.Write(IncomingMessage.Payload, 0, IncomingMessage.Payload.Length);
 
 			if (IncomingMessage.Block2.More)

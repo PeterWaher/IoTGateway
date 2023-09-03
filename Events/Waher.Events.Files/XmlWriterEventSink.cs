@@ -99,14 +99,14 @@ namespace Waher.Events.Files
 
 					this.output.WriteEndElement();
 
-					if (Event.Tags != null && Event.Tags.Length > 0)
+					if (!(Event.Tags is null) && Event.Tags.Length > 0)
 					{
 						foreach (KeyValuePair<string, object> Tag in Event.Tags)
 						{
 							this.output.WriteStartElement("Tag");
 							this.output.WriteAttributeString("key", Tag.Key);
 
-							if (Tag.Value != null)
+							if (!(Tag.Value is null))
 								this.output.WriteAttributeString("value", Tag.Value.ToString());
 
 							this.output.WriteEndElement();

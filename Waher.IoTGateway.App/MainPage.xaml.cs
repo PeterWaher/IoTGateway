@@ -120,7 +120,7 @@ namespace Waher.IoTGateway.App
 					sb.Append(" [");
 					sb.Append(Parameter.Key);
 					sb.Append("=");
-					if (Parameter.Value != null)
+					if (!(Parameter.Value is null))
 						sb.Append(Parameter.Value.ToString());
 					sb.Append("]");
 				}

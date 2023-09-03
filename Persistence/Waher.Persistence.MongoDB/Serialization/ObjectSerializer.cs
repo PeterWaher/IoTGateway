@@ -177,12 +177,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
-				if ((FI = Member as FieldInfo) != null)
+				if (!((FI = Member as FieldInfo) is null))
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if ((PI = Member as PropertyInfo) != null)
+				else if (!((PI = Member as PropertyInfo) is null))
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -409,12 +409,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
-				if ((FI = Member as FieldInfo) != null)
+				if (!((FI = Member as FieldInfo) is null))
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if ((PI = Member as PropertyInfo) != null)
+				else if (!((PI = Member as PropertyInfo) is null))
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -549,12 +549,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 				{
-					if ((FI = Member as FieldInfo) != null)
+					if (!((FI = Member as FieldInfo) is null))
 					{
 						PI = null;
 						MemberType = FI.FieldType;
 					}
-					else if ((PI = Member as PropertyInfo) != null)
+					else if (!((PI = Member as PropertyInfo) is null))
 					{
 						if (PI.GetMethod is null || PI.SetMethod is null)
 							continue;
@@ -1585,12 +1585,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
-				if ((FI = Member as FieldInfo) != null)
+				if (!((FI = Member as FieldInfo) is null))
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if ((PI = Member as PropertyInfo) != null)
+				else if (!((PI = Member as PropertyInfo) is null))
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -2111,11 +2111,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 				foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 				{
 					FI = MI2 as FieldInfo;
-					if (FI != null && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+					if (!(FI is null) && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 						Dependencies[s] = true;
 
 					PI = MI2 as PropertyInfo;
-					if (PI != null && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+					if (!(PI is null) && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 						Dependencies[s] = true;
 				}
 
@@ -2471,7 +2471,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			get
 			{
-				return this.objectIdFieldInfo != null || this.objectIdPropertyInfo != null;
+				return !(this.objectIdFieldInfo is null) || !(this.objectIdPropertyInfo is null);
 			}
 		}
 

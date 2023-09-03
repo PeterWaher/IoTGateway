@@ -22,7 +22,7 @@ namespace Waher.Security.DTLS.Test
 
 		public void SendPacket(byte[] Packet, object RemoteEndpoint)
 		{
-			if (this.remoteBridge != null)
+			if (!(this.remoteBridge is null))
 			{
 				Task.Run(() =>
 				{

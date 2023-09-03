@@ -205,7 +205,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task DeleteBootstrapInfo()
 		{
-			if (this.ObjectId != null)
+			if (!(this.ObjectId is null))
 				await Database.Delete(this);
 		}
 

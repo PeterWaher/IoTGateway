@@ -155,7 +155,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.provider != null)
+			if (!(this.provider is null))
 			{
 				this.provider.Dispose();
 				this.provider = null;
@@ -456,7 +456,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private static async Task SaveLastObject(FilesProvider Provider, object LastObjectAdded)
 		{
-			if (LastObjectAdded != null)
+			if (!(LastObjectAdded is null))
 			{
 				IObjectSerializer Serializer = await Provider.GetObjectSerializer(LastObjectAdded.GetType());
 				BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
@@ -617,7 +617,7 @@ namespace Waher.Persistence.FilesLW.Test
 			if (!AssertIndividually)
 				await AssertConsistent(this.file, this.provider, NrObjects, null, true);
 
-			if (Stat != null)
+			if (!(Stat is null))
 			{
 				Variables v = new Variables()
 				{
@@ -1251,7 +1251,7 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 					catch (Exception ex)
 					{
-						if (this.file != null)
+						if (!(this.file is null))
 							Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml", false));
 
 						ExceptionDispatchInfo.Capture(ex).Throw();

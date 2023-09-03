@@ -181,7 +181,7 @@ namespace Waher.Events.Files
 		protected override async Task BeforeWrite()
 		{
 			string s = GetFileName(this.fileName);
-			if (this.lastFileName != null && this.lastFileName == s)
+			if (!(this.lastFileName is null) && this.lastFileName == s)
 				return;
 
 			if (!(this.file is null))

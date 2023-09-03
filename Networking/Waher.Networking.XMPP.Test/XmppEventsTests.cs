@@ -29,14 +29,14 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (this.sink != null)
+			if (!(this.sink is null))
 			{
 				Log.Unregister(this.sink);
 				this.sink.Dispose();
 				this.sink = null;
 			}
 
-			if (this.receptor != null)
+			if (!(this.receptor is null))
 			{
 				this.receptor.Dispose();
 				this.receptor = null;

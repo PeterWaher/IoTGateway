@@ -216,7 +216,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.server.RequestReceived(Request, From, Resource, SubPath);
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
+					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0)
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
@@ -260,7 +260,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					Request.SubPath = SubPath;
 					Resource.Validate(Request);
 
-					if (Request.Header.Expect != null)
+					if (!(Request.Header.Expect is null))
 					{
 						if (Request.Header.Expect.Continue100)
 						{

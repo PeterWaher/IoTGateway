@@ -499,7 +499,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			{
 				bool HasSniffers = this.xmppClient.HasSniffers;
 
-				while (Packet != null && !this.disposed)
+				while (!(Packet is null) && !this.disposed)
 				{
 					if (HasSniffers)
 						this.xmppClient?.TransmitText(Packet);
@@ -525,7 +525,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 					lock (this.queue)
 					{
-						if (this.queue.First != null)
+						if (!(this.queue.First is null))
 						{
 							LinkedListNode<KeyValuePair<string, EventHandler>> Node = this.queue.First;
 							Packet = Node.Value.Key;
@@ -568,7 +568,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				};
 				Doc.LoadXml(Xml);
 
-				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "close" && Doc.DocumentElement.NamespaceURI == FramingNamespace)
+				if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "close" && Doc.DocumentElement.NamespaceURI == FramingNamespace)
 				{
 					if (!this.closeSent)
 						this.CloseSession();

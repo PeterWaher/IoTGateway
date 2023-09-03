@@ -116,10 +116,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client1 != null)
+			if (!(this.client1 is null))
 				this.client1.Dispose();
 
-			if (this.ex1 != null)
+			if (!(this.ex1 is null))
 				throw new TargetInvocationException(this.ex1);
 		}
 
@@ -177,7 +177,7 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("PUT URL:" + e.PutUrl);
 			Console.Out.WriteLine("PUT Headers:");
 
-			if (e.PutHeaders != null)
+			if (!(e.PutHeaders is null))
 			{
 				foreach (KeyValuePair<string, string> Header in e.PutHeaders)
 					Console.Out.WriteLine(Header.Key + ": " + Header.Value);

@@ -12,7 +12,7 @@ namespace Waher.Persistence.FilesLW.Test
 	{
 		private static void MakeCompatible(ref object Left, ref object Right)
 		{
-			if (Left != null && Right != null && Left.GetType() != Right.GetType())
+			if (!(Left is null) && !(Right is null) && Left.GetType() != Right.GetType())
 			{
 				if (Left is long)
 					Right = Convert.ToInt64(Right);

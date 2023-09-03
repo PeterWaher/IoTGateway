@@ -36,7 +36,7 @@ namespace Waher.Content.Xsl
 		}
 
 		internal XmlSchemaException Exception => this.exception;
-		internal bool HasError { get { return this.exception != null; } }
+		internal bool HasError { get { return !(this.exception is null); } }
 
 		internal void AssertNoError()
 		{

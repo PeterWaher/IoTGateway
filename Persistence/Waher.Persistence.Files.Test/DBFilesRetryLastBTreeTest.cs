@@ -75,7 +75,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.provider != null)
+			if (!(this.provider is null))
 			{
 				this.provider.Dispose();
 				this.provider = null;

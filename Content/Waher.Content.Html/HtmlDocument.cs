@@ -467,7 +467,7 @@ namespace Waher.Content.Html
 						{
 							if (!Empty)
 							{
-								if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 									CurrentElement = CurrentElement.Parent as HtmlElement;
 
 								CurrentElement?.Add(new HtmlText(this, CurrentElement, StartOfText, Pos - 1, sb.ToString()));
@@ -483,7 +483,7 @@ namespace Waher.Content.Html
 						{
 							if (!Empty)
 							{
-								if (CurrentElement != null && CurrentElement.IsEmptyElement)
+								if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 									CurrentElement = CurrentElement.Parent as HtmlElement;
 
 								CurrentElement?.Add(new HtmlText(this, CurrentElement, StartOfText, Pos - 1, sb.ToString()));
@@ -609,7 +609,7 @@ namespace Waher.Content.Html
 
 							DtdInstruction Dtd = new DtdInstruction(this, CurrentElement, Pos - 2, Pos, string.Empty);
 
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(Dtd);
@@ -671,14 +671,14 @@ namespace Waher.Content.Html
 								{
 									HtmlElement Loop = CurrentElement.Parent as HtmlElement;
 
-									while (Loop != null && Loop.Name != s)
+									while (!(Loop is null) && Loop.Name != s)
 										Loop = Loop.Parent as HtmlElement;
 
 									if (!(Loop is null))
 									{
 										Loop = CurrentElement.Parent as HtmlElement;
 
-										while (Loop != null && Loop.Name != s)
+										while (!(Loop is null) && Loop.Name != s)
 										{
 											if (Loop.EndPosition < Pos)
 												Loop.EndPosition = Pos;
@@ -977,7 +977,7 @@ namespace Waher.Content.Html
 							s = sb.ToString();
 							DtdInstruction Dtd = new DtdInstruction(this, CurrentElement, Pos - s.Length - 2, Pos, s);
 
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(Dtd);
@@ -1036,7 +1036,7 @@ namespace Waher.Content.Html
 					case 18:    // End of comment
 						if (ch == '>')
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							s = sb.ToString();
@@ -1082,7 +1082,7 @@ namespace Waher.Content.Html
 							s = sb.ToString();
 							ProcessingInstruction PI = new ProcessingInstruction(this, CurrentElement, Pos - s.Length - 3, Pos, s);
 
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(PI);
@@ -1207,7 +1207,7 @@ namespace Waher.Content.Html
 					case 29:
 						if (ch == '>')
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							s = sb.ToString();
@@ -1233,7 +1233,7 @@ namespace Waher.Content.Html
 							sb.Append(ch);
 						else if (ch == ';')
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							s = sb.ToString();
@@ -1265,7 +1265,7 @@ namespace Waher.Content.Html
 							State += 2;
 						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#" + s, Code));
@@ -1291,7 +1291,7 @@ namespace Waher.Content.Html
 							sb.Append(ch);
 						else if (ch == ';' && int.TryParse(s = sb.ToString(), out int Code))
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#" + s, Code));
@@ -1317,7 +1317,7 @@ namespace Waher.Content.Html
 							sb.Append(ch);
 						else if (ch == ';' && int.TryParse(s = sb.ToString(), NumberStyles.HexNumber, null, out int Code))
 						{
-							if (CurrentElement != null && CurrentElement.IsEmptyElement)
+							if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(new HtmlEntityUnicode(this, CurrentElement, Pos - s.Length - 1, Pos, "#x" + s, Code));
@@ -1448,7 +1448,7 @@ namespace Waher.Content.Html
 					case 0:     // Waiting for <
 					case 1:     // Waiting for !, /, attributes or >
 					case 3: // Wait for > at end of empty element.
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						s = sb.ToString();
@@ -1470,7 +1470,7 @@ namespace Waher.Content.Html
 
 					case 10: // First character of entity
 					case 30: // Entity name
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						sb.Insert(0, '&');
@@ -1499,7 +1499,7 @@ namespace Waher.Content.Html
 					case 16:    // In comment
 					case 17:    // Second hyphen?
 					case 18:    // End of comment
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						s = sb.ToString();
@@ -1514,7 +1514,7 @@ namespace Waher.Content.Html
 						s = sb.ToString();
 						ProcessingInstruction PI = new ProcessingInstruction(this, CurrentElement, Pos - s.Length - 3, Pos, s);
 
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						CurrentElement?.Add(PI);
@@ -1524,7 +1524,7 @@ namespace Waher.Content.Html
 					case 27:    // In CDATA
 					case 28:
 					case 29:
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						s = sb.ToString();
@@ -1533,7 +1533,7 @@ namespace Waher.Content.Html
 
 					case 31: // First entity number
 					case 32: // Entity number
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						sb.Insert(0, "&#");
@@ -1542,7 +1542,7 @@ namespace Waher.Content.Html
 						break;
 
 					case 33: // Hexadecimal entity number
-						if (CurrentElement != null && CurrentElement.IsEmptyElement)
+						if (!(CurrentElement is null) && CurrentElement.IsEmptyElement)
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						sb.Insert(0, "&#x");
@@ -1660,7 +1660,7 @@ namespace Waher.Content.Html
 		{
 			HtmlElement Result;
 
-			if (Parent != null && Parent.IsEmptyElement)
+			if (!(Parent is null) && Parent.IsEmptyElement)
 				Parent = Parent.Parent as HtmlElement;
 
 			TagName = TagName.ToUpper();

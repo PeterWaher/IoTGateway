@@ -52,7 +52,7 @@ namespace Waher.Security.ACME.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.Dispose();
 				this.client = null;

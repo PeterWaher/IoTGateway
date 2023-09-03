@@ -326,7 +326,7 @@ namespace Waher.Security.DTLS
 				return false;
 			}
 
-			if (Record.epoch > 0 && State.currentCipher != null)
+			if (Record.epoch > 0 && !(State.currentCipher is null))
 			{
 				try
 				{
@@ -628,7 +628,7 @@ namespace Waher.Security.DTLS
 								if (this.mode == DtlsMode.Server)
 									break;
 
-								if (State.pendingCipher != null)
+								if (!(State.pendingCipher is null))
 									State.pendingCipher.ServerKeyExchange(Record.fragment, ref Pos, State);
 								break;
 
@@ -782,7 +782,7 @@ namespace Waher.Security.DTLS
 								if (this.mode == DtlsMode.Client)
 									break;
 
-								if (State.pendingCipher != null)
+								if (!(State.pendingCipher is null))
 									Pos = await State.pendingCipher.ClientKeyExchange(Record.fragment, Pos, State);
 								break;
 
@@ -1152,7 +1152,7 @@ namespace Waher.Security.DTLS
 			Header[11] = (byte)(Length >> 8);
 			Header[12] = (byte)Length;
 
-			if (State.currentEpoch > 0 && State.currentCipher != null)
+			if (State.currentEpoch > 0 && !(State.currentCipher is null))
 			{
 				Payload = State.currentCipher.Encrypt(Fragment, Header, 0, State);
 				Length = (ushort)Payload.Length;
@@ -1184,12 +1184,12 @@ namespace Waher.Security.DTLS
 			if (More && State.buffer is null)
 				State.buffer = new MemoryStream();
 
-			if (State.buffer != null)
+			if (!(State.buffer is null))
 				State.buffer.Write(Record, 0, Record.Length);
 
 			if (!More)
 			{
-				if (State.buffer != null)
+				if (!(State.buffer is null))
 				{
 					Record = State.buffer.ToArray();
 					State.buffer = null;

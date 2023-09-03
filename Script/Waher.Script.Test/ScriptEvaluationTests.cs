@@ -123,7 +123,7 @@ namespace Waher.Script.Test
 			}
 			else if (Expected is null)
 			{
-				if (Result != null)
+				if (!(Result is null))
 					Assert.Fail("Expected null: " + Script);
 			}
 			else if (!Expected.Equals(Result))

@@ -240,7 +240,7 @@ namespace Waher.Networking.XMPP.Provisioning
 #endif
 			XmlElement E = e.FirstElement;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioningToken)
+			if (e.Ok && !(E is null) && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioningToken)
 			{
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
@@ -279,7 +279,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			XmlElement E = e.FirstElement;
 			string Token;
 
-			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioningToken)
+			if (e.Ok && !(E is null) && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioningToken)
 			{
 				Token = XML.Attribute(E, "token");
 
@@ -352,7 +352,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					throw new ForbiddenException("Token not recognized.", e.IQ);
 			}
 
-			if (Use.LocalCertificate != null)
+			if (!(Use.LocalCertificate is null))
 			{
 				byte[] Bin = Convert.FromBase64String(Challenge);
 
@@ -416,7 +416,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							byte[] Certificate;
 							XmlElement E;
 
-							if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "certificate" && E.NamespaceURI == NamespaceProvisioningToken)
+							if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "certificate" && E.NamespaceURI == NamespaceProvisioningToken)
 								Certificate = Convert.FromBase64String(e.FirstElement.InnerText);
 							else
 							{
@@ -481,7 +481,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			bool Result;
 			XmlElement E = e.FirstElement;
 
-			if (e.Ok && E != null && E.LocalName == "isFriendResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
+			if (e.Ok && !(E is null) && E.LocalName == "isFriendResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 			{
 				JID = XML.Attribute(E, "jid");
 				Result = XML.Attribute(E, "result", false);
@@ -626,7 +626,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						IThingReference[] Nodes2 = Permitted as IThingReference[];
-						if (Nodes2 is null && Permitted != null)
+						if (Nodes2 is null && !(Permitted is null))
 						{
 							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Permitted);
@@ -634,7 +634,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] FieldNames2 = FieldNames as string[];
-						if (FieldNames2 is null && FieldNames != null)
+						if (FieldNames2 is null && !(FieldNames is null))
 						{
 							List<string> List = new List<string>();
 							List.AddRange(FieldNames);
@@ -887,7 +887,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private void AppendTokens(StringBuilder Xml, string AttributeName, string[] Tokens)
 		{
-			if (Tokens != null && Tokens.Length > 0)
+			if (!(Tokens is null) && Tokens.Length > 0)
 			{
 				Xml.Append("' ");
 				Xml.Append(AttributeName);
@@ -928,7 +928,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					try
 					{
 						IThingReference[] Nodes2 = Nodes as IThingReference[];
-						if (Nodes2 is null && Nodes != null)
+						if (Nodes2 is null && !(Nodes is null))
 						{
 							List<IThingReference> List = new List<IThingReference>();
 							List.AddRange(Nodes);
@@ -936,7 +936,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 
 						string[] ParameterNames2 = ParameterNames as string[];
-						if (ParameterNames2 is null && ParameterNames != null)
+						if (ParameterNames2 is null && !(ParameterNames is null))
 						{
 							List<string> List = new List<string>();
 							List.AddRange(ParameterNames);
@@ -1627,10 +1627,10 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			if (CanRead)
 			{
-				if (Node != null && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
+				if (!(Node is null) && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
 					this.AppendNode(Xml, Node);
 
-				if (FieldTypes != FieldType.All || (FieldNames != null && FieldNames.Length > 0))
+				if (FieldTypes != FieldType.All || (!(FieldNames is null) && FieldNames.Length > 0))
 				{
 					Xml.Append("<partial");
 
@@ -1969,10 +1969,10 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			if (CanControl)
 			{
-				if (Node != null && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
+				if (!(Node is null) && (!string.IsNullOrEmpty(Node.NodeId) || !string.IsNullOrEmpty(Node.SourceId) || !string.IsNullOrEmpty(Node.Partition)))
 					this.AppendNode(Xml, Node);
 
-				if (ParameterNames != null && ParameterNames.Length > 0)
+				if (!(ParameterNames is null) && ParameterNames.Length > 0)
 				{
 					Xml.Append("<partial");
 

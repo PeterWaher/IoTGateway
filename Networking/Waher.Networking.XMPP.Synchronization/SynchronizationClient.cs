@@ -243,7 +243,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				long? LatencyHF;
 				long? ClockDifferenceHF;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "resp" && E.NamespaceURI == NamespaceSynchronization &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "resp" && E.NamespaceURI == NamespaceSynchronization &&
 					DateTimeHF.TryParse(E.InnerText, out DateTimeHF ServerTime))
 				{
 					long dt1 = ServerTime - ClientTime1;
@@ -910,7 +910,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				XmlElement E;
 				string ClockSourceJID = null;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "sourceResp" && E.NamespaceURI == NamespaceSynchronization)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sourceResp" && E.NamespaceURI == NamespaceSynchronization)
 					ClockSourceJID = E.InnerText;
 
 				try

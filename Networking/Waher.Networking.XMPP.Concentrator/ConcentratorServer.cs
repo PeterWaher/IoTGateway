@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (!e.Node.IsEmpty)
 			{
 				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
-				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+				if (!(Ref is null) && Ref is ILifeCycleManagement LifeCycleManagement)
 					await LifeCycleManagement.Claimed(e.JID, e.IsPublic);
 
 				string KeyId = this.KeyId(Ref);
@@ -169,7 +169,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
 
-				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+				if (!(Ref is null) && Ref is ILifeCycleManagement LifeCycleManagement)
 				{
 					await LifeCycleManagement.Disowned();
 					await this.RegisterNode(LifeCycleManagement);
@@ -182,7 +182,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (!e.Node.IsEmpty)
 			{
 				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
-				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+				if (!(Ref is null) && Ref is ILifeCycleManagement LifeCycleManagement)
 					await LifeCycleManagement.Removed();
 			}
 		}
@@ -748,7 +748,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-			bool Result = (Node != null && await Node.CanViewAsync(Caller));
+			bool Result = (!(Node is null) && await Node.CanViewAsync(Caller));
 
 			e.IqResult("<bool xmlns='" + NamespaceConcentrator + "'>" + CommonTypes.Encode(Result) + "</bool>");
 		}
@@ -786,7 +786,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-				Result = (Node != null && await Node.CanViewAsync(Caller));
+				Result = (!(Node is null) && await Node.CanViewAsync(Caller));
 
 				Xml.Append("<bool>");
 				Xml.Append(CommonTypes.Encode(Result));
@@ -893,7 +893,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-			if (Node != null && await Node.CanViewAsync(Caller))
+			if (!(Node is null) && await Node.CanViewAsync(Caller))
 			{
 				StringBuilder Xml = new StringBuilder();
 
@@ -1052,7 +1052,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(NamespaceConcentrator);
 				Xml.Append("'>");
 
-				while (Nodes.First != null)
+				while (!(Nodes.First is null))
 				{
 					Node = Nodes.First.Value;
 					Nodes.RemoveFirst();
@@ -1120,7 +1120,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-			if (Node != null && await Node.CanViewAsync(Caller))
+			if (!(Node is null) && await Node.CanViewAsync(Caller))
 			{
 				StringBuilder Xml = new StringBuilder();
 				Type T = Node.GetType();
@@ -1687,7 +1687,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if ((NewNodeId != OldNodeId ||
 							NewSourceId != OldSourceId ||
 							NewPartition != OldPartition) &&
-							await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							!(await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) is null))
 						{
 							Result = new Parameters.SetEditableFormResult()
 							{
@@ -1700,7 +1700,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
-					bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
 					if (Result is null)
 						Result = await Parameters.SetEditableForm(e, Node, Form, true);
@@ -1727,7 +1727,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
-						if (this.thingRegistryClient != null && LifeCycleManagement != null)
+						if (!(this.thingRegistryClient is null) && !(LifeCycleManagement is null))
 						{
 							if (LifeCycleManagement.IsProvisioned)
 							{
@@ -1756,7 +1756,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (KeyValuePair<string, string> P in Errors)
 			{
-				if ((Field = Form[P.Key]) != null)
+				if (!((Field = Form[P.Key]) is null))
 					Field.Error = P.Value;
 			}
 
@@ -1915,7 +1915,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if ((NewNodeId != OldNodeId ||
 							NewSourceId != OldSourceId ||
 							NewPartition != OldPartition) &&
-							await P.Item1.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							!(await P.Item1.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) is null))
 						{
 							Result = new Parameters.SetEditableFormResult()
 							{
@@ -1928,12 +1928,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					ILifeCycleManagement LifeCycleManagement = P.Item2 as ILifeCycleManagement;
-					bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
 					if (Result is null)
 						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
 
-					if (Result.Errors != null)
+					if (!(Result.Errors is null))
 					{
 						Form = null;
 						DataForm Form2 = null;
@@ -1963,7 +1963,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Log.Informational("Node edited.", P.Item2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
-					if (this.thingRegistryClient != null && LifeCycleManagement != null)
+					if (!(this.thingRegistryClient is null) && !(LifeCycleManagement is null))
 					{
 						if (LifeCycleManagement.IsProvisioned)
 						{
@@ -2216,7 +2216,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Result.Errors is null)
 			{
-				if (await Rec.Source.GetNodeAsync(PresumptiveChild) != null)
+				if (!(await Rec.Source.GetNodeAsync(PresumptiveChild) is null))
 				{
 					Result.Errors = new KeyValuePair<string, string>[]
 					{
@@ -2248,7 +2248,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
 
-				if (this.thingRegistryClient != null && PresumptiveChild is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+				if (!(this.thingRegistryClient is null) && PresumptiveChild is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
 					await this.RegisterNode(LifeCycleManagement);
 			}
 			else
@@ -2736,7 +2736,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-						if (Result.Errors != null)
+						if (!(Result.Errors is null))
 						{
 							DisposeObject(Command);
 
@@ -2818,7 +2818,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-					if (Result.Errors != null)
+					if (!(Result.Errors is null))
 					{
 						DisposeObject(Command);
 						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
@@ -3675,7 +3675,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-				if (Result.Errors != null)
+				if (!(Result.Errors is null))
 				{
 					DisposeObject(Command);
 					e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
@@ -3828,7 +3828,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
-			if (Result.Errors != null)
+			if (!(Result.Errors is null))
 			{
 				DisposeObject(Command);
 				e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
@@ -4349,7 +4349,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						this.Append(Xml, NodeStatusChanged);
 
-						if (Subscription.Messages && NodeStatusChanged.Messages != null)
+						if (Subscription.Messages && !(NodeStatusChanged.Messages is null))
 						{
 							Xml.Append("'>");
 
@@ -4439,7 +4439,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				Xml.Append("'>");
 
-				if (IncludeParameters && NodeParametersEvent.Parameters != null)
+				if (IncludeParameters && !(NodeParametersEvent.Parameters is null))
 				{
 					foreach (Parameter Parameter in NodeParametersEvent.Parameters)
 						Parameter.Export(Xml);

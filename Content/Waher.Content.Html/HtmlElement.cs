@@ -74,12 +74,12 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// If the element has children.
 		/// </summary>
-		public bool HasChildren => this.children != null;
+		public bool HasChildren => !(this.children is null);
 
 		/// <summary>
 		/// If the element has attributes.
 		/// </summary>
-		public bool HasAttributes => this.attributes != null;
+		public bool HasAttributes => !(this.attributes is null);
 
 		/// <summary>
 		/// Child nodes, or null if none.

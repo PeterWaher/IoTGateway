@@ -286,7 +286,7 @@ namespace Waher.Networking.UPnP
 
 						this.ReceiveText(Header);
 
-						if (Data.RemoteEndPoint != null &&
+						if (!(Data.RemoteEndPoint is null) &&
 							Headers.Direction == HttpDirection.Request &&
 							Headers.HttpVersion >= 1.0)
 						{

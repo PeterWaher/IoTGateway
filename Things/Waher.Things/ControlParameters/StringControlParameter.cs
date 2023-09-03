@@ -124,10 +124,10 @@ namespace Waher.Things.ControlParameters
 		{
 			try
 			{
-				if (this.regex != null && !this.regex.IsMatch(Value))
+				if (!(this.regex is null) && !this.regex.IsMatch(Value))
 					return false;
 
-				if (this.options != null && Array.IndexOf(this.options, Value) < 0)
+				if (!(this.options is null) && Array.IndexOf(this.options, Value) < 0)
 					return false;
 
 				await this.setHandler(Node, Value);
@@ -148,10 +148,10 @@ namespace Waher.Things.ControlParameters
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
 		public override async Task<bool> SetStringValue(IThingReference Node, string StringValue)
 		{
-			if (this.regex != null && !this.regex.IsMatch(StringValue))
+			if (!(this.regex is null) && !this.regex.IsMatch(StringValue))
 				return false;
 
-			if (this.options != null && Array.IndexOf(this.options, StringValue) < 0)
+			if (!(this.options is null) && Array.IndexOf(this.options, StringValue) < 0)
 				return false;
 
 			try

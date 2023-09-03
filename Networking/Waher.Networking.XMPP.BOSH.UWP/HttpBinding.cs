@@ -220,7 +220,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					for (i = 0; i < c; i++)
 					{
-						if ((this.active[i] && this.httpClients[i] != null) || i == 0)
+						if ((this.active[i] && !(this.httpClients[i] is null)) || i == 0)
 						{
 							this.httpClients[i]?.Dispose();
 							this.httpClients[i] = new HttpClient(new HttpClientHandler()
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 				for (i = 0; i < this.requests; i++)
 				{
-					if (this.httpClients[i] != null)
+					if (!(this.httpClients[i] is null))
 					{
 						if (this.active[i])
 						{
@@ -454,7 +454,7 @@ namespace Waher.Networking.XMPP.BOSH
 				for (i = 0; i < c; i++)
 				{
 					this.active[i] = false;
-					if (this.httpClients[i] != null)
+					if (!(this.httpClients[i] is null))
 					{
 						this.httpClients[i].Dispose();
 						this.httpClients[i] = null;
@@ -552,7 +552,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 							this.active[ClientIndex] = true;
 
-							if (this.outputQueue.First != null)
+							if (!(this.outputQueue.First is null))
 							{
 								Queued = this.outputQueue;
 								this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
@@ -603,7 +603,7 @@ namespace Waher.Networking.XMPP.BOSH
 							await this.RaiseOnSent(P.Key);
 							Xml.Append(P.Key);
 
-							if (P.Value != null)
+							if (!(P.Value is null))
 							{
 								try
 								{
@@ -659,7 +659,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					lock (this.httpClients)
 					{
-						if (this.outputQueue.First != null)
+						if (!(this.outputQueue.First is null))
 						{
 							Queued = this.outputQueue;
 							this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
@@ -704,7 +704,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					await this.BodyReceived(XmlResponse, false);
 				}
-				while (!this.disposed && (Queued != null || (AllInactive && this.xmppClient.State == XmppState.Connected)));
+				while (!this.disposed && (!(Queued is null) || (AllInactive && this.xmppClient.State == XmppState.Connected)));
 
 				if (ClientIndex >= 0)
 				{

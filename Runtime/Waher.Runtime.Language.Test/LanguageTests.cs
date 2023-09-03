@@ -38,7 +38,7 @@ namespace Waher.Runtime.Language.Test
 			filesProvider?.Dispose();
 			filesProvider = null;
 
-			if (consoleEventSink != null)
+			if (!(consoleEventSink is null))
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;

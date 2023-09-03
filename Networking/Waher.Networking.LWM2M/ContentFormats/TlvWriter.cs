@@ -80,7 +80,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <returns></returns>
 		public byte[] ToArray()
 		{
-			if (this.nested != null && this.nested.Last != null)
+			if (!(this.nested is null) && !(this.nested.Last is null))
 				throw new Exception("Nested TLVs not completed.");
 
 			return this.ms.ToArray();

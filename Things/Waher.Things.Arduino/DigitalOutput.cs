@@ -31,7 +31,7 @@ namespace Waher.Things.Arduino
 		{
 			RemoteDevice Device = this.Device;
 
-			if (Device != null)
+			if (!(Device is null))
 			{
 				Device.pinMode(this.PinNr, PinMode.OUTPUT);
 				this.initialized = true;

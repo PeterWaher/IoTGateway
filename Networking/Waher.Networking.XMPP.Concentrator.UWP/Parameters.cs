@@ -105,13 +105,13 @@ namespace Waher.Networking.XMPP.Concentrator
 					ValidationMethod = null;
 					Options = null;
 					Required = Masked = Alpha = DateOnly = false;
-					ReadOnly = PropertyInfo != null && !PropertyInfo.CanWrite;
+					ReadOnly = !(PropertyInfo is null) && !PropertyInfo.CanWrite;
 					PagePriority = PageAttribute.DefaultPriority;
 					FieldPriority = HeaderAttribute.DefaultPriority;
 
 					foreach (Attribute Attr in (PropertyInfo?.GetCustomAttributes() ?? FieldInfo.GetCustomAttributes()))
 					{
-						if ((HeaderAttribute = Attr as HeaderAttribute) != null)
+						if (!((HeaderAttribute = Attr as HeaderAttribute) is null))
 						{
 							Header = HeaderAttribute.Header;
 							StringId = HeaderAttribute.StringId;
@@ -126,7 +126,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (StringId > 0)
 								ToolTip = await Namespace.GetStringAsync(StringId, ToolTip);
 						}
-						else if ((PageAttribute = Attr as PageAttribute) != null)
+						else if (!((PageAttribute = Attr as PageAttribute) is null))
 						{
 							PageLabel = PageAttribute.Label;
 							StringId = PageAttribute.StringId;
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (StringId > 0)
 								SectionLabel = await Namespace.GetStringAsync(StringId, SectionLabel);
 						}
-						else if ((TextAttribute = Attr as TextAttribute) != null)
+						else if (!((TextAttribute = Attr as TextAttribute) is null))
 						{
 							if (TextAttributes is null)
 								TextAttributes = new LinkedList<TextAttribute>();
@@ -637,7 +637,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						continue;
 					}
 
-					if (PropertyInfo != null && (!PropertyInfo.CanRead || !PropertyInfo.CanWrite))
+					if (!(PropertyInfo is null) && (!PropertyInfo.CanRead || !PropertyInfo.CanWrite))
 					{
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(2, "Property not editable."));
 						continue;

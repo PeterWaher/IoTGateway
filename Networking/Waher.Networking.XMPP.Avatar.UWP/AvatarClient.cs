@@ -176,7 +176,7 @@ namespace Waher.Networking.XMPP.Avatar
 				await Database.Update(this.localAvatar);
 			}
 
-			if (this.client != null && this.client.State == XmppState.Connected)
+			if (!(this.client is null) && this.client.State == XmppState.Connected)
 			{
 				if (StoreOnBroker)
 				{
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.Avatar
 		private async Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (NewState == XmppState.StreamOpened &&
-				this.localAvatar != null &&
+				!(this.localAvatar is null) &&
 				this.localAvatar.BareJid != this.client.BareJID)
 			{
 				this.localAvatar.BareJid = this.client.BareJID;
@@ -454,7 +454,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 		private async Task ParseAvatar(string BareJid, string Hash, XmlElement E)
 		{
-			if (E != null && E.LocalName == "query" && (E.NamespaceURI == "jabber:iq:avatar" || E.NamespaceURI == "storage:client:avatar"))
+			if (!(E is null) && E.LocalName == "query" && (E.NamespaceURI == "jabber:iq:avatar" || E.NamespaceURI == "storage:client:avatar"))
 			{
 				XmlElement E2;
 				byte[] Bin = null;
@@ -690,7 +690,7 @@ namespace Waher.Networking.XMPP.Avatar
 					Avatar = null;
 			}
 
-			if (Avatar != null && !string.IsNullOrEmpty(Avatar.ObjectId))
+			if (!(Avatar is null) && !string.IsNullOrEmpty(Avatar.ObjectId))
 				await Database.Delete(Avatar);
 			else
 				await Database.FindDelete<Avatar>(new FilterFieldEqualTo("BareJid", BareJid.ToLower()));
@@ -711,7 +711,7 @@ namespace Waher.Networking.XMPP.Avatar
 					Avatar = null;
 			}
 
-			if (Avatar != null && string.IsNullOrEmpty(Avatar.ObjectId))
+			if (!(Avatar is null) && string.IsNullOrEmpty(Avatar.ObjectId))
 			{
 				await Database.Insert(Avatar);
 
@@ -740,7 +740,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 			try
 			{
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "vCard" && E.NamespaceURI == "vcard-temp")
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "vCard" && E.NamespaceURI == "vcard-temp")
 				{
 					Avatar Avatar = null;
 
@@ -765,7 +765,7 @@ namespace Waher.Networking.XMPP.Avatar
 								}
 							}
 
-							if (!string.IsNullOrEmpty(ContentType) && Data != null)
+							if (!string.IsNullOrEmpty(ContentType) && !(Data is null))
 							{
 								string Jid = InMuc ? e.From : XmppClient.GetBareJID(e.From).ToLower();
 								Avatar = new Avatar(Jid, ContentType, Data, 0, 0);
@@ -847,7 +847,7 @@ namespace Waher.Networking.XMPP.Avatar
 				{
 					e.GetUserAvatarData(Best, async (sender2, e2) =>
 					{
-						if (e2.Ok && e2.AvatarImage != null)
+						if (e2.Ok && !(e2.AvatarImage is null))
 						{
 							AvatarEventHandler h;
 

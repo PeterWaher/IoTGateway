@@ -98,7 +98,7 @@ namespace Waher.IoTGateway.Console
 
 						w.Write("Type: ");
 
-						if (e.ExceptionObject != null)
+						if (!(e.ExceptionObject is null))
 							w.WriteLine(e.ExceptionObject.GetType().FullName);
 						else
 							w.WriteLine("null");
@@ -121,7 +121,7 @@ namespace Waher.IoTGateway.Console
 						}
 						else
 						{
-							if (e.ExceptionObject != null)
+							if (!(e.ExceptionObject is null))
 								w.WriteLine(e.ExceptionObject.ToString());
 
 							w.WriteLine();
@@ -133,7 +133,7 @@ namespace Waher.IoTGateway.Console
 
 					if (e.ExceptionObject is Exception ex2)
 						Log.Critical(ex2);
-					else if (e.ExceptionObject != null)
+					else if (!(e.ExceptionObject is null))
 						Log.Critical(e.ExceptionObject.ToString());
 					else
 						Log.Critical("Unexpected null exception thrown.");

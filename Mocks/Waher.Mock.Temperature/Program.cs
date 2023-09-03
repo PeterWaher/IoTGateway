@@ -114,7 +114,7 @@ namespace Waher.Mock.Temperature
 							case XmppState.Connected:
 								Connected = true;
 
-								if (!registered && thingRegistryClient != null)
+								if (!registered && !(thingRegistryClient is null))
 									Register();
 								break;
 

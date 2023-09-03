@@ -61,7 +61,7 @@ namespace Waher.Networking.LWM2M
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("coap");
-			if (this.credentials != null)
+			if (!(this.credentials is null))
 				sb.Append('s');
 			sb.Append("://");
 			sb.Append(this.remoteEndpoint);
@@ -103,7 +103,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public bool Encrypted
 		{
-			get { return this.credentials != null; }
+			get { return !(this.credentials is null); }
 		}
 
 		/// <summary>

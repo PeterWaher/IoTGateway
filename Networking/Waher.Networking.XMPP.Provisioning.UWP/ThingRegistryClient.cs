@@ -253,7 +253,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					string OwnerJid = string.Empty;
 					bool IsPublic = false;
 
-					if (e.Ok && E != null && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
 					{
 						OwnerJid = XML.Attribute(E, "jid");
 						IsPublic = XML.Attribute(E, "public", false);
@@ -370,7 +370,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					string NodeJid = string.Empty;
 					ThingReference Node = ThingReference.Empty;
 
-					if (e.Ok && E != null && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
 					{
 						string NodeId = XML.Attribute(E, "id");
 						string SourceId = XML.Attribute(E, "src");
@@ -676,7 +676,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					XmlElement E = e.FirstElement;
 					bool Disowned = false;
 
-					if (e.Ok && E != null && E.LocalName == "disowned" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "disowned" && E.NamespaceURI == NamespaceDiscovery)
 					{
 						Disowned = true;
 
@@ -973,7 +973,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			string Name;
 			bool More = false;
 
-			if (e.Ok && E != null && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
+			if (e.Ok && !(E is null) && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
 			{
 				More = XML.Attribute(E, "more", false);
 

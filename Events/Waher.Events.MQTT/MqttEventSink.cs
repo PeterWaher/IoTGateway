@@ -100,7 +100,7 @@ namespace Waher.Events.MQTT
 						this.connected = false;
 					}
 
-					if (ImmediateReconnect && this.timer != null)
+					if (ImmediateReconnect && !(this.timer is null))
 					{
 						this.timer.Dispose();
 						this.timer = new Timer(this.CheckConnection, null, 100, 60000);

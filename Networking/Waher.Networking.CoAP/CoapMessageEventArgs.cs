@@ -131,7 +131,7 @@ namespace Waher.Networking.CoAP
 			if (this.message.Type == CoapMessageType.ACK || this.message.Type == CoapMessageType.RST)
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
-			int BlockNr = this.message.Block2 != null ? this.message.Block2.Number : 0;
+			int BlockNr = !(this.message.Block2 is null) ? this.message.Block2.Number : 0;
 
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.message.MessageId,

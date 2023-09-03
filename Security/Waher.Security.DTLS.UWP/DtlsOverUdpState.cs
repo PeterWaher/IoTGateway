@@ -29,7 +29,7 @@ namespace Waher.Security.DTLS
 			{
 				lock (this.Queue)
 				{
-					if (this.Queue.First != null)
+					if (!(this.Queue.First is null))
 					{
 						Rec = this.Queue.First.Value;
 						this.Queue.RemoveFirst();
@@ -43,7 +43,7 @@ namespace Waher.Security.DTLS
 					if (Successful)
 						DtlsOverUdp.DTLS.SendApplicationData(Rec.Item1, this.RemoteEndpoint);
 
-					if (Rec.Item2 != null)
+					if (!(Rec.Item2 is null))
 					{
 						try
 						{

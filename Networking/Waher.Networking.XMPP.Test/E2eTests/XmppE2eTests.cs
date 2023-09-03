@@ -116,9 +116,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				this.client2.RegisterIqGetHandler("test", "testns", (sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
-						e.E2eEncryption != null &&
+						!(e.E2eEncryption is null) &&
 						!string.IsNullOrEmpty(e.E2eReference) &&
-						e.E2eSymmetricCipher != null &&
+						!(e.E2eSymmetricCipher is null) &&
 						e.Query.InnerText == Check)
 					{
 						e.IqResult("<test xmlns='testns'>World</test>");
@@ -133,11 +133,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 					this.client2.FullJID, "<test xmlns='testns'>" + Send + "</test>", (sender, e) =>
 					{
 						if (e.UsesE2eEncryption &&
-							e.E2eEncryption != null &&
+							!(e.E2eEncryption is null) &&
 							!string.IsNullOrEmpty(e.E2eReference) &&
-							e.E2eSymmetricCipher != null &&
+							!(e.E2eSymmetricCipher is null) &&
 							e.Ok == ExpectOk &&
-							(!ExpectOk || (e.FirstElement != null &&
+							(!ExpectOk || (!(e.FirstElement is null) &&
 							e.FirstElement.LocalName == "test" &&
 							e.FirstElement.NamespaceURI == "testns" &&
 							e.FirstElement.InnerText == "World")))
@@ -199,9 +199,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				this.client2.RegisterIqSetHandler("test", "testns", (sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
-						e.E2eEncryption != null &&
+						!(e.E2eEncryption is null) &&
 						!string.IsNullOrEmpty(e.E2eReference) &&
-						e.E2eSymmetricCipher != null &&
+						!(e.E2eSymmetricCipher is null) &&
 						e.Query.InnerText == "Hello")
 					{
 						e.IqResult("<test xmlns='testns'>World</test>");
@@ -215,11 +215,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
 					this.client2.FullJID, "<test xmlns='testns'>Hello</test>", (sender, e) =>
 					{
-						if (e.E2eEncryption != null &&
+						if (!(e.E2eEncryption is null) &&
 							!string.IsNullOrEmpty(e.E2eReference) &&
-							e.E2eSymmetricCipher != null &&
+							!(e.E2eSymmetricCipher is null) &&
 							e.Ok &&
-							e.FirstElement != null &&
+							!(e.FirstElement is null) &&
 							e.FirstElement.LocalName == "test" &&
 							e.FirstElement.NamespaceURI == "testns" &&
 							e.FirstElement.InnerText == "World")

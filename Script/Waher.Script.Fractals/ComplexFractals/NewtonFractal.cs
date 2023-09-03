@@ -174,7 +174,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			else
 				throw new ScriptRuntimeException("Missing coefficients or lambda expression.", this);
 
-			if (i < c && this.Arguments[i] != null && Arguments[i] is ObjectVector)
+			if (i < c && !(this.Arguments[i] is null) && Arguments[i] is ObjectVector)
 			{
 				ColorExpression = this.Arguments[i].SubExpression;
 				Palette = FractalGraph.ToPalette((ObjectVector)Arguments[i++]);

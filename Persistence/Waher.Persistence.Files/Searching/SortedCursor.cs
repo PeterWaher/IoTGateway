@@ -60,7 +60,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return !(e.Current.Value is null);
+				return e.Current.Value != null;
 			}
 		}
 

@@ -19,14 +19,30 @@ namespace Waher.Events.Pipe
 		private readonly StringBuilder fragment = new StringBuilder();
 		private readonly string pipeName;
 		private readonly byte[] inputBuffer = new byte[bufferSize];
+		private readonly bool logIncoming;
 		private NamedPipeServerStream pipe = null;
 		private bool disposed = false;
 		private int inputState = 0;
 		private int inputDepth = 0;
 
+		/// <summary>
+		/// Receives events from an operating system pipe
+		/// </summary>
+		/// <param name="PipeName">Name if pipe to listen on.</param>
 		public PipeEventRecipient(string PipeName)
+			: this(PipeName, true)
+		{
+		}
+
+		/// <summary>
+		/// Receives events from an operating system pipe
+		/// </summary>
+		/// <param name="PipeName">Name if pipe to listen on.</param>
+		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/> automatically.</param>
+		public PipeEventRecipient(string PipeName, bool LogIncomingEvents)
 		{
 			this.pipeName = PipeName;
+			this.logIncoming = LogIncomingEvents;
 			this.pipe = new NamedPipeServerStream(this.pipeName, PipeDirection.In, 1, PipeTransmissionMode.Message,
 				PipeOptions.Asynchronous, 65536, 65536);
 			this.pipe.BeginWaitForConnection(this.PipeClientConnected, null);
@@ -234,7 +250,15 @@ namespace Waher.Events.Pipe
 				Doc.LoadXml(Xml);
 
 				if (TryParseEventXml(Doc.DocumentElement, out Event Event))
-					Log.Event(Event);
+				{
+					if (this.logIncoming)
+						Log.Event(Event);
+
+					EventEventHandler h = this.EventReceived;
+
+					if (!(h is null))
+						await h(this, new EventEventArgs(Event));
+				}
 				else
 				{
 					CustomFragmentEventHandler h = this.CustomFragmentReceived;
@@ -250,6 +274,11 @@ namespace Waher.Events.Pipe
 
 			return true;
 		}
+
+		/// <summary>
+		/// Event raised when an event has been received.
+		/// </summary>
+		public event EventEventHandler EventReceived;
 
 		/// <summary>
 		/// Event raised when a custom XML fragment has been received.

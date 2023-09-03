@@ -215,16 +215,14 @@ namespace Waher.Networking.UPnP
 					throw new Exception("Unexpected response returned.");
 				}
 
-				XmlElement ResponseBody = GetChildElement(ResponseXml.DocumentElement, "Body", "http://schemas.xmlsoap.org/soap/envelope/");
-				if (ResponseBody is null)
-					throw new Exception("Response body not found.");
+				XmlElement ResponseBody = GetChildElement(ResponseXml.DocumentElement, "Body", "http://schemas.xmlsoap.org/soap/envelope/")
+					?? throw new Exception("Response body not found.");
 
 				XmlElement ActionResponse = GetChildElement(ResponseBody, this.name + "Response", this.parent.Service.ServiceType);
 				if (ActionResponse is null)
 				{
-					XmlElement ResponseFault = GetChildElement(ResponseBody, "Fault", "http://schemas.xmlsoap.org/soap/envelope/");
-					if (ResponseFault is null)
-						throw new Exception("Unable to parse response.");
+					XmlElement ResponseFault = GetChildElement(ResponseBody, "Fault", "http://schemas.xmlsoap.org/soap/envelope/")
+						?? throw new Exception("Unable to parse response.");
 
 					string FaultCode = string.Empty;
 					string FaultString = string.Empty;

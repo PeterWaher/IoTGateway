@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Markup;
 using System.Windows.Media;
 using Waher.Events;
 
@@ -15,9 +11,9 @@ namespace Waher.Client.MqttEventViewer
 	/// </summary>
 	public class EventItem
 	{
+		private readonly Event e;
 		private Color foregroundColor;
 		private Color backgroundColor;
-		private Event e;
 		private bool selected = false;
 
 		/// <summary>

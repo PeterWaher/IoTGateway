@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Security;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -152,10 +151,7 @@ namespace Waher.Networking.XMPP.BOSH
 			if (!(this.httpClients is null))
 			{
 				foreach (HttpClient Client in this.httpClients)
-				{
-					if (!(Client is null))
-						Client.Dispose();
-				}
+					Client?.Dispose();
 
 				this.httpClients = null;
 			}

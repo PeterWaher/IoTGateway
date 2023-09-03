@@ -215,8 +215,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 					}
 				}
 
-				foreach (Attribute Attr in Member.GetCustomAttributes(true))
+				foreach (object Item in Member.GetCustomAttributes(true))
 				{
+					if (!(Item is Attribute Attr))
+						continue;
+
 					if (Attr is IgnoreMemberAttribute)
 					{
 						Ignore = true;
@@ -443,8 +446,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 					}
 				}
 
-				foreach (Attribute Attr in Member.GetCustomAttributes(true))
+				foreach (object Item in Member.GetCustomAttributes(true))
 				{
+					if (!(Item is Attribute Attr))
+						continue;
+
 					if (Attr is IgnoreMemberAttribute)
 					{
 						Ignore = true;
@@ -585,8 +591,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 						}
 					}
 
-					foreach (Attribute Attr in Member.GetCustomAttributes(true))
+					foreach (object Item in Member.GetCustomAttributes(true))
 					{
+						if (!(Item is Attribute Attr))
+							continue;
+
 						if (Attr is IgnoreMemberAttribute)
 						{
 							Ignore = true;
@@ -1623,8 +1632,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 					}
 				}
 
-				foreach (Attribute Attr in Member.GetCustomAttributes(true))
+				foreach (object Item in Member.GetCustomAttributes(true))
 				{
+					if (!(Item is Attribute Attr))
+						continue;
+
 					if (Attr is IgnoreMemberAttribute)
 					{
 						Ignore = true;

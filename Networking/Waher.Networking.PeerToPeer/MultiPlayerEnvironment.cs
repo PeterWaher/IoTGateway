@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Net;
 using Waher.Events;
 using Waher.Networking.MQTT;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -623,8 +622,7 @@ namespace Waher.Networking.PeerToPeer
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			if (!(Connection is null))
-				Connection.SendTcp(Packet);
+			Connection?.SendTcp(Packet);
 		}
 
 		/// <summary>
@@ -644,8 +642,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			if (!(Connection is null))
-				Connection.SendTcp(Packet);
+			Connection?.SendTcp(Packet);
 		}
 
 		/// <summary>
@@ -682,8 +679,7 @@ namespace Waher.Networking.PeerToPeer
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			if (!(Connection is null))
-				Connection.SendUdp(Packet, IncludeNrPreviousPackets);
+			Connection?.SendUdp(Packet, IncludeNrPreviousPackets);
 		}
 
 		/// <summary>
@@ -705,8 +701,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			if (!(Connection is null))
-				Connection.SendUdp(Packet, IncludeNrPreviousPackets);
+			Connection?.SendUdp(Packet, IncludeNrPreviousPackets);
 		}
 
 		private void Peer_OnClosed(object sender, EventArgs e)
@@ -1080,10 +1075,7 @@ namespace Waher.Networking.PeerToPeer
 					this.remotePlayersByIndex.Clear();
 
 					foreach (Player Player in this.remotePlayersByEndpoint.Values)
-					{
-						if (!(Player.Connection is null))
-							Player.Connection.Dispose();
-					}
+						Player.Connection?.Dispose();
 
 					this.remotePlayersByEndpoint.Clear();
 					this.remotePlayers = null;

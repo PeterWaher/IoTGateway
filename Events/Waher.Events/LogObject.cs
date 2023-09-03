@@ -8,7 +8,7 @@ namespace Waher.Events
 	/// </summary>
 	public abstract class LogObject : ILogObject
 	{
-		private string objectId;
+		private readonly string objectId;
 
 		/// <summary>
 		/// Base class for objects that can log events.

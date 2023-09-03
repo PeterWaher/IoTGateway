@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
 using Waher.Runtime.Language;
-using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
 
@@ -16,7 +12,7 @@ namespace Waher.Things.Gpio
 	/// </summary>
 	public class Controller : MeteringNode
 	{
-		private GpioController controller;
+		private readonly GpioController controller;
 
 		/// <summary>
 		/// Node representing a GPIO conroller.

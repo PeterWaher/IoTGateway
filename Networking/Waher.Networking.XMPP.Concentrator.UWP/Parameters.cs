@@ -522,8 +522,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			string DefaultLanguageCode = null;
 
-			foreach (DefaultLanguageAttribute Attr in Type.GetTypeInfo().GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
+			foreach (object Item in Type.GetTypeInfo().GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
 			{
+				if (!(Item is DefaultLanguageAttribute Attr))
+					continue;
+
 				DefaultLanguageCode = Attr.LanguageCode;
 				if (!string.IsNullOrEmpty(DefaultLanguageCode))
 					break;

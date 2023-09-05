@@ -2225,14 +2225,16 @@ The following functions return HTTP server error responses back to he client:
 | `ServiceUnavailable(Content)`            |  503 | Returns the Service Unavailable server error message back to the client.             |
 | `VariantAlsoNegotiates(Content)`         |  506 | Returns the Variant Also Negotiates server error message back to the client.         |
 
-The following predefined variables are available in such web content files:
+##### Special Web Variables
+
+The following predefined variables are available when processing web requests:
 
 | Variable       | Description                                              |
 |:--------------:|----------------------------------------------------------|
 | `Request`      | The current HttpRequest object.                          |
 | `Response`     | The current HttpResponse object.                         |
 | `Posted`       | Any decoded data posted to the resource.                 |
-| `Gloabl`       | Global variables.                                        |
+| `Global`       | Global variables.                                        |
 | `Page`         | Page-local variables.                                    |
 
 #### JWT Extensions (Waher.Security.JWT\[.UWP\])
@@ -2382,6 +2384,16 @@ IoT Broker or the Neuron^TM.
 | `GetServiceProvidersForBuyingEDaler(Country,Currency)`  | Gets available service providers that can be used to buy eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForBuyingEDaler("US","USD")` |
 | `GetServiceProvidersForPeerReview(MetaData)`            | Gets available service providers that can be used for peer reviews of identity applications. Meta-data about the person is provided in the `MetaData` argument, which is assumed to be an object ex-nihilo. | `GetServiceProvidersForPeerReview({"COUNTRY":"SE","CITY":"Stockholm"})` |
 | `GetServiceProvidersForSellingEDaler(Country,Currency)` | Gets available service providers that can be used to sell eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForSellingEDaler("US","USD")` |
+
+#### Microsoft Interoperability (available in TAG.MicrosoftInterop.package)
+
+The following functions are available on systems with the `TAG.MicrosoftInterop.package` installed. A more detailed description
+about the script functions referenced in this section is available in the [MicrosoftInterop repository](https://github.com/Trust-Anchor-Group/MicrosoftInterop#converting-documents-in-script).
+
+| Function              | Description                                           |
+|-----------------------|-------------------------------------------------------|
+| `WordToMarkdown(Doc)` | Converts a Word document to [Markdown](/Markdown.md). |
+| `ExcelToScript(Doc)`  | Converts an Excel document to Script.                 |
 
 #### Scriptable Providers Extensions (available in TAG.ScriptProviders.package)
 

@@ -493,6 +493,8 @@
 	<Assembly fileName='Waher.Things.Modbus.pdb'/>
 	<Assembly fileName='Waher.Things.Mqtt.dll'/>
 	<Assembly fileName='Waher.Things.Mqtt.pdb'/>
+	<Assembly fileName='Waher.Things.Script.dll'/>
+	<Assembly fileName='Waher.Things.Script.pdb'/>
 	<Assembly fileName='Waher.Things.Semantic.dll'/>
 	<Assembly fileName='Waher.Things.Semantic.pdb'/>
 	<Assembly fileName='Waher.Things.Snmp.dll'/>
@@ -942,6 +944,7 @@
 		<Content fileName='Waher.Things.Metering.en.lng'/>
 		<Content fileName='Waher.Things.Modbus.en.lng'/>
 		<Content fileName='Waher.Things.Mqtt.en.lng'/>
+		<Content fileName='Waher.Things.Script.en.lng'/>
 		<Content fileName='Waher.Things.Semantic.en.lng'/>
 		<Content fileName='Waher.Things.Snmp.en.lng'/>
 		<Content fileName='Waher.Things.Virtual.en.lng'/>

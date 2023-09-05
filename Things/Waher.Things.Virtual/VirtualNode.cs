@@ -22,7 +22,7 @@ using Waher.Things.Metering.NodeTypes;
 namespace Waher.Things.Virtual
 {
 	/// <summary>
-	/// Node representing a TCP/IP connection to a Modbus Gateway
+	/// Virtual node, that can be used as a placeholder for services.
 	/// </summary>
 	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties, ISensor, IActuator
 	{
@@ -34,7 +34,7 @@ namespace Waher.Things.Virtual
 		private bool hasReport = false;
 
 		/// <summary>
-		/// Node representing a TCP/IP connection to a Modbus Gateway
+		/// Virtual node, that can be used as a placeholder for services.
 		/// </summary>
 		public VirtualNode()
 			: base()

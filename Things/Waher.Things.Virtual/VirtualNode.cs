@@ -530,7 +530,6 @@ namespace Waher.Things.Virtual
 			}
 		}
 
-
 		/// <summary>
 		/// Starts the readout of the sensor.
 		/// </summary>

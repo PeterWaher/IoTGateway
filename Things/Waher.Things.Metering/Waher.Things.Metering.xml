@@ -892,6 +892,20 @@
             <param name="NodeRef">Node reference.</param>
             <returns>Node, if found, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Things.Metering.MeteringTopology.GetNode(System.String)">
+            <summary>
+            Gets a node from the Metering Topology
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <returns>Node, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Things.Metering.MeteringTopology.GetNode(Waher.Things.IThingReference)">
+            <summary>
+            Gets a node from the Metering Topology
+            </summary>
+            <param name="NodeRef">Node reference</param>
+            <returns>Node, if found, null otherwise.</returns>
+        </member>
         <member name="M:Waher.Things.Metering.MeteringTopology.CanViewAsync(Waher.Things.RequestOrigin)">
             <summary>
             If the data source is visible to the caller.

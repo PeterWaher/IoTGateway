@@ -109,7 +109,22 @@ namespace Waher.Things.Metering
 			return await GetNode(NodeRef);
 		}
 
-		internal static async Task<MeteringNode> GetNode(IThingReference NodeRef)
+		/// <summary>
+		/// Gets a node from the Metering Topology
+		/// </summary>
+		/// <param name="NodeId">Node ID</param>
+		/// <returns>Node, if found, null otherwise.</returns>
+		public static Task<MeteringNode> GetNode(string NodeId)
+		{
+			return GetNode(new ThingReference(NodeId, SourceID));
+		}
+
+		/// <summary>
+		/// Gets a node from the Metering Topology
+		/// </summary>
+		/// <param name="NodeRef">Node reference</param>
+		/// <returns>Node, if found, null otherwise.</returns>
+		public static async Task<MeteringNode> GetNode(IThingReference NodeRef)
 		{
 			if (NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;

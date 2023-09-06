@@ -1936,6 +1936,13 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Duration(s)`                                      | Parses a string `s` into a Duration value. | `Duration("PT10H30M")` |
 | `Duration(Years,Month,Dats,Hours,Minutes,Seconds)` | Creates a Duration value. | `Duration(0,0,0,10,30,0)` |
 | `Encode(Object[,Types])`                           | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
+| `FileAttributes(FileName)`                         | Gets the attributes of a file, given its full file name. | [Example][FileAttributesExample] |
+| `FileCreationTime(FileName)`                       | Gets the creation time of a file, given its full file name. | [Example][FileCreationTimeExample] |
+| `FileCreationTimeUtc(FileName)`                    | Gets the creation time (in UTC) of a file, given its full file name. | [Example][FileCreationTimeUtcExample] |
+| `FileLastAccessTime(FileName)`                     | Gets the last access time of a file, given its full file name. | [Example][FileLastAccessTimeExample] |
+| `FileLastAccessTimeUtc(FileName)`                  | Gets the last access time (in UTC) of a file, given its full file name. | [Example][FileLastAccessTimeUtcExample] |
+| `FileLastWriteTime(FileName)`						 | Gets the last write time of a file, given its full file name. | [Example][FileLastWriteTimeExample] |
+| `FileLastWriteTimeUtc(FileName)`					 | Gets the last write time (in UTC) of a file, given its full file name. | [Example][FileLastWriteTimeUtcExample] |
 | `Get(Url[,Accept/Headers[,Certificate]])`          | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][GetExample] |
 | `Head(Url[,Accept/Headers[,Certificate]])`         | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][HeadExample] |
 | `HtmlAttributeEncode(s)`                           | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
@@ -1960,6 +1967,13 @@ The following functions are available in the `Waher.Script.Content` library.
 [DecodeExample]: Prompt.md?Expression=Decode(Csv,%22text/csv%22)
 [DeleteExample]: Prompt.md?Expression=Delete(%22URL%22,{})
 [EncodeExample]: Prompt.md?Expression=Encode("Hello",[%22text/plain%22])
+[FileAttributesExample]: Prompt.md?Expression=FileAttributes(%22FileName%22)
+[FileCreationTimeExample]: Prompt.md?Expression=FileCreationTime(%22FileName%22)
+[FileCreationTimeUtcExample]: Prompt.md?Expression=FileCreationTimeUtc(%22FileName%22)
+[FileLastAccessTimeExample]: Prompt.md?Expression=FileLastAccessTime(%22FileName%22)
+[FileLastAccessTimeUtcExample]: Prompt.md?Expression=FileLastAccessTimeUtc(%22FileName%22)
+[FileLastWriteTimeExample]: Prompt.md?Expression=FileLastWriteTime(%22FileName%22)
+[FileLastWriteTimeUtcExample]: Prompt.md?Expression=FileLastWriteTimeUtc(%22FileName%22)
 [GetExample]: Prompt.md?Expression=Get(%22URL%22)
 [HeadExample]: Prompt.md?Expression=Head(%22URL%22)
 [HtmlAttributeEncodeExample]: Prompt.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)

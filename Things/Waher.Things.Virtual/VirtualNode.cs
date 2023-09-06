@@ -61,9 +61,9 @@ namespace Waher.Things.Virtual
 		/// </summary>
 		/// <param name="Child">Presumptive child node.</param>
 		/// <returns>If the child is acceptable.</returns>
-		public override Task<bool> AcceptsChildAsync(INode Child)
+		public override async Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is VirtualNode);
+			return Child is VirtualNode || await Child.AcceptsParentAsync(this);
 		}
 
 		/// <summary>

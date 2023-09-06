@@ -80,10 +80,14 @@ namespace Waher.Things.Script
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		public async Task StartReadout(ISensorReadout Request)
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public override async Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
 			try
 			{
+				await base.StartReadout(Request, false);
+
 				Expression Exp = this.parsedSensorScript;
 
 				if (Exp is null)

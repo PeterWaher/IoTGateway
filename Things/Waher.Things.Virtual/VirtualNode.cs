@@ -535,7 +535,20 @@ namespace Waher.Things.Virtual
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
 		public Task StartReadout(ISensorReadout Request)
+		{
+			return this.StartReadout(Request, true);
+		}
+
+		/// <summary>
+		/// Starts the readout of the sensor.
+		/// </summary>
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public virtual Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
 			List<SensorData.Field> ToReport = new List<SensorData.Field>();
 
@@ -548,7 +561,8 @@ namespace Waher.Things.Virtual
 				}
 			}
 
-			Request.ReportFields(true, ToReport.ToArray());
+			if (DoneAfter || ToReport.Count > 0)
+				Request.ReportFields(DoneAfter, ToReport.ToArray());
 
 			return Task.CompletedTask;
 		}
@@ -746,6 +760,10 @@ namespace Waher.Things.Virtual
 			Commands.Add(new AddMetaDataInt32(this));
 			Commands.Add(new AddMetaDataInt64(this));
 			Commands.Add(new AddMetaDataDouble(this));
+			Commands.Add(new AddMetaDataBoolean(this));
+			Commands.Add(new AddMetaDataDateTime(this));
+			Commands.Add(new AddMetaDataTimeSpan(this));
+			Commands.Add(new AddMetaDataDuration(this));
 
 			return Commands.ToArray();
 		}

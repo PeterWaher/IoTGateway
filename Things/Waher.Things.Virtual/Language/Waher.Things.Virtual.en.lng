@@ -15,10 +15,10 @@
 			<String id="11">Add 32-bit integer parameter...</String>
 			<String id="12">Add 64-bit integer parameter...</String>
 			<String id="13">Add floating-point parameter...</String>
-			<String id="14"></String>
-			<String id="15"></String>
-			<String id="16"></String>
-			<String id="17"></String>
+			<String id="14">Add Boolean parameter...</String>
+			<String id="15">Add Date &amp; Time parameter...</String>
+			<String id="16">Add Time-span parameter...</String>
+			<String id="17">Add Duration parameter...</String>
 			<String id="18"></String>
 			<String id="19"></String>
 			<String id="20"></String>

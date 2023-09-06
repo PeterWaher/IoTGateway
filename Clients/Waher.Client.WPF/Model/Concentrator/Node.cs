@@ -1199,8 +1199,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 					{
 						if (e.Ok)
 						{
+							Dictionary<string, bool> VariablesProcessed = new Dictionary<string, bool>();
+
 							foreach (Networking.XMPP.DataForms.Field Field in e.Form.Fields)
 							{
+								VariablesProcessed[Field.Var] = true;
+
 								Networking.XMPP.DataForms.Field InputField = ImportForm[Field.Var];
 
 								if (Field.HasError)
@@ -1233,6 +1237,27 @@ namespace Waher.Client.WPF.Model.Concentrator
 								else if (!(InputField is null))
 									Field.SetValue(InputField.ValueStrings);
 							}
+
+							List<Networking.XMPP.DataForms.Field> ExtendedFields = null;
+
+							foreach (Networking.XMPP.DataForms.Field Field in ImportForm.Fields)
+							{
+								if (VariablesProcessed.ContainsKey(Field.Var))
+									continue;
+
+								VariablesProcessed[Field.Var] = true;
+
+								if (ExtendedFields is null)
+								{
+									ExtendedFields = new List<Networking.XMPP.DataForms.Field>();
+									ExtendedFields.AddRange(e.Form.Fields);
+								}
+
+								ExtendedFields.Add(Field);
+							}
+
+							if (!(ExtendedFields is null))
+								e.Form.Fields = ExtendedFields.ToArray();
 
 							e.Form.Submit();
 						}

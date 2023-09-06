@@ -16,7 +16,7 @@ namespace Waher.Things.Script
 	/// <summary>
 	/// Node defined by script.
 	/// </summary>
-	public class ScriptNode : ProvisionedMeteringNode, ISensor
+	public class ScriptNode : VirtualNode, ISensor
 	{
 		private string[] sensorScript;
 		private Expression parsedSensorScript;
@@ -100,6 +100,12 @@ namespace Waher.Things.Script
 				{
 					["this"] = this
 				};
+
+				if (!(this.MetaData is null))
+				{
+					foreach (MetaDataValue Tag in this.MetaData)
+						v[Tag.Name] = Tag.Value;
+				}
 
 				v.OnPreview += (sender, e) =>
 				{

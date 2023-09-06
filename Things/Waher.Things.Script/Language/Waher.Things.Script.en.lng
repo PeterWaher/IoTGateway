@@ -7,9 +7,9 @@
 			<String id="3">Sensor-data script:</String>
 			<String id="4"></String>
 			<String id="5">Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the "this" variable to refer to this node.</String>
-			<String id="6"></String>
-			<String id="7"></String>
-			<String id="8"></String>
+			<String id="6">Script Node:</String>
+			<String id="7">ID of template node that defines how the node operates.</String>
+			<String id="8">Script Reference Node</String>
 			<String id="9"></String>
 			<String id="10"></String>
 			<String id="11"></String>

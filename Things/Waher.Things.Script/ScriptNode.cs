@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things.Attributes;
-using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
 using Waher.Things.SensorData;
 using Waher.Things.Virtual;
@@ -63,7 +62,7 @@ namespace Waher.Things.Script
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is ScriptNode);
+			return Task.FromResult(Child is ScriptNode || Child is ScriptReferenceNode);
 		}
 
 		/// <summary>
@@ -73,7 +72,7 @@ namespace Waher.Things.Script
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Root || Parent is VirtualNode || Parent is ScriptNode);
+			return Task.FromResult(Parent is Root || Parent is VirtualNode || Parent is ScriptNode || Parent is ScriptReferenceNode);
 		}
 
 		/// <summary>
@@ -88,18 +87,6 @@ namespace Waher.Things.Script
 			{
 				await base.StartReadout(Request, false);
 
-				Expression Exp = this.parsedSensorScript;
-
-				if (Exp is null)
-				{
-					StringBuilder sb = new StringBuilder();
-
-					foreach (string s in this.sensorScript)
-						sb.AppendLine(s);
-
-					this.parsedSensorScript = Exp = new Expression(sb.ToString());
-				}
-
 				Variables v = new Variables()
 				{
 					["this"] = this
@@ -113,11 +100,11 @@ namespace Waher.Things.Script
 
 				v.OnPreview += (sender, e) =>
 				{
-					this.ReportFields(Request, e.Preview.AssociatedObjectValue, false);
+					ReportFields(Request, e.Preview.AssociatedObjectValue, false);
 				};
 
-				object Obj = await Exp.EvaluateAsync(v);
-				this.ReportFields(Request, Obj, true);
+				object Obj = await this.ParsedSensorDataScript.EvaluateAsync(v);
+				ReportFields(Request, Obj, true);
 
 				await this.RemoveErrorAsync("ScriptError");
 			}
@@ -128,7 +115,30 @@ namespace Waher.Things.Script
 			}
 		}
 
-		private void ReportFields(ISensorReadout Request, object Obj, bool Done)
+		/// <summary>
+		/// Parsed sensor-data script.
+		/// </summary>
+		public Expression ParsedSensorDataScript
+		{
+			get
+			{
+				Expression Exp = this.parsedSensorScript;
+
+				if (Exp is null)
+				{
+					StringBuilder sb = new StringBuilder();
+
+					foreach (string s in this.sensorScript)
+						sb.AppendLine(s);
+
+					this.parsedSensorScript = Exp = new Expression(sb.ToString());
+				}
+
+				return Exp;
+			}
+		}
+
+		internal static void ReportFields(ISensorReadout Request, object Obj, bool Done)
 		{
 			if (Obj is Field Field)
 				Request.ReportFields(Done, Field);

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -74,6 +73,20 @@ namespace Waher.Script.Operators.Vectors
 		{
 			if (Vector is IVector V)
 				return EvaluateIndex(V, Index, Node);
+			else if (Vector is ISet S)
+			{
+				int i = (int)Expression.ToDouble(Index.AssociatedObjectValue);
+				if (i < 0)
+					throw new ScriptRuntimeException("Index must be a non-negative number.", Node);
+
+				foreach (IElement E in S.ChildElements)
+				{
+					if (i-- == 0)
+						return E;
+				}
+
+				throw new ScriptRuntimeException("Index out of range.", Node);
+			}
 			else if (Vector.IsScalar)
 			{
 				object Object = Vector.AssociatedObjectValue;

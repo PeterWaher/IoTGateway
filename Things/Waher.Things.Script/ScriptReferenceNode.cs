@@ -14,8 +14,6 @@ namespace Waher.Things.Script
 	/// </summary>
 	public class ScriptReferenceNode : VirtualNode, ISensor
 	{
-		private string sensorNodeId;
-
 		/// <summary>
 		/// Node referencing a script node.
 		/// </summary>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -12,6 +11,19 @@ namespace Waher.Script.Functions.Vectors
 	/// </summary>
 	public class Join : FunctionMultiVariate
 	{
+		/// <summary>
+		/// Joins vectors in a vector of vectors.
+		/// </summary>
+		/// <param name="v">Vector of vectors</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Join(ScriptNode v, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { v }, new ArgumentType[] { ArgumentType.Vector },
+				  Start, Length, Expression)
+		{
+		}
+
 		/// <summary>
 		/// Joins vectors.
 		/// </summary>
@@ -71,7 +83,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Join(ScriptNode v1, ScriptNode v2, ScriptNode v3, ScriptNode v4, ScriptNode v5, 
+		public Join(ScriptNode v1, ScriptNode v2, ScriptNode v3, ScriptNode v4, ScriptNode v5,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { v1, v2, v3, v4, v5 },
 				  new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector,
@@ -116,7 +128,7 @@ namespace Waher.Script.Functions.Vectors
 			ScriptNode v7, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { v1, v2, v3, v4, v5, v6, v7 },
 				  new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector,
-					  ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector }, 
+					  ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Vector },
 				  Start, Length, Expression)
 		{
 		}
@@ -173,24 +185,12 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "v1", "v2" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "v1", "v2" };
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Join";
-			}
-		}
+		public override string FunctionName => nameof(Join);
 
 		/// <summary>
 		/// Evaluates the function.
@@ -200,54 +200,84 @@ namespace Waher.Script.Functions.Vectors
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
+			return this.Evaluate(Arguments, true);
+		}
+
+
+		private IElement Evaluate(IElement[] Arguments, bool CheckVectorOfVectors)
+		{
 			int i, c = Arguments.Length;
-			IElement ResultRef = Arguments[0];
-			IElement Ref;
-			ISet ResultSet = ResultRef.AssociatedSet;
-			ISet Set;
 
-			for (i = 1; i < c; i++)
+			if (c == 1 && CheckVectorOfVectors)
 			{
-				Ref = Arguments[i];
-				Set = Arguments[i].AssociatedSet;
+				IElement E = Arguments[0];
 
-				if (!ResultSet.Equals(Set))
+				if (E is IVector V)
 				{
-					if (Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
-					{
-						Arguments[0] = ResultRef;
-						Arguments[i] = Ref;
-					}
-					else
-					{
-						ResultRef = new ObjectVector(ResultRef.ChildElements);
-						ResultSet = ResultRef.AssociatedSet;
-						Arguments[0] = ResultRef;
+					ICollection<IElement> Elements = V.VectorElements;
+					c = Elements.Count;
 
-						Ref = new ObjectVector(Ref.ChildElements);
-						Arguments[i] = Ref;
+					if (!(Elements is IElement[] ElementArray))
+					{
+						ElementArray = new IElement[c];
+						Elements.CopyTo(ElementArray, 0);
+					}
+
+					return this.Evaluate(ElementArray, false);
+				}
+				else
+					return E;
+			}
+			else
+			{
+				IElement ResultRef = Arguments[0];
+				IElement Ref;
+				ISet ResultSet = ResultRef.AssociatedSet;
+				ISet Set;
+
+				for (i = 1; i < c; i++)
+				{
+					Ref = Arguments[i];
+					Set = Arguments[i].AssociatedSet;
+
+					if (!ResultSet.Equals(Set))
+					{
+						if (Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
+						{
+							Arguments[0] = ResultRef;
+							Arguments[i] = Ref;
+						}
+						else
+						{
+							ResultRef = new ObjectVector(ResultRef.ChildElements);
+							ResultSet = ResultRef.AssociatedSet;
+							Arguments[0] = ResultRef;
+
+							Ref = new ObjectVector(Ref.ChildElements);
+							Arguments[i] = Ref;
+						}
 					}
 				}
-			}
 
-			List<IElement> Elements = new List<IElement>();
-			Elements.AddRange(ResultRef.ChildElements);
+				List<IElement> Elements = new List<IElement>();
+				Elements.AddRange(ResultRef.ChildElements);
 
-			for (i = 1; i < c; i++)
-			{
-				Ref = Arguments[i];
-				Set = Arguments[i].AssociatedSet;
-
-				if (!ResultSet.Equals(Set))
+				for (i = 1; i < c; i++)
 				{
-					if (!Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
-						Ref = new ObjectVector(Ref.ChildElements);
+					Ref = Arguments[i];
+					Set = Arguments[i].AssociatedSet;
+
+					if (!ResultSet.Equals(Set))
+					{
+						if (!Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
+							Ref = new ObjectVector(Ref.ChildElements);
+					}
+
+					Elements.AddRange(Ref.ChildElements);
 				}
 
-				Elements.AddRange(Ref.ChildElements);
+				return ResultRef.Encapsulate(Elements, this);
 			}
-
-			return ResultRef.Encapsulate(Elements, this);
 		}
 	}
 }

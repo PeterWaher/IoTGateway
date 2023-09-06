@@ -8522,6 +8522,15 @@
             Joins vectors.
             </summary>
         </member>
+        <member name="M:Waher.Script.Functions.Vectors.Join.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Joins vectors in a vector of vectors.
+            </summary>
+            <param name="v">Vector of vectors</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
         <member name="M:Waher.Script.Functions.Vectors.Join.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Joins vectors.

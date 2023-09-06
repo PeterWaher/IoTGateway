@@ -1032,6 +1032,7 @@ The following functions operate on vectors:
 | `Count(v,x)`                                           | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
 | `FindElements(Search,V)`                               | Finds elements in a vector, and returns a vector of N elements representing the indices, where N is the number of elements found. | `FindElements("Hello",V)` |
 | `IndexOf(v,x[,From])`                                  | Returns the zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `IndexOf(v,1)` |
+| `Join(v)`                                              | Joins a vector of vectors, into a larger vector. | `Join(v)` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])`       | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
 | `LastIndexOf(v,x[,From])`                              | Returns the last zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `LastIndexOf(v,1)` |
 | `Left(v,N)`                                            | Returns a vector with the left-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Left(v,3)` |

@@ -3,10 +3,10 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Script">
 			<String id="1">Script Node</String>
-			<String id="2"></String>
-			<String id="3"></String>
+			<String id="2">Script</String>
+			<String id="3">Sensor-data script:</String>
 			<String id="4"></String>
-			<String id="5"></String>
+			<String id="5">Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the "this" variable to refer to this node.</String>
 			<String id="6"></String>
 			<String id="7"></String>
 			<String id="8"></String>

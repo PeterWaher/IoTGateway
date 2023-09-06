@@ -5394,30 +5394,36 @@
             <param name="StackTrace">Stack Trace of event.</param>
             <param name="Tags">Variable set of tags providing event-specific warning.</param>
         </member>
-        <member name="T:Waher.Script.Functions.Matries.Identity">
+        <member name="T:Waher.Script.Functions.Matrices.FindElements">
             <summary>
-            Creates an identity matrix.
+            Finds elements in matrices or vectors.
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Matries.Identity.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Functions.Matrices.FindElements.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Creates an identity matrix.
+            Finds elements in matrices or vectors.
             </summary>
-            <param name="Dimension">Dimension of matrix.</param>
+            <param name="SearchFor">What to search for.</param>
+            <param name="In">Object to search in.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
+            <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Functions.Matries.Identity.FunctionName">
+        <member name="P:Waher.Script.Functions.Matrices.FindElements.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Matries.Identity.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="P:Waher.Script.Functions.Matrices.FindElements.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.FindElements.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
-            <param name="Argument">Function argument.</param>
+            <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
@@ -5534,6 +5540,33 @@
             </summary>
             <param name="Argument1">Function argument 1.</param>
             <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matries.Identity">
+            <summary>
+            Creates an identity matrix.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matries.Identity.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an identity matrix.
+            </summary>
+            <param name="Dimension">Dimension of matrix.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matries.Identity.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matries.Identity.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
@@ -7580,6 +7613,30 @@
             <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

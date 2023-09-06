@@ -1030,6 +1030,7 @@ The following functions operate on vectors:
 | `Contains(v,x)`                                        | Returns `true` if `v` contains `x` as an element, `false` otherwise. | `Contains(v,1)` |
 | `Count(v)`                                             | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
 | `Count(v,x)`                                           | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
+| `FindElements(Search,V)`                               | Finds elements in a vector, and returns a vector of N elements representing the indices, where N is the number of elements found. | `FindElements("Hello",V)` |
 | `IndexOf(v,x[,From])`                                  | Returns the zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `IndexOf(v,1)` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])`       | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
 | `LastIndexOf(v,x[,From])`                              | Returns the last zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `LastIndexOf(v,1)` |
@@ -1062,14 +1063,15 @@ The following functions operate on vectors:
 
 The following functions operate on matrices:
 
-| Function               | Description                                         | Example |
-|------------------------|-----------------------------------------------------|---------|
-| `Identity(N)`          | Creates an NxN identity matrix.                     | `Identity(10)`           |
-| `Inv(M)`               | Alias for `Invert(M)`.                              | `Inv([[1,1],[0,1]])`     |
-| `Inverse(M)`           | Alias for `Invert(M)`.                              | `Inverse([[1,1],[0,1]])` |
-| `Invert(M)`            | Inverts `M`. Works on any invertable element.       | `Invert([[1,1],[0,1]])`  |
-| `Ones(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 1.   | `Ones(5,4)`              |
-| `Zeroes(Rows,Columns)` | Creates an MxN-matrix with all elements set to 0.   | `Zeroes(5,4)`            |
+| Function                 | Description                                                                                                                                       | Example                   |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| `FindElements(Search,M)` | Finds elements in a matrix, and returns a matrix of two columns and N rows representing the coordinates, where N is the number of elements found. | `FindElements("Hello",M)` |
+| `Identity(N)`            | Creates an NxN identity matrix.                                                                                                                   | `Identity(10)`            |
+| `Inv(M)`                 | Alias for `Invert(M)`.                                                                                                                            | `Inv([[1,1],[0,1]])`      |
+| `Inverse(M)`             | Alias for `Invert(M)`.                                                                                                                            | `Inverse([[1,1],[0,1]])`  |
+| `Invert(M)`              | Inverts `M`. Works on any invertable element.                                                                                                     | `Invert([[1,1],[0,1]])`   |
+| `Ones(Rows,Columns)`     | Creates an MxN-matrix with all elements set to 1.                                                                                                 | `Ones(5,4)`               |
+| `Zeroes(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 0.                                                                                                 | `Zeroes(5,4)`             |
 
 ### Transforms
 

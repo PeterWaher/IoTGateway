@@ -112,17 +112,17 @@ namespace Waher.Script.Model
         {
 			object Value = Argument.AssociatedObjectValue;
 
-			if (Expression.TryConvert<string>(Value, out string s))
+			if (Expression.TryConvert(Value, out string s))
 				return this.EvaluateScalar(s, Variables);
-			else if (Expression.TryConvert<double>(Value, out double d))
+			else if (Expression.TryConvert(Value, out double d))
 				return this.EvaluateScalar(d, Variables);
-			else if (Expression.TryConvert<bool>(Value, out bool b))
+			else if (Expression.TryConvert(Value, out bool b))
 				return this.EvaluateScalar(b, Variables);
-			else if (Expression.TryConvert<Complex>(Value, out Complex z))
+			else if (Expression.TryConvert(Value, out Complex z))
 				return this.EvaluateScalar(z, Variables);
-            else if (Expression.TryConvert<Integer>(Value, out Integer i))
+            else if (Expression.TryConvert(Value, out Integer i))
                 return this.EvaluateScalar((double)i.Value, Variables);
-            else if (Expression.TryConvert<RationalNumber>(Value, out RationalNumber q))
+            else if (Expression.TryConvert(Value, out RationalNumber q))
                 return this.EvaluateScalar(q.ToDouble(), Variables);
             else
                 throw new ScriptRuntimeException("Type of scalar not supported.", this);

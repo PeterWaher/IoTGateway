@@ -18,6 +18,7 @@ using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
+using Waher.Things.Virtual.Commands;
 
 namespace Waher.Things.Virtual
 {
@@ -729,6 +730,24 @@ namespace Waher.Things.Virtual
 
 			object Payload = await Expression.EvalAsync(PayloadScript, v);
 			await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
+		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Commands = new List<ICommand>();
+			Commands.AddRange(await base.Commands);
+
+			Commands.Add(new AddMetaDataString(this));
+			Commands.Add(new AddMetaDataInt32(this));
+			Commands.Add(new AddMetaDataInt64(this));
+			Commands.Add(new AddMetaDataDouble(this));
+
+			return Commands.ToArray();
 		}
 
 	}

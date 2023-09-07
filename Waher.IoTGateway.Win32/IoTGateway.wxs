@@ -680,6 +680,7 @@
 							<File Id='Waher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.SpaceGravel.dll'/>
 							<File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
+							<File Id='Waher.Things.Files.dll' Name='Waher.Things.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.dll' Vital='yes'/>
 							<File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
 							<File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
 							<File Id='Waher.Things.Modbus.dll' Name='Waher.Things.Modbus.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Modbus.dll' Vital='yes'/>
@@ -805,6 +806,7 @@
 							<RemoveFile Id='RemoveWaher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Files.dll' Name='Waher.Things.Files.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Modbus.dll' Name='Waher.Things.Modbus.dll' On='uninstall'/>
@@ -909,6 +911,7 @@
 							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
+							<File Id='Waher.Things.Files.pdb' Name='Waher.Things.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.pdb' Vital='yes'/>
 							<File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Modbus.pdb' Name='Waher.Things.Modbus.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Modbus.pdb' Vital='yes'/>
@@ -1011,6 +1014,7 @@
 							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Files.pdb' Name='Waher.Things.Files.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.pdb' Name='Waher.Things.IP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Modbus.pdb' Name='Waher.Things.Modbus.pdb' On='uninstall'/>
@@ -2142,6 +2146,7 @@
 							<File Id='Waher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.es.lng' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng'/>
+							<File Id='Waher.Things.Files.en.lng' Name='Waher.Things.Files.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Files.en.lng'/>
 							<File Id='Waher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng'/>
 							<File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng'/>
 							<File Id='Waher.Things.Modbus.en.lng' Name='Waher.Things.Modbus.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Modbus.en.lng'/>
@@ -2154,6 +2159,7 @@
 							<RemoveFile Id='RemoveWaher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Files.en.lng' Name='Waher.Things.Files.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Modbus.en.lng' Name='Waher.Things.Modbus.en.lng' On='uninstall'/>

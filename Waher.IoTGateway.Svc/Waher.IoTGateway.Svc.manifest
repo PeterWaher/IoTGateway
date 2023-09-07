@@ -485,6 +485,8 @@
 	<Assembly fileName='Waher.Theme.WinterDawn.pdb'/>
 	<Assembly fileName='Waher.Things.dll'/>
 	<Assembly fileName='Waher.Things.pdb'/>
+	<Assembly fileName='Waher.Things.Files.dll'/>
+	<Assembly fileName='Waher.Things.Files.pdb'/>
 	<Assembly fileName='Waher.Things.IP.dll'/>
 	<Assembly fileName='Waher.Things.IP.pdb'/>
 	<Assembly fileName='Waher.Things.Metering.dll'/>
@@ -940,6 +942,7 @@
 		<Content fileName="Waher.IoTGateway.en.lng"/>
 		<Content fileName="Waher.IoTGateway.es.lng"/>
 		<Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
+		<Content fileName='Waher.Things.Files.en.lng'/>
 		<Content fileName='Waher.Things.IP.en.lng'/>
 		<Content fileName='Waher.Things.Metering.en.lng'/>
 		<Content fileName='Waher.Things.Modbus.en.lng'/>

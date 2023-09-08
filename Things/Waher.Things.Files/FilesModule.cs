@@ -103,6 +103,14 @@ namespace Waher.Things.Files
 				{
 					if (watchers.TryGetValue(Node.FolderPath, out KeyValuePair<FolderNode, FileSystemWatcher> P))
 					{
+						P.Value.Changed -= Node.Watcher_Changed;
+						P.Value.Created -= Node.Watcher_Created;
+						P.Value.Deleted -= Node.Watcher_Deleted;
+						P.Value.Renamed -= Node.Watcher_Renamed;
+						P.Value.Error -= Node.Watcher_Error;
+						
+						P.Value.EnableRaisingEvents = false;
+
 						watchers.Remove(Node.FolderPath);
 						P.Value.Dispose();
 					}

@@ -42,6 +42,7 @@ namespace Waher.Things.Files
 	/// </summary>
 	public class FolderNode : VirtualNode
 	{
+		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
 		private SynchronizationOptions synchronizationOptions = SynchronizationOptions.NoSynchronization;
 		private string folderPath;
 		private string fileFilter;
@@ -293,6 +294,57 @@ namespace Waher.Things.Files
 							Log.Critical(ex);
 						}
 					}
+
+					Dictionary<string, Guid> ObjectIdsByPath = new Dictionary<string, Guid>();
+					LinkedList<Tuple<string, INode, INode>> ToCheck = new LinkedList<Tuple<string, INode, INode>>();
+					ToCheck.AddLast(new Tuple<string, INode, INode>(null, null, this));
+
+					while (!(ToCheck.First is null))
+					{
+						Tuple<string, INode, INode> P = ToCheck.First.Value;
+						string ParentPath = P.Item1;
+						INode Parent = P.Item2;
+						INode Node = P.Item3;
+
+						ToCheck.RemoveFirst();
+
+						if (Node is FileNode FileNode)
+						{
+							if (!File.Exists(FileNode.FolderPath) || ObjectIdsByPath.ContainsKey(FileNode.FolderPath))
+							{
+								await Parent.RemoveAsync(Node);
+								await FileNode.DestroyAsync();
+
+								if (!(Statistics is null))
+									await Statistics.FileDeleted(ParentPath, FileNode.FolderPath);
+							}
+							else
+								ObjectIdsByPath[FileNode.FolderPath] = FileNode.ObjectId;
+						}
+						else if (Node is SubFolderNode SubFolderNode)
+						{
+							if (!Directory.Exists(SubFolderNode.FolderPath) || ObjectIdsByPath.ContainsKey(SubFolderNode.FolderPath))
+							{
+								await Parent.RemoveAsync(Node);
+								await SubFolderNode.DestroyAsync();
+
+								if (!(Statistics is null))
+									await Statistics.FolderDeleted(ParentPath, SubFolderNode.FolderPath);
+							}
+							else
+							{
+								ObjectIdsByPath[SubFolderNode.FolderPath] = SubFolderNode.ObjectId;
+
+								foreach (INode Child in await SubFolderNode.ChildNodes)
+									ToCheck.AddLast(new Tuple<string, INode, INode>(SubFolderNode.FolderPath, SubFolderNode, Child));
+							}
+						}
+						else if (Node is FolderNode FolderNode)
+						{
+							foreach (INode Child in await FolderNode.ChildNodes)
+								ToCheck.AddLast(new Tuple<string, INode, INode>(FolderNode.FolderPath, FolderNode, Child));
+						}
+					}
 				}
 				catch (Exception ex)
 				{
@@ -317,7 +369,7 @@ namespace Waher.Things.Files
 			}
 		}
 
-		private async Task<INode> FindNode(string Path, bool CreateIfNecessary, SynchronizationStatistics Statistics)
+		private async Task<INode> FindNodeLocked(string Path, bool CreateIfNecessary, SynchronizationStatistics Statistics)
 		{
 			if (!Path.StartsWith(this.folderPath, StringComparison.InvariantCultureIgnoreCase))
 				return null;
@@ -458,49 +510,6 @@ namespace Waher.Things.Files
 				SubPath = s2;
 			}
 
-			LinkedList<KeyValuePair<string, INode>> ToCheck = new LinkedList<KeyValuePair<string, INode>>();
-			ToCheck.AddLast(new KeyValuePair<string, INode>(null, this));
-
-			while (!(ToCheck.First is null))
-			{
-				KeyValuePair<string, INode> P = ToCheck.First.Value;
-				string ParentPath = P.Key;
-				INode Node = P.Value;
-
-				ToCheck.RemoveFirst();
-
-				if (Node is FileNode FileNode)
-				{
-					if (!File.Exists(FileNode.FolderPath))
-					{
-						await FileNode.DestroyAsync();
-
-						if (!(Statistics is null))
-							await Statistics.FileDeleted(ParentPath, FileNode.FolderPath);
-					}
-				}
-				else if (Node is SubFolderNode SubFolderNode)
-				{
-					if (Directory.Exists(SubFolderNode.FolderPath))
-					{
-						foreach (INode Child in await SubFolderNode.ChildNodes)
-							ToCheck.AddLast(new KeyValuePair<string, INode>(SubFolderNode.FolderPath, Child));
-					}
-					else
-					{
-						await SubFolderNode.DestroyAsync();
-
-						if (!(Statistics is null))
-							await Statistics.FolderDeleted(ParentPath, SubFolderNode.FolderPath);
-					}
-				}
-				else if (Node is FolderNode FolderNode)
-				{
-					foreach (INode Child in await FolderNode.ChildNodes)
-						ToCheck.AddLast(new KeyValuePair<string, INode>(FolderNode.FolderPath, Child));
-				}
-			}
-
 			return Parent;
 		}
 
@@ -529,14 +538,30 @@ namespace Waher.Things.Files
 
 		private async Task OnCreated(string Path)
 		{
-			INode Node = await this.FindNode(Path, true, null);
-			await this.ExecuteAssociatedScript(Node);
+			await this.synchObj.WaitAsync();
+			try
+			{
+				INode Node = await this.FindNodeLocked(Path, true, null);
+				await this.ExecuteAssociatedScript(Node);
+			}
+			finally
+			{
+				this.synchObj.Release();
+			}
 		}
 
 		private async Task OnChanged(string Path, SynchronizationStatistics Statistics)
 		{
-			INode Node = await this.FindNode(Path, true, Statistics);
-			await this.ExecuteAssociatedScript(Node);
+			await this.synchObj.WaitAsync();
+			try
+			{
+				INode Node = await this.FindNodeLocked(Path, true, Statistics);
+				await this.ExecuteAssociatedScript(Node);
+			}
+			finally
+			{
+				this.synchObj.Release();
+			}
 		}
 
 		private async Task ExecuteAssociatedScript(INode Node)
@@ -562,67 +587,90 @@ namespace Waher.Things.Files
 
 		private async Task OnRenamed(string OldPath, string NewPath)
 		{
-			INode OldNode = await this.FindNode(OldPath, false, null);
-			INode NewNode = await this.FindNode(NewPath, true, null);
-
-			if (OldNode is null || OldNode.NodeId == NewNode.NodeId)
-				return;
-
-			if (NewNode is ScriptReferenceNode NewScriptReferenceNode && OldNode is ScriptReferenceNode OldScriptReferenceNode)
-				NewScriptReferenceNode.ScriptNodeId = OldScriptReferenceNode.ScriptNodeId;
-
-			if (NewNode is VirtualNode NewVirtualNode && OldNode is VirtualNode OldVirtualNode)
-				NewVirtualNode.MetaData = OldVirtualNode.MetaData;
-
-			if (NewNode is ProvisionedMeteringNode NewProvisionedMeteringNode && OldNode is ProvisionedMeteringNode OldProvisionedMeteringNode)
+			await this.synchObj.WaitAsync();
+			try
 			{
-				NewProvisionedMeteringNode.OwnerAddress = OldProvisionedMeteringNode.OwnerAddress;
-				NewProvisionedMeteringNode.Public = OldProvisionedMeteringNode.Public;
-				NewProvisionedMeteringNode.Provisioned = OldProvisionedMeteringNode.Provisioned;
-			}
+				INode OldNode = await this.FindNodeLocked(OldPath, false, null);
+				INode NewNode = await this.FindNodeLocked(NewPath, true, null);
 
-			if (NewNode is MetaMeteringNode NewMetaMeteringNode && OldNode is MetaMeteringNode OldMetaMeteringNode)
+				if (OldNode is null || OldNode.NodeId == NewNode.NodeId)
+					return;
+
+				if (NewNode is ScriptReferenceNode NewScriptReferenceNode && OldNode is ScriptReferenceNode OldScriptReferenceNode)
+					NewScriptReferenceNode.ScriptNodeId = OldScriptReferenceNode.ScriptNodeId;
+
+				if (NewNode is VirtualNode NewVirtualNode && OldNode is VirtualNode OldVirtualNode)
+					NewVirtualNode.MetaData = OldVirtualNode.MetaData;
+
+				if (NewNode is ProvisionedMeteringNode NewProvisionedMeteringNode && OldNode is ProvisionedMeteringNode OldProvisionedMeteringNode)
+				{
+					NewProvisionedMeteringNode.OwnerAddress = OldProvisionedMeteringNode.OwnerAddress;
+					NewProvisionedMeteringNode.Public = OldProvisionedMeteringNode.Public;
+					NewProvisionedMeteringNode.Provisioned = OldProvisionedMeteringNode.Provisioned;
+				}
+
+				if (NewNode is MetaMeteringNode NewMetaMeteringNode && OldNode is MetaMeteringNode OldMetaMeteringNode)
+				{
+					NewMetaMeteringNode.Name = OldMetaMeteringNode.Name;
+					NewMetaMeteringNode.Class = OldMetaMeteringNode.Class;
+					NewMetaMeteringNode.SerialNumber = OldMetaMeteringNode.SerialNumber;
+					NewMetaMeteringNode.MeterNumber = OldMetaMeteringNode.MeterNumber;
+					NewMetaMeteringNode.MeterLocation = OldMetaMeteringNode.MeterLocation;
+					NewMetaMeteringNode.ManufacturerDomain = OldMetaMeteringNode.ManufacturerDomain;
+					NewMetaMeteringNode.Model = OldMetaMeteringNode.Model;
+					NewMetaMeteringNode.Version = OldMetaMeteringNode.Version;
+					NewMetaMeteringNode.ProductUrl = OldMetaMeteringNode.ProductUrl;
+					NewMetaMeteringNode.Country = OldMetaMeteringNode.Country;
+					NewMetaMeteringNode.Region = OldMetaMeteringNode.Region;
+					NewMetaMeteringNode.City = OldMetaMeteringNode.City;
+					NewMetaMeteringNode.Street = OldMetaMeteringNode.Street;
+					NewMetaMeteringNode.StreetNr = OldMetaMeteringNode.StreetNr;
+					NewMetaMeteringNode.Building = OldMetaMeteringNode.Building;
+					NewMetaMeteringNode.Apartment = OldMetaMeteringNode.Apartment;
+					NewMetaMeteringNode.Room = OldMetaMeteringNode.Room;
+					NewMetaMeteringNode.Latitude = OldMetaMeteringNode.Latitude;
+					NewMetaMeteringNode.Longitude = OldMetaMeteringNode.Longitude;
+					NewMetaMeteringNode.Altitude = OldMetaMeteringNode.Altitude;
+				}
+
+				await NewNode.UpdateAsync();
+
+				if (!(OldNode.Parent is null))
+					await OldNode.Parent.RemoveAsync(OldNode);
+
+				await OldNode.DestroyAsync();
+
+				Log.Informational("File Node renamed.",
+					new KeyValuePair<string, object>("Old Node ID", OldNode.NodeId),
+					new KeyValuePair<string, object>("New Node ID", NewNode.NodeId));
+			}
+			finally
 			{
-				NewMetaMeteringNode.Name = OldMetaMeteringNode.Name;
-				NewMetaMeteringNode.Class = OldMetaMeteringNode.Class;
-				NewMetaMeteringNode.SerialNumber = OldMetaMeteringNode.SerialNumber;
-				NewMetaMeteringNode.MeterNumber = OldMetaMeteringNode.MeterNumber;
-				NewMetaMeteringNode.MeterLocation = OldMetaMeteringNode.MeterLocation;
-				NewMetaMeteringNode.ManufacturerDomain = OldMetaMeteringNode.ManufacturerDomain;
-				NewMetaMeteringNode.Model = OldMetaMeteringNode.Model;
-				NewMetaMeteringNode.Version = OldMetaMeteringNode.Version;
-				NewMetaMeteringNode.ProductUrl = OldMetaMeteringNode.ProductUrl;
-				NewMetaMeteringNode.Country = OldMetaMeteringNode.Country;
-				NewMetaMeteringNode.Region = OldMetaMeteringNode.Region;
-				NewMetaMeteringNode.City = OldMetaMeteringNode.City;
-				NewMetaMeteringNode.Street = OldMetaMeteringNode.Street;
-				NewMetaMeteringNode.StreetNr = OldMetaMeteringNode.StreetNr;
-				NewMetaMeteringNode.Building = OldMetaMeteringNode.Building;
-				NewMetaMeteringNode.Apartment = OldMetaMeteringNode.Apartment;
-				NewMetaMeteringNode.Room = OldMetaMeteringNode.Room;
-				NewMetaMeteringNode.Latitude = OldMetaMeteringNode.Latitude;
-				NewMetaMeteringNode.Longitude = OldMetaMeteringNode.Longitude;
-				NewMetaMeteringNode.Altitude = OldMetaMeteringNode.Altitude;
+				this.synchObj.Release();
 			}
-
-			await NewNode.UpdateAsync();
-			await OldNode.DestroyAsync();
-
-			Log.Informational("File Node renamed.",
-				new KeyValuePair<string, object>("Old Node ID", OldNode.NodeId),
-				new KeyValuePair<string, object>("New Node ID", NewNode.NodeId));
 		}
 
 		private async Task OnDeleted(string Path)
 		{
-			INode Node = await this.FindNode(Path, false, null);
-			if (Node is null)
-				return;
+			await this.synchObj.WaitAsync();
+			try
+			{
+				INode Node = await this.FindNodeLocked(Path, false, null);
+				if (Node is null)
+					return;
 
-			await Node.DestroyAsync();
+				if (!(Node.Parent is null))
+					await Node.Parent.RemoveAsync(Node);
 
-			Log.Informational("File Node deleted.",
-				new KeyValuePair<string, object>("Node ID", Node.NodeId));
+				await Node.DestroyAsync();
+
+				Log.Informational("File Node deleted.",
+					new KeyValuePair<string, object>("Node ID", Node.NodeId));
+			}
+			finally
+			{
+				this.synchObj.Release();
+			}
 		}
 
 		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();

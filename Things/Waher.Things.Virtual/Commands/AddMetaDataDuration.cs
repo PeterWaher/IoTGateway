@@ -16,7 +16,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Adds a Duration-valued meta-data tag on a virtual node.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
+		/// <param name="Node">Virtual node.</param>
 		public AddMetaDataDuration(VirtualNode Node)
 		{
 			this.node = Node;

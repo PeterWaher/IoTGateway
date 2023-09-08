@@ -15,7 +15,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Adds a 64-bit integer-valued meta-data tag on a virtual node.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
+		/// <param name="Node">Virtual node.</param>
 		public AddMetaDataInt64(VirtualNode Node)
 		{
 			this.node = Node;

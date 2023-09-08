@@ -15,7 +15,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Adds a floating-point-valued meta-data tag on a virtual node.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
+		/// <param name="Node">Virtual node.</param>
 		public AddMetaDataDouble(VirtualNode Node)
 		{
 			this.node = Node;

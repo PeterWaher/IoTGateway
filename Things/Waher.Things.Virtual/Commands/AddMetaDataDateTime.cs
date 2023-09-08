@@ -16,7 +16,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Adds a DateTime-valued meta-data tag on a virtual node.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
+		/// <param name="Node">Virtual node.</param>
 		public AddMetaDataDateTime(VirtualNode Node)
 		{
 			this.node = Node;

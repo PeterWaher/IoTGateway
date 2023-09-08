@@ -86,11 +86,7 @@ namespace Waher.Things.Script
 					["this"] = this
 				};
 
-				if (!(this.MetaData is null))
-				{
-					foreach (MetaDataValue Tag in this.MetaData)
-						v[Tag.Name] = Tag.Value;
-				}
+				this.PopulateVariables(v);
 
 				v.OnPreview += (sender, e) =>
 				{
@@ -106,6 +102,19 @@ namespace Waher.Things.Script
 			{
 				await this.LogErrorAsync("ScriptError", ex.Message);
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
+			}
+		}
+
+		/// <summary>
+		/// Populates a variable collection with variables before script execution.
+		/// </summary>
+		/// <param name="Variables">Variable collection.</param>
+		public virtual void PopulateVariables(Variables Variables)
+		{
+			if (!(this.MetaData is null))
+			{
+				foreach (MetaDataValue Tag in this.MetaData)
+					Variables[Tag.Name] = Tag.Value;
 			}
 		}
 

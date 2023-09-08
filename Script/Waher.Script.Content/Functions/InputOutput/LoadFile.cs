@@ -75,7 +75,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		{
 			string FileName = Arguments[0].AssociatedObjectValue?.ToString();
 			string ContentType;
-			
+
 			FileName = Path.Combine(Directory.GetCurrentDirectory(), FileName);
 
 			if (Arguments.Length > 1)
@@ -83,21 +83,58 @@ namespace Waher.Script.Content.Functions.InputOutput
 			else
 				ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 
-			using (FileStream fs = File.OpenRead(FileName))
+			byte[] Bin;
+
+			try
 			{
-				long l = fs.Length;
-				if (l > int.MaxValue)
-					throw new ScriptRuntimeException("File too large.", this);
-
-				int Len = (int)l;
-				byte[] Bin = new byte[Len];
-
-				await fs.ReadAsync(Bin, 0, Len);
-				
-				object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
-
-				return Expression.Encapsulate(Decoded);
+				using (FileStream fs = File.OpenRead(FileName))
+				{
+					Bin = await this.LoadBin(fs);
+				}
 			}
+			catch (IOException)
+			{
+				string TempFileName = Path.GetTempFileName();
+				File.Copy(FileName, TempFileName, true);
+
+				try
+				{
+					using (FileStream fs = File.OpenRead(TempFileName))
+					{
+						Bin = await this.LoadBin(fs);
+					}
+				}
+				finally
+				{
+					File.Delete(TempFileName);
+				}
+			}
+
+			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
+
+			return Expression.Encapsulate(Decoded);
+		}
+
+		private async Task<byte[]> LoadBin(FileStream fs)
+		{
+			long l = fs.Length;
+			if (l > int.MaxValue)
+				throw new ScriptRuntimeException("File too large.", this);
+
+			int Len = (int)l;
+			byte[] Bin = new byte[Len];
+			int Pos = 0;
+
+			while (Pos < Len)
+			{
+				int i = await fs.ReadAsync(Bin, Pos, Len - Pos);
+				if (i < 0)
+					throw new ScriptRuntimeException("Unexpected end of file.", this);
+
+				Pos += i;
+			}
+
+			return Bin;
 		}
 	}
 }

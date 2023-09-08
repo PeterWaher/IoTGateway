@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Language;
+using Waher.Script;
 using Waher.Things.Attributes;
 using Waher.Things.Script;
 
@@ -23,7 +24,13 @@ namespace Waher.Things.Files
 		[Page(2, "File System", 100)]
 		[Header(13, "File:")]
 		[ToolTip(14, "Full path to file (on host).")]
+		[Text(TextPosition.AfterField, 19, "The file path can be accessible in the FileName variable from associated script.")]
 		public string FolderPath { get; set; }
+		
+		/// <summary>
+		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
+		/// </summary>
+		public override string LocalId => FolderNode.GetLocalName(this.FolderPath);
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -54,5 +61,22 @@ namespace Waher.Things.Files
 		{
 			return Task.FromResult(Parent is FolderNode || Parent is SubFolderNode);
 		}
+
+		public override Task StartReadout(ISensorReadout Request, bool DoneAfter)
+		{
+			return base.StartReadout(Request, DoneAfter);
+		}
+
+		/// <summary>
+		/// Populates a variable collection with variables before script execution.
+		/// </summary>
+		/// <param name="Variables">Variable collection.</param>
+		public override void PopulateVariables(Variables Variables)
+		{
+			Variables["FileName"] = this.FolderPath;
+		
+			base.PopulateVariables(Variables);
+		}
+
 	}
 }

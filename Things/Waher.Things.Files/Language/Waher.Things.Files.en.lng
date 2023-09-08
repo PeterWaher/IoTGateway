@@ -17,10 +17,10 @@
 			<String id="13">File:</String>
 			<String id="14">Full path to file (on host).</String>
 			<String id="15">File reference</String>
-			<String id="16"></String>
-			<String id="17"></String>
-			<String id="18"></String>
-			<String id="19"></String>
+			<String id="16">You can add default script templates to be used for files found, by adding string-valued meta-data tags to the node, where the meta-data key names correspond to file extensions.</String>
+			<String id="17">Synchronize folder...</String>
+			<String id="18">Unable to start synchronization.</String>
+			<String id="19">The file path can be accessible in the FileName variable from associated script.</String>
 			<String id="20"></String>
 			<String id="21"></String>
 			<String id="22"></String>

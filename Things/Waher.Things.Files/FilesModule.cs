@@ -17,7 +17,7 @@ namespace Waher.Things.Files
 	public class FilesModule : IModule
 	{
 		private static readonly Dictionary<string, KeyValuePair<FolderNode, FileSystemWatcher>> watchers = new Dictionary<string, KeyValuePair<FolderNode, FileSystemWatcher>>();
-		private static SemaphoreSlim synchObj = new SemaphoreSlim(1);
+		private static readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
 
 		/// <summary>
 		/// Starts the module.

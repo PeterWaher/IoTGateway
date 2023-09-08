@@ -8,7 +8,6 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
-using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
@@ -477,10 +476,7 @@ namespace Waher.Things.Virtual
 		/// <param name="Fields">Parsed fields.</param>
 		public void ReportSensorData(params SensorData.Field[] Fields)
 		{
-			if (!Types.TryGetModuleParameter("Sensor", out object Obj) || !(Obj is SensorServer SensorServer))
-				return;
-
-			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out Obj) && Obj is Scheduler Scheduler)
+			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
 				scheduler = Scheduler;
 
 			lock (this.fields)
@@ -503,7 +499,7 @@ namespace Waher.Things.Virtual
 				{
 					if (scheduler is null)
 					{
-						SensorServer.NewMomentaryValues(this, this.toReport.ToArray());
+						this.NewMomentaryValues(this.toReport.ToArray());
 						this.toReport.Clear();
 						this.hasReport = false;
 					}
@@ -520,12 +516,9 @@ namespace Waher.Things.Virtual
 
 		private void DoReport(object _)
 		{
-			if (!Types.TryGetModuleParameter("Sensor", out object Obj) || !(Obj is SensorServer SensorServer))
-				return;
-
 			lock (this.fields)
 			{
-				SensorServer.NewMomentaryValues(this, this.toReport.ToArray());
+				this.NewMomentaryValues(this.toReport.ToArray());
 				this.toReport.Clear();
 				this.hasReport = false;
 			}

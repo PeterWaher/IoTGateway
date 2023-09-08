@@ -177,48 +177,45 @@ namespace Waher.Things.Mqtt.Model
 			if (this.broker.Client?.HasSniffers ?? false)
 				this.data.SnifferOutput(this.broker.Client);
 
-			if (Types.TryGetModuleParameter("Sensor", out object Obj) && Obj is SensorServer SensorServer)
+			try
 			{
-				try
-				{
-					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
-						new ThingReference[] { this.node }, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-						(sender, e) =>
+				InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
+					new ThingReference[] { this.node }, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
+					(sender, e) =>
+					{
+						this.node.NewMomentaryValues(e.Fields);
+
+						MqttTopic Current = this;
+						MqttTopic Parent = this.parent;
+
+						while (!(Parent is null))
 						{
-							SensorServer.NewMomentaryValues(this.node, e.Fields);
-
-							MqttTopic Current = this;
-							MqttTopic Parent = this.parent;
-
-							while (!(Parent is null))
+							foreach (Field F in e.Fields)
 							{
-								foreach (Field F in e.Fields)
-								{
-									if (F.Name == "Value")
-										F.Name = Current.localTopic;
-									else
-										F.Name = Current.localTopic + ", " + F.Name;
+								if (F.Name == "Value")
+									F.Name = Current.localTopic;
+								else
+									F.Name = Current.localTopic + ", " + F.Name;
 
-									SensorServer.NewMomentaryValues(Parent.node, F);
-								}
-
-								Current = Parent;
-								Parent = Parent.parent;
+								Parent.node.NewMomentaryValues(F);
 							}
 
-							return Task.CompletedTask;
-						},
-						(sender, e) =>
-						{
-							return Task.CompletedTask;
-						}, null);
+							Current = Parent;
+							Parent = Parent.parent;
+						}
 
-					this.StartReadout(Request);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
+						return Task.CompletedTask;
+					},
+					(sender, e) =>
+					{
+						return Task.CompletedTask;
+					}, null);
+
+				this.StartReadout(Request);
+			}
+			catch (Exception ex)
+			{
+				await this.Exception(ex);
 			}
 		}
 

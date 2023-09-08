@@ -1230,7 +1230,10 @@ namespace Waher.Things.Metering
 			}
 
 			if (this.objectId != Guid.Empty)
+			{
 				await Database.Delete(this);
+				this.objectId = Guid.Empty;
+			}
 
 			MeteringTopology.UnregisterNode(this);
 		}

@@ -84,8 +84,8 @@ namespace Waher.Networking
 			X509Certificate ServerCertificate, ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
-			this.tls = true;
 			this.serverCertificate = ServerCertificate;
+			this.tls = !(this.serverCertificate is null);
 
 			this.Init(Port, ActivityTimeout);
 		}

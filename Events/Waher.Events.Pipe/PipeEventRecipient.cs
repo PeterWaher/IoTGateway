@@ -9,6 +9,11 @@ using Waher.Content.Xml;
 
 namespace Waher.Events.Pipe
 {
+	/// <summary>
+	/// Delegate for methods that create object instances of <see cref="NamedPipeServerStream"/>.
+	/// </summary>
+	/// <param name="Name">Pipe name.</param>
+	/// <returns>Object instance.</returns>
 	public delegate NamedPipeServerStream NamedPipeServerStreamFactory(string Name);
 
 	/// <summary>
@@ -52,6 +57,7 @@ namespace Waher.Events.Pipe
 		/// </summary>
 		/// <param name="PipeName">Name if pipe to listen on.</param>
 		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/> automatically.</param>
+		/// <param name="StreamFactory">Method used to create a pipe stream object.</param>
 		public PipeEventRecipient(string PipeName, bool LogIncomingEvents, NamedPipeServerStreamFactory StreamFactory)
 		{
 			if (StreamFactory is null)
@@ -69,6 +75,11 @@ namespace Waher.Events.Pipe
 			return new NamedPipeServerStream(Name, PipeDirection.In, 1, PipeTransmissionMode.Message,
 				PipeOptions.Asynchronous, 65536, 65536);
 		}
+
+		/// <summary>
+		/// Pipe object.
+		/// </summary>
+		public NamedPipeServerStream Pipe => this.pipe;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

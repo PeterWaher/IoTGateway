@@ -10,6 +10,13 @@ using Waher.Content.Xml;
 namespace Waher.Events.Pipe
 {
 	/// <summary>
+	/// Delegate for methods that create object instances of <see cref="NamedPipeClientStream"/>.
+	/// </summary>
+	/// <param name="Name">Pipe name.</param>
+	/// <returns>Object instance.</returns>
+	public delegate NamedPipeClientStream NamedPipeClientStreamFactory(string Name);
+
+	/// <summary>
 	/// Writes logged events to an operating system pipe, for inter-process communication.
 	/// </summary>
 	public class PipeEventSink : EventSink
@@ -17,9 +24,10 @@ namespace Waher.Events.Pipe
 		/// <summary>
 		/// http://waher.se/Schema/EventOutput.xsd
 		/// </summary>
-		public const string LogNamespace= "http://waher.se/Schema/EventOutput.xsd";
+		public const string LogNamespace = "http://waher.se/Schema/EventOutput.xsd";
 
 		private readonly LinkedList<byte[]> pipeQueue = new LinkedList<byte[]>();
+		private readonly NamedPipeClientStreamFactory pipeStreamFactory;
 		private readonly string pipeName;
 		private NamedPipeClientStream pipe;
 		private bool writing = false;
@@ -30,11 +38,34 @@ namespace Waher.Events.Pipe
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="PipeName">Name of pipe.</param>
 		public PipeEventSink(string ObjectId, string PipeName)
+			: this(ObjectId, PipeName, DefaultFactory)
+		{
+		}
+
+		/// <summary>
+		/// Writes logged events to an operating system pipe, for inter-process communication.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="PipeName">Name of pipe.</param>
+		/// <param name="StreamFactory">Method used to create a pipe stream object.</param>
+		public PipeEventSink(string ObjectId, string PipeName, NamedPipeClientStreamFactory StreamFactory)
 			: base(ObjectId)
 		{
+			this.pipeStreamFactory = StreamFactory;
 			this.pipe = null;
 			this.pipeName = PipeName;
 		}
+
+		private static NamedPipeClientStream DefaultFactory(string Name)
+		{
+			return new NamedPipeClientStream(".", Name, PipeDirection.Out, PipeOptions.Asynchronous,
+				TokenImpersonationLevel.Anonymous, HandleInheritability.None);
+		}
+
+		/// <summary>
+		/// Pipe object.
+		/// </summary>
+		public NamedPipeClientStream Pipe => this.pipe;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose()"/>
@@ -185,10 +216,10 @@ namespace Waher.Events.Pipe
 
 				if (this.pipe is null)
 				{
-					this.pipe = new NamedPipeClientStream(".", this.pipeName, PipeDirection.Out, PipeOptions.Asynchronous,
-						TokenImpersonationLevel.Anonymous, HandleInheritability.None);
-
+					this.pipe = this.pipeStreamFactory(this.pipeName);
+					this.Raise(this.BeforeConnect);
 					await this.pipe.ConnectAsync(5000);
+					this.Raise(this.AfterConnect);
 				}
 
 				while (!(Bin is null))
@@ -225,6 +256,21 @@ namespace Waher.Events.Pipe
 			}
 		}
 
+		private void Raise(EventHandler Event)
+		{
+			if (!(Event is null))
+			{
+				try
+				{
+					Event(this, EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
 		private void EmptyPipeQueue()
 		{
 			lock (this.pipeQueue)
@@ -233,6 +279,16 @@ namespace Waher.Events.Pipe
 				this.writing = false;
 			}
 		}
+
+		/// <summary>
+		/// Raised before connecting to the pipe stream.
+		/// </summary>
+		public event EventHandler BeforeConnect;
+
+		/// <summary>
+		/// Raised after connecting to the pipe stream
+		/// </summary>
+		public event EventHandler AfterConnect;
 
 		private static string[] GetRows(string s)
 		{

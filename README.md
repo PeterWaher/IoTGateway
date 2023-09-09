@@ -185,6 +185,8 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.MQTT.UWP**        | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Events.MQTT.UWP/)        | The [Waher.Events.MQTT.UWP](Events/Waher.Events.MQTT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Events.MQTT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Events.Persistence**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.Persistence/)     | The [Waher.Events.Persistence](Events/Waher.Events.Persistence) project creates an even sink that stores incoming (logged) events in the local object database, as defined by [Waher.Persistence](Persistence/Waher.Persistence). Event life time in the database is defined in the constructor. Searches can be made for historical events. |
 | **Waher.Events.Pipe**            | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Events.Pipe/)            | The [Waher.Events.Pipe](Events/Waher.Events.Pipe) project creates an even sink that sends incoming (logged) events to a pipe. An event reader is also available, making it easy to transport logged events from one process to another on the same machine. |
+| **Waher.Events.Socket**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.Socket/)          | The [Waher.Events.Socket](Events/Waher.Events.Socket) project defines an event sink that sends events to a TCP listener socket. Events are sent as XML fragments. |
+| **Waher.Events.Socket.UWP**      | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Events.Socket.UWP/)      | The [Waher.Events.Socket.UWP](Events/Waher.Events.Socket.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Events.Socket** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Events.Statistics**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.Statistics/)      | The [Waher.Events.Statistics](Events/Waher.Events.Statistics) project defines an event sink that computes statistics of events being logged. |
 | **Waher.Events.WindowsEventLog** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.WindowsEventLog/) | The [Waher.Events.WindowsEventLog](Events/Waher.Events.WindowsEventLog) project defines an event sink that logs events to a Windows Event Log. |
 | **Waher.Events.XMPP**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP/)            | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
@@ -192,9 +194,10 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 
 The folder also contains the following unit test projects:
 
-| Project                    | Type   | Project description |
-|----------------------------|--------|---------------------|
-| **Waher.Events.Pipe.Test** | .NET 6 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
+| Project                      | Type   | Project description |
+|------------------------------|--------|---------------------|
+| **Waher.Events.Pipe.Test**   | .NET 6 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
+| **Waher.Events.Socket.Test** | .NET 6 | The [Waher.Events.Socket.Test](Events/Waher.Events.Socket.Test) project contains unit tests for the **Waher.Events.Socket** project. |
 
 Layout
 ----------------------

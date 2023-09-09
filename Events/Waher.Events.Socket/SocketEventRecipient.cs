@@ -37,7 +37,27 @@ namespace Waher.Events.Socket
 			this.logIncoming = LogIncomingEvents;
 		}
 
-		public async Task<SocketEventRecipient> Create(int Port, X509Certificate Certificate, bool LogIncomingEvents, params ISniffer[] Sniffers)
+		/// <summary>
+		/// Creates and opens a socket-based event recipient.
+		/// </summary>
+		/// <param name="Port">Port to open.</param>
+		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/>.</param>
+		/// <param name="Sniffers">Any sniffers to output communucation to.</param>
+		/// <returns>Event recipient.</returns>
+		public static Task<SocketEventRecipient> Create(int Port, bool LogIncomingEvents, params ISniffer[] Sniffers)
+		{
+			return Create(Port, null, LogIncomingEvents, Sniffers);
+		}
+
+		/// <summary>
+		/// Creates and opens a socket-based event recipient.
+		/// </summary>
+		/// <param name="Port">Port to open.</param>
+		/// <param name="Certificate">Certificate to use for TLS encryption.</param>
+		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/>.</param>
+		/// <param name="Sniffers">Any sniffers to output communucation to.</param>
+		/// <returns>Event recipient.</returns>
+		public static async Task<SocketEventRecipient> Create(int Port, X509Certificate Certificate, bool LogIncomingEvents, params ISniffer[] Sniffers)
 		{
 			SocketEventRecipient Result = null;
 
@@ -45,10 +65,10 @@ namespace Waher.Events.Socket
 			{
 				Result = new SocketEventRecipient(Port, Certificate, LogIncomingEvents, Sniffers);
 
-				Result.server.OnAccept += this.Server_OnAccept;
-				Result.server.OnClientConnected += this.Server_OnClientConnected;
-				Result.server.OnClientDisconnected += this.Server_OnClientDisconnected;
-				Result.server.OnDataReceived += this.Server_OnDataReceived;
+				Result.server.OnAccept += Result.Server_OnAccept;
+				Result.server.OnClientConnected += Result.Server_OnClientConnected;
+				Result.server.OnClientDisconnected += Result.Server_OnClientDisconnected;
+				Result.server.OnDataReceived += Result.Server_OnDataReceived;
 
 				await Result.server.Open();
 			}

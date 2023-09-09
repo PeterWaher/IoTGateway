@@ -200,14 +200,14 @@ namespace Waher.Networking.MQTT
 		{
 			try
 			{
-				this.Information("Connecting to " + Host + ":" + Port.ToString());
+				this.Information("Connecting to " + this.Host + ":" + this.Port.ToString());
 
 				this.DisposeClient();
 
 				this.State = MqttState.Connecting;
 
 				this.client = new BinaryTcpClient();
-				await this.client.ConnectAsync(Host, Port, this.tls);
+				await this.client.ConnectAsync(this.Host, this.Port, this.tls);
 
 				if (this.tls)
 				{
@@ -365,7 +365,7 @@ namespace Waher.Networking.MQTT
 				lock (this.synchObj)
 				{
 					while (this.packetByTimeout.ContainsKey(Timeout))
-						Timeout = Timeout.AddTicks(rnd.Next(1, 10));
+						Timeout = Timeout.AddTicks(this.rnd.Next(1, 10));
 
 					this.packetByTimeout[Timeout] = new OutputRecord()
 					{
@@ -1128,7 +1128,7 @@ namespace Waher.Networking.MQTT
 			for (i = 0; i < c; i++)
 				Topics2[i] = new KeyValuePair<string, MqttQualityOfService>(Topics[i], MqttQualityOfService.ExactlyOnce);
 
-			return SUBSCRIBE(Topics2);
+			return this.SUBSCRIBE(Topics2);
 		}
 
 		/// <summary>

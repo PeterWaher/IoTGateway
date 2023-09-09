@@ -9,6 +9,8 @@ using Waher.Content.Xml;
 
 namespace Waher.Events.Pipe
 {
+	public delegate NamedPipeServerStream NamedPipeServerStreamFactory(string Name);
+
 	/// <summary>
 	/// Receives events from an operating system pipe
 	/// </summary>
@@ -20,6 +22,7 @@ namespace Waher.Events.Pipe
 		private readonly string pipeName;
 		private readonly byte[] inputBuffer = new byte[bufferSize];
 		private readonly bool logIncoming;
+		private readonly NamedPipeServerStreamFactory pipeStreamFactory;
 		private NamedPipeServerStream pipe = null;
 		private bool disposed = false;
 		private int inputState = 0;
@@ -30,7 +33,7 @@ namespace Waher.Events.Pipe
 		/// </summary>
 		/// <param name="PipeName">Name if pipe to listen on.</param>
 		public PipeEventRecipient(string PipeName)
-			: this(PipeName, true)
+			: this(PipeName, true, DefaultFactory)
 		{
 		}
 
@@ -40,12 +43,31 @@ namespace Waher.Events.Pipe
 		/// <param name="PipeName">Name if pipe to listen on.</param>
 		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/> automatically.</param>
 		public PipeEventRecipient(string PipeName, bool LogIncomingEvents)
+			: this(PipeName, LogIncomingEvents, DefaultFactory)
 		{
+		}
+
+		/// <summary>
+		/// Receives events from an operating system pipe
+		/// </summary>
+		/// <param name="PipeName">Name if pipe to listen on.</param>
+		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/> automatically.</param>
+		public PipeEventRecipient(string PipeName, bool LogIncomingEvents, NamedPipeServerStreamFactory StreamFactory)
+		{
+			if (StreamFactory is null)
+				throw new ArgumentNullException(nameof(StreamFactory), "Pipe stream factory cannot be null.");
+
+			this.pipeStreamFactory = StreamFactory;
 			this.pipeName = PipeName;
 			this.logIncoming = LogIncomingEvents;
-			this.pipe = new NamedPipeServerStream(this.pipeName, PipeDirection.In, 1, PipeTransmissionMode.Message,
-				PipeOptions.Asynchronous, 65536, 65536);
+			this.pipe = StreamFactory(this.pipeName);
 			this.pipe.BeginWaitForConnection(this.PipeClientConnected, null);
+		}
+
+		private static NamedPipeServerStream DefaultFactory(string Name)
+		{
+			return new NamedPipeServerStream(Name, PipeDirection.In, 1, PipeTransmissionMode.Message,
+				PipeOptions.Asynchronous, 65536, 65536);
 		}
 
 		/// <summary>
@@ -77,8 +99,7 @@ namespace Waher.Events.Pipe
 				this.pipe?.Dispose();
 				this.pipe = null;
 
-				this.pipe = new NamedPipeServerStream(this.pipeName, PipeDirection.In, 1, PipeTransmissionMode.Message,
-					PipeOptions.Asynchronous);
+				this.pipe = this.pipeStreamFactory(this.pipeName);
 			}
 
 			this.inputState = 0;
@@ -220,7 +241,7 @@ namespace Waher.Events.Pipe
 						{
 							if (this.inputDepth == 0)
 							{
-								if (!await ProcessFragment(this.fragment.ToString()))
+								if (!await this.ProcessFragment(this.fragment.ToString()))
 									Result = false;
 
 								this.fragment.Clear();

@@ -27,7 +27,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Client connection
 		/// </summary>
-		internal BinaryTcpClient Client => this.connection.Client;
+		public BinaryTcpClient Client => this.connection.Client;
 
 		/// <summary>
 		/// Server reference.

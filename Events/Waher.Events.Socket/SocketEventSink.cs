@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Events.Socket
 {
@@ -16,6 +17,7 @@ namespace Waher.Events.Socket
 	{
 		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
 		private BinaryTcpClient client = null;
+		private readonly ISniffer[] sniffers;
 		private readonly string host;
 		private readonly int port;
 		private readonly bool tls;
@@ -27,12 +29,14 @@ namespace Waher.Events.Socket
 		/// <param name="Host">Host name of server.</param>
 		/// <param name="Port">Port number to connect to.</param>
 		/// <param name="Tls">If TLS is to be used.</param>
-		public SocketEventSink(string ObjectId, string Host, int Port, bool Tls)
+		/// <param name="Sniffers">Sniffers</param>
+		public SocketEventSink(string ObjectId, string Host, int Port, bool Tls, params ISniffer[] Sniffers)
 			: base(ObjectId)
 		{
 			this.host = Host;
 			this.port = Port;
 			this.tls = Tls;
+			this.sniffers = Sniffers;
 		}
 
 		/// <summary>
@@ -173,7 +177,7 @@ namespace Waher.Events.Socket
 						this.client?.Dispose();
 						this.client = null;
 
-						this.client = new BinaryTcpClient();
+						this.client = new BinaryTcpClient(this.sniffers);
 
 						this.client.OnDisconnected += this.Client_OnDisconnected;
 						this.client.OnReceived += this.Client_OnReceived;
@@ -184,7 +188,7 @@ namespace Waher.Events.Socket
 							Event Event = new Event(EventType.Error, "Unable to connect to event recipient.", this.ObjectID,
 								string.Empty, string.Empty, EventLevel.Major, string.Empty, string.Empty, string.Empty);
 
-							Event.ShoudAvoid(this);
+							Event.Avoid(this);
 							Log.Event(Event);
 
 							this.client = null;
@@ -203,7 +207,7 @@ namespace Waher.Events.Socket
 						Event Event = new Event(EventType.Error, "Unable to sent event to event recipient.", this.ObjectID,
 							string.Empty, string.Empty, EventLevel.Major, string.Empty, string.Empty, string.Empty);
 
-						Event.ShoudAvoid(this);
+						Event.Avoid(this);
 						Log.Event(Event);
 
 						this.client?.DisposeWhenDone();
@@ -220,7 +224,7 @@ namespace Waher.Events.Socket
 				Event Event = new Event(EventType.Critical, ex, this.ObjectID, string.Empty, string.Empty, EventLevel.Major, 
 					string.Empty, string.Empty);
 
-				Event.ShoudAvoid(this);
+				Event.Avoid(this);
 				Log.Event(Event);
 
 				this.client?.DisposeWhenDone();

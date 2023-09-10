@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events.Files;
 
 namespace Waher.Events.Pipe
 {
@@ -281,7 +282,7 @@ namespace Waher.Events.Pipe
 
 				Doc.LoadXml(Xml);
 
-				if (TryParseEventXml(Doc.DocumentElement, out Event Event))
+				if (EventExtensions.TryParse(Doc.DocumentElement, out Event Event))
 				{
 					if (this.logIncoming)
 						Log.Event(Event);
@@ -316,100 +317,5 @@ namespace Waher.Events.Pipe
 		/// Event raised when a custom XML fragment has been received.
 		/// </summary>
 		public event CustomFragmentEventHandler CustomFragmentReceived;
-
-		/// <summary>
-		/// Parses an event encoded into an XML fragment
-		/// </summary>
-		/// <param name="Xml">XML Element</param>
-		/// <param name="Parsed">Parsed event, if detected, null if not an event.</param>
-		/// <returns>If able to parse an event.</returns>
-		public static bool TryParseEventXml(XmlElement Xml, out Event Parsed)
-		{
-			if (Xml is null || Xml.NamespaceURI != PipeEventSink.LogNamespace)
-			{
-				Parsed = null;
-				return false;
-			}
-
-			DateTime Timestamp = XML.Attribute(Xml, "timestamp", DateTime.Now);
-			EventLevel Level = XML.Attribute(Xml, "level", EventLevel.Minor);
-			string EventId = XML.Attribute(Xml, "id");
-			string Object = XML.Attribute(Xml, "object");
-			string Actor = XML.Attribute(Xml, "actor");
-			string Module = XML.Attribute(Xml, "module");
-			string Facility = XML.Attribute(Xml, "facility");
-			string StackTrace = null;
-			string Message = null;
-			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
-
-			foreach (XmlNode N2 in Xml.ChildNodes)
-			{
-				if (!(N2 is XmlElement E2))
-					continue;
-
-				switch (E2.LocalName)
-				{
-					case "Message":
-						Message = ReadRows(E2);
-						break;
-
-					case "StackTrace":
-						StackTrace = ReadRows(E2);
-						break;
-
-					case "Tag":
-						string Key = XML.Attribute(E2, "key");
-						string Value = XML.Attribute(E2, "value");
-
-						if (bool.TryParse(Value, out bool b))
-							Tags.Add(new KeyValuePair<string, object>(Key, b));
-						else if (int.TryParse(Value, out int i))
-							Tags.Add(new KeyValuePair<string, object>(Key, i));
-						else if (long.TryParse(Value, out long l))
-							Tags.Add(new KeyValuePair<string, object>(Key, l));
-						else if (double.TryParse(Value, out double d))
-							Tags.Add(new KeyValuePair<string, object>(Key, d));
-						else
-							Tags.Add(new KeyValuePair<string, object>(Key, Value));
-						break;
-				}
-			}
-
-			if (!Enum.TryParse(Xml.LocalName, out EventType EventType))
-			{
-				Parsed = null;
-				return false;
-			}
-
-			Parsed = new Event(Timestamp, EventType, Message ?? string.Empty, Object, Actor,
-				EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
-
-			return true;
-		}
-
-		private static string ReadRows(XmlElement E)
-		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
-
-			foreach (XmlNode N in E.ChildNodes)
-			{
-				if (!(N is XmlElement E2))
-					continue;
-
-				if (E2.LocalName == "Row")
-				{
-					if (First)
-						First = false;
-					else
-						sb.AppendLine();
-
-					sb.Append(E2.InnerText);
-				}
-			}
-
-			return sb.ToString();
-		}
-
 	}
 }

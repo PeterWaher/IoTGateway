@@ -94,7 +94,7 @@ namespace Waher.Events.Files
 
 					this.output.WriteStartElement("Message");
 
-					foreach (string Row in GetRows(Event.Message))
+					foreach (string Row in EventExtensions.GetRows(Event.Message))
 						this.output.WriteElementString("Row", Row);
 
 					this.output.WriteEndElement();
@@ -117,7 +117,7 @@ namespace Waher.Events.Files
 					{
 						this.output.WriteStartElement("StackTrace");
 
-						foreach (string Row in GetRows(Event.StackTrace))
+						foreach (string Row in EventExtensions.GetRows(Event.StackTrace))
 							this.output.WriteElementString("Row", Row);
 
 						this.output.WriteEndElement();
@@ -135,11 +135,6 @@ namespace Waher.Events.Files
 			{
 				await this.semaphore.EndWrite();
 			}
-		}
-
-		private static string[] GetRows(string s)
-		{
-			return s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
 		}
 
 		internal static string Encode(DateTime DT)

@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Events.Files;
 
 namespace Waher.Events.Pipe
 {
@@ -21,11 +22,6 @@ namespace Waher.Events.Pipe
 	/// </summary>
 	public class PipeEventSink : EventSink
 	{
-		/// <summary>
-		/// http://waher.se/Schema/EventOutput.xsd
-		/// </summary>
-		public const string LogNamespace = "http://waher.se/Schema/EventOutput.xsd";
-
 		private readonly LinkedList<byte[]> pipeQueue = new LinkedList<byte[]>();
 		private readonly NamedPipeClientStreamFactory pipeStreamFactory;
 		private readonly string pipeName;
@@ -84,95 +80,7 @@ namespace Waher.Events.Pipe
 		/// <param name="Event">Event to queue.</param>
 		public override Task Queue(Event Event)
 		{
-			StringBuilder sb = new StringBuilder();
-			string ElementName = Event.Type.ToString();
-
-			sb.Append('<');
-			sb.Append(ElementName);
-			sb.Append(" xmlns='");
-			sb.Append(LogNamespace);
-			sb.Append("' timestamp='");
-			sb.Append(XML.Encode(Event.Timestamp));
-			sb.Append("' level='");
-			sb.Append(Event.Level.ToString());
-
-			if (!string.IsNullOrEmpty(Event.EventId))
-			{
-				sb.Append("' id='");
-				sb.Append(Event.EventId);
-			}
-
-			if (!string.IsNullOrEmpty(Event.Object))
-			{
-				sb.Append("' object='");
-				sb.Append(Event.Object);
-			}
-
-			if (!string.IsNullOrEmpty(Event.Actor))
-			{
-				sb.Append("' actor='");
-				sb.Append(Event.Actor);
-			}
-
-			if (!string.IsNullOrEmpty(Event.Module))
-			{
-				sb.Append("' module='");
-				sb.Append(Event.Module);
-			}
-
-			if (!string.IsNullOrEmpty(Event.Facility))
-			{
-				sb.Append("' facility='");
-				sb.Append(Event.Facility);
-			}
-
-			sb.Append("'><Message>");
-
-			foreach (string Row in GetRows(Event.Message))
-			{
-				sb.Append("<Row>");
-				sb.Append(XML.Encode(Row));
-				sb.Append("</Row>");
-			}
-
-			sb.Append("</Message>");
-
-			if (!(Event.Tags is null) && Event.Tags.Length > 0)
-			{
-				foreach (KeyValuePair<string, object> Tag in Event.Tags)
-				{
-					sb.Append("<Tag key='");
-					sb.Append(XML.Encode(Tag.Key));
-
-					if (!(Tag.Value is null))
-					{
-						sb.Append("' value='");
-						sb.Append(XML.Encode(Tag.Value.ToString()));
-					}
-
-					sb.Append("'/>");
-				}
-			}
-
-			if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
-			{
-				sb.Append("<StackTrace>");
-
-				foreach (string Row in GetRows(Event.StackTrace))
-				{
-					sb.Append("<Row>");
-					sb.Append(XML.Encode(Row));
-					sb.Append("</Row>");
-				}
-
-				sb.Append("</StackTrace>");
-			}
-
-			sb.Append("</");
-			sb.Append(ElementName);
-			sb.Append('>');
-
-			return this.Queue(sb.ToString(), false);
+			return this.Queue(Event.ToXML(), false);
 		}
 
 		/// <summary>
@@ -289,10 +197,5 @@ namespace Waher.Events.Pipe
 		/// Raised after connecting to the pipe stream
 		/// </summary>
 		public event EventHandler AfterConnect;
-
-		private static string[] GetRows(string s)
-		{
-			return s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
-		}
 	}
 }

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#else
 using System.Security.Authentication;
+#endif
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Events.Files;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 
@@ -62,7 +67,7 @@ namespace Waher.Events.Socket
 			sb.Append('<');
 			sb.Append(ElementName);
 			sb.Append(" xmlns='");
-			sb.Append(SocketEventRecipient.LogNamespace);
+			sb.Append(EventExtensions.LogNamespace);
 			sb.Append("' timestamp='");
 			sb.Append(XML.Encode(Event.Timestamp));
 			sb.Append("' level='");
@@ -197,7 +202,11 @@ namespace Waher.Events.Socket
 
 						if (this.tls)
 						{
+#if WINDOWS_UWP
+							await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12);
+#else
 							await this.client.UpgradeToTlsAsClient(SslProtocols.Tls12);
+#endif
 							this.client.Continue();
 						}
 					}

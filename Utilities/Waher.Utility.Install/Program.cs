@@ -546,7 +546,7 @@ namespace Waher.Utility.Install
 
 			if (Copy1)
 			{
-				Log.Informational("Copying " + From + " to " + To);
+				Log.Informational("Copying " + From + " to " + To, string.Empty, string.Empty, "FileCopy");
 				File.Copy(From, To, true);
 			}
 
@@ -562,6 +562,7 @@ namespace Waher.Utility.Install
 					if (ToTP >= FromTP)
 					{
 						Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+							string.Empty, string.Empty, "FileSkip",
 							new KeyValuePair<string, object>("FromTP", FromTP),
 							new KeyValuePair<string, object>("ToTP", ToTP),
 							new KeyValuePair<string, object>("From", From),
@@ -572,7 +573,7 @@ namespace Waher.Utility.Install
 
 				if (Copy2)
 				{
-					Log.Informational("Copying " + From + " to " + To2);
+					Log.Informational("Copying " + From + " to " + To2, string.Empty, string.Empty, "FileCopy");
 					File.Copy(From, To2, true);
 				}
 			}
@@ -843,7 +844,7 @@ namespace Waher.Utility.Install
 			if (!File.Exists(FileName))
 				return false;
 
-			Log.Informational("Deleting " + FileName);
+			Log.Informational("Deleting " + FileName, string.Empty, string.Empty, "FileDelete");
 			File.Delete(FileName);
 
 			return true;
@@ -1296,7 +1297,7 @@ namespace Waher.Utility.Install
 
 								if (ContentOnly || b == 1)
 								{
-									Log.Notice("Skipping file: " + FileName);
+									Log.Notice("Skipping file: " + FileName, string.Empty, string.Empty, "FileSkip");
 									SkipBytes(Decompressed, Bytes, Buffer);
 								}
 								else

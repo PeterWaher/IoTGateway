@@ -29,7 +29,7 @@ namespace Waher.Client.WPF.Controls
 		/// <param name="Register">If the log view should be registered with <see cref="Log"/>.</param>
 		public LogView(bool Register)
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 
 			if (Register)
 			{

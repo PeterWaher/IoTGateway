@@ -2291,6 +2291,36 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Query;
 		}
 
+		/// <summary>
+		/// Executes a node query command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Parameters">Command parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Query">Node query object where results will be made available</param>
+		/// <param name="Callback">Method to call when operation has been executed.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQuery Query, NodeQueryResponseEventHandler Callback, object State)
+		{
+			lock (this.queries)
+			{
+				if (this.queries.ContainsKey(Query.QueryId))
+					throw new ArgumentException("Query ID already registered.", nameof(Query));
+
+				this.queries[Query.QueryId] = Query;
+			}
+
+			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
+		}
+
 		private void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, NodeQuery Query,
 			string Language, string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler CommandCallback,
 			NodeQueryResponseEventHandler QueryCallback, object State)

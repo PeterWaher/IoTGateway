@@ -81,19 +81,19 @@ namespace Waher.Things.ScriptExtensions
 			switch (Arguments.Length)
 			{
 				case 0:
-					return new ObjectValue(Waher.Things.ThingReference.Empty);
+					return new ObjectValue(Things.ThingReference.Empty);
 
 				case 1:
-					return new ObjectValue(new Waher.Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty));
+					return new ObjectValue(new Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty));
 
 				case 2:
-					return new ObjectValue(new Waher.Things.ThingReference(
+					return new ObjectValue(new Things.ThingReference(
 						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
 						Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty));
 
 				case 3:
 				default:
-					return new ObjectValue(new Waher.Things.ThingReference(
+					return new ObjectValue(new Things.ThingReference(
 						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
 						Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty,
 						Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty));

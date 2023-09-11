@@ -55,6 +55,21 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		}
 
 		/// <summary>
+		/// Gets a node object on the gateway.
+		/// </summary>
+		/// <param name="NodeId">Node ID</param>
+		/// <param name="SourceId">Source ID</param>
+		/// <param name="Partition">Partition</param>
+		/// <param name="Jid">JID of remote host.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression.</param>
+		public GetNode(ScriptNode NodeId, ScriptNode SourceId, ScriptNode Partition, ScriptNode Jid, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { NodeId, SourceId, Partition, Jid }, argumentTypes4Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(GetNode);
@@ -62,7 +77,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "NodeId", "SourceId", "Partition" };
+		public override string[] DefaultArgumentNames => new string[] { "NodeId", "SourceId", "Partition", "JID" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -90,14 +105,19 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			INode Result;
+			int c = Arguments.Length;
 
-			switch (Arguments.Length)
+			if (c == 0)
+				return ObjectValue.Null;
+			else
 			{
-				case 1:
-					IDataSource Source;
-					string SourceId;
+				object Arg0 = Arguments[0].AssociatedObjectValue;
+				IDataSource Source;
+				string SourceId;
 
-					if (Arguments[0] is IThingReference ThingReference)
+				if (c == 1)
+				{
+					if (Arg0 is IThingReference ThingReference)
 					{
 						if (!TryGetDataSource(ThingReference.SourceId, out Source))
 							return ObjectValue.Null;
@@ -110,29 +130,36 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						if (!TryGetDataSource(SourceId, out Source))
 							return ObjectValue.Null;
 
-						Result = await Source.GetNodeAsync(new Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId));
+						Result = await Source.GetNodeAsync(new ThingReference(Arg0?.ToString() ?? string.Empty, SourceId));
 					}
-					break;
+				}
+				else
+				{
+					string NodeId = Arg0?.ToString() ?? string.Empty;
+					object Arg1 = Arguments[1].AssociatedObjectValue;
 
-				case 2:
-					SourceId = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					SourceId = Arg1?.ToString() ?? string.Empty;
 					if (!TryGetDataSource(SourceId, out Source))
 						return ObjectValue.Null;
 
-					Result = await Source.GetNodeAsync(new Things.ThingReference(
-						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId));
-					break;
+					if (c == 2)
+						Result = await Source.GetNodeAsync(new ThingReference(NodeId, SourceId));
+					else
+					{
+						object Arg2 = Arguments[2].AssociatedObjectValue;
+						string PartitionId = Arg2?.ToString() ?? string.Empty;
 
-				case 3:
-				default:
-					SourceId = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					if (!TryGetDataSource(SourceId, out Source))
-						return ObjectValue.Null;
+						if (c == 3)
+							Result = await Source.GetNodeAsync(new ThingReference(NodeId, SourceId, PartitionId));
+						else
+						{
+							object Arg3 = Arguments[3].AssociatedObjectValue;
+							string Jid = Arg3?.ToString() ?? string.Empty;
 
-					Result = await Source.GetNodeAsync(new Things.ThingReference(
-						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId,
-						Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty));
-					break;
+							Result = new ExternalNode(NodeId, SourceId, PartitionId, Jid);
+						}
+					}
+				}
 			}
 
 			if (Result is null)

@@ -2273,7 +2273,6 @@ The following functions are available in the `Waher.Things` library.
 | `AddableTypes(Node)`                                        | Gets an array of types of nodes that can be added to an existing node. |
 | `Field(Thing,Name,Value)`                                   | Creates a field object depending on the type of the value (Momentary Value, Automatic Readout, not writable) using the current time. |
 | `Field(Thing,Timestamp,Name,Value[,Type[,QoS[,Writable]]])` | Creates a field object depending on the type of the value. If Type is omitted, it is assumed the field is a Momentary Value. If QoS is omitted, it is assumed it's a Momentary Readout. If is also assumed the field is not writable, unless declared otherwise. |
-| `GetNode(ThingReference)`                                   | Gets the node object of a node in the gateway. If the node is not found, null is returned. |
 | `ThingReference([NodeId[,SourceId[,Partition]]])`           | Creates a reference object pointing to a node on the gateway. |
 
 #### Gateway Extensions (Waher.IoTGateway)
@@ -2287,7 +2286,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `DecCounter(CounterName[,Amount])`                    | Decrements a counter, given its name, and returns the decremented count. |
 | `FullJID(JID)`                                        | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
 | `GetCounter(CounterName)`                             | Gets the current count of a counter, given its name. |
-| `GetNode(NodeId[,SourceId[,Partition]])`              | Gets the node object of a node in the gateway. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
+| `GetNode(NodeId[,SourceId[,Partition[,JID]]])`        | Gets the node object of a node in the gateway (if not providing a `JID`), or a provisional reference node to a node hosted by a remote gateway identified by `JID`. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
 | `GetSources()`                                        | Gets available sources of things. |
 | `GetTabIDs([Page[,QueryFilter]])`                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
 | `GetTabIDs(Pages)`                                    | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |

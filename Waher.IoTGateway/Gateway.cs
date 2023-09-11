@@ -130,6 +130,7 @@ namespace Waher.IoTGateway
 		private static ConcentratorServer concentratorServer = null;
 		private static SensorClient sensorClient = null;
 		private static ControlClient controlClient = null;
+		private static ConcentratorClient concentratorClient = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
 		private static MultiUserChatClient mucClient = null;
@@ -1353,8 +1354,8 @@ namespace Waher.IoTGateway
 				};
 				Doc.Load(ManifestFileName);
 
-				if (!(Doc.DocumentElement is null) && 
-					Doc.DocumentElement.LocalName == "Module" && 
+				if (!(Doc.DocumentElement is null) &&
+					Doc.DocumentElement.LocalName == "Module" &&
 					Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
 				{
 					string InstallUtilityFolder = Path.Combine(runtimeFolder, "InstallUtility");
@@ -1461,6 +1462,7 @@ namespace Waher.IoTGateway
 
 			sensorClient = new SensorClient(xmppClient);
 			controlClient = new ControlClient(xmppClient);
+			concentratorClient = new ConcentratorClient(xmppClient);
 			synchronizationClient = new SynchronizationClient(xmppClient);
 			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
 
@@ -1901,6 +1903,9 @@ namespace Waher.IoTGateway
 				controlClient?.Dispose();
 				controlClient = null;
 
+				concentratorClient?.Dispose();
+				concentratorClient = null;
+
 				synchronizationClient?.Dispose();
 				synchronizationClient = null;
 
@@ -2192,8 +2197,8 @@ namespace Waher.IoTGateway
 			string BareJid = e.FromBareJID.ToLower();
 
 			if (string.IsNullOrEmpty(BareJid) ||
-				(!(xmppClient is null) && 
-				(BareJid == xmppClient.Domain.ToLower() || 
+				(!(xmppClient is null) &&
+				(BareJid == xmppClient.Domain.ToLower() ||
 				BareJid == xmppClient.BareJID.ToLower())))
 			{
 				e.Accept();
@@ -2748,6 +2753,14 @@ namespace Waher.IoTGateway
 		public static ControlClient ControlClient
 		{
 			get { return controlClient; }
+		}
+
+		/// <summary>
+		/// XMPP Concentrator Client.
+		/// </summary>
+		public static ConcentratorClient ConcentratorClient
+		{
+			get { return concentratorClient; }
 		}
 
 		/// <summary>

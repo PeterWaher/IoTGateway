@@ -784,10 +784,10 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
-		/// If the node can be added to by the caller.
+		/// If the node can be destroyed to by the caller.
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
-		/// <returns>If the node can be added to by the caller.</returns>
+		/// <returns>If the node can be destroyed to by the caller.</returns>
 		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
 			return Task.FromResult(true);     // TODO: Check user privileges

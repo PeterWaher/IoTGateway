@@ -666,10 +666,10 @@
         </member>
         <member name="M:Waher.Things.Metering.MeteringNode.CanDestroyAsync(Waher.Things.RequestOrigin)">
             <summary>
-            If the node can be added to by the caller.
+            If the node can be destroyed to by the caller.
             </summary>
             <param name="Caller">Information about caller.</param>
-            <returns>If the node can be added to by the caller.</returns>
+            <returns>If the node can be destroyed to by the caller.</returns>
         </member>
         <member name="M:Waher.Things.Metering.MeteringNode.GetDisplayableParametersAsync(Waher.Runtime.Language.Language,Waher.Things.RequestOrigin)">
             <summary>

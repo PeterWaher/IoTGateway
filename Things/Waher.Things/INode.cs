@@ -163,10 +163,10 @@ namespace Waher.Things
 		Task<bool> CanAddAsync(RequestOrigin Caller);
 
 		/// <summary>
-		/// If the node can be added to by the caller.
+		/// If the node can be destroyed to by the caller.
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
-		/// <returns>If the node can be added to by the caller.</returns>
+		/// <returns>If the node can be destroyed to by the caller.</returns>
 		Task<bool> CanDestroyAsync(RequestOrigin Caller);
 
 		/// <summary>

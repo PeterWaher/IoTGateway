@@ -2107,10 +2107,10 @@
         </member>
         <member name="M:Waher.Things.INode.CanDestroyAsync(Waher.Things.RequestOrigin)">
             <summary>
-            If the node can be added to by the caller.
+            If the node can be destroyed to by the caller.
             </summary>
             <param name="Caller">Information about caller.</param>
-            <returns>If the node can be added to by the caller.</returns>
+            <returns>If the node can be destroyed to by the caller.</returns>
         </member>
         <member name="M:Waher.Things.INode.GetDisplayableParametersAsync(Waher.Runtime.Language.Language,Waher.Things.RequestOrigin)">
             <summary>
@@ -2316,6 +2316,13 @@
             <param name="Fields">Fields that have been read.</param>
         </member>
         <member name="M:Waher.Things.ISensorReadout.ReportErrors(System.Boolean,Waher.Things.ThingError[])">
+            <summary>
+            Report error states to the client.
+            </summary>
+            <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
+            <param name="Errors">Errors that have been detected.</param>
+        </member>
+        <member name="M:Waher.Things.ISensorReadout.ReportErrors(System.Boolean,System.Collections.Generic.IEnumerable{Waher.Things.ThingError})">
             <summary>
             Report error states to the client.
             </summary>

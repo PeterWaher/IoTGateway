@@ -152,5 +152,12 @@ namespace Waher.Things
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
 		void ReportErrors(bool Done, params ThingError[] Errors);
+
+		/// <summary>
+		/// Report error states to the client.
+		/// </summary>
+		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
+		/// <param name="Errors">Errors that have been detected.</param>
+		void ReportErrors(bool Done, IEnumerable<ThingError> Errors);
 	}
 }

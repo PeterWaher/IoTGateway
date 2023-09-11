@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Things;
+﻿using Waher.Things;
 
 namespace Waher.Networking.XMPP.Concentrator
 {

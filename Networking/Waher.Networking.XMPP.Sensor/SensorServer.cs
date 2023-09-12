@@ -9,7 +9,6 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Runtime.Timing;
-using Waher.Script.Constants;
 
 namespace Waher.Networking.XMPP.Sensor
 {
@@ -299,7 +298,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				Task _ = Task.Run(async () =>
 				{
-					ApprovedReadoutParameters P = await this.CanReadAsync(Request, e.FromBareJid);
+					ApprovedReadoutParameters P = await this.CanReadAsync(e.FromBareJid, Request);
 
 					if (P is null)
 					{
@@ -323,20 +322,38 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Checks if a requestor is permitted to read a nodes or set of nodes.
 		/// </summary>
-		/// <param name="Request">Sensor-data request object.</param>
 		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Request">Sensor-data request object.</param>
 		/// <returns>If approved or partially approved, the result will contain the information about what has
 		/// been approved. If not approved, null is returned.</returns>
-		public Task<ApprovedReadoutParameters> CanReadAsync(SensorDataRequest Request, string RequestorBareJid)
+		public Task<ApprovedReadoutParameters> CanReadAsync(string RequestorBareJid, SensorDataRequest Request)
+		{
+			RequestOrigin Origin = new RequestOrigin(RequestorBareJid,
+				Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries));
+
+			return this.CanReadAsync(Request.Types, Request.Nodes, Request.FieldNames, Origin);
+		}
+
+		/// <summary>
+		/// Checks if a requestor is permitted to read a nodes or set of nodes.
+		/// </summary>
+		/// <param name="FieldTypes">Field types requested.</param>
+		/// <param name="Nodes">Nodes requested.</param>
+		/// <param name="FieldNames">Field names requested.</param>
+		/// <param name="Origin">Origin of request.</param>
+		/// <returns>If approved or partially approved, the result will contain the information about what has
+		/// been approved. If not approved, null is returned.</returns>
+		public Task<ApprovedReadoutParameters> CanReadAsync(FieldType FieldTypes, IThingReference[] Nodes, string[] FieldNames,
+			RequestOrigin Origin)
 		{
 			TaskCompletionSource<ApprovedReadoutParameters> Result = new TaskCompletionSource<ApprovedReadoutParameters>();
 
 			if (!(this.provisioningClient is null))
 			{
-				this.provisioningClient.CanRead(RequestorBareJid, Request.Types, Request.Nodes, Request.FieldNames,
-					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-					Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-					Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				this.provisioningClient.CanRead(Origin.From, FieldTypes, Nodes, FieldNames,
+					Origin.ServiceTokens, Origin.DeviceTokens, Origin.UserTokens,
 					(sender2, e2) =>
 					{
 						if (e2.Ok && e2.CanRead)
@@ -348,7 +365,7 @@ namespace Waher.Networking.XMPP.Sensor
 					}, null);
 			}
 			else
-				Result.TrySetResult(new ApprovedReadoutParameters(Request.Nodes, Request.FieldNames, Request.Types));
+				Result.TrySetResult(new ApprovedReadoutParameters(Nodes, FieldNames, FieldTypes));
 
 			return Result.Task;
 		}

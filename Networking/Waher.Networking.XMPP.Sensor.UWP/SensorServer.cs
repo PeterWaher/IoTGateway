@@ -296,32 +296,78 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (!(this.provisioningClient is null))
 			{
-				this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
-					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-					Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-					Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-					(sender2, e2) =>
+				Task _ = Task.Run(async () =>
+				{
+					ApprovedReadoutParameters P = await this.CanReadAsync(e.FromBareJid, Request);
+
+					if (P is null)
 					{
-						if (e2.Ok && e2.CanRead)
-						{
-							Request.Nodes = e2.Nodes;
-							Request.FieldNames = e2.FieldsNames;
-							Request.Types = e2.FieldTypes;
+						Request.Nodes = P.Nodes;
+						Request.FieldNames = P.FieldNames;
+						Request.Types = P.FieldTypes;
 
-							this.AcceptRequest(Request, e, Id);
-						}
-						else
-						{
-							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
-						}
-
-						return Task.CompletedTask;
-
-					}, null);
+						this.AcceptRequest(Request, e, Id);
+					}
+					else
+					{
+						e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+							"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+					}
+				});
 			}
 			else
 				this.AcceptRequest(Request, e, Id);
+		}
+
+		/// <summary>
+		/// Checks if a requestor is permitted to read a nodes or set of nodes.
+		/// </summary>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Request">Sensor-data request object.</param>
+		/// <returns>If approved or partially approved, the result will contain the information about what has
+		/// been approved. If not approved, null is returned.</returns>
+		public Task<ApprovedReadoutParameters> CanReadAsync(string RequestorBareJid, SensorDataRequest Request)
+		{
+			RequestOrigin Origin = new RequestOrigin(RequestorBareJid,
+				Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries));
+
+			return this.CanReadAsync(Request.Types, Request.Nodes, Request.FieldNames, Origin);
+		}
+
+		/// <summary>
+		/// Checks if a requestor is permitted to read a nodes or set of nodes.
+		/// </summary>
+		/// <param name="FieldTypes">Field types requested.</param>
+		/// <param name="Nodes">Nodes requested.</param>
+		/// <param name="FieldNames">Field names requested.</param>
+		/// <param name="Origin">Origin of request.</param>
+		/// <returns>If approved or partially approved, the result will contain the information about what has
+		/// been approved. If not approved, null is returned.</returns>
+		public Task<ApprovedReadoutParameters> CanReadAsync(FieldType FieldTypes, IThingReference[] Nodes, string[] FieldNames,
+			RequestOrigin Origin)
+		{
+			TaskCompletionSource<ApprovedReadoutParameters> Result = new TaskCompletionSource<ApprovedReadoutParameters>();
+
+			if (!(this.provisioningClient is null))
+			{
+				this.provisioningClient.CanRead(Origin.From, FieldTypes, Nodes, FieldNames,
+					Origin.ServiceTokens, Origin.DeviceTokens, Origin.UserTokens,
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+							Result.TrySetResult(new ApprovedReadoutParameters(e2.Nodes, e2.FieldsNames, e2.FieldTypes));
+						else
+							Result.TrySetResult(null);
+
+						return Task.CompletedTask;
+					}, null);
+			}
+			else
+				Result.TrySetResult(new ApprovedReadoutParameters(Nodes, FieldNames, FieldTypes));
+
+			return Result.Task;
 		}
 
 		private static readonly char[] space = new char[] { ' ' };

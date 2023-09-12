@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -165,7 +166,31 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			if (Result is null)
 				return ObjectValue.Null;
 			else
+			{
+				RequestOrigin Origin = GetOriginOfRequest(Variables);
+
+				if (!await Result.CanViewAsync(Origin))
+					throw new UnauthorizedAccessException("Access to node denied.");
+
 				return new ObjectValue(Result);
+			}
+		}
+
+		/// <summary>
+		/// Gets the origin of a request.
+		/// </summary>
+		/// <param name="Variables">Current variables collection.</param>
+		/// <returns>Origin of request.</returns>
+		public static RequestOrigin GetOriginOfRequest(Variables Variables)
+		{
+			if (Variables.TryGetVariable("this", out Variable v) && v.ValueObject is IRequestOrigin Origin)
+				return Origin.Origin;
+			else if (Variables.TryGetVariable("QuickLoginUser", out v) && v.ValueObject is IRequestOrigin Origin2)
+				return Origin2.Origin;
+			else if (Variables.TryGetVariable("User", out v) && v.ValueObject is IRequestOrigin Origin3)
+				return Origin3.Origin;
+			else
+				return new RequestOrigin(Gateway.XmppClient.BareJID, null, null, null);
 		}
 
 		/// <summary>

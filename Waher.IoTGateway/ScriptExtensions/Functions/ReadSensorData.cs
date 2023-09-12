@@ -191,8 +191,13 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			List<ThingError> Errors = new List<ThingError>();
 			bool Error = false;
 
+			RequestOrigin Origin = GetNode.GetOriginOfRequest(Variables);
+			IThingReference[] Nodes = new IThingReference[] { Sensor };
+			ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, FieldNames, Origin)
+				?? throw new ScriptRuntimeException("Not authorized to read sensor-data from node.", this);
+
 			InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(nameof(ReadSensorData),
-				new IThingReference[] { Sensor }, FieldTypes, FieldNames, From, To,
+				Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, From, To,
 				(sender, e) =>
 				{
 					foreach (Field F in e.Fields)
@@ -230,7 +235,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 			Dictionary<string, IElement> Fields2 = new Dictionary<string, IElement>();
 
-			foreach (KeyValuePair<string,List<Field>> P in Fields)
+			foreach (KeyValuePair<string, List<Field>> P in Fields)
 			{
 				if (P.Value.Count == 1)
 					Fields2[P.Key] = new ObjectValue(P.Value[0]);

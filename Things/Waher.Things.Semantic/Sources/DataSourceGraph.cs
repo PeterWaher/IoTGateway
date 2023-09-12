@@ -8,6 +8,7 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
+using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
@@ -718,9 +719,13 @@ namespace Waher.Things.Semantic.Sources
 						new UriNode(IoTSensorData.Errors),
 						Errors));
 
+					IThingReference[] Nodes = new IThingReference[] { Node };
+					ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, null, Caller)
+						?? throw new ForbiddenException("Not authorized to read sensor-data from node.");
+
 					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 					InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
-						new IThingReference[] { Node }, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+						Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, DateTime.MinValue, DateTime.MaxValue,
 						async (sender, e) =>
 						{
 							foreach (Field F in e.Fields)

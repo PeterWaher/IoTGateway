@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
+using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Things;
 
@@ -117,15 +119,12 @@ namespace Waher.WebService.Sparql
 		/// <summary>
 		/// Origin of request.
 		/// </summary>
-		public RequestOrigin Origin
+		public Task<RequestOrigin> GetOrigin()
 		{
-			get
-			{
-				if (this.origin is null)
-					this.origin = new RequestOrigin(this.request.RemoteEndPoint, null, null, null);
+			if (this.origin is null)
+				this.origin = new RequestOrigin(this.request.RemoteEndPoint, null, null, null);
 
-				return this.origin;
-			}
+			return Task.FromResult(this.origin);
 		}
 	}
 }

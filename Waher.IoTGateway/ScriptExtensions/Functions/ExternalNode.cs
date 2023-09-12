@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.IoTGateway.Setup;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -200,7 +199,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>If the node is visible to the caller.</returns>
 		public Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(false);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>

@@ -2187,7 +2187,7 @@
             Interface for requestors that can act as an origin for distributed requests.
             </summary>
         </member>
-        <member name="P:Waher.Things.IRequestOrigin.Origin">
+        <member name="M:Waher.Things.IRequestOrigin.GetOrigin">
             <summary>
             Origin of request.
             </summary>
@@ -2995,7 +2995,7 @@
             User tokens, or null.
             </summary>
         </member>
-        <member name="P:Waher.Things.RequestOrigin.Origin">
+        <member name="M:Waher.Things.RequestOrigin.GetOrigin">
             <summary>
             Origin of request.
             </summary>

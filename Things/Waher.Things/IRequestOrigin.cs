@@ -1,4 +1,6 @@
-﻿namespace Waher.Things
+﻿using System.Threading.Tasks;
+
+namespace Waher.Things
 {
 	/// <summary>
 	/// Interface for requestors that can act as an origin for distributed requests.
@@ -8,6 +10,6 @@
 		/// <summary>
 		/// Origin of request.
 		/// </summary>
-		RequestOrigin Origin { get; }
+		Task<RequestOrigin> GetOrigin();
 	}
 }

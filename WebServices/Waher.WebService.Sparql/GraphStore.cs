@@ -101,7 +101,7 @@ namespace Waher.WebService.Sparql
 			ISemanticModel Graph;
 
 			if (Request.Header.TryGetQueryParameter("default", out _))
-				Graph = await GetDefaultSource(GetOrigin(Request));
+				Graph = await GetDefaultSource(await GetOrigin(Request));
 			else
 			{
 				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
@@ -113,18 +113,18 @@ namespace Waher.WebService.Sparql
 
 				IGraphSource Source = await Reference.GetGraphSource();
 
-				Graph = await Source.LoadGraph(GraphUri, null, false, GetOrigin(Request));
+				Graph = await Source.LoadGraph(GraphUri, null, false, await GetOrigin(Request));
 			}
 
 			await Response.Return(Graph);
 		}
 
-		public static RequestOrigin GetOrigin(HttpRequest Request)
+		public static Task<RequestOrigin> GetOrigin(HttpRequest Request)
 		{
 			if (Request.User is IRequestOrigin RequestOrigin)
-				return RequestOrigin.Origin;
+				return RequestOrigin.GetOrigin();
 			else
-				return new RequestOrigin(Request.RemoteEndPoint, null, null, null);
+				return Task.FromResult(new RequestOrigin(Request.RemoteEndPoint, null, null, null));
 		}
 
 		internal static async Task<ISemanticModel> GetDefaultSource(RequestOrigin Caller)

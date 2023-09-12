@@ -283,7 +283,7 @@
             <param name="Privilege">Privilege.</param>
             <returns>If the user has the corresponding privilege.</returns>
         </member>
-        <member name="P:Waher.Security.Users.User.Origin">
+        <member name="M:Waher.Security.Users.User.GetOrigin">
             <summary>
             Origin of request.
             </summary>

@@ -191,7 +191,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			List<ThingError> Errors = new List<ThingError>();
 			bool Error = false;
 
-			RequestOrigin Origin = GetNode.GetOriginOfRequest(Variables);
+			RequestOrigin Origin = await GetNode.GetOriginOfRequest(Variables);
 			IThingReference[] Nodes = new IThingReference[] { Sensor };
 			ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, FieldNames, Origin)
 				?? throw new ScriptRuntimeException("Not authorized to read sensor-data from node.", this);

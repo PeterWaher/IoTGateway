@@ -165,12 +165,9 @@ namespace Waher.IoTGateway.WebResources
 				return true;
 			}
 
-			public RequestOrigin Origin
+			public Task<RequestOrigin> GetOrigin()
 			{
-				get
-				{
-					return new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null);
-				}
+				return Task.FromResult(new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null));
 			}
 		}
 

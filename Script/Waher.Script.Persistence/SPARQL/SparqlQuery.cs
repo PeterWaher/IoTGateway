@@ -762,12 +762,12 @@ namespace Waher.Script.Persistence.SPARQL
 			if (Variables.TryGetVariable("QuickLoginUser", out v) &&
 				v.ValueObject is IRequestOrigin Caller)
 			{
-				return await Source.LoadGraph(Uri, this, NullIfNotFound, Caller.Origin);
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, await Caller.GetOrigin());
 			}
 			else if (Variables.TryGetVariable("User", out v) &&
 				v.ValueObject is IRequestOrigin Caller2)
 			{
-				return await Source.LoadGraph(Uri, this, NullIfNotFound, Caller2.Origin);
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, await Caller2.GetOrigin());
 			}
 			else
 				return await Source.LoadGraph(Uri, this, NullIfNotFound, new RequestOrigin(string.Empty, null, null, null));

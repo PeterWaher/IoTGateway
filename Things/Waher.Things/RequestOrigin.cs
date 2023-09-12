@@ -1,4 +1,6 @@
-﻿namespace Waher.Things
+﻿using System.Threading.Tasks;
+
+namespace Waher.Things
 {
 	/// <summary>
 	/// Tokens available in request.
@@ -53,6 +55,9 @@
 		/// <summary>
 		/// Origin of request.
 		/// </summary>
-		public RequestOrigin Origin => this;
+		public Task<RequestOrigin> GetOrigin()
+		{
+			return Task.FromResult(this);
+		}
 	}
 }

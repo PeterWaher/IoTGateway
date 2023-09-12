@@ -167,7 +167,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				return ObjectValue.Null;
 			else
 			{
-				RequestOrigin Origin = GetOriginOfRequest(Variables);
+				RequestOrigin Origin = await GetOriginOfRequest(Variables);
 
 				if (!await Result.CanViewAsync(Origin))
 					throw new UnauthorizedAccessException("Access to node denied.");
@@ -181,16 +181,16 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// </summary>
 		/// <param name="Variables">Current variables collection.</param>
 		/// <returns>Origin of request.</returns>
-		public static RequestOrigin GetOriginOfRequest(Variables Variables)
+		public static Task<RequestOrigin> GetOriginOfRequest(Variables Variables)
 		{
 			if (Variables.TryGetVariable("this", out Variable v) && v.ValueObject is IRequestOrigin Origin)
-				return Origin.Origin;
+				return Origin.GetOrigin();
 			else if (Variables.TryGetVariable("QuickLoginUser", out v) && v.ValueObject is IRequestOrigin Origin2)
-				return Origin2.Origin;
+				return Origin2.GetOrigin();
 			else if (Variables.TryGetVariable("User", out v) && v.ValueObject is IRequestOrigin Origin3)
-				return Origin3.Origin;
+				return Origin3.GetOrigin();
 			else
-				return new RequestOrigin(Gateway.XmppClient.BareJID, null, null, null);
+				return Task.FromResult(new RequestOrigin(Gateway.XmppClient.BareJID, null, null, null));
 		}
 
 		/// <summary>

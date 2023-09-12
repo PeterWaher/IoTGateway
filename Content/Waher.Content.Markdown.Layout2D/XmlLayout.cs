@@ -191,6 +191,8 @@ namespace Waher.Content.Markdown.Layout2D
 				Output.Append("\" title=\"");
 				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 			}
+			else
+				Output.Append("\" alt=\"2D-layout");
 
 			Output.Append("\" class=\"aloneUnsized\"/>");
 

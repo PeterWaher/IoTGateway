@@ -140,6 +140,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(GraphSettings.Height.ToString());
 				Output.Append("\" src=\"data:image/png;base64,");
 				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" alt=\"");
+
+				if (G is Graph2D Graph2D && !string.IsNullOrEmpty(Graph2D.Title))
+					Output.Append(XML.Encode(Graph2D.Title));
+				else
+					Output.Append("Graph");
+
 				Output.Append("\" />");
 
 				if (AloneInParagraph)
@@ -158,7 +165,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(Pixels.Height.ToString());
 				Output.Append("\" src=\"data:image/png;base64,");
 				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-				Output.Append("\" />");
+				Output.Append("\" alt=\"Image\" />");
 
 				if (AloneInParagraph)
 					Output.Append("</figure>");
@@ -178,7 +185,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.Append(Img.Height.ToString());
 					Output.Append("\" src=\"data:image/png;base64,");
 					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-					Output.Append("\" />");
+					Output.Append("\" alt=\"Image\" />");
 
 					if (AloneInParagraph)
 						Output.Append("</figure>");
@@ -327,6 +334,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(GraphSettings.Height.ToString());
 				Output.Append("\" src=\"data:image/png;base64,");
 				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" alt=\"");
+
+				if (G is Graph2D Graph2D && !string.IsNullOrEmpty(Graph2D.Title))
+					Output.Append(XML.Encode(Graph2D.Title));
+				else
+					Output.Append("Graph");
+
 				Output.Append("\" />");
 
 				if (AloneInParagraph)
@@ -345,7 +359,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(Pixels.Height.ToString());
 				Output.Append("\" src=\"data:image/png;base64,");
 				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-				Output.Append("\" />");
+				Output.Append("\" alt=\"Image\" />");
 
 				if (AloneInParagraph)
 					Output.Append("</figure>");
@@ -365,7 +379,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.Append(Img.Height.ToString());
 					Output.Append("\" src=\"data:image/png;base64,");
 					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-					Output.Append("\" />");
+					Output.Append("\" alt=\"Image\" />");
 
 					if (AloneInParagraph)
 						Output.Append("</figure>");

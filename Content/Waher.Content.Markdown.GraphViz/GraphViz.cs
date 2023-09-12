@@ -425,6 +425,8 @@ namespace Waher.Content.Markdown.GraphViz
 				Output.Append("\" title=\"");
 				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 			}
+			else
+				Output.Append("\" alt=\"GraphViz graph");
 
 			if (!string.IsNullOrEmpty(Info.MapFileName))
 			{

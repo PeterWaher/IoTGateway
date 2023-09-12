@@ -90,7 +90,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 				Output.AppendLine("</figcaption></figure>");
 			}
 			else
-				Output.AppendLine("/></figure>");
+				Output.AppendLine(" alt=\"Image\"/></figure>");
 
 			return Task.FromResult(true);
 		}

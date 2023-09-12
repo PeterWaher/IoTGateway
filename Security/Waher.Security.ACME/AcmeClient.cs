@@ -503,9 +503,8 @@ namespace Waher.Security.ACME
 
 			if (NewKey.KeySize != KeySize)	// Happens when using library from traditioanl .NET FW
 			{
-				Type T = Runtime.Inventory.Types.GetType("System.Security.Cryptography.RSACryptoServiceProvider");
-				if (T is null)
-					throw new Exception("Unable to set RSA key size to anything but default (" + NewKey.KeySize.ToString() + " bits).");
+				Type T = Runtime.Inventory.Types.GetType("System.Security.Cryptography.RSACryptoServiceProvider")
+					?? throw new Exception("Unable to set RSA key size to anything but default (" + NewKey.KeySize.ToString() + " bits).");
 
 				NewKey = Runtime.Inventory.Types.Instantiate(T, KeySize) as RSA;
 			}

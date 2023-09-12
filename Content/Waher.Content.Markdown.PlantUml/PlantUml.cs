@@ -378,8 +378,6 @@ namespace Waher.Content.Markdown.PlantUml
 			P.StartInfo = ProcessInformation;
 			P.EnableRaisingEvents = true;
 			P.Start();
-			P.BeginErrorReadLine();
-			P.BeginOutputReadLine();
 
 			int ExitCode = await ExitSource.Task;
 
@@ -408,6 +406,8 @@ namespace Waher.Content.Markdown.PlantUml
 				Output.Append("\" title=\"");
 				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 			}
+			else
+				Output.Append("\" alt=\"PlantUML graph");
 
 			Output.Append("\" class=\"aloneUnsized\"/>");
 

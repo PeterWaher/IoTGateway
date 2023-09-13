@@ -10,6 +10,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
 using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
 
@@ -74,11 +75,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				this.variables.ContextVariables = this;
 
-				if (!this.authorized &&
-					!(this.Document.Settings.AuthorizeExpression is null) &&
-					!await this.Document.Settings.AuthorizeExpression(this.expression))
+				if (!this.authorized && !(this.Document.Settings.AuthorizeExpression is null))
 				{
-					throw new UnauthorizedAccessException("Expression not permitted.");
+					ScriptNode Prohibited = await Document.Settings.AuthorizeExpression(this.expression);
+					if (!(Prohibited is null))
+						throw new UnauthorizedAccessException("Expression not permitted: " + Prohibited.SubExpression);
 				}
 
 				this.authorized = true;

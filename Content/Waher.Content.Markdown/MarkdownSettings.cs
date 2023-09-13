@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Script;
+using Waher.Script.Model;
 
 namespace Waher.Content.Markdown
 {
@@ -10,8 +10,9 @@ namespace Waher.Content.Markdown
 	/// Delegate for expression authorization methods.
 	/// </summary>
 	/// <param name="Expression">Expression to be authorized.</param>
-	/// <returns>If the expression is authorized to execute.</returns>
-	public delegate Task<bool> AuthorizeExpression(Expression Expression);
+	/// <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
+	/// <see cref="ScriptNode"/> that is prohibited is returned.</returns>
+	public delegate Task<ScriptNode> AuthorizeExpression(Expression Expression);
 
 	/// <summary>
 	/// Contains settings that the Markdown parser uses to customize its behavior.

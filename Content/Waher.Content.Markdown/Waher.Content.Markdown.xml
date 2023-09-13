@@ -1527,7 +1527,8 @@
             Delegate for expression authorization methods.
             </summary>
             <param name="Expression">Expression to be authorized.</param>
-            <returns>If the expression is authorized to execute.</returns>
+            <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
+            <see cref="T:Waher.Script.Model.ScriptNode"/> that is prohibited is returned.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.MarkdownSettings">
             <summary>

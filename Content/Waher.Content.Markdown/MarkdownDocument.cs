@@ -19,6 +19,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
 using Waher.Script;
 using Waher.Content.Json;
+using Waher.Script.Model;
 
 namespace Waher.Content.Markdown
 {
@@ -338,10 +339,11 @@ namespace Waher.Content.Markdown
 
 								Exp = new Expression(Script, FileName2);
 
-								if (!(Settings.AuthorizeExpression is null) &&
-									!await Settings.AuthorizeExpression(Exp))
+								if (!(Settings.AuthorizeExpression is null))
 								{
-									throw new UnauthorizedAccessException("Expression not permitted: " + Script);
+									ScriptNode Prohibited = await Settings.AuthorizeExpression(Exp);
+									if (!(Prohibited is null))
+										throw new UnauthorizedAccessException("Expression not permitted: " + Prohibited.SubExpression);
 								}
 
 								await Exp.EvaluateAsync(Variables);
@@ -370,10 +372,11 @@ namespace Waher.Content.Markdown
 				{
 					Exp = new Expression(Script, FileName);
 
-					if (!(Settings.AuthorizeExpression is null) &&
-						!await Settings.AuthorizeExpression(Exp))
+					if (!(Settings.AuthorizeExpression is null))
 					{
-						throw new UnauthorizedAccessException("Expression not permitted: " + Script);
+						ScriptNode Prohibited = await Settings.AuthorizeExpression(Exp);
+						if (!(Prohibited is null))
+							throw new UnauthorizedAccessException("Expression not permitted: " + Prohibited.SubExpression);
 					}
 
 					if (!IsDynamic)
@@ -1142,7 +1145,7 @@ namespace Waher.Content.Markdown
 				}
 				else if (Block.IsFootnote(out s, out int WhiteSparePrefix))
 				{
-					Footnote Footnote = new Footnote(this, s, 
+					Footnote Footnote = new Footnote(this, s,
 						this.ParseBlocks(Block.RemovePrefix(string.Empty, WhiteSparePrefix)));
 
 					i = BlockIndex;
@@ -5246,7 +5249,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5367,7 +5370,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5489,7 +5492,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5674,7 +5677,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5688,7 +5691,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5819,7 +5822,7 @@ namespace Waher.Content.Markdown
 			{
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && 
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
 						Footnote.Referenced)
 					{

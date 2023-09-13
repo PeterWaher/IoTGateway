@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Content.Markdown.Model;
-using Waher.Script;
+﻿using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
-using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Markdown.Functions
 {

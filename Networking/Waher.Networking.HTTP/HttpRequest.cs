@@ -25,6 +25,7 @@ namespace Waher.Networking.HTTP
 		private string subPath = string.Empty;
 		private HttpResource resource = null;
 		private HttpResponse response = null;
+		private Guid? requestId = null;
 		internal HttpClientConnection clientConnection = null;
 		internal bool tempSession = false;
 
@@ -151,6 +152,20 @@ namespace Waher.Networking.HTTP
 		{
 			get => this.resource;
 			set => this.resource = value;
+		}
+
+		/// <summary>
+		/// ID of request.
+		/// </summary>
+		public Guid RequestId
+		{
+			get
+			{
+				if (!this.requestId.HasValue)
+					this.requestId = Guid.NewGuid();
+
+				return this.requestId.Value;
+			}
 		}
 
 		/// <summary>

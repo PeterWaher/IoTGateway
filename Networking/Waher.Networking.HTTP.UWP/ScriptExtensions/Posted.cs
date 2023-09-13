@@ -42,26 +42,29 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 			if (!Variables.TryGetVariable(" LastPost ", out Variable v))
 				return ObjectValue.Null;
 
-			IElement Result = v.ValueElement;
-
-			if (!Variables.TryGetVariable(" LastPostResource ", out v) ||
-				!(v.ValueObject is string SubPath) ||
-				!Variables.TryGetVariable("Request", out v) ||
-				!(v.ValueObject is HttpRequest Request) ||
-				string.Compare(SubPath, Request.SubPath, true) != 0 ||
-				!Request.HasData)
+			if (!(v.ValueObject is PostedInformation PostedInfo))
 			{
-				if (!(v is null))
-				{
-					Variables.Remove(" LastPost ");
-					Variables.Remove(" LastPostResource ");
-					Variables.Remove(" LastPostReferer ");
-				}
-
+				Variables.Remove(" LastPost ");
 				return ObjectValue.Null;
 			}
 
-			return Result;
+			if (!Variables.TryGetVariable("Request", out v) ||
+				!(v.ValueObject is HttpRequest Request) ||
+				string.Compare(PostedInfo.Resource, Request.SubPath, true) != 0)
+			{
+				Variables.Remove(" LastPost ");
+				return ObjectValue.Null;
+			}
+
+			if (!PostedInfo.RequestId.HasValue)
+				PostedInfo.RequestId = Request.RequestId;
+			else if (PostedInfo.RequestId.Value != Request.RequestId)
+			{
+				Variables.Remove(" LastPost ");
+				return ObjectValue.Null;
+			}
+
+			return PostedInfo.DecodedContent;
 		}
 
 	}

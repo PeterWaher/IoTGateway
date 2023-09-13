@@ -878,8 +878,6 @@ namespace Waher.Networking.HTTP
 						Session.ContainsVariable(" LastPost "))
 					{
 						Session.Remove(" LastPost ");
-						Session.Remove(" LastPostResource ");
-						Session.Remove(" LastPostReferer ");
 					}
 
 					await this.Dispose();
@@ -1252,9 +1250,12 @@ namespace Waher.Networking.HTTP
 
 			string Referer = Request.Header.Referer?.Value;
 
-			Session[" LastPost "] = await Request.DecodeDataAsync();
-			Session[" LastPostResource "] = Request.SubPath;
-			Session[" LastPostReferer "] = Referer;
+			Session[" LastPost "] = new PostedInformation()
+			{
+				DecodedContent = Expression.Encapsulate(await Request.DecodeDataAsync()),
+				Resource = Request.SubPath,
+				Referer = Referer
+			};
 
 			if (!string.IsNullOrEmpty(Referer) &&
 				Uri.TryCreate(Referer, UriKind.RelativeOrAbsolute, out Uri RefererUri) &&

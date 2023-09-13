@@ -217,6 +217,7 @@
     <Compile Include="Interfaces\IHttpPutMethod.cs" />
     <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpTraceMethod.cs" />
+    <Compile Include="PostedInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptExtensions\Functions\ClientErrors\BadRequest.cs" />
     <Compile Include="ScriptExtensions\Functions\ClientErrors\Conflict.cs" />

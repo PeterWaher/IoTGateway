@@ -6,26 +6,31 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.DateAndTime
 {
     /// <summary>
-    /// Hours(x)
+    /// Minutes(x)
     /// </summary>
-    public class Hours : FunctionOneScalarVariable
+    public class Minute : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Hours(x)
+        /// Minutes(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Hours">Hours of expression covered by node.</param>
+        /// <param name="Minutes">Minutes of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public Hours(ScriptNode Argument, int Start, int Hours, Expression Expression)
-            : base(Argument, Start, Hours, Expression)
+        public Minute(ScriptNode Argument, int Start, int Minutes, Expression Expression)
+            : base(Argument, Start, Minutes, Expression)
         {
         }
 
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => nameof(Hours);
+        public override string FunctionName => nameof(Minute);
+
+		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "Minutes" };
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -38,11 +43,13 @@ namespace Waher.Script.Functions.DateAndTime
             object Obj = Argument.AssociatedObjectValue;
 
             if (Obj is System.DateTime TP)
-                return new DoubleNumber(TP.Hour);
+                return new DoubleNumber(TP.Minute);
 			else if (Obj is System.TimeSpan TS)
-				return new DoubleNumber(TS.TotalHours);
+				return new DoubleNumber(TS.TotalMinutes);
+			else if (Argument.AssociatedObjectValue is IMinutes D)
+				return new DoubleNumber(D.Minutes);
 			else
-				throw new ScriptRuntimeException("Expected Date and Time or TimeSpan value.", this);
+				throw new ScriptRuntimeException("Unable to extract number of minutes.", this);
 		}
 	}
 }

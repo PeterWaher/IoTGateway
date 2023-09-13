@@ -1575,15 +1575,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "HOURS":
 					Node = this.ParseArgument(Parser);
-					return new Hours(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Hour(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "MINUTES":
 					Node = this.ParseArgument(Parser);
-					return new Minutes(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Minute(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "SECONDS":
 					Node = this.ParseArgument(Parser);
-					return new Seconds(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Second(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "NOW":
 					this.Parse0Arguments(Parser);

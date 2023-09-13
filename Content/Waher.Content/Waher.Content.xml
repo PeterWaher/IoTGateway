@@ -826,7 +826,7 @@
             <summary>
             Adds a duration to a <see cref="T:System.DateTime"/> value.
             </summary>
-            <param name="Timepoint">DateTime value.</param>
+            <param name="Timepoint">System.DateTime value.</param>
             <param name="Offset">Offset.</param>
             <returns><paramref name="Timepoint"/>+<paramref name="Offset"/>.</returns>
         </member>
@@ -834,7 +834,7 @@
             <summary>
             Subtracts a duration from a <see cref="T:System.DateTime"/> value.
             </summary>
-            <param name="Timepoint">DateTime value.</param>
+            <param name="Timepoint">System.DateTime value.</param>
             <param name="Offset">Offset.</param>
             <returns><paramref name="Timepoint"/>-<paramref name="Offset"/>.</returns>
         </member>

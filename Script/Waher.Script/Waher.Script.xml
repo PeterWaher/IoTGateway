@@ -4713,6 +4713,11 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.Day.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Day.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
@@ -4721,12 +4726,12 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.Functions.DateAndTime.Hours">
+        <member name="T:Waher.Script.Functions.DateAndTime.Hour">
             <summary>
             Hours(x)
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Hours.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Functions.DateAndTime.Hour.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Hours(x)
             </summary>
@@ -4735,12 +4740,17 @@
             <param name="Hours">Hours of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.Functions.DateAndTime.Hours.FunctionName">
+        <member name="P:Waher.Script.Functions.DateAndTime.Hour.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Hours.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="P:Waher.Script.Functions.DateAndTime.Hour.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Hour.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -4748,12 +4758,72 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.Functions.DateAndTime.Minutes">
+        <member name="T:Waher.Script.Functions.DateAndTime.IDays">
+            <summary>
+            Interface for objects having a Days component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.IDays.Days">
+            <summary>
+            Number of days.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.IHours">
+            <summary>
+            Interface for objects having a Hours component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.IHours.Hours">
+            <summary>
+            Number of hours.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.IMinutes">
+            <summary>
+            Interface for objects having a Minutes component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.IMinutes.Minutes">
+            <summary>
+            Number of minutes.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.IMonths">
+            <summary>
+            Interface for objects having a Months component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.IMonths.Months">
+            <summary>
+            Number of months.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.ISeconds">
+            <summary>
+            Interface for objects having a Seconds component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.ISeconds.Seconds">
+            <summary>
+            Number of seconds.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.IYears">
+            <summary>
+            Interface for objects having a Years component.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.IYears.Years">
+            <summary>
+            Number of years.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.Minute">
             <summary>
             Minutes(x)
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Minutes.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Functions.DateAndTime.Minute.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Minutes(x)
             </summary>
@@ -4762,12 +4832,17 @@
             <param name="Minutes">Minutes of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.Functions.DateAndTime.Minutes.FunctionName">
+        <member name="P:Waher.Script.Functions.DateAndTime.Minute.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Minutes.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="P:Waher.Script.Functions.DateAndTime.Minute.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Minute.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -4794,6 +4869,11 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.Month.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Month.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
@@ -4802,12 +4882,12 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.Functions.DateAndTime.Seconds">
+        <member name="T:Waher.Script.Functions.DateAndTime.Second">
             <summary>
             Seconds(x)
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Seconds.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Functions.DateAndTime.Second.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Seconds(x)
             </summary>
@@ -4816,12 +4896,17 @@
             <param name="Seconds">Seconds of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.Functions.DateAndTime.Seconds.FunctionName">
+        <member name="P:Waher.Script.Functions.DateAndTime.Second.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.DateAndTime.Seconds.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="P:Waher.Script.Functions.DateAndTime.Second.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Second.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -4930,6 +5015,11 @@
         <member name="P:Waher.Script.Functions.DateAndTime.Year.FunctionName">
             <summary>
             Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.Year.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Year.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">

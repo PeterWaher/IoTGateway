@@ -28,6 +28,11 @@ namespace Waher.Script.Functions.DateAndTime
         public override string FunctionName => nameof(Month);
 
 		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "Months" };
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
@@ -37,8 +42,10 @@ namespace Waher.Script.Functions.DateAndTime
 		{
             if (Argument.AssociatedObjectValue is System.DateTime TP)
                 return new DoubleNumber(TP.Month);
-            else
-                throw new ScriptRuntimeException("Expected Date and Time value.", this);
+			else if (Argument.AssociatedObjectValue is IMonths D)
+				return new DoubleNumber(D.Months);
+			else
+				throw new ScriptRuntimeException("Unable to extract number of months.", this);
 		}
 	}
 }

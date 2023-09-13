@@ -8,7 +8,7 @@ namespace Waher.Script.Functions.DateAndTime
     /// <summary>
     /// Seconds(x)
     /// </summary>
-    public class Seconds : FunctionOneScalarVariable
+    public class Second : FunctionOneScalarVariable
     {
         /// <summary>
         /// Seconds(x)
@@ -17,7 +17,7 @@ namespace Waher.Script.Functions.DateAndTime
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Seconds">Seconds of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public Seconds(ScriptNode Argument, int Start, int Seconds, Expression Expression)
+        public Second(ScriptNode Argument, int Start, int Seconds, Expression Expression)
             : base(Argument, Start, Seconds, Expression)
         {
         }
@@ -25,7 +25,12 @@ namespace Waher.Script.Functions.DateAndTime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => nameof(Seconds);
+        public override string FunctionName => nameof(Second);
+
+		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "Seconds" };
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -41,8 +46,10 @@ namespace Waher.Script.Functions.DateAndTime
                 return new DoubleNumber(TP.Second);
 			else if (Obj is System.TimeSpan TS)
 				return new DoubleNumber(TS.TotalSeconds);
+			else if (Argument.AssociatedObjectValue is ISeconds D)
+				return new DoubleNumber(D.Seconds);
 			else
-				throw new ScriptRuntimeException("Expected Date and Time or TimeSpan value.", this);
+				throw new ScriptRuntimeException("Unable to extract number of seconds.", this);
 		}
 	}
 }

@@ -28,6 +28,11 @@ namespace Waher.Script.Functions.DateAndTime
         public override string FunctionName => nameof(Day);
 
 		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[] { "Days" };
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
@@ -35,10 +40,16 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-            if (Argument.AssociatedObjectValue is System.DateTime TP)
+			object Obj = Argument.AssociatedObjectValue;
+
+			if (Obj is System.DateTime TP)
                 return new DoubleNumber(TP.Day);
-            else
-                throw new ScriptRuntimeException("Expected Date and Time value.", this);
+			else if (Obj is System.TimeSpan TS)
+				return new DoubleNumber(TS.TotalDays);
+			else if (Argument.AssociatedObjectValue is IDays D)
+				return new DoubleNumber(D.Days);
+			else
+				throw new ScriptRuntimeException("Unable to extract number of days.", this);
 		}
 	}
 }

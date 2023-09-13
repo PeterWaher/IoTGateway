@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Script.Functions.DateAndTime;
 
 namespace Waher.Content
 {
@@ -9,7 +9,7 @@ namespace Waher.Content
 	/// Represents a duration value, as defined by the xsd:duration data type:
 	/// http://www.w3.org/TR/xmlschema-2/#duration
 	/// </summary>
-	public struct Duration : IComparable<Duration>
+	public struct Duration : IComparable<Duration>, ISeconds, IMinutes, IHours, IDays, IMonths, IYears
 	{
 		private static readonly Regex parser = new Regex(@"(?'Negation'-)?P((?'Years'\d+)Y)?((?'Months'\d+)M)?((?'Days'\d+)D)?(T((?'Hours'\d+)H)?((?'Minutes'\d+)M)?((?'Seconds'\d+([.]\d*)?)S)?)?", RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -168,12 +168,12 @@ namespace Waher.Content
 		}
 
 		/// <summary>
-		/// Adds a duration to a <see cref="DateTime"/> value.
+		/// Adds a duration to a <see cref="System.DateTime"/> value.
 		/// </summary>
-		/// <param name="Timepoint">DateTime value.</param>
+		/// <param name="Timepoint">System.DateTime value.</param>
 		/// <param name="Offset">Offset.</param>
 		/// <returns><paramref name="Timepoint"/>+<paramref name="Offset"/>.</returns>
-		public static DateTime operator +(DateTime Timepoint, Duration Offset)
+		public static System.DateTime operator +(System.DateTime Timepoint, Duration Offset)
 		{
 			if (Offset.negation)
 			{
@@ -220,12 +220,12 @@ namespace Waher.Content
 		}
 
 		/// <summary>
-		/// Subtracts a duration from a <see cref="DateTime"/> value.
+		/// Subtracts a duration from a <see cref="System.DateTime"/> value.
 		/// </summary>
-		/// <param name="Timepoint">DateTime value.</param>
+		/// <param name="Timepoint">System.DateTime value.</param>
 		/// <param name="Offset">Offset.</param>
 		/// <returns><paramref name="Timepoint"/>-<paramref name="Offset"/>.</returns>
-		public static DateTime operator -(DateTime Timepoint, Duration Offset)
+		public static System.DateTime operator -(System.DateTime Timepoint, Duration Offset)
 		{
 			if (Offset.negation)
 			{
@@ -279,8 +279,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;<paramref name="D2"/>.</returns>
 		public static bool operator <(Duration D1, Duration D2)
 		{
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 < DT2;
 		}
@@ -293,8 +293,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;=<paramref name="D2"/>.</returns>
 		public static bool operator <=(Duration D1, Duration D2)
 		{
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 <= DT2;
 		}
@@ -307,8 +307,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;<paramref name="D2"/>.</returns>
 		public static bool operator >(Duration D1, Duration D2)
 		{
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 > DT2;
 		}
@@ -321,8 +321,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;=<paramref name="D2"/>.</returns>
 		public static bool operator >=(Duration D1, Duration D2)
 		{
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 >= DT2;
 		}
@@ -341,8 +341,8 @@ namespace Waher.Content
 			if ((object)D1 is null)
 				return true;
 
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 == DT2;
 		}
@@ -361,8 +361,8 @@ namespace Waher.Content
 			if ((object)D1 is null)
 				return false;
 
-			DateTime DT1 = JSON.UnixEpoch + D1;
-			DateTime DT2 = JSON.UnixEpoch + D2;
+			System.DateTime DT1 = JSON.UnixEpoch + D1;
+			System.DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 != DT2;
 		}
@@ -446,7 +446,7 @@ namespace Waher.Content
 			return (reference + this).GetHashCode();
 		}
 
-		private static readonly DateTime reference = new DateTime(2000, 1, 1);
+		private static readonly System.DateTime reference = new System.DateTime(2000, 1, 1);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -577,9 +577,9 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="TS">TimeSpan value.</param>
 		/// <returns>Duration value</returns>
-		public static Duration FromTimeSpan(TimeSpan TS)
+		public static Duration FromTimeSpan(System.TimeSpan TS)
 		{
-			bool Sign = TS < TimeSpan.Zero;
+			bool Sign = TS < System.TimeSpan.Zero;
 			if (Sign)
 				TS = -TS;
 
@@ -599,8 +599,8 @@ namespace Waher.Content
 		/// order.</returns>
 		public int CompareTo(Duration other)
 		{
-			DateTime TP1 = JSON.UnixEpoch + this;
-			DateTime TP2 = JSON.UnixEpoch + other;
+			System.DateTime TP1 = JSON.UnixEpoch + this;
+			System.DateTime TP2 = JSON.UnixEpoch + other;
 
 			return TP1.CompareTo(TP2);
 		}

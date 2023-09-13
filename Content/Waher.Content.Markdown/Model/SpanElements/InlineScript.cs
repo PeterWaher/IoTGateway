@@ -77,7 +77,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				if (!this.authorized && !(this.Document.Settings.AuthorizeExpression is null))
 				{
-					ScriptNode Prohibited = await Document.Settings.AuthorizeExpression(this.expression);
+					ScriptNode Prohibited = await this.Document.Settings.AuthorizeExpression(this.expression);
 					if (!(Prohibited is null))
 						throw new UnauthorizedAccessException("Expression not permitted: " + Prohibited.SubExpression);
 				}

@@ -3169,6 +3169,17 @@ enumerated label. When calling .NET classes that accept numerical parameters, en
 converted to such. The same is true if performing any of the logical/binary operators with enumerated values.
 The results of the latter will be numerical values.
 
+Example:
+
+	FT:=Waher.Things.SensorData.FieldType;
+	Types:=0;
+							
+	if Momentary then Types|=FT.Momentary;
+	if Identity then Types|=FT.Identity;
+	if Status then Types|=FT.Status;
+	if Computed then Types|=FT.Computed;
+	if Peak then Types|=FT.Peak;
+
 ### Utilizing operators defined in underlying objects.
 
 If operators are defined in the underlying .NET code-behind, the script engine will utilize such

@@ -214,10 +214,7 @@ namespace Waher.Things.SensorData
 		/// Provides a string identifying the data type of the field. Should conform to field value data types specified in the IEEE XMPP IoT extensions, if possible:
 		/// http://xmpp.org/extensions/xep-0323.html#fieldvaluetypes
 		/// </summary>
-		public override string FieldDataTypeName
-		{
-			get { return "q"; }
-		}
+		public override string FieldDataTypeName => "q";
 
 		/// <summary>
 		/// Reference value. Can be used for change calculations, as outlined in 
@@ -225,24 +222,17 @@ namespace Waher.Things.SensorData
 		/// 
 		/// Possible values are either double values or string values.
 		/// </summary>
-		public override object ReferenceValue
-		{
-			get
-			{
-				return this.value;
-			}
-		}
+		public override object ReferenceValue => this.value;
 
 		/// <summary>
 		/// Physical Quantity
 		/// </summary>
-		public PhysicalQuantity Quantity
-		{
-			get
-			{
-				return new PhysicalQuantity(this.value, new Unit(this.unit));
-			}
-		}
+		public PhysicalQuantity Quantity => new PhysicalQuantity(this.value, new Unit(this.unit));
+
+		/// <summary>
+		/// Persistable Quantity
+		/// </summary>
+		public PersistableQuantity PersistableQuantity => new PersistableQuantity(this.value, this.unit, this.nrDecimals);
 
 		/// <summary>
 		/// Field value, boxed as an object reference.

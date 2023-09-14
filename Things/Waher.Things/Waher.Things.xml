@@ -4475,6 +4475,48 @@
             <param name="Steps">Sequence of steps.</param>
             <returns>Localized result, if successful, null if not.</returns>
         </member>
+        <member name="T:Waher.Things.SensorData.PersistableQuantity">
+            <summary>
+            Persistable quantity object.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.#ctor">
+            <summary>
+            Persistable quantity object.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.#ctor(System.Double,System.String,System.Byte)">
+            <summary>
+            Persistable quantity object.
+            </summary>
+            <param name="Value">Magnitude</param>
+            <param name="Unit">Unit</param>
+            <param name="NrDecimals">Number of decimals.</param>
+        </member>
+        <member name="P:Waher.Things.SensorData.PersistableQuantity.Value">
+            <summary>
+            Magnitude
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.PersistableQuantity.Unit">
+            <summary>
+            Unit
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.PersistableQuantity.NrDecimals">
+            <summary>
+            Number of decimals.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.ToString">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Things.SensorData.QuantityField">
             <summary>
             Represents a physical quantity value.
@@ -4611,6 +4653,11 @@
         <member name="P:Waher.Things.SensorData.QuantityField.Quantity">
             <summary>
             Physical Quantity
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.QuantityField.PersistableQuantity">
+            <summary>
+            Persistable Quantity
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.QuantityField.ObjectValue">
@@ -5732,6 +5779,80 @@
             <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.From"/>.</exception>
         </member>
+        <member name="T:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/> to a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/> to a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.PersistableQuantityToPhysicalQuantity.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/> to a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/> to a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.PhysicalQuantityToPersistableQuantity.From"/>.</exception>
+        </member>
         <member name="T:Waher.Things.TypeConverters.QuantityFieldToDouble">
             <summary>
             Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:System.Double"/>.
@@ -5768,6 +5889,43 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:Waher.Things.SensorData.PersistableQuantity"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPersistableQuantity.From"/>.</exception>
         </member>
         <member name="T:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity">
             <summary>

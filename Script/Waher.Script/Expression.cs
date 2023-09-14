@@ -5277,7 +5277,8 @@ namespace Waher.Script
 
 			lock (converters)
 			{
-				if (!converters.TryGetValue(From, out Dictionary<Type, ITypeConverter> Converters))
+				if (!converters.TryGetValue(From, out Dictionary<Type, ITypeConverter> Converters) &&
+					(!From.GetTypeInfo().IsEnum || !converters.TryGetValue(typeof(Enum), out Converters)))
 				{
 					Converter = null;
 					return false;

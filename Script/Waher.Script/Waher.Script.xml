@@ -22570,6 +22570,38 @@
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToDecimal.From"/>.</exception>
         </member>
+        <member name="T:Waher.Script.TypeConversion.EnumToDouble">
+            <summary>
+            Converts enumerated values to double numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.EnumToDouble.From">
+            <summary>
+            Converts enumerated values to short numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.EnumToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.EnumToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.EnumToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.EnumToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.Int16ToDouble">
             <summary>
             Converts short numbers to double numbers.

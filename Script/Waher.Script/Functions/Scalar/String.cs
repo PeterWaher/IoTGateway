@@ -87,6 +87,28 @@ namespace Waher.Script.Functions.Scalar
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(PhysicalQuantity Argument, Variables Variables)
+		{
+			return new StringValue(Argument.ToString());
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(Measurement Argument, Variables Variables)
+		{
+			return new StringValue(Argument.ToString());
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
 			return new StringValue(Argument.ToString());
@@ -100,7 +122,7 @@ namespace Waher.Script.Functions.Scalar
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 		/// <summary>

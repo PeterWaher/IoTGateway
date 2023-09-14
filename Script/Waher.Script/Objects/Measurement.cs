@@ -11,7 +11,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Physical measurement
 	/// </summary>
-	public sealed class Measurement : FieldElement, IComparable     // Not a proper field, as division is not the inversion of multiplication
+	public sealed class Measurement : FieldElement, IComparable, IPhysicalQuantity     // Not a proper field, as division is not the inversion of multiplication
 	{
 		/// <summary>
 		/// 0
@@ -92,6 +92,12 @@ namespace Waher.Script.Objects
 		{
 			get { return new PhysicalQuantity(this.magnitude - this.error, this.unit); }
 		}
+
+		/// <summary>
+		/// Converts underlying object to a physical quantity.
+		/// </summary>
+		/// <returns>Physical quantity</returns>
+		public PhysicalQuantity ToPhysicalQuantity() => this.Estimate;
 
 		/// <inheritdoc/>
 		public override string ToString()

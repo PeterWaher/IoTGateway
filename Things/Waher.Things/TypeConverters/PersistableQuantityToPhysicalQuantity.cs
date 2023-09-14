@@ -2,7 +2,6 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.TypeConversion;
-using Waher.Script.Units;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.TypeConverters
@@ -38,7 +37,7 @@ namespace Waher.Things.TypeConverters
 		public object Convert(object Value)
 		{
 			if (Value is PersistableQuantity Q)
-				return new PhysicalQuantity(Q.Value, new Unit(Q.Unit));
+				return Q.ToPhysicalQuantity();
 			else
 				throw new ArgumentException("Not a PersistableQuantity.", nameof(Value));
 		}
@@ -53,7 +52,7 @@ namespace Waher.Things.TypeConverters
 		public IElement ConvertToElement(object Value)
 		{
 			if (Value is PersistableQuantity Q)
-				return new PhysicalQuantity(Q.Value, new Unit(Q.Unit));
+				return Q.ToPhysicalQuantity();
 			else
 				throw new ArgumentException("Not a PersistableQuantity.", nameof(Value));
 		}

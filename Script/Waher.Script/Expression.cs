@@ -2809,7 +2809,7 @@ namespace Waher.Script
 									Node = new ConstantElement(new PhysicalQuantity(d, Unit),
 										ConstantElement.Start, this.pos - ConstantElement.Start, this);
 								}
-								else if (C is PhysicalQuantity)
+								else if (C.AssociatedObjectValue is IPhysicalQuantity)
 									Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
 								else
 								{
@@ -2951,7 +2951,7 @@ namespace Waher.Script
 									Node = new ConstantElement(new PhysicalQuantity(d, Unit),
 										ConstantElement.Start, this.pos - ConstantElement.Start, this);
 								}
-								else if (C is PhysicalQuantity)
+								else if (C.AssociatedObjectValue is IPhysicalQuantity)
 									Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
 								else
 								{

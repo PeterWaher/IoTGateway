@@ -62,7 +62,7 @@ namespace Waher.Script.Objects
 						return 0;
 
 					IElement E = BinaryOperator.EvaluateNamedOperator("op_LessThan", x, y, ScriptNode.EmptyNode);
-					if (E.AssociatedObjectValue is bool B)
+					if (E?.AssociatedObjectValue is bool B)
 						return B ? -1 : 1;
 				}
 

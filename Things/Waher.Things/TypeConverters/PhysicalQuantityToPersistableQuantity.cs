@@ -37,8 +37,11 @@ namespace Waher.Things.TypeConverters
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is PhysicalQuantity Q)
+			if (Value is IPhysicalQuantity PQ)
+			{
+				PhysicalQuantity Q = PQ.ToPhysicalQuantity();
 				return new PersistableQuantity(Q.Magnitude, Q.Unit.ToString(), CommonTypes.GetNrDecimals(Q.Magnitude));
+			}
 			else
 				throw new ArgumentException("Not a PhysicalQuantity.", nameof(Value));
 		}
@@ -52,8 +55,11 @@ namespace Waher.Things.TypeConverters
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is PhysicalQuantity Q)
+			if (Value is IPhysicalQuantity PQ)
+			{
+				PhysicalQuantity Q = PQ.ToPhysicalQuantity();
 				return new ObjectValue(new PersistableQuantity(Q.Magnitude, Q.Unit.ToString(), CommonTypes.GetNrDecimals(Q.Magnitude)));
+			}
 			else
 				throw new ArgumentException("Not a PhysicalQuantity.", nameof(Value));
 		}

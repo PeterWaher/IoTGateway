@@ -49,11 +49,11 @@ namespace Waher.Script.Model
                 if (Obj is string s)
                     return this.EvaluateScalar(s, Variables);
 
-				if (Argument is PhysicalQuantity PhysicalQuantity)
-					return this.EvaluateScalar(PhysicalQuantity.Magnitude, Variables);
+				if (Argument is Measurement Measurement)
+					return this.EvaluateScalar(Measurement, Variables);
 
-                if (Argument is Measurement Measurement)
-                    return this.EvaluateScalar(Measurement.Magnitude, Variables);
+				if (Argument.AssociatedObjectValue is IPhysicalQuantity PhysicalQuantity)
+					return this.EvaluateScalar(PhysicalQuantity.ToPhysicalQuantity(), Variables);
 
                 return this.EvaluateScalar(Argument, Variables);
             }
@@ -172,13 +172,35 @@ namespace Waher.Script.Model
             throw new ScriptRuntimeException("String-valued arguments not supported.", this);
         }
 
-        /// <summary>
-        /// Evaluates the function.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override async Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual IElement EvaluateScalar(PhysicalQuantity Argument, Variables Variables)
+		{
+            return this.EvaluateScalar(Argument.Magnitude, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual IElement EvaluateScalar(Measurement Argument, Variables Variables)
+		{
+			return this.EvaluateScalar(Argument.Magnitude, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
         {
             if (Argument.IsScalar)
             {
@@ -196,11 +218,11 @@ namespace Waher.Script.Model
 				if (Obj is string s)
 					return await this.EvaluateScalarAsync(s, Variables);
 
-                if (Argument is PhysicalQuantity PhysicalQuantity)
-                    return await this.EvaluateScalarAsync(PhysicalQuantity.Magnitude, Variables);
+				if (Argument is Measurement Measurement)
+					return await this.EvaluateScalarAsync(Measurement, Variables);
 
-                if (Argument is Measurement Measurement)
-                    return await this.EvaluateScalarAsync(Measurement.Magnitude, Variables);
+				if (Argument.AssociatedObjectValue is IPhysicalQuantity PhysicalQuantity)
+                    return await this.EvaluateScalarAsync(PhysicalQuantity.ToPhysicalQuantity(), Variables);
 
                 return await this.EvaluateScalarAsync(Argument, Variables);
             }
@@ -259,17 +281,17 @@ namespace Waher.Script.Model
         {
             object Value = Argument.AssociatedObjectValue;
 
-            if (Expression.TryConvert<string>(Value, out string s))
+            if (Expression.TryConvert(Value, out string s))
                 return this.EvaluateScalarAsync(s, Variables);
-            else if (Expression.TryConvert<double>(Value, out double d))
+            else if (Expression.TryConvert(Value, out double d))
                 return this.EvaluateScalarAsync(d, Variables);
-            else if (Expression.TryConvert<bool>(Value, out bool b))
+            else if (Expression.TryConvert(Value, out bool b))
                 return this.EvaluateScalarAsync(b, Variables);
-            else if (Expression.TryConvert<Complex>(Value, out Complex z))
+            else if (Expression.TryConvert(Value, out Complex z))
                 return this.EvaluateScalarAsync(z, Variables);
-            else if (Expression.TryConvert<Integer>(Value, out Integer i))
+            else if (Expression.TryConvert(Value, out Integer i))
                 return this.EvaluateScalarAsync((double)i.Value, Variables);
-            else if (Expression.TryConvert<RationalNumber>(Value, out RationalNumber q))
+            else if (Expression.TryConvert(Value, out RationalNumber q))
                 return this.EvaluateScalarAsync(q.ToDouble(), Variables);
             else
                 throw new ScriptRuntimeException("Type of scalar not supported.", this);
@@ -319,5 +341,27 @@ namespace Waher.Script.Model
             return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
         }
 
-    }
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateScalarAsync(PhysicalQuantity Argument, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateScalarAsync(Measurement Argument, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+		}
+
+	}
 }

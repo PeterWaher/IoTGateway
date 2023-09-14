@@ -397,8 +397,12 @@ namespace Waher.Script.Graphs
 			}
 			else if (Vector is ObjectVector OV)
 			{
-				if (Min is PhysicalQuantity MinQ && Max is PhysicalQuantity MaxQ)
+				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ && 
+					Max.AssociatedObjectValue is IPhysicalQuantity PMaxQ)
 				{
+					PhysicalQuantity MinQ = PMinQ.ToPhysicalQuantity();
+					PhysicalQuantity MaxQ = PMaxQ.ToPhysicalQuantity();
+
 					if (MinQ.Unit != MaxQ.Unit)
 					{
 						if (!Unit.TryConvert(MaxQ.Magnitude, MaxQ.Unit, MinQ.Unit, out double d))
@@ -410,12 +414,12 @@ namespace Waher.Script.Graphs
 					int i = 0;
 					int c = Vector.Dimension;
 					PhysicalQuantity[] Vector2 = new PhysicalQuantity[c];
-					PhysicalQuantity Q;
+					IPhysicalQuantity Q;
 
 					foreach (IElement E in Vector.ChildElements)
 					{
-						Q = E as PhysicalQuantity ?? throw new ScriptException("Incompatible values.");
-						Vector2[i++] = Q;
+						Q = E.AssociatedObjectValue as IPhysicalQuantity ?? throw new ScriptException("Incompatible values.");
+						Vector2[i++] = Q.ToPhysicalQuantity();
 					}
 
 					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
@@ -754,10 +758,11 @@ namespace Waher.Script.Graphs
 			{
 				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
 			}
-			else if (Min is PhysicalQuantity QMin && Max is PhysicalQuantity QMax)
+			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin && 
+				Max.AssociatedObjectValue is IPhysicalQuantity PQMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
-				return new ObjectVector(GetLabels(QMin, QMax, ApproxNrLabels));
+				return new ObjectVector(GetLabels(PQMin.ToPhysicalQuantity(), PQMax.ToPhysicalQuantity(), ApproxNrLabels));
 			}
 			else if (Min.AssociatedObjectValue is string &&
 				Max.AssociatedObjectValue is string)

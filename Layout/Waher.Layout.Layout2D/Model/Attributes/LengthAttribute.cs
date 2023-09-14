@@ -56,8 +56,10 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				Value = new Length((float)(d * 100), LengthUnit.Percent);
 				return true;
 			}
-			else if (Result is PhysicalQuantity Q)
+			else if (Result is IPhysicalQuantity PQ)
 			{
+				PhysicalQuantity Q = PQ.ToPhysicalQuantity();
+
 				switch (Q.Unit.ToString().ToLower())
 				{
 					case "px":

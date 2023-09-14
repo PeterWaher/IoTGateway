@@ -7397,6 +7397,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
@@ -11015,6 +11031,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -11056,6 +11088,22 @@
             <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -13417,6 +13465,17 @@
             <param name="Remainder">Remainder.</param>
             <returns>Result, if understood, null otherwise.</returns>
         </member>
+        <member name="T:Waher.Script.Objects.IPhysicalQuantity">
+            <summary>
+            Interface for objects that can be represented as a physical quantity.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.IPhysicalQuantity.ToPhysicalQuantity">
+            <summary>
+            Converts underlying object to a physical quantity.
+            </summary>
+            <returns>Physical quantity</returns>
+        </member>
         <member name="T:Waher.Script.Objects.Matrices.BooleanMatrices">
             <summary>
             Pseudo-ring of Boolean-valued matrices.
@@ -14506,6 +14565,12 @@
             Estimate of measurement
             </summary>
         </member>
+        <member name="M:Waher.Script.Objects.Measurement.ToPhysicalQuantity">
+            <summary>
+            Converts underlying object to a physical quantity.
+            </summary>
+            <returns>Physical quantity</returns>
+        </member>
         <member name="M:Waher.Script.Objects.Measurement.ToString">
             <inheritdoc/>
         </member>
@@ -14844,6 +14909,12 @@
             <summary>
             Unit
             </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.PhysicalQuantity.ToPhysicalQuantity">
+            <summary>
+            Converts underlying object to a physical quantity.
+            </summary>
+            <returns>Physical quantity</returns>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantity.ToString">
             <inheritdoc/>

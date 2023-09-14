@@ -37,8 +37,9 @@ namespace Waher.Script.Operators
 			Unit Unit;
 			double Error;
 
-			if (Operand1 is PhysicalQuantity Q1)
+			if (Operand1.AssociatedObjectValue is IPhysicalQuantity PQ1)
 			{
+				PhysicalQuantity Q1 = PQ1.ToPhysicalQuantity();
 				Magnitude = Q1.Magnitude;
 				Unit = Q1.Unit;
 			}
@@ -50,8 +51,9 @@ namespace Waher.Script.Operators
 			else
 				throw new ScriptRuntimeException("Expected Physical Quantity our numeric value.", this.LeftOperand);
 
-			if (Operand2 is PhysicalQuantity Q2)
+			if (Operand2.AssociatedObjectValue is IPhysicalQuantity PQ2)
 			{
+				PhysicalQuantity Q2 = PQ2.ToPhysicalQuantity();
 				if (Unit == Unit.Empty)
 				{
 					Error = Q2.Magnitude;

@@ -49,8 +49,8 @@ namespace Waher.Things.Semantic
 		/// <returns>Encapsulated semantic literal value.</returns>
 		public override ISemanticLiteral Encapsulate(object Value)
 		{
-			if (Value is PhysicalQuantity Typed)
-				return new QuantityLiteral(Typed);
+			if (Value is IPhysicalQuantity Typed)
+				return new QuantityLiteral(Typed.ToPhysicalQuantity());
 			else
 				return new StringLiteral(Value?.ToString() ?? string.Empty);
 		}

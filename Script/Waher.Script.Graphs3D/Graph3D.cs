@@ -1016,10 +1016,11 @@ namespace Waher.Script.Graphs3D
 			{
 				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
 			}
-			else if (Min is PhysicalQuantity QMin && Max is PhysicalQuantity QMax)
+			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin && 
+				Max.AssociatedObjectValue is IPhysicalQuantity PQMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
-				return new ObjectVector(GetLabels(QMin, QMax, ApproxNrLabels));
+				return new ObjectVector(GetLabels(PQMin.ToPhysicalQuantity(), PQMax.ToPhysicalQuantity(), ApproxNrLabels));
 			}
 			else if (Min.AssociatedObjectValue is string && Max.AssociatedObjectValue is string)
 			{
@@ -1151,8 +1152,12 @@ namespace Waher.Script.Graphs3D
 				int r = OM.Rows;
 				int i, j;
 
-				if (Min is PhysicalQuantity MinQ && Max is PhysicalQuantity MaxQ)
+				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ && 
+					Max.AssociatedObjectValue is IPhysicalQuantity PMaxQ)
 				{
+					PhysicalQuantity MinQ = PMinQ.ToPhysicalQuantity();
+					PhysicalQuantity MaxQ = PMaxQ.ToPhysicalQuantity();
+
 					if (MinQ.Unit != MaxQ.Unit)
 					{
 						if (!Unit.TryConvert(MaxQ.Magnitude, MaxQ.Unit, MinQ.Unit, out double d))
@@ -1162,15 +1167,15 @@ namespace Waher.Script.Graphs3D
 					}
 
 					PhysicalQuantity[,] Matrix2 = new PhysicalQuantity[c, r];
-					PhysicalQuantity Q;
+					IPhysicalQuantity Q;
 
 					for (i = 0; i < c; i++)
 					{
 						for (j = 0; j < r; j++)
 						{
 							E = Elements[i, j];
-							Q = E as PhysicalQuantity ?? throw new ScriptException("Incompatible values.");
-							Matrix2[i, j] = Q;
+							Q = E.AssociatedObjectValue as IPhysicalQuantity ?? throw new ScriptException("Incompatible values.");
+							Matrix2[i, j] = Q.ToPhysicalQuantity();
 						}
 					}
 

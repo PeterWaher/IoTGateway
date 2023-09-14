@@ -1,13 +1,17 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Script.Exceptions;
+using Waher.Script.Objects;
+using Waher.Script.Units;
 
 namespace Waher.Things.SensorData
 {
 	/// <summary>
 	/// Persistable quantity object.
 	/// </summary>
-	public class PersistableQuantity
+	public class PersistableQuantity : IPhysicalQuantity, IComparable
 	{
 		/// <summary>
 		/// Persistable quantity object.
@@ -81,6 +85,26 @@ namespace Waher.Things.SensorData
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts underlying object to a physical quantity.
+		/// </summary>
+		/// <returns>Physical quantity</returns>
+		public PhysicalQuantity ToPhysicalQuantity()
+		{
+			return new PhysicalQuantity(this.Value, new Unit(this.Unit));
+		}
+
+		/// <summary>
+		/// <see cref="IComparable.CompareTo"/>
+		/// </summary>
+		public int CompareTo(object obj)
+		{
+			if (!(obj is IPhysicalQuantity PQ))
+				throw new ScriptException("Values not comparable.");
+
+			return this.ToPhysicalQuantity().CompareTo(PQ.ToPhysicalQuantity());
 		}
 	}
 }

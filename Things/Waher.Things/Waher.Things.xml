@@ -4517,6 +4517,17 @@
         <member name="M:Waher.Things.SensorData.PersistableQuantity.ToString">
             <inheritdoc/>
         </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.ToPhysicalQuantity">
+            <summary>
+            Converts underlying object to a physical quantity.
+            </summary>
+            <returns>Physical quantity</returns>
+        </member>
+        <member name="M:Waher.Things.SensorData.PersistableQuantity.CompareTo(System.Object)">
+            <summary>
+            <see cref="M:System.IComparable.CompareTo(System.Object)"/>
+            </summary>
+        </member>
         <member name="T:Waher.Things.SensorData.QuantityField">
             <summary>
             Represents a physical quantity value.

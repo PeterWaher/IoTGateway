@@ -168,8 +168,11 @@ namespace Waher.Things.ScriptExtensions.SensorData
 
 			if (ValueObject is double d)
 				return new ObjectValue(new QuantityField(ThingRef, TP, FieldName, d, CommonTypes.GetNrDecimals(d), string.Empty, Type, QoS, Writable));
-			if (ValueObject is PhysicalQuantity PQ)
-				return new ObjectValue(new QuantityField(ThingRef, TP, FieldName, PQ.Magnitude, CommonTypes.GetNrDecimals(PQ.Magnitude), PQ.Unit.ToString(), Type, QoS, Writable));
+			if (ValueObject is IPhysicalQuantity PQ)
+			{
+				PhysicalQuantity Q = PQ.ToPhysicalQuantity();
+				return new ObjectValue(new QuantityField(ThingRef, TP, FieldName, Q.Magnitude, CommonTypes.GetNrDecimals(Q.Magnitude), Q.Unit.ToString(), Type, QoS, Writable));
+			}
 			else if (ValueObject is string s)
 				return new ObjectValue(new StringField(ThingRef, TP, FieldName, s, Type, QoS, Writable));
 			else if (ValueObject is bool b)

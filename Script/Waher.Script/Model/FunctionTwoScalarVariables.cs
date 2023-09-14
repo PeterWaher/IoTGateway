@@ -69,10 +69,8 @@ namespace Waher.Script.Model
 						arg1 = xd2;
 					else
 					{
-						if (x is PhysicalQuantity Q1)
-							arg1 = Q1.Magnitude;
-						else if (x is Measurement M1)
-							arg1 = M1.Magnitude;
+						if (x is IPhysicalQuantity Q1)
+							arg1 = Q1.ToPhysicalQuantity().Magnitude;
 						else
 							return this.EvaluateScalar(Argument1, Argument2, Variables);
 					}
@@ -81,10 +79,8 @@ namespace Waher.Script.Model
 						arg2 = yd2;
 					else
 					{
-						if (y is PhysicalQuantity Q2)
-							arg2 = Q2.Magnitude;
-						else if (y is Measurement M2)
-							arg2 = M2.Magnitude;
+						if (y is IPhysicalQuantity Q2)
+							arg2 = Q2.ToPhysicalQuantity().Magnitude;
 						else
 							return this.EvaluateScalar(Argument1, Argument2, Variables);
 					}
@@ -275,10 +271,8 @@ namespace Waher.Script.Model
 						arg1 = xd2;
 					else
 					{
-						if (x is PhysicalQuantity Q1)
-							arg1 = Q1.Magnitude;
-						else if (x is Measurement M1)
-							arg1 = M1.Magnitude;
+						if (x is IPhysicalQuantity Q1)
+							arg1 = Q1.ToPhysicalQuantity().Magnitude;
 						else
 							return await this.EvaluateScalarAsync(Argument1, Argument2, Variables);
 					}
@@ -287,10 +281,8 @@ namespace Waher.Script.Model
 						arg2 = yd2;
 					else
 					{
-						if (y is PhysicalQuantity Q2)
-							arg2 = Q2.Magnitude;
-						else if (y is Measurement M2)
-							arg2 = M2.Magnitude;
+						if (y is IPhysicalQuantity Q2)
+							arg2 = Q2.ToPhysicalQuantity().Magnitude;
 						else
 							return await this.EvaluateScalarAsync(Argument1, Argument2, Variables);
 					}

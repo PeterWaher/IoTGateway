@@ -10,7 +10,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Physical quantity.
 	/// </summary>
-	public sealed class PhysicalQuantity : FieldElement, IComparable
+	public sealed class PhysicalQuantity : FieldElement, IComparable, IPhysicalQuantity
 	{
 		/// <summary>
 		/// 0
@@ -56,6 +56,12 @@ namespace Waher.Script.Objects
 			set => this.unit = value;
 		}
 
+		/// <summary>
+		/// Converts underlying object to a physical quantity.
+		/// </summary>
+		/// <returns>Physical quantity</returns>
+		public PhysicalQuantity ToPhysicalQuantity() => this;
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -88,10 +94,11 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
-			if (Element is PhysicalQuantity E)
+			if (Element.AssociatedObjectValue is IPhysicalQuantity E)
 			{
-				Unit Unit = Unit.Multiply(this.unit, E.unit, out int ResidueExponential);
-				double Magnitude = this.magnitude * E.magnitude;
+				PhysicalQuantity Q = E.ToPhysicalQuantity();
+				Unit Unit = Unit.Multiply(this.unit, Q.unit, out int ResidueExponential);
+				double Magnitude = this.magnitude * Q.magnitude;
 				if (ResidueExponential != 0)
 					Magnitude *= Math.Pow(10, ResidueExponential);
 
@@ -124,9 +131,10 @@ namespace Waher.Script.Objects
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			if (Element is PhysicalQuantity E)
+			if (Element.AssociatedObjectValue is IPhysicalQuantity E)
 			{
-				if (Unit.TryConvert(E.magnitude, E.unit, this.unit, out double d))
+				PhysicalQuantity Q = E.ToPhysicalQuantity();
+				if (Unit.TryConvert(Q.magnitude, Q.unit, this.unit, out double d))
 					return new PhysicalQuantity(this.magnitude + d, this.unit);
 			}
 			else if (Element.AssociatedObjectValue is double d)
@@ -289,8 +297,10 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public int CompareTo(object obj)
 		{
-			if (!(obj is PhysicalQuantity Q))
+			if (!(obj is IPhysicalQuantity PQ))
 				throw new ScriptException("Values not comparable.");
+
+			PhysicalQuantity Q = PQ.ToPhysicalQuantity();
 
 			if (this.unit.Equals(Q.unit))
 				return this.magnitude.CompareTo(Q.magnitude);

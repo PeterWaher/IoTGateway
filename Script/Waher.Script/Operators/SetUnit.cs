@@ -44,14 +44,6 @@ namespace Waher.Script.Operators
 			if (Operand.AssociatedObjectValue is double D)
 				return new PhysicalQuantity(D, this.unit);
 
-			if (Operand is PhysicalQuantity Q)
-			{
-				if (Unit.TryConvert(Q.Magnitude, Q.Unit, this.unit, out double Magnitude))
-					return new PhysicalQuantity(Magnitude, this.unit);
-				else
-					throw new ScriptRuntimeException("Unable to convert from " + Q.Unit.ToString() + " to " + this.unit.ToString() + ".", this);
-			}
-
 			if (Operand is Measurement M)
 			{
 				if (Unit.TryConvert(M.Magnitude, M.Unit, this.unit, out double Magnitude) &&
@@ -61,6 +53,15 @@ namespace Waher.Script.Operators
 				}
 				else
 					throw new ScriptRuntimeException("Unable to convert from " + M.Unit.ToString() + " to " + this.unit.ToString() + ".", this);
+			}
+
+			if (Operand.AssociatedObjectValue is IPhysicalQuantity PQ)
+			{
+				PhysicalQuantity Q = PQ.ToPhysicalQuantity();
+				if (Unit.TryConvert(Q.Magnitude, Q.Unit, this.unit, out double Magnitude))
+					return new PhysicalQuantity(Magnitude, this.unit);
+				else
+					throw new ScriptRuntimeException("Unable to convert from " + Q.Unit.ToString() + " to " + this.unit.ToString() + ".", this);
 			}
 
 			throw new ScriptRuntimeException("Unable to set physical unit.", this);

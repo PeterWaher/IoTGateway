@@ -140,18 +140,26 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					object Arg1 = Arguments[1].AssociatedObjectValue;
 
 					SourceId = Arg1?.ToString() ?? string.Empty;
-					if (!TryGetDataSource(SourceId, out Source))
-						return ObjectValue.Null;
 
 					if (c == 2)
+					{
+						if (!TryGetDataSource(SourceId, out Source))
+							return ObjectValue.Null;
+
 						Result = await Source.GetNodeAsync(new ThingReference(NodeId, SourceId));
+					}
 					else
 					{
 						object Arg2 = Arguments[2].AssociatedObjectValue;
 						string PartitionId = Arg2?.ToString() ?? string.Empty;
 
 						if (c == 3)
+						{
+							if (!TryGetDataSource(SourceId, out Source))
+								return ObjectValue.Null;
+
 							Result = await Source.GetNodeAsync(new ThingReference(NodeId, SourceId, PartitionId));
+						}
 						else
 						{
 							object Arg3 = Arguments[3].AssociatedObjectValue;

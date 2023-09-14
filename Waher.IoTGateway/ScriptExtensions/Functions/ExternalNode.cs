@@ -305,9 +305,16 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				return Task.CompletedTask;
 			}
 
+			INode[] Nodes;
+
+			if (string.IsNullOrEmpty(this.nodeId))
+				Nodes = null;
+			else
+				Nodes = new INode[] { this };
+
 			SensorDataClientRequest SensorDataRequest = Gateway.SensorClient.RequestReadout(Item.LastPresenceFullJid,
-				new IThingReference[] { this }, Request.Types, Request.FieldNames, Request.From, Request.To,
-				Request.When, Request.ServiceToken, Request.DeviceToken, Request.UserToken);
+				Nodes, Request.Types, Request.FieldNames, Request.From, Request.To, Request.When, 
+				Request.ServiceToken, Request.DeviceToken, Request.UserToken);
 
 			SensorDataRequest.OnFieldsReceived += (sender, Fields) =>
 			{

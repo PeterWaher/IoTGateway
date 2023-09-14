@@ -3161,6 +3161,14 @@ If an object has the index property `Item` defined, it can be accessed using the
 `T`, the script engine will await for the task to complete, and return the finished result rather
 than the `Task` object.
 
+### Enumerated values
+
+You can create enumerated value by simply referencing the type, and name, as you would in .NET: `TYPE.NAME`.
+The `Type` would be a short name, fully qualified name, or a reference to a Type. The `Name` would be the
+enumerated label. When calling .NET classes that accept numerical parameters, enumerated values are automatically
+converted to such. The same is true if performing any of the logical/binary operators with enumerated values.
+The results of the latter will be numerical values.
+
 ### Utilizing operators defined in underlying objects.
 
 If operators are defined in the underlying .NET code-behind, the script engine will utilize such

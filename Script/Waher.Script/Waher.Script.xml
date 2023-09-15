@@ -4726,6 +4726,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Day.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Hour">
             <summary>
             Hours(x)
@@ -4751,6 +4759,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Hour.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Hour.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -4845,6 +4861,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Local.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Minute">
             <summary>
             Minutes(x)
@@ -4870,6 +4894,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Minute.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Minute.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -4909,6 +4941,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Month.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Second">
             <summary>
             Seconds(x)
@@ -4934,6 +4974,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Second.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Second.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -5052,6 +5100,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Utc.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Year">
             <summary>
             Year(x)
@@ -5077,6 +5133,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.Year.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Year.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

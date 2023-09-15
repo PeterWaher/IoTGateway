@@ -36,6 +36,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Threading.Functions.Abort.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Threading.Functions.Abort.EvaluateScalar(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.

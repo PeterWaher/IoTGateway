@@ -305,7 +305,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateScalarAsync(double Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateScalarAsync(Complex Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateScalarAsync(bool Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
         }
 
 		/// <summary>
@@ -349,7 +349,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateScalarAsync(PhysicalQuantity Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 		/// <summary>
@@ -360,7 +360,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateScalarAsync(Measurement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 	}

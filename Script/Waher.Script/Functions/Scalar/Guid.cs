@@ -76,7 +76,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
         }
 
         /// <summary>

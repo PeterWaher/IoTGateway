@@ -7,31 +7,26 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.DateAndTime
 {
     /// <summary>
-    /// Seconds(x)
+    /// Utc(x)
     /// </summary>
-    public class Second : FunctionOneScalarVariable
+    public class Utc : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Seconds(x)
+        /// Utc(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Seconds">Seconds of expression covered by node.</param>
+        /// <param name="Utc">Utc of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public Second(ScriptNode Argument, int Start, int Seconds, Expression Expression)
-            : base(Argument, Start, Seconds, Expression)
+        public Utc(ScriptNode Argument, int Start, int Utc, Expression Expression)
+            : base(Argument, Start, Utc, Expression)
         {
         }
 
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => nameof(Second);
-
-		/// <summary>
-		/// Optional aliases. If there are no aliases for the function, null is returned.
-		/// </summary>
-		public override string[] Aliases => new string[] { "Seconds" };
+        public override string FunctionName => nameof(Utc);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -41,18 +36,14 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-            object Obj = Argument.AssociatedObjectValue;
+			object Obj = Argument.AssociatedObjectValue;
 
-            if (Obj is System.DateTime TP)
-                return new DoubleNumber(TP.Second);
-			else if (Argument.AssociatedObjectValue is System.DateTimeOffset TPO)
-				return new DoubleNumber(TPO.Second);
-			else if (Obj is System.TimeSpan TS)
-				return new DoubleNumber(TS.TotalSeconds);
-			else if (Argument.AssociatedObjectValue is ISeconds D)
-				return new DoubleNumber(D.Seconds);
+			if (Obj is System.DateTime TP)
+                return new DateTimeValue(TP.ToUniversalTime());
+			else if (Obj is System.DateTimeOffset TPO)
+				return new ObjectValue(TPO.ToUniversalTime());
 			else
-				throw new ScriptRuntimeException("Unable to extract number of seconds.", this);
+				throw new ScriptRuntimeException("Unable to convert to universal time coordinates.", this);
 		}
 
 		/// <summary>

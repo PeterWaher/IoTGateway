@@ -94,6 +94,14 @@ namespace Waher.Script.Functions.DateAndTime
 			if (c == 1)
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
+
+				if (Obj is System.DateTime TP)
+					return new ObjectValue(TP.TimeOfDay);
+				else if (Obj is System.DateTimeOffset TPO)
+					return new ObjectValue(TPO.TimeOfDay);
+				else if (Obj is TimeSpan)
+					return Arguments[0];
+
 				string s = Obj?.ToString() ?? string.Empty;
 
 				if (TryParse(s, out System.TimeSpan TS))

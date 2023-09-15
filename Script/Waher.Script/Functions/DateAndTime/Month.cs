@@ -1,4 +1,5 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -42,10 +43,23 @@ namespace Waher.Script.Functions.DateAndTime
 		{
             if (Argument.AssociatedObjectValue is System.DateTime TP)
                 return new DoubleNumber(TP.Month);
+			else if (Argument.AssociatedObjectValue is System.DateTimeOffset TPO)
+				return new DoubleNumber(TPO.Month);
 			else if (Argument.AssociatedObjectValue is IMonths D)
 				return new DoubleNumber(D.Months);
 			else
 				throw new ScriptRuntimeException("Unable to extract number of months.", this);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 	}
 }

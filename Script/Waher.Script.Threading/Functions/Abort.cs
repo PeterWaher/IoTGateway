@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -47,6 +48,17 @@ namespace Waher.Script.Threading.Functions
 				return this.EvaluateScalar(s, Variables);
 			else
 				throw new ScriptRuntimeException("Expected a Task ID.", this);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 
 		/// <summary>

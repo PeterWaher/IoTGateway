@@ -4818,6 +4818,33 @@
             Number of years.
             </summary>
         </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.Local">
+            <summary>
+            Local(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Local.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Local(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Local">Local of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.Local.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Local.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Minute">
             <summary>
             Minutes(x)
@@ -4997,6 +5024,33 @@
             <param name="CheckAgainst">Value to check against.</param>
             <param name="AlreadyFound">Variables already identified.</param>
             <returns>Pattern match result</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.Utc">
+            <summary>
+            Utc(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Utc.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Utc(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Utc">Utc of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.Utc.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.Utc.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Script.Functions.DateAndTime.Year">
             <summary>

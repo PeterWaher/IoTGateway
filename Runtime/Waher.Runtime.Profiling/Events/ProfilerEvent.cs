@@ -80,9 +80,18 @@ namespace Waher.Runtime.Profiling.Events
 		{
 			StringBuilder Output = States.GetBuilder(this.ticks);
 			Output.Append(this.thread.Key);
-			Output.Append(" is \"");
-			Output.Append(this.PlantUmlState.Replace("\"", "'"));
-			Output.AppendLine("\"");
+			Output.Append(" is ");
+
+			string s = this.PlantUmlState;
+
+			if (s.StartsWith("{") && s.EndsWith("}"))
+				Output.Append(s);
+			else
+			{
+				Output.Append("\"");
+				Output.Append(s.Replace("\"", "'"));
+				Output.AppendLine("\"");
+			}
 		}
 
 		/// <summary>

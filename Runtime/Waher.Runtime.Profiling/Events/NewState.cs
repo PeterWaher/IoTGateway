@@ -39,16 +39,7 @@ namespace Waher.Runtime.Profiling.Events
 		}
 
 		/// <inheritdoc/>
-		public override string PlantUmlState
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(this.state))
-					return "\"\"";
-				else
-					return this.state;
-			}
-		}
+		public override string PlantUmlState => this.state;
 
 		/// <inheritdoc/>
 		public override void Accumulate(Accumulator Accumulator)

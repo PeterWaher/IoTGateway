@@ -2007,7 +2007,7 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Ed25519([PrivKey[,HashKey]])`                             | Creates an Edwards25519 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed25519Example] |
 | `Ed448([PrivKey[,HashKey]])`                               | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
 | `HexDecode(Data)`                                          | Decodes binary data from a string using hexadecimal encoding. | [Example][HexDecodeExample] |
-| `HexEncode(Data)`                                          | Encodes binary data to a string using hexadecimal encoding. | [Example][HexEncodeExample] |
+| `HexEncode(Data[,NrBytes])`                                | Encodes binary data to a string using hexadecimal encoding. Data can be an integer, if a second argument provides the number of bytes to use when encoding integer. | [Example][HexEncodeExample] |
 | `Md5(Data)`                                                | Calculates a MD5 Hash Digest of the binary `Data`. If `Data` is a string, it is UTF-8 encoded first.  | [Example][Md5Example] |
 | `P192([PrivKey])`                                          | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
 | `P224([PrivKey])`                                          | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |

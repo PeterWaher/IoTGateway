@@ -604,7 +604,33 @@ namespace Waher.Content.Markdown
 
 					Block = Blocks[BlockIndex];
 					s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
-					CodeBlock CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+
+					CodeBlock CodeBlock;
+
+					if (s.StartsWith("base64", StringComparison.CurrentCultureIgnoreCase))
+					{
+						try
+						{
+							StringBuilder sb = new StringBuilder();
+
+							foreach (string Row in Code)
+								sb.Append(Row);
+
+							byte[] Bin = Convert.FromBase64String(sb.ToString());
+							s2 = Encoding.UTF8.GetString(Bin);
+
+							Rows = s2.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+
+							CodeBlock = new CodeBlock(this, Rows, 0, Rows.Length - 1, 0, s.Substring(6));
+						}
+						catch (Exception)
+						{
+							CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+						}
+					}
+					else
+						CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+
 					Elements.AddLast(CodeBlock);
 
 					if (!string.IsNullOrEmpty(s) && !CodeBlock.HasHandler)

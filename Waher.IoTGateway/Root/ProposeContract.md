@@ -91,10 +91,8 @@ Legal Text
 Machine-Readable Information
 -------------------------------
 
-```xml
-
-((PrettyXml(Page.Contract.ForMachines) ))
-
+```base64xml
+{{Base64Encode(Utf8Encode(PrettyXml(Page.Contract.ForMachines)))}}
 ```
 
 	[[;

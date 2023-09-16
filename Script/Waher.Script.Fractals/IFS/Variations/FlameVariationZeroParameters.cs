@@ -55,7 +55,7 @@ namespace Waher.Script.Fractals.IFS.Variations
 
 		public Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.Evaluate(Arguments, Variables));
+			return Task.FromResult(this.Evaluate(Arguments, Variables));
 		}
 
 		public int NrArguments => 2;

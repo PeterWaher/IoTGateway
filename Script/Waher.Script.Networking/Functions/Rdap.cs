@@ -65,9 +65,8 @@ namespace Waher.Script.Networking.Functions
 
 		private async Task<IElement> EvaluateScalarAsync(IPAddress IP)
 		{
-			Uri Uri = WhoIsClient.RdapUri(IP);
-			if (Uri is null)
-				throw new ScriptRuntimeException("RDAP URI not available for " + Argument, this);
+			Uri Uri = WhoIsClient.RdapUri(IP)
+				?? throw new ScriptRuntimeException("RDAP URI not available for " + IP.ToString(), this);
 
 			object Result = await InternetContent.GetAsync(Uri);
 

@@ -919,8 +919,8 @@ namespace Waher.Script.Graphs
 			Output.WriteAttributeString("title", this.title);
 			Output.WriteAttributeString("labelX", this.labelX);
 			Output.WriteAttributeString("labelY", this.labelY);
-			Output.WriteAttributeString("axisTypeX", this.axisTypeX.FullName);
-			Output.WriteAttributeString("axisTypeY", this.axisTypeY.FullName);
+			Output.WriteAttributeString("axisTypeX", this.axisTypeX?.FullName);
+			Output.WriteAttributeString("axisTypeY", this.axisTypeY?.FullName);
 			Output.WriteAttributeString("minX", ReducedXmlString(this.minX));
 			Output.WriteAttributeString("maxX", ReducedXmlString(this.maxX));
 			Output.WriteAttributeString("minY", ReducedXmlString(this.minY));

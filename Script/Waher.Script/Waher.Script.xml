@@ -2222,6 +2222,32 @@
             </summary>
             <param name="Variables">Current set of variables.</param>
         </member>
+        <member name="T:Waher.Script.Constants.VariablesConstant">
+            <summary>
+            The empty set.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.VariablesConstant.#ctor">
+            <summary>
+            The empty set.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.VariablesConstant.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.VariablesConstant.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.VariablesConstant.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
         <member name="T:Waher.Script.Constants.Z">
             <summary>
             Integers.

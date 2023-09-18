@@ -138,6 +138,7 @@ There are also a set of predefined variables:
 | `TimeUtc`              | Current time, UTC coordinates.                              |
 | `Today`                | Current date, local time coordinates.                       |
 | `TodayUtc`             | Current date, UTC coordinates.                              |
+| `Variables`            | Reference to the current set of variables.                  |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 

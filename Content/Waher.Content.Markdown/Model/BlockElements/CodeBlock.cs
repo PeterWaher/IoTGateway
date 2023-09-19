@@ -241,8 +241,21 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
+			if (!(this.handler is null) && this.handler.HandlesMarkdown)
+			{
+				try
+				{
+					if (await this.handler.GenerateMarkdown(Output, this.rows, this.language, this.indent, this.Document))
+						return;
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+
 			int Max = 2;
 
 			foreach (string Row in this.rows)
@@ -276,8 +289,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.AppendLine(s);
 			Output.AppendLine();
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

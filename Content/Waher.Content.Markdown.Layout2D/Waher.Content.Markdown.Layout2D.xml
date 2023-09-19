@@ -41,6 +41,11 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesMarkdown">
+            <summary>
+            If (transportable) Markdown is handled.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -80,6 +85,17 @@
             <param name="Rows">Code Block rows</param>
             <param name="Session">Session variables.</param>
             <returns>File name</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates (transportanle) Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>

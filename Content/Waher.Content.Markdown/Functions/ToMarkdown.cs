@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -10,6 +12,7 @@ using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Content.Markdown.Functions
 {
@@ -67,6 +70,10 @@ namespace Waher.Content.Markdown.Functions
 				return SetToMarkdown(Set);
 			else if (Argument is Graph Graph)
 				return GraphToMarkdown(Graph);
+			else if (Argument is PixelInformation Pixels)
+				return PixelsToMarkdown(Pixels);
+			else if (Argument is SKImage Image)
+				return ImageToMarkdown(Image);
 			else
 				return Argument.AssociatedObjectValue?.ToString();
 		}
@@ -79,12 +86,22 @@ namespace Waher.Content.Markdown.Functions
 		public static string MatrixToMarkdown(IMatrix Matrix)
 		{
 			StringBuilder Markdown = new StringBuilder();
+			MatrixToMarkdown(Matrix, Markdown);
+			return Markdown.ToString();
+		}
+
+		/// <summary>
+		/// Converts a matrix to Markdown.
+		/// </summary>
+		/// <param name="Matrix">Matrix</param>
+		/// <param name="Markdown">Markdown output.</param>
+		public static void MatrixToMarkdown(IMatrix Matrix, StringBuilder Markdown)
+		{
 			int Cols = Matrix.Columns;
 			int Rows = Matrix.Rows;
 			int Col, Row;
 			IElement E;
 			string s;
-			object Obj;
 
 			if (Matrix is ObjectMatrix OM && OM.HasColumnNames)
 			{
@@ -131,6 +148,8 @@ namespace Waher.Content.Markdown.Functions
 
 			Markdown.AppendLine("|");
 
+			LinkedList<KeyValuePair<string, string>> Notes = null;
+
 			for (Row = 0; Row < Rows; Row++)
 			{
 				for (Col = 0; Col < Cols; Col++)
@@ -138,22 +157,50 @@ namespace Waher.Content.Markdown.Functions
 					Markdown.Append("| ");
 
 					E = Matrix.GetElement(Col, Row);
-					Obj = E.AssociatedObjectValue;
 
-					if (!(Obj is null))
+					if (!(E is null))
 					{
-						s = Obj.ToString().Trim();
-						s = s.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-						Markdown.Append(s);
+						s = Evaluate(E);
+
+						if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
+						{
+							string NoteId = "n" + Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+							if (Notes is null)
+								Notes = new LinkedList<KeyValuePair<string, string>>();
+
+							Notes.AddLast(new KeyValuePair<string, string>(NoteId, s));
+
+							Markdown.Append("[^");
+							Markdown.Append(NoteId);
+							Markdown.Append(']');
+						}
+						else
+							Markdown.Append(s);
+
 						Markdown.Append(' ');
 					}
-
 				}
 
 				Markdown.AppendLine("|");
 			}
 
-			return Markdown.ToString();
+			if (!(Notes is null))
+			{
+				foreach (KeyValuePair<string, string> Note in Notes)
+				{
+					Markdown.AppendLine();
+					Markdown.Append("[^");
+					Markdown.Append(Note.Key);
+					Markdown.Append("]:");
+
+					foreach (string Row2 in Note.Value.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					{
+						Markdown.Append('\t');
+						Markdown.AppendLine(Row2);
+					}
+				}
+			}
 		}
 
 		private static TextAlignment ColumnAlignment(IMatrix Matrix, int Column)
@@ -264,13 +311,75 @@ namespace Waher.Content.Markdown.Functions
 		public static string GraphToMarkdown(Graph Graph)
 		{
 			StringBuilder Markdown = new StringBuilder();
+			GraphToMarkdown(Graph, Markdown);
+			return Markdown.ToString();
+		}
 
-			Markdown.AppendLine("```Graph");
+		/// <summary>
+		/// Converts a graph to Markdown.
+		/// </summary>
+		/// <param name="Graph">Graph</param>
+		/// <param name="Markdown">Markdown output.</param>
+		public static void GraphToMarkdown(Graph Graph, StringBuilder Markdown)
+		{
+			Markdown.AppendLine("```graph");
 			Graph.ToXml(Markdown);
 			Markdown.AppendLine();
 			Markdown.AppendLine("```");
+		}
 
+		/// <summary>
+		/// Converts pixels to Markdown.
+		/// </summary>
+		/// <param name="Pixels">Pixels</param>
+		public static string PixelsToMarkdown(PixelInformation Pixels)
+		{
+			StringBuilder Markdown = new StringBuilder();
+			PixelsToMarkdown(Pixels, Markdown);
 			return Markdown.ToString();
+		}
+
+		/// <summary>
+		/// Converts pixels to Markdown.
+		/// </summary>
+		/// <param name="Pixels">Pixels</param>
+		/// <param name="Markdown">Markdown output.</param>
+		public static void PixelsToMarkdown(PixelInformation Pixels, StringBuilder Markdown)
+		{
+			byte[] Bin = Pixels.EncodeAsPng();
+
+			Markdown.AppendLine("```image/png");
+			Markdown.AppendLine(Convert.ToBase64String(Bin));
+			Markdown.AppendLine();
+		}
+
+		/// <summary>
+		/// Converts an image to Markdown.
+		/// </summary>
+		/// <param name="Image">Image</param>
+		public static string ImageToMarkdown(SKImage Image)
+		{
+			StringBuilder Markdown = new StringBuilder();
+			ImageToMarkdown(Image, Markdown);
+			return Markdown.ToString();
+		}
+
+		/// <summary>
+		/// Converts an image to Markdown.
+		/// </summary>
+		/// <param name="Image">Image</param>
+		/// <param name="Markdown">Markdown output.</param>
+		public static void ImageToMarkdown(SKImage Image, StringBuilder Markdown)
+		{
+			using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
+			{
+				byte[] Bin = Data.ToArray();
+
+				Markdown.AppendLine("```image/png");
+				Markdown.AppendLine(Convert.ToBase64String(Bin));
+				Markdown.AppendLine();
+			}
+
 		}
 	}
 }

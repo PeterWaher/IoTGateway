@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model;
+using Waher.Content.Markdown.Model.CodeContent;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -323,6 +323,11 @@ namespace Waher.Content.Markdown.GraphViz
 		{
 			// Do nothing.
 		}
+
+		/// <summary>
+		/// If (transportable) Markdown is handled.
+		/// </summary>
+		public bool HandlesMarkdown => true;
 
 		/// <summary>
 		/// If HTML is handled.
@@ -643,6 +648,24 @@ namespace Waher.Content.Markdown.GraphViz
 			Output.AppendLine(Info.Title);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Generates (transportanle) Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			if (Info is null)
+				return false;
+
+			return await ImageContent.GenerateMarkdownFromFile(Output, Info.FileName, Info.Title);
 		}
 
 		/// <summary>

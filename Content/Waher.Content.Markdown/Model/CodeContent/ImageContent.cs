@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -44,6 +45,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		}
 
 		/// <summary>
+		/// If (transportable) Markdown is handled.
+		/// </summary>
+		public bool HandlesMarkdown => false;
+
+		/// <summary>
 		/// If HTML is handled.
 		/// </summary>
 		public bool HandlesHTML => true;
@@ -62,6 +68,58 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// If LaTeX is handled.
 		/// </summary>
 		public bool HandlesLaTeX => true;
+
+		/// <summary>
+		/// Generates (transportanle) Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			return Task.FromResult(false);
+		}
+
+		/// <summary>
+		/// Generates Markdown embedding an image available in a file.
+		/// </summary>
+		/// <param name="Output">Markdown output.</param>
+		/// <param name="FileName">Image file name.</param>
+		/// <param name="Title">Optional title.</param>
+		/// <returns>If Markdown could be generated.</returns>
+		public static async Task<bool> GenerateMarkdownFromFile(StringBuilder Output, string FileName, string Title)
+		{
+			if (!InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType))
+				return false;
+
+			try
+			{
+				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
+
+				Output.Append("```");
+				Output.Append(ContentType);
+
+				if (!string.IsNullOrEmpty(Title))
+				{
+					Output.Append(':');
+					Output.Append(Title);
+				}
+
+				Output.AppendLine();
+				Output.AppendLine(Convert.ToBase64String(Bin));
+				Output.AppendLine("```");
+				Output.AppendLine();
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.

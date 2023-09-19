@@ -10,9 +10,7 @@ using Waher.Content.Emoji;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
-using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Runtime.Temporary;
-using Waher.Content.Html.Elements;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

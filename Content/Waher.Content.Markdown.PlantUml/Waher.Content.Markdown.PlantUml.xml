@@ -57,6 +57,11 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesMarkdown">
+            <summary>
+            If (transportable) Markdown is handled.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -82,6 +87,17 @@
             Generates HTML for the markdown element.
             </summary>
             <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates (transportanle) Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
             <param name="Rows">Code rows.</param>
             <param name="Language">Language used.</param>
             <param name="Indent">Additional indenting.</param>

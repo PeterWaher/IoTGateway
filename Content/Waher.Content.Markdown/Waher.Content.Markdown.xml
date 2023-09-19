@@ -547,6 +547,13 @@
             <param name="Matrix">Matrix</param>
             <returns>Markdown</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.MatrixToMarkdown(Waher.Script.Abstraction.Elements.IMatrix,System.Text.StringBuilder)">
+            <summary>
+            Converts a matrix to Markdown.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <param name="Markdown">Markdown output.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.VectorToMarkdown(Waher.Script.Abstraction.Elements.IVector)">
             <summary>
             Converts a vector to Markdown.
@@ -567,6 +574,39 @@
             </summary>
             <param name="Graph">Graph</param>
             <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.GraphToMarkdown(Waher.Script.Graphs.Graph,System.Text.StringBuilder)">
+            <summary>
+            Converts a graph to Markdown.
+            </summary>
+            <param name="Graph">Graph</param>
+            <param name="Markdown">Markdown output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.PixelsToMarkdown(Waher.Script.Graphs.PixelInformation)">
+            <summary>
+            Converts pixels to Markdown.
+            </summary>
+            <param name="Pixels">Pixels</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.PixelsToMarkdown(Waher.Script.Graphs.PixelInformation,System.Text.StringBuilder)">
+            <summary>
+            Converts pixels to Markdown.
+            </summary>
+            <param name="Pixels">Pixels</param>
+            <param name="Markdown">Markdown output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.ImageToMarkdown(SkiaSharp.SKImage)">
+            <summary>
+            Converts an image to Markdown.
+            </summary>
+            <param name="Image">Image</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.ImageToMarkdown(SkiaSharp.SKImage,System.Text.StringBuilder)">
+            <summary>
+            Converts an image to Markdown.
+            </summary>
+            <param name="Image">Image</param>
+            <param name="Markdown">Markdown output.</param>
         </member>
         <member name="T:Waher.Content.Markdown.HtmlSettings">
             <summary>
@@ -4877,6 +4917,11 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.GraphContent.HandlesMarkdown">
+            <summary>
+            If (transportable) Markdown is handled.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.CodeContent.GraphContent.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -4896,6 +4941,17 @@
             <summary>
             If LaTeX is handled.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates (transportanle) Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
@@ -4993,6 +5049,11 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesMarkdown">
+            <summary>
+            If (transportable) Markdown is handled.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -5012,6 +5073,26 @@
             <summary>
             If LaTeX is handled.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates (transportanle) Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateMarkdownFromFile(System.Text.StringBuilder,System.String,System.String)">
+            <summary>
+            Generates Markdown embedding an image available in a file.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="FileName">Image file name.</param>
+            <param name="Title">Optional title.</param>
+            <returns>If Markdown could be generated.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
@@ -5114,6 +5195,11 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesMarkdown">
+            <summary>
+            If (transportable) Markdown is handled.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -5133,6 +5219,17 @@
             <summary>
             If LaTeX is handled.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates (transportanle) Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>

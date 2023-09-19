@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Emoji;
+using Waher.Content.Markdown.Functions;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
@@ -129,68 +131,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Result is Graph G)
 			{
-				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
-				byte[] Bin = Pixels.EncodeAsPng();
-
-				if (AloneInParagraph)
-					Output.Append("<figure>");
-
-				Output.Append("<img border=\"2\" width=\"");
-				Output.Append(GraphSettings.Width.ToString());
-				Output.Append("\" height=\"");
-				Output.Append(GraphSettings.Height.ToString());
-				Output.Append("\" src=\"data:image/png;base64,");
-				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-				Output.Append("\" alt=\"");
-
-				if (G is Graph2D Graph2D && !string.IsNullOrEmpty(Graph2D.Title))
-					Output.Append(XML.Encode(Graph2D.Title));
-				else
-					Output.Append("Graph");
-
-				Output.Append("\" />");
-
-				if (AloneInParagraph)
-					Output.Append("</figure>");
+				ToMarkdown.GraphToMarkdown(G, Output);
+				Output.AppendLine();
 			}
 			else if (Result is PixelInformation Pixels)
 			{
-				byte[] Bin = Pixels.EncodeAsPng();
-
-				if (AloneInParagraph)
-					Output.Append("<figure>");
-
-				Output.Append("<img border=\"2\" width=\"");
-				Output.Append(Pixels.Width.ToString());
-				Output.Append("\" height=\"");
-				Output.Append(Pixels.Height.ToString());
-				Output.Append("\" src=\"data:image/png;base64,");
-				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-				Output.Append("\" alt=\"Image\" />");
-
-				if (AloneInParagraph)
-					Output.Append("</figure>");
+				ToMarkdown.PixelsToMarkdown(Pixels, Output);
+				Output.AppendLine();
 			}
 			else if (Result is SKImage Img)
 			{
-				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
-				{
-					byte[] Bin = Data.ToArray();
-
-					if (AloneInParagraph)
-						Output.Append("<figure>");
-
-					Output.Append("<img border=\"2\" width=\"");
-					Output.Append(Img.Width.ToString());
-					Output.Append("\" height=\"");
-					Output.Append(Img.Height.ToString());
-					Output.Append("\" src=\"data:image/png;base64,");
-					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-					Output.Append("\" alt=\"Image\" />");
-
-					if (AloneInParagraph)
-						Output.Append("</figure>");
-				}
+				ToMarkdown.ImageToMarkdown(Img, Output);
+				Output.AppendLine();
 			}
 			else if (Result is MarkdownDocument Doc)
 			{
@@ -231,47 +183,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				Output.Append("</font>");
 			}
-			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
+			else if (Result is IMatrix M)
 			{
-				Output.Append("<table><thead><tr>");
-
-				foreach (string s2 in M.ColumnNames)
-				{
-					Output.Append("<th>");
-					Output.Append(MarkdownDocument.Encode(s2));
-					Output.Append("</th>");
-				}
-
-				Output.Append("</tr></thead><tbody>");
-
-				int x, y;
-
-				for (y = 0; y < M.Rows; y++)
-				{
-					Output.Append("<tr>");
-
-					for (x = 0; x < M.Columns; x++)
-					{
-						Output.Append("<td>");
-
-						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (!(Item is null))
-						{
-							if (Item is string s2)
-								Output.Append(FormatText(MarkdownDocument.Encode(s2)));
-							else if (Item is MarkdownElement Element)
-								await Element.GenerateMarkdown(Output);
-							else
-								Output.Append(MarkdownDocument.Encode(Expression.ToString(Item)));
-						}
-
-						Output.Append("</td>");
-					}
-
-					Output.Append("</tr>");
-				}
-
-				Output.Append("</tbody></table>");
+				ToMarkdown.MatrixToMarkdown(M, Output);
+				Output.AppendLine();
 			}
 			else if (Result is Array A)
 			{

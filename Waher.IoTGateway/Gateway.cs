@@ -3353,32 +3353,16 @@ namespace Waher.IoTGateway
 		/// <param name="Settings">Graph settings.</param>
 		public static Task SendNotification(Graph Graph, GraphSettings Settings)
 		{
-			PixelInformation Pixels = Graph.CreatePixels(Settings);
-			return SendNotification(Pixels);
+			return SendNotification(ToMarkdown.GraphToMarkdown(Graph));
 		}
 
 		/// <summary>
 		/// Sends an image as a notification message to configured notification recipients.
 		/// </summary>
 		/// <param name="Pixels">Pixels to send.</param>
-		public static async Task SendNotification(PixelInformation Pixels)
+		public static Task SendNotification(PixelInformation Pixels)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Pixels, null);
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append("<figure>");
-			sb.Append("<img border=\"2\" width=\"");
-			sb.Append(Pixels.Width.ToString());
-			sb.Append("\" height=\"");
-			sb.Append(Pixels.Height.ToString());
-			sb.Append("\" src=\"data:");
-			sb.Append(P.Value);
-			sb.Append(";base64,");
-			sb.Append(Convert.ToBase64String(P.Key, 0, P.Key.Length));
-			sb.Append("\" />");
-			sb.Append("</figure>");
-
-			await SendNotification(sb.ToString());
+			return SendNotification(ToMarkdown.PixelsToMarkdown(Pixels));
 		}
 
 		/// <summary>

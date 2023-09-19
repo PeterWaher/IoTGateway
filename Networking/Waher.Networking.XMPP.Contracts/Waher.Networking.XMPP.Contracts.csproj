@@ -37,12 +37,16 @@
     <None Remove="Schema\P2P.xsd" />
     <None Remove="Schema\SmartContracts.xsd" />
     <None Remove="Schema\Xml.xsd" />
+    <None Remove="Schema\Xmlns.xsd" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Schema\E2E.xsd" />
     <EmbeddedResource Include="Schema\LegalIdentities.xsd" />
     <EmbeddedResource Include="Schema\P2P.xsd" />
+    <EmbeddedResource Include="Schema\Xmlns.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Schema\Xml.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -53,6 +57,7 @@
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />

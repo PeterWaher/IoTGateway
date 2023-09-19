@@ -1,0 +1,10 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='http://www.w3.org/2000/xmlns/'
+    xmlns='http://www.w3.org/2000/xmlns/'
+    elementFormDefault='qualified'>
+
+  <xs:attribute name='xmlns' type='xs:string'/>
+
+</xs:schema>

@@ -113,6 +113,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApprovedReadoutParameters.cs" />
     <Compile Include="CustomSensorDataClientRequest.cs" />
     <Compile Include="FieldSubscriptionRule.cs" />
     <Compile Include="InternalReadoutErrorsEventArgs.cs" />

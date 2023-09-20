@@ -18,9 +18,9 @@ Script Syntax: https://waher.se/Script.md#networkingRelatedFunctionsWaherScriptN
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing networking</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
-    <FileVersion>2.0.2</FileVersion>
-    <Version>2.0.2</Version>
+    <AssemblyVersion>2.0.3</AssemblyVersion>
+    <FileVersion>2.0.3</FileVersion>
+    <Version>2.0.3</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

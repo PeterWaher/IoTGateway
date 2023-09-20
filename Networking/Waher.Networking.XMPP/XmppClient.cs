@@ -252,6 +252,11 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceQuickLogin = "http://waher.se/Schema/QL.xsd";
 
 		/// <summary>
+		/// http://waher.se/Schema/AlternativeNames.xsd
+		/// </summary>
+		public const string AlternativesNamespace = "http://waher.se/Schema/Alternatives.xsd";
+
+		/// <summary>
 		/// Regular expression for Full JIDs
 		/// </summary>
 		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);

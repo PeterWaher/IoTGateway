@@ -1,5 +1,4 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 
 namespace Waher.Networking.XMPP.StanzaErrors
 {
@@ -8,6 +7,8 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// </summary>
 	public class ConflictException : StanzaCancelExceptionException
 	{
+		private readonly string[] alternatives;
+
 		/// <summary>
 		/// Access cannot be granted because an existing resource exists with the same name or address; the associated error type SHOULD be "cancel".
 		/// </summary>
@@ -16,6 +17,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public ConflictException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Conflict." : Message, Stanza)
 		{
+			this.alternatives = StreamErrors.ConflictException.GetAlternatives(Stanza);
 		}
 
 		/// <inheritdoc/>
@@ -23,5 +25,15 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		{
 			get { return "conflict"; }
 		}
+
+		/// <summary>
+		/// If response contains alternatives.
+		/// </summary>
+		public bool HasAlternatives => !(this.alternatives is null) && this.alternatives.Length > 0;
+
+		/// <summary>
+		/// Alternatives
+		/// </summary>
+		public string[] Alternatives => this.alternatives;
 	}
 }

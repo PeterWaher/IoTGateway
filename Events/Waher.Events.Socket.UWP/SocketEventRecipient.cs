@@ -24,6 +24,47 @@ namespace Waher.Events.Socket
 		private int inputState = 0;
 		private int inputDepth = 0;
 
+#if WINDOWS_UWP
+		/// <summary>
+		/// Receives events from a socket.
+		/// </summary>
+		private SocketEventRecipient(int Port, bool LogIncomingEvents, params ISniffer[] Sniffers)
+		{
+			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(10), Sniffers);
+			this.logIncoming = LogIncomingEvents;
+		}
+
+		/// <summary>
+		/// Creates and opens a socket-based event recipient.
+		/// </summary>
+		/// <param name="Port">Port to open.</param>
+		/// <param name="LogIncomingEvents">If incoming events should be logged to <see cref="Log"/>.</param>
+		/// <param name="Sniffers">Any sniffers to output communucation to.</param>
+		/// <returns>Event recipient.</returns>
+		public static async Task<SocketEventRecipient> Create(int Port, bool LogIncomingEvents, params ISniffer[] Sniffers)
+		{
+			SocketEventRecipient Result = null;
+
+			try
+			{
+				Result = new SocketEventRecipient(Port, LogIncomingEvents, Sniffers);
+
+				Result.server.OnAccept += Result.Server_OnAccept;
+				Result.server.OnClientConnected += Result.Server_OnClientConnected;
+				Result.server.OnClientDisconnected += Result.Server_OnClientDisconnected;
+				Result.server.OnDataReceived += Result.Server_OnDataReceived;
+
+				await Result.server.Open();
+			}
+			catch (Exception ex)
+			{
+				Result?.Dispose();
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Result;
+		}
+#else
 		/// <summary>
 		/// Receives events from a socket.
 		/// </summary>
@@ -76,6 +117,7 @@ namespace Waher.Events.Socket
 
 			return Result;
 		}
+#endif
 
 		private async Task Server_OnAccept(object Sender, ServerConnectionAcceptEventArgs e)
 		{

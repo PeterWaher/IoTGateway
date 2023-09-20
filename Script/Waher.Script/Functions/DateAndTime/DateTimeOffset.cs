@@ -174,10 +174,16 @@ namespace Waher.Script.Functions.DateAndTime
 			{
 				int i = s.LastIndexOfAny(PlusMinus);
 				if (i < 0)
+				{
+					TP = default;
 					return false;
+				}
 
 				if (!TimeSpan.TryParse(s.Substring(i + 1), out TimeZone))
+				{
+					TP = default;
 					return false;
+				}
 
 				if (s[i] == '-')
 					TimeZone = -TimeZone;
@@ -186,7 +192,10 @@ namespace Waher.Script.Functions.DateAndTime
 			}
 
 			if (!DateTime.TryParse(s, out System.DateTime TP0))
+			{
+				TP = default;
 				return false;
+			}
 
 			TP = new System.DateTimeOffset(TP0, TimeZone);
 			return true;

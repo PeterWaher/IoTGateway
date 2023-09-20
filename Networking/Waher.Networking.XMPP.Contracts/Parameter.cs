@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -122,5 +126,55 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Value">Value</param>
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public abstract void SetValue(object Value);
+
+		/// <summary>
+		/// Imports parameter values from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <returns>If import was successful.</returns>
+		public virtual bool Import(XmlElement Xml)
+		{
+			this.Name = XML.Attribute(Xml, "name");
+			if (string.IsNullOrEmpty(this.Name))
+				return false;
+
+			this.guide = XML.Attribute(Xml, "guide");
+			this.exp = XML.Attribute(Xml, "exp");
+			this.parsed = null;
+
+			List<HumanReadableText> Descriptions = new List<HumanReadableText>();
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "description": // Smart contract
+							HumanReadableText Text = HumanReadableText.Parse(E);
+							if (Text is null || !Text.IsWellDefined)
+								return false;
+
+							Descriptions.Add(Text);
+							break;
+
+						case "Description": // Simplified (ex. state machine note command).
+							Text = HumanReadableText.ParseSimplified(E);
+							if (Text is null || !Text.IsWellDefined)
+								return false;
+
+							Descriptions.Add(Text);
+							break;
+
+						default:
+							return false;
+					}
+				}
+			}
+
+			this.Descriptions = Descriptions.ToArray();
+
+			return true;
+		}
 	}
 }

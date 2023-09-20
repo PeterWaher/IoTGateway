@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
@@ -99,6 +100,25 @@ namespace Waher.Networking.XMPP.Contracts
 				this.Value = d.Date;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
+		}
+
+		/// <summary>
+		/// Imports parameter values from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <returns>If import was successful.</returns>
+		public override bool Import(XmlElement Xml)
+		{
+			if (!base.Import(Xml))
+				return false;
+
+			this.Value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value", DateTime.MinValue).Date : (DateTime?)null;
+			this.Min = Xml.HasAttribute("min") ? XML.Attribute(Xml, "min", DateTime.MinValue).Date : (DateTime?)null;
+			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
+			this.Max = Xml.HasAttribute("max") ? XML.Attribute(Xml, "max", DateTime.MinValue).Date : (DateTime?)null;
+			this.MaxIncluded = XML.Attribute(Xml, "maxIncluded", true);
+
+			return true;
 		}
 
 	}

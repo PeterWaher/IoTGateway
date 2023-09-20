@@ -92,6 +92,13 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.CalcParameter">
             <summary>
             Calculation contractual parameter
@@ -2696,6 +2703,13 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.DateTimeParameter">
             <summary>
             Date and Time contractual parameter
@@ -2715,6 +2729,13 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.DurationParameter">
             <summary>
             Duration contractual parameter
@@ -2733,6 +2754,13 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
@@ -4089,6 +4117,13 @@
             <param name="Xml">XML representation.</param>
             <returns>Human-readable text.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.ParseSimplified(System.Xml.XmlElement)">
+            <summary>
+            Parses simplified human readable text.
+            </summary>
+            <param name="Xml">XML representation.</param>
+            <returns>Human-readable text.</returns>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText.Language">
             <summary>
             Optional language
@@ -4838,6 +4873,13 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Parameter">
             <summary>
             Abstract base class for contractual parameters
@@ -4900,6 +4942,13 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ParsedContract">
             <summary>
@@ -5168,6 +5217,13 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaDigest">
             <summary>
@@ -6803,6 +6859,13 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.TimeParameter">
             <summary>
             Time contractual parameter
@@ -6821,6 +6884,13 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.Import(System.Xml.XmlElement)">
+            <summary>
+            Imports parameter values from its XML definition.
+            </summary>
+            <param name="Xml">XML definition.</param>
+            <returns>If import was successful.</returns>
         </member>
     </members>
 </doc>

@@ -4,6 +4,7 @@ using System.Xml;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements;
+using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {
@@ -25,6 +26,34 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 			{
 				language = XML.Attribute(Xml, "xml:lang"),
 				Body = BlockElement.Parse(Xml)
+			};
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Parses simplified human readable text.
+		/// </summary>
+		/// <param name="Xml">XML representation.</param>
+		/// <returns>Human-readable text.</returns>
+		public static HumanReadableText ParseSimplified(XmlElement Xml)
+		{
+			HumanReadableText Result = new HumanReadableText()
+			{
+				language = XML.Attribute(Xml, "lang"),
+				Body = new BlockElement[]
+				{
+					new Paragraph()
+					{
+						Elements = new InlineElement[]
+						{
+							new Text()
+							{
+								Value = Xml.InnerText
+							}
+						}
+					}
+				}
 			};
 
 			return Result;

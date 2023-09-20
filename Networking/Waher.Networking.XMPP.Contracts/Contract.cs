@@ -654,163 +654,54 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (N2 is XmlElement E2)
 							{
-								string Name = XML.Attribute(E2, "name");
-								if (string.IsNullOrEmpty(Name))
-									return null;
-
-								Descriptions = new List<HumanReadableText>();
-
-								foreach (XmlNode N3 in E2.ChildNodes)
-								{
-									if (N3 is XmlElement E3)
-									{
-										if (E3.LocalName == "description")
-										{
-											Text = HumanReadableText.Parse(E3);
-											if (Text is null || !Text.IsWellDefined)
-												return null;
-
-											Descriptions.Add(Text);
-										}
-										else
-											return null;
-									}
-								}
+								Parameter P2;
 
 								switch (E2.LocalName)
 								{
 									case "stringParameter":
-										Parameters.Add(new StringParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value") : null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											RegEx = XML.Attribute(E2, "regEx"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min") : null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max") : null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											MinLength = E2.HasAttribute("minLength") ? XML.Attribute(E2, "minLength", 0) : (int?)null,
-											MaxLength = E2.HasAttribute("maxLength") ? XML.Attribute(E2, "maxLength", 0) : (int?)null,
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new StringParameter();
 										break;
 
 									case "numericalParameter":
-										Parameters.Add(new NumericalParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", 0.0m) : (decimal?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", 0.0m) : (decimal?)null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", 0.0m) : (decimal?)null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new NumericalParameter();
 										break;
 
 									case "booleanParameter":
-										Parameters.Add(new BooleanParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", false) : (bool?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new BooleanParameter();
 										break;
 
 									case "dateParameter":
-										Parameters.Add(new DateParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", DateTime.MinValue).Date : (DateTime?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", DateTime.MinValue).Date : (DateTime?)null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", DateTime.MinValue).Date : (DateTime?)null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new DateParameter();
 										break;
 
 									case "dateTimeParameter":
-										Parameters.Add(new DateTimeParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", DateTime.MinValue) : (DateTime?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", DateTime.MinValue) : (DateTime?)null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", DateTime.MinValue) : (DateTime?)null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new DateTimeParameter();
 										break;
 
 									case "timeParameter":
-										Parameters.Add(new TimeParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", TimeSpan.Zero) : (TimeSpan?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", TimeSpan.Zero) : (TimeSpan?)null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", TimeSpan.Zero) : (TimeSpan?)null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new TimeParameter();
 										break;
 
 									case "durationParameter":
-										Parameters.Add(new DurationParameter()
-										{
-											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", Waher.Content.Duration.Zero) : (Duration?)null,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", Waher.Content.Duration.Zero) : (Duration?)null,
-											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", Waher.Content.Duration.Zero) : (Duration?)null,
-											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new DurationParameter();
 										break;
 
-
 									case "calcParameter":
-										Parameters.Add(new CalcParameter()
-										{
-											Name = Name,
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new CalcParameter();
 										break;
 
 									case "roleParameter":
-										Parameters.Add(new RoleParameter()
-										{
-											Name = Name,
-											Role = XML.Attribute(E2, "role"),
-											Index = XML.Attribute(E2, "index", 0),
-											Property = XML.Attribute(E2, "property"),
-											Required = XML.Attribute(E2, "required", false),
-											Guide = XML.Attribute(E2, "guide"),
-											Expression = XML.Attribute(E2, "exp"),
-											Descriptions = Descriptions.ToArray()
-										});
+										P2 = new RoleParameter();
 										break;
 
 									default:
 										return null;
 								}
+
+								if (!P2.Import(E2))
+									return null;
+
+								Parameters.Add(P2);
 							}
 						}
 

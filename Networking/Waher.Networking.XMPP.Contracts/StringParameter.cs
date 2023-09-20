@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
@@ -305,6 +306,28 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.value = Value.ToString();
 			this.match = null;
+		}
+
+		/// <summary>
+		/// Imports parameter values from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <returns>If import was successful.</returns>
+		public override bool Import(XmlElement Xml)
+		{
+			if (!base.Import(Xml))
+				return false;
+
+			this.value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
+			this.regEx = XML.Attribute(Xml, "regEx");
+			this.min = Xml.HasAttribute("min") ? XML.Attribute(Xml, "min") : null;
+			this.minIncluded = XML.Attribute(Xml, "minIncluded", true);
+			this.max = Xml.HasAttribute("max") ? XML.Attribute(Xml, "max") : null;
+			this.maxIncluded = XML.Attribute(Xml, "maxIncluded", true);
+			this.minLength = Xml.HasAttribute("minLength") ? XML.Attribute(Xml, "minLength", 0) : (int?)null;
+			this.maxLength = Xml.HasAttribute("maxLength") ? XML.Attribute(Xml, "maxLength", 0) : (int?)null;
+
+			return true;
 		}
 
 	}

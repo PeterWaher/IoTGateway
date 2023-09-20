@@ -5,6 +5,7 @@ using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using System;
+using System.Xml;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -139,5 +140,24 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.value = Value?.ToString() ?? string.Empty;
 		}
+
+		/// <summary>
+		/// Imports parameter values from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <returns>If import was successful.</returns>
+		public override bool Import(XmlElement Xml)
+		{
+			if (!base.Import(Xml))
+				return false;
+
+			this.Role = XML.Attribute(Xml, "role");
+			this.Index = XML.Attribute(Xml, "index", 0);
+			this.Property = XML.Attribute(Xml, "property");
+			this.Required = XML.Attribute(Xml, "required", false);
+
+			return true;
+		}
+
 	}
 }

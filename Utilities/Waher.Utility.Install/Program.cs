@@ -1303,9 +1303,9 @@ namespace Waher.Utility.Install
 								else
 								{
 									if (b == 1)
-										Log.Informational("Application file: " + FileName);
+										Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 									else
-										Log.Informational("Assembly file: " + FileName);
+										Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 									CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
@@ -1392,14 +1392,14 @@ namespace Waher.Utility.Install
 								bool OnlyIfNewer = b == 3;
 
 								FileName = Path.Combine(AppFolder, RelativeName);
-								Log.Informational("Content file: " + FileName);
+								Log.Informational("Content file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
 								using (FileStream TempFile = File.OpenRead(FileName))
 								{
 									FileName = Path.Combine(ProgramDataFolder, RelativeName);
-									Log.Informational("Content file: " + FileName);
+									Log.Informational("Content file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 									CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 								}
@@ -1407,7 +1407,7 @@ namespace Waher.Utility.Install
 
 							case 5: // External application file
 								FileName = Path.Combine(ExternalFolder, RelativeName);
-								Log.Informational("External file: " + FileName);
+								Log.Informational("External file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 								break;

@@ -1003,7 +1003,7 @@ namespace Waher.Utility.Install
 			return ReadBin(Input, Len);
 		}
 
-		private static byte[] ReadBin(Stream Input, ulong Len)
+		public static byte[] ReadBin(Stream Input, ulong Len)
 		{
 			if (Len > int.MaxValue)
 				throw new Exception("Invalid package.");

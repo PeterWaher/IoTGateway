@@ -636,7 +636,7 @@ namespace Waher.IoTGateway
 					else
 						Log.Notice("System needs to be configured. This is done by navigating to the machine using a browser on another machine in the same network.");
 
-					webServer = new HttpServer(new int[] { HttpServer.DefaultHttpPort, 8080, 8081, 8082 }, null, null)
+					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null)
 					{
 						ResourceOverrideFilter = "(?<!Login)[.]md(\\?[.]*)?$",
 						LoginAuditor = loginAuditor

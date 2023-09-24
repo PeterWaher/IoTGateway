@@ -56,7 +56,7 @@ namespace Waher.Events.WindowsEventLog
 			if (this.eventLog != IntPtr.Zero)
 			{
 				Win32.DeregisterEventSource(this.eventLog);
-				eventLog = IntPtr.Zero;
+				this.eventLog = IntPtr.Zero;
 			}
 		}
 

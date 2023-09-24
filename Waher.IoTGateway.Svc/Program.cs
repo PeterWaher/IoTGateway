@@ -16,6 +16,7 @@ using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
+using System.Diagnostics;
 
 namespace Waher.IoTGateway.Svc
 {
@@ -142,7 +143,6 @@ namespace Waher.IoTGateway.Svc
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
-				Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway"));
 				Log.Informational("Program started.");
 
 				for (i = 0; i < c; i++)
@@ -269,6 +269,8 @@ namespace Waher.IoTGateway.Svc
 					return -1;
 				}
 
+				Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName));
+
 				if (Install && Uninstall)
 				{
 					Log.Error("Conflicting arguments.");
@@ -278,6 +280,18 @@ namespace Waher.IoTGateway.Svc
 
 				if (Install)
 				{
+					string EventSource = "IoTGateway" + InstanceName;
+					if (!EventLog.Exists(EventSource) || !EventLog.SourceExists(EventSource))
+					{
+						Log.Informational("Creating event source.",
+							new KeyValuePair<string, object>("Source", EventSource));
+
+						EventLog.CreateEventSource(new EventSourceCreationData(EventSource, EventSource));
+						
+						Log.Informational("Event source created.",
+							new KeyValuePair<string, object>("Source", EventSource));
+					}
+
 					Log.Informational("Installing service.");
 
 					InstallService(ServiceName, InstanceName, DisplayName, Description, StartType, Immediate,
@@ -294,6 +308,36 @@ namespace Waher.IoTGateway.Svc
 				{
 					Log.Informational("Uninstalling service.");
 					UninstallService(ServiceName, InstanceName);
+
+					try
+					{
+						string EventSource = "IoTGateway" + InstanceName;
+						if (EventLog.Exists(EventSource))
+						{
+							Log.Informational("Deleting event log.",
+								new KeyValuePair<string, object>("Source", EventSource));
+
+							EventLog.Delete(EventSource);
+
+							Log.Informational("Event log deleted.",
+								new KeyValuePair<string, object>("Source", EventSource));
+						}
+
+						if (EventLog.SourceExists(EventSource))
+						{
+							Log.Informational("Deleting event source.",
+								new KeyValuePair<string, object>("Source", EventSource));
+
+							EventLog.DeleteEventSource(EventSource);
+
+							Log.Informational("Event source deleted.",
+								new KeyValuePair<string, object>("Source", EventSource));
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 
 					return 0;
 				}

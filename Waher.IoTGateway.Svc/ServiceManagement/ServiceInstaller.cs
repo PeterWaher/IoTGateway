@@ -15,10 +15,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 	public class ServiceInstaller
 	{
 		private readonly string serviceName;
+		private readonly string instanceName;
 
 		internal ServiceInstaller(string ServiceName, string InstanceName)
 		{
 			this.serviceName = ServiceName;
+			this.instanceName = InstanceName;
+
 			if (!string.IsNullOrEmpty(InstanceName))
 				this.serviceName += " " + InstanceName;
 		}
@@ -46,16 +49,19 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		{
 			string Path = Assembly.GetExecutingAssembly().Location.Replace(".dll", ".exe");
 
+			if (!string.IsNullOrEmpty(this.instanceName))
+				Path += " -instance \"" + this.instanceName + "\"";
+
 			try
 			{
 				using ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All);
-			
+
 				if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
 					out Win32Exception errorException))
 				{
 					using (existingService)
 					{
-						existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess, StartType, 
+						existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess, StartType,
 							ErrorSeverity.Normal, Credentials);
 
 						if (!string.IsNullOrEmpty(Description))
@@ -124,7 +130,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			try
 			{
 				using ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All);
-				
+
 				if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
 					out Win32Exception errorException))
 				{

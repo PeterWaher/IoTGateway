@@ -20,10 +20,14 @@ namespace Waher.IoTGateway.Svc
 		/// Gateway Service
 		/// </summary>
 		/// <param name="ServiceName">Service Name</param>
-		public GatewayService(string ServiceName)
+		/// <param name="InstanceName">Name of service instance.</param>
+		public GatewayService(string ServiceName, string InstanceName)
 			: base()
 		{
 			this.ServiceName = ServiceName;
+			if (!string.IsNullOrEmpty(InstanceName))
+				this.ServiceName += " " + InstanceName;
+
 			this.AutoLog = true;
 			this.CanHandlePowerEvent = true;
 			this.CanHandleSessionChangeEvent = true;
@@ -38,27 +42,26 @@ namespace Waher.IoTGateway.Svc
 			{
 				bool Started;
 
-				if (starting)
+				if (this.starting)
 					Started = false;
 				else
 				{
-					using (PendingTimer Timer = new PendingTimer(this))
+					using PendingTimer Timer = new PendingTimer(this);
+
+					Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+					Gateway.GetDatabaseProvider += Program.GetDatabase;
+					Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
+					Gateway.OnTerminate += this.TerminateService;
+
+					this.starting = true;
+					try
 					{
-						Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-
-						Gateway.GetDatabaseProvider += Program.GetDatabase;
-						Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
-						Gateway.OnTerminate += this.TerminateService;
-
-						starting = true;
-						try
-						{
-							Started = Gateway.Start(false, true, Program.InstanceName).Result;
-						}
-						finally
-						{
-							starting = false;
-						}
+						Started = Gateway.Start(false, true, Program.InstanceName).Result;
+					}
+					finally
+					{
+						this.starting = false;
 					}
 				}
 
@@ -133,21 +136,20 @@ namespace Waher.IoTGateway.Svc
 			{
 				bool Started;
 
-				if (starting)
+				if (this.starting)
 					Started = false;
 				else
 				{
-					using (PendingTimer Timer = new PendingTimer(this))
+					using PendingTimer Timer = new PendingTimer(this);
+
+					this.starting = true;
+					try
 					{
-						starting = true;
-						try
-						{
-							Started = Gateway.Start(false, true, Program.InstanceName).Result;
-						}
-						finally
-						{
-							starting = false;
-						}
+						Started = Gateway.Start(false, true, Program.InstanceName).Result;
+					}
+					finally
+					{
+						this.starting = false;
 					}
 				}
 
@@ -183,7 +185,7 @@ namespace Waher.IoTGateway.Svc
 					{
 						this.autoPaused = false;
 
-						if (starting)
+						if (this.starting)
 							Log.Warning("Gateway is in the process of starting, called from another source.");
 						else
 						{

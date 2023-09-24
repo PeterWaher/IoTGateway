@@ -16,9 +16,11 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 	{
 		private readonly string serviceName;
 
-		internal ServiceInstaller(string ServiceName)
+		internal ServiceInstaller(string ServiceName, string InstanceName)
 		{
 			this.serviceName = ServiceName;
+			if (!string.IsNullOrEmpty(InstanceName))
+				this.serviceName += " " + InstanceName;
 		}
 
 		/// <summary>

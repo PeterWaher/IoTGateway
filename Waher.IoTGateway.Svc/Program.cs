@@ -280,7 +280,7 @@ namespace Waher.IoTGateway.Svc
 				{
 					Log.Informational("Installing service.");
 
-					InstallService(ServiceName, DisplayName, Description, StartType, Immediate, 
+					InstallService(ServiceName, InstanceName, DisplayName, Description, StartType, Immediate,
 						new ServiceFailureActions(TimeSpan.FromDays(1), null, null, new ScAction[]
 						{
 							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
@@ -293,7 +293,7 @@ namespace Waher.IoTGateway.Svc
 				else if (Uninstall)
 				{
 					Log.Informational("Uninstalling service.");
-					UninstallService(ServiceName);
+					UninstallService(ServiceName, InstanceName);
 
 					return 0;
 				}
@@ -307,7 +307,7 @@ namespace Waher.IoTGateway.Svc
 					else
 					{
 						Log.Informational("Running as service application.");
-						RunAsService(ServiceName);
+						RunAsService(ServiceName, InstanceName);
 					}
 
 					return 1;   // Allows the service to be restarted.
@@ -321,13 +321,15 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private static void RunAsService(string ServiceName)
+		private static void RunAsService(string ServiceName, string InstanceName)
 		{
 			try
 			{
-				Log.Informational("Starting service.");
+				Log.Informational("Starting service.",
+					new KeyValuePair<string, object>("Service Name", ServiceName),
+					new KeyValuePair<string, object>("Instance Name", InstanceName));
 
-				using GatewayService Service = new GatewayService(ServiceName);
+				using GatewayService Service = new GatewayService(ServiceName, InstanceName);
 				ServiceBase.Run(Service);
 			}
 			catch (Exception ex)
@@ -441,10 +443,10 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, 
-			bool Immediate, ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
+		private static void InstallService(string ServiceName, string InstanceName, string DisplayName, string Description, 
+			ServiceStartType StartType, bool Immediate, ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
-			ServiceInstaller host = new ServiceInstaller(ServiceName);
+			ServiceInstaller host = new ServiceInstaller(ServiceName, InstanceName);
 			int i;
 
 			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
@@ -470,9 +472,9 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private static void UninstallService(string ServiceName)
+		private static void UninstallService(string ServiceName, string InstanceName)
 		{
-			ServiceInstaller host = new ServiceInstaller(ServiceName);
+			ServiceInstaller host = new ServiceInstaller(ServiceName, InstanceName);
 
 			if (host.Uninstall())
 				Console.Out.WriteLine("Service successfully uninstalled.");

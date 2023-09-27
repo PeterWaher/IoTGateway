@@ -6,7 +6,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
@@ -239,15 +238,15 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append("HalleySmoothFractal(");
+			sb.Append("HalleySmoothFractal((");
 			sb.Append(Expression.ToString(r));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Expression.ToString(i));
-			sb.Append(",");
+			sb.Append("),");
 			sb.Append(Expression.ToString(Size / 4));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Expression.ToString(R));
-			sb.Append(",");
+			sb.Append(',');
 
 			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
@@ -258,15 +257,15 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (!string.IsNullOrEmpty(ColorExpression))
 			{
-				sb.Append(",");
+				sb.Append(',');
 				sb.Append(ColorExpression);
 			}
 
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(DimX.ToString());
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(DimY.ToString());
-			sb.Append(")");
+			sb.Append(')');
 
 			return sb.ToString();
 		}

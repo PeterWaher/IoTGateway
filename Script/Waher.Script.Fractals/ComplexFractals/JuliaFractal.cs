@@ -189,7 +189,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             sb.Append("JuliaFractal((");
             sb.Append(Expression.ToString(r));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(i));
             sb.Append("),");
 
@@ -199,25 +199,25 @@ namespace Waher.Script.Fractals.ComplexFractals
             {
                 sb.Append('(');
                 sb.Append(Expression.ToString(r0));
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(Expression.ToString(i0));
                 sb.Append(')');
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Size / 4));
 
             if (!string.IsNullOrEmpty(ColorExpression))
             {
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(ColorExpression);
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

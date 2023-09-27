@@ -7,7 +7,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Fractals.IFS
@@ -328,31 +327,31 @@ namespace Waher.Script.Fractals.IFS
 
             sb.Append("FlameFractalRgba(");
             sb.Append(Expression.ToString(r));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(i));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Size / 4));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(N.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(FunctionsExpression);
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Preview));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Parallel));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(SuperSampling.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Gamma));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Vibrancy));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Seed.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

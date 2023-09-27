@@ -168,41 +168,41 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             sb.Append("NovaSmoothFractal(");
             sb.Append(Expression.ToString(r));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(i));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Size / 4));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(Rr));
 
             if (Ri != 0)
             {
-                sb.Append("+");
+                sb.Append('+');
                 sb.Append(Expression.ToString(Ri));
                 sb.Append("*i");
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(pr));
 
             if (pi != 0)
             {
-                sb.Append("+");
+                sb.Append('+');
                 sb.Append(Expression.ToString(pi));
                 sb.Append("*i");
             }
             
             if (!string.IsNullOrEmpty(ColorExpression))
             {
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(ColorExpression);
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

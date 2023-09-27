@@ -219,28 +219,28 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("NewtonBuilderFractal(");
+            sb.Append("NewtonBuilderFractal((");
             sb.Append(Expression.ToString(rc));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(ic));
-            sb.Append(",");
+            sb.Append("),");
             sb.Append(Expression.ToString(Size));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(R));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(C2));
 
             if (!string.IsNullOrEmpty(ColorExpression))
             {
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(ColorExpression);
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

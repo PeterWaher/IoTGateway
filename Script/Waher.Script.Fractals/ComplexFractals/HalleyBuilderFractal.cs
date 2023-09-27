@@ -1,11 +1,9 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Exceptions;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
@@ -215,28 +213,28 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("HalleyBuilderFractal(");
+            sb.Append("HalleyBuilderFractal((");
             sb.Append(Expression.ToString(rc));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(ic));
-            sb.Append(",");
+            sb.Append("),");
             sb.Append(Expression.ToString(Size));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(R));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(C2));
 
             if (!string.IsNullOrEmpty(ColorExpression))
             {
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(ColorExpression);
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

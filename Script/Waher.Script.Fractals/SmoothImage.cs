@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -64,9 +63,9 @@ namespace Waher.Script.Fractals
 
 			for (i = j = 0; i < c; i++)
 			{
-				R[i] = Bin[j++];
-				G[i] = Bin[j++];
 				B[i] = Bin[j++];
+				G[i] = Bin[j++];
+				R[i] = Bin[j++];
 				A[i] = Bin[j++];
 			}
 

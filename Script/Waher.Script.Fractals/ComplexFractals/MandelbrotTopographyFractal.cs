@@ -162,31 +162,29 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("MandelbrotTopographyFractal(");
+            sb.Append("MandelbrotTopographyFractal((");
             sb.Append(Expression.ToString(r));
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(Expression.ToString(i));
+			sb.Append("),");
 
-            if (!(f is null))
-            {
-                sb.Append(",");
+			if (!(f is null))
                 sb.Append(f.SubExpression);
-            }
-
-            sb.Append(",");
+             
+            sb.Append(',');
             sb.Append(Expression.ToString(Size / 4));
 
             if (!string.IsNullOrEmpty(ColorExpression))
             {
-                sb.Append(",");
+                sb.Append(',');
                 sb.Append(ColorExpression);
             }
 
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimX.ToString());
-            sb.Append(",");
+            sb.Append(',');
             sb.Append(DimY.ToString());
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

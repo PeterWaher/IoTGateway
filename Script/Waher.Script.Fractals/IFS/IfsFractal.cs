@@ -307,21 +307,21 @@ namespace Waher.Script.Fractals.IFS
 
 			sb.Append("IfsFractal(");
 			sb.Append(Expression.ToString(r));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Expression.ToString(i));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Expression.ToString(Size / 4));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(N.ToString());
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(FunctionsExpression);
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(DimX.ToString());
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(DimY.ToString());
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Seed.ToString());
-			sb.Append(")");
+			sb.Append(')');
 
 			return sb.ToString();
 		}

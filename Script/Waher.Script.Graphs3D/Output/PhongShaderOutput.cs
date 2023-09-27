@@ -31,7 +31,7 @@ namespace Waher.Script.Graphs3D.Output
 			sb.Append(Expression.ToString(Shader.Material));
 			sb.Append(',');
 			sb.Append(Expression.ToString(Shader.Ambient));
-			sb.Append(",");
+			sb.Append(',');
 			sb.Append(Expression.ToString(Shader.Sources));
 			sb.Append(')');
 

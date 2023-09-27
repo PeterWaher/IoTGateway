@@ -564,7 +564,7 @@ namespace Waher.Script.Operators
 				}
 			}
 
-			Result.Append(")");
+			Result.Append(')');
 
 			return Result.ToString();
 		}

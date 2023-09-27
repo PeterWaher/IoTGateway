@@ -103,7 +103,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			foreach (MarkdownElement E in this.Children)
 				await E.GenerateLaTeX(Output);
 
-			Output.Append("}");
+			Output.Append('}');
 		}
 
 		/// <summary>

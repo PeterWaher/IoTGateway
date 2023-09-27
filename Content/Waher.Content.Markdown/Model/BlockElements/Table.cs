@@ -717,7 +717,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						await E.GenerateLaTeX(Output);
 
 					if (k > 1)
-						Output.Append("}");
+						Output.Append('}');
 				}
 
 				Output.AppendLine("\\\\");
@@ -751,7 +751,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						await E.GenerateLaTeX(Output);
 
 					if (k > 1)
-						Output.Append("}");
+						Output.Append('}');
 				}
 
 				Output.AppendLine("\\\\");

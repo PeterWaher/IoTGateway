@@ -112,7 +112,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				Output.Append(" [");
 				Output.Append(Nr.ToString());
-				Output.Append("]");
+				Output.Append(']');
 			}
 
 			return Task.CompletedTask;

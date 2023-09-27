@@ -2090,7 +2090,7 @@ namespace Waher.Content.Markdown
 								Text.Append(State.UntilToken("</SCRIPT>"));
 								Text.Append("</");
 								Text.Append(Url.Substring(1, 6));
-								Text.Append(">");
+								Text.Append('>');
 
 								Elements.AddLast(new InlineHTML(this, Text.ToString()));
 							}
@@ -4969,7 +4969,7 @@ namespace Waher.Content.Markdown
 						if (sb is null)
 							sb = new StringBuilder();
 						else
-							sb.Append(" ");
+							sb.Append(' ');
 
 						sb.Append(P.Key);
 					}

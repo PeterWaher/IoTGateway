@@ -35,7 +35,7 @@ namespace Waher.Script.Graphs3D.Output
 			sb.Append(Expression.ToString(Material.SpecularReflectionConstant));
 			sb.Append(',');
 			sb.Append(Expression.ToString(Material.Shininess));
-			sb.Append(")");
+			sb.Append(')');
 
 			return sb.ToString();
 		}

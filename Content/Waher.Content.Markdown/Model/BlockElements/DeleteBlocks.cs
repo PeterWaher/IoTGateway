@@ -132,7 +132,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 				await E.GenerateLaTeX(Output);
 
-			Output.Append("}");
+			Output.Append('}');
 		}
 
 		/// <summary>

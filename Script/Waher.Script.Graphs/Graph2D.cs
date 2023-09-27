@@ -1009,7 +1009,7 @@ namespace Waher.Script.Graphs
 				if (sb is null)
 					sb = new StringBuilder("[");
 				else
-					sb.Append(",");
+					sb.Append(',');
 
 				sb.Append(((float)d).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 			}
@@ -1038,7 +1038,7 @@ namespace Waher.Script.Graphs
 				if (sb is null)
 					sb = new StringBuilder("DateTime([");
 				else
-					sb.Append(",");
+					sb.Append(',');
 
 				int Year = d.Year;
 				int Month = d.Month;
@@ -1145,7 +1145,7 @@ namespace Waher.Script.Graphs
 				if (sb is null)
 					sb = new StringBuilder("TimeSpan([");
 				else
-					sb.Append(",");
+					sb.Append(',');
 
 				int Days = TS.Days;
 				int Hours = TS.Hours;

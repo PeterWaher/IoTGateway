@@ -47,7 +47,7 @@ namespace Waher.Content.Images.Exif
 			else
 				sb.Append(this.name.ToString());
 			
-			sb.Append("=");
+			sb.Append('=');
 
 			object Value = this.Value;
 

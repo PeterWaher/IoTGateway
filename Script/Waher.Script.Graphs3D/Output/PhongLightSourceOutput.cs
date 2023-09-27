@@ -33,7 +33,7 @@ namespace Waher.Script.Graphs3D.Output
 			sb.Append(Expression.ToString(Source.Specular));
 			sb.Append(',');
 			sb.Append(Expression.ToString(Source.Position));
-			sb.Append(")");
+			sb.Append(')');
 
 			return sb.ToString();
 		}

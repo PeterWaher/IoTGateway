@@ -131,7 +131,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Output.Append("\\texttt{");
 			Output.Append(InlineText.EscapeLaTeX(this.code));
-			Output.Append("}");
+			Output.Append('}');
 
 			return Task.CompletedTask;
 		}

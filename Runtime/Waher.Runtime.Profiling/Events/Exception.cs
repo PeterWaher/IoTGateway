@@ -70,7 +70,7 @@ namespace Waher.Runtime.Profiling.Events
 		{
 			StringBuilder Output = States.GetBuilder(this.Ticks);
 
-			Output.Append("X");
+			Output.Append('X');
 			Output.Append(this.ordinal.ToString());
 			Output.Append(" -> ");
 			Output.Append(this.Thread.Key);

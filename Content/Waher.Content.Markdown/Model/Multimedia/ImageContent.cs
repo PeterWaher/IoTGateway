@@ -154,9 +154,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 					if (Item.Width.HasValue)
 					{
-						Output.Append(" ");
+						Output.Append(' ');
 						Output.Append(Item.Width.Value.ToString());
-						Output.Append("w");
+						Output.Append('w');
 					}
 				}
 

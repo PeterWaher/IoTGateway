@@ -35,7 +35,7 @@ namespace Waher.Script.Graphs3D.Output
 			sb.Append(Expression.ToString(Intensity.Blue));
 			sb.Append(',');
 			sb.Append(Expression.ToString(Intensity.Alpha));
-			sb.Append(")");
+			sb.Append(')');
 
 			return sb.ToString();
 		}

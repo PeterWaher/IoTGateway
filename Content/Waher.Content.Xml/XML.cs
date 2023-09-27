@@ -114,7 +114,7 @@ namespace Waher.Content.Xml
 				sb.Append(DT.Millisecond.ToString("D3"));
 
 				if (DT.Kind == DateTimeKind.Utc)
-					sb.Append("Z");
+					sb.Append('Z');
 			}
 
 			return sb.ToString();
@@ -209,7 +209,7 @@ namespace Waher.Content.Xml
 			{
 				Xml.Append(" xmlns='");
 				Xml.Append(Namespace);
-				Xml.Append("'");
+				Xml.Append('\'');
 			}
 
 			bool HasChildren = false;

@@ -19,7 +19,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		private static readonly ArgumentType[] argumentTypes3Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar };
 
 		/// <summary>
-		/// Plots a two-dimensional line.
+		/// Plots a two-dimensional horizontal line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -33,7 +33,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional line.
+		/// Plots a two-dimensional horizontal line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -48,7 +48,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional line.
+		/// Plots a two-dimensional horizontal line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>

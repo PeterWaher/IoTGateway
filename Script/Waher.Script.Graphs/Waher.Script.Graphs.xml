@@ -1696,7 +1696,7 @@
         </member>
         <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Plots a two-dimensional line.
+            Plots a two-dimensional horizontal line.
             </summary>
             <param name="X">X-axis.</param>
             <param name="Y">Y-axis.</param>
@@ -1707,7 +1707,7 @@
         </member>
         <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Plots a two-dimensional line.
+            Plots a two-dimensional horizontal line.
             </summary>
             <param name="X">X-axis.</param>
             <param name="Y">Y-axis.</param>
@@ -1719,7 +1719,7 @@
         </member>
         <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Plots a two-dimensional line.
+            Plots a two-dimensional horizontal line.
             </summary>
             <param name="X">X-axis.</param>
             <param name="Y">Y-axis.</param>

@@ -1172,31 +1172,35 @@ The named colors will be recognized, and converted to the corresponding color.
 The following functions are available in the `Waher.Script.Graphs` library. In an interactive script environment, clicking on the resulting graphs
 will return a vector corresponding to the point under the mouse.
 
-| Function                                | Description                                           | Example                                   |
-|-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
-| `Canvas(Width,Height[Color[,BgColor]])` | Creates a 2D canvas for custom drawing.               | [Example](CanvasExample)                  |
-| `HorizontalBars(Labels,Values[,Color])` | Plots a two-dimensional stacked horizontal bar chart. | [Example][HorizontalBarsExample]          |
-| `Plot2DArea(X,Y[,Color])`               | Plots a stacked area chart.                           | [Example][Plot2DAreaExample]              |
-| `Plot2DCurve(X,Y[,Color[,PenSize]])`    | Plots a smooth two-dimensional curve.                 | [Example][Plot2DCurveExample]             |
-| `Plot2DCurveArea(X,Y[,Color])`          | Plots a stacked spline area chart.                    | [Example][Plot2DCurveAreaExample]         |
-| `Plot2DLayeredArea(X,Y[,Color])`        | Plots a layered area chart.                           | [Example][Plot2DLayeredAreaExample]       |
-| `Plot2DLayeredCurveArea(X,Y[,Color])`   | Plots a layered spline area chart.                    | [Example][Plot2DLayeredCurveAreaExample]  |
-| `Plot2DLayeredLineArea(X,Y[,Color])`    | Alias for `Plot2DLayeredArea`.                        | [Example][Plot2DLayeredLineAreaExample]   |
-| `Plot2DLayeredSplineArea(X,Y[,Color])`  | Alias for `Plot2DLayeredCurveArea`.                   | [Example][Plot2DLayeredSplineAreaExample] |
-| `Plot2DLine(X,Y[,Color[,PenSize]])`     | Alias for `Plot2DCurve`.                              | [Example][Plot2DLineExample]              |
-| `Plot2DLineArea(X,Y[,Color])`           | Alias for `Plot2DArea`.                               | [Example][Plot2DLineAreaExample]          |
-| `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
-| `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
-| `Polygon2D(X,Y[,Color])`                | Plots a filled polygon.                               | [Example][Polygon2DExample]               |
-| `SameScale(Graph)`                      | Informs the graph to use the same scale for all axes. | [Example][SameScaleExample]               |
-| `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
-| `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
+| Function                                           | Description                                           | Example                                   |
+|----------------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `Canvas(Width,Height[Color[,BgColor]])`            | Creates a 2D canvas for custom drawing.               | [Example](CanvasExample)                  |
+| `HorizontalBars(Labels,Values[,Color])`            | Plots a two-dimensional stacked horizontal bar chart. | [Example][HorizontalBarsExample]          |
+| `Plot2DArea(X,Y[,Color])`                          | Plots a stacked area chart.                           | [Example][Plot2DAreaExample]              |
+| `Plot2DCurve(X,Y[,Color[,PenSize]])`               | Plots a smooth two-dimensional curve.                 | [Example][Plot2DCurveExample]             |
+| `Plot2DCurveArea(X,Y[,Color])`                     | Plots a stacked spline area chart.                    | [Example][Plot2DCurveAreaExample]         |
+| `Plot2DH(X,Y,Mode[,Color[,PenSize]])`              | Alias for `Plot2dHorizontalLine`.                     | [Example][Plot2DHLineExample]             |
+| `Plot2DHorizontalLine(X,Y,Mode[,Color[,PenSize]])` | Plots a two-dimensional horizontal line graph.        | [Example][Plot2DHorizontalLineExample]    |
+| `Plot2DLayeredArea(X,Y[,Color])`                   | Plots a layered area chart.                           | [Example][Plot2DLayeredAreaExample]       |
+| `Plot2DLayeredCurveArea(X,Y[,Color])`              | Plots a layered spline area chart.                    | [Example][Plot2DLayeredCurveAreaExample]  |
+| `Plot2DLayeredLineArea(X,Y[,Color])`               | Alias for `Plot2DLayeredArea`.                        | [Example][Plot2DLayeredLineAreaExample]   |
+| `Plot2DLayeredSplineArea(X,Y[,Color])`             | Alias for `Plot2DLayeredCurveArea`.                   | [Example][Plot2DLayeredSplineAreaExample] |
+| `Plot2DLine(X,Y[,Color[,PenSize]])`                | Plots a two-dimensional line graph.                   | [Example][Plot2DLineExample]              |
+| `Plot2DLineArea(X,Y[,Color])`                      | Alias for `Plot2DArea`.                               | [Example][Plot2DLineAreaExample]          |
+| `Plot2DSpline(X,Y[,Color[,PenSize]])`              | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
+| `Plot2DSplineArea(X,Y[,Color])`                    | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
+| `Polygon2D(X,Y[,Color])`                           | Plots a filled polygon.                               | [Example][Polygon2DExample]               |
+| `SameScale(Graph)`                                 | Informs the graph to use the same scale for all axes. | [Example][SameScaleExample]               |
+| `Scatter2D(X,Y[,Color[,BulletSize]])`              | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
+| `VerticalBars(Labels,Values[,Color])`              | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
 [CanvasExample]: Prompt.md?Expression=Canvas%28500,500,"Red","White"%29
 [HorizontalBarsExample]: Prompt.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BHorizontalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BHorizontalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 [Plot2DAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2darea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2darea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DCurveExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)
 [Plot2DCurveAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Plot2DHLineExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3Bplot2dhline(x%2Cy%2C0%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy%2C%22Blue%22%2C5)%2Bplot2dline(x%2Cy%2C%22Blue%22%2C1)%3B
+[Plot2DHorizontalLineExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3Bplot2dHorizontalLine(x%2Cy%2C0%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy%2C%22Blue%22%2C5)%2Bplot2dline(x%2Cy%2C%22Blue%22%2C1)%3B
 [Plot2DLayeredAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredarea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredarea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DLayeredCurveAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
 [Plot2DLayeredLineAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)

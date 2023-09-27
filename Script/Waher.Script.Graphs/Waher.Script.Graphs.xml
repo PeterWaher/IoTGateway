@@ -1684,6 +1684,91 @@
             <param name="A">Corresponding coefficients for first control points.</param>
             <param name="B">Corresponding coefficients for second control points.</param>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine">
+            <summary>
+            Plots a two-dimensional horizontal line.
+            </summary>
+            <example>
+            x:=-10..10;
+            y:=sin(x);
+            plot2dhline(x,y,0,"Red",5)+scatter2d(x,y,"Blue",5)+plot2dline(x,y,"Blue",1);
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Color">Color</param>
+            <param name="Size">Size</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLinePainter">
+            <summary>
+            Plots a two-dimensional horizontal line graph.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLinePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea">
             <summary>
             Plots a two-dimensional layered area chart.
@@ -1893,7 +1978,7 @@
         </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter">
             <summary>
-            Plots a two-dimensional line.
+            Plots a two-dimensional line graph.
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">

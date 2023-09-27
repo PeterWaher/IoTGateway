@@ -1,11 +1,12 @@
 ﻿using SkiaSharp;
+using System;
 
 namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
-	/// Plots a two-dimensional line graph.
+	/// Plots a two-dimensional horizontal line graph.
 	/// </summary>
-	public class Plot2DLinePainter : SingleColorGraphPainter, IPainter2D
+	public class Plot2DHorizontalLinePainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.
@@ -21,11 +22,13 @@ namespace Waher.Script.Graphs.Functions.Plots
 		{
 			SKPaint Pen = null;
 			SKPath Path = null;
+			SKPoint Last = default;
 			bool First = true;
+			int Mode = Math.Sign(Expression.ToDouble(Parameters[0]));
 
 			try
 			{
-				Pen = Graph.ToPen(Parameters[0], Parameters[1]);
+				Pen = Graph.ToPen(Parameters[1], Parameters[2]);
 				Path = new SKPath();
 
 				foreach (SKPoint Point in Points)
@@ -35,8 +38,34 @@ namespace Waher.Script.Graphs.Functions.Plots
 						First = false;
 						Path.MoveTo(Point);
 					}
-					else
+					else if (Point.Y == Last.Y || Point.X == Last.X)
 						Path.LineTo(Point);
+					else
+					{
+						switch (Mode)
+						{
+							case -1:
+								Path.LineTo(Last.X, Point.Y);
+								Path.LineTo(Point);
+								break;
+
+							case 0:
+								float xm = (Last.X + Point.X) / 2;
+								Path.LineTo(xm, Last.Y);
+								Path.LineTo(xm, Point.Y);
+								Path.LineTo(Point);
+								break;
+
+							case 1:
+								Path.LineTo(Point.X, Last.Y);
+								Path.LineTo(Point);
+								break;
+						}
+
+						Path.LineTo(Point);
+					}
+
+					Last = Point;
 				}
 
 				Canvas.DrawPath(Path, Pen);

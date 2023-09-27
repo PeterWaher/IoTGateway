@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
@@ -170,10 +169,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get { return this; }
-		}
+		public override object AssociatedObjectValue => this;
 
 		/// <summary>
 		/// Tries to multiply an element to the current element, from the left.
@@ -280,24 +276,12 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// If the element represents a scalar value.
 		/// </summary>
-		public override bool IsScalar
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool IsScalar => false;
 
 		/// <summary>
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
-		public override ICollection<IElement> ChildElements
-		{
-			get
-			{
-				return this.Elements;
-			}
-		}
+		public override ICollection<IElement> ChildElements => this.Elements;
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.

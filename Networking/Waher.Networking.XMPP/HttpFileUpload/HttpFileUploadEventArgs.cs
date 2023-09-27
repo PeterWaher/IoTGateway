@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 	public class HttpFileUploadEventArgs : IqResultEventArgs
 	{
 		/// <summary>
-		/// Maximum chunk size, in ranged PUT requests, is 20 MB by default.
+		/// Maximum chunk size, in ranged PUT/PATCH requests, is 20 MB by default.
 		/// </summary>
 		public const int DefaultMaxChunkSize = 20 * 1024 * 1024;
 
@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		public KeyValuePair<string, string>[] PutHeaders => this.putHeaders;
 
 		/// <summary>
-		/// Maximum Chunk Size. If uploading a larger file, ranged PUT requests will
+		/// Maximum Chunk Size. If uploading a larger file, ranged PUT/PATCH requests will
 		/// be performed until file is completely uploaded. The timeout property is
 		/// calculated on each ranged PUT request individually, and not on the total
 		/// time it takes to upload the entire file.
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			}
 			else
 			{
-				// Ranged PUT
+				// Ranged PATCH
 
 				using (HttpClient HttpClient = new HttpClient())
 				{
@@ -174,14 +174,21 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 						Body.Headers.Add("Content-Type", ContentType);
 						Body.Headers.Add("Content-Range", "bytes " + Pos.ToString() + "-" + (Pos + c - 1).ToString() + "/" + Len.ToString());
 
-						this.LogSent(HttpClient, this.PutUrl, Body);
+						using (HttpRequestMessage RequestMessage = new HttpRequestMessage(
+							new HttpMethod("PATCH"), this.putUrl)
+							{
+								Content = Body
+							})
+						{
+							this.LogSent(HttpClient, this.PutUrl, Body, "PATCH");
 
-						HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Body);
+							HttpResponseMessage Response = await HttpClient.SendAsync(RequestMessage);
 
-						this.LogReceived(Response);
+							this.LogReceived(Response);
 
-						if (!Response.IsSuccessStatusCode)
-							await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+							if (!Response.IsSuccessStatusCode)
+								await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+						}
 
 						Pos += c;
 					}
@@ -209,8 +216,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				}
 
 				Content.Headers.Add("Content-Type", ContentType);
-
-				this.LogSent(HttpClient, this.PutUrl, Content);
+				this.LogSent(HttpClient, this.PutUrl, Content, "PUT");
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 
@@ -224,14 +230,14 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			}
 		}
 
-		private void LogSent(HttpClient Client, string PutUrl, HttpContent Content)
+		private void LogSent(HttpClient Client, string PutUrl, HttpContent Content, string Method)
 		{
 			if (!this.hasSniffers)
 				return;
 
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append("PUT");
+			sb.Append(Method);
 
 			if (Content.Headers.ContentLength.HasValue)
 			{

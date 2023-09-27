@@ -547,7 +547,12 @@ namespace Waher.IoTGateway.WebResources
 
 			try
 			{
-				if (Gateway.XmppClient.State != XmppState.Connected)
+				if (!File.Exists(BackupInfo.FullFileName))
+				{
+					Log.Warning("Backup file has been removed. Upload cancelled.", BackupInfo.LocalFileName);
+					return;
+				}
+				else if (Gateway.XmppClient.State != XmppState.Connected)
 					Reschedule = true;
 				else
 				{
@@ -647,7 +652,7 @@ namespace Waher.IoTGateway.WebResources
 						}
 						catch (Exception ex)
 						{
-							BackupInfo.Thread?.Exception(ex);
+							BackupInfo.Thread?.Exception(ex, BackupInfo.LocalFileName);
 							Log.Critical(ex);
 							Reschedule = true;
 

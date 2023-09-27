@@ -334,7 +334,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="ContentSize">Size of content.</param>
 		public Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize)
 		{
-			return RequestUploadSlotAsync(FileName, ContentType, ContentSize, true);
+			return this.RequestUploadSlotAsync(FileName, ContentType, ContentSize, true);
 		}
 
 		/// <summary>

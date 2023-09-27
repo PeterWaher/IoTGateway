@@ -75,6 +75,14 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		public async Task Graph2D_Test_05_Plot2dHLine()
+		{
+			await this.Test("x:=-10..10;y:=sin(x);plot2dhline(x,y,0)", "2D_05_1.png");
+			await this.Test("x:=-10..10;y:=sin(x);plot2dhline(x,y,1,'Blue')", "2D_05_2.png");
+			await this.Test("x:=-10..10;y:=sin(x);plot2dhline(x,y,-1,'Blue',5)", "2D_05_3.png");
+		}
+
+		[TestMethod]
 		public async Task Graph3D_Test_01_LineMesh()
 		{
 			await this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(linemesh3d(x,y,z))", "3D_01_1.png");

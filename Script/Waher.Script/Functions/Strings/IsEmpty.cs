@@ -51,7 +51,7 @@ namespace Waher.Script.Functions.Strings
 			else if (Value is string s)
 				return this.EvaluateScalar(s, Variables);
 			else
-				return BooleanValue.False;
+				return this.EvaluateScalar(Value.ToString(), Variables);
 		}
 
 		/// <summary>

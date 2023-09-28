@@ -17,6 +17,7 @@ namespace Waher.Script.Objects.Matrices
 	public sealed class ComplexMatrix : RingElement, IMatrix
 	{
 		private Complex[,] values;
+		private IElement[,] matrixElements;
 		private ICollection<IElement> elements;
 		private readonly int rows;
 		private readonly int columns;
@@ -29,6 +30,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			this.values = Values;
 			this.elements = null;
+			this.matrixElements = null;
 			this.rows = Values.GetLength(0);
 			this.columns = Values.GetLength(1);
 		}
@@ -43,6 +45,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			this.values = null;
 			this.elements = Elements;
+			this.matrixElements = null;
 			this.rows = Rows;
 			this.columns = Columns;
 		}
@@ -102,6 +105,36 @@ namespace Waher.Script.Objects.Matrices
 				}
 
 				return this.elements;
+			}
+		}
+
+		/// <summary>
+		/// Matrix elements
+		/// </summary>
+		public IElement[,] MatrixElements
+		{
+			get
+			{
+				if (this.matrixElements is null)
+				{
+					IElement[,] v = new IElement[this.rows, this.columns];
+					int x = 0;
+					int y = 0;
+
+					foreach (IElement E in this.Elements)
+					{
+						v[y, x++] = E;
+						if (x >= this.columns)
+						{
+							y++;
+							x = 0;
+						}
+					}
+
+					this.matrixElements = v;
+				}
+
+				return this.matrixElements;
 			}
 		}
 
@@ -180,12 +213,13 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			Complex[,] Values = this.Values;
 			Complex[,] v;
 			int x, y, z;
 
 			if (Element.AssociatedObjectValue is Complex n)
 			{
+				Complex[,] Values = this.Values;
+
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -201,6 +235,7 @@ namespace Waher.Script.Objects.Matrices
 				if (Matrix.columns != this.rows)
 					return null;
 
+				Complex[,] Values = this.Values;
 				Complex[,] Values2 = Matrix.Values;
 
 				v = new Complex[Matrix.rows, this.columns];
@@ -219,6 +254,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).MultiplyLeft(Element);
 			else
 				return null;
 		}
@@ -230,12 +267,13 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			Complex[,] Values = this.Values;
 			Complex[,] v;
 			int x, y, z;
 
 			if (Element.AssociatedObjectValue is Complex n)
 			{
+				Complex[,] Values = this.Values;
+
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -251,6 +289,7 @@ namespace Waher.Script.Objects.Matrices
 				if (this.columns != Matrix.rows)
 					return null;
 
+				Complex[,] Values = this.Values;
 				Complex[,] Values2 = Matrix.Values;
 
 				v = new Complex[this.rows, Matrix.columns];
@@ -269,6 +308,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).MultiplyRight(Element);
 			else
 				return null;
 		}
@@ -285,9 +326,7 @@ namespace Waher.Script.Objects.Matrices
 			Complex[,] Values = this.Values;
 			int c2 = this.columns << 1;
 			Complex[,] v = new Complex[this.rows, c2];
-			double a, b;
-			Complex w;
-			int x, y, z, u;
+			int x, y;
 
 			for (y = 0; y < this.rows; y++)
 			{
@@ -298,49 +337,8 @@ namespace Waher.Script.Objects.Matrices
 				}
 			}
 
-			for (x = 0; x < this.columns; x++)
-			{
-				a = v[x, x].Magnitude;
-				z = x;
-				for (y = x + 1; y < this.rows; y++)
-				{
-					b = v[y, x].Magnitude;
-					if (b > a)
-					{
-						a = b;
-						z = y;
-					}
-				}
-
-				if (z != x)
-				{
-					for (u = x; u < c2; u++)
-					{
-						w = v[x, u];
-						v[x, u] = v[z, u];
-						v[z, u] = w;
-					}
-				}
-
-				w = v[x, x];
-				if (w == 0)
-					return null;
-
-				if (w != 1)
-				{
-					for (u = x; u < c2; u++)
-						v[x, u] /= w;
-				}
-
-				for (y = 0; y < this.rows; y++)
-				{
-					if (y != x && (w = v[y, x]) != 0)
-					{
-						for (u = x; u < c2; u++)
-							v[y, u] -= w * v[x, u];
-					}
-				}
-			}
+			if (Reduce(v, true, true) < 0)
+				return null;
 
 			Complex[,] v2 = new Complex[this.rows, this.columns];
 
@@ -354,18 +352,110 @@ namespace Waher.Script.Objects.Matrices
 		}
 
 		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <returns>Reduced matrix</returns>
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		{
+			Complex[,] M = (Complex[,])this.Values.Clone();
+			Rank = Reduce(M, Eliminate, BreakIfZero);
+			return new ComplexMatrix(M);
+		}
+
+		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Matrix">Matrix to be reduced.</param>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <returns>Rank of matrix, or -1 if process broken.</returns>
+		public static int Reduce(Complex[,] Matrix, bool Eliminate, bool BreakIfZero)
+		{
+			int x, y, u, z;
+			int Rows = Matrix.GetLength(0);
+			int Columns = Matrix.GetLength(1);
+			int MinCount = Math.Min(Rows, Columns);
+			double a, b;
+			Complex w;
+			int Rank = 0;
+
+			for (x = 0; x < MinCount; x++)
+			{
+				a = Matrix[x, x].Magnitude;
+				z = x;
+				for (y = x + 1; y < Rows; y++)
+				{
+					b = Matrix[y, x].Magnitude;
+					if (b > a)
+					{
+						a = b;
+						z = y;
+					}
+				}
+
+				if (z != x)
+				{
+					for (u = x; u < Columns; u++)
+					{
+						w = Matrix[x, u];
+						Matrix[x, u] = Matrix[z, u];
+						Matrix[z, u] = w;
+					}
+				}
+
+				w = Matrix[x, x];
+				if (w == 0)
+				{
+					if (BreakIfZero)
+						return -1;
+				}
+				else
+				{
+					Rank++;
+
+					if (w != 1)
+					{
+						for (u = x; u < Columns; u++)
+							Matrix[x, u] /= w;
+					}
+
+					for (y = Eliminate ? 0 : x + 1; y < Rows; y++)
+					{
+						if (y != x && (w = Matrix[y, x]) != 0)
+						{
+							for (u = x; u < Columns; u++)
+								Matrix[y, u] -= w * Matrix[x, u];
+						}
+					}
+				}
+			}
+
+			return Rank;
+		}
+
+		/// <summary>
 		/// Tries to add an element to the current element.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			Complex[,] Values = this.Values;
 			Complex[,] v;
 			int x, y;
 
 			if (Element.AssociatedObjectValue is Complex n)
 			{
+				Complex[,] Values = this.Values;
+
 				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -381,6 +471,7 @@ namespace Waher.Script.Objects.Matrices
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
 
+				Complex[,] Values = this.Values;
 				Complex[,] Values2 = Matrix.Values;
 
 				v = new Complex[this.rows, this.columns];
@@ -392,6 +483,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).Add(Element);
 			else
 				return null;
 		}
@@ -422,26 +515,30 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is ComplexMatrix Matrix))
-				return false;
-
-			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
-				return false;
-
-			Complex[,] V1 = this.Values;
-			Complex[,] V2 = Matrix.Values;
-			int x, y;
-
-			for (y = 0; y < this.rows; y++)
+			if (obj is ComplexMatrix Matrix)
 			{
-				for (x = 0; x < this.columns; x++)
-				{
-					if (V1[y, x] != V2[y, x])
-						return false;
-				}
-			}
+				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
+					return false;
 
-			return true;
+				Complex[,] V1 = this.Values;
+				Complex[,] V2 = Matrix.Values;
+				int x, y;
+
+				for (y = 0; y < this.rows; y++)
+				{
+					for (x = 0; x < this.columns; x++)
+					{
+						if (V1[y, x] != V2[y, x])
+							return false;
+					}
+				}
+
+				return true;
+			}
+			else if (obj is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).Equals(obj);
+			else
+				return false;
 		}
 
 		/// <summary>

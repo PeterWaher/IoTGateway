@@ -16,6 +16,7 @@ namespace Waher.Script.Objects.Matrices
 	public sealed class DoubleMatrix : RingElement, IMatrix
     {
 		private double[,] values;
+		private IElement[,] matrixElements;
 		private ICollection<IElement> elements;
 		private readonly int rows;
 		private readonly int columns;
@@ -28,6 +29,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			this.values = Values;
 			this.elements = null;
+			this.matrixElements = null;
 			this.rows = Values.GetLength(0);
 			this.columns = Values.GetLength(1);
 		}
@@ -41,6 +43,7 @@ namespace Waher.Script.Objects.Matrices
 		public DoubleMatrix(int Rows, int Columns, ICollection<IElement> Elements)
 		{
 			this.values = null;
+			this.matrixElements = null;
 			this.elements = Elements;
 			this.rows = Rows;
 			this.columns = Columns;
@@ -101,6 +104,36 @@ namespace Waher.Script.Objects.Matrices
 				}
 
 				return this.elements;
+			}
+		}
+
+		/// <summary>
+		/// Matrix elements
+		/// </summary>
+		public IElement[,] MatrixElements
+		{
+			get
+			{
+				if (this.matrixElements is null)
+				{
+					IElement[,] v = new IElement[this.rows, this.columns];
+					int x = 0;
+					int y = 0;
+
+					foreach (IElement E in this.Elements)
+					{
+						v[y, x++] = E;
+						if (x >= this.columns)
+						{
+							y++;
+							x = 0;
+						}
+					}
+
+					this.matrixElements = v;
+				}
+
+				return this.matrixElements;
 			}
 		}
 
@@ -179,19 +212,19 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			double[,] Values = this.Values;
 			double[,] v;
-			double n;
 			int x, y, z;
 
-			if (Element.AssociatedObjectValue is double d)
+			if (Element.AssociatedObjectValue is double n)
 			{
+				double[,] Values = this.Values;
+
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = d * Values[y, x];
+						v[y, x] = n * Values[y, x];
 				}
 
 				return new DoubleMatrix(v);
@@ -201,9 +234,10 @@ namespace Waher.Script.Objects.Matrices
 				if (Matrix.columns != this.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+				double[,] Values = this.Values;
+				double[,] Values2 = Matrix.Values;
 
-                v = new double[Matrix.rows, this.columns];
+				v = new double[Matrix.rows, this.columns];
 				for (y = 0; y < Matrix.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
@@ -219,6 +253,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).MultiplyLeft(Element);
 			else
 				return null;
 		}
@@ -230,19 +266,19 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			double[,] Values = this.Values;
 			double[,] v;
-			double n;
 			int x, y, z;
 
-			if (Element.AssociatedObjectValue is double d)
+			if (Element.AssociatedObjectValue is double n)
 			{
+				double[,] Values = this.Values;
+
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = d * Values[y, x];
+						v[y, x] = n * Values[y, x];
 				}
 
 				return new DoubleMatrix(v);
@@ -252,7 +288,8 @@ namespace Waher.Script.Objects.Matrices
 				if (this.columns != Matrix.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+				double[,] Values = this.Values;
+				double[,] Values2 = Matrix.Values;
 
                 v = new double[this.rows, Matrix.columns];
 				for (y = 0; y < this.rows; y++)
@@ -270,6 +307,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).MultiplyRight(Element);
 			else
 				return null;
 		}
@@ -286,8 +325,7 @@ namespace Waher.Script.Objects.Matrices
 			double[,] Values = this.Values;
 			int c2 = this.columns << 1;
 			double[,] v = new double[this.rows, c2];
-			double a, b;
-			int x, y, z, u;
+			int x, y;
 
 			for (y = 0; y < this.rows; y++)
 			{
@@ -298,49 +336,8 @@ namespace Waher.Script.Objects.Matrices
 				}
 			}
 
-			for (x = 0; x < this.columns; x++)
-			{
-				a = Math.Abs(v[x, x]);
-				z = x;
-				for (y = x + 1; y < this.rows; y++)
-				{
-					b = Math.Abs(v[y, x]);
-					if (b > a)
-					{
-						a = b;
-						z = y;
-					}
-				}
-
-				if (z != x)
-				{
-					for (u = x; u < c2; u++)
-					{
-						a = v[x, u];
-						v[x, u] = v[z, u];
-						v[z, u] = a;
-					}
-				}
-
-				a = v[x, x];
-				if (a == 0)
-					return null;
-
-				if (a != 1)
-				{
-					for (u = x; u < c2; u++)
-						v[x, u] /= a;
-				}
-
-				for (y = 0; y < this.rows; y++)
-				{
-					if (y != x && (a = v[y, x]) != 0)
-					{
-						for (u = x; u < c2; u++)
-							v[y, u] -= a * v[x, u];
-					}
-				}
-			}
+			if (Reduce(v, true, true) < 0)
+				return null;
 
 			double[,] v2 = new double[this.rows, this.columns];
 
@@ -354,18 +351,109 @@ namespace Waher.Script.Objects.Matrices
 		}
 
 		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <returns>Reduced matrix</returns>
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		{
+			double[,] M = (double[,])this.Values.Clone();
+			Rank = Reduce(M, Eliminate, BreakIfZero);
+			return new DoubleMatrix(M);
+		}
+
+		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Matrix">Matrix to be reduced.</param>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <returns>Rank of matrix, or -1 if process broken.</returns>
+		public static int Reduce(double[,] Matrix, bool Eliminate, bool BreakIfZero)
+		{
+			int x, y, u, z;
+			int Rows = Matrix.GetLength(0);
+			int Columns = Matrix.GetLength(1);
+			int MinCount = Math.Min(Rows, Columns);
+			double a, b;
+			int Rank = 0;
+
+			for (x = 0; x < MinCount; x++)
+			{
+				a = Math.Abs(Matrix[x, x]);
+				z = x;
+				for (y = x + 1; y < Rows; y++)
+				{
+					b = Math.Abs(Matrix[y, x]);
+					if (b > a)
+					{
+						a = b;
+						z = y;
+					}
+				}
+
+				if (z != x)
+				{
+					for (u = x; u < Columns; u++)
+					{
+						a = Matrix[x, u];
+						Matrix[x, u] = Matrix[z, u];
+						Matrix[z, u] = a;
+					}
+				}
+
+				a = Matrix[x, x];
+				if (a == 0)
+				{
+					if (BreakIfZero)
+						return -1;
+				}
+				else
+				{
+					Rank++;
+
+					if (a != 1)
+					{
+						for (u = x; u < Columns; u++)
+							Matrix[x, u] /= a;
+					}
+
+					for (y = Eliminate ? 0 : x + 1; y < Rows; y++)
+					{
+						if (y != x && (a = Matrix[y, x]) != 0)
+						{
+							for (u = x; u < Columns; u++)
+								Matrix[y, u] -= a * Matrix[x, u];
+						}
+					}
+				}
+			}
+
+			return Rank;
+		}
+
+		/// <summary>
 		/// Tries to add an element to the current element.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			double[,] Values = this.Values;
 			double[,] v;
 			int x, y;
 
 			if (Element.AssociatedObjectValue is double d)
 			{
+				double[,] Values = this.Values;
+
 				v = new double[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
@@ -381,7 +469,8 @@ namespace Waher.Script.Objects.Matrices
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+				double[,] Values = this.Values;
+				double[,] Values2 = Matrix.Values;
 
                 v = new double[this.rows, this.columns];
 				for (y = 0; y < this.rows; y++)
@@ -392,6 +481,8 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
+			else if (Element is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).Add(Element);
 			else
 				return null;
 		}
@@ -422,26 +513,30 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is DoubleMatrix Matrix))
-				return false;
-
-			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
-				return false;
-
-			double[,] V1 = this.Values;
-			double[,] V2 = Matrix.Values;
-			int x, y;
-
-            for (y = 0; y < this.rows; y++)
+			if (obj is DoubleMatrix Matrix)
 			{
-				for (x = 0; x < this.columns; x++)
-				{
-					if (V1[y, x] != V2[y, x])
-						return false;
-				}
-			}
+				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
+					return false;
 
-			return true;
+				double[,] V1 = this.Values;
+				double[,] V2 = Matrix.Values;
+				int x, y;
+
+				for (y = 0; y < this.rows; y++)
+				{
+					for (x = 0; x < this.columns; x++)
+					{
+						if (V1[y, x] != V2[y, x])
+							return false;
+					}
+				}
+
+				return true;
+			}
+			else if (obj is IMatrix)
+				return new ObjectMatrix(this.MatrixElements).Equals(obj);
+			else
+				return false;
 		}
 
 		/// <summary>

@@ -607,6 +607,11 @@
             Number of columns.
             </summary>
         </member>
+        <member name="P:Waher.Script.Abstraction.Elements.IMatrix.MatrixElements">
+            <summary>
+            Matrix elements
+            </summary>
+        </member>
         <member name="M:Waher.Script.Abstraction.Elements.IMatrix.Transpose">
             <summary>
             Returns a transposed matrix.
@@ -618,6 +623,18 @@
             Returns a conjugate transposed matrix.
             </summary>
             <returns>Conjugate transposed matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Abstraction.Elements.IMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <returns>Reduced matrix, or null if process broken</returns>
         </member>
         <member name="M:Waher.Script.Abstraction.Elements.IMatrix.GetElement(System.Int32,System.Int32)">
             <summary>
@@ -13701,6 +13718,11 @@
             Matrix elements.
             </summary>
         </member>
+        <member name="P:Waher.Script.Objects.Matrices.BooleanMatrix.MatrixElements">
+            <summary>
+            Matrix elements
+            </summary>
+        </member>
         <member name="P:Waher.Script.Objects.Matrices.BooleanMatrix.Rows">
             <summary>
             Number of rows.
@@ -13743,6 +13765,24 @@
             Inverts the element, if possible.
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <returns>Reduced matrix</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.ToDoubleMatrix">
+            <summary>
+            Converts matrix to a double-valued matrix.
+            </summary>
+            <returns>Double-valued matrix.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
             <summary>
@@ -13954,6 +13994,11 @@
             Matrix elements.
             </summary>
         </member>
+        <member name="P:Waher.Script.Objects.Matrices.ComplexMatrix.MatrixElements">
+            <summary>
+            Matrix elements
+            </summary>
+        </member>
         <member name="P:Waher.Script.Objects.Matrices.ComplexMatrix.Rows">
             <summary>
             Number of rows.
@@ -13996,6 +14041,30 @@
             Inverts the element, if possible.
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <returns>Reduced matrix</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Numerics.Complex[0:,0:],System.Boolean,System.Boolean)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Matrix">Matrix to be reduced.</param>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
             <summary>
@@ -14207,6 +14276,11 @@
             Matrix elements.
             </summary>
         </member>
+        <member name="P:Waher.Script.Objects.Matrices.DoubleMatrix.MatrixElements">
+            <summary>
+            Matrix elements
+            </summary>
+        </member>
         <member name="P:Waher.Script.Objects.Matrices.DoubleMatrix.Rows">
             <summary>
             Number of rows.
@@ -14249,6 +14323,30 @@
             Inverts the element, if possible.
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <returns>Reduced matrix</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Double[0:,0:],System.Boolean,System.Boolean)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Matrix">Matrix to be reduced.</param>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
             <summary>
@@ -14461,6 +14559,11 @@
             Matrix element values.
             </summary>
         </member>
+        <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.MatrixElements">
+            <summary>
+            Matrix elements
+            </summary>
+        </member>
         <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.Elements">
             <summary>
             Matrix elements.
@@ -14526,6 +14629,30 @@
             Inverts the element, if possible.
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <returns>Reduced matrix</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(Waher.Script.Abstraction.Elements.IElement[0:,0:],System.Boolean,System.Boolean)">
+            <summary>
+            Reduces a matrix.
+            </summary>
+            <param name="Matrix">Matrix to be reduced.</param>
+            <param name="Eliminate">By default, reduction produces an
+            upper triangular matrix. By using elimination, upwards reduction
+            is also performed.</param>
+            <param name="BreakIfZero">If elimination process should break if a
+            zero-row is encountered.</param>
+            <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
             <summary>

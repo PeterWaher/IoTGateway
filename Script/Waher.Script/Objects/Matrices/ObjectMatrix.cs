@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Matrices;
+using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Objects.Matrices
 {
@@ -96,6 +97,11 @@ namespace Waher.Script.Objects.Matrices
 				return this.values;
 			}
 		}
+
+		/// <summary>
+		/// Matrix elements
+		/// </summary>
+		public IElement[,] MatrixElements => this.Values;
 
 		/// <summary>
 		/// Matrix elements.
@@ -254,21 +260,21 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x], null);
+						v[y, x] = Multiply.EvaluateMultiplication(Element, Values[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
 			}
-			else if (Element is ObjectMatrix Matrix)
+			else if (Element is IMatrix Matrix)
 			{
-				if (Matrix.columns != this.rows)
+				if (Matrix.Columns != this.rows)
 					return null;
 
-				IElement[,] Values2 = Matrix.Values;
+				IElement[,] Values2 = Matrix.MatrixElements;
 
-				v = new IElement[Matrix.rows, this.columns];
+				v = new IElement[Matrix.Rows, this.columns];
 
-				for (y = 0; y < Matrix.rows; y++)
+				for (y = 0; y < Matrix.Rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
 					{
@@ -277,10 +283,12 @@ namespace Waher.Script.Objects.Matrices
 						for (z = 0; z < this.rows; z++)
 						{
 							if (n is null)
-								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null);
+								n = Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null);
 							else
+							{
 								n = Operators.Arithmetics.Add.EvaluateAddition(n,
-									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null), null);
+									Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null), null);
+							}
 						}
 
 						v[y, x] = n;
@@ -312,34 +320,34 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x], null);
+						v[y, x] = Multiply.EvaluateMultiplication(Element, Values[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
 			}
-			else if (Element is ObjectMatrix Matrix)
+			else if (Element is IMatrix Matrix)
 			{
-				if (this.columns != Matrix.rows)
+				if (this.columns != Matrix.Rows)
 					return null;
 
-				IElement[,] Values2 = Matrix.Values;
+				IElement[,] Values2 = Matrix.MatrixElements;
 
-				v = new IElement[this.rows, Matrix.columns];
+				v = new IElement[this.rows, Matrix.Columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
-					for (x = 0; x < Matrix.columns; x++)
+					for (x = 0; x < Matrix.Columns; x++)
 					{
 						n = null;
 
 						for (z = 0; z < this.columns; z++)
 						{
 							if (n is null)
-								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null);
+								n = Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null);
 							else
 							{
 								n = Operators.Arithmetics.Add.EvaluateAddition(n,
-									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null), null);
+									Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null), null);
 							}
 						}
 
@@ -359,7 +367,148 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Inverted element, or null if not possible.</returns>
 		public override IRingElement Invert()
 		{
-			return null;
+			if (this.rows != this.columns)
+				return null;
+
+			IElement[,] Values = this.Values;
+			int c2 = this.columns << 1;
+			IElement[,] v = new IElement[this.rows, c2];
+			IElement E;
+			int x, y;
+
+			for (y = 0; y < this.rows; y++)
+			{
+				for (x = 0; x < this.columns; x++)
+				{
+					v[y, x] = E = Values[y, x];
+					if (!(E is ICommutativeRingWithIdentityElement E2))
+						return null;
+
+					v[y, x + this.columns] = (x == y ? E2.One : E2.Zero);
+				}
+			}
+
+			if (Reduce(v, true, true) < 0)
+				return null;
+
+			IElement[,] v2 = new IElement[this.rows, this.columns];
+
+			for (y = 0; y < this.rows; y++)
+			{
+				for (x = 0; x < this.columns; x++)
+					v2[y, x] = v[y, x + this.columns];
+			}
+
+			return new ObjectMatrix(v2);
+		}
+
+		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <returns>Reduced matrix</returns>
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		{
+			IElement[,] M = (IElement[,])this.Values.Clone();
+			Rank = Reduce(M, Eliminate, BreakIfZero);
+			return new ObjectMatrix(M);
+		}
+
+		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Matrix">Matrix to be reduced.</param>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <returns>Rank of matrix, or -1 if process broken.</returns>
+		public static int Reduce(IElement[,] Matrix, bool Eliminate, bool BreakIfZero)
+		{
+			int x, y, u, z;
+			int Rows = Matrix.GetLength(0);
+			int Columns = Matrix.GetLength(1);
+			int MinCount = Math.Min(Rows, Columns);
+			ICommutativeRingWithIdentityElement a, b;
+			IElement w;
+			int Rank = 0;
+
+			for (x = 0; x < MinCount; x++)
+			{
+				a = Matrix[x, x] as ICommutativeRingWithIdentityElement;
+				if (a is null)
+					return -1;
+
+				if (a.Equals(a.Zero))
+				{
+					z = x;
+					for (y = x + 1; y < Rows; y++)
+					{
+						b = Matrix[y, x] as ICommutativeRingWithIdentityElement;
+						if (b is null)
+							return -1;
+
+						if (!b.Equals(b.Zero))
+						{
+							a = b;
+							z = y;
+							break;
+						}
+					}
+
+					if (z != x)
+					{
+						for (u = x; u < Columns; u++)
+						{
+							w = Matrix[x, u];
+							Matrix[x, u] = Matrix[z, u];
+							Matrix[z, u] = w;
+						}
+					}
+					else
+					{
+						if (BreakIfZero)
+							return -1;
+						else
+							continue;
+					}
+				}
+
+				Rank++;
+
+				if (a != a.One)
+				{
+					for (u = x; u < Columns; u++)
+						Matrix[x, u] = Divide.EvaluateDivision(Matrix[x, u] , a, null);
+				}
+
+				for (y = Eliminate ? 0 : x + 1; y < Rows; y++)
+				{
+					if (y != x)
+					{
+						a = Matrix[y, x] as ICommutativeRingWithIdentityElement;
+						if (a is null)
+							return -1;
+
+						if (!a.Equals(a.Zero))
+						{
+							for (u = x; u < Columns; u++)
+							{
+								Matrix[y, u] = Subtract.EvaluateSubtraction(Matrix[y, u],
+									Multiply.EvaluateMultiplication(a, Matrix[x, u], null), null);
+							}
+						}
+					}
+				}
+			}
+
+			return Rank;
 		}
 
 		/// <summary>
@@ -385,12 +534,12 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if (Element is ObjectMatrix Matrix)
+			else if (Element is IMatrix Matrix)
 			{
-				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
+				if (this.columns != Matrix.Columns || this.rows != Matrix.Rows)
 					return null;
 
-				IElement[,] Values2 = Matrix.Values;
+				IElement[,] Values2 = Matrix.MatrixElements;
 
 				v = new IElement[this.rows, this.columns];
 				for (y = 0; y < this.rows; y++)
@@ -431,14 +580,14 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is ObjectMatrix Matrix))
+			if (!(obj is IMatrix Matrix))
 				return false;
 
-			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
+			if (this.columns != Matrix.Columns || this.rows != Matrix.Rows)
 				return false;
 
 			IElement[,] V1 = this.Values;
-			IElement[,] V2 = Matrix.Values;
+			IElement[,] V2 = Matrix.MatrixElements;
 			int x, y;
 
 			for (y = 0; y < this.rows; y++)

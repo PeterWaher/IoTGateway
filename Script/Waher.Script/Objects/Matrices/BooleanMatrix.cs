@@ -15,6 +15,7 @@ namespace Waher.Script.Objects.Matrices
 	public sealed class BooleanMatrix : RingElement, IMatrix
 	{
 		private bool[,] values;
+		private IElement[,] matrixElements;
 		private ICollection<IElement> elements;
 		private readonly int rows;
 		private readonly int columns;
@@ -27,6 +28,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			this.values = Values;
 			this.elements = null;
+			this.matrixElements = null;
 			this.rows = Values.GetLength(0);
 			this.columns = Values.GetLength(1);
 		}
@@ -41,6 +43,7 @@ namespace Waher.Script.Objects.Matrices
 		{
 			this.values = null;
 			this.elements = Elements;
+			this.matrixElements = null;
 			this.rows = Rows;
 			this.columns = Columns;
 		}
@@ -100,6 +103,36 @@ namespace Waher.Script.Objects.Matrices
 				}
 
 				return this.elements;
+			}
+		}
+
+		/// <summary>
+		/// Matrix elements
+		/// </summary>
+		public IElement[,] MatrixElements
+		{
+			get
+			{
+				if (this.matrixElements is null)
+				{
+					IElement[,] v = new IElement[this.rows, this.columns];
+					int x = 0;
+					int y = 0;
+
+					foreach (IElement E in this.Elements)
+					{
+						v[y, x++] = E;
+						if (x >= this.columns)
+						{
+							y++;
+							x = 0;
+						}
+					}
+
+					this.matrixElements = v;
+				}
+
+				return this.matrixElements;
 			}
 		}
 
@@ -178,7 +211,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			return null;
+			return this.ToDoubleMatrix().MultiplyLeft(Element);
 		}
 
 		/// <summary>
@@ -188,7 +221,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			return null;
+			return this.ToDoubleMatrix().MultiplyRight(Element);
 		}
 
 		/// <summary>
@@ -197,7 +230,44 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Inverted element, or null if not possible.</returns>
 		public override IRingElement Invert()
 		{
-			return null;
+			if (this.rows != this.columns)
+				return null;
+
+			return this.ToDoubleMatrix().Invert();
+		}
+
+		/// <summary>
+		/// Reduces a matrix.
+		/// </summary>
+		/// <param name="Eliminate">By default, reduction produces an
+		/// upper triangular matrix. By using elimination, upwards reduction
+		/// is also performed.</param>
+		/// <param name="BreakIfZero">If elimination process should break if a
+		/// zero-row is encountered.</param>
+		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <returns>Reduced matrix</returns>
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		{
+			return this.ToDoubleMatrix().Reduce(Eliminate, BreakIfZero, out Rank);
+		}
+
+		/// <summary>
+		/// Converts matrix to a double-valued matrix.
+		/// </summary>
+		/// <returns>Double-valued matrix.</returns>
+		public DoubleMatrix ToDoubleMatrix()
+		{
+			bool[,] Values = this.Values;
+			double[,] v = new double[this.rows, this.columns];
+			int x, y;
+
+			for (y = 0; y < this.rows; y++)
+			{
+				for (x = 0; x < this.columns; x++)
+					v[y, x] = Values[y, x] ? 1 : 0;
+			}
+
+			return new DoubleMatrix(v);
 		}
 
 		/// <summary>
@@ -207,7 +277,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			return null;
+			return this.ToDoubleMatrix().Add(Element);
 		}
 
 		/// <summary>

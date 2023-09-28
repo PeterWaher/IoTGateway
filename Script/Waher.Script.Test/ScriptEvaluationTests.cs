@@ -46,14 +46,22 @@ namespace Waher.Script.Test
 			Expression Exp = new Expression(Script);
 			object Result = await Exp.EvaluateAsync(v);
 
-			if (Result is BooleanMatrix BM)
-				Result = BM.Values;
-			else if (Result is DoubleMatrix DM)
-				Result = DM.Values;
-			else if (Result is ComplexMatrix CM)
-				Result = CM.Values;
-			else if (Result is ObjectMatrix OM)
-				Result = OM.Values;
+			if (Result is IMatrix M)
+			{
+				IElement[,] Elements = M.MatrixElements;
+				int Rows = Elements.GetLength(0);
+				int Columns = Elements.GetLength(1);
+				object[,] Elements2 = new object[Rows, Columns];
+				int x, y;
+
+				for (y = 0; y < Rows; y++)
+				{
+					for (x = 0; x < Columns; x++)
+						Elements2[y, x] = Elements[y, x].AssociatedObjectValue;
+				}
+
+				Result = Elements2;
+			}
 
 			if (Result is Dictionary<string, IElement> R &&
 				ExpectedValue is Dictionary<string, IElement> E)

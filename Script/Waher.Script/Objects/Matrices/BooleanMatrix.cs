@@ -245,10 +245,11 @@ namespace Waher.Script.Objects.Matrices
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
 		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Reduced matrix</returns>
-		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank, out ICommutativeRingWithIdentityElement Factor)
 		{
-			return this.ToDoubleMatrix().Reduce(Eliminate, BreakIfZero, out Rank);
+			return this.ToDoubleMatrix().Reduce(Eliminate, BreakIfZero, out Rank, out Factor);
 		}
 
 		/// <summary>

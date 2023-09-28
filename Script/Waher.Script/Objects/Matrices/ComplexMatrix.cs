@@ -337,7 +337,7 @@ namespace Waher.Script.Objects.Matrices
 				}
 			}
 
-			if (Reduce(v, true, true) < 0)
+			if (Reduce(v, true, true, out _) < 0)
 				return null;
 
 			Complex[,] v2 = new Complex[this.rows, this.columns];
@@ -360,11 +360,13 @@ namespace Waher.Script.Objects.Matrices
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
 		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Reduced matrix</returns>
-		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank, out ICommutativeRingWithIdentityElement Factor)
 		{
 			Complex[,] M = (Complex[,])this.Values.Clone();
-			Rank = Reduce(M, Eliminate, BreakIfZero);
+			Rank = Reduce(M, Eliminate, BreakIfZero, out Complex c);
+			Factor = new ComplexNumber(c);
 			return new ComplexMatrix(M);
 		}
 
@@ -377,8 +379,10 @@ namespace Waher.Script.Objects.Matrices
 		/// is also performed.</param>
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Rank of matrix, or -1 if process broken.</returns>
-		public static int Reduce(Complex[,] Matrix, bool Eliminate, bool BreakIfZero)
+		public static int Reduce(Complex[,] Matrix, bool Eliminate, bool BreakIfZero, 
+			out Complex Factor)
 		{
 			int x, y, u, z;
 			int Rows = Matrix.GetLength(0);
@@ -387,6 +391,8 @@ namespace Waher.Script.Objects.Matrices
 			double a, b;
 			Complex w;
 			int Rank = 0;
+
+			Factor = 1;
 
 			for (x = 0; x < MinCount; x++)
 			{
@@ -410,6 +416,8 @@ namespace Waher.Script.Objects.Matrices
 						Matrix[x, u] = Matrix[z, u];
 						Matrix[z, u] = w;
 					}
+
+					Factor = -Factor;
 				}
 
 				w = Matrix[x, x];
@@ -426,6 +434,8 @@ namespace Waher.Script.Objects.Matrices
 					{
 						for (u = x; u < Columns; u++)
 							Matrix[x, u] /= w;
+
+						Factor *= w;
 					}
 
 					for (y = Eliminate ? 0 : x + 1; y < Rows; y++)

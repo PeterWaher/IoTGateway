@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
+using System.Xml.Linq;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -98,20 +100,42 @@ namespace Waher.Script.Functions.Vectors
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
         public override IElement EvaluateVector(IVector Argument, Variables Variables)
-        {
-            IRingElement Result = null;
+		{
+			return EvaluateProduct(Argument, this);
+		}
+
+		/// <summary>
+		/// Multiplies the elements of a vector.
+		/// </summary>
+		/// <param name="Vector">Vector</param>
+		/// <param name="Node">Node performing evaluation.</param>
+		/// <returns>Sum of elements.</returns>
+		public static IElement EvaluateProduct(IVector Vector, ScriptNode Node)
+		{
+			return EvaluateProduct(Vector.VectorElements, Node);
+		}
+
+		/// <summary>
+		/// Multiplies the elements of a vector.
+		/// </summary>
+		/// <param name="Elements">Elements to sum.</param>
+		/// <param name="Node">Node performing evaluation.</param>
+		/// <returns>Sum of elements.</returns>
+		public static IElement EvaluateProduct(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			IRingElement Result = null;
             IRingElement RE;
             IRingElement Product;
 
-            foreach (IElement E in Argument.ChildElements)
+            foreach (IElement E in Elements)
             {
                 RE = E as IRingElement;
 				if (RE is null)
 				{
-					if (Argument.ChildElements.Count == 1)
+					if (Elements.Count == 1)
 						return E;
 					else
-						throw new ScriptRuntimeException("Elements cannot be multiplied.", this);
+						throw new ScriptRuntimeException("Elements cannot be multiplied.", Node);
 				}
 
                 if (Result is null)
@@ -120,7 +144,7 @@ namespace Waher.Script.Functions.Vectors
                 {
                     Product = Result.MultiplyRight(RE);
                     if (Product is null)
-                        Product = (IRingElement)Operators.Arithmetics.Multiply.EvaluateMultiplication(Result, RE, this);
+                        Product = (IRingElement)Operators.Arithmetics.Multiply.EvaluateMultiplication(Result, RE, Node);
 
                     Result = Product;
                 }

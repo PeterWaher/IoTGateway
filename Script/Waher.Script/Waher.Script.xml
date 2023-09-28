@@ -624,7 +624,7 @@
             </summary>
             <returns>Conjugate transposed matrix.</returns>
         </member>
-        <member name="M:Waher.Script.Abstraction.Elements.IMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+        <member name="M:Waher.Script.Abstraction.Elements.IMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -634,6 +634,7 @@
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
             <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Reduced matrix, or null if process broken</returns>
         </member>
         <member name="M:Waher.Script.Abstraction.Elements.IMatrix.GetElement(System.Int32,System.Int32)">
@@ -5645,6 +5646,97 @@
             <param name="StackTrace">Stack Trace of event.</param>
             <param name="Tags">Variable set of tags providing event-specific warning.</param>
         </member>
+        <member name="T:Waher.Script.Functions.Matrices.Determinant">
+            <summary>
+            Determinant(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Determinant.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Determinant(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Determinant.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Determinant.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Determinant.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Diagonal">
+            <summary>
+            Diagonal(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Diagonal.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Diagonal(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Diagonal.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Diagonal.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Diagonal.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Eliminate">
+            <summary>
+            Eliminate(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Eliminate.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Eliminate(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Eliminate.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Eliminate.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Matrices.FindElements">
             <summary>
             Finds elements in matrices or vectors.
@@ -5757,6 +5849,92 @@
             </summary>
             <param name="Argument1">Function argument 1.</param>
             <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Rank">
+            <summary>
+            Rank(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Rank.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Rank(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Rank.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Rank.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Reduce">
+            <summary>
+            Reduce(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Reduce.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Reduce(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Reduce.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Reduce.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Trace">
+            <summary>
+            Trace(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Trace.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Trace(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Trace.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Trace.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Trace.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
@@ -9462,6 +9640,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Vectors.Product.EvaluateProduct(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Multiplies the elements of a vector.
+            </summary>
+            <param name="Vector">Vector</param>
+            <param name="Node">Node performing evaluation.</param>
+            <returns>Sum of elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Vectors.Product.EvaluateProduct(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement},Waher.Script.Model.ScriptNode)">
+            <summary>
+            Multiplies the elements of a vector.
+            </summary>
+            <param name="Elements">Elements to sum.</param>
+            <param name="Node">Node performing evaluation.</param>
+            <returns>Sum of elements.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Vectors.Reverse">
             <summary>
             Reverse(v)
@@ -9886,6 +10080,14 @@
             Sums the elements of a vector.
             </summary>
             <param name="Vector">Vector</param>
+            <param name="Node">Node performing evaluation.</param>
+            <returns>Sum of elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Vectors.Sum.EvaluateSum(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement},Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sums the elements of a vector.
+            </summary>
+            <param name="Elements">Elements to sum.</param>
             <param name="Node">Node performing evaluation.</param>
             <returns>Sum of elements.</returns>
         </member>
@@ -13766,7 +13968,7 @@
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+        <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -13776,6 +13978,7 @@
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
             <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Reduced matrix</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.ToDoubleMatrix">
@@ -14042,7 +14245,7 @@
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14052,9 +14255,10 @@
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
             <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Reduced matrix</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Numerics.Complex[0:,0:],System.Boolean,System.Boolean)">
+        <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Reduce(System.Numerics.Complex[0:,0:],System.Boolean,System.Boolean,System.Numerics.Complex@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14064,6 +14268,7 @@
             is also performed.</param>
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
@@ -14324,7 +14529,7 @@
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14334,9 +14539,10 @@
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
             <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Reduced matrix</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Double[0:,0:],System.Boolean,System.Boolean)">
+        <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Reduce(System.Double[0:,0:],System.Boolean,System.Boolean,System.Double@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14346,6 +14552,7 @@
             is also performed.</param>
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
@@ -14630,7 +14837,7 @@
             </summary>
             <returns>Inverted element, or null if not possible.</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@)">
+        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(System.Boolean,System.Boolean,System.Int32@,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14640,9 +14847,10 @@
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
             <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Reduced matrix</returns>
         </member>
-        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(Waher.Script.Abstraction.Elements.IElement[0:,0:],System.Boolean,System.Boolean)">
+        <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Reduce(Waher.Script.Abstraction.Elements.IElement[0:,0:],System.Boolean,System.Boolean,Waher.Script.Abstraction.Elements.ICommutativeRingWithIdentityElement@)">
             <summary>
             Reduces a matrix.
             </summary>
@@ -14652,6 +14860,7 @@
             is also performed.</param>
             <param name="BreakIfZero">If elimination process should break if a
             zero-row is encountered.</param>
+            <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
             <returns>Rank of matrix, or -1 if process broken.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
@@ -15341,6 +15550,30 @@
             <param name="Right">Right operand.</param>
             <returns>Product.</returns>
         </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Division(Waher.Script.Objects.RationalNumber,Waher.Script.Objects.RationalNumber)">
+            <summary>
+            Divides a rational number with another rational number.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Division(Waher.Script.Objects.RationalNumber,System.Numerics.BigInteger)">
+            <summary>
+            Divides a rational number with a big integer.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Division(System.Numerics.BigInteger,Waher.Script.Objects.RationalNumber)">
+            <summary>
+            Divides a big integer with a rational number.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
+        </member>
         <member name="M:Waher.Script.Objects.RationalNumber.Invert">
             <summary>
             Inverts the element, if possible.
@@ -15377,6 +15610,30 @@
             <param name="Left">Left operand.</param>
             <param name="Right">Right operand.</param>
             <returns>Sum.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Subtraction(Waher.Script.Objects.RationalNumber,Waher.Script.Objects.RationalNumber)">
+            <summary>
+            Subtracts a rational number with another rational number.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Subtraction(Waher.Script.Objects.RationalNumber,System.Numerics.BigInteger)">
+            <summary>
+            Subtracts a rational number with a big integer.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.RationalNumber.op_Subtraction(System.Numerics.BigInteger,Waher.Script.Objects.RationalNumber)">
+            <summary>
+            Subtracts a big integer with a rational number.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <returns>Product.</returns>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumber.Negate">
             <summary>

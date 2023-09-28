@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.Script.Objects
 {
@@ -26,8 +27,16 @@ namespace Waher.Script.Objects
 			if (Denominator.IsZero)
 				throw new DivideByZeroException();
 
-			this.numerator = Numerator;
-			this.denominator = Denominator;
+			if (Denominator.Sign < 0)
+			{
+				this.numerator = -Numerator;
+				this.denominator = -Denominator;
+			}
+			else
+			{
+				this.numerator = Numerator;
+				this.denominator = Denominator;
+			}
 		}
 
 		/// <summary>
@@ -68,18 +77,12 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Field.
 		/// </summary>
-		public override IField AssociatedField
-		{
-			get { return associatedField; }
-		}
+		public override IField AssociatedField => associatedField;
 
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get { return this; }
-		}
+		public override object AssociatedObjectValue => this;
 
 		/// <summary>
 		/// Tries to multiply an element to the current element.
@@ -120,7 +123,7 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Product.</returns>
-		public static RationalNumber operator *(RationalNumber Left, RationalNumber Right)
+		public static ICommutativeRingWithIdentityElement operator *(RationalNumber Left, RationalNumber Right)
 		{
 			if (Left.numerator.IsZero || Right.numerator.IsZero)
 				return RationalNumbers.zero;
@@ -131,7 +134,25 @@ namespace Waher.Script.Objects
 			BigInteger n = BigInteger.Divide(Left.numerator, gcd1) * BigInteger.Divide(Right.numerator, gcd2);
 			BigInteger d = BigInteger.Divide(Left.denominator, gcd2) * BigInteger.Divide(Right.denominator, gcd1);
 
-			return new RationalNumber(n, d);
+			return OperationResult(n, d);
+		}
+
+		private static ICommutativeRingWithIdentityElement OperationResult(BigInteger n, BigInteger d)
+		{
+			if (d.IsOne)
+				return new Integer(n);
+			else if (d.Sign < 0)
+			{
+				n = -n;
+				d = -d;
+
+				if (d.IsOne)
+					return new Integer(n);
+				else
+					return new RationalNumber(n, d);
+			}
+			else
+				return new RationalNumber(n, d);
 		}
 
 		/// <summary>
@@ -140,14 +161,14 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Product.</returns>
-		public static RationalNumber operator *(RationalNumber Left, BigInteger Right)
+		public static ICommutativeRingWithIdentityElement operator *(RationalNumber Left, BigInteger Right)
 		{
 			BigInteger gcd2 = BigInteger.GreatestCommonDivisor(Right, Left.denominator);
 
 			BigInteger n = Left.numerator * BigInteger.Divide(Right, gcd2);
 			BigInteger d = BigInteger.Divide(Left.denominator, gcd2);
 
-			return new RationalNumber(n, d);
+			return OperationResult(n, d);
 		}
 
 		/// <summary>
@@ -156,9 +177,42 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Product.</returns>
-		public static RationalNumber operator *(BigInteger Left, RationalNumber Right)
+		public static ICommutativeRingWithIdentityElement operator *(BigInteger Left, RationalNumber Right)
 		{
 			return Right * Left;
+		}
+
+		/// <summary>
+		/// Divides a rational number with another rational number.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator /(RationalNumber Left, RationalNumber Right)
+		{
+			return Left * new RationalNumber(Right.denominator, Right.numerator);
+		}
+
+		/// <summary>
+		/// Divides a rational number with a big integer.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator /(RationalNumber Left, BigInteger Right)
+		{
+			return Left * new RationalNumber(BigInteger.One, Right);
+		}
+
+		/// <summary>
+		/// Divides a big integer with a rational number.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator /(BigInteger Left, RationalNumber Right)
+		{
+			return new RationalNumber(Left, BigInteger.One) * new RationalNumber(Right.denominator, Right.numerator);
 		}
 
 		/// <summary>
@@ -170,7 +224,7 @@ namespace Waher.Script.Objects
 			if (this.numerator.IsZero)
 				throw new DivideByZeroException();
 
-			return new RationalNumber(this.denominator, this.numerator);
+			return OperationResult(this.denominator, this.numerator);
 		}
 
 		/// <summary>
@@ -203,14 +257,14 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Sum.</returns>
-		public static RationalNumber operator +(RationalNumber Left, RationalNumber Right)
+		public static ICommutativeRingWithIdentityElement operator +(RationalNumber Left, RationalNumber Right)
 		{
 			BigInteger n = Left.numerator * Right.denominator + Right.numerator * Left.denominator;
 			BigInteger d = Right.denominator * Left.denominator;
 
 			BigInteger gcd = BigInteger.GreatestCommonDivisor(n, d);
 
-			return new RationalNumber(BigInteger.Divide(n, gcd), BigInteger.Divide(d, gcd));
+			return OperationResult(BigInteger.Divide(n, gcd), BigInteger.Divide(d, gcd));
 		}
 
 		/// <summary>
@@ -219,12 +273,12 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Sum.</returns>
-		public static RationalNumber operator +(RationalNumber Left, BigInteger Right)
+		public static ICommutativeRingWithIdentityElement operator +(RationalNumber Left, BigInteger Right)
 		{
 			BigInteger n = Left.numerator + Right * Left.denominator;
 			BigInteger gcd = BigInteger.GreatestCommonDivisor(n, Left.denominator);
 
-			return new RationalNumber(BigInteger.Divide(n, gcd), BigInteger.Divide(Left.denominator, gcd));
+			return OperationResult(BigInteger.Divide(n, gcd), BigInteger.Divide(Left.denominator, gcd));
 		}
 
 		/// <summary>
@@ -233,9 +287,42 @@ namespace Waher.Script.Objects
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <returns>Sum.</returns>
-		public static RationalNumber operator +(BigInteger Left, RationalNumber Right)
+		public static ICommutativeRingWithIdentityElement operator +(BigInteger Left, RationalNumber Right)
 		{
 			return Right + Left;
+		}
+
+		/// <summary>
+		/// Subtracts a rational number with another rational number.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator -(RationalNumber Left, RationalNumber Right)
+		{
+			return Left + new RationalNumber(-Right.numerator, Right.denominator);
+		}
+
+		/// <summary>
+		/// Subtracts a rational number with a big integer.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator -(RationalNumber Left, BigInteger Right)
+		{
+			return Left + new RationalNumber(-Right, BigInteger.One);
+		}
+
+		/// <summary>
+		/// Subtracts a big integer with a rational number.
+		/// </summary>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operand.</param>
+		/// <returns>Product.</returns>
+		public static ICommutativeRingWithIdentityElement operator -(BigInteger Left, RationalNumber Right)
+		{
+			return new RationalNumber(Left, BigInteger.One) + new RationalNumber(-Right.numerator, Right.denominator);
 		}
 
 		/// <summary>
@@ -258,7 +345,7 @@ namespace Waher.Script.Objects
 				if (this.numerator.IsZero)
 					return Q.numerator.IsZero;
 				else
-					return this.numerator == Q.numerator && this.denominator == Q.denominator;
+					return this.numerator * Q.denominator == Q.numerator * this.denominator;
 			}
 
 			object Obj = E.AssociatedObjectValue;
@@ -286,18 +373,12 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public override IAbelianGroupElement Zero
-		{
-			get { return RationalNumbers.zero; }
-		}
+		public override IAbelianGroupElement Zero => RationalNumbers.zero;
 
 		/// <summary>
 		/// Returns the identity element of the commutative ring with identity.
 		/// </summary>
-		public override ICommutativeRingWithIdentityElement One
-		{
-			get { return RationalNumbers.one; }
-		}
+		public override ICommutativeRingWithIdentityElement One => RationalNumbers.one;
 
 		/// <summary>
 		/// Converts the value to a .NET type.

@@ -2,6 +2,7 @@
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 
@@ -30,6 +31,20 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(Columns);
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement Evaluate(IElement Argument, Variables Variables)
+		{
+			if (Argument is IMatrix M)
+				return new DoubleNumber(M.Columns);
+			else
+				return base.Evaluate(Argument, Variables);
+		}
 
 		/// <summary>
 		/// Evaluates the function on a vector argument.

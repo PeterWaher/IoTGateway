@@ -388,7 +388,7 @@ namespace Waher.Script.Objects.Matrices
 				}
 			}
 
-			if (Reduce(v, true, true) < 0)
+			if (Reduce(v, true, true, out _) < 0)
 				return null;
 
 			IElement[,] v2 = new IElement[this.rows, this.columns];
@@ -411,11 +411,12 @@ namespace Waher.Script.Objects.Matrices
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
 		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Reduced matrix</returns>
-		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank)
+		public IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank, out ICommutativeRingWithIdentityElement Factor)
 		{
 			IElement[,] M = (IElement[,])this.Values.Clone();
-			Rank = Reduce(M, Eliminate, BreakIfZero);
+			Rank = Reduce(M, Eliminate, BreakIfZero, out Factor);
 			return new ObjectMatrix(M);
 		}
 
@@ -428,8 +429,9 @@ namespace Waher.Script.Objects.Matrices
 		/// is also performed.</param>
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Rank of matrix, or -1 if process broken.</returns>
-		public static int Reduce(IElement[,] Matrix, bool Eliminate, bool BreakIfZero)
+		public static int Reduce(IElement[,] Matrix, bool Eliminate, bool BreakIfZero, out ICommutativeRingWithIdentityElement Factor)
 		{
 			int x, y, u, z;
 			int Rows = Matrix.GetLength(0);
@@ -438,6 +440,9 @@ namespace Waher.Script.Objects.Matrices
 			ICommutativeRingWithIdentityElement a, b;
 			IElement w;
 			int Rank = 0;
+			bool Sign = false;
+
+			Factor = null;
 
 			for (x = 0; x < MinCount; x++)
 			{
@@ -470,6 +475,8 @@ namespace Waher.Script.Objects.Matrices
 							Matrix[x, u] = Matrix[z, u];
 							Matrix[z, u] = w;
 						}
+
+						Sign = !Sign;
 					}
 					else
 					{
@@ -485,7 +492,16 @@ namespace Waher.Script.Objects.Matrices
 				if (a != a.One)
 				{
 					for (u = x; u < Columns; u++)
-						Matrix[x, u] = Divide.EvaluateDivision(Matrix[x, u] , a, null);
+						Matrix[x, u] = Divide.EvaluateDivision(Matrix[x, u], a, null);
+
+					if (Factor is null)
+						Factor = a;
+					else
+					{
+						Factor = Multiply.EvaluateMultiplication(Factor, a, null) as ICommutativeRingWithIdentityElement;
+						if (Factor is null)
+							return -1;
+					}
 				}
 
 				for (y = Eliminate ? 0 : x + 1; y < Rows; y++)
@@ -506,6 +522,16 @@ namespace Waher.Script.Objects.Matrices
 						}
 					}
 				}
+			}
+
+			if (Factor is null)
+				Factor = new DoubleNumber(1);
+
+			if (Sign)
+			{
+				Factor = Factor.Negate() as ICommutativeRingWithIdentityElement;
+				if (Factor is null)
+					return -1;
 			}
 
 			return Rank;

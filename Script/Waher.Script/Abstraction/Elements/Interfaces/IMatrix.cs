@@ -1,4 +1,6 @@
-﻿namespace Waher.Script.Abstraction.Elements
+﻿using Waher.Script.Functions.DateAndTime;
+
+namespace Waher.Script.Abstraction.Elements
 {
 	/// <summary>
 	/// Basic interface for matrices.
@@ -41,8 +43,9 @@
 		/// <param name="BreakIfZero">If elimination process should break if a
 		/// zero-row is encountered.</param>
 		/// <param name="Rank">Rank of matrix, or -1 if process broken.</param>
+		/// <param name="Factor">Multiplication factor for determinant of resulting matrix.</param>
 		/// <returns>Reduced matrix, or null if process broken</returns>
-		IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank);
+		IMatrix Reduce(bool Eliminate, bool BreakIfZero, out int Rank, out ICommutativeRingWithIdentityElement Factor);
 
 		/// <summary>
 		/// Gets an element of the matrix.

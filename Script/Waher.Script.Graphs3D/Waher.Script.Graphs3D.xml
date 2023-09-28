@@ -1051,6 +1051,14 @@
             Name of the function
             </summary>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.EvaluateVector(Waher.Script.Objects.VectorSpaces.DoubleVector,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a vector argument.
@@ -1159,6 +1167,14 @@
         <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.EvaluateVector(Waher.Script.Objects.VectorSpaces.DoubleVector,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
             </summary>
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>

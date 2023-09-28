@@ -1067,15 +1067,29 @@ The following functions operate on vectors:
 
 The following functions operate on matrices:
 
-| Function                 | Description                                                                                                                                       | Example                   |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
-| `FindElements(Search,M)` | Finds elements in a matrix, and returns a matrix of two columns and N rows representing the coordinates, where N is the number of elements found. | `FindElements("Hello",M)` |
-| `Identity(N)`            | Creates an NxN identity matrix.                                                                                                                   | `Identity(10)`            |
-| `Inv(M)`                 | Alias for `Invert(M)`.                                                                                                                            | `Inv([[1,1],[0,1]])`      |
-| `Inverse(M)`             | Alias for `Invert(M)`.                                                                                                                            | `Inverse([[1,1],[0,1]])`  |
-| `Invert(M)`              | Inverts `M`. Works on any invertable element.                                                                                                     | `Invert([[1,1],[0,1]])`   |
-| `Ones(Rows,Columns)`     | Creates an MxN-matrix with all elements set to 1.                                                                                                 | `Ones(5,4)`               |
-| `Zeroes(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 0.                                                                                                 | `Zeroes(5,4)`             |
+| Function                 | Description                                                                                                                                       | Example                    |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| `Columns(M)`             | Returns the number of columns in the matrix `M`. (From the Waher.Script.Graphs3D extension.)                                                      | `Columns(Identity(3))=3`   |
+| `Determinant(M)`         | Returns the determinant of a matrix `M`.                                                                                                          | `Determinant(Identity(3))` |
+| `Det(M)`                 | Alias for `Determinant(M)`.                                                                                                                       | `det(Identity(3))`         |
+| `Diagonal(M)`            | Returns the diagonal vector of a matrix `M`.                                                                                                      | `Diagonal(Identity(3))`    |
+| `Diag(M)`                | Alias for `Diagonal(M)`.                                                                                                                          | `diag(Identity(3))`        |
+| `Eliminate(M)`           | Reduces the rows in the matrix `M`, and eliminates corresponding elements. (Also called Gauss-Jordan elimination of the matrix.)                  | `Eliminate(M)`             |
+| `FindElements(Search,M)` | Finds elements in a matrix, and returns a matrix of two columns and N rows representing the coordinates, where N is the number of elements found. | `FindElements("Hello",M)`  |
+| `Identity(N)`            | Creates an NxN identity matrix.                                                                                                                   | `Identity(10)`             |
+| `Inv(M)`                 | Alias for `Invert(M)`.                                                                                                                            | `Inv([[1,1],[0,1]])`       |
+| `Inverse(M)`             | Alias for `Invert(M)`.                                                                                                                            | `Inverse([[1,1],[0,1]])`   |
+| `Invert(M)`              | Inverts `M`. Works on any invertable element.                                                                                                     | `Invert([[1,1],[0,1]])`    |
+| `Ones(Rows,Columns)`     | Creates an MxN-matrix with all elements set to 1.                                                                                                 | `Ones(5,4)`                |
+| `Rank(M)`                | Computes the rank of the matrix `M`.                                                                                                              | `Rank(M)=Rows(M)`          |
+| `Reduce(M)`              | Reduces the rows in the matrix `M`. (Also called Gauss-elimination, or row reduction of a matrix.)                                                | `Reduce(M)`                |
+| `Rows(M)`                | Returns the number of rows in the matrix `M`. (From the Waher.Script.Graphs3D extension.)                                                         | `Rows(Identity(3))=3`      |
+| `Trace(M)`               | Returns the sum of the elements on the diagonal of a matrix `M`.                                                                                  | `Trace(Identity(3))`       |
+| `Tr(M)`                  | Alias for `Trace(M)`.                                                                                                                             | `tr(Identity(3))`          |
+| `Zeroes(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 0.                                                                                                 | `Zeroes(5,4)`              |
+
+**Note**: The transpose and conjugate transpose of a matrix is performed using the `T` and `H`
+suffix operators, not by function calls.
 
 ### Transforms
 

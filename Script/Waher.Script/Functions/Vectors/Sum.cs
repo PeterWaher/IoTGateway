@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -107,16 +108,27 @@ namespace Waher.Script.Functions.Vectors
         /// <returns>Sum of elements.</returns>
         public static IElement EvaluateSum(IVector Vector, ScriptNode Node)
         {
-            ISemiGroupElement Result = null;
+            return EvaluateSum(Vector.VectorElements, Node);
+        }
+
+		/// <summary>
+		/// Sums the elements of a vector.
+		/// </summary>
+		/// <param name="Elements">Elements to sum.</param>
+		/// <param name="Node">Node performing evaluation.</param>
+		/// <returns>Sum of elements.</returns>
+		public static IElement EvaluateSum(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			ISemiGroupElement Result = null;
             ISemiGroupElement SE;
             ISemiGroupElement Sum;
 
-            foreach (IElement E in Vector.VectorElements)
+            foreach (IElement E in Elements)
             {
                 SE = E as ISemiGroupElement;
                 if (SE is null)
 				{
-					if (Vector.ChildElements.Count == 1)
+					if (Elements.Count == 1)
 						return E;
 					else
 						throw new ScriptRuntimeException("Elements not addable.", Node);

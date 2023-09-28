@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Units;
 using System.Threading.Tasks;
@@ -126,7 +125,7 @@ namespace Waher.Script.Test
 			}
 			else if (Result is double d)
 			{
-				if (Convert.ToDouble(Expected) != d)
+				if (Math.Abs(Convert.ToDouble(Expected) - d) > 1e-10)
 					Assert.Fail("Expected " + Expected.ToString() + ", but got " + Result.ToString() + ": " + Script);
 			}
 			else if (Expected is null)

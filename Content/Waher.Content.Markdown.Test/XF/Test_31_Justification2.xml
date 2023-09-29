@@ -1,0 +1,54 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<StackLayout Orientation="Vertical">
+		<ContentView Padding="0,5,0,5">
+			<Grid RowSpacing="0" ColumnSpacing="0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+					<Label>1.</Label>
+				</ContentView>
+				<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+					<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+						<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<strong>DEFINED TERMS </strong>]]></Label>
+					</ContentView>
+					<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+						<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[In these Terms the following words have the following meanings: ]]></Label>
+					</ContentView>
+					<ContentView Padding="0,5,0,5">
+						<Grid RowSpacing="0" ColumnSpacing="0">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+							</Grid.RowDefinitions>
+							<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+								<Label>1.</Label>
+							</ContentView>
+							<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+								<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+									<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA["<strong>Applicable Law</strong>" means all laws, regulations, rules and regulatory guidance applicable to the operation of the Techical Operator’s Site.]]></Label>
+								</ContentView>
+							</StackLayout>
+							<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+								<Label>2.</Label>
+							</ContentView>
+							<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+								<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+									<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<strong>“A Beneficiary”</strong> means  a third party named in this agreement who will receive funds for the defined project/initiative in accordance to this this agreement and who agrees to use such funds solely for the purpose of the said project/initiative.]]></Label>
+								</ContentView>
+							</StackLayout>
+						</Grid>
+					</ContentView>
+				</StackLayout>
+			</Grid>
+		</ContentView>
+	</StackLayout>
+</StackLayout>

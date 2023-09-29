@@ -252,5 +252,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await this.DoTest("Test_30_Incomplete.md", "Test_30_Incomplete.html");
 		}
+
+		[TestMethod]
+		public async Task Test_31_Justification2()
+		{
+			await this.DoTest("Test_31_Justification2.md", "Test_31_Justification2.html");
+		}
 	}
 }

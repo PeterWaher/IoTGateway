@@ -1,0 +1,41 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData />
+	<elements>
+		<MarginAligned>
+			<NumberedList>
+				<NumberedItem number="1">
+					<NestedBlock>
+						<Paragraph>
+							<Strong>
+								<InlineText>DEFINED TERMS </InlineText>
+							</Strong>
+						</Paragraph>
+						<Paragraph>
+							<InlineText>In these Terms the following words have the following meanings: </InlineText>
+						</Paragraph>
+						<NumberedList>
+							<NumberedItem number="1">
+								<Paragraph>
+									<InlineText>"</InlineText>
+									<Strong>
+										<InlineText>Applicable Law</InlineText>
+									</Strong>
+									<InlineText>" means all laws, regulations, rules and regulatory guidance applicable to the operation of the Techical Operator’s Site.</InlineText>
+								</Paragraph>
+							</NumberedItem>
+							<UnnumberedItem prefix="#. ">
+								<Paragraph>
+									<Strong>
+										<InlineText>“A Beneficiary”</InlineText>
+									</Strong>
+									<InlineText> means  a third party named in this agreement who will receive funds for the defined project/initiative in accordance to this this agreement and who agrees to use such funds solely for the purpose of the said project/initiative.</InlineText>
+								</Paragraph>
+							</UnnumberedItem>
+						</NumberedList>
+					</NestedBlock>
+				</NumberedItem>
+			</NumberedList>
+		</MarginAligned>
+	</elements>
+	<references />
+</parsedMakdown>

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Xml;
@@ -217,6 +214,12 @@ namespace Waher.Content.Markdown.Test
 		public async Task Test_30_Incomplete()
 		{
 			await this.DoTest("Test_30_Incomplete.md", "Test_30_Incomplete.xml");
+		}
+
+		[TestMethod]
+		public async Task Test_31_Justification2()
+		{
+			await this.DoTest("Test_31_Justification2.md", "Test_31_Justification2.xml");
 		}
 	}
 }

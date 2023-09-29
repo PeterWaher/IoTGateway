@@ -491,6 +491,8 @@ namespace Waher.Content.Markdown
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			LinkedList<MarkdownElement> Content;
+			List<Block> AlignedBlocks;
+			Block NextBlock;
 			Block Block;
 			string[] Rows;
 			string s, s2;
@@ -644,7 +646,17 @@ namespace Waher.Content.Markdown
 				{
 					if (Block.IsSuffixedBy("<<") && Block.IsPrefixedBy(">>", false))
 					{
-						Content = this.ParseBlocks(Block.RemovePrefixAndSuffix(">>", 2, "<<"));
+						AlignedBlocks = Block.RemovePrefixAndSuffix(">>", 2, "<<");
+
+						while (BlockIndex < EndBlock &&
+							(NextBlock = Blocks[BlockIndex + 1]).IsPrefixedBy(">>", false) &&
+							NextBlock.IsSuffixedBy("<<"))
+						{
+							BlockIndex++;
+							AlignedBlocks.AddRange(NextBlock.RemovePrefixAndSuffix(">>", 2, "<<"));
+						}
+
+						Content = this.ParseBlocks(AlignedBlocks);
 
 						if (!(Elements.Last is null) && Elements.Last.Value is CenterAligned CenterAligned)
 							CenterAligned.AddChildren(Content);
@@ -653,7 +665,16 @@ namespace Waher.Content.Markdown
 					}
 					else if (Block.IsSuffixedBy(">>"))
 					{
-						Content = this.ParseBlocks(Block.RemoveSuffix(">>"));
+						AlignedBlocks = Block.RemoveSuffix(">>");
+
+						while (BlockIndex < EndBlock &&
+							(NextBlock = Blocks[BlockIndex + 1]).IsSuffixedBy(">>"))
+						{
+							BlockIndex++;
+							AlignedBlocks.AddRange(NextBlock.RemoveSuffix(">>"));
+						}
+
+						Content = this.ParseBlocks(AlignedBlocks);
 
 						if (!(Elements.Last is null) && Elements.Last.Value is RightAligned RightAligned)
 							RightAligned.AddChildren(Content);
@@ -676,7 +697,17 @@ namespace Waher.Content.Markdown
 				{
 					if (Block.IsSuffixedBy(">>"))
 					{
-						Content = this.ParseBlocks(Block.RemovePrefixAndSuffix("<<", 2, ">>"));
+						AlignedBlocks = Block.RemovePrefixAndSuffix("<<", 2, ">>");
+
+						while (BlockIndex < EndBlock &&
+							(NextBlock = Blocks[BlockIndex + 1]).IsPrefixedBy("<<", false) &&
+							NextBlock.IsSuffixedBy(">>"))
+						{
+							BlockIndex++;
+							AlignedBlocks.AddRange(NextBlock.RemovePrefixAndSuffix("<<", 2, ">>"));
+						}
+
+						Content = this.ParseBlocks(AlignedBlocks);
 
 						if (!(Elements.Last is null) && Elements.Last.Value is MarginAligned MarginAligned)
 							MarginAligned.AddChildren(Content);
@@ -685,7 +716,16 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						Content = this.ParseBlocks(Block.RemovePrefix("<<", 2));
+						AlignedBlocks = Block.RemovePrefix("<<", 2);
+
+						while (BlockIndex < EndBlock &&
+							(NextBlock = Blocks[BlockIndex + 1]).IsPrefixedBy("<<", false))
+						{
+							BlockIndex++;
+							AlignedBlocks.AddRange(NextBlock.RemovePrefix("<<", 2));
+						}
+
+						Content = this.ParseBlocks(AlignedBlocks);
 
 						if (!(Elements.Last is null) && Elements.Last.Value is LeftAligned LeftAligned)
 							LeftAligned.AddChildren(Content);

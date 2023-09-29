@@ -1,0 +1,39 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<StackPanel>
+		<Grid Margin="0,5,0,5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+			<StackPanel Grid.Column="1" Grid.Row="0">
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+					<Bold>DEFINED TERMS </Bold>
+				</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">In these Terms the following words have the following meanings: </TextBlock>
+				<Grid Margin="0,5,0,5">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+					<StackPanel Grid.Column="1" Grid.Row="0">
+						<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">"<Bold>Applicable Law</Bold>" means all laws, regulations, rules and regulatory guidance applicable to the operation of the Techical Operator’s Site.</TextBlock>
+					</StackPanel>
+					<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,5,5,5">2.</TextBlock>
+					<StackPanel Grid.Column="1" Grid.Row="1">
+						<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+							<Bold>“A Beneficiary”</Bold> means  a third party named in this agreement who will receive funds for the defined project/initiative in accordance to this this agreement and who agrees to use such funds solely for the purpose of the said project/initiative.</TextBlock>
+					</StackPanel>
+				</Grid>
+			</StackPanel>
+		</Grid>
+	</StackPanel>
+</StackPanel>

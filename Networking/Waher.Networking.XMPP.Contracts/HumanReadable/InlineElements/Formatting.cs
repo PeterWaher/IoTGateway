@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
+﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
 	/// <summary>
 	/// Abstract base class for inline formatting elements.

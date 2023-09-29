@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
+﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {
 	/// <summary>
 	/// Abstract base class for item lists

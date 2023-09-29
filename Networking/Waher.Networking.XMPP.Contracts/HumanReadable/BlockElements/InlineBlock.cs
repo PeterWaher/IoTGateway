@@ -1,19 +1,16 @@
-﻿using System;
-using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
-
-namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
+﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {
 	/// <summary>
 	/// Abstract base class of blocks with inline elements.
 	/// </summary>
 	public abstract class InlineBlock : BlockElement
 	{
-		private InlineElement[] elements;
+		private HumanReadableElement[] elements;
 
 		/// <summary>
 		/// Inline elements
 		/// </summary>
-		public InlineElement[] Elements
+		public HumanReadableElement[] Elements
 		{
 			get => this.elements;
 			set => this.elements = value;
@@ -29,7 +26,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 				if (this.elements is null)
 					return false;
 
-				foreach (InlineElement E in this.elements)
+				foreach (HumanReadableElement E in this.elements)
 				{
 					if (E is null || !E.IsWellDefined)
 						return false;

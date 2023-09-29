@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.XMPP.Contracts.HumanReadable
+﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {
 	/// <summary>
 	/// Type of Markdown to generate

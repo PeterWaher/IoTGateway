@@ -56,22 +56,26 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
+			Indent(Markdown, Indentation);
 			Markdown.Append(new string('#', SectionLevel));
 			Markdown.Append(' ');
 
 			if (!(this.header is null))
 			{
 				foreach (InlineElement E in this.header)
-					E.GenerateMarkdown(Markdown, SectionLevel, Settings);
+					E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
 			}
 
 			Markdown.AppendLine();
+
+			Indent(Markdown, Indentation);
 			Markdown.AppendLine();
 
-			base.GenerateMarkdown(Markdown, SectionLevel + 1, Settings);
+			base.GenerateMarkdown(Markdown, SectionLevel + 1, Indentation, Settings);
 		}
 
 	}

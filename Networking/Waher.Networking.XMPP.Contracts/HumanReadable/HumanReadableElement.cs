@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
+using Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements;
+using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {
@@ -78,8 +80,20 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public abstract void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings);
+		public abstract void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings);
+
+		/// <summary>
+		/// Outputs indentation to Markdown output.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="Indentation">Number of tabs of indentation.</param>
+		protected static void Indent(StringBuilder Markdown, int Indentation)
+		{
+			while (Indentation-- > 0)
+				Markdown.Append('\t');
+		}
 
 		/// <summary>
 		/// Encodes text to Markdown.
@@ -104,6 +118,60 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		{
 			"\\*", "\\_", "\\~", "\\\\", "\\`", "\\{", "\\}", "\\[", "\\]", "\\(", "\\)", "\\<", "\\>", "\\&", "\\#", "\\^"
 		};
+
+		/// <summary>
+		/// Parses XML for a set of block or inline elements (but not both).
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <returns>Array of inline elements</returns>
+		public static HumanReadableElement[] ParseBlockOrInlineChildren(XmlElement Xml)
+		{
+			List<InlineElement> InlineElements = null;
+			List<BlockElement> BlockElements = null;
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					InlineElement InlineElement = InlineElement.TryParse(E);
+					if (InlineElement is null)
+					{
+						BlockElement BlockElement = BlockElement.TryParse(E);
+						if (BlockElement is null)
+							return null;
+						else
+						{
+							if (BlockElements is null)
+								BlockElements = new List<BlockElement>();
+
+							BlockElements.Add(BlockElement);
+						}
+					}
+					else
+					{
+						if (InlineElements is null)
+							InlineElements = new List<InlineElement>();
+
+						InlineElements.Add(InlineElement);
+					}
+				}
+			}
+
+			if (BlockElements is null)
+				return InlineElements?.ToArray();
+			else
+			{
+				if (!(InlineElements is null))
+				{
+					BlockElements.Add(new Paragraph()
+					{
+						Elements = InlineElements.ToArray()
+					});
+				}
+
+				return BlockElements.ToArray();
+			}
+		}
 
 	}
 }

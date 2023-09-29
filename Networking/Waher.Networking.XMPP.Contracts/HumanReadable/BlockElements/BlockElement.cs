@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
@@ -15,100 +14,112 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Array of block elements</returns>
-		public static BlockElement[] Parse(XmlElement Xml)
+		public static BlockElement[] ParseChildren(XmlElement Xml)
 		{
 			List<BlockElement> Result = new List<BlockElement>();
-			Parse(Xml, Result);
+			ParseChildren(Xml, Result);
 			return Result.ToArray();
 		}
 
-		private static void Parse(XmlElement Xml, List<BlockElement> Result)
+		private static void ParseChildren(XmlElement Xml, List<BlockElement> Result)
 		{
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E)
 				{
-					switch (E.LocalName)
+					BlockElement Element = TryParse(E);
+
+					if (Element is null)
 					{
-						case "paragraph":
-							Result.Add(new Paragraph()
-							{
-								Elements = InlineElement.Parse(E)
-							});
-							break;
-
-						case "section":
-							Section Section = new Section();
-
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (N2 is XmlElement E2)
-								{
-									switch (E2.LocalName)
-									{
-										case "header":
-											Section.Header = InlineElement.Parse(E2);
-											break;
-
-										case "body":
-											Section.Body = BlockElement.Parse(E2);
-											break;
-									}
-								}
-							}
-
-							Result.Add(Section);
-							break;
-
-						case "bulletItems":
-							List<Item> Items = new List<Item>();
-
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (N2 is XmlElement E2 && E2.LocalName == "item")
-								{
-									Items.Add(new Item()
-									{
-										Elements = InlineElement.Parse(E2)
-									});
-								}
-							}
-
-							Result.Add(new BulletList()
-							{
-								Items = Items.ToArray()
-							});
-							break;
-
-						case "numberedItems":
-							Items = new List<Item>();
-
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (N2 is XmlElement E2 && E2.LocalName == "item")
-								{
-									Items.Add(new Item()
-									{
-										Elements = InlineElement.Parse(E2)
-									});
-								}
-							}
-
-							Result.Add(new NumberedList()
-							{
-								Items = Items.ToArray()
-							});
-							break;
-
-						default:
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (N2 is XmlElement E2)
-									Parse(E2, Result);
-							}
-							break;
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (N2 is XmlElement E2)
+								ParseChildren(E2, Result);
+						}
 					}
+					else
+						Result.Add(Element);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to parse a single block element from its XML definition..
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <returns>Block element, or null if not recognized.</returns>
+		public static BlockElement TryParse(XmlElement Xml)
+		{
+			switch (Xml.LocalName)
+			{
+				case "paragraph":
+					return new Paragraph()
+					{
+						Elements = InlineElement.ParseChildren(Xml)
+					};
+
+				case "section":
+					Section Section = new Section();
+
+					foreach (XmlNode N2 in Xml.ChildNodes)
+					{
+						if (N2 is XmlElement E2)
+						{
+							switch (E2.LocalName)
+							{
+								case "header":
+									Section.Header = InlineElement.ParseChildren(E2);
+									break;
+
+								case "body":
+									Section.Body = ParseChildren(E2);
+									break;
+							}
+						}
+					}
+
+					return Section;
+
+				case "bulletItems":
+					List<Item> Items = new List<Item>();
+
+					foreach (XmlNode N2 in Xml.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "item")
+						{
+							Items.Add(new Item()
+							{
+								Elements = ParseBlockOrInlineChildren(E2)
+							});
+						}
+					}
+
+					return new BulletList()
+					{
+						Items = Items.ToArray()
+					};
+
+				case "numberedItems":
+					Items = new List<Item>();
+
+					foreach (XmlNode N2 in Xml.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "item")
+						{
+							Items.Add(new Item()
+							{
+								Elements = ParseBlockOrInlineChildren(E2)
+							});
+						}
+					}
+
+					return new NumberedList()
+					{
+						Items = Items.ToArray()
+					};
+
+				default:
+					return null;
 			}
 		}
 	}

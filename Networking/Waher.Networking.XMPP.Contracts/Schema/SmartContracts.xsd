@@ -981,7 +981,10 @@ purposes.
 					<xs:sequence>
 						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
 							<xs:complexType>
-								<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+								<xs:choice>
+									<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+									<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'/>
+								</xs:choice>
 							</xs:complexType>
 						</xs:element>
 					</xs:sequence>
@@ -995,7 +998,10 @@ purposes.
 					<xs:sequence>
 						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
 							<xs:complexType>
-								<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+								<xs:choice>
+									<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+									<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'/>
+								</xs:choice>
 							</xs:complexType>
 						</xs:element>
 					</xs:sequence>

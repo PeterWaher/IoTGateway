@@ -20,12 +20,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Xml">XML representation.</param>
 		/// <returns>Human-readable text.</returns>
-		public new static HumanReadableText Parse(XmlElement Xml)
+		public static HumanReadableText Parse(XmlElement Xml)
 		{
 			HumanReadableText Result = new HumanReadableText()
 			{
 				language = XML.Attribute(Xml, "xml:lang"),
-				Body = BlockElement.Parse(Xml)
+				Body = ParseChildren(Xml)
 			};
 
 			return Result;
@@ -146,7 +146,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		public string GenerateMarkdown(MarkdownSettings Settings)
 		{
 			StringBuilder Markdown = new StringBuilder();
-			this.GenerateMarkdown(Markdown, 1, Settings);
+			this.GenerateMarkdown(Markdown, 1, 0, Settings);
 			return Markdown.ToString();
 		}
 

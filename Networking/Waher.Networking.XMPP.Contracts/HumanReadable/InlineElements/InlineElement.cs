@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -15,87 +14,96 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Array of inline elements</returns>
-		public static InlineElement[] Parse(XmlElement Xml)
+		public static InlineElement[] ParseChildren(XmlElement Xml)
 		{
 			List<InlineElement> Result = new List<InlineElement>();
-			Parse(Xml, Result);
+			ParseChildren(Xml, Result);
 			return Result.ToArray();
 		}
 
-		private static void Parse(XmlElement Xml, List<InlineElement> Result)
+		private static void ParseChildren(XmlElement Xml, List<InlineElement> Result)
 		{ 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E)
 				{
-					switch (E.LocalName)
+					InlineElement Element = TryParse(E);
+
+					if (Element is null)
 					{
-						case "text":
-							Result.Add(new Text()
-							{
-								Value = E.InnerText
-							});
-							break;
-
-						case "parameter":
-							Result.Add(new Parameter()
-							{
-								Name = XML.Attribute(E, "name")
-							});
-							break;
-
-						case "bold":
-							Result.Add(new Bold()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						case "italic":
-							Result.Add(new Italic()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						case "underline":
-							Result.Add(new Underline()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						case "strikeThrough":
-							Result.Add(new StrikeThrough()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						case "super":
-							Result.Add(new Superscript()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						case "sub":
-							Result.Add(new Subscript()
-							{
-								Elements = Parse(E)
-							});
-							break;
-
-						default:
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (N2 is XmlElement E2)
-									Parse(E2, Result);
-							}
-							break;
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (N2 is XmlElement E2)
+								ParseChildren(E2, Result);
+						}
 					}
+					else
+						Result.Add(Element);
 				}
 			}
 		}
+
+		/// <summary>
+		/// Tries to parse a single inline element from its XML definition..
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <returns>Inline element, or null if not recognized.</returns>
+		public static InlineElement TryParse(XmlElement Xml)
+		{
+			switch (Xml.LocalName)
+			{
+				case "text":
+					return new Text()
+					{
+						Value = Xml.InnerText
+					};
+
+				case "parameter":
+					return new Parameter()
+					{
+						Name = XML.Attribute(Xml, "name")
+					};
+
+				case "bold":
+					return new Bold()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				case "italic":
+					return new Italic()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				case "underline":
+					return new Underline()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				case "strikeThrough":
+					return new StrikeThrough()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				case "super":
+					return new Superscript()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				case "sub":
+					return new Subscript()
+					{
+						Elements = ParseChildren(Xml)
+					};
+
+				default:
+					return null;
+			}
+		}
+
 	}
 }

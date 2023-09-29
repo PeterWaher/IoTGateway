@@ -3893,12 +3893,19 @@
             Abstract base class for inline elements.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement.Parse(System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement.ParseChildren(System.Xml.XmlElement)">
             <summary>
             Parses XML for a set of block elements.
             </summary>
             <param name="Xml">XML representation</param>
             <returns>Array of block elements</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BlockElement.TryParse(System.Xml.XmlElement)">
+            <summary>
+            Tries to parse a single block element from its XML definition..
+            </summary>
+            <param name="Xml">XML representation</param>
+            <returns>Block element, or null if not recognized.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks">
             <summary>
@@ -3915,12 +3922,13 @@
             Checks if the element is well-defined.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList">
@@ -3934,12 +3942,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.BulletList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock">
@@ -3968,12 +3977,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList">
@@ -4002,12 +4012,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.NumberedList.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph">
@@ -4021,12 +4032,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Paragraph.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section">
@@ -4050,12 +4062,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement">
@@ -4089,13 +4102,21 @@
             <param name="Elements">Elements to serialize.</param>
             <param name="EncapsulatingElementName">Encapsulating element name.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.Indent(System.Text.StringBuilder,System.Int32)">
+            <summary>
+            Outputs indentation to Markdown output.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="Indentation">Number of tabs of indentation.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.MarkdownEncode(System.String,System.Boolean)">
             <summary>
@@ -4104,6 +4125,13 @@
             <param name="s">Text to encode.</param>
             <param name="SimpleEscape">If simplified escape procedures are to be used.</param>
             <returns>Encoded text.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.ParseBlockOrInlineChildren(System.Xml.XmlElement)">
+            <summary>
+            Parses XML for a set of block or inline elements (but not both).
+            </summary>
+            <param name="Xml">XML representation</param>
+            <returns>Array of inline elements</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText">
             <summary>
@@ -4204,12 +4232,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Bold.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting">
@@ -4232,12 +4261,19 @@
             Abstract base class for inline elements.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement.Parse(System.Xml.XmlElement)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement.ParseChildren(System.Xml.XmlElement)">
             <summary>
             Parses XML for a set of inline elements.
             </summary>
             <param name="Xml">XML representation</param>
             <returns>Array of inline elements</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.InlineElement.TryParse(System.Xml.XmlElement)">
+            <summary>
+            Tries to parse a single inline element from its XML definition..
+            </summary>
+            <param name="Xml">XML representation</param>
+            <returns>Inline element, or null if not recognized.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic">
             <summary>
@@ -4250,12 +4286,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Italic.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter">
@@ -4279,12 +4316,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough">
@@ -4298,12 +4336,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.StrikeThrough.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript">
@@ -4317,12 +4356,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Subscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript">
@@ -4336,12 +4376,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Superscript.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text">
@@ -4365,12 +4406,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline">
@@ -4384,12 +4426,13 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline.GenerateMarkdown(System.Text.StringBuilder,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Underline.GenerateMarkdown(System.Text.StringBuilder,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
             <param name="Markdown">Markdown output.</param>
             <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType">

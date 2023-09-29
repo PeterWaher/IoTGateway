@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -22,15 +21,16 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			Markdown.Append('[');
 
 			if (!(this.Elements is null))
 			{
 				foreach (InlineElement E in this.Elements)
-					E.GenerateMarkdown(Markdown, SectionLevel, Settings);
+					E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
 			}
 
 			Markdown.Append(']');

@@ -158,7 +158,11 @@ namespace Waher.Utility.Install
 								throw new Exception("Missing instance.");
 
 							if (string.IsNullOrEmpty(Suffix))
+							{
 								Suffix = args[i++];
+								if (!string.IsNullOrEmpty(Suffix))
+									Suffix = "." + Suffix;
+							}
 							else
 								throw new Exception("Only one instance allowed.");
 							break;

@@ -879,8 +879,8 @@
 		<Folder name='Themes'>
 			<Folder name='CactusRose'>
 				<Content fileName='CactusRose.cssx'/>
-				<Content fileName='CactusRose.xml'/>
 				<Content fileName='CactusRose.png'/>
+				<Content fileName='CactusRose.xml'/>
 				<Content fileName='CactusRoseBanner1400x425.png'/>
 				<Content fileName='CactusRoseBanner1900x500.png'/>
 				<Content fileName='CactusRoseBanner2000x600.png'/>
@@ -891,8 +891,8 @@
 			</Folder>
 			<Folder name='GothicPeacock'>
 				<Content fileName='GothicPeacock.cssx'/>
-				<Content fileName='GothicPeacock.xml'/>
 				<Content fileName='GothicPeacock.png'/>
+				<Content fileName='GothicPeacock.xml'/>
 				<Content fileName='GothicPeacockBanner1400x425.png'/>
 				<Content fileName='GothicPeacockBanner1900x500.png'/>
 				<Content fileName='GothicPeacockBanner2000x600.png'/>
@@ -901,17 +901,22 @@
 				<Content fileName='GothicPeacock1600x1600.png'/>
 				<Content fileName='GothicPeacock1600x1600Dimmed.png'/>
 			</Folder>
+			<Folder name='Retro64'>
+				<Content fileName='Retro64.cssx'/>
+				<Content fileName='Retro64.png'/>
+				<Content fileName='Retro64.xml'/>
+			</Folder>
 			<Folder name='SpaceGravel'>
 				<Content fileName='SpaceGravel.cssx'/>
-				<Content fileName='SpaceGravel.xml'/>
 				<Content fileName='SpaceGravel.png'/>
+				<Content fileName='SpaceGravel.xml'/>
 				<Content fileName='SpaceGravel800x800.png'/>
 				<Content fileName='SpaceGravel1600x1600.png'/>
 			</Folder>
 			<Folder name='WinterDawn'>
 				<Content fileName='WinterDawn.cssx'/>
-				<Content fileName='WinterDawn.xml'/>
 				<Content fileName='WinterDawn.png'/>
+				<Content fileName='WinterDawn.xml'/>
 				<Content fileName='WinterDawnBanner1400x425.png'/>
 				<Content fileName='WinterDawnBanner1900x500.png'/>
 				<Content fileName='WinterDawnBanner2000x600.png'/>

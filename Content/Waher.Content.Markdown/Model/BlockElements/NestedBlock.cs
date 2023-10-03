@@ -10,6 +10,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class NestedBlock : BlockElementChildren
 	{
+		private readonly bool hasBlocks = false;
+
 		/// <summary>
 		/// Represents a nested block with no special formatting rules in a markdown document.
 		/// </summary>
@@ -18,6 +20,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public NestedBlock(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
 			: base(Document, Children)
 		{
+			this.hasBlocks = this.CalcHasBlocks();
 		}
 
 		/// <summary>
@@ -28,7 +31,76 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public NestedBlock(MarkdownDocument Document, params MarkdownElement[] Children)
 			: base(Document, Children)
 		{
+			this.hasBlocks = this.CalcHasBlocks();
 		}
+
+		private bool CalcHasBlocks()
+		{
+			bool HasBlocks = false;
+			bool HasSpans = false;
+			bool Inconsistent = false;
+
+			foreach (MarkdownElement E in this.Children)
+			{
+				if (E.IsBlockElement)
+				{
+					HasBlocks = true;
+					if (HasSpans)
+					{
+						Inconsistent = true;
+						break;
+					}
+				}
+				else
+				{
+					HasSpans = true;
+					if (HasBlocks)
+					{
+						Inconsistent = true;
+						break;
+					}
+				}
+			}
+
+			if (!Inconsistent)
+				return HasBlocks;
+
+			LinkedList<MarkdownElement> NewChildren = new LinkedList<MarkdownElement>();
+			LinkedList<MarkdownElement> Spans = null;
+
+			foreach (MarkdownElement E in this.Children)
+			{
+				if (E.IsBlockElement)
+				{
+					if (!(Spans is null))
+					{
+						NewChildren.AddLast(new Paragraph(this.Document, Spans));
+						Spans = null;
+					}
+
+					NewChildren.AddLast(E);
+				}
+				else
+				{
+					if (Spans is null)
+						Spans = new LinkedList<MarkdownElement>();
+
+					Spans.AddLast(E);
+				}
+			}
+
+			if (!(Spans is null))
+				NewChildren.AddLast(new Paragraph(this.Document, Spans));
+
+			this.SetChildren(NewChildren);
+
+			return true;
+		}
+
+		/// <summary>
+		/// If the element is a block element.
+		/// </summary>
+		public override bool IsBlockElement => this.hasBlocks;
 
 		/// <summary>
 		/// Generates HTML for the markdown element.

@@ -298,11 +298,13 @@
 			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
 				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1]]></Label>
 			</StackLayout>
-			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
 				<Label>2.</Label>
 			</ContentView>
 			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
-				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				</ContentView>
 				<ContentView Padding="0,5,0,5">
 					<Grid RowSpacing="0" ColumnSpacing="0">
 						<Grid.ColumnDefinitions>
@@ -356,11 +358,13 @@
 			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
 				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1]]></Label>
 			</StackLayout>
-			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
 				<Label>2.</Label>
 			</ContentView>
 			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
-				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				</ContentView>
 				<ContentView Padding="0,5,0,5">
 					<Grid RowSpacing="0" ColumnSpacing="0">
 						<Grid.ColumnDefinitions>
@@ -414,11 +418,13 @@
 			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
 				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1]]></Label>
 			</StackLayout>
-			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
 				<Label>2.</Label>
 			</ContentView>
 			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
-				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				</ContentView>
 				<ContentView Padding="0,5,0,5">
 					<Grid RowSpacing="0" ColumnSpacing="0">
 						<Grid.ColumnDefinitions>
@@ -472,11 +478,13 @@
 			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
 				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1]]></Label>
 			</StackLayout>
-			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
 				<Label>2.</Label>
 			</ContentView>
 			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
-				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				</ContentView>
 				<ContentView Padding="0,5,0,5">
 					<Grid RowSpacing="0" ColumnSpacing="0">
 						<Grid.ColumnDefinitions>
@@ -494,11 +502,13 @@
 						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
 							<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2a]]></Label>
 						</StackLayout>
-						<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
 							<Label>2.</Label>
 						</ContentView>
 						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
-							<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2b ]]></Label>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2b ]]></Label>
+							</ContentView>
 							<ContentView Padding="0,5,0,5">
 								<Grid RowSpacing="0" ColumnSpacing="0">
 									<Grid.ColumnDefinitions>
@@ -545,6 +555,409 @@
 			</ContentView>
 			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
 				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 3]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Multi-paragraph, multi-level lists:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<StackLayout Orientation="Vertical">
+						<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1." />
+					</StackLayout>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.1]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.1.]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<StackLayout Orientation="Vertical">
+									<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.1." />
+								</StackLayout>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.1.]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.1.1]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.1.1.]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<StackLayout Orientation="Vertical">
+												<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.1.1." />
+											</StackLayout>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.1.1.]]></Label>
+										</ContentView>
+									</StackLayout>
+									<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.1.2]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.1.2.]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<StackLayout Orientation="Vertical">
+												<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.1.2." />
+											</StackLayout>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.1.2.]]></Label>
+										</ContentView>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.2]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.2.]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<StackLayout Orientation="Vertical">
+									<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.2." />
+								</StackLayout>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.2.]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.2.1]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.2.1.]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<StackLayout Orientation="Vertical">
+												<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.2.1." />
+											</StackLayout>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.2.1.]]></Label>
+										</ContentView>
+									</StackLayout>
+									<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.2.2]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1.2.2.]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<StackLayout Orientation="Vertical">
+												<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="This is some code of item 1.2.2." />
+											</StackLayout>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Third paragraph of item 1.2.2.]]></Label>
+										</ContentView>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Starting with simple items, continuing with block items:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 1.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 2.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>3.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 3.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="3">
+				<Label>4.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 4.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 4 has a second paragraph.]]></Label>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="4">
+				<Label>5.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="4" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 5.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="5">
+				<Label>6.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="5" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Item 6.]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Multi-paragraph, multi-level lists:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Unchecked]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 1]]></Label>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Checked]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Unchecked subitem]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<StackLayout Orientation="Vertical">
+									<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="Some code" />
+								</StackLayout>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2.1]]></Label>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Checked subitem]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2.2]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Unchecked subsubitem]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Checked subsubitem]]></Label>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<StackLayout Orientation="Vertical">
+												<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="Some code" />
+											</StackLayout>
+										</ContentView>
+										<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+											<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2.2.2]]></Label>
+										</ContentView>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+										<Label>3.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second checked subsubitem]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="3">
+										<Label>4.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second unchecked subsubitem]]></Label>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+							<Label>3.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second checked subitem]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2.3]]></Label>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="3">
+							<Label>4.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second unchecked subitem]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 2.4]]></Label>
+							</ContentView>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>3.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Also checked]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Second paragraph of item 3]]></Label>
+				</ContentView>
 			</StackLayout>
 		</Grid>
 	</ContentView>

@@ -35,7 +35,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			await PrefixedBlock(Output, this.Child, "*\t", "\t");
+			await PrefixedBlock(Output, this.Child, this.prefix + "\t", "\t");
 			Output.AppendLine();
 		}
 
@@ -76,6 +76,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.prefix);
+			Output.Append(' ');
 
 			StringBuilder sb = new StringBuilder();
 			await this.Child.GeneratePlainText(sb);

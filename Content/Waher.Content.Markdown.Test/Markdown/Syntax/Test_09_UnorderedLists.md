@@ -109,3 +109,116 @@ Three levels:
 		* Item 2biii
 	* Item 2c
 * Item 3
+
+Multi-paragraph, multi-level lists:
+
+*	Item 1
+	
+	Second paragraph of item 1.
+	
+		This is some code of item 1.
+
+	Third paragraph of item 1.
+	
+	*	Item 1.1
+		
+		Second paragraph of item 1.1.
+	
+			This is some code of item 1.1.
+
+		Third paragraph of item 1.1.
+	
+		*	Item 1.1.1
+		
+			Second paragraph of item 1.1.1.
+	
+				This is some code of item 1.1.1.
+
+			Third paragraph of item 1.1.1.
+	
+		*	Item 1.1.2
+		
+			Second paragraph of item 1.1.2.
+	
+				This is some code of item 1.1.2.
+
+			Third paragraph of item 1.1.2.
+	
+	*	Item 1.2
+		
+		Second paragraph of item 1.2.
+	
+			This is some code of item 1.2.
+
+		Third paragraph of item 1.2.
+	
+		*	Item 1.2.1
+		
+			Second paragraph of item 1.2.1.
+	
+				This is some code of item 1.2.1.
+
+			Third paragraph of item 1.2.1.
+	
+		*	Item 1.2.2
+		
+			Second paragraph of item 1.2.2.
+	
+				This is some code of item 1.2.2.
+
+			Third paragraph of item 1.2.2.
+
+Starting with simple items, continuing with block items:
+
+*	Item 1.
+*	Item 2.
+*	Item 3.
+*	Item 4.
+	
+	Item 4 has a second paragraph.
+
+*	Item 5.
+*	Item 6.
+
+
+Multi-paragraph, multi-level lists:
+
+*	Unchecked
+	
+	Second paragraph of item 1
+
+*	Checked
+	
+	Second paragraph of item 2
+	
+	*	Unchecked subitem
+
+			Some code
+
+		Second paragraph of item 2.1
+
+	*	Checked subitem
+
+		Second paragraph of item 2.2
+
+		*	Unchecked subsubitem
+		*	Checked subsubitem
+
+				Some code
+
+			Second paragraph of item 2.2.2
+
+		*	Second checked subsubitem
+		*	Second unchecked subsubitem
+	*	Second checked subitem
+
+		Second paragraph of item 2.3
+
+	*	Second unchecked subitem
+
+		Second paragraph of item 2.4
+
+*	Also checked
+
+	Second paragraph of item 3
+

@@ -156,7 +156,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				if (TextAlignment != TextAlignment.Left)
 					Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
-				Output.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," + 
+				Output.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
 					Settings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
 
 				if (!(Item is null))
@@ -344,6 +344,29 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			Statistics.NrNumberedLists++;
 			Statistics.NrLists++;
+		}
+
+
+		/// <summary>
+		/// Adds children to the element.
+		/// </summary>
+		/// <param name="NewChildren">New children to add.</param>
+		public override void AddChildren(IEnumerable<MarkdownElement> NewChildren)
+		{
+			if (this.LastChild is NumberedItem LastItem)
+			{
+				int Next = LastItem.Number + 1;
+
+				foreach (MarkdownElement E in NewChildren)
+				{
+					if (E is NumberedItem NewItem && !NewItem.NumberExplicit)
+						NewItem.Number = Next++;
+					else
+						break;
+				}
+			}
+
+			base.AddChildren(NewChildren);
 		}
 	}
 }

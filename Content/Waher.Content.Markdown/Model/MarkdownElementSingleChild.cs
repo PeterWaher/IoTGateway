@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -12,7 +11,7 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public abstract class MarkdownElementSingleChild : MarkdownElement
 	{
-		private readonly MarkdownElement child;
+		private MarkdownElement child;
 
 		/// <summary>
 		/// Abstract base class for all markdown elements with one child element.
@@ -31,7 +30,11 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Child element.
 		/// </summary>
-		public MarkdownElement Child => this.child;
+		public MarkdownElement Child
+		{
+			get => this.child;
+			internal set => this.child = value;
+		}
 
 		/// <summary>
 		/// Any children of the element.
@@ -102,8 +105,7 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">XML Output.</param>
 		protected virtual void ExportChild(XmlWriter Output)
 		{
-			if (!(this.child is null))
-				this.child.Export(Output);
+			this.child?.Export(Output);
 		}
 
 		/// <summary>

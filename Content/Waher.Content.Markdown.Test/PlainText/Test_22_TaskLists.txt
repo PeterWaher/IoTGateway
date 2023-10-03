@@ -8,8 +8,10 @@ Nested task list:
 
 [ ] Unchecked
 [X] Checked 
+
 [ ] Unchecked subitem
 [X] Checked subitem 
+
 [ ] Unchecked subsubitem
 [X] Checked subsubitem
 [X] Second checked subsubitem
@@ -19,4 +21,46 @@ Nested task list:
 [ ] Second unchecked subitem
 
 [X] Also checked
+
+Multi-paragraph, multi-level lists:
+
+[ ] Unchecked
+
+Second paragraph of item 1
+
+[X] Checked
+
+Second paragraph of item 2
+
+[ ] Unchecked subitem
+
+Some code
+
+Second paragraph of item 2.1
+
+[X] Checked subitem
+
+Second paragraph of item 2.2
+
+[ ] Unchecked subsubitem
+[X] Checked subsubitem
+
+Some code
+
+Second paragraph of item 2.2.2
+
+[X] Second checked subsubitem
+[ ] Second unchecked subsubitem
+
+[X] Second checked subitem
+
+Second paragraph of item 2.3
+
+[ ] Second unchecked subitem
+
+Second paragraph of item 2.4
+
+[X] Also checked
+
+Second paragraph of item 3
 

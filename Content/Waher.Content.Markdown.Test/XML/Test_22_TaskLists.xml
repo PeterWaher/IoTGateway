@@ -28,14 +28,18 @@
 			</TaskItem>
 			<TaskItem isChecked="true">
 				<NestedBlock>
-					<InlineText>Checked </InlineText>
+					<Paragraph>
+						<InlineText>Checked </InlineText>
+					</Paragraph>
 					<TaskList>
 						<TaskItem isChecked="false">
 							<InlineText>Unchecked subitem</InlineText>
 						</TaskItem>
 						<TaskItem isChecked="true">
 							<NestedBlock>
-								<InlineText>Checked subitem </InlineText>
+								<Paragraph>
+									<InlineText>Checked subitem </InlineText>
+								</Paragraph>
 								<TaskList>
 									<TaskItem isChecked="false">
 										<InlineText>Unchecked subsubitem</InlineText>
@@ -63,6 +67,110 @@
 			</TaskItem>
 			<TaskItem isChecked="true">
 				<InlineText>Also checked</InlineText>
+			</TaskItem>
+		</TaskList>
+		<Paragraph>
+			<InlineText>Multi-paragraph, multi-level lists:</InlineText>
+		</Paragraph>
+		<TaskList>
+			<TaskItem isChecked="false">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Unchecked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 1</InlineText>
+					</Paragraph>
+				</NestedBlock>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Checked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 2</InlineText>
+					</Paragraph>
+					<TaskList>
+						<TaskItem isChecked="false">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Unchecked subitem</InlineText>
+								</Paragraph>
+								<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+									<Row>Some code</Row>
+								</CodeBlock>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.1</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</TaskItem>
+						<TaskItem isChecked="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Checked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.2</InlineText>
+								</Paragraph>
+								<TaskList>
+									<TaskItem isChecked="false">
+										<InlineText>Unchecked subsubitem</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Checked subsubitem</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>Some code</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Second paragraph of item 2.2.2</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Second checked subsubitem</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="false">
+										<InlineText>Second unchecked subsubitem</InlineText>
+									</TaskItem>
+								</TaskList>
+							</NestedBlock>
+						</TaskItem>
+						<TaskItem isChecked="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Second checked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.3</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</TaskItem>
+						<TaskItem isChecked="false">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Second unchecked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.4</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</TaskItem>
+					</TaskList>
+				</NestedBlock>
+			</TaskItem>
+			<TaskItem isChecked="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Also checked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 3</InlineText>
+					</Paragraph>
+				</NestedBlock>
 			</TaskItem>
 		</TaskList>
 	</elements>

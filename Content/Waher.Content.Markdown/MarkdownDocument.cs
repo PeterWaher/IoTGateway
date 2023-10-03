@@ -658,7 +658,7 @@ namespace Waher.Content.Markdown
 
 						Content = this.ParseBlocks(AlignedBlocks);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is CenterAligned CenterAligned)
+						if (Elements.Last?.Value is CenterAligned CenterAligned)
 							CenterAligned.AddChildren(Content);
 						else
 							Elements.AddLast(new CenterAligned(this, Content));
@@ -676,7 +676,7 @@ namespace Waher.Content.Markdown
 
 						Content = this.ParseBlocks(AlignedBlocks);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is RightAligned RightAligned)
+						if (Elements.Last?.Value is RightAligned RightAligned)
 							RightAligned.AddChildren(Content);
 						else
 							Elements.AddLast(new RightAligned(this, Content));
@@ -685,7 +685,7 @@ namespace Waher.Content.Markdown
 					{
 						Content = this.ParseBlocks(Block.RemovePrefix(">", 2));
 
-						if (!(Elements.Last is null) && Elements.Last.Value is BlockQuote BlockQuote)
+						if (Elements.Last?.Value is BlockQuote BlockQuote)
 							BlockQuote.AddChildren(Content);
 						else
 							Elements.AddLast(new BlockQuote(this, Content));
@@ -709,7 +709,7 @@ namespace Waher.Content.Markdown
 
 						Content = this.ParseBlocks(AlignedBlocks);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is MarginAligned MarginAligned)
+						if (Elements.Last?.Value is MarginAligned MarginAligned)
 							MarginAligned.AddChildren(Content);
 						else
 							Elements.AddLast(new MarginAligned(this, Content));
@@ -727,7 +727,7 @@ namespace Waher.Content.Markdown
 
 						Content = this.ParseBlocks(AlignedBlocks);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is LeftAligned LeftAligned)
+						if (Elements.Last?.Value is LeftAligned LeftAligned)
 							LeftAligned.AddChildren(Content);
 						else
 							Elements.AddLast(new LeftAligned(this, Content));
@@ -739,7 +739,7 @@ namespace Waher.Content.Markdown
 				{
 					Content = this.ParseBlocks(Block.RemoveSuffix(">>"));
 
-					if (!(Elements.Last is null) && Elements.Last.Value is RightAligned RightAligned)
+					if (Elements.Last?.Value is RightAligned RightAligned)
 						RightAligned.AddChildren(Content);
 					else
 						Elements.AddLast(new RightAligned(this, Content));
@@ -750,7 +750,7 @@ namespace Waher.Content.Markdown
 				{
 					Content = this.ParseBlocks(Block.RemovePrefix("+>", 3));
 
-					if (!(Elements.Last is null) && Elements.Last.Value is InsertBlocks InsertBlocks)
+					if (Elements.Last?.Value is InsertBlocks InsertBlocks)
 						InsertBlocks.AddChildren(Content);
 					else
 						Elements.AddLast(new InsertBlocks(this, Content));
@@ -761,7 +761,7 @@ namespace Waher.Content.Markdown
 				{
 					Content = this.ParseBlocks(Block.RemovePrefix("->", 3));
 
-					if (!(Elements.Last is null) && Elements.Last.Value is DeleteBlocks DeleteBlocks)
+					if (Elements.Last?.Value is DeleteBlocks DeleteBlocks)
 						DeleteBlocks.AddChildren(Content);
 					else
 						Elements.AddLast(new DeleteBlocks(this, Content));
@@ -802,7 +802,9 @@ namespace Waher.Content.Markdown
 					Elements.AddLast(new InvisibleBreak(this, Block.Rows[0]));
 					continue;
 				}
-				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
+				else if (Block.IsPrefixedBy(s2 = "*", true) ||
+					Block.IsPrefixedBy(s2 = "+", true) ||
+					Block.IsPrefixedBy(s2 = "-", true))
 				{
 					LinkedList<Block> Segments = null;
 					i = 0;
@@ -823,76 +825,43 @@ namespace Waher.Content.Markdown
 
 					Segments?.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
+					LinkedList<MarkdownElement> Items;
+					UnnumberedItem LastItem;
+
 					if (Segments is null)
 					{
-						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, Items));
 
-						i = BlockIndex;
-						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
-						{
-							BlockIndex++;
-							Block.Indent--;
-						}
-
-						if (BlockIndex > i)
-						{
-							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
-								Items.AddLast(E);
-						}
-
-						if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
-							BulletList.AddChildren(new UnnumberedItem(this, s2 + " ", new NestedBlock(this, Items)));
+						if (Elements.Last?.Value is BulletList BulletList)
+							BulletList.AddChildren(LastItem);
 						else
-							Elements.AddLast(new BulletList(this, new UnnumberedItem(this, s2 + " ", new NestedBlock(this, Items))));
-
-						continue;
+							Elements.AddLast(new BulletList(this, LastItem));
 					}
 					else
 					{
-						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
+						Items = new LinkedList<MarkdownElement>();
+						LastItem = null;
 
 						foreach (Block Segment in Segments)
 						{
 							foreach (Block SegmentItem in Segment.RemovePrefix(s2, 4))
 							{
-								Items.AddLast(new UnnumberedItem(this, s2 + " ", new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End))));
+								LastItem = new UnnumberedItem(this, s2, new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+
+								Items.AddLast(LastItem);
 							}
 						}
 
-						if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+						if (Elements.Last?.Value is BulletList BulletList)
 							BulletList.AddChildren(Items);
 						else
 							Elements.AddLast(new BulletList(this, Items));
-
-						continue;
-					}
-				}
-				else if (Block.IsPrefixedBy("#.", true))
-				{
-					LinkedList<Block> Segments = null;
-					i = 0;
-					c = Block.End;
-
-					for (d = Block.Start + 1; d <= c; d++)
-					{
-						s = Block.Rows[d];
-						if (IsPrefixedBy(s, "#.", true))
-						{
-							if (Segments is null)
-								Segments = new LinkedList<Block>();
-
-							Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, d - 1));
-							i = d;
-						}
 					}
 
-					Segments?.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
-
-					if (Segments is null)
+					if (!(LastItem is null))
 					{
-						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix("#.", 4));
-
 						i = BlockIndex;
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
 						{
@@ -902,39 +871,143 @@ namespace Waher.Content.Markdown
 
 						if (BlockIndex > i)
 						{
-							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
-								Items.AddLast(E);
+							Items = this.ParseBlocks(Blocks, i + 1, BlockIndex);
+
+							if (LastItem.Child is NestedBlock LastItemChildren)
+							{
+								if (LastItemChildren.IsBlockElement)
+									LastItemChildren.AddChildren(Items);
+								else
+								{
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									LastItem.Child = new NestedBlock(this, Items);
+								}
+							}
+							else
+							{
+								if (LastItem.Child.IsBlockElement)
+									Items.AddFirst(LastItem.Child);
+								else
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+
+								LastItem.Child = new NestedBlock(this, Items);
+							}
 						}
+					}
 
-						if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
-							NumberedList.AddChildren(new UnnumberedItem(this, "#. ", new NestedBlock(this, Items)));
+					continue;
+				}
+				else if (Block.IsPrefixedBy("#.", true))
+				{
+					LinkedList<Tuple<int, bool, Block>> Segments = null;
+					i = 0;
+					c = Block.End;
+					int Index2 = 1;
+					bool Explicit = false;
+
+					for (d = Block.Start + 1; d <= c; d++)
+					{
+						s = Block.Rows[d];
+						if (IsPrefixedByNumber(s, out j))
+						{
+							if (Segments is null)
+								Segments = new LinkedList<Tuple<int, bool, Block>>();
+
+							Segments.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							i = d;
+							Index2 = j;
+							Explicit = true;
+						}
+						else if (IsPrefixedBy(s, "#.", true))
+						{
+							if (Segments is null)
+								Segments = new LinkedList<Tuple<int, bool, Block>>();
+
+							Segments.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							i = d;
+							Index2++;
+							Explicit = false;
+						}
+					}
+
+					Segments?.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
+
+					LinkedList<MarkdownElement> Items;
+					NumberedItem LastItem;
+
+					if (Segments is null)
+					{
+						Items = this.ParseBlocks(Block.RemovePrefix("#.", 4));
+						LastItem = new NumberedItem(this, Index2, Explicit, new NestedBlock(this, Items));
+
+						if (Elements.Last?.Value is NumberedList NumberedList)
+							NumberedList.AddChildren(LastItem);
 						else
-							Elements.AddLast(new NumberedList(this, new UnnumberedItem(this, "#. ", new NestedBlock(this, Items))));
-
-						continue;
+							Elements.AddLast(new NumberedList(this, LastItem));
 					}
 					else
 					{
-						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
+						Items = new LinkedList<MarkdownElement>();
+						LastItem = null;
 
-						foreach (Block Segment in Segments)
+						foreach (Tuple<int, bool, Block> Segment in Segments)
 						{
-							foreach (Block SegmentItem in Segment.RemovePrefix("#.", 4))
+							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
+							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
 							{
-								Items.AddLast(new UnnumberedItem(this, "#. ", new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End))));
+								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+
+								Items.AddLast(LastItem);
 							}
 						}
 
-						if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
+						if (Elements.Last?.Value is NumberedList NumberedList)
 							NumberedList.AddChildren(Items);
 						else
 							Elements.AddLast(new NumberedList(this, Items));
-
-						continue;
 					}
+
+					if (!(LastItem is null))
+					{
+						i = BlockIndex;
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
+						{
+							BlockIndex++;
+							Block.Indent--;
+						}
+
+						if (BlockIndex > i)
+						{
+							Items = this.ParseBlocks(Blocks, i + 1, BlockIndex);
+
+							if (LastItem.Child is NestedBlock LastItemChildren)
+							{
+								if (LastItemChildren.IsBlockElement)
+									LastItemChildren.AddChildren(Items);
+								else
+								{
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									LastItem.Child = new NestedBlock(this, Items);
+								}
+							}
+							else
+							{
+								if (LastItem.Child.IsBlockElement)
+									Items.AddFirst(LastItem.Child);
+								else
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+
+								LastItem.Child = new NestedBlock(this, Items);
+							}
+						}
+					}
+
+					continue;
 				}
-				else if (Block.IsPrefixedBy(s2 = "[ ]", true) || Block.IsPrefixedBy(s2 = "[x]", true) || Block.IsPrefixedBy(s2 = "[X]", true))
+				else if (Block.IsPrefixedBy(s2 = "[ ]", true) ||
+					Block.IsPrefixedBy(s2 = "[x]", true) ||
+					Block.IsPrefixedBy(s2 = "[X]", true))
 				{
 					LinkedList<Tuple<Block, string, int>> Segments = null;
 					int CheckPosition = Block.Positions[0] + 1;
@@ -945,7 +1018,9 @@ namespace Waher.Content.Markdown
 					for (d = Block.Start + 1; d <= c; d++)
 					{
 						s = Block.Rows[d];
-						if (IsPrefixedBy(s, s3 = "[ ]", true) || IsPrefixedBy(s, s3 = "[x]", true) || IsPrefixedBy(s, s3 = "[X]", true))
+						if (IsPrefixedBy(s, s3 = "[ ]", true) ||
+							IsPrefixedBy(s, s3 = "[x]", true) ||
+							IsPrefixedBy(s, s3 = "[X]", true))
 						{
 							if (Segments is null)
 								Segments = new LinkedList<Tuple<Block, string, int>>();
@@ -959,10 +1034,43 @@ namespace Waher.Content.Markdown
 
 					Segments?.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
 
+					LinkedList<MarkdownElement> Items;
+					TaskItem LastItem;
+
 					if (Segments is null)
 					{
-						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						LastItem = new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items));
 
+						if (Elements.Last?.Value is TaskList TaskList)
+							TaskList.AddChildren(LastItem);
+						else
+							Elements.AddLast(new TaskList(this, LastItem));
+					}
+					else
+					{
+						Items = new LinkedList<MarkdownElement>();
+						LastItem = null;
+
+						foreach (Tuple<Block, string, int> Segment in Segments)
+						{
+							foreach (Block SegmentItem in Segment.Item1.RemovePrefix(Segment.Item2, 4))
+							{
+								LastItem = new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3, new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+
+								Items.AddLast(LastItem);
+							}
+						}
+
+						if (Elements.Last?.Value is TaskList TaskList)
+							TaskList.AddChildren(Items);
+						else
+							Elements.AddLast(new TaskList(this, Items));
+					}
+
+					if (!(LastItem is null))
+					{
 						i = BlockIndex;
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
 						{
@@ -972,43 +1080,38 @@ namespace Waher.Content.Markdown
 
 						if (BlockIndex > i)
 						{
-							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
-								Items.AddLast(E);
-						}
+							Items = this.ParseBlocks(Blocks, i + 1, BlockIndex);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is TaskList TaskList)
-							TaskList.AddChildren(new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items)));
-						else
-							Elements.AddLast(new TaskList(this, new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items))));
-
-						continue;
-					}
-					else
-					{
-						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
-
-						foreach (Tuple<Block, string, int> Segment in Segments)
-						{
-							foreach (Block SegmentItem in Segment.Item1.RemovePrefix(Segment.Item2, 4))
+							if (LastItem.Child is NestedBlock LastItemChildren)
 							{
-								Items.AddLast(new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End))));
+								if (LastItemChildren.IsBlockElement)
+									LastItemChildren.AddChildren(Items);
+								else
+								{
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									LastItem.Child = new NestedBlock(this, Items);
+								}
+							}
+							else
+							{
+								if (LastItem.Child.IsBlockElement)
+									Items.AddFirst(LastItem.Child);
+								else
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+
+								LastItem.Child = new NestedBlock(this, Items);
 							}
 						}
-
-						if (!(Elements.Last is null) && Elements.Last.Value is TaskList TaskList)
-							TaskList.AddChildren(Items);
-						else
-							Elements.AddLast(new TaskList(this, Items));
-
-						continue;
 					}
+
+					continue;
 				}
 				else if (Block.IsPrefixedByNumber(out Index))
 				{
-					LinkedList<KeyValuePair<int, Block>> Segments = null;
+					LinkedList<Tuple<int, bool, Block>> Segments = null;
 					i = 0;
 					c = Block.End;
+					bool Explicit = true;
 
 					for (d = Block.Start + 1; d <= c; d++)
 					{
@@ -1016,21 +1119,66 @@ namespace Waher.Content.Markdown
 						if (IsPrefixedByNumber(s, out j))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<KeyValuePair<int, Block>>();
+								Segments = new LinkedList<Tuple<int, bool, Block>>();
 
-							Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							Segments.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
 							i = d;
 							Index = j;
+							Explicit = true;
+						}
+						else if (IsPrefixedBy(s, "#.", true))
+						{
+							if (Segments is null)
+								Segments = new LinkedList<Tuple<int, bool, Block>>();
+
+							Segments.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							i = d;
+							Index++;
+							Explicit = false;
 						}
 					}
 
-					Segments?.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, c)));
+					Segments?.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
+
+					LinkedList<MarkdownElement> Items;
+					NumberedItem LastItem;
 
 					if (Segments is null)
 					{
 						s = Index.ToString();
-						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2)));
+						Items = this.ParseBlocks(Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2)));
+						LastItem = new NumberedItem(this, Index, Explicit, new NestedBlock(this, Items));
 
+						if (Elements.Last?.Value is NumberedList NumberedList)
+							NumberedList.AddChildren(LastItem);
+						else
+							Elements.AddLast(new NumberedList(this, LastItem));
+					}
+					else
+					{
+						Items = new LinkedList<MarkdownElement>();
+						LastItem = null;
+
+						foreach (Tuple<int, bool, Block> Segment in Segments)
+						{
+							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
+							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
+							{
+								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+
+								Items.AddLast(LastItem);
+							}
+						}
+
+						if (Elements.Last?.Value is NumberedList NumberedList)
+							NumberedList.AddChildren(Items);
+						else
+							Elements.AddLast(new NumberedList(this, Items));
+					}
+
+					if (!(LastItem is null))
+					{
 						i = BlockIndex;
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
 						{
@@ -1040,38 +1188,31 @@ namespace Waher.Content.Markdown
 
 						if (BlockIndex > i)
 						{
-							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
-								Items.AddLast(E);
-						}
+							Items = this.ParseBlocks(Blocks, i + 1, BlockIndex);
 
-						if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
-							NumberedList.AddChildren(new NumberedItem(this, Index, new NestedBlock(this, Items)));
-						else
-							Elements.AddLast(new NumberedList(this, new NumberedItem(this, Index, new NestedBlock(this, Items))));
-
-						continue;
-					}
-					else
-					{
-						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
-
-						foreach (KeyValuePair<int, Block> Segment in Segments)
-						{
-							s = Segment.Key.ToString();
-							foreach (Block SegmentItem in Segment.Value.RemovePrefix(s + ".", Math.Max(4, s.Length + 2)))
+							if (LastItem.Child is NestedBlock LastItemChildren)
 							{
-								Items.AddLast(new NumberedItem(this, Segment.Key, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End))));
+								if (LastItemChildren.IsBlockElement)
+									LastItemChildren.AddChildren(Items);
+								else
+								{
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									LastItem.Child = new NestedBlock(this, Items);
+								}
+							}
+							else
+							{
+								if (LastItem.Child.IsBlockElement)
+									Items.AddFirst(LastItem.Child);
+								else
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+
+								LastItem.Child = new NestedBlock(this, Items);
 							}
 						}
-
-						if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
-							NumberedList.AddChildren(Items);
-						else
-							Elements.AddLast(new NumberedList(this, Items));
-
-						continue;
 					}
+
+					continue;
 				}
 				else if (Block.IsTable(out TableInformation TableInformation))
 				{
@@ -1202,7 +1343,7 @@ namespace Waher.Content.Markdown
 							Terms.AddLast(new NestedBlock(this, Term));
 					}
 
-					if (!(Elements.Last is null) && Elements.Last.Value is DefinitionList DefinitionList)
+					if (Elements.Last?.Value is DefinitionList DefinitionList)
 						DefinitionList.AddChildren(new DefinitionTerms(this, Terms));
 					else
 						Elements.AddLast(new DefinitionTerms(this, Terms));
@@ -1383,9 +1524,9 @@ namespace Waher.Content.Markdown
 								{
 									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
 									{
-										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+										if (Elements.Last?.Value is BulletList BulletList)
 											BulletList.AddChildren(Item);
 										else
 											Elements.AddLast(new BulletList(this, Item));
@@ -1410,9 +1551,9 @@ namespace Waher.Content.Markdown
 
 								if (Rows.Count > 0)
 								{
-									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+									if (Elements.Last?.Value is BulletList BulletList)
 										BulletList.AddChildren(Item);
 									else
 										Elements.AddLast(new BulletList(this, Item));
@@ -1711,7 +1852,7 @@ namespace Waher.Content.Markdown
 									Item = new TaskItem(this, Checked, CheckPosition,
 										new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (!(Elements.Last is null) && Elements.Last.Value is TaskList TaskList)
+									if (Elements.Last?.Value is TaskList TaskList)
 										TaskList.AddChildren(Item);
 									else
 										Elements.AddLast(new TaskList(this, Item));
@@ -1748,7 +1889,7 @@ namespace Waher.Content.Markdown
 								Item = new TaskItem(this, Checked, CheckPosition,
 									new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-								if (!(Elements.Last is null) && Elements.Last.Value is TaskList TaskList)
+								if (Elements.Last?.Value is TaskList TaskList)
 									TaskList.AddChildren(Item);
 								else
 									Elements.AddLast(new TaskList(this, Item));
@@ -2495,9 +2636,9 @@ namespace Waher.Content.Markdown
 								{
 									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
 									{
-										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+										if (Elements.Last?.Value is BulletList BulletList)
 											BulletList.AddChildren(Item);
 										else
 											Elements.AddLast(new BulletList(this, Item));
@@ -2522,9 +2663,9 @@ namespace Waher.Content.Markdown
 
 								if (Rows.Count > 0)
 								{
-									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+									if (Elements.Last?.Value is BulletList BulletList)
 										BulletList.AddChildren(Item);
 									else
 										Elements.AddLast(new BulletList(this, Item));
@@ -2567,9 +2708,9 @@ namespace Waher.Content.Markdown
 								{
 									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
 									{
-										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+										if (Elements.Last?.Value is BulletList BulletList)
 											BulletList.AddChildren(Item);
 										else
 											Elements.AddLast(new BulletList(this, Item));
@@ -2594,9 +2735,9 @@ namespace Waher.Content.Markdown
 
 								if (Rows.Count > 0)
 								{
-									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (!(Elements.Last is null) && Elements.Last.Value is BulletList BulletList)
+									if (Elements.Last?.Value is BulletList BulletList)
 										BulletList.AddChildren(Item);
 									else
 										Elements.AddLast(new BulletList(this, Item));
@@ -2638,7 +2779,7 @@ namespace Waher.Content.Markdown
 								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
-								UnnumberedItem Item;
+								NumberedItem Item;
 								List<string> Rows = new List<string>();
 								List<int> Positions = new List<int>()
 								{
@@ -2654,9 +2795,9 @@ namespace Waher.Content.Markdown
 										State.NextCharSameRow();
 										if (State.PeekNextCharSameRow() == '.')
 										{
-											Item = new UnnumberedItem(this, "#. ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+											Item = new NumberedItem(this, 1, false, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-											if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
+											if (Elements.Last?.Value is NumberedList NumberedList)
 												NumberedList.AddChildren(Item);
 											else
 												Elements.AddLast(new NumberedList(this, Item));
@@ -2689,12 +2830,17 @@ namespace Waher.Content.Markdown
 
 								if (Rows.Count > 0)
 								{
-									Item = new UnnumberedItem(this, "#. ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+									Item = new NumberedItem(this, 1, false, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
+									if (Elements.Last?.Value is NumberedList NumberedList)
 										NumberedList.AddChildren(Item);
 									else
+									{
+										if (!Item.NumberExplicit && Elements.Last?.Value is NumberedItem PrevItem)
+											Item.Number = PrevItem.Number + 1;
+
 										Elements.AddLast(new NumberedList(this, Item));
+									}
 								}
 							}
 							else
@@ -2908,9 +3054,9 @@ namespace Waher.Content.Markdown
 
 											if (ch2 == '.' && int.TryParse(sb.ToString(), out int Index2))
 											{
-												Item = new NumberedItem(this, Index, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+												Item = new NumberedItem(this, Index, true, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-												if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
+												if (Elements.Last?.Value is NumberedList NumberedList)
 													NumberedList.AddChildren(Item);
 												else
 													Elements.AddLast(new NumberedList(this, Item));
@@ -2945,9 +3091,9 @@ namespace Waher.Content.Markdown
 
 									if (Rows.Count > 0)
 									{
-										Item = new NumberedItem(this, Index, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
+										Item = new NumberedItem(this, Index, true, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (!(Elements.Last is null) && Elements.Last.Value is NumberedList NumberedList)
+										if (Elements.Last?.Value is NumberedList NumberedList)
 											NumberedList.AddChildren(Item);
 										else
 											Elements.AddLast(new NumberedList(this, Item));
@@ -4584,11 +4730,13 @@ namespace Waher.Content.Markdown
 			int RowEnd = 0;
 			int Pos, Len;
 			char ch;
+			char FirstChar = (char)0;
 			bool InBlock = false;
 			bool InRow = false;
 			bool NonWhitespaceInRow = false;
 			bool StartsWithHashSigns = false;
 			bool IsHeader = false;
+			bool HasRows = false;
 
 			Len = MarkdownText.Length;
 
@@ -4602,9 +4750,21 @@ namespace Waher.Content.Markdown
 					{
 						if (InRow && NonWhitespaceInRow)
 						{
+							if (HasRows &&
+								LineIndent < FirstLineIndent &&
+								IsListPrefix(MarkdownText, RowStart))
+							{
+								Blocks.Add(new Block(Rows.ToArray(), Positions.ToArray(), FirstLineIndent / 4));
+								Rows.Clear();
+								Positions.Clear();
+								FirstLineIndent = LineIndent;
+							}
+
 							Positions.Add(RowStart);
 							Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
+							FirstChar = (char)0;
 							InRow = false;
+							HasRows = true;
 
 							if (IsHeader && Rows.Count == 1)
 							{
@@ -4612,6 +4772,7 @@ namespace Waher.Content.Markdown
 								Rows.Clear();
 								Positions.Clear();
 								InBlock = false;
+								HasRows = false;
 								FirstLineIndent = 0;
 							}
 						}
@@ -4621,7 +4782,9 @@ namespace Waher.Content.Markdown
 							Rows.Clear();
 							Positions.Clear();
 							InBlock = false;
+							FirstChar = (char)0;
 							InRow = false;
+							HasRows = false;
 							FirstLineIndent = 0;
 						}
 					}
@@ -4648,6 +4811,7 @@ namespace Waher.Content.Markdown
 						{
 							if (LineIndent >= FirstLineIndent)
 							{
+								FirstChar = ch;
 								InRow = true;
 								RowStart = RowEnd = Pos;
 							}
@@ -4669,6 +4833,7 @@ namespace Waher.Content.Markdown
 				{
 					if (!InRow)
 					{
+						FirstChar = ch;
 						InRow = true;
 						InBlock = true;
 						RowStart = Pos;
@@ -4690,12 +4855,72 @@ namespace Waher.Content.Markdown
 				{
 					Positions.Add(RowStart);
 					Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
+					HasRows = true;
 				}
 
 				Blocks.Add(new Block(Rows.ToArray(), Positions.ToArray(), FirstLineIndent / 4));
 			}
 
 			return Blocks;
+		}
+
+		private static bool IsListPrefix(string MarkdownText, int Pos)
+		{
+			int c = MarkdownText.Length;
+			char ch = MarkdownText[Pos++];
+			bool ExpectPeriod;
+
+			if (ch == '*' || ch == '+' || ch == '-')
+			{
+				ExpectPeriod = false;
+			}
+			else if (ch == '#')
+			{
+				ExpectPeriod = true;
+			}
+			else if (ch == '[')
+			{
+				ExpectPeriod = false;
+				if (Pos >= c)
+					return false;
+
+				ch = MarkdownText[Pos++];
+				if (ch != ' ' && ch != 'x' && ch != 'X')
+					return false;
+
+				if (Pos >= c)
+					return false;
+
+				ch = MarkdownText[Pos++];
+				if (ch != ']')
+					return false;
+			}
+			else if (ch >= '0' && ch <= '9')
+			{
+				ExpectPeriod = true;
+
+				while (Pos < c && (ch = MarkdownText[Pos]) >= '0' && ch <= '9')
+					Pos++;
+			}
+			else
+				return false;
+
+			if (ExpectPeriod)
+			{
+				if (Pos >= c)
+					return false;
+
+				ch = MarkdownText[Pos++];
+				if (ch != '.')
+					return false;
+			}
+
+			if (Pos >= c)
+				return false;
+
+			ch = MarkdownText[Pos++];
+
+			return ch <= ' ' || ch == 160;
 		}
 
 		/// <summary>

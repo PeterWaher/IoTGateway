@@ -9,20 +9,20 @@
 
 is equivalent to\:
 
-*	Red
++	Red
 
-*	Green
++	Green
 
-*	Blue
++	Blue
 
 
 and\:
 
-*	Red
+-	Red
 
-*	Green
+-	Green
 
-*	Blue
+-	Blue
 
 
 To make lists look nice, you can wrap items with hanging indents\:
@@ -93,7 +93,9 @@ Nested lists\:
 
 *	Item 1
 
-*	Item 2 *	Item 2a
+*	Item 2 
+	
+	*	Item 2a
 	
 	*	Item 2b
 	
@@ -104,9 +106,11 @@ Nested lists 2\:
 
 *	Item 1
 
-*	Item 2 *	Item 2a
+*	Item 2 
 	
-	*	Item 2b
+	#.	Item 2a
+	
+	#.	Item 2b
 	
 	
 
@@ -117,9 +121,11 @@ Nested lists 3\:
 
 *	Item 1
 
-*	Item 2 #.	Item 2a
+*	Item 2 
 	
-	#.	Item 2b
+	2.	Item 2a
+	
+	3.	Item 2b
 	
 	
 
@@ -130,9 +136,13 @@ Three levels\:
 
 *	Item 1
 
-*	Item 2 *	Item 2a
+*	Item 2 
 	
-	*	Item 2b *	Item 2bi
+	*	Item 2a
+	
+	*	Item 2b 
+		
+		*	Item 2bi
 		
 		*	Item 2bii
 		
@@ -145,5 +155,165 @@ Three levels\:
 	
 
 *	Item 3
+
+
+Multi\-paragraph, multi\-level lists\:
+
+*	Item 1
+	
+	Second paragraph of item 1\.
+	
+	```
+	This is some code of item 1.
+	```
+	
+	Third paragraph of item 1\.
+	
+	*	Item 1\.1
+		
+		Second paragraph of item 1\.1\.
+		
+		```
+		This is some code of item 1.1.
+		```
+		
+		Third paragraph of item 1\.1\.
+		
+		*	Item 1\.1\.1
+			
+			Second paragraph of item 1\.1\.1\.
+			
+			```
+			This is some code of item 1.1.1.
+			```
+			
+			Third paragraph of item 1\.1\.1\.
+			
+		
+		*	Item 1\.1\.2
+			
+			Second paragraph of item 1\.1\.2\.
+			
+			```
+			This is some code of item 1.1.2.
+			```
+			
+			Third paragraph of item 1\.1\.2\.
+			
+		
+		
+	
+	*	Item 1\.2
+		
+		Second paragraph of item 1\.2\.
+		
+		```
+		This is some code of item 1.2.
+		```
+		
+		Third paragraph of item 1\.2\.
+		
+		*	Item 1\.2\.1
+			
+			Second paragraph of item 1\.2\.1\.
+			
+			```
+			This is some code of item 1.2.1.
+			```
+			
+			Third paragraph of item 1\.2\.1\.
+			
+		
+		*	Item 1\.2\.2
+			
+			Second paragraph of item 1\.2\.2\.
+			
+			```
+			This is some code of item 1.2.2.
+			```
+			
+			Third paragraph of item 1\.2\.2\.
+			
+		
+		
+	
+	
+
+
+Starting with simple items, continuing with block items\:
+
+*	Item 1\.
+
+*	Item 2\.
+
+*	Item 3\.
+
+*	Item 4\.
+	
+	Item 4 has a second paragraph\.
+	
+
+*	Item 5\.
+
+*	Item 6\.
+
+
+Multi\-paragraph, multi\-level lists\:
+
+*	Unchecked
+	
+	Second paragraph of item 1
+	
+
+*	Checked
+	
+	Second paragraph of item 2
+	
+	*	Unchecked subitem
+		
+		```
+		Some code
+		```
+		
+		Second paragraph of item 2\.1
+		
+	
+	*	Checked subitem
+		
+		Second paragraph of item 2\.2
+		
+		*	Unchecked subsubitem
+		
+		*	Checked subsubitem
+			
+			```
+			Some code
+			```
+			
+			Second paragraph of item 2\.2\.2
+			
+		
+		*	Second checked subsubitem
+		
+		*	Second unchecked subsubitem
+		
+		
+	
+	*	Second checked subitem
+		
+		Second paragraph of item 2\.3
+		
+	
+	*	Second unchecked subitem
+		
+		Second paragraph of item 2\.4
+		
+	
+	
+
+*	Also checked
+	
+	Second paragraph of item 3
+	
 
 

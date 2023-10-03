@@ -64,9 +64,9 @@ Term 2
 :	>	block quote on two lines\.
 :	>	
 :	
-:	#.	first list item
+:	1.	first list item
 :	
-:	#.	second list item
+:	2.	second list item
 :	
 :	
 

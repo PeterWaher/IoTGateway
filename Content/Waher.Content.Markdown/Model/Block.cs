@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Waher.Content.Markdown.Model
@@ -470,5 +471,20 @@ namespace Waher.Content.Markdown.Model
 			return true;
 		}
 
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			int i;
+
+			for (i = this.start; i <= this.end; i++)
+			{
+				if (i > this.start)
+					sb.AppendLine();
+
+				sb.Append(this.rows[i]);
+			}
+
+			return sb.ToString();
+		}
 	}
 }

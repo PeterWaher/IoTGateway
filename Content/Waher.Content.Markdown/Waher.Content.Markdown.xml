@@ -3794,6 +3794,11 @@
             <param name="Document">Markdown document.</param>
             <param name="Children">Child elements.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.NestedBlock.IsBlockElement">
+            <summary>
+            If the element is a block element.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.NestedBlock.GenerateHTML(System.Text.StringBuilder)">
             <summary>
             Generates HTML for the markdown element.
@@ -3864,17 +3869,23 @@
             Represents a numbered item in an ordered list.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Int32,Waher.Content.Markdown.Model.MarkdownElement)">
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Int32,System.Boolean,Waher.Content.Markdown.Model.MarkdownElement)">
             <summary>
             Represents a numbered item in an ordered list.
             </summary>
             <param name="Document">Markdown document.</param>
             <param name="Number">Number associated with item.</param>
+            <param name="NumberExplicit">If number is provided explicitly</param>
             <param name="Child">Child element.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedItem.Number">
             <summary>
             Number associated with item.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedItem.NumberExplicit">
+            <summary>
+            If number is explicitly provided (true) or inferred (false).
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.GenerateMarkdown(System.Text.StringBuilder)">
@@ -4067,6 +4078,12 @@
             Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
             </summary>
             <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.AddChildren(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Adds children to the element.
+            </summary>
+            <param name="NewChildren">New children to add.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Paragraph">
             <summary>
@@ -5722,6 +5739,12 @@
             <summary>
             Any children of the element.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElementChildren.SetChildren(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement})">
+            <summary>
+            Sets the children of the node.
+            </summary>
+            <param name="Children">Children to set.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.MarkdownElementChildren.Create(System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
             <summary>

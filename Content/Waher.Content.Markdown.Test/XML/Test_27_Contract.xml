@@ -191,7 +191,7 @@
 			<InlineText> is received. If no bids are available when the auction expires, the consignment concludes without any payments being processed. Otherwise, two payments will be made:</InlineText>
 		</Paragraph>
 		<BulletList>
-			<UnnumberedItem prefix="* ">
+			<UnnumberedItem prefix="*">
 				<NestedBlock>
 					<InlineText>An instant payment representing the agreed upon price for the best or first accepted bid plus the agreed upon commission, as a percentage of the price (</InlineText>
 					<Strong>
@@ -209,7 +209,7 @@
 					<InlineText>.</InlineText>
 				</NestedBlock>
 			</UnnumberedItem>
-			<UnnumberedItem prefix="* ">
+			<UnnumberedItem prefix="*">
 				<NestedBlock>
 					<InlineText>An instant payment representing the agreed upon price for the best or first accepted bid, will be made from the </InlineText>
 					<Strong>

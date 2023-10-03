@@ -140,10 +140,10 @@
 						</Paragraph>
 					</BlockQuote>
 					<NumberedList>
-						<NumberedItem number="1">
+						<NumberedItem number="1" explicit="true">
 							<InlineText>first list item</InlineText>
 						</NumberedItem>
-						<NumberedItem number="2">
+						<NumberedItem number="2" explicit="true">
 							<InlineText>second list item</InlineText>
 						</NumberedItem>
 					</NumberedList>

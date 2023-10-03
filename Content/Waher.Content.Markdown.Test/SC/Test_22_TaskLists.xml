@@ -8,9 +8,13 @@
 	<text>Nested task list:</text>
 </paragraph>
 <text>Unchecked</text>
-<text>Checked </text>
+<paragraph>
+	<text>Checked </text>
+</paragraph>
 <text>Unchecked subitem</text>
-<text>Checked subitem </text>
+<paragraph>
+	<text>Checked subitem </text>
+</paragraph>
 <text>Unchecked subsubitem</text>
 <text>Checked subsubitem</text>
 <text>Second checked subsubitem</text>
@@ -18,3 +22,57 @@
 <text>Second checked subitem</text>
 <text>Second unchecked subitem</text>
 <text>Also checked</text>
+<paragraph>
+	<text>Multi-paragraph, multi-level lists:</text>
+</paragraph>
+<paragraph>
+	<text>Unchecked</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 1</text>
+</paragraph>
+<paragraph>
+	<text>Checked</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2</text>
+</paragraph>
+<paragraph>
+	<text>Unchecked subitem</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2.1</text>
+</paragraph>
+<paragraph>
+	<text>Checked subitem</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2.2</text>
+</paragraph>
+<text>Unchecked subsubitem</text>
+<paragraph>
+	<text>Checked subsubitem</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2.2.2</text>
+</paragraph>
+<text>Second checked subsubitem</text>
+<text>Second unchecked subsubitem</text>
+<paragraph>
+	<text>Second checked subitem</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2.3</text>
+</paragraph>
+<paragraph>
+	<text>Second unchecked subitem</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 2.4</text>
+</paragraph>
+<paragraph>
+	<text>Also checked</text>
+</paragraph>
+<paragraph>
+	<text>Second paragraph of item 3</text>
+</paragraph>

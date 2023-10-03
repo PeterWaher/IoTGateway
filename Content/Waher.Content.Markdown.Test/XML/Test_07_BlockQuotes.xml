@@ -51,10 +51,10 @@
 				<InlineText>This is a header.</InlineText>
 			</Header>
 			<NumberedList>
-				<NumberedItem number="1">
+				<NumberedItem number="1" explicit="true">
 					<InlineText>This is the first list item.</InlineText>
 				</NumberedItem>
-				<NumberedItem number="2">
+				<NumberedItem number="2" explicit="true">
 					<InlineText>This is the second list item.</InlineText>
 				</NumberedItem>
 			</NumberedList>

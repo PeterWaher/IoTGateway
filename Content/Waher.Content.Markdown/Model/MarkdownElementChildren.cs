@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -119,6 +118,15 @@ namespace Waher.Content.Markdown.Model
 		/// Any children of the element.
 		/// </summary>
 		public override IEnumerable<MarkdownElement> Children => this.children;
+
+		/// <summary>
+		/// Sets the children of the node.
+		/// </summary>
+		/// <param name="Children">Children to set.</param>
+		protected void SetChildren(IEnumerable<MarkdownElement> Children)
+		{
+			this.children = Children;
+		}
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

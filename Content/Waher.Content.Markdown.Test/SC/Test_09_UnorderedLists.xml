@@ -138,7 +138,9 @@
 		<text>Item 1</text>
 	</item>
 	<item>
-		<text>Item 2 </text>
+		<paragraph>
+			<text>Item 2 </text>
+		</paragraph>
 		<bulletItems>
 			<item>
 				<text>Item 2a</text>
@@ -157,7 +159,9 @@
 		<text>Item 1</text>
 	</item>
 	<item>
-		<text>Item 2 </text>
+		<paragraph>
+			<text>Item 2 </text>
+		</paragraph>
 		<numberedItems>
 			<item>
 				<text>Item 2a</text>
@@ -179,7 +183,9 @@
 		<text>Item 1</text>
 	</item>
 	<item>
-		<text>Item 2 </text>
+		<paragraph>
+			<text>Item 2 </text>
+		</paragraph>
 		<numberedItems>
 			<item>
 				<text>Item 2a</text>
@@ -201,13 +207,17 @@
 		<text>Item 1</text>
 	</item>
 	<item>
-		<text>Item 2 </text>
+		<paragraph>
+			<text>Item 2 </text>
+		</paragraph>
 		<bulletItems>
 			<item>
 				<text>Item 2a</text>
 			</item>
 			<item>
-				<text>Item 2b </text>
+				<paragraph>
+					<text>Item 2b </text>
+				</paragraph>
 				<bulletItems>
 					<item>
 						<text>Item 2bi</text>
@@ -227,5 +237,203 @@
 	</item>
 	<item>
 		<text>Item 3</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Multi-paragraph, multi-level lists:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>Item 1</text>
+		</paragraph>
+		<paragraph>
+			<text>Second paragraph of item 1.</text>
+		</paragraph>
+		<paragraph>
+			<text>Third paragraph of item 1.</text>
+		</paragraph>
+		<bulletItems>
+			<item>
+				<paragraph>
+					<text>Item 1.1</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 1.1.</text>
+				</paragraph>
+				<paragraph>
+					<text>Third paragraph of item 1.1.</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<paragraph>
+							<text>Item 1.1.1</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 1.1.1.</text>
+						</paragraph>
+						<paragraph>
+							<text>Third paragraph of item 1.1.1.</text>
+						</paragraph>
+					</item>
+					<item>
+						<paragraph>
+							<text>Item 1.1.2</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 1.1.2.</text>
+						</paragraph>
+						<paragraph>
+							<text>Third paragraph of item 1.1.2.</text>
+						</paragraph>
+					</item>
+				</bulletItems>
+			</item>
+			<item>
+				<paragraph>
+					<text>Item 1.2</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 1.2.</text>
+				</paragraph>
+				<paragraph>
+					<text>Third paragraph of item 1.2.</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<paragraph>
+							<text>Item 1.2.1</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 1.2.1.</text>
+						</paragraph>
+						<paragraph>
+							<text>Third paragraph of item 1.2.1.</text>
+						</paragraph>
+					</item>
+					<item>
+						<paragraph>
+							<text>Item 1.2.2</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 1.2.2.</text>
+						</paragraph>
+						<paragraph>
+							<text>Third paragraph of item 1.2.2.</text>
+						</paragraph>
+					</item>
+				</bulletItems>
+			</item>
+		</bulletItems>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Starting with simple items, continuing with block items:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Item 1.</text>
+	</item>
+	<item>
+		<text>Item 2.</text>
+	</item>
+	<item>
+		<text>Item 3.</text>
+	</item>
+	<item>
+		<paragraph>
+			<text>Item 4.</text>
+		</paragraph>
+		<paragraph>
+			<text>Item 4 has a second paragraph.</text>
+		</paragraph>
+	</item>
+	<item>
+		<text>Item 5.</text>
+	</item>
+	<item>
+		<text>Item 6.</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Multi-paragraph, multi-level lists:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>Unchecked</text>
+		</paragraph>
+		<paragraph>
+			<text>Second paragraph of item 1</text>
+		</paragraph>
+	</item>
+	<item>
+		<paragraph>
+			<text>Checked</text>
+		</paragraph>
+		<paragraph>
+			<text>Second paragraph of item 2</text>
+		</paragraph>
+		<bulletItems>
+			<item>
+				<paragraph>
+					<text>Unchecked subitem</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 2.1</text>
+				</paragraph>
+			</item>
+			<item>
+				<paragraph>
+					<text>Checked subitem</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 2.2</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<text>Unchecked subsubitem</text>
+					</item>
+					<item>
+						<paragraph>
+							<text>Checked subsubitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 2.2.2</text>
+						</paragraph>
+					</item>
+					<item>
+						<text>Second checked subsubitem</text>
+					</item>
+					<item>
+						<text>Second unchecked subsubitem</text>
+					</item>
+				</bulletItems>
+			</item>
+			<item>
+				<paragraph>
+					<text>Second checked subitem</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 2.3</text>
+				</paragraph>
+			</item>
+			<item>
+				<paragraph>
+					<text>Second unchecked subitem</text>
+				</paragraph>
+				<paragraph>
+					<text>Second paragraph of item 2.4</text>
+				</paragraph>
+			</item>
+		</bulletItems>
+	</item>
+	<item>
+		<paragraph>
+			<text>Also checked</text>
+		</paragraph>
+		<paragraph>
+			<text>Second paragraph of item 3</text>
+		</paragraph>
 	</item>
 </bulletItems>

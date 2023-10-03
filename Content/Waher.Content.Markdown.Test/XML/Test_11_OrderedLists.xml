@@ -9,13 +9,13 @@
 			<InlineText>Ordered lists use numbers followed by periods:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Bird</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<InlineText>McHale</InlineText>
 			</NumberedItem>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Parish</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -23,13 +23,13 @@
 			<InlineText>Ordered lists retain numbers used:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Bird</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<InlineText>McHale</InlineText>
 			</NumberedItem>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Parish</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -37,10 +37,10 @@
 			<InlineText>To make lists look nice, you can wrap items with hanging indents:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -48,10 +48,10 @@
 			<InlineText>But if you want to be lazy, you don’t have to:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<InlineText>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -59,12 +59,12 @@
 			<InlineText>On separate lines:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<Paragraph>
 					<InlineText>Bird</InlineText>
 				</Paragraph>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<Paragraph>
 					<InlineText>Magic</InlineText>
 				</Paragraph>
@@ -74,7 +74,7 @@
 			<InlineText>List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>This is a list item with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</InlineText>
@@ -84,7 +84,7 @@
 					</Paragraph>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<Paragraph>
 					<InlineText>Suspendisse id sem consectetuer libero luctus adipiscing.</InlineText>
 				</Paragraph>
@@ -94,7 +94,7 @@
 			<InlineText>It looks nice if you indent every line of the subsequent paragraphs, but here again, Markdown will allow you to be lazy:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>This is a list item with two paragraphs.</InlineText>
@@ -106,7 +106,7 @@
 					</Paragraph>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<Paragraph>
 					<InlineText>Another item in the same list.</InlineText>
 				</Paragraph>
@@ -116,7 +116,7 @@
 			<InlineText>To put a blockquote within a list item, the blockquote’s &gt; delimiters need to be indented:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>A list item with a blockquote:</InlineText>
@@ -133,7 +133,7 @@
 			<InlineText>To put a code block within a list item, the code block needs to be indented twice — 8 spaces or two tabs:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>A list item with a code block:</InlineText>
@@ -148,23 +148,25 @@
 			<InlineText>Nested lists:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Item 1</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<NestedBlock>
-					<InlineText>Item 2 </InlineText>
+					<Paragraph>
+						<InlineText>Item 2 </InlineText>
+					</Paragraph>
 					<BulletList>
-						<UnnumberedItem prefix="- ">
+						<UnnumberedItem prefix="-">
 							<InlineText>Item 2a</InlineText>
 						</UnnumberedItem>
-						<UnnumberedItem prefix="- ">
+						<UnnumberedItem prefix="-">
 							<InlineText>Item 2b</InlineText>
 						</UnnumberedItem>
 					</BulletList>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Item 3</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -172,23 +174,25 @@
 			<InlineText>Nested lists 2:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Item 1</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<NestedBlock>
-					<InlineText>Item 2 </InlineText>
+					<Paragraph>
+						<InlineText>Item 2 </InlineText>
+					</Paragraph>
 					<NumberedList>
-						<UnnumberedItem prefix="#. ">
+						<NumberedItem number="1" explicit="false">
 							<InlineText>Item 2a</InlineText>
-						</UnnumberedItem>
-						<UnnumberedItem prefix="#. ">
+						</NumberedItem>
+						<NumberedItem number="2" explicit="false">
 							<InlineText>Item 2b</InlineText>
-						</UnnumberedItem>
+						</NumberedItem>
 					</NumberedList>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Item 3</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -196,23 +200,25 @@
 			<InlineText>Nested lists 3:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Item 1</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<NestedBlock>
-					<InlineText>Item 2 </InlineText>
+					<Paragraph>
+						<InlineText>Item 2 </InlineText>
+					</Paragraph>
 					<NumberedList>
-						<NumberedItem number="2">
+						<NumberedItem number="2" explicit="true">
 							<InlineText>Item 2a</InlineText>
 						</NumberedItem>
-						<NumberedItem number="3">
+						<NumberedItem number="3" explicit="true">
 							<InlineText>Item 2b</InlineText>
 						</NumberedItem>
 					</NumberedList>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Item 3</InlineText>
 			</NumberedItem>
 		</NumberedList>
@@ -220,40 +226,301 @@
 			<InlineText>Three levels:</InlineText>
 		</Paragraph>
 		<NumberedList>
-			<NumberedItem number="1">
+			<NumberedItem number="1" explicit="true">
 				<InlineText>Item 1</InlineText>
 			</NumberedItem>
-			<NumberedItem number="2">
+			<NumberedItem number="2" explicit="true">
 				<NestedBlock>
-					<InlineText>Item 2 </InlineText>
+					<Paragraph>
+						<InlineText>Item 2 </InlineText>
+					</Paragraph>
 					<NumberedList>
-						<NumberedItem number="1">
+						<NumberedItem number="1" explicit="true">
 							<InlineText>Item 2a</InlineText>
 						</NumberedItem>
-						<NumberedItem number="2">
+						<NumberedItem number="2" explicit="true">
 							<NestedBlock>
-								<InlineText>Item 2b </InlineText>
+								<Paragraph>
+									<InlineText>Item 2b </InlineText>
+								</Paragraph>
 								<NumberedList>
-									<NumberedItem number="1">
+									<NumberedItem number="1" explicit="true">
 										<InlineText>Item 2bi</InlineText>
 									</NumberedItem>
-									<NumberedItem number="2">
+									<NumberedItem number="2" explicit="true">
 										<InlineText>Item 2bii</InlineText>
 									</NumberedItem>
-									<NumberedItem number="3">
+									<NumberedItem number="3" explicit="true">
 										<InlineText>Item 2biii</InlineText>
 									</NumberedItem>
 								</NumberedList>
 							</NestedBlock>
 						</NumberedItem>
-						<NumberedItem number="3">
+						<NumberedItem number="3" explicit="true">
 							<InlineText>Item 2c</InlineText>
 						</NumberedItem>
 					</NumberedList>
 				</NestedBlock>
 			</NumberedItem>
-			<NumberedItem number="3">
+			<NumberedItem number="3" explicit="true">
 				<InlineText>Item 3</InlineText>
+			</NumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Multi-paragraph, multi-level lists:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<NumberedItem number="1" explicit="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Item 1</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 1.</InlineText>
+					</Paragraph>
+					<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+						<Row>This is some code of item 1.</Row>
+					</CodeBlock>
+					<Paragraph>
+						<InlineText>Third paragraph of item 1.</InlineText>
+					</Paragraph>
+					<NumberedList>
+						<NumberedItem number="1" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Item 1.1</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 1.1.</InlineText>
+								</Paragraph>
+								<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+									<Row>This is some code of item 1.1.</Row>
+								</CodeBlock>
+								<Paragraph>
+									<InlineText>Third paragraph of item 1.1.</InlineText>
+								</Paragraph>
+								<NumberedList>
+									<NumberedItem number="1" explicit="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Item 1.1.1</InlineText>
+											</Paragraph>
+											<Paragraph>
+												<InlineText>Second paragraph of item 1.1.1.</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>This is some code of item 1.1.1.</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Third paragraph of item 1.1.1.</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</NumberedItem>
+									<NumberedItem number="2" explicit="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Item 1.1.2</InlineText>
+											</Paragraph>
+											<Paragraph>
+												<InlineText>Second paragraph of item 1.1.2.</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>This is some code of item 1.1.2.</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Third paragraph of item 1.1.2.</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+						<NumberedItem number="2" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Item 1.2</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 1.2.</InlineText>
+								</Paragraph>
+								<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+									<Row>This is some code of item 1.2.</Row>
+								</CodeBlock>
+								<Paragraph>
+									<InlineText>Third paragraph of item 1.2.</InlineText>
+								</Paragraph>
+								<NumberedList>
+									<NumberedItem number="1" explicit="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Item 1.2.1</InlineText>
+											</Paragraph>
+											<Paragraph>
+												<InlineText>Second paragraph of item 1.2.1.</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>This is some code of item 1.2.1.</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Third paragraph of item 1.2.1.</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</NumberedItem>
+									<NumberedItem number="2" explicit="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Item 1.2.2</InlineText>
+											</Paragraph>
+											<Paragraph>
+												<InlineText>Second paragraph of item 1.2.2.</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>This is some code of item 1.2.2.</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Third paragraph of item 1.2.2.</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</NumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Starting with simple items, continuing with block items:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<NumberedItem number="1" explicit="true">
+				<InlineText>Item 1.</InlineText>
+			</NumberedItem>
+			<NumberedItem number="2" explicit="true">
+				<InlineText>Item 2.</InlineText>
+			</NumberedItem>
+			<NumberedItem number="3" explicit="true">
+				<InlineText>Item 3.</InlineText>
+			</NumberedItem>
+			<NumberedItem number="4" explicit="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Item 4.</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Item 4 has a second paragraph.</InlineText>
+					</Paragraph>
+				</NestedBlock>
+			</NumberedItem>
+			<NumberedItem number="5" explicit="true">
+				<InlineText>Item 5.</InlineText>
+			</NumberedItem>
+			<NumberedItem number="6" explicit="true">
+				<InlineText>Item 6.</InlineText>
+			</NumberedItem>
+		</NumberedList>
+		<Paragraph>
+			<InlineText>Multi-paragraph, multi-level lists:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<NumberedItem number="1" explicit="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Unchecked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 1</InlineText>
+					</Paragraph>
+				</NestedBlock>
+			</NumberedItem>
+			<NumberedItem number="2" explicit="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Checked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 2</InlineText>
+					</Paragraph>
+					<NumberedList>
+						<NumberedItem number="1" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Unchecked subitem</InlineText>
+								</Paragraph>
+								<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+									<Row>Some code</Row>
+								</CodeBlock>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.1</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</NumberedItem>
+						<NumberedItem number="2" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Checked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.2</InlineText>
+								</Paragraph>
+								<NumberedList>
+									<NumberedItem number="1" explicit="true">
+										<InlineText>Unchecked subsubitem</InlineText>
+									</NumberedItem>
+									<NumberedItem number="2" explicit="true">
+										<NestedBlock>
+											<Paragraph>
+												<InlineText>Checked subsubitem</InlineText>
+											</Paragraph>
+											<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+												<Row>Some code</Row>
+											</CodeBlock>
+											<Paragraph>
+												<InlineText>Second paragraph of item 2.2.2</InlineText>
+											</Paragraph>
+										</NestedBlock>
+									</NumberedItem>
+									<NumberedItem number="3" explicit="true">
+										<InlineText>Second checked subsubitem</InlineText>
+									</NumberedItem>
+									<NumberedItem number="4" explicit="true">
+										<InlineText>Second unchecked subsubitem</InlineText>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+						<NumberedItem number="3" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Second checked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.3</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</NumberedItem>
+						<NumberedItem number="4" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Second unchecked subitem</InlineText>
+								</Paragraph>
+								<Paragraph>
+									<InlineText>Second paragraph of item 2.4</InlineText>
+								</Paragraph>
+							</NestedBlock>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</NumberedItem>
+			<NumberedItem number="3" explicit="true">
+				<NestedBlock>
+					<Paragraph>
+						<InlineText>Also checked</InlineText>
+					</Paragraph>
+					<Paragraph>
+						<InlineText>Second paragraph of item 3</InlineText>
+					</Paragraph>
+				</NestedBlock>
 			</NumberedItem>
 		</NumberedList>
 	</elements>

@@ -9,24 +9,36 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class NumberedItem : BlockElementSingleChild
 	{
-		private readonly int number;
+		private int number;
+		private readonly bool numberExplicit;
 
 		/// <summary>
 		/// Represents a numbered item in an ordered list.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Number">Number associated with item.</param>
+		/// <param name="NumberExplicit">If number is provided explicitly</param>
 		/// <param name="Child">Child element.</param>
-		public NumberedItem(MarkdownDocument Document, int Number, MarkdownElement Child)
+		public NumberedItem(MarkdownDocument Document, int Number, bool NumberExplicit, MarkdownElement Child)
 			: base(Document, Child)
 		{
 			this.number = Number;
+			this.numberExplicit = NumberExplicit;
 		}
 
 		/// <summary>
 		/// Number associated with item.
 		/// </summary>
-		public int Number => this.number;
+		public int Number
+		{
+			get => this.number;
+			internal set => this.number = value;
+		}
+
+		/// <summary>
+		/// If number is explicitly provided (true) or inferred (false).
+		/// </summary>
+		public bool NumberExplicit => this.numberExplicit;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
@@ -34,7 +46,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			await PrefixedBlock(Output, this.Child, "#.\t", "\t");
+			string Prefix;
+
+			if (this.numberExplicit)
+				Prefix = this.number.ToString() + ".\t";
+			else
+				Prefix = "#.\t";
+
+			await PrefixedBlock(Output, this.Child, Prefix, "\t");
 			Output.AppendLine();
 		}
 
@@ -44,9 +63,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override async Task GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<li value=\"");
-			Output.Append(this.number.ToString());
-			Output.Append("\">");
+			if (this.numberExplicit)
+			{
+				Output.Append("<li value=\"");
+				Output.Append(this.number.ToString());
+				Output.Append("\">");
+			}
+			else
+				Output.Append("<li>");
 
 			await this.Child.GenerateHTML(Output);
 
@@ -105,7 +129,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		internal static async Task GenerateSmartContractXmlItem(MarkdownElement Child, XmlWriter Output, SmartContractRenderState State)
-		{ 
+		{
 			Output.WriteStartElement("item");
 
 			if (Child is Paragraph P)
@@ -125,9 +149,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">LaTeX will be output here.</param>
 		public override async Task GenerateLaTeX(StringBuilder Output)
 		{
-			Output.Append("\\item[");
-			Output.Append(this.number.ToString());
-			Output.Append("]{");
+			if (this.numberExplicit)
+			{
+				Output.Append("\\item[");
+				Output.Append(this.number.ToString());
+				Output.Append("]{");
+			}
+			else
+				Output.Append("\\item{");
 
 			foreach (MarkdownElement E in this.Children)
 				await E.GenerateLaTeX(Output);
@@ -138,13 +167,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get
-			{
-				return this.Child.InlineSpanElement;
-			}
-		}
+		internal override bool InlineSpanElement => this.Child.InlineSpanElement;
 
 		/// <summary>
 		/// Gets margins for content.
@@ -164,6 +187,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			Output.WriteStartElement("NumberedItem");
 			Output.WriteAttributeString("number", this.number.ToString());
+			Output.WriteAttributeString("explicit", CommonTypes.Encode(this.numberExplicit));
 			this.ExportChild(Output);
 			Output.WriteEndElement();
 		}
@@ -177,7 +201,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
 		public override MarkdownElementSingleChild Create(MarkdownElement Child, MarkdownDocument Document)
 		{
-			return new NumberedItem(Document, this.number, Child);
+			return new NumberedItem(Document, this.number, this.numberExplicit, Child);
 		}
 
 		/// <summary>
@@ -190,6 +214,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			return E is NumberedItem x &&
 				x.number == this.number &&
+				x.numberExplicit == this.numberExplicit &&
 				base.SameMetaData(E);
 		}
 
@@ -202,6 +227,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			return obj is NumberedItem x &&
 				this.number == x.number &&
+				this.numberExplicit == x.numberExplicit &&
 				base.Equals(obj);
 		}
 
@@ -213,8 +239,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			int h1 = base.GetHashCode();
 			int h2 = this.number.GetHashCode();
+			int h3 = this.numberExplicit.GetHashCode();
 
 			h1 = ((h1 << 5) + h1) ^ h2;
+			h1 = ((h1 << 5) + h1) ^ h3;
 
 			return h1;
 		}

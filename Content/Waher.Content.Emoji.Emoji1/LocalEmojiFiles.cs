@@ -225,7 +225,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
 		public Task GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage)
 		{
-			return GenerateHTML(Output, Emoji, 1, EmbedImage);
+			return this.GenerateHTML(Output, Emoji, 1, EmbedImage);
 		}
 
 		/// <summary>

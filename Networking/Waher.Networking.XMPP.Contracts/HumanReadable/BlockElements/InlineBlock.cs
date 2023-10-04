@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
+﻿using System.Threading.Tasks;
+
+namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {
 	/// <summary>
 	/// Abstract base class of blocks with inline elements.
@@ -19,20 +21,33 @@
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined
+		public override async Task<bool> IsWellDefined()
 		{
-			get
+			if (this.elements is null)
+				return false;
+
+			foreach (HumanReadableElement E in this.elements)
 			{
-				if (this.elements is null)
+				if (E is null || !await E.IsWellDefined())
 					return false;
+			}
 
-				foreach (HumanReadableElement E in this.elements)
-				{
-					if (E is null || !E.IsWellDefined)
-						return false;
-				}
+			return true;
+		}
 
-				return true;
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Indentation">Current indentation.</param>
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		{
+			if (!(this.Elements is null))
+			{
+				foreach (HumanReadableElement E in this.Elements)
+					E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
 			}
 		}
 	}

@@ -529,7 +529,7 @@ namespace Waher.Networking.XMPP.Contracts
 								if (E2.LocalName == "description")
 								{
 									Text = HumanReadableText.Parse(E2);
-									if (Text is null || !Text.IsWellDefined)
+									if (Text is null || !await Text.IsWellDefined())
 										return null;
 
 									Descriptions.Add(Text);
@@ -698,7 +698,7 @@ namespace Waher.Networking.XMPP.Contracts
 										return null;
 								}
 
-								if (!P2.Import(E2))
+								if (!await P2.Import(E2))
 									return null;
 
 								Parameters.Add(P2);
@@ -708,10 +708,10 @@ namespace Waher.Networking.XMPP.Contracts
 						if (Parameters.Count == 0)
 							return null;
 						break;
-
+							
 					case "humanReadableText":
 						Text = HumanReadableText.Parse(E);
-						if (Text is null || !Text.IsWellDefined)
+						if (Text is null || !await Text.IsWellDefined())
 							return null;
 
 						ForHumans.Add(Text);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -114,9 +115,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override bool Import(XmlElement Xml)
+		public override async Task<bool> Import(XmlElement Xml)
 		{
-			if (!base.Import(Xml))
+			if (!await base.Import(Xml))
 				return false;
 
 			this.Value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value", 0.0m) : (decimal?)null;

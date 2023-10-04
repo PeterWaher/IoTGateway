@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -19,7 +20,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined => true;
+		public override Task<bool> IsWellDefined() => Task.FromResult(true);
 
 		/// <summary>
 		/// Generates markdown for the human-readable text.

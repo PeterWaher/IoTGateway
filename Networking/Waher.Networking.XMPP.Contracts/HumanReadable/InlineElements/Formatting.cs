@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
+﻿using System.Threading.Tasks;
+
+namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
 	/// <summary>
 	/// Abstract base class for inline formatting elements.
@@ -19,21 +21,18 @@
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined
+		public override async Task<bool> IsWellDefined()
 		{
-			get
+			if (this.elements is null)
+				return false;
+
+			foreach (InlineElement E in this.elements)
 			{
-				if (this.elements is null)
+				if (E is null || !await E.IsWellDefined())
 					return false;
-
-				foreach (InlineElement E in this.elements)
-				{
-					if (E is null || !E.IsWellDefined)
-						return false;
-				}
-
-				return true;
 			}
+
+			return true;
 		}
 
 		/// <summary>

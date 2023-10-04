@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
+﻿using System.Threading.Tasks;
+
+namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {
 	/// <summary>
 	/// Abstract base class for item lists
@@ -19,21 +21,18 @@
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined
+		public override async Task<bool> IsWellDefined()
 		{
-			get
+			if (this.items is null)
+				return false;
+
+			foreach (Item E in this.items)
 			{
-				if (this.items is null)
+				if (E is null || !await E.IsWellDefined())
 					return false;
-
-				foreach (Item E in this.items)
-				{
-					if (E is null || !E.IsWellDefined)
-						return false;
-				}
-
-				return true;
 			}
+
+			return true;
 		}
 
 	}

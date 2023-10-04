@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
@@ -123,6 +125,43 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 					{
 						Items = Items.ToArray()
 					};
+
+				case "imageStandalone":
+					Image Image = new Image()
+					{
+						ContentType = XML.Attribute(Xml, "contentType"),
+						Width = XML.Attribute(Xml, "width", 0),
+						Height = XML.Attribute(Xml, "height", 0)
+					};
+
+					foreach (XmlNode N in Xml.ChildNodes)
+					{
+						if (!(N is XmlElement E))
+							continue;
+
+						switch (E.LocalName)
+						{
+							case "binary":
+								try
+								{
+									Image.Data = Convert.FromBase64String(E.InnerText);
+								}
+								catch (Exception)
+								{
+									return null;
+								}
+								break;
+
+							case "caption":
+								Image.Elements = ParseChildren(E);
+								break;
+
+							default:
+								return null;
+						}
+					}
+
+					return Image;
 
 				default:
 					return null;

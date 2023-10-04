@@ -26,13 +26,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			Markdown.Indent(Indentation);
-
-			if (!(this.Elements is null))
-			{
-				foreach (HumanReadableElement E in this.Elements)
-					E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
-			}
-
+			base.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
 			Markdown.AppendLine();
 
 			Markdown.Indent(Indentation);

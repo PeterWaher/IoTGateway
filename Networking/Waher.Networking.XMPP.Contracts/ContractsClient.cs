@@ -3864,7 +3864,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (!IsHumanReadableWellDefined(Contract))
+			if (!await IsHumanReadableWellDefined(Contract))
 			{
 				await this.ReturnStatus(ContractStatus.HumanReadableNotWellDefined, Callback, State);
 				return;
@@ -4240,30 +4240,30 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
-		private static bool IsHumanReadableWellDefined(HumanReadableText[] Texts)
+		private static async Task<bool> IsHumanReadableWellDefined(HumanReadableText[] Texts)
 		{
 			if (Texts is null)
 				return false;
 
 			foreach (HumanReadableText Text in Texts)
 			{
-				if (!Text.IsWellDefined)
+				if (!await Text.IsWellDefined())
 					return false;
 			}
 
 			return true;
 		}
 
-		private static bool IsHumanReadableWellDefined(Contract Contract)
+		private static async Task<bool> IsHumanReadableWellDefined(Contract Contract)
 		{
-			if (!IsHumanReadableWellDefined(Contract.ForHumans))
+			if (!await IsHumanReadableWellDefined(Contract.ForHumans))
 				return false;
 
 			if (!(Contract.Roles is null))
 			{
 				foreach (Role Role in Contract.Roles)
 				{
-					if (!IsHumanReadableWellDefined(Role.Descriptions))
+					if (!await IsHumanReadableWellDefined(Role.Descriptions))
 						return false;
 				}
 			}
@@ -4272,7 +4272,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				foreach (Parameter Parameter in Contract.Parameters)
 				{
-					if (!IsHumanReadableWellDefined(Parameter.Descriptions))
+					if (!await IsHumanReadableWellDefined(Parameter.Descriptions))
 						return false;
 				}
 			}

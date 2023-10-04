@@ -3917,7 +3917,7 @@
             Body elements
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Blocks.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -3951,6 +3951,56 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image">
+            <summary>
+            Standalone image
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.Data">
+            <summary>
+            Binary data of image.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.ContentType">
+            <summary>
+            Internet Content-Type of image.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.AlternativeText">
+            <summary>
+            Image alternative text.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.Width">
+            <summary>
+            Width of image, in pixels.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.Height">
+            <summary>
+            Height of image, in pixels.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock">
             <summary>
             Abstract base class of blocks with inline elements.
@@ -3961,10 +4011,19 @@
             Inline elements
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.InlineBlock.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item">
             <summary>
@@ -3981,7 +4040,7 @@
             Block elements
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4011,7 +4070,7 @@
             Items
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.ItemList.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4066,7 +4125,7 @@
             Header elements
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4091,7 +4150,7 @@
             Abstract base class for human readable elements.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4259,12 +4318,67 @@
             Embedded elements
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image">
+            <summary>
+            Inline image
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.MaxSize">
+            <summary>
+            2048 pixels is maximum size (width or height) of images in smart contracts.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.Data">
+            <summary>
+            Binary data of image.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.ContentType">
+            <summary>
+            Internet Content-Type of image.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.AlternativeText">
+            <summary>
+            Image alternative text.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.Width">
+            <summary>
+            Width of image, in pixels.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.Height">
+            <summary>
+            Height of image, in pixels.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>
@@ -4323,7 +4437,7 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.LineBreak.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.LineBreak.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4347,7 +4461,7 @@
             Name of parameter
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Parameter.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>
@@ -4437,7 +4551,7 @@
             Text
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.IsWellDefined">
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Text.IsWellDefined">
             <summary>
             Checks if the element is well-defined.
             </summary>

@@ -1007,6 +1007,11 @@ purposes.
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name='imageStandalone' type='ImageType'>
+				<xs:annotation>
+					<xs:documentation>Shows a standalone image.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
 
@@ -1078,7 +1083,12 @@ purposes.
 			</xs:element>
 			<xs:element name='lineBreak' type='Empty'>
 				<xs:annotation>
-					<xs:documentation>Sub-script human-readdable text.</xs:documentation>
+					<xs:documentation>Breaks the current line. Following text is rendered on the following line.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='imageInline' type='ImageType'>
+				<xs:annotation>
+					<xs:documentation>Shows an inline image.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:choice>
@@ -1089,6 +1099,50 @@ purposes.
 	<xs:simpleType name='NonEmptyString'>
 		<xs:restriction base='xs:string'>
 			<xs:minLength value='1'/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name='ImageType'>
+		<xs:sequence>
+			<xs:element name='binary' type='xs:base64Binary'>
+				<xs:annotation>
+					<xs:documentation>Base64-encoded binary representation of image.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='caption'>
+				<xs:annotation>
+					<xs:documentation>Defines an image caption, or alternative text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='contentType' use='required'>
+			<xs:annotation>
+				<xs:documentation>Internet-Content type of image.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base='xs:string'>
+					<xs:pattern value='(^image)(\/)[a-zA-Z0-9_\-+]*'/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name='width' type='ImageSize' use='required'>
+			<xs:annotation>
+				<xs:documentation>Width of image, in pixels.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='height' type='ImageSize' use='required'>
+			<xs:annotation>
+				<xs:documentation>Height of image, in pixels.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name='ImageSize'>
+		<xs:restriction base='xs:positiveInteger'>
+			<xs:maxInclusive value='2048'/>
 		</xs:restriction>
 	</xs:simpleType>
 

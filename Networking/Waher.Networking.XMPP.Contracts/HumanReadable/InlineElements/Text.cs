@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
@@ -22,7 +23,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined => !string.IsNullOrEmpty(this.value);
+		public override Task<bool> IsWellDefined()
+		{
+			return Task.FromResult(!string.IsNullOrEmpty(this.value));
+		}
 
 		/// <summary>
 		/// Serializes the element in normalized form.

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
@@ -32,34 +33,31 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override bool IsWellDefined
+		public override async Task<bool> IsWellDefined()
 		{
-			get
+			if (!(this.inlineElements is null))
 			{
-				if (!(this.inlineElements is null))
-				{
-					if (!(this.blockElements is null))
-						return false;
-
-					foreach (InlineElement E in this.inlineElements)
-					{
-						if (E is null || !E.IsWellDefined)
-							return false;
-					}
-				}
-				else if (!(this.blockElements is null))
-				{
-					foreach (BlockElement E in this.blockElements)
-					{
-						if (E is null || !E.IsWellDefined)
-							return false;
-					}
-				}
-				else
+				if (!(this.blockElements is null))
 					return false;
 
-				return true;
+				foreach (InlineElement E in this.inlineElements)
+				{
+					if (E is null || !await E.IsWellDefined())
+						return false;
+				}
 			}
+			else if (!(this.blockElements is null))
+			{
+				foreach (BlockElement E in this.blockElements)
+				{
+					if (E is null || !await E.IsWellDefined())
+						return false;
+				}
+			}
+			else
+				return false;
+
+			return true;
 		}
 
 		/// <summary>

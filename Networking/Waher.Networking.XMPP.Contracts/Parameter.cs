@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public virtual bool Import(XmlElement Xml)
+		public virtual async Task<bool> Import(XmlElement Xml)
 		{
 			this.Name = XML.Attribute(Xml, "name");
 			if (string.IsNullOrEmpty(this.Name))
@@ -152,7 +152,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						case "description": // Smart contract
 							HumanReadableText Text = HumanReadableText.Parse(E);
-							if (Text is null || !Text.IsWellDefined)
+							if (Text is null || !await Text.IsWellDefined())
 								return false;
 
 							Descriptions.Add(Text);
@@ -160,7 +160,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						case "Description": // Simplified (ex. state machine note command).
 							Text = HumanReadableText.ParseSimplified(E);
-							if (Text is null || !Text.IsWellDefined)
+							if (Text is null || !await Text.IsWellDefined())
 								return false;
 
 							Descriptions.Add(Text);

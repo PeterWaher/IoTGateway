@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
@@ -16,10 +17,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public abstract bool IsWellDefined
-		{
-			get;
-		}
+		public abstract Task<bool> IsWellDefined();
 
 		/// <summary>
 		/// Serializes the element in normalized form.
@@ -34,8 +32,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <param name="Elements">Elements to serialize.</param>
 		protected static void Serialize(StringBuilder Xml, IEnumerable<HumanReadableElement> Elements)
 		{
-			foreach (HumanReadableElement E in Elements)
-				E.Serialize(Xml);
+			if (!(Elements is null))
+			{
+				foreach (HumanReadableElement E in Elements)
+					E.Serialize(Xml);
+			}
 		}
 
 		/// <summary>

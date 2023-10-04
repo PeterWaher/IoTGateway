@@ -146,9 +146,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override bool Import(XmlElement Xml)
+		public override async Task<bool> Import(XmlElement Xml)
 		{
-			if (!base.Import(Xml))
+			if (!await base.Import(Xml))
 				return false;
 
 			this.Role = XML.Attribute(Xml, "role");

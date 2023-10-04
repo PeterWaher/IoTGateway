@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <returns>Markdown</returns>
 		public string GenerateMarkdown(MarkdownSettings Settings)
 		{
-			StringBuilder Markdown = new StringBuilder();
+			MarkdownOutput Markdown = new MarkdownOutput();
 			this.GenerateMarkdown(Markdown, 1, 0, Settings);
 			return Markdown.ToString();
 		}

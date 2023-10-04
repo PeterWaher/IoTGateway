@@ -87,9 +87,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 					{
 						if (N2 is XmlElement E2 && E2.LocalName == "item")
 						{
+							KeyValuePair<InlineElement[], BlockElement[]> P = ParseBlockOrInlineChildren(E2);
+
 							Items.Add(new Item()
 							{
-								Elements = ParseBlockOrInlineChildren(E2)
+								InlineElements = P.Key,
+								BlockElements = P.Value
 							});
 						}
 					}
@@ -106,9 +109,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 					{
 						if (N2 is XmlElement E2 && E2.LocalName == "item")
 						{
+							KeyValuePair<InlineElement[], BlockElement[]> P = ParseBlockOrInlineChildren(E2);
+
 							Items.Add(new Item()
 							{
-								Elements = ParseBlockOrInlineChildren(E2)
+								InlineElements = P.Key,
+								BlockElements = P.Value
 							});
 						}
 					}

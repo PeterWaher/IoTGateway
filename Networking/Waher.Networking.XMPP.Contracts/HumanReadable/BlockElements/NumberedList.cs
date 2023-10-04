@@ -23,21 +23,21 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			if (!(this.Items is null))
 			{
-				bool First = true;
-
 				foreach (Item Item in this.Items)
 				{
-					Indent(Markdown, Indentation);
-
+					Markdown.Indent(Indentation);
 					Markdown.Append("#.\t");
-					Item.GenerateMarkdown(Markdown, SectionLevel, First ? 0 : Indentation + 1, Settings);
-					First = false;
+					Item.GenerateMarkdown(Markdown, SectionLevel, Indentation + 1, Settings);
+
+					if (!Markdown.EmptyRow)
+						Markdown.AppendLine();
 				}
 
+				Markdown.Indent(Indentation);
 				Markdown.AppendLine();
 			}
 		}

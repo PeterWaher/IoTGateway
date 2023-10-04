@@ -82,18 +82,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public abstract void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings);
-
-		/// <summary>
-		/// Outputs indentation to Markdown output.
-		/// </summary>
-		/// <param name="Markdown">Markdown output.</param>
-		/// <param name="Indentation">Number of tabs of indentation.</param>
-		protected static void Indent(StringBuilder Markdown, int Indentation)
-		{
-			while (Indentation-- > 0)
-				Markdown.Append('\t');
-		}
+		public abstract void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings);
 
 		/// <summary>
 		/// Encodes text to Markdown.
@@ -124,7 +113,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Array of inline elements</returns>
-		public static HumanReadableElement[] ParseBlockOrInlineChildren(XmlElement Xml)
+		public static KeyValuePair<InlineElement[], BlockElement[]> ParseBlockOrInlineChildren(XmlElement Xml)
 		{
 			List<InlineElement> InlineElements = null;
 			List<BlockElement> BlockElements = null;
@@ -138,7 +127,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 					{
 						BlockElement BlockElement = BlockElement.TryParse(E);
 						if (BlockElement is null)
-							return null;
+							return new KeyValuePair<InlineElement[], BlockElement[]>(null, null);
 						else
 						{
 							if (BlockElements is null)
@@ -158,7 +147,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 			}
 
 			if (BlockElements is null)
-				return InlineElements?.ToArray();
+				return new KeyValuePair<InlineElement[], BlockElement[]>(InlineElements?.ToArray(), null);
 			else
 			{
 				if (!(InlineElements is null))
@@ -169,7 +158,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 					});
 				}
 
-				return BlockElements.ToArray();
+				return new KeyValuePair<InlineElement[], BlockElement[]>(null, BlockElements.ToArray());
 			}
 		}
 

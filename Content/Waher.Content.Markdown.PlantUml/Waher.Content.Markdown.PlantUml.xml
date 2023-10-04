@@ -82,6 +82,11 @@
             If LaTeX is handled.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesSmartContract">
+            <summary>
+            If smart-contract XML is handled.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates HTML for the markdown element.
@@ -168,6 +173,19 @@
             <summary>
             Default Foreground color
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
     </members>
 </doc>

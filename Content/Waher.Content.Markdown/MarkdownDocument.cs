@@ -4730,7 +4730,6 @@ namespace Waher.Content.Markdown
 			int RowEnd = 0;
 			int Pos, Len;
 			char ch;
-			char FirstChar = (char)0;
 			bool InBlock = false;
 			bool InRow = false;
 			bool NonWhitespaceInRow = false;
@@ -4762,7 +4761,6 @@ namespace Waher.Content.Markdown
 
 							Positions.Add(RowStart);
 							Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
-							FirstChar = (char)0;
 							InRow = false;
 							HasRows = true;
 
@@ -4782,7 +4780,6 @@ namespace Waher.Content.Markdown
 							Rows.Clear();
 							Positions.Clear();
 							InBlock = false;
-							FirstChar = (char)0;
 							InRow = false;
 							HasRows = false;
 							FirstLineIndent = 0;
@@ -4811,7 +4808,6 @@ namespace Waher.Content.Markdown
 						{
 							if (LineIndent >= FirstLineIndent)
 							{
-								FirstChar = ch;
 								InRow = true;
 								RowStart = RowEnd = Pos;
 							}
@@ -4833,7 +4829,6 @@ namespace Waher.Content.Markdown
 				{
 					if (!InRow)
 					{
-						FirstChar = ch;
 						InRow = true;
 						InBlock = true;
 						RowStart = Pos;
@@ -4855,7 +4850,7 @@ namespace Waher.Content.Markdown
 				{
 					Positions.Add(RowStart);
 					Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
-					HasRows = true;
+					//HasRows = true;
 				}
 
 				Blocks.Add(new Block(Rows.ToArray(), Positions.ToArray(), FirstLineIndent / 4));

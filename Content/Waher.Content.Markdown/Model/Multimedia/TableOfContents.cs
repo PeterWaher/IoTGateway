@@ -254,5 +254,92 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph,
+			MarkdownDocument Document)
+		{
+			int LastLevel = 0;
+			bool ListItemAdded = true;
+
+			Output.WriteStartElement("paragraph");
+
+			foreach (MarkdownElement E in ChildNodes)
+				await E.GenerateSmartContractXml(Output, State);
+			
+			Output.WriteEndElement();
+
+			int NrLevel1 = 0;
+			bool SkipLevel1;
+
+			foreach (Header Header in Document.Headers)
+			{
+				if (Header.Level == 1)
+					NrLevel1++;
+			}
+
+			SkipLevel1 = (NrLevel1 == 1);
+			if (SkipLevel1)
+				LastLevel++;
+
+			foreach (Header Header in Document.Headers)
+			{
+				if (SkipLevel1 && Header.Level == 1)
+					continue;
+
+				if (Header.Level > LastLevel)
+				{
+					while (Header.Level > LastLevel)
+					{
+						if (!ListItemAdded)
+							Output.WriteStartElement("item");
+
+						Output.WriteStartElement("numberedItems");
+						LastLevel++;
+						ListItemAdded = false;
+					}
+				}
+				else if (Header.Level < LastLevel)
+				{
+					while (Header.Level < LastLevel)
+					{
+						if (ListItemAdded)
+							Output.WriteEndElement();
+
+						Output.WriteEndElement();
+						ListItemAdded = true;
+						LastLevel--;
+					}
+				}
+
+				if (ListItemAdded)
+					Output.WriteEndElement();
+
+				Output.WriteStartElement("item");
+
+				await Header.GenerateSmartContractXml(Output, State);
+
+				ListItemAdded = true;
+			}
+
+			while (LastLevel > (SkipLevel1 ? 1 : 0))
+			{
+				if (ListItemAdded)
+					Output.WriteEndElement();
+
+				Output.WriteEndElement();
+				ListItemAdded = true;
+				LastLevel--;
+			}
+		}
 	}
 }

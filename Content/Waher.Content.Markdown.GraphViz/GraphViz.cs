@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.CodeContent;
 using Waher.Content.Markdown.Model.SpanElements;
@@ -348,6 +349,11 @@ namespace Waher.Content.Markdown.GraphViz
 		/// If LaTeX is handled.
 		/// </summary>
 		public bool HandlesLaTeX => true;
+
+		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		public bool HandlesSmartContract => true;
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
@@ -790,6 +796,63 @@ namespace Waher.Content.Markdown.GraphViz
 		{
 			get => defaultFgColor;
 			set => defaultFgColor = value;
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			try
+			{
+				GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+				if (Info is null)
+					return false;
+
+				byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
+				string ContentType = "image/png";
+
+				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
+					return false;
+
+				int Width = Image.Width;
+				int Height = Image.Height;
+
+				Output.WriteStartElement("imageStandalone");
+
+				Output.WriteAttributeString("contentType", ContentType);
+				Output.WriteAttributeString("width", Width.ToString());
+				Output.WriteAttributeString("height", Height.ToString());
+
+				Output.WriteStartElement("binary");
+				Output.WriteValue(Convert.ToBase64String(Data));
+				Output.WriteEndElement();
+
+				Output.WriteStartElement("caption");
+				if (string.IsNullOrEmpty(Info.Title))
+					Output.WriteElementString("text", "Graph");
+				else
+					Output.WriteElementString("text", Info.Title);
+
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
 		}
 	}
 }

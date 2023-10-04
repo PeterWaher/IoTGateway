@@ -246,6 +246,11 @@ namespace Waher.Content.Markdown.PlantUml
 		public bool HandlesLaTeX => true;
 
 		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		public bool HandlesSmartContract => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -652,6 +657,63 @@ namespace Waher.Content.Markdown.PlantUml
 		{
 			get => defaultFgColor;
 			set => defaultFgColor = value;
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			try
+			{
+				GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+				if (Info is null)
+					return false;
+
+				byte[] Data = await Resources.ReadAllBytesAsync(Info.ImageFileName);
+				string ContentType = "image/png";
+
+				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
+					return false;
+
+				int Width = Image.Width;
+				int Height = Image.Height;
+
+				Output.WriteStartElement("imageStandalone");
+
+				Output.WriteAttributeString("contentType", ContentType);
+				Output.WriteAttributeString("width", Width.ToString());
+				Output.WriteAttributeString("height", Height.ToString());
+
+				Output.WriteStartElement("binary");
+				Output.WriteValue(Convert.ToBase64String(Data));
+				Output.WriteEndElement();
+
+				Output.WriteStartElement("caption");
+				if (string.IsNullOrEmpty(Info.Title))
+					Output.WriteElementString("text", "Graph");
+				else
+					Output.WriteElementString("text", Info.Title);
+
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
 		}
 	}
 }

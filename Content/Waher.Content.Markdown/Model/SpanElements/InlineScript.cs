@@ -700,16 +700,178 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			object Result = await this.EvaluateExpression();
+			
+			await GenerateSmartContractXml(Result, Output, this.aloneInParagraph, this.variables, State);
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		/// <param name="State">Current rendering state.</param>
+		public static async Task GenerateSmartContractXml(object Result, XmlWriter Output, 
+			bool AloneInParagraph, Variables Variables, SmartContractRenderState State)
+		{
 			if (Result is null)
 				return;
 
-			if (this.aloneInParagraph)
-				Output.WriteStartElement("paragraph");
+			if (Result is XmlDocument Xml)
+				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+			else if (Result is IToMatrix ToMatrix)
+				Result = ToMatrix.ToMatrix();
 
-			Output.WriteElementString("text", Result.ToString());
+			if (Result is Graph G)
+			{
+				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
+				byte[] Bin = Pixels.EncodeAsPng();
 
-			if (this.aloneInParagraph)
+				if (AloneInParagraph)
+					Output.WriteStartElement("imageStandalone");
+				else
+					Output.WriteStartElement("imageInline");
+
+				Output.WriteAttributeString("contentType", "image/png");
+				Output.WriteAttributeString("width", GraphSettings.Width.ToString());
+				Output.WriteAttributeString("height", GraphSettings.Height.ToString());
+
+				Output.WriteStartElement("binary");
+				Output.WriteValue(Convert.ToBase64String(Bin));
 				Output.WriteEndElement();
+
+				Output.WriteStartElement("caption");
+				if (G is Graph2D Graph2D && !string.IsNullOrEmpty(Graph2D.Title))
+					Output.WriteElementString("text", Graph2D.Title);
+				else
+					Output.WriteElementString("text", "Graph");
+
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+			}
+			else if (Result is PixelInformation Pixels)
+			{
+				byte[] Bin = Pixels.EncodeAsPng();
+
+				if (AloneInParagraph)
+					Output.WriteStartElement("imageStandalone");
+				else
+					Output.WriteStartElement("imageInline");
+
+				Output.WriteAttributeString("contentType", "image/png");
+				Output.WriteAttributeString("width", Pixels.Width.ToString());
+				Output.WriteAttributeString("height", Pixels.Height.ToString());
+
+				Output.WriteStartElement("binary");
+				Output.WriteValue(Convert.ToBase64String(Bin));
+				Output.WriteEndElement();
+
+				Output.WriteStartElement("caption");
+				Output.WriteElementString("text", "Image");
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+			}
+			else if (Result is SKImage Img)
+			{
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
+
+					if (AloneInParagraph)
+						Output.WriteStartElement("imageStandalone");
+					else
+						Output.WriteStartElement("imageInline");
+
+					Output.WriteAttributeString("contentType", "image/png");
+					Output.WriteAttributeString("width", Img.Width.ToString());
+					Output.WriteAttributeString("height", Img.Height.ToString());
+
+					Output.WriteStartElement("binary");
+					Output.WriteValue(Convert.ToBase64String(Bin));
+					Output.WriteEndElement();
+
+					Output.WriteStartElement("caption");
+					Output.WriteElementString("text", "Image");
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+				}
+			}
+			else if (Result is MarkdownDocument Doc)
+			{
+				await Doc.GenerateSmartContractXml(Output, null);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateSmartContractXml(Output, null);   // Does not call ProcessAsyncTasks()
+				Doc.ProcessAsyncTasks();
+			}
+			else if (Result is Exception ex)
+			{
+				bool First = true;
+
+				ex = Log.UnnestException(ex);
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						if (AloneInParagraph)
+							Output.WriteStartElement("paragraph");
+
+						foreach (string Row in ex3.Message.Replace("\r\n", "\n").
+							Replace('\r', '\n').Split('\n'))
+						{
+							if (First)
+								First = false;
+							else
+								Output.WriteElementString("lineBreak", string.Empty);
+
+							Output.WriteElementString("text", Result?.ToString() ?? string.Empty);
+						}
+
+						if (AloneInParagraph)
+							Output.WriteEndElement();
+					}
+				}
+				else
+				{
+					if (AloneInParagraph)
+						Output.WriteStartElement("paragraph");
+
+					foreach (string Row in ex.Message.Replace("\r\n", "\n").
+						Replace('\r', '\n').Split('\n'))
+					{
+						if (First)
+							First = false;
+						else
+							Output.WriteElementString("lineBreak", string.Empty);
+
+						Output.WriteElementString("text", Result?.ToString() ?? string.Empty);
+					}
+
+					if (AloneInParagraph)
+						Output.WriteEndElement();
+				}
+			}
+			else if (Result is Array A)
+			{
+				foreach (object Item in A)
+					await GenerateSmartContractXml(Item, Output, false, Variables, State);
+			}
+			else
+			{
+				if (AloneInParagraph)
+					Output.WriteStartElement("paragraph");
+
+				Output.WriteElementString("text", Result?.ToString() ?? string.Empty);
+
+				if (AloneInParagraph)
+					Output.WriteEndElement();
+			}
 		}
 
 		/// <summary>

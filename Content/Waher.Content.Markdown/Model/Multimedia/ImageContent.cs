@@ -11,6 +11,8 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
+using Waher.Script;
+using Waher.Content.Markdown.Model.SpanElements;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -459,6 +461,102 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					temporaryFiles.Clear();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+		{
+			try
+			{
+				string ContentType;
+				string Title;
+				byte[] Bin;
+				int Width;
+				int Height;
+
+				foreach (MultimediaItem Item in Items)
+				{
+					try
+					{
+						Uri Uri = new Uri(Item.Url);
+						KeyValuePair<string, TemporaryStream> P = await InternetContent.GetTempStreamAsync(
+							new Uri(Item.Url), 10000, new KeyValuePair<string, string>("Accept", "image/*"));
+
+						using (TemporaryStream f = P.Value)
+						{
+							MemoryStream ms = new MemoryStream();
+							f.Position = 0;
+
+							await f.CopyToAsync(ms);
+
+							Bin = ms.ToArray();
+							ContentType = P.Key;
+
+							if (!(await InternetContent.DecodeAsync(ContentType, Bin, Uri) is SKImage Image))
+								continue;
+
+							Width = Item.Width ?? Image.Width;
+							Height = Item.Height ?? Image.Height;
+							Title = Item.Title;
+
+							if (AloneInParagraph)
+								Output.WriteStartElement("imageStandalone");
+							else
+								Output.WriteStartElement("imageInline");
+
+							Output.WriteAttributeString("contentType", ContentType);
+							Output.WriteAttributeString("width", Image.Width.ToString());
+							Output.WriteAttributeString("height", Image.Height.ToString());
+
+							Output.WriteStartElement("binary");
+							Output.WriteValue(Convert.ToBase64String(Bin));
+							Output.WriteEndElement();
+
+							Output.WriteStartElement("caption");
+							if (string.IsNullOrEmpty(Title))
+								Output.WriteElementString("text", "Image");
+							else
+								Output.WriteElementString("text", Title);
+
+							Output.WriteEndElement();
+							Output.WriteEndElement();
+
+							return;
+						}
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+				}
+			}
+			catch (Exception)
+			{
+			}
+
+			Variables Variables = Document.Settings.Variables;
+			Variables?.Push();
+
+			try
+			{
+				foreach (MultimediaItem Item in Items)
+					await InlineScript.GenerateSmartContractXml(Item.Url, Output, AloneInParagraph, Variables, State);
+			}
+			finally
+			{
+				Variables?.Pop();
+			}
+
 		}
 	}
 }

@@ -98,6 +98,11 @@ namespace Waher.IoTGateway.CodeContent
 		public bool HandlesLaTeX => true;
 
 		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		public bool HandlesSmartContract => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -319,5 +324,29 @@ namespace Waher.IoTGateway.CodeContent
 
 			return true;
 		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = Document.Settings.Variables;
+			object Result = await this.Evaluate(Script, Variables);
+
+			await InlineScript.GenerateSmartContractXml(Result, Output, true, Variables, State);
+
+			return true;
+		}
+
 	}
 }

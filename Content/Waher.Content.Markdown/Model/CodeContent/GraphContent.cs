@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -64,6 +65,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// If LaTeX is handled.
 		/// </summary>
 		public bool HandlesLaTeX => true;
+
+		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		public bool HandlesSmartContract => true;
 
 		/// <summary>
 		/// Generates (transportanle) Markdown for the markdown element.
@@ -179,7 +185,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			try
 			{
 				Graph G = await GetGraph(Rows);
-				await SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(), 
+				await SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(),
 					Document.Settings.XamlSettings);
 				return true;
 			}
@@ -207,9 +213,9 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			{
 				Graph G = await GetGraph(Rows);
 
-				await SpanElements.InlineScript.GenerateXamarinForms(G, Output, State, true, 
+				await SpanElements.InlineScript.GenerateXamarinForms(G, Output, State, true,
 					Document.Settings.Variables ?? new Variables(), Document.Settings.XamlSettings);
-				
+
 				return true;
 			}
 			catch (Exception ex)
@@ -255,6 +261,33 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			Graph G = await GetGraph(Rows);
 			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			try
+			{
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GenerateSmartContractXml(G, Output, true, Document.Settings.Variables ?? new Variables(), State);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
 		}
 
 	}

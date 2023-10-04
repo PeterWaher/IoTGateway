@@ -167,6 +167,11 @@ namespace Waher.Content.Markdown.Layout2D
 		public bool HandlesLaTeX => true;
 
 		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		public bool HandlesSmartContract => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -445,6 +450,79 @@ namespace Waher.Content.Markdown.Layout2D
 			using (SKImage Img = P.Key)   // TODO: Maps
 			{
 				return PixelInformation.FromImage(Img);
+			}
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			try
+			{
+				string Xml = MarkdownDocument.AppendRows(Rows);
+				string Title;
+				int i = Language.IndexOf(':');
+
+				if (i > 0)
+				{
+					Title = Language.Substring(i + 1).Trim();
+					Language = Language.Substring(0, i).TrimEnd();
+				}
+				else
+					Title = string.Empty;
+
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Xml);
+
+				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc);
+				Variables Variables = Document.Settings.Variables;
+				RenderSettings Settings = await LayoutDoc.GetRenderSettings(Variables);
+
+				KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
+
+				using (SKImage Img = P.Key)
+				{
+					Output.WriteStartElement("imageStandalone");
+
+					Output.WriteAttributeString("contentType", "image/png");
+					Output.WriteAttributeString("width", Img.Width.ToString());
+					Output.WriteAttributeString("height", Img.Height.ToString());
+
+					using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+					{
+						byte[] Bin = Data.ToArray();
+
+						Output.WriteStartElement("binary");
+						Output.WriteValue(Convert.ToBase64String(Bin));
+						Output.WriteEndElement();
+					}
+
+					Output.WriteStartElement("caption");
+					if (string.IsNullOrEmpty(Title))
+						Output.WriteElementString("text", "Layout");
+					else
+						Output.WriteElementString("text", Title);
+
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+				}
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
 			}
 		}
 

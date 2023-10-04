@@ -64,6 +64,14 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// If smart-contract XML is handled.
+		/// </summary>
+		bool HandlesSmartContract
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Generates (transportanle) Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
@@ -133,5 +141,19 @@ namespace Waher.Content.Markdown.Model
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document);
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			string[] Rows, string Language, int Indent, MarkdownDocument Document);
 	}
 }

@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -190,5 +191,32 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
+			MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph,
+			MarkdownDocument Document)
+		{
+			Variables Variables = Document.Settings.Variables;
+			Variables?.Push();
+
+			try
+			{
+				foreach (MultimediaItem Item in Items)
+					await InlineScript.GenerateSmartContractXml(Item.Url, Output, true, Variables, State);
+			}
+			finally
+			{
+				Variables?.Pop();
+			}
+		}
 	}
 }

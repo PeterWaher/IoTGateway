@@ -4967,6 +4967,11 @@
             If LaTeX is handled.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.GraphContent.HandlesSmartContract">
+            <summary>
+            If smart-contract XML is handled.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates (transportanle) Markdown for the markdown element.
@@ -5051,6 +5056,19 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>Image, if successful, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.CodeContent.ImageContent">
             <summary>
             Base64-encoded image content.
@@ -5097,6 +5115,11 @@
         <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesLaTeX">
             <summary>
             If LaTeX is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesSmartContract">
+            <summary>
+            If smart-contract XML is handled.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
@@ -5202,6 +5225,19 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>Image, if successful, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.ICodeContent">
             <summary>
             Interface for all markdown handlers of code content.
@@ -5243,6 +5279,11 @@
         <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesLaTeX">
             <summary>
             If LaTeX is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesSmartContract">
+            <summary>
+            If smart-contract XML is handled.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
@@ -5307,6 +5348,19 @@
             Generates LaTeX text for the markdown element.
             </summary>
             <param name="Output">LaTeX will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
             <param name="Rows">Code rows.</param>
             <param name="Language">Language used.</param>
             <param name="Indent">Additional indenting.</param>
@@ -5411,6 +5465,18 @@
             Generates LaTeX text for the markdown element.
             </summary>
             <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -5971,6 +6037,18 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.MultimediaItem">
             <summary>
             Multimedia item.
@@ -6105,6 +6183,18 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.ImageContent">
             <summary>
             Image content.
@@ -6185,6 +6275,18 @@
             <param name="FileExtension">File extension.</param>
             <returns>Temporary file name.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.MarkdownContent">
             <summary>
             Markdown content.
@@ -6255,6 +6357,18 @@
             Generates LaTeX text for the markdown element.
             </summary>
             <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -6335,6 +6449,18 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.VideoContent">
             <summary>
             Video content.
@@ -6395,6 +6521,18 @@
             Generates LaTeX text for the markdown element.
             </summary>
             <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -6465,6 +6603,18 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.YouTubeContent">
             <summary>
             YouTube content.
@@ -6525,6 +6675,18 @@
             Generates LaTeX text for the markdown element.
             </summary>
             <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -7872,6 +8034,17 @@
             Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateSmartContractXml(System.Object,System.Xml.XmlWriter,System.Boolean,Waher.Script.Variables,Waher.Content.Markdown.Model.SmartContractRenderState)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
             <param name="State">Current rendering state.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateLaTeX(System.Text.StringBuilder)">

@@ -2570,6 +2570,14 @@
             </summary>
             <param name="Output">LaTeX will be output here.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="State">Current rendering state.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Indent">
             <summary>
             Code block indentation.

@@ -1076,8 +1076,15 @@ purposes.
 					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name='lineBreak' type='Empty'>
+				<xs:annotation>
+					<xs:documentation>Sub-script human-readdable text.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
+
+	<xs:complexType name='Empty'/>
 
 	<xs:simpleType name='NonEmptyString'>
 		<xs:restriction base='xs:string'>

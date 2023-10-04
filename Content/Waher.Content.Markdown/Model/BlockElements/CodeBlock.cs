@@ -597,6 +597,33 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		{
+			Output.WriteStartElement("paragraph");
+
+			bool First = true;
+
+			foreach (string Row in this.rows)
+			{
+				if (First)
+					First = false;
+				else
+					Output.WriteElementString("lineBreak", string.Empty);
+
+				Output.WriteElementString("text", Row);
+			}
+
+			Output.WriteEndElement();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Code block indentation.
 		/// </summary>
 		public int Indent => this.indent;

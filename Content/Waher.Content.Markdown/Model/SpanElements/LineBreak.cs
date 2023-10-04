@@ -94,7 +94,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="State">Current rendering state.</param>
 		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			Output.WriteElementString("text", "\n");
+			Output.WriteElementString("lineBreak", string.Empty);
 			return Task.CompletedTask;
 		}
 

@@ -100,6 +100,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 						Elements = ParseChildren(Xml)
 					};
 
+				case "lineBreak":
+					return new LineBreak();
+
 				default:
 					return null;
 			}

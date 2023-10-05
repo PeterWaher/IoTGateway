@@ -12,10 +12,10 @@
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incomplete <u>underline</u>]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incoplete <ins>insertion</ins>]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incomplete <ins>insertion</ins>]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incoplete <ins>insertion 2_</ins>]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incomplete <ins>insertion 2_</ins>]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Incomplete <s>strike over</s>]]></Label>

@@ -8,9 +8,9 @@ Incomplete *emphasis
 
 Incomplete _underline
 
-Incoplete __insertion
+Incomplete __insertion
 
-Incoplete __insertion 2_
+Incomplete __insertion 2_
 
 Incomplete ~strike over
 

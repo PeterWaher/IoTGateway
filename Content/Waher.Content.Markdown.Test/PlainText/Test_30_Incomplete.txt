@@ -6,9 +6,9 @@ Incomplete emphasis
 
 Incomplete underline
 
-Incoplete insertion
+Incomplete insertion
 
-Incoplete insertion 2_
+Incomplete insertion 2_
 
 Incomplete strike over
 

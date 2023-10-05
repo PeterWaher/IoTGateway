@@ -6,9 +6,9 @@ Incomplete *emphasis*
 
 Incomplete _underline_
 
-Incoplete __insertion__
+Incomplete __insertion__
 
-Incoplete __insertion 2\___
+Incomplete __insertion 2\___
 
 Incomplete ~strike over~
 

@@ -3,8 +3,8 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Bold>strong*</Bold></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Italic>emphasis</Italic></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Underline>underline</Underline></TextBlock>
-	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incoplete <Underline>insertion</Underline></TextBlock>
-	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incoplete <Underline>insertion 2_</Underline></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Underline>insertion</Underline></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <Underline>insertion 2_</Underline></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>strike over</TextBlock></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>deletion</TextBlock></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Incomplete <TextBlock TextWrapping="Wrap"><TextBlock.TextDecorations><TextDecoration Location="Strikethrough" /></TextBlock.TextDecorations>deletion 2~</TextBlock></TextBlock>

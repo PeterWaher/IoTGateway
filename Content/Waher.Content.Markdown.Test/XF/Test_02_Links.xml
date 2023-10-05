@@ -219,4 +219,7 @@
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Recognized multi-media content put on separate rows are automatically handled as multi-media:]]></Label>
 	</ContentView>
 	<WebView Source="https://www.youtube.com/embed/whBPLc8m4SU" />
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<abbr data-title="is&nbsp;an&nbsp;abbreviation&nbsp;for&nbsp;abbreviation">abbr</abbr>.]]></Label>
+	</ContentView>
 </StackLayout>

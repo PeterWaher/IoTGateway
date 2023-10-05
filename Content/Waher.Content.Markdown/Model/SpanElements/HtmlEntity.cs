@@ -34,11 +34,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			Output.Append('&');
-			Output.Append(this.entity);
-			Output.Append(';');
-
-			return Task.CompletedTask;
+			return this.GenerateHTML(Output);
 		}
 
 		/// <summary>
@@ -56,6 +52,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					case "apos":
 					case "lt":
 					case "gt":
+					case "nbsp":	// Has syntactic significance when parsing HTML or Markdown
 						Output.Append('&');
 						Output.Append(this.entity);
 						Output.Append(';');

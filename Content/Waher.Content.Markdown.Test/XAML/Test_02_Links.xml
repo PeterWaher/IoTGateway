@@ -17,4 +17,5 @@
 	</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Recognized multi-media content put on separate rows are automatically handled as multi-media:</TextBlock>
 	<WebBrowser Source="https://www.youtube.com/embed/whBPLc8m4SU" />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">abbr.</TextBlock>
 </StackPanel>

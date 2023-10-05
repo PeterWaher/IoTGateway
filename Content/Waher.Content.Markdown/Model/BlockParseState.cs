@@ -208,6 +208,7 @@ namespace Waher.Content.Markdown.Model
 			public int Pos;
 			public int Len;
 			public int Current;
+			public char LastChar;
 			public string CurrentRow;
 			public bool LineBreakAfter;
 		}
@@ -222,7 +223,8 @@ namespace Waher.Content.Markdown.Model
 				Len = this.len,
 				Current = this.current,
 				CurrentRow = this.currentRow,
-				LineBreakAfter = this.lineBreakAfter
+				LineBreakAfter = this.lineBreakAfter,
+				LastChar = this.lastChar
 			};
 
 			if (this.backup is null)
@@ -244,6 +246,7 @@ namespace Waher.Content.Markdown.Model
 			this.current = Backup.Current;
 			this.currentRow = Backup.CurrentRow;
 			this.lineBreakAfter = Backup.LineBreakAfter;
+			this.lastChar = Backup.LastChar;
 		}
 
 		public void DiscardBackup()

@@ -28,3 +28,5 @@ Recognized multi\-media content put on separate rows are automatically handled a
 
 ![https\://www\.youtube\.com/watch?v\=whBPLc8m4SU](https://www.youtube.com/watch?v=whBPLc8m4SU)
 
+[abbr](abbr:is an abbreviation for abbreviation)\.
+

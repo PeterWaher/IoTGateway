@@ -116,6 +116,12 @@
 			<InlineText>https://www.youtube.com/watch?v=whBPLc8m4SU</InlineText>
 			<MultimediaItem url="https://www.youtube.com/watch?v=whBPLc8m4SU" title="" extension="" contentType="" />
 		</Multimedia>
+		<Paragraph>
+			<Abbreviation description="is an abbreviation for abbreviation">
+				<InlineText>abbr</InlineText>
+			</Abbreviation>
+			<InlineText>.</InlineText>
+		</Paragraph>
 	</elements>
 	<references>
 		<reference key="id">

@@ -1914,16 +1914,17 @@ namespace Waher.Content.Markdown
 								State.NextNonWhitespaceChar();
 								Title = string.Empty;
 
-								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+								while ((ch2 = State.PeekNextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+								{
+									State.NextChar();
 									Text.Append(ch2);
+								}
 
 								Url = Text.ToString();
 								if (Url.StartsWith("abbr:", StringComparison.CurrentCultureIgnoreCase))
 								{
 									if (ch2 != ')' && ch2 != 0)
 									{
-										Text.Append(ch2);
-
 										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ')')
 											Text.Append(ch2);
 									}
@@ -1950,21 +1951,31 @@ namespace Waher.Content.Markdown
 											while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
 												Text.Append(ch3);
 
-											ch2 = ch3;
 											Title = Text.ToString();
 											Text.Clear();
+
+											ch2 = State.PeekNextNonWhitespaceChar(true);
 										}
 										else
 											Title = string.Empty;
 									}
 
-									if (ch == '!')
+									if (ch == '!' && ch2 != ')')
+									{
 										ParseWidthHeight(State, out Width, out Height);
+										ch2 = State.PeekNextCharSameRow();
+									}
 									else
 										Width = Height = null;
 
 									while (ch2 != 0 && ch2 != ')')
-										ch2 = State.NextCharSameRow();
+									{
+										State.NextCharSameRow();
+										ch2 = State.PeekNextCharSameRow();
+									}
+
+									if (ch2 == ')')
+										State.NextChar();
 
 									if (ch == '!')
 									{
@@ -1977,13 +1988,18 @@ namespace Waher.Content.Markdown
 											this.includesTableOfContents = true;
 
 										State.BackupState();
-										ch2 = State.NextNonWhitespaceChar();
+										ch2 = State.PeekNextNonWhitespaceChar(false);
+
 										while (ch2 == '(')
 										{
+											State.NextNonWhitespaceChar();
 											Title = string.Empty;
 
-											while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+											while ((ch2 = State.PeekNextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+											{
+												State.NextChar();
 												Text.Append(ch2);
+											}
 
 											Url = Text.ToString();
 
@@ -2005,24 +2021,40 @@ namespace Waher.Content.Markdown
 													ch2 = ch3;
 													Title = Text.ToString();
 													Text.Clear();
+
+													ch2 = State.PeekNextNonWhitespaceChar(true);
 												}
 												else
 													Title = string.Empty;
 											}
 
-											ParseWidthHeight(State, out Width, out Height);
+											if (ch2 != ')')
+											{
+												ParseWidthHeight(State, out Width, out Height);
 
-											while (ch2 != 0 && ch2 != ')')
-												ch2 = State.NextCharSameRow();
+												ch2 = State.PeekNextCharSameRow();
+
+												while (ch2 != 0 && ch2 != ')')
+												{
+													State.NextCharSameRow();
+													ch2 = State.PeekNextCharSameRow();
+												}
+											}
 
 											Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
 
+											if (ch2 == ')')
+											{
+												State.NextChar();
+												ch2 = State.PeekNextNonWhitespaceChar(true);
+											}
+
 											State.DiscardBackup();
 											State.BackupState();
-											ch2 = State.NextNonWhitespaceChar();
 										}
 
 										State.RestoreState();
+
 										Elements.AddLast(new Multimedia(this, ChildElements, Elements.First is null && State.PeekNextChar() == 0,
 											Items.ToArray()));
 									}
@@ -2515,8 +2547,8 @@ namespace Waher.Content.Markdown
 
 						try
 						{
-							Expression Exp = new Expression(Text.ToString(), this.fileName);
 							State.DiscardBackup();
+							Expression Exp = new Expression(Text.ToString(), this.fileName);
 							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables,
 								Elements.First is null && State.PeekNextChar() == 0, StartPosition, EndPosition));
 							Text.Clear();

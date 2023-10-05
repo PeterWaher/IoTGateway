@@ -4357,6 +4357,16 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Formatting.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings,System.Boolean)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+            <param name="EspaceFirstSpace">If escaping of the first character should be done, if it is a space character.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.Image">
             <summary>
             Inline image

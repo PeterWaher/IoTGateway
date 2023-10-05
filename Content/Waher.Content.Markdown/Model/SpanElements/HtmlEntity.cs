@@ -34,7 +34,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			return this.GenerateHTML(Output);
+			Output.Append('&');
+			Output.Append(this.entity);
+			Output.Append(';');
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

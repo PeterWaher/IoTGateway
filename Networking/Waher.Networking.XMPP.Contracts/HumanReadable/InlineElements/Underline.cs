@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			Markdown.Append('_');
-			base.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+			base.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings, true);
 			Markdown.Append('_');
 		}
 	}

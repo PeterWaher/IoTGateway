@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -44,10 +45,47 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
 		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
+			this.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings, false);
+		}
+
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="SectionLevel">Current section level.</param>
+		/// <param name="Indentation">Current indentation.</param>
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		/// <param name="EspaceFirstSpace">If escaping of the first character should be done, if it is a space character.</param>
+		public void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings,
+			bool EspaceFirstSpace)
+		{
 			if (!(this.elements is null))
 			{
-				foreach (InlineElement E in this.elements)
-					E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+				if (EspaceFirstSpace)
+				{
+					MarkdownOutput Markdown2 = new MarkdownOutput();
+
+					foreach (InlineElement E in this.elements)
+						E.GenerateMarkdown(Markdown2, SectionLevel, Indentation, Settings);
+
+					string Segment = Markdown2.ToString();
+
+					if (!string.IsNullOrEmpty(Segment))
+					{
+						if (Segment[0] == ' ')
+						{
+							Markdown.Append("&nbsp;");
+							Segment = Segment.Substring(1);
+						}
+
+						Markdown.Append(Segment);
+					}
+				}
+				else
+				{
+					foreach (InlineElement E in this.elements)
+						E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+				}
 			}
 		}
 	}

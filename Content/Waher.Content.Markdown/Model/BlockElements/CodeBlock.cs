@@ -602,8 +602,21 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
+			if (!(this.handler is null) && this.handler.HandlesSmartContract)
+			{
+				try
+				{
+					if (await this.handler.GenerateSmartContractXml(Output, State, this.rows, this.language, this.indent, this.Document))
+						return;
+				}
+				catch (Exception)
+				{
+					// Continue
+				}
+			}
+
 			Output.WriteStartElement("paragraph");
 
 			bool First = true;
@@ -619,8 +632,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.WriteEndElement();
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

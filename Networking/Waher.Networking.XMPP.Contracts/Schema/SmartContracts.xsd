@@ -1012,6 +1012,11 @@ purposes.
 					<xs:documentation>Shows a standalone image.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name='separator' type='Empty'>
+				<xs:annotation>
+					<xs:documentation>Displays a horizontal separator.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
 

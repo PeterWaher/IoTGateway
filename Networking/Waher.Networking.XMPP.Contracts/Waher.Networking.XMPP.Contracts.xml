@@ -3951,6 +3951,31 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.HorizontalSeparator">
+            <summary>
+            Horizontal separator.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.HorizontalSeparator.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.HorizontalSeparator.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.HorizontalSeparator.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Image">
             <summary>
             Standalone image

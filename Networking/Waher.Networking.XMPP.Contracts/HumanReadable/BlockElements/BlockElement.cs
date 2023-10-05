@@ -163,6 +163,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 
 					return Image;
 
+				case "separator":
+					return new HorizontalSeparator();
+
 				default:
 					return null;
 			}

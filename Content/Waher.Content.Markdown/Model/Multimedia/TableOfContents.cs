@@ -218,10 +218,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items, 
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			return Task.CompletedTask;	// TODO: Table of Contents in XAML
+			return Task.CompletedTask;  // TODO: Table of Contents in XAML
 		}
 
 		/// <summary>
@@ -236,7 +236,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			return Task.CompletedTask;	// TODO: Table of Contents in Xamarin.Forms
+			return Task.CompletedTask;  // TODO: Table of Contents in Xamarin.Forms
 		}
 
 		/// <summary>
@@ -275,7 +275,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			foreach (MarkdownElement E in ChildNodes)
 				await E.GenerateSmartContractXml(Output, State);
-			
+
 			Output.WriteEndElement();
 
 			int NrLevel1 = 0;
@@ -291,8 +291,13 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			if (SkipLevel1)
 				LastLevel++;
 
-			foreach (Header Header in Document.Headers)
+			int NrHeaders = Document.Headers.Length;
+			int HeaderIndex;
+
+			for (HeaderIndex = 0; HeaderIndex < NrHeaders; HeaderIndex++)
 			{
+				Header Header = Document.Headers[HeaderIndex];
+
 				if (SkipLevel1 && Header.Level == 1)
 					continue;
 
@@ -326,7 +331,21 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				Output.WriteStartElement("item");
 
-				await Header.GenerateSmartContractXml(Output, State);
+				if (HeaderIndex + 1 < NrHeaders &&
+					Document.Headers[HeaderIndex + 1].Level > Header.Level)
+				{
+					Output.WriteStartElement("paragraph");
+
+					foreach (MarkdownElement E in Header.Children)
+						await E.GenerateSmartContractXml(Output, State);
+
+					Output.WriteEndElement();
+				}
+				else
+				{
+					foreach (MarkdownElement E in Header.Children)
+						await E.GenerateSmartContractXml(Output, State);
+				}
 
 				ListItemAdded = true;
 			}

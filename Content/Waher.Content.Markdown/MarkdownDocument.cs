@@ -49,7 +49,8 @@ namespace Waher.Content.Markdown
 		private readonly List<KeyValuePair<AsyncMarkdownProcessing, object>> asyncTasks = new List<KeyValuePair<AsyncMarkdownProcessing, object>>();
 		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private readonly Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
-		private Dictionary<string, int> footnoteNumbers = null;
+		private Dictionary<string, int> footnoteNumberByKey = null;
+		private Dictionary<int, string> footnoteKeyByNumber = null;
 		private Dictionary<string, Footnote> footnotes = null;
 		private SortedDictionary<int, string> toInsert = null;
 		private readonly Type[] transparentExceptionTypes;
@@ -124,7 +125,7 @@ namespace Waher.Content.Markdown
 		private MarkdownDocument(string MarkdownText, bool IsDynamic, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
 			params Type[] TransparentExceptionTypes)
 		{
-			this.markdownText = MarkdownText.Replace("\r\n", "\n").Replace('\r', '\n');
+			this.markdownText = MarkdownText?.Replace("\r\n", "\n").Replace('\r', '\n') ?? string.Empty;
 			this.isDynamic = IsDynamic;
 			this.emojiSource = Settings.EmojiSource;
 			this.settings = Settings;
@@ -1365,9 +1366,10 @@ namespace Waher.Content.Markdown
 					if (BlockIndex > i)
 						Footnote.AddChildren(this.ParseBlocks(Blocks, i + 1, BlockIndex));
 
-					if (this.footnoteNumbers is null)
+					if (this.footnoteNumberByKey is null)
 					{
-						this.footnoteNumbers = new Dictionary<string, int>();
+						this.footnoteNumberByKey = new Dictionary<string, int>();
+						this.footnoteKeyByNumber = new Dictionary<int, string>();
 						this.footnoteOrder = new List<string>();
 						this.footnotes = new Dictionary<string, Footnote>();
 					}
@@ -1783,9 +1785,10 @@ namespace Waher.Content.Markdown
 									Url = Text.ToString();
 									Text.Clear();
 
-									if (this.footnoteNumbers is null)
+									if (this.footnoteNumberByKey is null)
 									{
-										this.footnoteNumbers = new Dictionary<string, int>();
+										this.footnoteNumberByKey = new Dictionary<string, int>();
+										this.footnoteKeyByNumber = new Dictionary<int, string>();
 										this.footnoteOrder = new List<string>();
 										this.footnotes = new Dictionary<string, Footnote>();
 									}
@@ -1794,9 +1797,10 @@ namespace Waher.Content.Markdown
 									{
 										Title = Url.ToLower();
 										Elements.AddLast(new FootnoteReference(this, XmlConvert.VerifyNCName(Title)));
-										if (!this.footnoteNumbers.ContainsKey(Title))
+										if (!this.footnoteNumberByKey.ContainsKey(Title))
 										{
-											this.footnoteNumbers[Title] = ++this.lastFootnote;
+											this.footnoteNumberByKey[Title] = ++this.lastFootnote;
+											this.footnoteKeyByNumber[this.lastFootnote] = Title;
 											this.footnoteOrder.Add(Title);
 										}
 									}
@@ -1805,7 +1809,8 @@ namespace Waher.Content.Markdown
 										Title = Guid.NewGuid().ToString();
 
 										Elements.AddLast(new FootnoteReference(this, Title));
-										this.footnoteNumbers[Title] = ++this.lastFootnote;
+										this.footnoteNumberByKey[Title] = ++this.lastFootnote;
+										this.footnoteKeyByNumber[this.lastFootnote] = Title;
 										this.footnoteOrder.Add(Title);
 										this.footnotes[Title] = new Footnote(this, Title, new Paragraph(this, this.ParseBlock(new string[] { Url }, new int[] { State.CurrentPosition - 1 - Url.Length })));
 									}
@@ -5535,7 +5540,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out int Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5656,7 +5661,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out int Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5778,7 +5783,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5792,7 +5797,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5963,7 +5968,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -5977,7 +5982,7 @@ namespace Waher.Content.Markdown
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) &&
+					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
 						this.footnotes.TryGetValue(Key, out Footnote) &&
 						Footnote.Referenced)
 					{
@@ -6106,18 +6111,28 @@ namespace Waher.Content.Markdown
 
 			if (this.NeedsToDisplayFootnotes)
 			{
-				foreach (string Key in this.footnoteOrder)
+				int Nr = 1;
+				bool FootNotesAdded = false;
+
+				while (this.footnoteKeyByNumber.TryGetValue(Nr, out string Key) &&
+					this.footnotes.TryGetValue(Key, out Footnote Footnote))
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
-						Footnote.Referenced)
+					if (!FootNotesAdded)
 					{
-						Output.WriteStartElement("paragraph");
-						Output.WriteElementString("text", "[" + Nr.ToString() + "] ");
-						await Footnote.GenerateSmartContractXml(Output, State);
-						Output.WriteEndElement();
+						FootNotesAdded = true;
+						Output.WriteElementString("separator", string.Empty);
+						Output.WriteStartElement("numberedItems");
 					}
+
+					Output.WriteStartElement("item");
+					await Footnote.GenerateSmartContractXml(Output, State);
+					Output.WriteEndElement();
+
+					Nr++;
 				}
+
+				if (FootNotesAdded)
+					Output.WriteEndElement();
 			}
 
 			if (!string.IsNullOrEmpty(LocalName))
@@ -6559,13 +6574,13 @@ namespace Waher.Content.Markdown
 		/// <returns>If a footnote with the given key was found.</returns>
 		public bool TryGetFootnoteNumber(string Key, out int Number)
 		{
-			if (this.footnoteNumbers is null)
+			if (this.footnoteNumberByKey is null)
 			{
 				Number = 0;
 				return false;
 			}
 			else
-				return this.footnoteNumbers.TryGetValue(Key, out Number);
+				return this.footnoteNumberByKey.TryGetValue(Key, out Number);
 		}
 
 		/// <summary>

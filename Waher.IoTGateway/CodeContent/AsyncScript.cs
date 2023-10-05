@@ -129,7 +129,7 @@ namespace Waher.IoTGateway.CodeContent
 			};
 
 			State.Variables.ConsoleOut = new StringWriter(State.ImplicitPrint);
-			Document.Settings.Variables.CopyTo(State.Variables);
+			Document.Settings.Variables?.CopyTo(State.Variables);
 
 			Document.QueueAsyncTask(this.ExecuteScript, State);
 
@@ -234,7 +234,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateMarkdown(Result, Output, true, Variables);
@@ -254,7 +254,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GeneratePlainText(Result, Output, true);
@@ -275,7 +275,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateXAML(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
@@ -296,7 +296,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateXamarinForms(Result, Output, State, true, Variables, Document.Settings.XamlSettings);
@@ -317,7 +317,7 @@ namespace Waher.IoTGateway.CodeContent
 			MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateLaTeX(Result, Output, true, Variables);
@@ -340,7 +340,7 @@ namespace Waher.IoTGateway.CodeContent
 			string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables;
+			Variables Variables = Document.Settings.Variables ?? new Variables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateSmartContractXml(Result, Output, true, Variables, State);

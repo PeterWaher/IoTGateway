@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 								break;
 
 							case "caption":
-								Image.Elements = ParseChildren(E);
+								Image.Elements = InlineElement.ParseChildren(E);
 								break;
 
 							default:

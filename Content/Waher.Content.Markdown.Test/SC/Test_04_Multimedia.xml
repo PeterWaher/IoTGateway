@@ -1,30 +1,166 @@
 ﻿<paragraph>
 	<text>Image: </text>
-	<text>Alt text 1</text>
+	<text>/path/to/img.jpg</text>
 </paragraph>
-<text>Alt text 1</text>
-<text>Alt text 2</text>
-<text>Alt text 3</text>
-<text>Alt text 4</text>
-<text>Alt text 5</text>
-<text>Alt text 6</text>
-<text>Alt text 7</text>
-<text>Alt text 8</text>
-<text>Alt text 9</text>
-<text>Alt text 10</text>
-<text>Your browser does not support the audio tag</text>
-<text>Your browser does not support the video tag</text>
-<text>Your browser does not support the iframe tag</text>
-<text>MultiImage1</text>
-<text>MultiImage2</text>
-<text>MultiImage3</text>
-<text>MultiAudio1</text>
-<text>MultiVideo1</text>
-<text>MultiVideo2</text>
-<text>MultiImage1</text>
-<text>MultiImage2</text>
-<text>MultiImage3</text>
-<text>MultiAudio1</text>
-<text>MultiVideo1</text>
-<text>MultiVideo2</text>
-<text>Google</text>
+<paragraph>
+	<text>/path/to/img.jpg</text>
+</paragraph>
+<paragraph>
+	<text>/path/to/img.jpg</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>/path/to/img.jpg</text>
+</paragraph>
+<paragraph>
+	<text>/path/to/img.jpg</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>url/to/image</text>
+</paragraph>
+<paragraph>
+	<text>/local/music.mp3</text>
+</paragraph>
+<paragraph>
+	<text>/local/video.mp4</text>
+</paragraph>
+<paragraph>
+	<text>https://www.youtube.com/watch?v=whBPLc8m4SU</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>audio1.mp3</text>
+</paragraph>
+<paragraph>
+	<text>audio2.wav</text>
+</paragraph>
+<paragraph>
+	<text>audio3.ogg</text>
+</paragraph>
+<paragraph>
+	<text>video1.mp4</text>
+</paragraph>
+<paragraph>
+	<text>video2.webm</text>
+</paragraph>
+<paragraph>
+	<text>video3.ogv</text>
+</paragraph>
+<paragraph>
+	<text>video4.3gp</text>
+</paragraph>
+<paragraph>
+	<text>video5.flv</text>
+</paragraph>
+<paragraph>
+	<text>video1.mp4</text>
+</paragraph>
+<paragraph>
+	<text>video2.webm</text>
+</paragraph>
+<paragraph>
+	<text>video3.ogv</text>
+</paragraph>
+<paragraph>
+	<text>video4.3gp</text>
+</paragraph>
+<paragraph>
+	<text>video5.flv</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>img1.svg</text>
+</paragraph>
+<paragraph>
+	<text>img2.png</text>
+</paragraph>
+<paragraph>
+	<text>audio1.mp3</text>
+</paragraph>
+<paragraph>
+	<text>audio2.wav</text>
+</paragraph>
+<paragraph>
+	<text>audio3.ogg</text>
+</paragraph>
+<paragraph>
+	<text>video1.mp4</text>
+</paragraph>
+<paragraph>
+	<text>video2.webm</text>
+</paragraph>
+<paragraph>
+	<text>video3.ogv</text>
+</paragraph>
+<paragraph>
+	<text>video4.3gp</text>
+</paragraph>
+<paragraph>
+	<text>video5.flv</text>
+</paragraph>
+<paragraph>
+	<text>video1.mp4</text>
+</paragraph>
+<paragraph>
+	<text>video2.webm</text>
+</paragraph>
+<paragraph>
+	<text>video3.ogv</text>
+</paragraph>
+<paragraph>
+	<text>video4.3gp</text>
+</paragraph>
+<paragraph>
+	<text>video5.flv</text>
+</paragraph>
+<paragraph>
+	<text>http://google.com/</text>
+</paragraph>
+<imageStandalone contentType="image/png" width="128" height="128">
+	<binary>iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAwFBMVEUAAADtTFztTFztTFz5+fkqX57tTFztTFztTFztTFz5+fkqX57tTFz5+fkqX57tTFztTFztTFztTFz5+fn5+fkqX54qX575+fn5+fkqX54qX575+fkqX54qX57tTFz5+fn5+fkqX575+fkqX575+fntTFztTFwqX575+fn5+fn5+fkqX54qX54qX57tTFz5+fkqX56Fosa4yd2ettE3aaTF0+Ls7/NEcqnS3Ojf5u5RfK94mcBehrWSrMxrj7qrv9fPtihIAAAALnRSTlMA74AQ7+9Aj89gEBCfgIAgv1DfQGBAz4/PYI+fIJ+vIN+/v99QcDBQcK8wMK9wikih8QAAA3lJREFUeAHslwVi61AMBD+8MjNjyrQyh3P/U5UhsIZaKncuoMmTtVL+/FKKX5Yup/f2huQO3OH296dOFt6n9uba1rJ0gS5WNxZ33rb68XpF+kAfuysHb1X9fH1IBsEgbuXMvvrE2rJQQFldHLctPz0kKSAFNzVuX54BvLkCL08EiILFyFckE2Syqw2HiQvJATmcjqvmfki0AnDlc2FiXfJBPislH2FzWWwEsFoqoJeGxEoArsS3uCbFQDEWXz38YiuAV0bCllgLYONt6gvMDXj9RkMtgA1N/31fL4Cp8t9/CIT5AjazsCSEBuAZCKBAHmwOCSECqhYCLjcTJ2j+JgCQGAhgNW8v8P3jAUBgIYCVnP0rlCoA1EwEkLmdJ4aEkeCepomAy2rChVAC3NMxEcBpsQn0Wi/UcE/cesEjAvpZrHQ/e4QMokQhsFswgj2k4mlaAEwV/ALrVVCqddEJuPGiO6gFQku6gdkT0BFs1tBHrW8YYfYE08IIA/QQhGIggCn6AJwXAxrHsHqCNUnBRxe+hQC/DJaFk6CHxEhgtb/+uRBIGnhGAjjjazhlEQJx/JgBegG+loeyO+CHoc97gJI4fgfwDsRtuaUdsx6gLAfFOlAD4IePmeCTswQ2PagIp/748+94fIQ6F9DtxE1JIUAQ9gVjYCSAnSIpFDWlj2ZkJbCY/2eUYyWwQWJQIaALQ/kIAdBjVCGgOE4vP0bghN0iCgHFVbL3MQL7n0dg6GMEnMUUChT8Cnwagc2PEnj+c3D1Qfx54lfgV+Cm3brAkSSGoQD6HSskRUUHKGGX+N//eCvqcQ/0QEG89A4QMkXoQnA30cX0+xwg0EXA3Y0ubrhLdJHwgi5gCh0UmEYHDabSQYUZ6WAEzMLuFjzK7C7j0czuZrwiPqPQZJ8ImI2dbXij+LRBU326kFFhR6J4J/j8RYyKzwOY4PMARsXnAUxweQCHmbjgmcQuEp5a2cGK51R8MtDM3f8B6D2WMz6nhZcqii+MwgvJiC8lpwo0tecvoG9LDvimxks0fFtz2t80p/1NcIq/qS75/ygJTyMJO4yFJykjdtHMU2TFXrPwMJlxgK48aFUckxYesCQcF4Q7ScApNMi+7RVn0SA+2xuthT9QquJ0WxZ+i+QNF5nzwi8secalxtoKnyitjugi3cI0CV/INIVbwh7//fcL7aUSs7ldhxUAAAAASUVORK5CYII=</binary>
+	<caption>
+		<text>PNG as a code block</text>
+	</caption>
+</imageStandalone>

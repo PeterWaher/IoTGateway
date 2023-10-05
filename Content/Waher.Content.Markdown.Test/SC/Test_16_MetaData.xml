@@ -1,12 +1,10 @@
 ﻿<paragraph>
 	<text>Title of document: </text>
 	<parameter name="Title" />
-	<text>
-</text>
+	<lineBreak />
 	<text>Subtitle of document: </text>
 	<parameter name="Subtitle" />
-	<text>
-</text>
+	<lineBreak />
 	<text>Author: </text>
 	<parameter name="Author" />
 </paragraph>

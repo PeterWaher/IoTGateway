@@ -2,16 +2,74 @@
 	<text>This is a normal paragraph:</text>
 </paragraph>
 <paragraph>
+	<text>This is a code block.</text>
+</paragraph>
+<paragraph>
 	<text>Here is an example of AppleScript:</text>
+</paragraph>
+<paragraph>
+	<text>tell application "Foo"</text>
+	<lineBreak />
+	<text>    beep</text>
+	<lineBreak />
+	<text>end tell</text>
 </paragraph>
 <paragraph>
 	<text>Fenced code block:</text>
 </paragraph>
 <paragraph>
+	<text>&lt;div class="footer"&gt;</text>
+	<lineBreak />
+	<text>    &amp;copy; 2004 Foo Corporation</text>
+	<lineBreak />
+	<text>&lt;/div&gt;</text>
+</paragraph>
+<paragraph>
 	<text>Fenced code block (with syntax highlighting):</text>
+</paragraph>
+<paragraph>
+	<text />
+	<lineBreak />
+	<text>10 PRINT "*";</text>
+	<lineBreak />
+	<text />
+	<lineBreak />
+	<text>20 GOTO 10</text>
+	<lineBreak />
+	<text />
 </paragraph>
 <paragraph>
 	<text>Headers can also be written on a single line, prefixing them with hash signs (</text>
 	<text>#</text>
 	<text>) and a space character. The number of hash signs defines the level of the header:</text>
+</paragraph>
+<paragraph>
+	<text># First level header</text>
+	<lineBreak />
+	<text />
+	<lineBreak />
+	<text>## Second level header</text>
+	<lineBreak />
+	<text />
+	<lineBreak />
+	<text>### Third level header</text>
+	<lineBreak />
+	<text />
+	<lineBreak />
+	<text>#### Fourth level header</text>
+	<lineBreak />
+	<text />
+	<lineBreak />
+	<text>...</text>
+</paragraph>
+<paragraph>
+	<text>```</text>
+	<lineBreak />
+	<text>&lt;div class="footer"&gt;</text>
+	<lineBreak />
+	<text>    &amp;copy; 2004 Foo Corporation</text>
+	<lineBreak />
+	<text>&lt;/div&gt;</text>
+	<lineBreak />
+	<text>```</text>
 </paragraph>

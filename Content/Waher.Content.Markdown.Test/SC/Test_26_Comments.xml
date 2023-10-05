@@ -9,8 +9,7 @@
 </paragraph>
 <paragraph>
 	<text>In this fourth paragraph</text>
-	<text>
-</text>
+	<lineBreak />
 	<text>a line break is inserted.</text>
 </paragraph>
 <paragraph>

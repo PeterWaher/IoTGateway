@@ -19,28 +19,28 @@
 		<text>3</text>
 	</super>
 </paragraph>
-<paragraph>
-	<text>[1] </text>
-	<paragraph>
-		<text>Here is the text of the footnote itself.</text>
-	</paragraph>
-</paragraph>
-<paragraph>
-	<text>[2] </text>
-	<paragraph>
-		<text>Depending on the final form of your document, of course. See the documentation and experiment.</text>
-	</paragraph>
-	<paragraph>
-		<text>This footnote has a second paragraph.</text>
-	</paragraph>
-</paragraph>
-<paragraph>
-	<text>[3] </text>
-	<paragraph>
-		<text>This is the </text>
-		<italic>
-			<text>actual</text>
-		</italic>
-		<text> footnote.</text>
-	</paragraph>
-</paragraph>
+<separator />
+<numberedItems>
+	<item>
+		<paragraph>
+			<text>Here is the text of the footnote itself.</text>
+		</paragraph>
+	</item>
+	<item>
+		<paragraph>
+			<text>Depending on the final form of your document, of course. See the documentation and experiment.</text>
+		</paragraph>
+		<paragraph>
+			<text>This footnote has a second paragraph.</text>
+		</paragraph>
+	</item>
+	<item>
+		<paragraph>
+			<text>This is the </text>
+			<italic>
+				<text>actual</text>
+			</italic>
+			<text> footnote.</text>
+		</paragraph>
+	</item>
+</numberedItems>

@@ -41,6 +41,9 @@
 	<text>Unchecked subitem</text>
 </paragraph>
 <paragraph>
+	<text>Some code</text>
+</paragraph>
+<paragraph>
 	<text>Second paragraph of item 2.1</text>
 </paragraph>
 <paragraph>
@@ -52,6 +55,9 @@
 <text>Unchecked subsubitem</text>
 <paragraph>
 	<text>Checked subsubitem</text>
+</paragraph>
+<paragraph>
+	<text>Some code</text>
 </paragraph>
 <paragraph>
 	<text>Second paragraph of item 2.2.2</text>

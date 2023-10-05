@@ -114,6 +114,9 @@
 		<paragraph>
 			<text>A list item with a code block:</text>
 		</paragraph>
+		<paragraph>
+			<text>&lt;code goes here&gt;</text>
+		</paragraph>
 	</item>
 </numberedItems>
 <paragraph>
@@ -240,6 +243,9 @@
 			<text>Second paragraph of item 1.</text>
 		</paragraph>
 		<paragraph>
+			<text>This is some code of item 1.</text>
+		</paragraph>
+		<paragraph>
 			<text>Third paragraph of item 1.</text>
 		</paragraph>
 		<numberedItems>
@@ -249,6 +255,9 @@
 				</paragraph>
 				<paragraph>
 					<text>Second paragraph of item 1.1.</text>
+				</paragraph>
+				<paragraph>
+					<text>This is some code of item 1.1.</text>
 				</paragraph>
 				<paragraph>
 					<text>Third paragraph of item 1.1.</text>
@@ -262,6 +271,9 @@
 							<text>Second paragraph of item 1.1.1.</text>
 						</paragraph>
 						<paragraph>
+							<text>This is some code of item 1.1.1.</text>
+						</paragraph>
+						<paragraph>
 							<text>Third paragraph of item 1.1.1.</text>
 						</paragraph>
 					</item>
@@ -271,6 +283,9 @@
 						</paragraph>
 						<paragraph>
 							<text>Second paragraph of item 1.1.2.</text>
+						</paragraph>
+						<paragraph>
+							<text>This is some code of item 1.1.2.</text>
 						</paragraph>
 						<paragraph>
 							<text>Third paragraph of item 1.1.2.</text>
@@ -286,6 +301,9 @@
 					<text>Second paragraph of item 1.2.</text>
 				</paragraph>
 				<paragraph>
+					<text>This is some code of item 1.2.</text>
+				</paragraph>
+				<paragraph>
 					<text>Third paragraph of item 1.2.</text>
 				</paragraph>
 				<numberedItems>
@@ -297,6 +315,9 @@
 							<text>Second paragraph of item 1.2.1.</text>
 						</paragraph>
 						<paragraph>
+							<text>This is some code of item 1.2.1.</text>
+						</paragraph>
+						<paragraph>
 							<text>Third paragraph of item 1.2.1.</text>
 						</paragraph>
 					</item>
@@ -306,6 +327,9 @@
 						</paragraph>
 						<paragraph>
 							<text>Second paragraph of item 1.2.2.</text>
+						</paragraph>
+						<paragraph>
+							<text>This is some code of item 1.2.2.</text>
 						</paragraph>
 						<paragraph>
 							<text>Third paragraph of item 1.2.2.</text>
@@ -369,6 +393,9 @@
 					<text>Unchecked subitem</text>
 				</paragraph>
 				<paragraph>
+					<text>Some code</text>
+				</paragraph>
+				<paragraph>
 					<text>Second paragraph of item 2.1</text>
 				</paragraph>
 			</item>
@@ -386,6 +413,9 @@
 					<item>
 						<paragraph>
 							<text>Checked subsubitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Some code</text>
 						</paragraph>
 						<paragraph>
 							<text>Second paragraph of item 2.2.2</text>

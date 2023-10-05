@@ -2,20 +2,24 @@
 <text>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</text>
 <text>Orange</text>
 <text>The fruit of an evergreen tree of the genus Citrus.</text>
+<separator />
 <text>Apple</text>
 <text>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</text>
 <text>Orange</text>
 <text>The fruit of an evergreen tree of the genus Citrus.</text>
+<separator />
 <text>Apple</text>
 <text>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</text>
 <text>An American computer company.</text>
 <text>Orange</text>
 <text>The fruit of an evergreen tree of the genus Citrus.</text>
+<separator />
 <text>Term 1</text>
 <text>Term 2</text>
 <text>Definition a</text>
 <text>Term 3</text>
 <text>Definition b</text>
+<separator />
 <text>Apple</text>
 <paragraph>
 	<text>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</text>
@@ -24,6 +28,7 @@
 <paragraph>
 	<text>The fruit of an evergreen tree of the genus Citrus.</text>
 </paragraph>
+<separator />
 <text>Term 1</text>
 <paragraph>
 	<text>This is a definition with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</text>
@@ -37,6 +42,9 @@
 <text>Term 2</text>
 <paragraph>
 	<text>This definition has a code block, a blockquote and a list.</text>
+</paragraph>
+<paragraph>
+	<text>code block.</text>
 </paragraph>
 <paragraph>
 	<text>block quote on two lines.</text>

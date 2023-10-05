@@ -50,6 +50,9 @@
 			<text>s some example code:</text>
 		</paragraph>
 		<paragraph>
+			<text>return shell_exec("echo $input | $markdown_script");</text>
+		</paragraph>
+		<paragraph>
 			<text>Blockquotes can also be used do illustrate editing:</text>
 		</paragraph>
 		<paragraph>

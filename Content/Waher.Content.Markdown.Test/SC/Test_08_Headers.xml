@@ -1,4 +1,80 @@
-﻿<text>Table of Contents</text>
+﻿<paragraph>
+	<text>Table of Contents</text>
+</paragraph>
+<numberedItems>
+	<item>
+		<paragraph>
+			<text>This is an H1</text>
+		</paragraph>
+		<numberedItems>
+			<item>
+				<text>This is an H2</text>
+			</item>
+		</numberedItems>
+	</item>
+	<item>
+		<paragraph>
+			<text>This is a second H1</text>
+		</paragraph>
+		<numberedItems>
+			<item>
+				<paragraph>
+					<text>This is a second H2</text>
+				</paragraph>
+				<numberedItems>
+					<item>
+						<paragraph>
+							<text>This is a second H3</text>
+						</paragraph>
+						<numberedItems>
+							<item>
+								<paragraph>
+									<text>This is a second H4</text>
+								</paragraph>
+								<numberedItems>
+									<item>
+										<numberedItems>
+											<item>
+												<text>This is an H6</text>
+											</item>
+										</numberedItems>
+									</item>
+								</numberedItems>
+							</item>
+						</numberedItems>
+					</item>
+				</numberedItems>
+			</item>
+		</numberedItems>
+	</item>
+	<item>
+		<paragraph>
+			<text>This is a third H1</text>
+		</paragraph>
+		<numberedItems>
+			<item>
+				<paragraph>
+					<text>This is a third H2</text>
+				</paragraph>
+				<numberedItems>
+					<item>
+						<paragraph>
+							<text>This is a third H3</text>
+						</paragraph>
+						<numberedItems>
+							<item>
+								<text>This is a third H4</text>
+							</item>
+						</numberedItems>
+					</item>
+					<item>
+						<text>This is an H3</text>
+					</item>
+				</numberedItems>
+			</item>
+		</numberedItems>
+	</item>
+</numberedItems>
 <section>
 	<header>
 		<text>This is an H1</text>

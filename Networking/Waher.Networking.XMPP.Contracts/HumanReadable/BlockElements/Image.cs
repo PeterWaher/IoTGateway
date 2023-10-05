@@ -150,6 +150,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			Markdown.Append(' ');
 			Markdown.Append(this.height.ToString());
 			Markdown.Append(')');
+			Markdown.AppendLine();
+
+			Markdown.Indent(Indentation);
+			Markdown.AppendLine();
 		}
 	}
 }

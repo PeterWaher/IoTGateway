@@ -151,5 +151,36 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Multimedia.IncrementStatistics(Statistics, Multimedia?.Items);
 		}
 
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			Multimedia Multimedia = this.Document.GetReference(this.Label);
+
+			if (!(Multimedia is null))
+			{
+				await Multimedia.MultimediaHandler.GenerateLaTeX(Output, Multimedia.Items, this.Children,
+					this.aloneInParagraph, this.Document);
+			}
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		{
+			Multimedia Multimedia = this.Document.GetReference(this.Label);
+
+			if (!(Multimedia is null))
+			{
+				await Multimedia.MultimediaHandler.GenerateSmartContractXml(Output, State,
+					Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
+			}
+		}
 	}
 }

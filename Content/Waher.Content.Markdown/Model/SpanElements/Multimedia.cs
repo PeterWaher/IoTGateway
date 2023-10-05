@@ -256,6 +256,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		{
+			return this.MultimediaHandler.GenerateSmartContractXml(Output, State,
+				this.Items, this.Children, this.aloneInParagraph, this.Document);
+		}
+
+		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
 		internal override bool OutsideParagraph => true;

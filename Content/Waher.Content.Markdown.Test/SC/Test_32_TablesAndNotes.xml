@@ -15,45 +15,61 @@
 				<text>Table with large cells</text>
 			</header>
 			<body>
-				<paragraph>
-					<text> </text>
-				</paragraph>
-				<paragraph>
-					<text>First cell, first row</text>
-				</paragraph>
-				<paragraph>
-					<text>First cell, second row</text>
-				</paragraph>
-				<paragraph>
-					<text>First cell, third row</text>
-				</paragraph>
-				<paragraph>
-					<text>Second cell, first row</text>
-				</paragraph>
-				<paragraph>
-					<text>Second cell, second row</text>
-				</paragraph>
-				<paragraph>
-					<text>Second cell, third row</text>
-				</paragraph>
-				<paragraph>
-					<text>Third cell, first row</text>
-				</paragraph>
-				<paragraph>
-					<text>Third cell, second row</text>
-				</paragraph>
-				<paragraph>
-					<text>Third cell, third row</text>
-				</paragraph>
-				<paragraph>
-					<text>Fourth cell, first row</text>
-				</paragraph>
-				<paragraph>
-					<text>Fourth cell, second row</text>
-				</paragraph>
-				<paragraph>
-					<text>Fourth cell, third row</text>
-				</paragraph>
+				<table>
+					<row>
+						<cell alignment="Left" colSpan="2" header="true">
+							<text> </text>
+						</cell>
+					</row>
+					<row>
+						<cell alignment="Left" colSpan="1" header="false">
+							<paragraph>
+								<text>First cell, first row</text>
+							</paragraph>
+							<paragraph>
+								<text>First cell, second row</text>
+							</paragraph>
+							<paragraph>
+								<text>First cell, third row</text>
+							</paragraph>
+						</cell>
+						<cell alignment="Left" colSpan="1" header="false">
+							<paragraph>
+								<text>Second cell, first row</text>
+							</paragraph>
+							<paragraph>
+								<text>Second cell, second row</text>
+							</paragraph>
+							<paragraph>
+								<text>Second cell, third row</text>
+							</paragraph>
+						</cell>
+					</row>
+					<row>
+						<cell alignment="Left" colSpan="1" header="false">
+							<paragraph>
+								<text>Third cell, first row</text>
+							</paragraph>
+							<paragraph>
+								<text>Third cell, second row</text>
+							</paragraph>
+							<paragraph>
+								<text>Third cell, third row</text>
+							</paragraph>
+						</cell>
+						<cell alignment="Left" colSpan="1" header="false">
+							<paragraph>
+								<text>Fourth cell, first row</text>
+							</paragraph>
+							<paragraph>
+								<text>Fourth cell, second row</text>
+							</paragraph>
+							<paragraph>
+								<text>Fourth cell, third row</text>
+							</paragraph>
+						</cell>
+					</row>
+				</table>
 				<paragraph>
 					<text>The purpose is to see if footnotes</text>
 					<super>

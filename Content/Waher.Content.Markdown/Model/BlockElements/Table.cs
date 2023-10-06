@@ -632,41 +632,50 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="State">Current rendering state.</param>
 		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
+			Output.WriteStartElement("table");
+
 			foreach (MarkdownElement[] Row in this.headers)
+				await this.GenerateSmartContractXmlForRow(Output, State, Row, true);
+
+			foreach (MarkdownElement[] Row in this.rows)
+				await this.GenerateSmartContractXmlForRow(Output, State, Row, false);
+
+			Output.WriteEndElement();
+		}
+
+		private async Task GenerateSmartContractXmlForRow(XmlWriter Output, SmartContractRenderState State,
+			MarkdownElement[] Row, bool HeaderRow)
+		{
+			int i, c = Row.Length;
+
+			Output.WriteStartElement("row");
+
+			for (i = 0; i < c; i++)
 			{
-				foreach (MarkdownElement E in Row)
+				MarkdownElement Cell = Row[i];
+
+				if (!(Cell is null))
 				{
-					if (!(E is null))
+					int Span = 1;
+
+					while (i + 1 < c && Row[i + 1] is null)
 					{
-						if (E.InlineSpanElement)
-						{
-							Output.WriteStartElement("paragraph");
-							await E.GenerateSmartContractXml(Output, State);
-							Output.WriteEndElement();
-						}
-						else
-							await E.GenerateSmartContractXml(Output, State);
+						i++;
+						Span++;
 					}
+
+					Output.WriteStartElement("cell");
+					Output.WriteAttributeString("alignment", this.alignments[i].ToString());
+					Output.WriteAttributeString("colSpan", Span.ToString());
+					Output.WriteAttributeString("header", CommonTypes.Encode(HeaderRow));
+					
+					await Cell.GenerateSmartContractXml(Output, State);
+					
+					Output.WriteEndElement();
 				}
 			}
 
-			foreach (MarkdownElement[] Row in this.rows)
-			{
-				foreach (MarkdownElement E in Row)
-				{
-					if (!(E is null))
-					{
-						if (E.InlineSpanElement)
-						{
-							Output.WriteStartElement("paragraph");
-							await E.GenerateSmartContractXml(Output, State);
-							Output.WriteEndElement();
-						}
-						else
-							await E.GenerateSmartContractXml(Output, State);
-					}
-				}
-			}
+			Output.WriteEndElement();
 		}
 
 		/// <summary>
@@ -765,7 +774,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.Append("\\caption{");
 
 				s = string.IsNullOrEmpty(this.caption) ? this.id : this.caption;
-				
+
 				Output.Append(InlineText.EscapeLaTeX(s));
 
 				Output.AppendLine("}");

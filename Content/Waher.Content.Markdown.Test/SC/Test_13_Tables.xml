@@ -1,134 +1,203 @@
-﻿<paragraph>
-	<text>First Header</text>
-</paragraph>
-<paragraph>
-	<text>Second Header</text>
-</paragraph>
-<paragraph>
-	<text>Third Header</text>
-</paragraph>
-<paragraph>
-	<text>First row</text>
-</paragraph>
-<paragraph>
-	<text>Data</text>
-</paragraph>
-<paragraph>
-	<text>Very long data entry</text>
-</paragraph>
-<paragraph>
-	<text>Second row</text>
-</paragraph>
-<paragraph>
-	<bold>
-		<text>Cell</text>
-	</bold>
-</paragraph>
-<paragraph>
-	<italic>
-		<text>Cell</text>
-	</italic>
-</paragraph>
-<paragraph>
-	<text>Grouping</text>
-</paragraph>
-<paragraph>
-	<text>First Header</text>
-</paragraph>
-<paragraph>
-	<text>Second Header</text>
-</paragraph>
-<paragraph>
-	<text>Third Header</text>
-</paragraph>
-<paragraph>
-	<text>Content</text>
-</paragraph>
-<paragraph>
-	<italic>
-		<text>Long Cell</text>
-	</italic>
-</paragraph>
-<paragraph>
-	<text>Content</text>
-</paragraph>
-<paragraph>
-	<bold>
-		<text>Cell</text>
-	</bold>
-</paragraph>
-<paragraph>
-	<text>Cell</text>
-</paragraph>
-<paragraph>
-	<text>New section</text>
-</paragraph>
-<paragraph>
-	<text>More</text>
-</paragraph>
-<paragraph>
-	<text>Data</text>
-</paragraph>
-<paragraph>
-	<text>Table with complex cells</text>
-</paragraph>
-<paragraph>
-	<text>Info about cell</text>
-</paragraph>
-<paragraph>
-	<text>Row</text>
-</paragraph>
-<paragraph>
-	<text>1</text>
-</paragraph>
-<paragraph>
-	<text>Column</text>
-</paragraph>
-<paragraph>
-	<text>1</text>
-</paragraph>
-<paragraph>
-	<text>Info about cell</text>
-</paragraph>
-<paragraph>
-	<text>Row</text>
-</paragraph>
-<paragraph>
-	<text>1</text>
-</paragraph>
-<paragraph>
-	<text>Column</text>
-</paragraph>
-<paragraph>
-	<text>2</text>
-</paragraph>
-<paragraph>
-	<text>Info about cell</text>
-</paragraph>
-<paragraph>
-	<text>Row</text>
-</paragraph>
-<paragraph>
-	<text>2</text>
-</paragraph>
-<paragraph>
-	<text>Column</text>
-</paragraph>
-<paragraph>
-	<text>1</text>
-</paragraph>
-<paragraph>
-	<text>Info about cell</text>
-</paragraph>
-<paragraph>
-	<text>Row</text>
-</paragraph>
-<paragraph>
-	<text>2</text>
-</paragraph>
-<paragraph>
-	<text>Column</text>
-</paragraph>
-<paragraph>
-	<text>2</text>
-</paragraph>
+﻿<table>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>First Header</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Second Header</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Third Header</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>First row</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Data</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Very long data entry</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Second row</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<bold>
+				<text>Cell</text>
+			</bold>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<italic>
+				<text>Cell</text>
+			</italic>
+		</cell>
+	</row>
+</table>
+<table>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true" />
+		<cell alignment="Right" colSpan="2" header="true">
+			<text>Grouping</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>First Header</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Second Header</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Third Header</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Content</text>
+		</cell>
+		<cell alignment="Right" colSpan="2" header="false">
+			<italic>
+				<text>Long Cell</text>
+			</italic>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Content</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<bold>
+				<text>Cell</text>
+			</bold>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Cell</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>New section</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>More</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Data</text>
+		</cell>
+	</row>
+</table>
+<table>
+	<row>
+		<cell alignment="Left" colSpan="2" header="true">
+			<text>Table with complex cells</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<table>
+				<row>
+					<cell alignment="Right" colSpan="2" header="true">
+						<text>Info about cell</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Row</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>1</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Column</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>1</text>
+					</cell>
+				</row>
+			</table>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<table>
+				<row>
+					<cell alignment="Right" colSpan="2" header="true">
+						<text>Info about cell</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Row</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>1</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Column</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>2</text>
+					</cell>
+				</row>
+			</table>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<table>
+				<row>
+					<cell alignment="Right" colSpan="2" header="true">
+						<text>Info about cell</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Row</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>2</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Column</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>1</text>
+					</cell>
+				</row>
+			</table>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<table>
+				<row>
+					<cell alignment="Right" colSpan="2" header="true">
+						<text>Info about cell</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Row</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>2</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Column</text>
+					</cell>
+					<cell alignment="Right" colSpan="1" header="false">
+						<text>2</text>
+					</cell>
+				</row>
+			</table>
+		</cell>
+	</row>
+</table>

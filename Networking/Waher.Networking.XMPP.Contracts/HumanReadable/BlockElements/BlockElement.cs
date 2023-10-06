@@ -179,7 +179,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 							{
 								if (N3 is XmlElement E3 && E3.LocalName == "cell")
 								{
-									KeyValuePair<InlineElement[], BlockElement[]> P = ParseBlockOrInlineChildren(E2);
+									KeyValuePair<InlineElement[], BlockElement[]> P = ParseBlockOrInlineChildren(E3);
 
 									Cells.Add(new Cell()
 									{

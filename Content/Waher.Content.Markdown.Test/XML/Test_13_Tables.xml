@@ -133,6 +133,52 @@
 				</Cell>
 			</Row>
 		</Table>
+		<Table caption="" id="" columns="2">
+			<Column alignment="Left" />
+			<Column alignment="Left" />
+			<HeaderRow>
+				<HeaderCell>
+					<NestedBlock />
+				</HeaderCell>
+				<Continue />
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<NestedBlock>
+						<InlineText>e</InlineText>
+						<SubScript>
+							<InlineText>1,1</InlineText>
+						</SubScript>
+					</NestedBlock>
+				</Cell>
+				<Cell>
+					<NestedBlock>
+						<InlineText>e</InlineText>
+						<SubScript>
+							<InlineText>1,2</InlineText>
+						</SubScript>
+					</NestedBlock>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<NestedBlock>
+						<InlineText>e</InlineText>
+						<SubScript>
+							<InlineText>2,1</InlineText>
+						</SubScript>
+					</NestedBlock>
+				</Cell>
+				<Cell>
+					<NestedBlock>
+						<InlineText>e</InlineText>
+						<SubScript>
+							<InlineText>2,2</InlineText>
+						</SubScript>
+					</NestedBlock>
+				</Cell>
+			</Row>
+		</Table>
 	</elements>
 	<references />
 	<footnotes>

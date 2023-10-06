@@ -201,3 +201,36 @@
 		</cell>
 	</row>
 </table>
+<table>
+	<row>
+		<cell alignment="Left" colSpan="2" header="true" />
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>e</text>
+			<sub>
+				<text>1,1</text>
+			</sub>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>e</text>
+			<sub>
+				<text>1,2</text>
+			</sub>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>e</text>
+			<sub>
+				<text>2,1</text>
+			</sub>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>e</text>
+			<sub>
+				<text>2,2</text>
+			</sub>
+		</cell>
+	</row>
+</table>

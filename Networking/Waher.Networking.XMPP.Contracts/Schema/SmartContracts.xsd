@@ -1041,8 +1041,8 @@ purposes.
 										</xs:annotation>
 										<xs:complexType>
 											<xs:choice>
-												<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
-												<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'/>
+												<xs:group ref='InlineElements' minOccurs='0' maxOccurs='unbounded'/>
+												<xs:group ref='BlockElements' minOccurs='0' maxOccurs='unbounded'/>
 											</xs:choice>
 											<xs:attribute name='header' type='xs:boolean' use='required'>
 												<xs:annotation>

@@ -233,4 +233,38 @@
 			</StackPanel>
 		</Border>
 	</Grid>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+			<StackPanel Margin="5,2,5,2" />
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap">e<Run Typography.Variants="Subscript">1,1</Run></TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap">e<Run Typography.Variants="Subscript">1,2</Run></TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap">e<Run Typography.Variants="Subscript">2,1</Run></TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap">e<Run Typography.Variants="Subscript">2,2</Run></TextBlock>
+			</StackPanel>
+		</Border>
+	</Grid>
 </StackPanel>

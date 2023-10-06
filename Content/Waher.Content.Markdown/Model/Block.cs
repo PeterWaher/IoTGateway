@@ -210,6 +210,7 @@ namespace Waher.Content.Markdown.Model
 			int i, j;
 			int End = this.end;
 			bool IsUnderline;
+			bool HasUnderlineChars;
 			bool LeftPipe = false;
 			bool RightPipe = false;
 			Match M;
@@ -289,15 +290,19 @@ namespace Waher.Content.Markdown.Model
 					Rows[i] = s;
 					Positions[i] = Pos;
 
+					HasUnderlineChars = false;
+
 					foreach (char ch in s)
 					{
 						if (ch == '|')
 							j++;
-						else if (ch != '-' && ch != ':' && ch > ' ' && ch != 160)
+						else if (ch == '-' || ch == ':')
+							HasUnderlineChars = true;
+						else if (ch > ' ' && ch != 160)
 							IsUnderline = false;
 					}
 
-					if (IsUnderline && UnderlineRow < 0)
+					if (IsUnderline && HasUnderlineChars && UnderlineRow < 0 )
 						UnderlineRow = i;
 
 					if (j == 0)

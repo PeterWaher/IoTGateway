@@ -980,6 +980,9 @@ purposes.
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
+							<xs:annotation>
+								<xs:documentation>Represents one item in the list.</xs:documentation>
+							</xs:annotation>
 							<xs:complexType>
 								<xs:choice>
 									<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
@@ -997,6 +1000,9 @@ purposes.
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
+							<xs:annotation>
+								<xs:documentation>Represents one item in the list.</xs:documentation>
+							</xs:annotation>
 							<xs:complexType>
 								<xs:choice>
 									<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
@@ -1016,6 +1022,59 @@ purposes.
 				<xs:annotation>
 					<xs:documentation>Displays a horizontal separator.</xs:documentation>
 				</xs:annotation>
+			</xs:element>
+			<xs:element name='table'>
+				<xs:annotation>
+					<xs:documentation>A table consisting of rows and cells.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='row' minOccurs='1' maxOccurs='unbounded'>
+							<xs:annotation>
+								<xs:documentation>Represents one row in the table.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name='cell' minOccurs='1' maxOccurs='unbounded'>
+										<xs:annotation>
+											<xs:documentation>Represents one cell in the table row.</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:choice>
+												<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+												<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'/>
+											</xs:choice>
+											<xs:attribute name='header' type='xs:boolean' use='required'>
+												<xs:annotation>
+													<xs:documentation>If the cell represents a header cell (true) or a normal cell (false).</xs:documentation>
+													<xs:documentation>Default value is false, i.e. cell is a normal cell.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name='colSpan' type='xs:positiveInteger' use='required'>
+												<xs:annotation>
+													<xs:documentation>The number of columns the cell spans.</xs:documentation>
+													<xs:documentation>Default value is 1, i.e. the cell only spans one column.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name='alignment' use='required'>
+												<xs:annotation>
+													<xs:documentation>Horizontal alignment of contents in cell.</xs:documentation>
+												</xs:annotation>
+												<xs:simpleType>
+													<xs:restriction base='xs:string'>
+														<xs:enumeration value='Left'/>
+														<xs:enumeration value='Right'/>
+														<xs:enumeration value='Center'/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 		</xs:choice>
 	</xs:group>

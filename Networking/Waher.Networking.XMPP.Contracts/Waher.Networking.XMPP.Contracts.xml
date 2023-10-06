@@ -3951,6 +3951,57 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.CellAlignment">
+            <summary>
+            Horizontal alignment of contents in a cell.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.CellAlignment.Left">
+            <summary>
+            To the left.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.CellAlignment.Right">
+            <summary>
+            To the right
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.CellAlignment.Center">
+            <summary>
+            In the center
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell">
+            <summary>
+            A cell in a table row
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell.Header">
+            <summary>
+            If cell represents a header (true) or a normal cell (false).
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell.ColumnSpan">
+            <summary>
+            How many columns the cell spans.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell.Alignment">
+            <summary>
+            Horizontal alignment of contents in a cell.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Cell.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.HorizontalSeparator">
             <summary>
             Horizontal separator.
@@ -4140,6 +4191,41 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row">
+            <summary>
+            Table row
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row.Cells">
+            <summary>
+            Items
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row.Header">
+            <summary>
+            If the row is a header row.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Row.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section">
             <summary>
             A section consisting of a header and a body.
@@ -4162,6 +4248,36 @@
             <param name="Xml">XML Output.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Section.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="SectionLevel">Current section level.</param>
+            <param name="Indentation">Current indentation.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Table">
+            <summary>
+            Table
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Table.Rows">
+            <summary>
+            Rows
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Table.IsWellDefined">
+            <summary>
+            Checks if the element is well-defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Table.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Table.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
             </summary>

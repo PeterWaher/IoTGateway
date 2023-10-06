@@ -26,13 +26,17 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			if (this.items is null)
 				return false;
 
+			bool Found = false;
+
 			foreach (Item E in this.items)
 			{
 				if (E is null || !await E.IsWellDefined())
 					return false;
+
+				Found = true;
 			}
 
-			return true;
+			return Found;
 		}
 
 	}

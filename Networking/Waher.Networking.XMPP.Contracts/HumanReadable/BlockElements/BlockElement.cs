@@ -166,6 +166,44 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 				case "separator":
 					return new HorizontalSeparator();
 
+				case "table":
+					List<Row> Rows = new List<Row>();
+
+					foreach (XmlNode N2 in Xml.ChildNodes)
+					{
+						if (N2 is XmlElement E2 && E2.LocalName == "row")
+						{
+							List<Cell> Cells = new List<Cell>();
+
+							foreach (XmlNode N3 in E2.ChildNodes)
+							{
+								if (N3 is XmlElement E3 && E3.LocalName == "cell")
+								{
+									KeyValuePair<InlineElement[], BlockElement[]> P = ParseBlockOrInlineChildren(E2);
+
+									Cells.Add(new Cell()
+									{
+										InlineElements = P.Key,
+										BlockElements = P.Value,
+										Header = XML.Attribute(E3, "header", false),
+										ColumnSpan = XML.Attribute(E3, "colSpan", 1),
+										Alignment = XML.Attribute(E3, "alignment", CellAlignment.Left)
+									});
+								}
+							}
+
+							Rows.Add(new Row()
+							{
+								Cells = Cells.ToArray()
+							});
+						}
+					}
+
+					return new Table()
+					{
+						Rows = Rows.ToArray()
+					};
+
 				default:
 					return null;
 			}

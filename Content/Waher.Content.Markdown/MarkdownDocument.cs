@@ -2038,7 +2038,6 @@ namespace Waher.Content.Markdown
 													while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
 														Text.Append(ch3);
 
-													ch2 = ch3;
 													Title = Text.ToString();
 													Text.Clear();
 

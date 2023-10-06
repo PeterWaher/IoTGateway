@@ -144,6 +144,33 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
+		{
+			Output.WriteStartElement("row");
+			Output.WriteStartElement("cell");
+			Output.WriteAttributeString("alignment", "Center");
+			Output.WriteAttributeString("colSpan", "1");
+			Output.WriteAttributeString("header", "false");
+			Output.WriteElementString("text", this.isChecked ? "✓" : " ");
+			Output.WriteEndElement();
+
+			Output.WriteStartElement("cell");
+			Output.WriteAttributeString("alignment", "Left");
+			Output.WriteAttributeString("colSpan", "1");
+			Output.WriteAttributeString("header", "false");
+
+			await this.Child.GenerateSmartContractXml(Output, State);
+			
+			Output.WriteEndElement();
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
 		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>

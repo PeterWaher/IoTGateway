@@ -1,100 +1,369 @@
 ﻿<paragraph>
 	<text>Simple task list:</text>
 </paragraph>
-<text>Unchecked</text>
-<text>Checked</text>
-<text>Also checked</text>
+<table>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text> </text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Unchecked</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Checked</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Also checked</text>
+		</cell>
+	</row>
+</table>
 <paragraph>
 	<text>Nested task list:</text>
 </paragraph>
-<text>Unchecked</text>
-<paragraph>
-	<text>Checked </text>
-</paragraph>
-<text>Unchecked subitem</text>
-<paragraph>
-	<text>Checked subitem </text>
-</paragraph>
-<text>Unchecked subsubitem</text>
-<text>Checked subsubitem</text>
-<text>Second checked subsubitem</text>
-<text>Second unchecked subsubitem</text>
-<text>Second checked subitem</text>
-<text>Second unchecked subitem</text>
-<text>Also checked</text>
+<table>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text> </text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Unchecked</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<paragraph>
+				<text>Checked </text>
+			</paragraph>
+			<table>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text> </text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Unchecked subitem</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text>✓</text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Checked subitem </text>
+						</paragraph>
+						<table>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Unchecked subsubitem</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Checked subsubitem</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Second checked subsubitem</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Second unchecked subsubitem</text>
+								</cell>
+							</row>
+						</table>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text>✓</text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Second checked subitem</text>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text> </text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<text>Second unchecked subitem</text>
+					</cell>
+				</row>
+			</table>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Also checked</text>
+		</cell>
+	</row>
+</table>
 <paragraph>
 	<text>Multi-paragraph, multi-level lists:</text>
 </paragraph>
-<paragraph>
-	<text>Unchecked</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 1</text>
-</paragraph>
-<paragraph>
-	<text>Checked</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2</text>
-</paragraph>
-<paragraph>
-	<text>Unchecked subitem</text>
-</paragraph>
-<paragraph>
-	<text>Some code</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2.1</text>
-</paragraph>
-<paragraph>
-	<text>Checked subitem</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2.2</text>
-</paragraph>
-<text>Unchecked subsubitem</text>
-<paragraph>
-	<text>Checked subsubitem</text>
-</paragraph>
-<paragraph>
-	<text>Some code</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2.2.2</text>
-</paragraph>
-<text>Second checked subsubitem</text>
-<text>Second unchecked subsubitem</text>
-<paragraph>
-	<text>Second checked subitem</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2.3</text>
-</paragraph>
-<paragraph>
-	<text>Second unchecked subitem</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 2.4</text>
-</paragraph>
-<paragraph>
-	<text>Also checked</text>
-</paragraph>
-<paragraph>
-	<text>Second paragraph of item 3</text>
-</paragraph>
+<table>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text> </text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<paragraph>
+				<text>Unchecked</text>
+			</paragraph>
+			<paragraph>
+				<text>Second paragraph of item 1</text>
+			</paragraph>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<paragraph>
+				<text>Checked</text>
+			</paragraph>
+			<paragraph>
+				<text>Second paragraph of item 2</text>
+			</paragraph>
+			<table>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text> </text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Unchecked subitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Some code</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 2.1</text>
+						</paragraph>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text>✓</text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Checked subitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 2.2</text>
+						</paragraph>
+						<table>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Unchecked subsubitem</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<paragraph>
+										<text>Checked subsubitem</text>
+									</paragraph>
+									<paragraph>
+										<text>Some code</text>
+									</paragraph>
+									<paragraph>
+										<text>Second paragraph of item 2.2.2</text>
+									</paragraph>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Second checked subsubitem</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Second unchecked subsubitem</text>
+								</cell>
+							</row>
+						</table>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text>✓</text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Second checked subitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 2.3</text>
+						</paragraph>
+					</cell>
+				</row>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text> </text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Second unchecked subitem</text>
+						</paragraph>
+						<paragraph>
+							<text>Second paragraph of item 2.4</text>
+						</paragraph>
+					</cell>
+				</row>
+			</table>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>✓</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<paragraph>
+				<text>Also checked</text>
+			</paragraph>
+			<paragraph>
+				<text>Second paragraph of item 3</text>
+			</paragraph>
+		</cell>
+	</row>
+</table>
 <paragraph>
 	<text>Nested indentation:</text>
 </paragraph>
-<paragraph>
-	<text>Header 1</text>
-</paragraph>
-<text>Header 1.1</text>
-<text>Header 1.2</text>
-<text>Header 1.3</text>
-<text>Header 1.4</text>
-<paragraph>
-	<text>Header 2</text>
-</paragraph>
-<text>Header 2.1</text>
-<text>Header 2.2</text>
-<text>Header 2.3</text>
+<table>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text> </text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<table>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text>✓</text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Header 1</text>
+						</paragraph>
+						<table>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 1.1</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 1.2</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 1.3</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 1.4</text>
+								</cell>
+							</row>
+						</table>
+					</cell>
+				</row>
+			</table>
+			<table>
+				<row>
+					<cell alignment="Center" colSpan="1" header="false">
+						<text> </text>
+					</cell>
+					<cell alignment="Left" colSpan="1" header="false">
+						<paragraph>
+							<text>Header 2</text>
+						</paragraph>
+						<table>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 2.1</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text>✓</text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 2.2</text>
+								</cell>
+							</row>
+							<row>
+								<cell alignment="Center" colSpan="1" header="false">
+									<text> </text>
+								</cell>
+								<cell alignment="Left" colSpan="1" header="false">
+									<text>Header 2.3</text>
+								</cell>
+							</row>
+						</table>
+					</cell>
+				</row>
+			</table>
+		</cell>
+	</row>
+</table>

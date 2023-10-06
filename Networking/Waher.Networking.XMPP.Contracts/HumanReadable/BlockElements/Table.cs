@@ -108,23 +108,23 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 				}
 			}
 
-			int i, c = ColumnAlignmentCounts.Count;
-			ColumnAlignments = new TextAlignment[c];
+			int i;
+			ColumnAlignments = new TextAlignment[NrColumns];
 
-			for (i = 0; i < c; i++)
+			for (i = 0; i < NrColumns; i++)
 			{
 				int[] Counts = ColumnAlignmentCounts[i];
 
-				if (Counts[0] > Counts[1])
+				if (Counts[0] >= Counts[1])
 				{
-					if (Counts[0] > Counts[2])
+					if (Counts[0] >= Counts[2])
 						ColumnAlignments[i] = TextAlignment.Left;
 					else
 						ColumnAlignments[i] = TextAlignment.Center;
 				}
 				else
 				{
-					if (Counts[1] > Counts[2])
+					if (Counts[1] >= Counts[2])
 						ColumnAlignments[i] = TextAlignment.Right;
 					else
 						ColumnAlignments[i] = TextAlignment.Center;
@@ -139,6 +139,14 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 
 				if (InHeader && !IsRowHeader[i])
 				{
+					if (i == 0)	// No header in table.
+					{
+						Markdown.Indent(Indentation);
+						Markdown.Append("| ");
+						Markdown.Append(new string('|', NrColumns));
+						Markdown.AppendLine();
+					}
+
 					InHeader = false;
 					Markdown.Indent(Indentation);
 					Markdown.Append('|');

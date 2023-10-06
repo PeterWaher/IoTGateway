@@ -534,6 +534,58 @@
 				</NestedBlock>
 			</UnnumberedItem>
 		</BulletList>
+		<Paragraph>
+			<InlineText>Nested indentation:</InlineText>
+		</Paragraph>
+		<BulletList>
+			<UnnumberedItem prefix="*">
+				<NestedBlock>
+					<BulletList>
+						<UnnumberedItem prefix="*">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 1</InlineText>
+								</Paragraph>
+								<BulletList>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 1.1</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 1.2</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 1.3</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 1.4</InlineText>
+									</UnnumberedItem>
+								</BulletList>
+							</NestedBlock>
+						</UnnumberedItem>
+					</BulletList>
+					<BulletList>
+						<UnnumberedItem prefix="*">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 2</InlineText>
+								</Paragraph>
+								<BulletList>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 2.1</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 2.2</InlineText>
+									</UnnumberedItem>
+									<UnnumberedItem prefix="*">
+										<InlineText>Header 2.3</InlineText>
+									</UnnumberedItem>
+								</BulletList>
+							</NestedBlock>
+						</UnnumberedItem>
+					</BulletList>
+				</NestedBlock>
+			</UnnumberedItem>
+		</BulletList>
 	</elements>
 	<references />
 </parsedMakdown>

@@ -467,3 +467,49 @@
 		</paragraph>
 	</item>
 </bulletItems>
+<paragraph>
+	<text>Nested indentation:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<bulletItems>
+			<item>
+				<paragraph>
+					<text>Header 1</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<text>Header 1.1</text>
+					</item>
+					<item>
+						<text>Header 1.2</text>
+					</item>
+					<item>
+						<text>Header 1.3</text>
+					</item>
+					<item>
+						<text>Header 1.4</text>
+					</item>
+				</bulletItems>
+			</item>
+		</bulletItems>
+		<bulletItems>
+			<item>
+				<paragraph>
+					<text>Header 2</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<text>Header 2.1</text>
+					</item>
+					<item>
+						<text>Header 2.2</text>
+					</item>
+					<item>
+						<text>Header 2.3</text>
+					</item>
+				</bulletItems>
+			</item>
+		</bulletItems>
+	</item>
+</bulletItems>

@@ -173,6 +173,58 @@
 				</NestedBlock>
 			</TaskItem>
 		</TaskList>
+		<Paragraph>
+			<InlineText>Nested indentation:</InlineText>
+		</Paragraph>
+		<TaskList>
+			<TaskItem isChecked="false">
+				<NestedBlock>
+					<TaskList>
+						<TaskItem isChecked="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 1</InlineText>
+								</Paragraph>
+								<TaskList>
+									<TaskItem isChecked="true">
+										<InlineText>Header 1.1</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="false">
+										<InlineText>Header 1.2</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Header 1.3</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Header 1.4</InlineText>
+									</TaskItem>
+								</TaskList>
+							</NestedBlock>
+						</TaskItem>
+					</TaskList>
+					<TaskList>
+						<TaskItem isChecked="false">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 2</InlineText>
+								</Paragraph>
+								<TaskList>
+									<TaskItem isChecked="true">
+										<InlineText>Header 2.1</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="true">
+										<InlineText>Header 2.2</InlineText>
+									</TaskItem>
+									<TaskItem isChecked="false">
+										<InlineText>Header 2.3</InlineText>
+									</TaskItem>
+								</TaskList>
+							</NestedBlock>
+						</TaskItem>
+					</TaskList>
+				</NestedBlock>
+			</TaskItem>
+		</TaskList>
 	</elements>
 	<references />
 </parsedMakdown>

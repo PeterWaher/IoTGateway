@@ -456,3 +456,49 @@
 		</paragraph>
 	</item>
 </numberedItems>
+<paragraph>
+	<text>Nested indentation:</text>
+</paragraph>
+<numberedItems>
+	<item>
+		<numberedItems>
+			<item>
+				<paragraph>
+					<text>Header 1</text>
+				</paragraph>
+				<numberedItems>
+					<item>
+						<text>Header 1.1</text>
+					</item>
+					<item>
+						<text>Header 1.2</text>
+					</item>
+					<item>
+						<text>Header 1.3</text>
+					</item>
+					<item>
+						<text>Header 1.4</text>
+					</item>
+				</numberedItems>
+			</item>
+		</numberedItems>
+		<numberedItems>
+			<item>
+				<paragraph>
+					<text>Header 2</text>
+				</paragraph>
+				<numberedItems>
+					<item>
+						<text>Header 2.1</text>
+					</item>
+					<item>
+						<text>Header 2.2</text>
+					</item>
+					<item>
+						<text>Header 2.3</text>
+					</item>
+				</numberedItems>
+			</item>
+		</numberedItems>
+	</item>
+</numberedItems>

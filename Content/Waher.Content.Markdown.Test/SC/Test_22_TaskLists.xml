@@ -82,3 +82,19 @@
 <paragraph>
 	<text>Second paragraph of item 3</text>
 </paragraph>
+<paragraph>
+	<text>Nested indentation:</text>
+</paragraph>
+<paragraph>
+	<text>Header 1</text>
+</paragraph>
+<text>Header 1.1</text>
+<text>Header 1.2</text>
+<text>Header 1.3</text>
+<text>Header 1.4</text>
+<paragraph>
+	<text>Header 2</text>
+</paragraph>
+<text>Header 2.1</text>
+<text>Header 2.2</text>
+<text>Header 2.3</text>

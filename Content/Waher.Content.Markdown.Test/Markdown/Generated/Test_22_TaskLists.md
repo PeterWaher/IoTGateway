@@ -95,3 +95,31 @@ Multi\-paragraph, multi\-level lists\:
 	
 
 
+Nested indentation\:
+
+[ ]	[x]	Header 1
+		
+		[x]	Header 1\.1
+		
+		[ ]	Header 1\.2
+		
+		[x]	Header 1\.3
+		
+		[x]	Header 1\.4
+		
+		
+	
+	
+	[ ]	Header 2
+		
+		[x]	Header 2\.1
+		
+		[x]	Header 2\.2
+		
+		[ ]	Header 2\.3
+		
+		
+	
+	
+
+

@@ -64,3 +64,18 @@ Second paragraph of item 2.4
 
 Second paragraph of item 3
 
+Nested indentation:
+
+[ ] [X] Header 1
+
+[X] Header 1.1
+[ ] Header 1.2
+[X] Header 1.3
+[X] Header 1.4
+
+[ ] Header 2
+
+[X] Header 2.1
+[X] Header 2.2
+[ ] Header 2.3
+

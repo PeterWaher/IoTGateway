@@ -20,7 +20,6 @@ using Waher.Runtime.Text;
 using Waher.Script;
 using Waher.Content.Json;
 using Waher.Script.Model;
-using Waher.Script.Operators.Logical;
 
 namespace Waher.Content.Markdown
 {
@@ -831,7 +830,16 @@ namespace Waher.Content.Markdown
 
 					if (Segments is null)
 					{
-						Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						List<Block> SubBlocks = Block.RemovePrefix(s2, 4);
+
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
+						{
+							BlockIndex++;
+							Block.Indent--;
+							SubBlocks.Add(Block);
+						}
+
+						Items = this.ParseBlocks(SubBlocks);
 						LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, Items));
 
 						if (Elements.Last?.Value is BulletList BulletList)
@@ -938,7 +946,16 @@ namespace Waher.Content.Markdown
 
 					if (Segments is null)
 					{
-						Items = this.ParseBlocks(Block.RemovePrefix("#.", 4));
+						List<Block> SubBlocks = Block.RemovePrefix("#.", 4);
+
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
+						{
+							BlockIndex++;
+							Block.Indent--;
+							SubBlocks.Add(Block);
+						}
+
+						Items = this.ParseBlocks(SubBlocks);
 						LastItem = new NumberedItem(this, Index2, Explicit, new NestedBlock(this, Items));
 
 						if (Elements.Last?.Value is NumberedList NumberedList)
@@ -1040,7 +1057,16 @@ namespace Waher.Content.Markdown
 
 					if (Segments is null)
 					{
-						Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+						List<Block> SubBlocks = Block.RemovePrefix(s2, 4);
+
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
+						{
+							BlockIndex++;
+							Block.Indent--;
+							SubBlocks.Add(Block);
+						}
+
+						Items = this.ParseBlocks(SubBlocks);
 						LastItem = new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items));
 
 						if (Elements.Last?.Value is TaskList TaskList)
@@ -1147,7 +1173,16 @@ namespace Waher.Content.Markdown
 					if (Segments is null)
 					{
 						s = Index.ToString();
-						Items = this.ParseBlocks(Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2)));
+						List<Block> SubBlocks = Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2));
+
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
+						{
+							BlockIndex++;
+							Block.Indent--;
+							SubBlocks.Add(Block);
+						}
+
+						Items = this.ParseBlocks(SubBlocks);
 						LastItem = new NumberedItem(this, Index, Explicit, new NestedBlock(this, Items));
 
 						if (Elements.Last?.Value is NumberedList NumberedList)

@@ -554,4 +554,94 @@
 			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Second paragraph of item 3</TextBlock>
 		</StackPanel>
 	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested indentation:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Header 1</TextBlock>
+					<Grid Margin="0,5,0,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="0">
+							<TextBlock TextWrapping="Wrap">Header 1.1</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="1">
+							<TextBlock TextWrapping="Wrap">Header 1.2</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">3.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="2">
+							<TextBlock TextWrapping="Wrap">Header 1.3</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" Margin="0,0,5,0">4.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="3">
+							<TextBlock TextWrapping="Wrap">Header 1.4</TextBlock>
+						</StackPanel>
+					</Grid>
+				</StackPanel>
+			</Grid>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Header 2</TextBlock>
+					<Grid Margin="0,5,0,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="0">
+							<TextBlock TextWrapping="Wrap">Header 2.1</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="1">
+							<TextBlock TextWrapping="Wrap">Header 2.2</TextBlock>
+						</StackPanel>
+						<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">3.</TextBlock>
+						<StackPanel Grid.Column="1" Grid.Row="2">
+							<TextBlock TextWrapping="Wrap">Header 2.3</TextBlock>
+						</StackPanel>
+					</Grid>
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+	</Grid>
 </StackPanel>

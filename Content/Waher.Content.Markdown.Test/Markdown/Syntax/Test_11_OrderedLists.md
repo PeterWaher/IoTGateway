@@ -217,4 +217,17 @@ Multi-paragraph, multi-level lists:
 
 	Second paragraph of item 3
 
-	
+Nested indentation:
+
+1.	1.	Header 1
+		
+		1.	Header 1\.1
+		2.	Header 1\.2
+		3.	Header 1\.3
+		4.	Header 1\.4
+		
+	2.	Header 2
+		
+		1.	Header 2\.1
+		2.	Header 2\.2
+		3.	Header 2\.3

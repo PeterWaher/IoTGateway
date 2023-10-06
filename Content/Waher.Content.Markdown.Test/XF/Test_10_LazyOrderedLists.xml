@@ -906,4 +906,130 @@
 			</StackLayout>
 		</Grid>
 	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Nested indentation:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 1]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 1.1]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 1.2]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+										<Label>3.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 1.3]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="3">
+										<Label>4.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 1.4]]></Label>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 2]]></Label>
+							</ContentView>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 2.1]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 2.2]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+										<Label>3.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Header 2.3]]></Label>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
 </StackLayout>

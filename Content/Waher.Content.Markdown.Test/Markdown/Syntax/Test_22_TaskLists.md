@@ -61,3 +61,17 @@ Multi-paragraph, multi-level lists:
 
 	Second paragraph of item 3
 
+Nested indentation:
+
+[ ]	[x]	Header 1
+		
+		[X]	Header 1\.1
+		[ ]	Header 1\.2
+		[x]	Header 1\.3
+		[X]	Header 1\.4
+		
+	[ ]	Header 2
+		
+		[x]	Header 2\.1
+		[X]	Header 2\.2
+		[ ]	Header 2\.3

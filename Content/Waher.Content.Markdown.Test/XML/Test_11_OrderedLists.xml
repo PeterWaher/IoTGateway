@@ -523,6 +523,58 @@
 				</NestedBlock>
 			</NumberedItem>
 		</NumberedList>
+		<Paragraph>
+			<InlineText>Nested indentation:</InlineText>
+		</Paragraph>
+		<NumberedList>
+			<NumberedItem number="1" explicit="true">
+				<NestedBlock>
+					<NumberedList>
+						<NumberedItem number="1" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 1</InlineText>
+								</Paragraph>
+								<NumberedList>
+									<NumberedItem number="1" explicit="true">
+										<InlineText>Header 1.1</InlineText>
+									</NumberedItem>
+									<NumberedItem number="2" explicit="true">
+										<InlineText>Header 1.2</InlineText>
+									</NumberedItem>
+									<NumberedItem number="3" explicit="true">
+										<InlineText>Header 1.3</InlineText>
+									</NumberedItem>
+									<NumberedItem number="4" explicit="true">
+										<InlineText>Header 1.4</InlineText>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+					</NumberedList>
+					<NumberedList>
+						<NumberedItem number="2" explicit="true">
+							<NestedBlock>
+								<Paragraph>
+									<InlineText>Header 2</InlineText>
+								</Paragraph>
+								<NumberedList>
+									<NumberedItem number="1" explicit="true">
+										<InlineText>Header 2.1</InlineText>
+									</NumberedItem>
+									<NumberedItem number="2" explicit="true">
+										<InlineText>Header 2.2</InlineText>
+									</NumberedItem>
+									<NumberedItem number="3" explicit="true">
+										<InlineText>Header 2.3</InlineText>
+									</NumberedItem>
+								</NumberedList>
+							</NestedBlock>
+						</NumberedItem>
+					</NumberedList>
+				</NestedBlock>
+			</NumberedItem>
+		</NumberedList>
 	</elements>
 	<references />
 </parsedMakdown>

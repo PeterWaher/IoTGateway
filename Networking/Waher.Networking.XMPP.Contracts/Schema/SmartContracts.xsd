@@ -1044,18 +1044,6 @@ purposes.
 												<xs:group ref='InlineElements' minOccurs='0' maxOccurs='unbounded'/>
 												<xs:group ref='BlockElements' minOccurs='0' maxOccurs='unbounded'/>
 											</xs:choice>
-											<xs:attribute name='header' type='xs:boolean' use='required'>
-												<xs:annotation>
-													<xs:documentation>If the cell represents a header cell (true) or a normal cell (false).</xs:documentation>
-													<xs:documentation>Default value is false, i.e. cell is a normal cell.</xs:documentation>
-												</xs:annotation>
-											</xs:attribute>
-											<xs:attribute name='colSpan' type='xs:positiveInteger' use='required'>
-												<xs:annotation>
-													<xs:documentation>The number of columns the cell spans.</xs:documentation>
-													<xs:documentation>Default value is 1, i.e. the cell only spans one column.</xs:documentation>
-												</xs:annotation>
-											</xs:attribute>
 											<xs:attribute name='alignment' use='required'>
 												<xs:annotation>
 													<xs:documentation>Horizontal alignment of contents in cell.</xs:documentation>
@@ -1067,6 +1055,18 @@ purposes.
 														<xs:enumeration value='Center'/>
 													</xs:restriction>
 												</xs:simpleType>
+											</xs:attribute>
+											<xs:attribute name='colSpan' type='xs:positiveInteger' use='required'>
+												<xs:annotation>
+													<xs:documentation>The number of columns the cell spans.</xs:documentation>
+													<xs:documentation>Default value is 1, i.e. the cell only spans one column.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name='header' type='xs:boolean' use='required'>
+												<xs:annotation>
+													<xs:documentation>If the cell represents a header cell (true) or a normal cell (false).</xs:documentation>
+													<xs:documentation>Default value is false, i.e. cell is a normal cell.</xs:documentation>
+												</xs:annotation>
 											</xs:attribute>
 										</xs:complexType>
 									</xs:element>

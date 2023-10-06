@@ -1,0 +1,92 @@
+﻿<section>
+	<header>
+		<text>Tables &amp; Notes</text>
+	</header>
+	<body>
+		<paragraph>
+			<text>This example mixes footnotes</text>
+			<super>
+				<text>1</text>
+			</super>
+			<text> and tables.</text>
+		</paragraph>
+		<section>
+			<header>
+				<text>Table with large cells</text>
+			</header>
+			<body>
+				<paragraph>
+					<text> </text>
+				</paragraph>
+				<paragraph>
+					<text>First cell, first row</text>
+				</paragraph>
+				<paragraph>
+					<text>First cell, second row</text>
+				</paragraph>
+				<paragraph>
+					<text>First cell, third row</text>
+				</paragraph>
+				<paragraph>
+					<text>Second cell, first row</text>
+				</paragraph>
+				<paragraph>
+					<text>Second cell, second row</text>
+				</paragraph>
+				<paragraph>
+					<text>Second cell, third row</text>
+				</paragraph>
+				<paragraph>
+					<text>Third cell, first row</text>
+				</paragraph>
+				<paragraph>
+					<text>Third cell, second row</text>
+				</paragraph>
+				<paragraph>
+					<text>Third cell, third row</text>
+				</paragraph>
+				<paragraph>
+					<text>Fourth cell, first row</text>
+				</paragraph>
+				<paragraph>
+					<text>Fourth cell, second row</text>
+				</paragraph>
+				<paragraph>
+					<text>Fourth cell, third row</text>
+				</paragraph>
+				<paragraph>
+					<text>The purpose is to see if footnotes</text>
+					<super>
+						<text>2</text>
+					</super>
+					<text> and tables with complex cells interfere with each other.</text>
+				</paragraph>
+			</body>
+		</section>
+	</body>
+</section>
+<separator />
+<numberedItems>
+	<item>
+		<paragraph>
+			<text>Like this one, presented </text>
+			<bold>
+				<underline>
+					<text>before</text>
+				</underline>
+			</bold>
+			<text> the table.</text>
+		</paragraph>
+	</item>
+	<item>
+		<paragraph>
+			<text>Like this one, presented </text>
+			<bold>
+				<underline>
+					<text>after</text>
+				</underline>
+			</bold>
+			<text> the table.</text>
+		</paragraph>
+	</item>
+</numberedItems>

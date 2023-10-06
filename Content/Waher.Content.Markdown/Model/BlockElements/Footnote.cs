@@ -12,6 +12,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	{
 		private readonly string key;
 		private bool referenced;
+		private bool tableCellContents;
 
 		/// <summary>
 		/// Footnote reference
@@ -50,6 +51,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			get => this.referenced;
 			set => this.referenced = value;
+		}
+
+		/// <summary>
+		/// If the Footnote defines a table cell.
+		/// </summary>
+		internal bool TableCellContents
+		{
+			get => this.tableCellContents;
+			set => this.tableCellContents = value;
 		}
 
 		/// <summary>
@@ -141,11 +151,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void Export(XmlWriter Output)
 		{
 			Output.WriteStartElement("Footnote");
+			Output.WriteAttributeString("key", this.key);
 
 			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 				Output.WriteAttributeString("nr", Nr.ToString());
-			else
-				Output.WriteAttributeString("key", this.key);
 
 			this.ExportChildren(Output);
 			Output.WriteEndElement();

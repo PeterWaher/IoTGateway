@@ -1,0 +1,116 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData />
+	<elements>
+		<Header id="tablesAmpNotes" level="2">
+			<InlineText>Tables &amp; Notes</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>This example mixes footnotes</InlineText>
+			<FootnoteReference key="fn1" nr="1" />
+			<InlineText> and tables.</InlineText>
+		</Paragraph>
+		<Header id="tableWithLargeCells" level="3">
+			<InlineText>Table with large cells</InlineText>
+		</Header>
+		<Table caption="" id="" columns="2">
+			<Column alignment="Left" />
+			<Column alignment="Left" />
+			<HeaderRow>
+				<HeaderCell>
+					<HtmlEntity>nbsp</HtmlEntity>
+				</HeaderCell>
+				<Continue />
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<FootnoteReference key="n1" />
+				</Cell>
+				<Cell>
+					<FootnoteReference key="n2" />
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<FootnoteReference key="n3" />
+				</Cell>
+				<Cell>
+					<FootnoteReference key="n4" />
+				</Cell>
+			</Row>
+		</Table>
+		<Paragraph>
+			<InlineText>The purpose is to see if footnotes</InlineText>
+			<FootnoteReference key="fn2" nr="2" />
+			<InlineText> and tables with complex cells interfere with each other.</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+	<footnotes>
+		<Footnote key="fn1" nr="1">
+			<Paragraph>
+				<InlineText>Like this one, presented </InlineText>
+				<Strong>
+					<Underline>
+						<InlineText>before</InlineText>
+					</Underline>
+				</Strong>
+				<InlineText> the table.</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote key="n1">
+			<Paragraph>
+				<InlineText>First cell, first row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>First cell, second row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>First cell, third row</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote key="n2">
+			<Paragraph>
+				<InlineText>Second cell, first row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Second cell, second row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Second cell, third row</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote key="n3">
+			<Paragraph>
+				<InlineText>Third cell, first row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Third cell, second row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Third cell, third row</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote key="n4">
+			<Paragraph>
+				<InlineText>Fourth cell, first row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Fourth cell, second row</InlineText>
+			</Paragraph>
+			<Paragraph>
+				<InlineText>Fourth cell, third row</InlineText>
+			</Paragraph>
+		</Footnote>
+		<Footnote key="fn2" nr="2">
+			<Paragraph>
+				<InlineText>Like this one, presented </InlineText>
+				<Strong>
+					<Underline>
+						<InlineText>after</InlineText>
+					</Underline>
+				</Strong>
+				<InlineText> the table.</InlineText>
+			</Paragraph>
+		</Footnote>
+	</footnotes>
+</parsedMakdown>

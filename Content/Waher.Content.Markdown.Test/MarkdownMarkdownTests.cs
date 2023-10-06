@@ -220,5 +220,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await this.DoTest("Test_31_Justification2.md");
 		}
+
+		[TestMethod]
+		public async Task Test_32_TablesAndNotes()
+		{
+			await this.DoTest("Test_32_TablesAndNotes.md");
+		}
 	}
 }

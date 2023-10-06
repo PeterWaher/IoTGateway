@@ -1,0 +1,81 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Tables &amp; Notes</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This example mixes footnotes<TextBlock Text="1"><TextBlock.LayoutTransform><TransformGroup><ScaleTransform ScaleX="0.75" ScaleY="0.75" /><TranslateTransform Y="-5" /></TransformGroup></TextBlock.LayoutTransform></TextBlock> and tables.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="22" Foreground="Navy">Table with large cells</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold"> </TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">First cell, first row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">First cell, second row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">First cell, third row</TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Second cell, first row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Second cell, second row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Second cell, third row</TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Third cell, first row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Third cell, second row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Third cell, third row</TextBlock>
+			</StackPanel>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<StackPanel Margin="5,2,5,2">
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Fourth cell, first row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Fourth cell, second row</TextBlock>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Fourth cell, third row</TextBlock>
+			</StackPanel>
+		</Border>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The purpose is to see if footnotes<TextBlock Text="2"><TextBlock.LayoutTransform><TransformGroup><ScaleTransform ScaleX="0.75" ScaleY="0.75" /><TranslateTransform Y="-5" /></TransformGroup></TextBlock.LayoutTransform></TextBlock> and tables with complex cells interfere with each other.</TextBlock>
+	<Separator />
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock Text="1" Margin="0,5,2,5" Grid.Column="0" Grid.Row="0">
+			<TextBlock.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+					<TranslateTransform Y="-5" />
+				</TransformGroup>
+			</TextBlock.LayoutTransform>
+		</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Like this one, presented <Bold><Underline>before</Underline></Bold> the table.</TextBlock>
+		</StackPanel>
+		<TextBlock Text="2" Margin="0,5,2,5" Grid.Column="0" Grid.Row="1">
+			<TextBlock.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+					<TranslateTransform Y="-5" />
+				</TransformGroup>
+			</TextBlock.LayoutTransform>
+		</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Like this one, presented <Bold><Underline>after</Underline></Bold> the table.</TextBlock>
+		</StackPanel>
+	</Grid>
+</StackPanel>

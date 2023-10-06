@@ -54,6 +54,7 @@
     <None Remove="HTML\Test_29_Justification.html" />
     <None Remove="HTML\Test_30_Incomplete.html" />
     <None Remove="HTML\Test_31_Justification2.html" />
+    <None Remove="HTML\Test_32_TablesAndNotes.html" />
     <None Remove="Markdown\Diff\Diff\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Diff\Test_02_Paragraphs.md" />
     <None Remove="Markdown\Diff\Diff\Test_03_Bullets.md" />
@@ -94,6 +95,7 @@
     <None Remove="Markdown\Generated\Test_29_Justification.md" />
     <None Remove="Markdown\Generated\Test_30_Incomplete.md" />
     <None Remove="Markdown\Generated\Test_31_Justification2.md" />
+    <None Remove="Markdown\Generated\Test_32_TablesAndNotes.md" />
     <None Remove="Markdown\Syntax\Test_25_HashTags.md" />
     <None Remove="Markdown\Syntax\Test_26_Comments.md" />
     <None Remove="Markdown\Syntax\Test_27_Contract.md" />
@@ -101,6 +103,7 @@
     <None Remove="Markdown\Syntax\Test_29_Justification.md" />
     <None Remove="Markdown\Syntax\Test_30_Incomplete.md" />
     <None Remove="Markdown\Syntax\Test_31_Justification2.md" />
+    <None Remove="Markdown\Syntax\Test_32_TablesAndNotes.md" />
     <None Remove="Markdown\Test_01_Paragraphs.md" />
     <None Remove="Markdown\Test_02_Links.md" />
     <None Remove="Markdown\Test_03_TextFormatting.md" />
@@ -156,6 +159,7 @@
     <None Remove="PlainText\Test_29_Justification.txt" />
     <None Remove="PlainText\Test_30_Incomplete.txt" />
     <None Remove="PlainText\Test_31_Justification2.txt" />
+    <None Remove="PlainText\Test_32_TablesAndNotes.txt" />
     <None Remove="SC\Test_01_Paragraphs.xml" />
     <None Remove="SC\Test_02_Links.xml" />
     <None Remove="SC\Test_03_TextFormatting.xml" />
@@ -187,6 +191,7 @@
     <None Remove="SC\Test_29_Justification.xml" />
     <None Remove="SC\Test_30_Incomplete.xml" />
     <None Remove="SC\Test_31_Justification2.xml" />
+    <None Remove="SC\Test_32_TablesAndNotes.xml" />
     <None Remove="XAML\Test_01_Paragraphs.xml" />
     <None Remove="XAML\Test_02_Links.xml" />
     <None Remove="XAML\Test_03_TextFormatting.xml" />
@@ -218,6 +223,7 @@
     <None Remove="XAML\Test_29_Justification.xml" />
     <None Remove="XAML\Test_30_Incomplete.xml" />
     <None Remove="XAML\Test_31_Justification2.xml" />
+    <None Remove="XAML\Test_32_TablesAndNotes.xml" />
     <None Remove="XF\Test_01_Paragraphs.xml" />
     <None Remove="XF\Test_02_Links.xml" />
     <None Remove="XF\Test_03_TextFormatting.xml" />
@@ -249,6 +255,7 @@
     <None Remove="XF\Test_29_Justification.xml" />
     <None Remove="XF\Test_30_Incomplete.xml" />
     <None Remove="XF\Test_31_Justification2.xml" />
+    <None Remove="XF\Test_32_TablesAndNotes.xml" />
     <None Remove="XML\Test_01_Paragraphs.xml" />
     <None Remove="XML\Test_02_Links.xml" />
     <None Remove="XML\Test_03_TextFormatting.xml" />
@@ -280,9 +287,13 @@
     <None Remove="XML\Test_29_Justification.xml" />
     <None Remove="XML\Test_30_Incomplete.xml" />
     <None Remove="XML\Test_31_Justification2.xml" />
+    <None Remove="XML\Test_32_TablesAndNotes.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="HTML\Test_32_TablesAndNotes.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_31_Justification2.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -493,7 +504,13 @@
     <Content Include="Markdown\Generated\Test_30_Incomplete.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Markdown\Generated\Test_32_TablesAndNotes.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Markdown\Generated\Test_31_Justification2.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Markdown\Syntax\Test_32_TablesAndNotes.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Syntax\Test_31_Justification2.md">
@@ -587,6 +604,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Syntax\Test_27_Contract.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PlainText\Test_32_TablesAndNotes.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PlainText\Test_31_Justification2.txt">
@@ -688,6 +708,9 @@
     <Content Include="SC\Test_02_Links.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="SC\Test_32_TablesAndNotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="SC\Test_31_Justification2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -773,6 +796,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SC\Test_27_Contract.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XAML\Test_32_TablesAndNotes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XAML\Test_31_Justification2.xml">
@@ -874,6 +900,9 @@
     <Content Include="XF\Test_02_Links.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XF\Test_32_TablesAndNotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="XF\Test_31_Justification2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -959,6 +988,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XF\Test_26_Comments.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML\Test_32_TablesAndNotes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML\Test_31_Justification2.xml">

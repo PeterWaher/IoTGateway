@@ -108,12 +108,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (this.Document.TryGetFootnote(this.key, out Footnote Footnote))
 				Footnote.Referenced = true;
 
+			Output.Append(" [");
+
 			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
-			{
-				Output.Append(" [");
 				Output.Append(Nr.ToString());
-				Output.Append(']');
-			}
+			else
+				Output.Append(Key);
+
+			Output.Append(']');
 
 			return Task.CompletedTask;
 		}
@@ -264,11 +266,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void Export(XmlWriter Output)
 		{
 			Output.WriteStartElement("FootnoteReference");
+			Output.WriteAttributeString("key", this.key);
 
 			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 				Output.WriteAttributeString("nr", Nr.ToString());
-			else
-				Output.WriteAttributeString("key", this.key);
 
 			Output.WriteEndElement();
 		}

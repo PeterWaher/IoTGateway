@@ -7,6 +7,8 @@ using Waher.Content.Emoji.Emoji1;
 using Waher.Runtime.Text;
 using Waher.Script;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -39,6 +41,9 @@ namespace Waher.Content.Markdown.Test
 
 		public static void AssertEqual(string Expected, string Generated, string Message)
 		{
+			Generated = RemoveGuids(Generated);
+			Expected = RemoveGuids(Expected);
+
 			if (Generated != Expected)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -72,6 +77,24 @@ namespace Waher.Content.Markdown.Test
 				throw new Exception(sb.ToString());
 			}
 		}
+
+		private static string RemoveGuids(string s)
+		{
+			string s2;
+			int i = 0;
+
+			foreach (Match M in guids.Matches(s))
+			{
+				s2 = "GUID" + (++i).ToString();
+				s2 += new string('_', 36 - s2.Length);
+
+				s = s.Remove(M.Index, 36).Insert(M.Index, s2);
+			}
+
+			return s;
+		}
+
+		private readonly static Regex guids = new Regex(@"[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){4}[0-9a-fA-F]{8}", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		[TestMethod]
 		public async Task Test_01_Paragraphs()
@@ -257,6 +280,12 @@ namespace Waher.Content.Markdown.Test
 		public async Task Test_31_Justification2()
 		{
 			await this.DoTest("Test_31_Justification2.md", "Test_31_Justification2.html");
+		}
+
+		[TestMethod]
+		public async Task Test_32_TablesAndNotes()
+		{
+			await this.DoTest("Test_32_TablesAndNotes.md", "Test_32_TablesAndNotes.html");
 		}
 	}
 }

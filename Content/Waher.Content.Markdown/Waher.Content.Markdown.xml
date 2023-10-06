@@ -3082,6 +3082,11 @@
             to be shown at the end of the rendering process.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.Footnote.TableCellContents">
+            <summary>
+            If the Footnote defines a table cell.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.GenerateHTML(System.Text.StringBuilder)">
             <summary>
             Generates HTML for the markdown element.

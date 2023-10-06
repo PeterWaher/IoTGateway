@@ -7,28 +7,28 @@
 	<elements>
 		<Paragraph>
 			<InlineText>Here is some text containing a footnote</InlineText>
-			<FootnoteReference nr="1" />
+			<FootnoteReference key="somesamplefootnote" nr="1" />
 			<InlineText>. You can then continue your thought</InlineText>
 			<HtmlEntity>hellip</HtmlEntity>
 		</Paragraph>
 		<Paragraph>
 			<InlineText>Even go to a new paragraph and the footnotes with go to the bottom of the document</InlineText>
-			<FootnoteReference nr="2" />
+			<FootnoteReference key="documentdetails" nr="2" />
 			<InlineText>.</InlineText>
 		</Paragraph>
 		<Paragraph>
 			<InlineText>This is an example of an inline footnote.</InlineText>
-			<FootnoteReference nr="3" />
+			<FootnoteReference key="5ba15a6e-9402-4065-a4dc-a906906bb12b" nr="3" />
 		</Paragraph>
 	</elements>
 	<references />
 	<footnotes>
-		<Footnote nr="1">
+		<Footnote key="somesamplefootnote" nr="1">
 			<Paragraph>
 				<InlineText>Here is the text of the footnote itself.</InlineText>
 			</Paragraph>
 		</Footnote>
-		<Footnote nr="2">
+		<Footnote key="documentdetails" nr="2">
 			<Paragraph>
 				<InlineText>Depending on the final form of your document, of course. See the documentation and experiment.</InlineText>
 			</Paragraph>
@@ -36,7 +36,7 @@
 				<InlineText>This footnote has a second paragraph.</InlineText>
 			</Paragraph>
 		</Footnote>
-		<Footnote nr="3">
+		<Footnote key="5ba15a6e-9402-4065-a4dc-a906906bb12b" nr="3">
 			<Paragraph>
 				<InlineText>This is the </InlineText>
 				<Emphasize>

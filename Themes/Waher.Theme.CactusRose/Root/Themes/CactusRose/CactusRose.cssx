@@ -115,7 +115,7 @@ nav > ul > li:first-child
     border-left: 0;
 }
 
-nav > ul > li > a
+nav > ul > li a
 {
     display: block;
     text-align: center;
@@ -124,9 +124,15 @@ nav > ul > li > a
     color: ¤MenuTextColor¤;
 }
 
-nav > ul > li > a:hover
+nav > ul > li a:hover
 {
     background-color: rgba(0,0,0,0.5);
+}
+
+nav > ul > li > p
+{
+    padding: 0;
+    margin: 0;
 }
 
 header:hover > nav > ul > li.active
@@ -161,7 +167,7 @@ nav > ul > li > ul > li
 	color:white;
 }
 
-nav > ul > li > ul > li > a
+nav > ul > li > ul > li a
 {
     display: block;
     text-align: center;
@@ -170,9 +176,15 @@ nav > ul > li > ul > li > a
     color: ¤MenuTextColor¤;
 }
 
-nav > ul > li > ul > li > a:hover
+nav > ul > li > ul > li a:hover
 {
     background-color: rgba(0,0,0,0.5);
+}
+
+nav > ul > li > ul > li > p
+{
+    padding: 0;
+    margin: 0;
 }
 
 .active

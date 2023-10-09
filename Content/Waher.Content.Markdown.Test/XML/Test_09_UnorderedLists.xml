@@ -167,7 +167,7 @@
 			</UnnumberedItem>
 			<UnnumberedItem prefix="*">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<BulletList>
@@ -190,7 +190,7 @@
 			</UnnumberedItem>
 			<UnnumberedItem prefix="*">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<NumberedList>
@@ -216,7 +216,7 @@
 			</UnnumberedItem>
 			<UnnumberedItem prefix="*">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<NumberedList>
@@ -242,7 +242,7 @@
 			</UnnumberedItem>
 			<UnnumberedItem prefix="*">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<BulletList>
@@ -251,7 +251,7 @@
 						</UnnumberedItem>
 						<UnnumberedItem prefix="*">
 							<NestedBlock>
-								<Paragraph>
+								<Paragraph implicit="true">
 									<InlineText>Item 2b </InlineText>
 								</Paragraph>
 								<BulletList>
@@ -415,7 +415,7 @@
 			</UnnumberedItem>
 			<UnnumberedItem prefix="*">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 4.</InlineText>
 					</Paragraph>
 					<Paragraph>
@@ -480,7 +480,7 @@
 									</UnnumberedItem>
 									<UnnumberedItem prefix="*">
 										<NestedBlock>
-											<Paragraph>
+											<Paragraph implicit="true">
 												<InlineText>Checked subsubitem</InlineText>
 											</Paragraph>
 											<CodeBlock language="" start="0" end="0" indent="0" indentString="">

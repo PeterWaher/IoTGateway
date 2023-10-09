@@ -888,7 +888,7 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
@@ -897,7 +897,7 @@ namespace Waher.Content.Markdown
 								if (LastItem.Child.IsBlockElement)
 									Items.AddFirst(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1005,7 +1005,7 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
@@ -1014,7 +1014,7 @@ namespace Waher.Content.Markdown
 								if (LastItem.Child.IsBlockElement)
 									Items.AddFirst(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1115,7 +1115,7 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
@@ -1124,7 +1124,7 @@ namespace Waher.Content.Markdown
 								if (LastItem.Child.IsBlockElement)
 									Items.AddFirst(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1232,7 +1232,7 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children));
+									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
@@ -1241,7 +1241,7 @@ namespace Waher.Content.Markdown
 								if (LastItem.Child.IsBlockElement)
 									Items.AddFirst(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }));
+									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}

@@ -141,7 +141,7 @@
 			</NumberedItem>
 			<NumberedItem number="2" explicit="false">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<BulletList>
@@ -164,7 +164,7 @@
 			</NumberedItem>
 			<NumberedItem number="2" explicit="false">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<NumberedList>
@@ -187,7 +187,7 @@
 			</NumberedItem>
 			<NumberedItem number="2" explicit="false">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<NumberedList>
@@ -210,7 +210,7 @@
 			</NumberedItem>
 			<NumberedItem number="2" explicit="false">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 2 </InlineText>
 					</Paragraph>
 					<NumberedList>
@@ -219,7 +219,7 @@
 						</NumberedItem>
 						<NumberedItem number="2" explicit="false">
 							<NestedBlock>
-								<Paragraph>
+								<Paragraph implicit="true">
 									<InlineText>Item 2b </InlineText>
 								</Paragraph>
 								<NumberedList>
@@ -383,7 +383,7 @@
 			</NumberedItem>
 			<NumberedItem number="4" explicit="false">
 				<NestedBlock>
-					<Paragraph>
+					<Paragraph implicit="true">
 						<InlineText>Item 4.</InlineText>
 					</Paragraph>
 					<Paragraph>
@@ -448,7 +448,7 @@
 									</NumberedItem>
 									<NumberedItem number="2" explicit="false">
 										<NestedBlock>
-											<Paragraph>
+											<Paragraph implicit="true">
 												<InlineText>Checked subsubitem</InlineText>
 											</Paragraph>
 											<CodeBlock language="" start="0" end="0" indent="0" indentString="">

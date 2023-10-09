@@ -4118,6 +4118,14 @@
             <param name="Document">Markdown document.</param>
             <param name="Children">Child elements.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.#ctor(Waher.Content.Markdown.MarkdownDocument,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean)">
+            <summary>
+            Represents a paragraph in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Children">Child elements.</param>
+            <param name="Implicit">If paragraph is implicit or not.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.GenerateMarkdown(System.Text.StringBuilder)">
             <summary>
             Generates Markdown for the markdown element.

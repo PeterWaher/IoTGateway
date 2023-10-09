@@ -11,6 +11,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Paragraph : BlockElementChildren
 	{
+		private readonly bool @implicit;
+
 		/// <summary>
 		/// Represents a paragraph in a markdown document.
 		/// </summary>
@@ -19,6 +21,20 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public Paragraph(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
 			: base(Document, Children)
 		{
+			this.@implicit = false;
+		}
+
+		/// <summary>
+		/// Represents a paragraph in a markdown document.
+		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="Children">Child elements.</param>
+		/// <param name="Implicit">If paragraph is implicit or not.</param>
+		public Paragraph(MarkdownDocument Document, IEnumerable<MarkdownElement> Children,
+			bool Implicit)
+			: base(Document, Children)
+		{
+			this.@implicit = Implicit;
 		}
 
 		/// <summary>
@@ -38,12 +54,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override async Task GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<p>");
+			if (!this.@implicit)
+				Output.Append("<p>");
 
 			foreach (MarkdownElement E in this.Children)
 				await E.GenerateHTML(Output);
 
-			Output.AppendLine("</p>");
+			if (!this.@implicit)
+				Output.AppendLine("</p>");
 		}
 
 		/// <summary>
@@ -298,7 +316,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">XML Output.</param>
 		public override void Export(XmlWriter Output)
 		{
-			this.Export(Output, "Paragraph");
+			Output.WriteStartElement("Paragraph");
+
+			if (this.@implicit)
+				Output.WriteAttributeString("implicit", CommonTypes.Encode(this.@implicit));
+
+			this.ExportChildren(Output);
+			Output.WriteEndElement();
 		}
 
 		/// <summary>

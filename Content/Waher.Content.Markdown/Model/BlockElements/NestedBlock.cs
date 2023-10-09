@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				{
 					if (!(Spans is null))
 					{
-						NewChildren.AddLast(new Paragraph(this.Document, Spans));
+						NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
 						Spans = null;
 					}
 
@@ -90,7 +90,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			if (!(Spans is null))
-				NewChildren.AddLast(new Paragraph(this.Document, Spans));
+				NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
 
 			this.SetChildren(NewChildren);
 

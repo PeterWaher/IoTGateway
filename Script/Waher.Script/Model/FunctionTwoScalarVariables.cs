@@ -164,17 +164,17 @@ namespace Waher.Script.Model
 			object v1 = Argument1.AssociatedObjectValue;
 			object v2 = Argument2.AssociatedObjectValue;
 
-			if (Expression.TryConvert(v1, out string s1) && Expression.TryConvert<string>(v2, out string s2))
+			if (Expression.TryConvert(v1, out string s1) && Expression.TryConvert(v2, out string s2))
 				return this.EvaluateScalar(s1, s2, Variables);
-			else if (Expression.TryConvert(v1, out double d1) && Expression.TryConvert<double>(v2, out double d2))
+			else if (Expression.TryConvert(v1, out double d1) && Expression.TryConvert(v2, out double d2))
 				return this.EvaluateScalar(d1, d2, Variables);
-			else if (Expression.TryConvert(v1, out bool b1) && Expression.TryConvert<bool>(v2, out bool b2))
+			else if (Expression.TryConvert(v1, out bool b1) && Expression.TryConvert(v2, out bool b2))
 				return this.EvaluateScalar(b1, b2, Variables);
-			else if (Expression.TryConvert(v1, out Complex z1) && Expression.TryConvert<Complex>(v2, out Complex z2))
+			else if (Expression.TryConvert(v1, out Complex z1) && Expression.TryConvert(v2, out Complex z2))
 				return this.EvaluateScalar(z1, z2, Variables);
-			else if (Expression.TryConvert(v1, out Integer i1) && Expression.TryConvert<Integer>(v2, out Integer i2))
+			else if (Expression.TryConvert(v1, out Integer i1) && Expression.TryConvert(v2, out Integer i2))
 				return this.EvaluateScalar((double)i1.Value, (double)i2.Value, Variables);
-			else if (Expression.TryConvert(v1, out RationalNumber q1) && Expression.TryConvert<RationalNumber>(v2, out RationalNumber q2))
+			else if (Expression.TryConvert(v1, out RationalNumber q1) && Expression.TryConvert(v2, out RationalNumber q2))
 				return this.EvaluateScalar(q1.ToDouble(), q2.ToDouble(), Variables);
 			else
 				throw new ScriptRuntimeException("Type of scalar not supported.", this);
@@ -366,17 +366,17 @@ namespace Waher.Script.Model
 			object v1 = Argument1.AssociatedObjectValue;
 			object v2 = Argument2.AssociatedObjectValue;
 
-			if (Expression.TryConvert(v1, out string s1) && Expression.TryConvert<string>(v2, out string s2))
+			if (Expression.TryConvert(v1, out string s1) && Expression.TryConvert(v2, out string s2))
 				return this.EvaluateScalarAsync(s1, s2, Variables);
-			else if (Expression.TryConvert(v1, out double d1) && Expression.TryConvert<double>(v2, out double d2))
+			else if (Expression.TryConvert(v1, out double d1) && Expression.TryConvert(v2, out double d2))
 				return this.EvaluateScalarAsync(d1, d2, Variables);
-			else if (Expression.TryConvert(v1, out bool b1) && Expression.TryConvert<bool>(v2, out bool b2))
+			else if (Expression.TryConvert(v1, out bool b1) && Expression.TryConvert(v2, out bool b2))
 				return this.EvaluateScalarAsync(b1, b2, Variables);
-			else if (Expression.TryConvert(v1, out Complex z1) && Expression.TryConvert<Complex>(v2, out Complex z2))
+			else if (Expression.TryConvert(v1, out Complex z1) && Expression.TryConvert(v2, out Complex z2))
 				return this.EvaluateScalarAsync(z1, z2, Variables);
-			else if (Expression.TryConvert(v1, out Integer i1) && Expression.TryConvert<Integer>(v2, out Integer i2))
+			else if (Expression.TryConvert(v1, out Integer i1) && Expression.TryConvert(v2, out Integer i2))
 				return this.EvaluateScalarAsync((double)i1.Value, (double)i2.Value, Variables);
-			else if (Expression.TryConvert(v1, out RationalNumber q1) && Expression.TryConvert<RationalNumber>(v2, out RationalNumber q2))
+			else if (Expression.TryConvert(v1, out RationalNumber q1) && Expression.TryConvert(v2, out RationalNumber q2))
 				return this.EvaluateScalarAsync(q1.ToDouble(), q2.ToDouble(), Variables);
 			else
 				throw new ScriptRuntimeException("Type of scalar not supported.", this);

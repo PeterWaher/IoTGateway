@@ -41,7 +41,7 @@ namespace Waher.Script.Functions.Strings
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
 		{
-			int i = Argument1.LastIndexOf(Argument2);
+			int i = Argument1?.LastIndexOf(Argument2) ?? -1;
 			if (i < 0)
 				return ObjectValue.Null;
 			else

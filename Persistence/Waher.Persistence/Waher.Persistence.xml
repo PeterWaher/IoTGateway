@@ -233,7 +233,8 @@
             <summary>
             This attribute defines a method for obsolete properties and field values found in serializations of older versions of the class.
             The method should take one parameter, a <see cref="T:System.Collections.Generic.Dictionary`2"/>, that represents property or field values
-            with no matching properties or fields in the object.
+            with no matching properties or fields in the object. The return type of the method should be either void or Task. If a Task,
+            the deserialization of the object waits for the task to complete.
             </summary>
         </member>
         <member name="M:Waher.Persistence.Attributes.ObsoleteMethodAttribute.#ctor(System.String)">
@@ -242,14 +243,16 @@
             </summary>
             <param name="MethodName">Name of method that will be called if deserializing objects with obsolete property or field values.
             The method should take one parameter, a <see cref="T:System.Collections.Generic.Dictionary`2"/>, that represents property or field values
-            with no matching properties or fields in the object.
+            with no matching properties or fields in the object. The return type of the method should be either void or Task. If a Task,
+            the deserialization of the object waits for the task to complete.
             </param>
         </member>
         <member name="P:Waher.Persistence.Attributes.ObsoleteMethodAttribute.MethodName">
             <summary>
             Name of method that will be called if deserializing objects with obsolete property or field values.
             The method should take one parameter, a <see cref="T:System.Collections.Generic.Dictionary`2"/>, that represents property or field values
-            with no matching properties or fields in the object.
+            with no matching properties or fields in the object. The return type of the method should be either void or Task. If a Task,
+            the deserialization of the object waits for the task to complete.
             </summary>
         </member>
         <member name="T:Waher.Persistence.Attributes.ShortNameAttribute">

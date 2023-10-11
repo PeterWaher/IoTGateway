@@ -2171,7 +2171,12 @@ namespace Waher.Persistence.Serialization
 					if (!(this.obsoleteMethod is null))
 					{
 						CSharp.AppendLine("\t\t\tif (!(Obsolete is null))");
-						CSharp.Append("\t\t\t\tResult.");
+
+						if (this.obsoleteMethod.ReturnType == typeof(Task))
+							CSharp.Append("\t\t\t\tawait Result.");
+						else
+							CSharp.Append("\t\t\t\tResult.");
+
 						CSharp.Append(this.obsoleteMethod.Name);
 						CSharp.AppendLine("(Obsolete);");
 						CSharp.AppendLine();
@@ -4426,7 +4431,11 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (!(this.obsoleteMethod is null) && (!(Obsolete is null)))
-					this.obsoleteMethod.Invoke(Result, new object[] { Obsolete });
+				{
+					object Result2 = this.obsoleteMethod.Invoke(Result, new object[] { Obsolete });
+					if (Result2 is Task T)
+						await T;
+				}
 
 				return Result;
 #if NETSTANDARD2_0

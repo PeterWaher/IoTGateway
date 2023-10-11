@@ -1546,7 +1546,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (!(this.obsoleteMethod is null))
 				{
 					CSharp.AppendLine("\t\t\tif (!(Obsolete is null))");
-					CSharp.AppendLine("\t\t\t\tResult." + this.obsoleteMethod.Name + "(Obsolete);");
+
+					if (this.obsoleteMethod.ReturnType == typeof(Task))
+						CSharp.Append("\t\t\t\tawait Result.");
+					else
+						CSharp.Append("\t\t\t\tResult.");
+
+					CSharp.Append(this.obsoleteMethod.Name);
+					CSharp.AppendLine("(Obsolete);");
 					CSharp.AppendLine();
 				}
 

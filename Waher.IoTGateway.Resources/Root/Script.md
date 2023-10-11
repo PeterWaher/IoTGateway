@@ -2503,7 +2503,7 @@ ShowImages(Images):=
 R:=ChatGpt(
 	"You help users find images on the Internet, representative of the queries made by the user.",
 	"TestUser",
-	"Kan you find me some images of Kermit? If something is unclear, ask for additional information first. When ready to present images to the user, call available functions.",
+	"Can you find me some images of Kermit? If something is unclear, ask for additional information first. When ready to present images to the user, call available functions.",
 	ChatGptFunction("ShowImages", "Displays an array of images to the user.", [
 		ChatGptArray("Images", "Array of images to show.", true, 
 			ChatGptObject("Image", "Information about an image.", true, [

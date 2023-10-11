@@ -2350,7 +2350,9 @@ namespace Waher.Networking.XMPP.Contracts
 				E.NamespaceURI == NamespaceSmartContracts)
 			{
 				ParsedContract Parsed = await Contract.Parse(E);
-				Contract = Parsed.Contract;
+				Contract = Parsed?.Contract;
+				if (Contract is null)
+					e.Ok = false;
 			}
 			else
 				e.Ok = false;

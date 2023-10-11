@@ -4116,6 +4116,11 @@
             Block elements
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.Elements">
+            <summary>
+            Inline elements
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements.Item.IsWellDefined">
             <summary>
             Checks if the element is well-defined.

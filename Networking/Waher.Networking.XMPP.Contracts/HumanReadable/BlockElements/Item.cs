@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
@@ -28,6 +29,70 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		{
 			get => this.blockElements;
 			set => this.blockElements = value;
+		}
+
+		/// <summary>
+		/// Inline elements
+		/// </summary>
+		public HumanReadableElement[] Elements
+		{
+			set
+			{
+				List<InlineElement> InlineElements = null;
+				List<BlockElement> BlockElements = null;
+
+				foreach (HumanReadableElement E in value)
+				{
+					if (E is InlineElement InlineElement)
+					{
+						if (InlineElements is null)
+							InlineElements = new List<InlineElement>();
+
+						InlineElements.Add(InlineElement);
+					}
+					else if (E is BlockElement BlockElement)
+					{
+						if (BlockElements is null)
+							BlockElements = new List<BlockElement>();
+
+						if (!(InlineElements is null))
+						{
+							BlockElements.Add(new Paragraph()
+							{
+								Elements = InlineElements.ToArray()
+							});
+
+							InlineElements = null;
+						}
+
+						BlockElements.Add(BlockElement);
+					}
+				}
+
+				if (!(BlockElements is null))
+				{
+					if (!(InlineElements is null))
+					{
+						BlockElements.Add(new Paragraph()
+						{
+							Elements = InlineElements.ToArray()
+						});
+					}
+
+					this.BlockElements = BlockElements.ToArray();
+					this.InlineElements = null;
+				}
+				else if (!(InlineElements is null))
+				{
+					this.InlineElements = InlineElements.ToArray();
+					this.BlockElements = null;
+				}
+				else
+				{
+					this.InlineElements = null;
+					this.BlockElements = null;
+				}
+			}
 		}
 
 		/// <summary>

@@ -161,7 +161,7 @@ namespace Waher.Things.Script
 				{
 					if (Obj2 is Field F)
 						Fields3.Add(F);
-					else
+					else if (!(Obj2 is null))
 						throw new Exception("Expected script to return sensor data fields. Received object of type: " + Obj2.GetType().FullName);
 				}
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -38,6 +37,12 @@ namespace Waher.Script.Threading.Functions
 		public override string[] DefaultArgumentNames => new string[] { "Script" };
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => false;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
@@ -47,6 +52,16 @@ namespace Waher.Script.Threading.Functions
 			KeyValuePair<Guid, Task<IElement>> P = EvaluateInBackground(this.Argument, Variables, true);
 
 			return new ObjectValue(P.Key);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult(this.Evaluate(Variables));
 		}
 
 		/// <summary>

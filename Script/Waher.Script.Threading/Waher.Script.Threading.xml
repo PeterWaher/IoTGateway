@@ -76,7 +76,20 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Threading.Functions.Background.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Threading.Functions.Background.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

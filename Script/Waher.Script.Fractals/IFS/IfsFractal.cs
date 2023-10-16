@@ -186,7 +186,7 @@ namespace Waher.Script.Fractals.IFS
 				throw new ScriptRuntimeException("N in calls to IfsFractal() must be a positive integer.", this);
 
 			if (!(Arguments[i].AssociatedObjectValue is Array Functions))
-				throw new ScriptRuntimeException("the fifth parameter to IfsFractal must be an array of homogenous 2D-transformations or lambda expressions.", this);
+				throw new ScriptRuntimeException("The fifth parameter to IfsFractal must be an array of homogenous 2D-transformations or lambda expressions.", this);
 
 			List<DoubleMatrix> Matrices = null;
 			List<ILambdaExpression> LambdaExpressions = null;

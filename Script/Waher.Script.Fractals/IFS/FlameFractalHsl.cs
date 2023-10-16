@@ -150,7 +150,7 @@ namespace Waher.Script.Fractals.IFS
             string FunctionsExpression = this.Arguments[i++].SubExpression;
 
 			if (!(Obj is Array FlameArray))
-				throw new ScriptRuntimeException("the fifth parameter to FlameFractal must be an array, containing flame definitions.", this);
+				throw new ScriptRuntimeException("The fifth parameter to FlameFractalHsl must be an array, containing flame definitions.", this);
 
 			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
             double Weight;

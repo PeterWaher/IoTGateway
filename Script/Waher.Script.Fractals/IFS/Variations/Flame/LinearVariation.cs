@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Fractals.IFS.Variations.Flame
+﻿namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class LinearVariation : FlameVariationZeroParameters
     {

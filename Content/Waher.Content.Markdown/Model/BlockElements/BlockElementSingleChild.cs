@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.Markdown.Model.BlockElements
+﻿namespace Waher.Content.Markdown.Model.BlockElements
 {
 	/// <summary>
 	/// Abstract base class for block elements with one child.

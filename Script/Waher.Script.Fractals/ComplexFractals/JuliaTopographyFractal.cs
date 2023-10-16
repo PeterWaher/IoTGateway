@@ -340,7 +340,7 @@ namespace Waher.Script.Fractals.ComplexFractals
                 while (n < N && c > 0)
                 {
                     n++;
-                    P[0] = Expression.Encapsulate(Row);
+                    P[0] = new ComplexVector(Row);
                     Obj = f.Evaluate(P, v);
                     Row = Obj.AssociatedObjectValue as Complex[];
 

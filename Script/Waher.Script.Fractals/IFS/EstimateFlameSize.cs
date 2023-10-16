@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Scalar;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
@@ -10,12 +11,36 @@ using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.IFS
 {
-    /// <summary>
-    /// Estimates the size of a flame fractal.
-    /// </summary>
-    /// <example>
-    /// </example>
-    public class EstimateFlameSize : FunctionMultiVariate
+	/// <summary>
+	/// Estimates the size of a flame fractal.
+	/// </summary>
+	/// <example>
+	/// N:=1000;
+	/// do
+	/// (
+	///     cx:=Uniform(-1,1,6);
+	/// 	cy:=Uniform(-1,1,6);
+	/// 	f:=[
+	/// 		Identity(2), QuadraticVariation(cx, cy),"Red",
+	/// 		Identity(2), GaussianVariation(),"Yellow"
+	///     ];
+	///     v:=EstimateFlameSize(5000, f);
+	/// 	Dim:=max(abs(v))
+	/// ) while N-->0 && Dim>100;
+	/// 
+	/// if N<=0 then error("No coefficients found.");
+	/// 
+	/// [xc, yc, dr]:=v;
+	/// 
+	/// printline("X-coefficients: "+Str(cx));
+	/// printline("Y-coefficients: "+Str(cy));
+	/// printline("X-center: "+Str(xc));
+	/// printline("Y-center: "+Str(yc));
+	/// printline("Size: "+Str(dr));
+	/// 
+	/// FlameFractalHsl(xc, yc, dr, 2e7, f, false, false, 400, 300, 1, 2.5, 2)
+	/// </example>
+	public class EstimateFlameSize : FunctionMultiVariate
     {
 		public EstimateFlameSize(ScriptNode N, ScriptNode FlameFunctions, ScriptNode DimX, ScriptNode DimY, ScriptNode Seed, 
 			int Start, int Length, Expression Expression)
@@ -70,10 +95,10 @@ namespace Waher.Script.Fractals.IFS
             if (N <= 0)
                 throw new ScriptRuntimeException("N in calls to EstimateFlameSize() must be a positive integer.", this);
 
-            object Obj = Arguments[i].AssociatedObjectValue;
+            object Obj = Arguments[i++].AssociatedObjectValue;
 
 			if (!(Obj is Array FlameArray))
-				throw new ScriptRuntimeException("the second parameter to EstimateFlameSize must be an array, containing flame definitions.", this);
+				throw new ScriptRuntimeException("The second parameter to EstimateFlameSize must be an array, containing flame definitions.", this);
 
 			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
             double Weight;

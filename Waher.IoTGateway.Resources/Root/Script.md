@@ -1579,6 +1579,7 @@ The following functions can be used to create fractal images based on iterations
 | `HalleySmoothFractal(z,dr,R[,Coefficients[,Palette[,DimX[,DimY]]]])`<br/>`HalleySmoothFractal(z,dr,R[,Lambda[,Palette[,DimX[,DimY]]]])` | As `HalleyFractal`, except the image is smoothed out using the *Heat Equation*. Pixels where colors change are used as fixed boundary conditions. | `HalleySmoothFractal((0,0),3,,[-1,0,0,0,0,0,1])` |
 | `HalleyTopographyFractal(z,dr,R[,Coefficients[,Palette[,DimX[,DimY]]]])`<br/>`HalleyTopographyFractal(z,dr,R[,Lambda[,Palette[,DimX[,DimY]]]])` | As `HalleyFractal`, except only pixels where the color changes are returned, creating a topographical map of the image. | `HalleyTopographyFractal((0,0),3,,Uniform(0,5,8),,640,480)` |
 | `JuliaFractal(z,c,dr[,Palette[,DimX[,DimY]]])`<br/>`JuliaFractal(z,Lambda,dr[,Palette[,DimX[,DimY]]])` | Calculates a Julia Fractal Image. | `JuliaFractal((0,0),(-0.785028076171875,-0.1465322265625),3,RandomLinearAnalogousHSL(1024,16,2056656298),640,480)`<br/>`JuliaFractal((0,0),z->(1,0.2)*sin(z),7,RandomLinearAnalogousHsl(1024,16,21))` |
+| `JuliaInternalFractal(z,c,dr[,Palette[,DimX[,DimY]]])`<br/>`JuliaInternalFractal(z,Lambda,dr[,Palette[,DimX[,DimY]]])` | Calculates a Julia Fractal Image, and draws the internal of the fractal. | `JuliaInternalFractal((0,0),(-0.65,-0.4125),3,RandomLinearAnalogousHSL(16,4),800,600)` |
 | `JuliaSmoothFractal(z,c,dr[,Palette[,DimX[,DimY]]])`<br/>`JuliaSmoothFractal(z,Lambda,dr[,Palette[,DimX[,DimY]]])` | As `JuliaFractal`, except the image is smoothed out using the *Heat Equation*. Pixels where colors change are used as fixed boundary conditions. | `JuliaSmoothFractal((0,0),(-0.785028076171875,-0.1465322265625),3,RandomLinearAnalogousHSL(1024,16,2056656298),640,480)`<br/>`JuliaSmoothFractal((0,0),z->(1,0.2)*sin(z),7,RandomLinearAnalogousHsl(1024,16,21))` |
 | `JuliaTopographyFractal(z,c,dr[,Palette[,DimX[,DimY]]])`<br/>`JuliaTopographyFractal(z,Lambda,dr[,Palette[,DimX[,DimY]]])` | As `JuliaFractal`, except only pixels where the color changes are returned, creating a topographical map of the image. | `JuliaTopographyFractal((0,0),(-0.785028076171875,-0.1465322265625),3,RandomLinearAnalogousHSL(1024,16,2056656298),640,480)`<br/>`JuliaTopographyFractal((0,0),z->(1,0.2)*sin(z),7,RandomLinearAnalogousHsl(1024,16,21))` |
 | `MandelbrotFractal(z,f,dr[,Palette[,DimX[,DimY]]])` | Calculates a Mandelbrot Fractal Image. | `MandelbrotFractal((-0.728474426269531,-0.240391845703126),,0.000732421875,RandomLinearRGB(4096,128,1325528060),640,480)`<br/>`MandelbrotFractal((1.13804443359375,-0.586863875325517),(z,c)->c*(z-z^2),6.103515625E-05,RandomLinearAnalogousHsl(1024,16,21),400,400)` |
@@ -1605,15 +1606,58 @@ The following functions can be used to create fractal images based on iterations
 The following functions can be used to create fractal images based on Iterated Function Systems (IFS). The functions are available in the 
 `Waher.Script.Fractals` library. They can be used as a means to create backgound images for themes, etc.
 
-| Function                                | Description                                           | Example                                   |
-|-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| Function                                                                                                        | Description                                           | Example                                   |
+|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------|
 | `FlameFractalHsl(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,LightFactor[,Seed]]]]]]]])` | Calculates a flame fractal in HSL space. Intensity is mapped along the L-axis. Gamma correction is done along the SL-axes. The L-axis is multiplicated with the LightFactor. | `FlameFractalHsl(0.6109375,0.199208333333333,0.625,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",Identity(2),DiamondVariation(),"Red"],False,False,400,300,1,2.5,2,1668206157)` |
-| `FlameFractalRgba(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,Vibrancy[,Seed]]]]]]]])` | Calculates a flame fractal in RGBA space. Intensity is calculated along the A-axis. Gamma correction is done along the RGB-axes (vibrancy=0) or along the A-axis (vibrancy=1), or a combination thereof. | `FlameFractalRgba(0,0,0,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",ExponentialVariation(),Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",ExponentialVariation()],400,300)` |
-| `IfsFractal(xc,yc,dr,N,T[,DimX[,DimY[,Seed]]])` | Calculates a fractal based on an Iterated Function System, using the chaos game. | ` IfsFractal(0,5,6,2e6,[[[0,0,0],[0,0.16,0],[0,0,1]],0.01,"Green",[[0.85,0.04,0],[-0.04,0.85,1.6],[0,0,1]],0.85,"Green",[[0.2,-0.26,0],[0.26,0.24,1.6],[0,0,1]],0.07,"Green",[[-0.15,0.28,0],[0.26,0.24,0.44],[0,0,1]],0.07,"Green"],300,600);` |
+| `FlameFractalRgba(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,Vibrancy[,Seed]]]]]]]])`   | Calculates a flame fractal in RGBA space. Intensity is calculated along the A-axis. Gamma correction is done along the RGB-axes (vibrancy=0) or along the A-axis (vibrancy=1), or a combination thereof. | `FlameFractalRgba(0,0,0,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",ExponentialVariation(),Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",ExponentialVariation()],400,300)` |
+| `FlameFractal(xc,yc,dr,N,f[,Preview[,Parallel[,DimX[,DimY[,SuperSampling[,Gamma[,Vibrancy[,Seed]]]]]]]])`       | Alias for `FlameFractalRgba`. | `FlameFractal(0,0,0,1e7,[Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",ExponentialVariation(),Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",ExponentialVariation()],400,300)` |
+| `EstimateFlameSize(N,f[,DimX[,DimY[,Seed]]])`                                                                   | Estimates the dimensions necessary for a flame fractal. Can be used to check if a selected set of parameters diverges or not. A vector is returned with x- and y-coordinates, as well as size `[xc, yc, dr]`. |
+| `IfsFractal(xc,yc,dr,N,T[,DimX[,DimY[,Seed]]])`                                                                 | Calculates a fractal based on an Iterated Function System, using the chaos game. | ` IfsFractal(0,5,6,2e6,[[[0,0,0],[0,0.16,0],[0,0,1]],0.01,"Green",[[0.85,0.04,0],[-0.04,0.85,1.6],[0,0,1]],0.85,"Green",[[0.2,-0.26,0],[0.26,0.24,1.6],[0,0,1]],0.07,"Green",[[-0.15,0.28,0],[0.26,0.24,0.44],[0,0,1]],0.07,"Green"],300,600);` |
 
-`IfsFractals` run on Iterated Function Systems using systems of linear equations. Flame fractals can modify the linear transforms using one or more
-*variations*. There are many different types of variations[^For more information about Flame Fractals and variations, see the paper on
-<a href="http://flam3.com/flame.pdf" target="_blank">The Fractal Flame Algorithm</a> by Scott Daves and Erik Reckase] that can be used:
+`IfsFractals` run on Iterated Function Systems using systems of equations, with optional color coding and weights. These equations, color codings
+and weights are provided in the vector `T`. These equations can be given by matrices representing linear transforms, or lambdra expressions. 
+Examples:
+
+	IfsFractal(0.5,0.5,1,1e6, [
+		Scale2DH(0.5,0.5),
+		Translate2DH(0.25,0.5)*Scale2DH(0.5,0.5),
+		Translate2DH(0.5,0)*Scale2DH(0.5,0.5)],400,400);
+
+	IfsFractal(0,0,3,1e6, [
+		 z->sqrt(z-(-0.748814392089844-0.0801434326171877*i)),
+		 z->-sqrt(z-(-0.748814392089844-0.0801434326171877*i))],400,400);
+
+	IfsFractal(0,5,6,1e6, [
+		 [[0,0,0],
+		 [0,0.16,0],
+		 [0,0,1]],
+		 0.01,"Green",
+		 [[0.85,0.04,0],
+		 [-0.04,0.85,1.6],
+		 [0,0,1]],
+		 0.85,"Green",
+		 [[0.2,-0.26,0],
+		 [0.26,0.24,1.6],
+		 [0,0,1]],
+		 0.07,"Green",
+		 [[-0.15,0.28,0],
+		 [0.26,0.24,0.44],
+		 [0,0,1]],
+		 0.07,"Green"],300,600);
+
+Flame fractals can modify the linear transforms using one or more *variations*. (Variations can be seen as non-linear "distortions", or modifiers, 
+to the iterated function system, to create more interesting visual results.) There are also two rendering modes: HSL and RGBA.
+
+Example:
+
+	FlameFractalRgba(0,0,0,1e7,[
+		Rotate2DH(-45°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Orange",ExponentialVariation(),
+		Translate2DH(1,0)*Rotate2DH(-135°)*Scale2DH(1/sqrt(2),1/sqrt(2)),"Red",ExponentialVariation()
+		],400,300)
+
+There are many different types of predefined variations[^For more information about Flame Fractals and variations, see the paper on 
+<a href="http://flam3.com/flame.pdf" target="_blank">The Fractal Flame Algorithm</a> by Scott Daves and Erik Reckase] that can be used.
+You can also use the `LambdaVariation` to create your custom variations.
 
 | Flame variations        | Complex variations         | Fractal variations    |
 |-------------------------|----------------------------|-----------------------|
@@ -1650,6 +1694,7 @@ The following functions can be used to create fractal images based on Iterated F
 | `LinearVariation`		  |							   |					   |
 | `NGonVariation`		  |							   |					   |
 | `NoiseVariation`		  |							   |					   |
+| `QuadraticVariation`	  |							   |					   |
 | `ParabolaVariation`	  |							   |					   |
 | `PdjVariation`		  |							   |					   |
 | `PerspectiveVariation`  |							   |					   |

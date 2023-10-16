@@ -11077,6 +11077,21 @@
             One scalar parameter.
             </summary>
         </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Vector">
+            <summary>
+            One vector parameter.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Matrix">
+            <summary>
+            One matrix parameter.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Set">
+            <summary>
+            One set parameter.
+            </summary>
+        </member>
         <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes2Normal">
             <summary>
             Two normal parameters.

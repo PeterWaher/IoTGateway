@@ -24,6 +24,21 @@ namespace Waher.Script.Model
 		protected static readonly ArgumentType[] argumentTypes1Normal = new ArgumentType[] { ArgumentType.Normal };
 
 		/// <summary>
+		/// One vector parameter.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes1Vector = new ArgumentType[] { ArgumentType.Vector };
+
+		/// <summary>
+		/// One matrix parameter.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes1Matrix = new ArgumentType[] { ArgumentType.Matrix };
+
+		/// <summary>
+		/// One set parameter.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes1Set = new ArgumentType[] { ArgumentType.Set };
+
+		/// <summary>
 		/// Two normal parameters.
 		/// </summary>
 		protected static readonly ArgumentType[] argumentTypes2Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal };

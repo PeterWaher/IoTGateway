@@ -1446,14 +1446,14 @@ namespace Waher.Content.Markdown
 
 					if (IsUnderline(s, '=', false, false))
 					{
-						Header Header = new Header(this, 1, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
+						Header Header = new Header(this, 1, false, s, this.PrepareHeader(this.ParseBlock(Rows, Block.Positions, 0, c - 1)));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
 					}
 					else if (IsUnderline(s, '-', false, false))
 					{
-						Header Header = new Header(this, 2, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
+						Header Header = new Header(this, 2, false, s, this.PrepareHeader(this.ParseBlock(Rows, Block.Positions, 0, c - 1)));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
@@ -1474,7 +1474,7 @@ namespace Waher.Content.Markdown
 					if (++i < s.Length)
 						Rows[c] = s.Substring(0, i).TrimEnd();
 
-					Header Header = new Header(this, d, true, Prefix, this.ParseBlock(Rows, Block.Positions, Block.Start, c));
+					Header Header = new Header(this, d, true, Prefix, this.PrepareHeader(this.ParseBlock(Rows, Block.Positions, Block.Start, c)));
 					Elements.AddLast(Header);
 					this.headers.Add(Header);
 					continue;
@@ -1509,6 +1509,31 @@ namespace Waher.Content.Markdown
 			}
 			else
 				return Elements;
+		}
+
+		private LinkedList<MarkdownElement> PrepareHeader(LinkedList<MarkdownElement> Content)
+		{
+			if (Content?.First.Value is NumberedList NumberedList &&
+				Content.First.Next is null &&
+				NumberedList.HasOneChild &&
+				NumberedList.FirstChild is NumberedItem Item &&
+				Item.NumberExplicit)
+			{
+				LinkedList<MarkdownElement> NewContent = new LinkedList<MarkdownElement>();
+				NewContent.AddLast(new InlineText(this, Item.Number.ToString() + ". "));
+
+				if (Item.Child is NestedBlock B)
+				{
+					foreach (MarkdownElement E in B.Children)
+						NewContent.AddLast(E);
+				}
+				else
+					NewContent.AddLast(Item.Child);
+
+				return NewContent;
+			}
+			else
+				return Content;
 		}
 
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int[] Positions)

@@ -68,12 +68,15 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			Xml.Append(this.ColumnSpan.ToString());
 			Xml.Append("' alignment='");
 			Xml.Append(this.Alignment.ToString());
-			Xml.Append('>');
+			Xml.Append("'>");
 
-			if (!(this.InlineElements is null))
-				Serialize(Xml, this.InlineElements, "cell");
-			else if (!(this.BlockElements is null))
-				Serialize(Xml, this.BlockElements, "cell");
+			HumanReadableElement[] Elements = (HumanReadableElement[])this.InlineElements ?? this.BlockElements;
+
+			if (!(Elements is null))
+			{
+				foreach (HumanReadableElement E in Elements)
+					E.Serialize(Xml);
+			}
 
 			Xml.Append("</cell>");
 		}

@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>object serialization</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.7.6</AssemblyVersion>
-    <FileVersion>1.7.6</FileVersion>
-    <Version>1.7.6</Version>
+    <AssemblyVersion>1.7.7</AssemblyVersion>
+    <FileVersion>1.7.7</FileVersion>
+    <Version>1.7.7</Version>
   </PropertyGroup>
 
   <ItemGroup>

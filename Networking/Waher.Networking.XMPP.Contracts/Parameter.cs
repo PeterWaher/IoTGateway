@@ -128,6 +128,38 @@ namespace Waher.Networking.XMPP.Contracts
 		public abstract void SetValue(object Value);
 
 		/// <summary>
+		/// Sets the minimum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Minimum value.</param>
+		public void SetMinValue(object Value)
+		{
+			this.SetMinValue(Value, null);
+		}
+
+		/// <summary>
+		/// Sets the minimum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Minimum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public abstract void SetMinValue(object Value, bool? Inclusive);
+
+		/// <summary>
+		/// Sets the maximum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Maximum value.</param>
+		public void SetMaxValue(object Value)
+		{
+			this.SetMaxValue(Value, null);
+		}
+
+		/// <summary>
+		/// Sets the maximum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Maximum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public abstract void SetMaxValue(object Value, bool? Inclusive);
+
+		/// <summary>
 		/// Imports parameter values from its XML definition.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>

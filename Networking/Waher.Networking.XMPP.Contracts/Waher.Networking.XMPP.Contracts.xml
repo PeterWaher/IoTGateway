@@ -92,6 +92,20 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Import(System.Xml.XmlElement)">
             <summary>
             Imports parameter values from its XML definition.
@@ -135,6 +149,20 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ClientSignature">
             <summary>
@@ -2703,6 +2731,20 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.Import(System.Xml.XmlElement)">
             <summary>
             Imports parameter values from its XML definition.
@@ -2729,6 +2771,20 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.Import(System.Xml.XmlElement)">
             <summary>
             Imports parameter values from its XML definition.
@@ -2754,6 +2810,20 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.Import(System.Xml.XmlElement)">
             <summary>
@@ -5269,6 +5339,28 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.ToDecimal(System.Object)">
+            <summary>
+            Converts an object value to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="Value">Object value.</param>
+            <returns><see cref="T:System.Decimal"/> value</returns>
+            <exception cref="T:System.ArgumentException">If the object value cannot be converted to a <see cref="T:System.Decimal"/> value.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.Import(System.Xml.XmlElement)">
             <summary>
             Imports parameter values from its XML definition.
@@ -5338,6 +5430,32 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.SetMinValue(System.Object)">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.SetMaxValue(System.Object)">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Import(System.Xml.XmlElement)">
             <summary>
@@ -5613,6 +5731,20 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.RoleParameter.Import(System.Xml.XmlElement)">
             <summary>
@@ -7255,6 +7387,20 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.Import(System.Xml.XmlElement)">
             <summary>
             Imports parameter values from its XML definition.
@@ -7280,6 +7426,20 @@
             </summary>
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.SetMinValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the minimum value allowed by the parameter.
+            </summary>
+            <param name="Value">Minimum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.SetMaxValue(System.Object,System.Nullable{System.Boolean})">
+            <summary>
+            Sets the maximum value allowed by the parameter.
+            </summary>
+            <param name="Value">Maximum value.</param>
+            <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.Import(System.Xml.XmlElement)">
             <summary>

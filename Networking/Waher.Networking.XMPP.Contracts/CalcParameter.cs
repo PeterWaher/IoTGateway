@@ -110,5 +110,25 @@ namespace Waher.Networking.XMPP.Contracts
 			// Ignore
 		}
 
+		/// <summary>
+		/// Sets the minimum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Minimum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public override void SetMinValue(object Value, bool? Inclusive)
+		{
+			// Ignore
+		}
+
+		/// <summary>
+		/// Sets the maximum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Maximum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public override void SetMaxValue(object Value, bool? Inclusive)
+		{
+			// Ignore
+		}
+
 	}
 }

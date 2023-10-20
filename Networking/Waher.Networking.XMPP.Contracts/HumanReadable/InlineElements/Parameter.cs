@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 
@@ -85,6 +86,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 
 						if (Value is bool BooleanValue)
 							s = BooleanValue ? "[X]" : "[ ]";
+						else if (Value is DateTime TP && TP.TimeOfDay == TimeSpan.Zero)
+							s = TP.ToShortDateString();
 						else
 							s = Value.ToString();
 

@@ -82,32 +82,69 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
+			this.Value = ToDecimal(Value);
+		}
+
+		/// <summary>
+		/// Converts an object value to a <see cref="System.Decimal"/> value.
+		/// </summary>
+		/// <param name="Value">Object value.</param>
+		/// <returns><see cref="System.Decimal"/> value</returns>
+		/// <exception cref="ArgumentException">If the object value cannot be converted to a <see cref="System.Decimal"/> value.</exception>
+		public static decimal ToDecimal(object Value)
+		{
 			if (Value is double d)
-				this.Value = (decimal)d;
+				return (decimal)d;
 			else if (Value is float f)
-				this.Value = (decimal)f;
+				return (decimal)f;
 			else if (Value is decimal dec)
-				this.Value = dec;
+				return dec;
 			else if (Value is int i)
-				this.Value = i;
+				return i;
 			else if (Value is long l)
-				this.Value = l;
+				return l;
 			else if (Value is short s)
-				this.Value = s;
+				return s;
 			else if (Value is sbyte sb)
-				this.Value = sb;
+				return sb;
 			else if (Value is uint ui)
-				this.Value = ui;
+				return ui;
 			else if (Value is ulong ul)
-				this.Value = ul;
+				return ul;
 			else if (Value is ushort us)
-				this.Value = us;
+				return us;
 			else if (Value is byte ub)
-				this.Value = ub;
+				return ub;
 			else if (Value is string str && CommonTypes.TryParse(str, out dec))
-				this.Value = dec;
+				return dec;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
+		}
+
+		/// <summary>
+		/// Sets the minimum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Minimum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public override void SetMinValue(object Value, bool? Inclusive)
+		{
+			this.Min = ToDecimal(Value);
+
+			if (Inclusive.HasValue)
+				this.MinIncluded = Inclusive.Value;
+		}
+
+		/// <summary>
+		/// Sets the maximum value allowed by the parameter.
+		/// </summary>
+		/// <param name="Value">Maximum value.</param>
+		/// <param name="Inclusive">If the value is included in the range. If null, keeps the original value.</param>
+		public override void SetMaxValue(object Value, bool? Inclusive)
+		{
+			this.Max = ToDecimal(Value);
+
+			if (Inclusive.HasValue)
+				this.MaxIncluded = Inclusive.Value;
 		}
 
 		/// <summary>

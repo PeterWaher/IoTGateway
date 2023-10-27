@@ -7,6 +7,8 @@ using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
+using Waher.Events;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Script;
 
@@ -1677,5 +1679,30 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
+		/// <summary>
+		/// Event raised when a parameter value needs to be formatted for display to a human user.
+		/// </summary>
+		public event ParameterValueFormattingEventHandler FormatParameterDisplay;
+
+		internal object FormatParameterValue(string Name, object Value)
+		{
+			ParameterValueFormattingEventHandler h = this.FormatParameterDisplay;
+
+			if (h is null)
+				return Value;
+
+			ParameterValueFormattingEventArgs e = new ParameterValueFormattingEventArgs(Name, Value);
+
+			try
+			{
+				h(this, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			return e.Value;
+		}
 	}
 }

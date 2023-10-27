@@ -60,6 +60,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 				case MarkdownType.ForRendering:
 					object Value = Settings.Contract[this.name];
 
+					if (!(Value is null) && !(Settings.Contract is null))
+						Value = Settings.Contract.FormatParameterValue(this.name, Value);
+
 					if (Value is null)
 					{
 						string Guide = null;

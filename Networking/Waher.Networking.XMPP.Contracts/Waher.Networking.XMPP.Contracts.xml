@@ -504,6 +504,11 @@
             <param name="Role">Role</param>
             <param name="RoleIndex">Role index.</param>
         </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.Contract.FormatParameterDisplay">
+            <summary>
+            Event raised when a parameter value needs to be formatted for display to a human user.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSchemasGetter">
             <summary>
             Getter for well-known contract schemas.
@@ -3641,6 +3646,36 @@
         <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentitiesEventArgs.Identities">
             <summary>
             Network Identities
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.EventArguments.ParameterValueFormattingEventHandler">
+            <summary>
+            Delegate for parameter value formatting event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+            <returns>Formatted value.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.EventArguments.ParameterValueFormattingEventArgs">
+            <summary>
+            Event arguments for parameter value formatting events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.EventArguments.ParameterValueFormattingEventArgs.#ctor(System.String,System.Object)">
+            <summary>
+            Event arguments for parameter value formatting events.
+            </summary>
+            <param name="Name">Name of parameter.</param>
+            <param name="Value">Value of parameter.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.EventArguments.ParameterValueFormattingEventArgs.Name">
+            <summary>
+            Name of parameter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.EventArguments.ParameterValueFormattingEventArgs.Value">
+            <summary>
+            Value of parameter. Can be set by event handler, to format the value before it is being displayed.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.KeyEventHandler">

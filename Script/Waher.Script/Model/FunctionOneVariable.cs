@@ -84,7 +84,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
 		{
-			return Task.FromResult<IElement>(this.Evaluate(Argument, Variables));
+			return Task.FromResult(this.Evaluate(Argument, Variables));
 		}
 
 		/// <summary>

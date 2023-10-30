@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -89,20 +90,25 @@ namespace Waher.Script.Operators.Vectors
 			}
 			else if (Vector.IsScalar)
 			{
-				object Object = Vector.AssociatedObjectValue;
-				if (Object is null)
+				if (Vector is StringValue s)
+					return EvaluateIndex(s, Index, Node);
+				else
 				{
-					if (NullCheck)
-						return Vector;
-					else
-						throw new ScriptRuntimeException("Vector is null.", Node);
+					object Object = Vector.AssociatedObjectValue;
+					if (Object is null)
+					{
+						if (NullCheck)
+							return Vector;
+						else
+							throw new ScriptRuntimeException("Vector is null.", Node);
+					}
+
+					Type T = Object.GetType();
+					if (!TryGetIndexProperty(T, true, false, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
+						throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
+
+					return await EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
 				}
-
-				Type T = Object.GetType();
-				if (!TryGetIndexProperty(T, true, false, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
-					throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
-
-				return await EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
 			}
 			else
 			{
@@ -183,6 +189,24 @@ namespace Waher.Script.Operators.Vectors
 				Elements.AddLast(await EvaluateIndex(Object, T, ItemProperty, Parameters, E, Node));
 
 			return Index.Encapsulate(Elements, Node);
+		}
+
+		private static IElement EvaluateIndex(StringValue s, IElement Index, ScriptNode Node)
+		{
+			if (Index.IsScalar)
+			{
+				int i = (int)Expression.ToDouble(Index.AssociatedObjectValue);
+				return new StringValue(new string(s.Value[i], 1), s.CaseInsensitive);
+			}
+			else
+			{
+				LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+				foreach (IElement E in Index.ChildElements)
+					Elements.AddLast(EvaluateIndex(s, E, Node));
+
+				return Index.Encapsulate(Elements, Node);
+			}
 		}
 
 		/// <summary>

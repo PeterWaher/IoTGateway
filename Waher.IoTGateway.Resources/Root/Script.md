@@ -975,6 +975,7 @@ The following table lists available string-related functions:
 | `Right(s,N)`                      | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
 | `Split(s,Substring)`              | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
 | `StartsWith(s,Substring)`         | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
+| `ToExpression(x)`                 | Returns an expression string (if possible), that if evaluated, returns a value equal to `x`. | `ToExpression(Identity(3))` |
 | `Trim(s)`                         | Returns a trimmed version of `s`. | `Trim(" Hello ")` |
 | `TrimEnd(s)`                      | Returns a version of `s` with its end trimmed. | `TrimEnd(" Hello ")` |
 | `TrimStart(s)`                    | Returns a version of `s` with its start trimmed. | `TrimStart(" Hello ")` |

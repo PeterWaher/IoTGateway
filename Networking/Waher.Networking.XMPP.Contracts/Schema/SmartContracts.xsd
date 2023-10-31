@@ -451,6 +451,16 @@ purposes.
 				<xs:documentation>Optional script expression validating the parameter.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name='transient' type='xs:boolean' use='optional' default='false'>
+			<xs:annotation>
+				<xs:documentation>If parameter is transient or not.</xs:documentation>
+				<xs:documentation>A transient parameter is sent out-of-scope of the signature.</xs:documentation>
+				<xs:documentation>Instead, a GUID is used as a parameter value.</xs:documentation>
+				<xs:documentation>This GUID can be used to peers to validate the signature of the contract.</xs:documentation>
+				<xs:documentation>Transient parameters can be used to protect the privacy or secrecy of certain information, such as credit card information, voting, etc.</xs:documentation>
+				<xs:documentation>Transient parameter values are only available in-transit, and must not be persisted.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name='StringParameter'>

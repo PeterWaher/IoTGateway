@@ -307,6 +307,8 @@ namespace Waher.Content.Markdown
 			object Result;
 			int i, j;
 			bool IsDynamic = false;
+			bool UsesImplicitPrint = false;
+			bool HasImplicitPrint = false;
 
 			if (!string.IsNullOrEmpty(FileName))
 			{
@@ -385,8 +387,14 @@ namespace Waher.Content.Markdown
 						Variables.Add(" MarkdownSettings ", Settings);
 					}
 
-					if (Exp.ContainsImplicitPrint)
+					HasImplicitPrint = Exp.ContainsImplicitPrint;
+					if (!HasImplicitPrint && UsesImplicitPrint && Exp.ReferencesImplicitPrint(Variables))
+						HasImplicitPrint = true;
+
+					if (HasImplicitPrint)
 					{
+						UsesImplicitPrint = true;
+
 						TextWriter Bak = Variables.ConsoleOut;
 						StringBuilder sb = new StringBuilder();
 

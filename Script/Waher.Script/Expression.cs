@@ -4302,6 +4302,59 @@ namespace Waher.Script
 		public bool ContainsImplicitPrint => this.containsImplicitPrint;
 
 		/// <summary>
+		/// If the expression, or any function call references, contain implicit print operations.
+		/// </summary>
+		/// <param name="Variables">Variables containing available function and lambda definitions.</param>
+		/// <returns>If an implicit print operation was found.</returns>
+		public bool ReferencesImplicitPrint(Variables Variables)
+		{
+			if (this.ContainsImplicitPrint)
+				return true;
+
+			Dictionary<string, bool> Processed = null;
+			bool CheckFunctionCalls(ScriptNode Node, out ScriptNode NewNode, object State)
+			{
+				NewNode = null;
+
+				if (Node is NamedFunctionCall f)
+				{
+					Expression Exp;
+
+					if (Variables.TryGetVariable(f.FunctionName + " " + f.Arguments.Length.ToString(), out Variable v) &&
+						v.ValueObject is ScriptNode N)
+					{
+						Exp = N.Expression;
+					}
+					else if (Variables.TryGetVariable(f.FunctionName, out v) &&
+						v.ValueObject is ScriptNode N2)
+					{
+						Exp = N2.Expression;
+					}
+					else
+						return true;
+
+					if (Processed is null)
+						Processed = new Dictionary<string, bool>() { { this.script, true } };
+
+					if (Processed.ContainsKey(Exp.script))
+						return true;
+
+					Processed[Exp.script] = true;
+
+					if (Exp.ContainsImplicitPrint || !Exp.ForAll(CheckFunctionCalls, null, SearchMethod.TreeOrder))
+						return false;
+				}
+
+				return true;
+			};
+
+			if (!this.ForAll(CheckFunctionCalls, null, SearchMethod.TreeOrder))
+				return true;
+
+			return false;
+		}
+
+		/// <summary>
 		/// Transforms a string by executing embedded script.
 		/// </summary>
 		/// <param name="s">String to transform.</param>

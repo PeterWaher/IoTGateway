@@ -2481,6 +2481,13 @@
             If the expression contains implicit print operations.
             </summary>
         </member>
+        <member name="M:Waher.Script.Expression.ReferencesImplicitPrint(Waher.Script.Variables)">
+            <summary>
+            If the expression, or any function call references, contain implicit print operations.
+            </summary>
+            <param name="Variables">Variables containing available function and lambda definitions.</param>
+            <returns>If an implicit print operation was found.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.Transform(System.String,System.String,System.String,Waher.Script.Variables)">
             <summary>
             Transforms a string by executing embedded script.

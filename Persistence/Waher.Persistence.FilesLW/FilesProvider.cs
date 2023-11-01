@@ -2631,6 +2631,9 @@ namespace Waher.Persistence.Files
 			if (Object is null)
 				return null;
 
+			if (Object is GenericObject GenObj)
+				return GenObj; 
+
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
 			string CollectionName = await Serializer.CollectionName(Object);
 			BinarySerializer Output = new BinarySerializer(CollectionName, Encoding.UTF8);
@@ -2645,8 +2648,8 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Input = new BinaryDeserializer(CollectionName, Encoding.UTF8, Bin, 0);
 			object Result = await Serializer.Deserialize(Input, null, false);
 
-			if (Result is GenericObject GenObj)
-				return GenObj;
+			if (Result is GenericObject GenObj2)
+				return GenObj2;
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
 		}

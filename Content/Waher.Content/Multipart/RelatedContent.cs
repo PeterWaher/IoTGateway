@@ -5,7 +5,7 @@
 	/// </summary>
 	public class RelatedContent : MultipartContent
 	{
-		private string type;
+		private readonly string type;
 
 		/// <summary>
 		/// Represents related content, encoded with multipart/related

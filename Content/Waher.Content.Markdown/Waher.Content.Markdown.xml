@@ -4,6 +4,38 @@
         <name>Waher.Content.Markdown</name>
     </assembly>
     <members>
+        <member name="T:Waher.Content.Markdown.Functions.CssContent">
+            <summary>
+            Encapsulates css content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.CssContent.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Encapsulates css content.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.CssContent.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.CssContent.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.CssContent.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.FromMarkdown">
             <summary>
             Converts markdown to an element.
@@ -114,6 +146,38 @@
             </summary>
             <param name="FileName">File name</param>
             <returns>If script file needs to be executed.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Functions.JavascriptContent">
+            <summary>
+            Encapsulates javascript content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.JavascriptContent.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Encapsulates javascript content.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.JavascriptContent.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.JavascriptContent.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.JavascriptContent.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Functions.LoadMarkdown">
             <summary>

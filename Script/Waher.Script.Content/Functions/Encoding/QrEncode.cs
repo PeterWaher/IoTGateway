@@ -1,5 +1,7 @@
 ﻿using SkiaSharp;
+using System;
 using Waher.Content.QR;
+using Waher.Content.QR.Encoding;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
@@ -88,10 +90,30 @@ namespace Waher.Script.Content.Functions.Encoding
 			else
 				Height = (int)(Expression.ToDouble(Arguments[3].AssociatedObjectValue) + 0.5);
 
-			byte[] Rgba = encoder.GenerateMatrix(Level, Text).ToRGBA(Width, Height);
+			QrMatrix M = encoder.GenerateMatrix(Level, Text);
+			byte[] Rgba;
+
+			EventHandler<ColorFunctionEventArgs> h = CustomColorFunction;
+			if (h is null)
+				Rgba = M.ToRGBA(Width, Height);
+			else
+			{
+				ColorFunctionEventArgs e = new ColorFunctionEventArgs(Text);
+				h(this, e);
+
+				if (e.Function is null)
+					Rgba = M.ToRGBA(Width, Height);
+				else
+					Rgba = M.ToRGBA(Width, Height, e.Function, e.AntiAlias);
+			}
 
 			return new GraphBitmap(PixelInformation.FromRaw(SKColorType.Rgba8888, Rgba, Width, Height, Width << 2));
 		}
+
+		/// <summary>
+		/// Event raised to determine if a custom color function is to be applied.
+		/// </summary>
+		public static event EventHandler<ColorFunctionEventArgs> CustomColorFunction;
 
 	}
 }

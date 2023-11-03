@@ -92,7 +92,7 @@ Machine-Readable Information
 -------------------------------
 
 ```base64xml
-{{Base64Encode(Utf8Encode(PrettyXml(Page.Contract.ForMachines)))}}
+((Base64Encode(Utf8Encode(PrettyXml(Page.Contract.ForMachines) ) ) ))
 ```
 
 	[[;

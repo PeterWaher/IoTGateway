@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
-using System.Threading.Tasks;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -99,13 +99,17 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					ParentURL = NewUri.ToString();
 			}
 
-			FileName = Item.Document.Settings.GetFileName(Item.Document.FileName, FileName);
+            MarkdownDocument Document = Item.Document;
+			MarkdownSettings Settings = Document.Settings;
+
+			FileName = Settings.GetFileName(Document.FileName, FileName);
 
 			if (!string.IsNullOrEmpty(Query))
 			{
-				Variables Variables = Item.Document.Settings.Variables;
+				Variables Variables = Settings.Variables;
+				string Name;
 				string Value;
-				
+
 				if (!(Variables is null))
 				{
 					foreach (string Part in Query.Split('&'))
@@ -115,24 +119,25 @@ namespace Waher.Content.Markdown.Model.Multimedia
 							Variables[Part] = string.Empty;
 						else
 						{
-							Value = Part.Substring(i + 1);
+							Name = System.Net.WebUtility.UrlDecode(Part.Substring(0, i));
+							Value = System.Net.WebUtility.UrlDecode(Part.Substring(i + 1));
 
 							if (CommonTypes.TryParse(Value, out double d))
-								Variables[Part.Substring(0, i)] = d;
+								Variables[Name] = d;
 							else if (bool.TryParse(Value, out bool b))
-								Variables[Part.Substring(0, i)] = b;
+								Variables[Name] = b;
 							else
-								Variables[Part.Substring(0, i)] = Value;
+								Variables[Name] = Value;
 						}
 					}
 				}
 			}
 
 			string MarkdownText = await Resources.ReadAllTextAsync(FileName);
-            MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL);
-            Markdown.Master = Item.Document;
+            MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Settings, FileName, string.Empty, ParentURL);
+            Markdown.Master = Document;
 
-            MarkdownDocument Loop = Item.Document;
+            MarkdownDocument Loop = Document;
 
 			while (!(Loop is null))
             {

@@ -923,7 +923,11 @@ input[type="checkbox"] + label:before
     margin-right: 1em;
     position: absolute;
     left: 0;
+    vertical-align:center;
+    top: 1px;
     bottom: 1px;
+    margin-top: auto;
+    margin-bottom: auto;
 
     border-radius: 0.15em;
     font-size: 1.75em;
@@ -974,7 +978,11 @@ input[type="radio"] + label:before
     margin-right: 1em;
     position: absolute;
     left: 0;
+    vertical-align:center;
+    top: 1px;
     bottom: 1px;
+    margin-top: auto;
+    margin-bottom: auto;
 
     border-radius: 1em;
     font-size: 1.75em;

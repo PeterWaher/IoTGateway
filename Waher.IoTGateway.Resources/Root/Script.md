@@ -2178,10 +2178,10 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `ParseMarkdown(MD)`                | Parses the markdown provided in the string `MD`, and returns it as `MarkdownDocument` object. | [Example][ParseMarkdownExample] |
 | `PreprocessMarkdown(MD)`           | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 | `ScriptFile(FileName)`             | Evaluates the script in the file defined by `FileName`. | [Example][ScriptFileExample] |
+| `TextUnit(Nr,Sing,Plur)`           | Selects the singular (`Sing`) or plural (`Plur`) form of a unit to be used in text, based on the associated number (`Nr`). | [Example][ScriptTextUnitExample] |
 | `ToMarkdown(Obj)`                  | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
 
-The following 
-context-specific constants (read-only variables) are available in inline script:
+The following context-specific constants (read-only variables) are available in inline script:
 
 | Variable        | Description                                                           |
 |:---------------:|-----------------------------------------------------------------------|
@@ -2202,6 +2202,7 @@ context-specific constants (read-only variables) are available in inline script:
 [ToMarkdownExample]: Prompt.md?Expression=ToMarkdown((x:=-10..10;y:=sin(x);plot2dcurve(x,y)))
 [ScriptFileExample]: Prompt.md?Expression=ScriptFile(%22Example.script%22)
 [InitScriptFileExample]: Prompt.md?Expression=InitScriptFile(%22InitExample.script%22)
+[ScriptTextUnitExample]: Prompt.md?Expression=TextUnit(NrDays,"day","days")
 
 #### Semantic-web-related functions (Waher.Content.Semantic)
 

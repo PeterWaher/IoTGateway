@@ -43,6 +43,7 @@ https://waher.se/Markdown.md</Description>
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

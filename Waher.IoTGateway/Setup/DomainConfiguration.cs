@@ -446,17 +446,28 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 			}
 
+			if (DomainName.ToLower() == "localhost")
+				throw new BadRequestException("localhost is not a valid domain name.");
+
 			List<string> AlternativeNames = new List<string>();
 			int Index = 0;
 
 			while (Parameters.TryGetValue("altDomainName" + Index.ToString(), out Obj) && Obj is string AltDomainName && !string.IsNullOrEmpty(AltDomainName))
 			{
+				if (AltDomainName.ToLower() == "localhost")
+					throw new BadRequestException("localhost is not a valid domain name.");
+
 				AlternativeNames.Add(AltDomainName);
 				Index++;
 			}
 
 			if (Parameters.TryGetValue("altDomainName", out Obj) && Obj is string AltDomainName2 && !string.IsNullOrEmpty(AltDomainName2))
+			{
+				if (AltDomainName2.ToLower() == "localhost")
+					throw new BadRequestException("localhost is not a valid domain name.");
+
 				AlternativeNames.Add(AltDomainName2);
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))

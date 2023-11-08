@@ -50,7 +50,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Argument2">Function argument 2.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument1, IElement Argument2, Variables Variables)
+		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			if (!(Argument1.AssociatedObjectValue is Type Type) || !delegateTypeInfo.IsAssignableFrom(Type.GetTypeInfo()))
 				throw new ScriptRuntimeException("Expected a delegate type in the first argument.", this);
@@ -312,6 +312,18 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			IScriptProxy Proxy = (IScriptProxy)Activator.CreateInstance(ScriptProxyType, Lambda, Variables);
 
 			return new ObjectValue(Proxy.GetCallbackFunctionUntyped());
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument1, Argument2, Variables));
 		}
 
 		private static readonly TypeInfo delegateTypeInfo = typeof(Delegate).GetTypeInfo();

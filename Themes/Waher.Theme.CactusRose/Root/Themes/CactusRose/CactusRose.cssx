@@ -1097,6 +1097,11 @@ fieldset > legend
 	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
 }
 
+.disabledButton
+{
+	background-color:¤Blend(TextColor,BackgroundColor,0.75)¤;
+}
+
 .error 
 {
 	color:¤Theme.NegColor¤;

@@ -64,11 +64,30 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			{
 				if (!scriptProxyTypes.TryGetValue(Type, out ScriptProxyType))
 				{
+					Type ReturnType = null;
+					ParameterInfo[] Parameters = null;
+
+					foreach (MethodInfo MI in Type.GetRuntimeMethods())
+					{
+						if (MI.Name == "Invoke")
+						{
+							ReturnType = MI.ReturnType;
+							Parameters = MI.GetParameters();
+							break;
+						}
+					}
+
+					if (ReturnType is null || Parameters is null)
+						throw new ScriptRuntimeException("Delegate type lacks an Invoke method.", this);
+
+					bool IsAsync = taskTypeInfo.IsAssignableFrom(ReturnType.GetTypeInfo());
 					string TypeName = Type.Name.Replace("`", "_GT_");
 					StringBuilder CSharp = new StringBuilder();
 
 					CSharp.AppendLine("using System;");
+					CSharp.AppendLine("using Waher.Script;");
 					CSharp.AppendLine("using Waher.Script.Data.Functions;");
+					CSharp.AppendLine("using Waher.Script.Model;");
 					CSharp.AppendLine();
 					CSharp.Append("namespace ");
 					CSharp.Append(Type.Namespace);
@@ -80,7 +99,96 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					CSharp.Append(Type.FullName);
 					CSharp.AppendLine(">");
 					CSharp.AppendLine("\t{");
+					CSharp.Append("\t\tpublic ScriptProxy");
+					CSharp.Append(TypeName);
+					CSharp.AppendLine("(ILambdaExpression Lambda, Variables Variables)");
+					CSharp.AppendLine("\t\t\t: base(Lambda, Variables)");
+					CSharp.AppendLine("\t\t{");
+					CSharp.AppendLine("\t\t}");
+					CSharp.AppendLine();
+					CSharp.Append("\t\tpublic override ");
+					CSharp.Append(Type.FullName);
+					CSharp.AppendLine(" GetCallbackFunction()");
+					CSharp.AppendLine("\t\t{");
+					CSharp.AppendLine("\t\t\treturn this.CallLambda;");
+					CSharp.AppendLine("\t\t}");
+					CSharp.AppendLine();
+					CSharp.Append("\t\tprivate ");
 
+					if (ReturnType == typeof(void))
+						CSharp.Append("void");
+					else
+					{
+						if (IsAsync)
+							CSharp.Append("async Task<");
+
+						AppendType(ReturnType, CSharp);
+
+						if (IsAsync)
+							CSharp.Append('>');
+					}
+
+					CSharp.Append(" CallLambda(");
+
+					bool First = true;
+
+					foreach (ParameterInfo Parameter in Parameters)
+					{
+						if (First)
+							First = false;
+						else
+							CSharp.Append(", ");
+
+						AppendType(Parameter.ParameterType, CSharp);
+						CSharp.Append(' ');
+						CSharp.Append(Parameter.Name);
+					}
+
+					CSharp.AppendLine(")");
+					CSharp.AppendLine("\t\t{");
+
+					if (IsAsync)
+						CSharp.Append("\t\t\tIElement Result = await this.Lambda.EvaluateAsync(");
+					else
+						CSharp.Append("\t\t\tIElement Result = this.Lambda.Evaluate(");
+
+					if (Parameters.Length == 0)
+						CSharp.Append("new IElement[0]");
+					else
+					{
+						CSharp.AppendLine("new IElement[]");
+						CSharp.AppendLine("\t\t\t{");
+
+						First = true;
+
+						foreach (ParameterInfo Parameter in Parameters)
+						{
+							if (First)
+								First = false;
+							else
+								CSharp.AppendLine(",");
+
+							CSharp.Append("\t\t\t\tExpression.Encapsulate(");
+							CSharp.Append(Parameter.Name);
+							CSharp.Append(')');
+						}
+
+						CSharp.AppendLine();
+						CSharp.Append("\t\t\t}");
+					}
+
+					CSharp.AppendLine(", this.Variables);");
+					CSharp.AppendLine();
+					if (ReturnType == typeof(IElement))
+						CSharp.AppendLine("\t\t\treturn Result;");
+					else
+					{
+						CSharp.Append("\t\t\treturn (");
+						AppendType(ReturnType, CSharp);
+						CSharp.AppendLine(")Result.AssociatedObjectValue;");
+					}
+
+					CSharp.AppendLine("\t\t}");
 					CSharp.AppendLine("\t}");
 					CSharp.AppendLine("}");
 
@@ -89,7 +197,6 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
 					{
 						{ GetLocation(typeof(object)), true },
-						{ GetLocation(Type), true },
 						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
 						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
 						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
@@ -97,8 +204,11 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
 						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
 						{ GetLocation(typeof(Types)), true },
-						{ GetLocation(typeof(Expression)), true }
+						{ GetLocation(typeof(Expression)), true },
+						{ GetLocation(typeof(Callback)), true }
 					};
+
+					Dependencies[GetLocation(Type)] = true;
 
 					TypeInfo LoopInfo;
 					Type Loop = Type;
@@ -199,12 +309,13 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				}
 			}
 
-			IScriptProxy Proxy = (IScriptProxy)Activator.CreateInstance(ScriptProxyType, Lambda);
+			IScriptProxy Proxy = (IScriptProxy)Activator.CreateInstance(ScriptProxyType, Lambda, Variables);
 
 			return new ObjectValue(Proxy.GetCallbackFunctionUntyped());
 		}
 
 		private static readonly TypeInfo delegateTypeInfo = typeof(Delegate).GetTypeInfo();
+		private static readonly TypeInfo taskTypeInfo = typeof(Task).GetTypeInfo();
 		private static readonly Dictionary<Type, Type> scriptProxyTypes = new Dictionary<Type, Type>();
 
 		private static string GetLocation(Type T)

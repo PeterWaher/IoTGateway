@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
+using SkiaSharp;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -11,12 +11,11 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using SkiaSharp;
 using Waher.Content.Markdown;
 using Waher.Events;
-using Waher.Runtime.Inventory;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Inventory.Loader;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
@@ -62,58 +61,7 @@ namespace Waher.Script.Lab
 			try
 			{
 				string Folder = Path.GetDirectoryName(typeof(App).GetTypeInfo().Assembly.Location);
-				string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
-				Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-				Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
-
-				foreach (string DllFile in DllFiles)
-				{
-					try
-					{
-						Assembly A = Assembly.LoadFile(DllFile);
-						LoadedAssemblies[A.GetName().FullName] = A;
-
-						foreach (AssemblyName AN in A.GetReferencedAssemblies())
-							ReferencedAssemblies[AN.FullName] = AN;
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
-
-				do
-				{
-					AssemblyName[] References = new AssemblyName[ReferencedAssemblies.Count];
-					ReferencedAssemblies.Values.CopyTo(References, 0);
-					ReferencedAssemblies.Clear();
-
-					foreach (AssemblyName AN in References)
-					{
-						if (LoadedAssemblies.ContainsKey(AN.FullName))
-							continue;
-
-						try
-						{
-							Assembly A = Assembly.Load(AN);
-							LoadedAssemblies[A.GetName().FullName] = A;
-
-							foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-								ReferencedAssemblies[AN2.FullName] = AN2;
-						}
-						catch (Exception)
-						{
-							Log.Error("Unable to load assembly " + AN.ToString() + ".");
-						}
-					}
-				}
-				while (ReferencedAssemblies.Count > 0);
-
-				Assembly[] Assemblies = new Assembly[LoadedAssemblies.Count];
-				LoadedAssemblies.Values.CopyTo(Assemblies, 0);
-
-				Types.Initialize(Assemblies);
-
+				TypesLoader.Initialize(Folder);
 
 				appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScriptLab");
 

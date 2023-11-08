@@ -13,6 +13,11 @@ namespace Waher.Script.Data.Functions
 		ILambdaExpression Lambda { get; }
 
 		/// <summary>
+		/// Variables collection.
+		/// </summary>
+		Variables Variables { get; }
+
+		/// <summary>
 		/// Untyped callback function.
 		/// </summary>
 		/// <returns>Callback function.</returns>

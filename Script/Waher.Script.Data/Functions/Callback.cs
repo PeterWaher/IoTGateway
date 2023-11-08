@@ -120,12 +120,9 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					else
 					{
 						if (IsAsync)
-							CSharp.Append("async Task<");
+							CSharp.Append("async ");
 
 						AppendType(ReturnType, CSharp);
-
-						if (IsAsync)
-							CSharp.Append('>');
 					}
 
 					CSharp.Append(" CallLambda(");

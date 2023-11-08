@@ -1724,6 +1724,7 @@ You can also use the `LambdaVariation` to create your custom variations.
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Callback(DelegateType,Lambda)                       | Creates a callback function based on a script-based lambda-expression. The lambda expression must have the same number of arguments as defined by the delegate type. | `Callback(DelegateType,Lambda)` |
 | `ConnectMsSql(ConnectionString[,UserName,Password])` | Connects to an external Microsoft SQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectMsSql(cs,UserName,Password)` |
 | `ConnectMsSql(Host,Database[,UserName,Password])`    | Connects to an external Microsoft SQL Server database `Database` hosted by a machine reachable on `Host`, providing optional credentials. If no credentials are provided, Integrated Security is used. | `db:=ConnectMsSql("Host","Database",UserName,Password)` |
 | `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database using a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |

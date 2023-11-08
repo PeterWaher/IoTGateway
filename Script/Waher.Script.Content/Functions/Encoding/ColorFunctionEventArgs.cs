@@ -17,6 +17,9 @@ namespace Waher.Script.Content.Functions.Encoding
 			this.Text = Text;
 		}
 
+		/// <summary>
+		/// Contents of QR-code.
+		/// </summary>
 		public string Text { get; private set; }
 
 		/// <summary>

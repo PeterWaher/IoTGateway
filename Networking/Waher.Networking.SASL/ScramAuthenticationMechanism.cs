@@ -239,20 +239,32 @@ namespace Waher.Networking.SASL
 		/// </summary>
 		public override async Task Initialize()
 		{
-			saltBase64 = await RuntimeSettings.GetAsync("XMPP.SCRAM.Server.Salt", string.Empty);
-			if (!string.IsNullOrEmpty(saltBase64))
-				salt = Convert.FromBase64String(saltBase64);
-			else
+			saltBase64 = await GetSaltBase64("XMPP.SCRAM.Server.Salt");
+			salt = Convert.FromBase64String(saltBase64);
+		}
+
+		/// <summary>
+		/// Gets a salt value, given a key.
+		/// </summary>
+		/// <param name="Key">Salt key.</param>
+		/// <returns>Base64-encoded salt value.§</returns>
+		public static async Task<string> GetSaltBase64(string Key)
+		{
+			string Result = await RuntimeSettings.GetAsync(Key, string.Empty);
+			if (string.IsNullOrEmpty(Result))
 			{
+				byte[] Bin = new byte[32];
+
 				using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
 				{
-					salt = new byte[32];
-					Rnd.GetBytes(salt);
+					Rnd.GetBytes(Bin);
 				}
 
-				saltBase64 = Convert.ToBase64String(salt);
-				await RuntimeSettings.SetAsync("XMPP.SCRAM.Server.Salt", saltBase64);
+				Result = Convert.ToBase64String(Bin);
+				await RuntimeSettings.SetAsync(Key, Result);
 			}
+
+			return Result;
 		}
 
 		/// <summary>

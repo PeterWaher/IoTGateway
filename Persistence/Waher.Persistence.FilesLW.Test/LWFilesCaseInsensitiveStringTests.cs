@@ -19,9 +19,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S == "hello");
 			Assert.IsTrue(S == "Hello");
 			Assert.IsTrue(S == "HELLO");
-			Assert.AreEqual(S, "hello");
-			Assert.AreEqual(S, "Hello");
-			Assert.AreEqual(S, "HELLO");
+			Assert.AreEqual<object>(S, "hello");
+			Assert.AreEqual<object>(S, "Hello");
+			Assert.AreEqual<object>(S, "HELLO");
 		}
 
 		[TestMethod]

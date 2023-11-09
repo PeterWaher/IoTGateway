@@ -262,6 +262,31 @@ namespace Waher.Script.Operators.Membership
 					return Expression.Encapsulate(await WaitPossibleTask(Field.GetValue(Instance)));
 			}
 
+			EventInfo Event = T.GetRuntimeEvent(Name);
+			if (!(Event is null))
+				return Expression.Encapsulate(Event);
+
+			List<MethodLambda> Methods = null;
+
+			foreach (MethodInfo MI in T.GetRuntimeMethods())
+			{
+				if (!MI.IsAbstract && MI.IsPublic && MI.Name == Name)
+				{
+					if (Methods is null)
+						Methods = new List<MethodLambda>();
+
+					Methods.Add(new MethodLambda(Instance, MI));
+				}
+			}
+
+			if (!(Methods is null))
+			{
+				if (Methods.Count == 1)
+					return Expression.Encapsulate(Methods[0]);
+				else
+					return Expression.Encapsulate(Methods.ToArray());
+			}
+
 			if (VectorIndex.TryGetIndexProperty(T, true, false, out Property, out _))
 				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, new string[] { Name })));
 

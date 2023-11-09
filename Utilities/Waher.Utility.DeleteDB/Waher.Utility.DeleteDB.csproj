@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <StartupObject>Waher.Utility.DeleteDB.Program</StartupObject>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>

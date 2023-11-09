@@ -109,12 +109,12 @@ You can install it by using the following [IoT Gateway Setup application](Execut
 | **Waher.IoTClient.Win32**       | Wix           | [Installer](Executables/Waher.IoTClient.Win32.msi?raw=true)                            | The [Waher.IoTClient.Win32](Waher.IoTClient.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Client. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
 | **Waher.IoTGateway**            | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.IoTGateway/)                              | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 | **Waher.IoTGateway.App**        | UWP           | [App Bundle Package](Executables/Waher.IoTGateway.App_x86_x64_arm.appxbundle?raw=true) | The [Waher.IoTGateway.App](Waher.IoTGateway.App) project is a Universal Windows Platform application version of the IoT Gateway. It can be installed on IoT devices running Windows 10 IoT. |
-| **Waher.IoTGateway.Build**      | .NET Core 3.1 |                                                                                        | The [Waher.IoTGateway.Build](Waher.IoTGateway.Build) project contains MSBuild script for building setup files. Can be used in an auto-build environment. |
-| **Waher.IoTGateway.Console**    | .NET Core 3.1 | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
+| **Waher.IoTGateway.Build**      | .NET 6.0      |                                                                                        | The [Waher.IoTGateway.Build](Waher.IoTGateway.Build) project contains MSBuild script for building setup files. Can be used in an auto-build environment. |
+| **Waher.IoTGateway.Console**    | .NET 6.0      | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
 | **Waher.IoTGateway.Installers** | .NET 4.6.2    |                                                                                        | The [Waher.IoTGateway.Installers](Waher.IoTGateway.Installers) project defines custom actions used by the setup application to install the IoT Gateway and dependencies propertly. |
 | **Waher.IoTGateway.Resources**  | .NET Std 1.0  |                                                                                        | The [Waher.IoTGateway.Resources](Waher.IoTGateway.Resources) project contains resource files that are common to all IoT Gateway embodiments. |
 | **Waher.IoTGateway.Setup**      | Wix           | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Gateway, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
-| **Waher.IoTGateway.Svc**        | .NET Core 3.1 | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
+| **Waher.IoTGateway.Svc**        | .NET 6.0      | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
 | **Waher.IoTGateway.Win32**      | Wix           | [Installer](Executables/Waher.IoTGateway.Win32.msi?raw=true)                           | The [Waher.IoTGateway.Win32](Waher.IoTGateway.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Gateway. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
 
 Clients
@@ -159,15 +159,15 @@ corresponding Internet Content Type encodings and decodings.
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type          | Project description |
-|------------------------------------|---------------|---------------------|
-| **Waher.Content.Asn1.Test**        | .NET Core 3.1 | The [Waher.Content.Asn1.Test](Content/Waher.Content.Asn1.Test) project contains unit tests for the **Waher.Content.Asn1** project. |
-| **Waher.Content.Html.Test**        | .NET Core 3.1 | The [Waher.Content.Html.Test](Content/Waher.Content.Html.Test) project contains unit tests for the **Waher.Content.Html** project. |
-| **Waher.Content.Images.Test**      | .NET Core 3.1 | The [Waher.Content.Images.Test](Content/Waher.Content.Images.Test) project contains unit tests for the **Waher.Content.Images** project. |
-| **Waher.Content.Markdown.Test**    | .NET Core 3.1 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
-| **Waher.Content.QR.Test**          | .NET Core 3.1 | The [Waher.Content.QR.Test](Content/Waher.Content.QR.Test) project contains unit tests for the **Waher.Content.QR** project. |
-| **Waher.Content.Semantic.Test**    | .NET 6.0      | The [Waher.Content.Semantic.Test](Content/Waher.Content.Semantic.Test) project contains unit tests for the **Waher.Content.Semantic** project. |
-| **Waher.Content.Test**             | .NET Core 3.1 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
+| Project                            | Type     | Project description |
+|------------------------------------|----------|---------------------|
+| **Waher.Content.Asn1.Test**        | .NET 6.0 | The [Waher.Content.Asn1.Test](Content/Waher.Content.Asn1.Test) project contains unit tests for the **Waher.Content.Asn1** project. |
+| **Waher.Content.Html.Test**        | .NET 6.0 | The [Waher.Content.Html.Test](Content/Waher.Content.Html.Test) project contains unit tests for the **Waher.Content.Html** project. |
+| **Waher.Content.Images.Test**      | .NET 6.0 | The [Waher.Content.Images.Test](Content/Waher.Content.Images.Test) project contains unit tests for the **Waher.Content.Images** project. |
+| **Waher.Content.Markdown.Test**    | .NET 6.0 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.QR.Test**          | .NET 6.0 | The [Waher.Content.QR.Test](Content/Waher.Content.QR.Test) project contains unit tests for the **Waher.Content.QR** project. |
+| **Waher.Content.Semantic.Test**    | .NET 6.0 | The [Waher.Content.Semantic.Test](Content/Waher.Content.Semantic.Test) project contains unit tests for the **Waher.Content.Semantic** project. |
+| **Waher.Content.Test**             | .NET 6.0 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 
 
 Events
@@ -210,9 +210,9 @@ The [Layout](Layout) folder contains libraries for laying out objects visually.
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type          | Project description |
-|------------------------------------|---------------|---------------------|
-| **Waher.Layout.Layout2D.Test**     | .NET Core 3.1 | The [Waher.Layout.Layout2D.Test](Layout/Waher.Layout.Layout2D.Test) project contains unit tests for the **Waher.Layout.Layout2D** project. |
+| Project                            | Type     | Project description |
+|------------------------------------|----------|---------------------|
+| **Waher.Layout.Layout2D.Test**     | .NET 6.0 | The [Waher.Layout.Layout2D.Test](Layout/Waher.Layout.Layout2D.Test) project contains unit tests for the **Waher.Layout.Layout2D** project. |
 
 Mocks
 ----------------------
@@ -238,7 +238,7 @@ The [Networking](Networking) folder contains libraries that manage different asp
 |------------------------------------------------|---------------|------------------------------------------------------------------------------------|---------------------|
 | **Waher.Networking**                           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Networking/)                          | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries. This includes sniffers, etc., as well as classes for building client and server applications. |
 | **Waher.Networking.Cluster**                   | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Networking.Cluster/)                  | The [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) project provides a framework for building applications that can cooperate and solve problems in clusters. Communication between endpoints in clusters is performed using AES-256 encrypted datagrams over a predefined UDP Multicast channel. Only participants with access to the shared key can participate in the cluster. Supports Unacknowledged, Acknowledged and Assured Message transfers in clusters, as well as Request/Response command executions, Locking of singleton resources, serialization of objects, etc. |
-| **Waher.Networking.Cluster.ConsoleSandbox**    | .NET Core 3.1 |                                                                                    | The [Waher.Networking.Cluster.ConsoleSandbox](Networking/Waher.Networking.Cluster.ConsoleSandbox) project provides a simple console application that allows you to interactively test the cluster protocol in the network. |
+| **Waher.Networking.Cluster.ConsoleSandbox**    | .NET 6.0      |                                                                                    | The [Waher.Networking.Cluster.ConsoleSandbox](Networking/Waher.Networking.Cluster.ConsoleSandbox) project provides a simple console application that allows you to interactively test the cluster protocol in the network. |
 | **Waher.Networking.CoAP**                      | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP/)                     | The [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) project provides a simple CoAP endpoint client with DTLS support. |
 | **Waher.Networking.CoAP.UWP**                  | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP.UWP/)                 | The [Waher.Networking.CoAP.UWP](Networking/Waher.Networking.CoAP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.CoAP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.DNS**                       | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Networking.DNS/)                      | The [Waher.Networking.DNS](Networking/Waher.Networking.DNS) project provides a class library for resolving DNS host, mailbox and service names on the network. It also supports reverse address lookups, International Domain Names (IDN), DNS Black Lists (DNSBL), text records, and maintains a local Resource Record cache. |
@@ -296,14 +296,14 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
-| **Waher.Networking.Cluster.Test**  | .NET Core 3.1 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
-| **Waher.Networking.CoAP.Test**     | .NET Core 3.1 | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
-| **Waher.Networking.DNS.Test**      | .NET Core 3.1 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
-| **Waher.Networking.HTTP.Test**     | .NET Core 3.1 | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
-| **Waher.Networking.Modbus.Test**   | .NET Core 3.1 | The [Waher.Networking.Modbus.Test](Networking/Waher.Networking.Modbus.Test) project contains unit-tests for the [Waher.Networking.Modbus](Networking/Waher.Networking.Modbus) library. |
-| **Waher.Networking.MQTT.Test**     | .NET Core 3.1 | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
-| **Waher.Networking.WHOIS.Test**    | .NET Code 3.1 | The [Waher.Networking.WHOIS.Test](Networking/Waher.Networking.WHOIS.Test) project contains unit-tests for the [Waher.Networking.WHOIS](Networking/Waher.Networking.WHOIS) library. |
-| **Waher.Networking.XMPP.Test**     | .NET Core 3.1 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
+| **Waher.Networking.Cluster.Test**  | .NET 6.0 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
+| **Waher.Networking.CoAP.Test**     | .NET 6.0 | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
+| **Waher.Networking.DNS.Test**      | .NET 6.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
+| **Waher.Networking.HTTP.Test**     | .NET 6.0 | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
+| **Waher.Networking.Modbus.Test**   | .NET 6.0 | The [Waher.Networking.Modbus.Test](Networking/Waher.Networking.Modbus.Test) project contains unit-tests for the [Waher.Networking.Modbus](Networking/Waher.Networking.Modbus) library. |
+| **Waher.Networking.MQTT.Test**     | .NET 6.0 | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
+| **Waher.Networking.WHOIS.Test**    | .NET 6.0 | The [Waher.Networking.WHOIS.Test](Networking/Waher.Networking.WHOIS.Test) project contains unit-tests for the [Waher.Networking.WHOIS](Networking/Waher.Networking.WHOIS) library. |
+| **Waher.Networking.XMPP.Test**     | .NET 6.0 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 Persistence
 ----------------------
@@ -324,12 +324,12 @@ their annotated class definitions.
 
 The folder also contains the following unit test projects:
 
-| Project                                   | Type          | Project description |
-|-------------------------------------------|---------------|---------------------|
-| **Waher.Persistence.Files.Test**          | .NET Core 3.1 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
-| **Waher.Persistence.FilesLW.Test**        | .NET Core 3.1 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
-| **Waher.Persistence.FullTextSearch.Test** | .NET 6.0      | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
-| **Waher.Persistence.MongoDB.Test**        | .NET Core 3.1 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| Project                                   | Type     | Project description |
+|-------------------------------------------|----------|---------------------|
+| **Waher.Persistence.Files.Test**          | .NET 6.0 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
+| **Waher.Persistence.FilesLW.Test**        | .NET 6.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
+| **Waher.Persistence.FullTextSearch.Test** | .NET 6.0 | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
+| **Waher.Persistence.MongoDB.Test**        | .NET 6.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 
 Runtime
 ----------------------
@@ -356,14 +356,14 @@ language localization, runtime settings, timing and scheduling.
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type          | Project description |
-|------------------------------------|---------------|---------------------|
-| **Waher.Runtime.Inventory.Test**   | .NET Core 3.1 | The [Waher.Runtime.Inventory.Test](Runtime/Waher.Runtime.Inventory.Test) project contains unit tests for the [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project. |
-| **Waher.Runtime.Language.Test**    | .NET Core 3.1 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
-| **Waher.Runtime.Profiling.Test**   | .NET Core 3.1 | The [Waher.Runtime.Profiling.Test](Runtime/Waher.Runtime.Profiling.Test) project contains unit tests for the [Waher.Runtime.Profiling](Runtime/Waher.Runtime.Profiling) project. |
-| **Waher.Runtime.Settings.Test**    | .NET Core 3.1 | The [Waher.Runtime.Settings.Test](Runtime/Waher.Runtime.Settings.Test) project contains unit tests for the [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project. |
-| **Waher.Runtime.Text.Test**        | .NET Core 3.1 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
-| **Waher.Runtime.Threading.Test**   | .NET Core 3.1 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
+| Project                            | Type     | Project description |
+|------------------------------------|----------|---------------------|
+| **Waher.Runtime.Inventory.Test**   | .NET 6.0 | The [Waher.Runtime.Inventory.Test](Runtime/Waher.Runtime.Inventory.Test) project contains unit tests for the [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project. |
+| **Waher.Runtime.Language.Test**    | .NET 6.0 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
+| **Waher.Runtime.Profiling.Test**   | .NET 6.0 | The [Waher.Runtime.Profiling.Test](Runtime/Waher.Runtime.Profiling.Test) project contains unit tests for the [Waher.Runtime.Profiling](Runtime/Waher.Runtime.Profiling) project. |
+| **Waher.Runtime.Settings.Test**    | .NET 6.0 | The [Waher.Runtime.Settings.Test](Runtime/Waher.Runtime.Settings.Test) project contains unit tests for the [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project. |
+| **Waher.Runtime.Text.Test**        | .NET 6.0 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
+| **Waher.Runtime.Threading.Test**   | .NET 6.0 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
 
 Script
 ----------------------
@@ -396,9 +396,9 @@ graphs, physical units and unit conversions, etc. For more information about the
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type          | Project description |
-|------------------------------------|---------------|---------------------|
-| **Waher.Script.Test**              | .NET Core 3.1 | The [Waher.Script.Test](Script/Waher.Script.Test) project contains unit tests for the script-related projects in this section. |
+| Project                            | Type     | Project description |
+|------------------------------------|----------|---------------------|
+| **Waher.Script.Test**              | .NET 6.0 | The [Waher.Script.Test](Script/Waher.Script.Test) project contains unit tests for the script-related projects in this section. |
 
 Security
 ----------------------
@@ -426,17 +426,17 @@ authorization and encryption.
 
 The folder also contains the following unit test projects:
 
-| Project                                | Type          | Project description |
-|----------------------------------------|---------------|---------------------|
-| **Waher.Security.ACME.Test**           | .NET Core 3.1 | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project.                                         |
-| **Waher.Security.ChaChaPoly.Test**     | .NET Core 3.1 | The [Waher.Security.ChaChaPoly.Test](Security/Waher.Security.ChaChaPoly.Test) project contains unit tests for the  [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project. |
-| **Waher.Security.DTLS.Test**           | .NET Core 3.1 | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project.                                         |
-| **Waher.Security.EllipticCurves.Test** | .NET Core 3.1 | The [Waher.Security.EllipticCurves.Test](Security/Waher.Security.EllipticCurves.Test) project contains unit tests for the  [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project. |
-| **Waher.Security.JWT.Test**            | .NET Core 3.1 | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project.                                             |
-| **Waher.Security.LoginMonitor.Test**   | .NET Core 3.1 | The [Waher.Security.LoginMonitor.Test](Security/Waher.Security.LoginMonitor.Test) project contains unit tests for the  [Waher.Security.LoginMonitor](Security/Waher.Security.LoginMonitor) project. |
-| **Waher.Security.PKCS.Test**           | .NET Core 3.1 | The [Waher.Security.PKCS.Test](Security/Waher.Security.PKCS.Test) project contains unit tests for the  [Waher.Security.PKCS](Security/Waher.Security.PKCS) project.                                         |
-| **Waher.Security.SHA3.Test**           | .NET Core 3.1 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
-| **Waher.Security.SPF.Test**            | .NET Core 3.1 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
+| Project                                | Type     | Project description |
+|----------------------------------------|----------|---------------------|
+| **Waher.Security.ACME.Test**           | .NET 6.0 | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project.                                         |
+| **Waher.Security.ChaChaPoly.Test**     | .NET 6.0 | The [Waher.Security.ChaChaPoly.Test](Security/Waher.Security.ChaChaPoly.Test) project contains unit tests for the  [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project. |
+| **Waher.Security.DTLS.Test**           | .NET 6.0 | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project.                                         |
+| **Waher.Security.EllipticCurves.Test** | .NET 6.0 | The [Waher.Security.EllipticCurves.Test](Security/Waher.Security.EllipticCurves.Test) project contains unit tests for the  [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project. |
+| **Waher.Security.JWT.Test**            | .NET 6.0 | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project.                                             |
+| **Waher.Security.LoginMonitor.Test**   | .NET 6.0 | The [Waher.Security.LoginMonitor.Test](Security/Waher.Security.LoginMonitor.Test) project contains unit tests for the  [Waher.Security.LoginMonitor](Security/Waher.Security.LoginMonitor) project. |
+| **Waher.Security.PKCS.Test**           | .NET 6.0 | The [Waher.Security.PKCS.Test](Security/Waher.Security.PKCS.Test) project contains unit tests for the  [Waher.Security.PKCS](Security/Waher.Security.PKCS) project.                                         |
+| **Waher.Security.SHA3.Test**           | .NET 6.0 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
+| **Waher.Security.SPF.Test**            | .NET 6.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
 
 Services
 ----------------------
@@ -481,7 +481,7 @@ to form more complex devices, such as concentrators or bridges.
 | **Waher.Things.Script**   | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Script/)   | The [Waher.Things.Script](Things/Waher.Things.Script) project is a class library that publishes nodes that permit you to define sensors and actuators using script. |
 | **Waher.Things.Semantic** | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Semantic/) | The [Waher.Things.Semantic](Things/Waher.Things.Semantic) project is a class library that publishes nodes representing Semantic Web devices. It also makes other non-semantic metering devices available via semantic web interfaces, such as SPARQL queries. |
 | **Waher.Things.Snmp**     | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Snmp/)     | The [Waher.Things.Snmp](Things/Waher.Things.Snmp) project is a class library that publishes nodes representing SNMP devices on the local area network. |
-| **Waher.Things.Test**     | .NET Core 3.1 |                                                                | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
+| **Waher.Things.Test**     | .NET 6.0      |                                                                | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 | **Waher.Things.Virtual**  | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Virtual/)  | The [Waher.Things.Virtual](Things/Waher.Things.Virtual) project is a class library that publishes virtual nodes that can act as placeholders for software that wishes to publish nodes on the network. |
 | **Waher.Things.Xmpp**     | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Xmpp/)     | The [Waher.Things.Xmpp](Things/Waher.Things.Xmpp) project is a class library that publishes nodes for communication with devices over XMPP. |
 
@@ -490,24 +490,24 @@ Utilities
 
 The [Utilities](Utilities) folder contains applications that help the developer or administrator with different tasks.
 
-| Project                            | Type          | Link  | Project description |
-|------------------------------------|---------------|-------|---------------------|
-| **Waher.Utility.Acme**             | .NET 4.6.2    |       | The [Waher.Utility.Acme](Utilities/Waher.Utility.Acme) is a command-line tool that helps you create certificates using the Automatic Certificate Management Environment (ACME) v2 protocol. |
-| **Waher.Utility.AnalyzeClock**     | .NET Core 3.1 |       | The [Waher.Utility.AnalyzeClock](Utilities/Waher.Utility.AnalyzeClock) is a command-line tool that helps you analyze the difference in clocks between machines compatible with the [IEEE XMPP IoT extensions](https://gitlab.com/IEEE-SA/XMPPI/IoT). |
-| **Waher.Utility.AnalyzeDB**        | .NET Core 3.1 |       | The [Waher.Utility.AnalyzeDB](Utilities/Waher.Utility.AnalyzeDB) is a command-line tool that helps you analyze an object database created by the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) or [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) libraries, such as the IoT Gateway database. |
-| **Waher.Utility.Asn1ToCSharp**     | .NET Core 3.1 |       | The [Waher.Utility.Asn1ToCSharp](Utilities/Waher.Utility.Asn1ToCSharp) is a command-line tool that creates C# files from definitions made in ASN.1 files. |
-| **Waher.Utility.Csp**              | .NET Core 3.1 |       | The [Waher.Utility.Csp](Utilities/Waher.Utility.Csp) is a command-line tool that helps you perform operations on keys managed by the system Cryptographic Service Provider CSP. |
-| **Waher.Utility.DeleteDB**         | .NET Core 3.1 |       | The [Waher.Utility.DeleteDB](Utilities/Waher.Utility.DeleteDB) is a command-line tool that helps you delete an object database created by the Waher.Persistence.Files or Waher.Persistence.FilesLW libraries, such as the IoT Gateway database, including any cryptographic keys stored in the CSP. |
-| **Waher.Utility.ExStat**           | .NET Core 3.1 |       | The [Waher.Utility.ExStat](Utilities/Waher.Utility.ExStat) is a command-line tool that helps you extract statistical information about exceptions occurring in an IoT Gateway, with logging of exceptions activated. |
-| **Waher.Utility.Extract**          | .NET Core 3.1 |       | The [Waher.Utility.Extract](Utilities/Waher.Utility.Extract) is a command-line tool that helps you extract information from a backup file generated by the IoT Gateway. |
-| **Waher.Utility.GenManifest**      | .NET Core 3.1 |       | The [Waher.Utility.GenManifest](Utilities/Waher.Utility.GenManifest) project provides a command-line tool that can generate manifest files from files existing in folders. |
-| **Waher.Utility.GetEmojiCatalog**  | .NET Core 3.1 |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
-| **Waher.Utility.Install**          | .NET Core 3.1 |       | The [Waher.Utility.Install](Utilities/Waher.Utility.Install) is a command-line tool that helps you install pluggable modules into the IoT Gateway. |
-| **Waher.Utility.RegEx**            | .NET Core 3.1 |       | The [Waher.Utility.RegEx](Utilities/Waher.Utility.RegEx) is a command-line tool that helps you find content in files using regular expressions, and optionally either export the findings or replace them with something else. |
-| **Waher.Utility.RunScript**        | .NET Core 3.1 |       | The [Waher.Utility.RunScript](Utilities/Waher.Utility.RunScript) is a command-line tool that allows you to execute script. |
-| **Waher.Utility.Sign**             | .NET Core 3.1 |       | The [Waher.Utility.Sign](Utilities/Waher.Utility.Sign) is a command-line tool that helps you sign files using asymmetric keys. |
-| **Waher.Utility.Transform**        | .NET Core 3.1 |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
-| **Waher.Utility.Translate**        | .NET Core 3.1 |       | The [Waher.Utility.Translate](Utilities/Waher.Utility.Translate) is a command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly. |
+| Project                            | Type       | Link  | Project description |
+|------------------------------------|------------|-------|---------------------|
+| **Waher.Utility.Acme**             | .NET 4.6.2 |       | The [Waher.Utility.Acme](Utilities/Waher.Utility.Acme) is a command-line tool that helps you create certificates using the Automatic Certificate Management Environment (ACME) v2 protocol. |
+| **Waher.Utility.AnalyzeClock**     | .NET 6.0   |       | The [Waher.Utility.AnalyzeClock](Utilities/Waher.Utility.AnalyzeClock) is a command-line tool that helps you analyze the difference in clocks between machines compatible with the [IEEE XMPP IoT extensions](https://gitlab.com/IEEE-SA/XMPPI/IoT). |
+| **Waher.Utility.AnalyzeDB**        | .NET 6.0   |       | The [Waher.Utility.AnalyzeDB](Utilities/Waher.Utility.AnalyzeDB) is a command-line tool that helps you analyze an object database created by the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) or [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) libraries, such as the IoT Gateway database. |
+| **Waher.Utility.Asn1ToCSharp**     | .NET 6.0   |       | The [Waher.Utility.Asn1ToCSharp](Utilities/Waher.Utility.Asn1ToCSharp) is a command-line tool that creates C# files from definitions made in ASN.1 files. |
+| **Waher.Utility.Csp**              | .NET 6.0   |       | The [Waher.Utility.Csp](Utilities/Waher.Utility.Csp) is a command-line tool that helps you perform operations on keys managed by the system Cryptographic Service Provider CSP. |
+| **Waher.Utility.DeleteDB**         | .NET 6.0   |       | The [Waher.Utility.DeleteDB](Utilities/Waher.Utility.DeleteDB) is a command-line tool that helps you delete an object database created by the Waher.Persistence.Files or Waher.Persistence.FilesLW libraries, such as the IoT Gateway database, including any cryptographic keys stored in the CSP. |
+| **Waher.Utility.ExStat**           | .NET 6.0   |       | The [Waher.Utility.ExStat](Utilities/Waher.Utility.ExStat) is a command-line tool that helps you extract statistical information about exceptions occurring in an IoT Gateway, with logging of exceptions activated. |
+| **Waher.Utility.Extract**          | .NET 6.0   |       | The [Waher.Utility.Extract](Utilities/Waher.Utility.Extract) is a command-line tool that helps you extract information from a backup file generated by the IoT Gateway. |
+| **Waher.Utility.GenManifest**      | .NET 6.0   |       | The [Waher.Utility.GenManifest](Utilities/Waher.Utility.GenManifest) project provides a command-line tool that can generate manifest files from files existing in folders. |
+| **Waher.Utility.GetEmojiCatalog**  | .NET 6.0   |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
+| **Waher.Utility.Install**          | .NET 6.0   |       | The [Waher.Utility.Install](Utilities/Waher.Utility.Install) is a command-line tool that helps you install pluggable modules into the IoT Gateway. |
+| **Waher.Utility.RegEx**            | .NET 6.0   |       | The [Waher.Utility.RegEx](Utilities/Waher.Utility.RegEx) is a command-line tool that helps you find content in files using regular expressions, and optionally either export the findings or replace them with something else. |
+| **Waher.Utility.RunScript**        | .NET 6.0   |       | The [Waher.Utility.RunScript](Utilities/Waher.Utility.RunScript) is a command-line tool that allows you to execute script. |
+| **Waher.Utility.Sign**             | .NET 6.0   |       | The [Waher.Utility.Sign](Utilities/Waher.Utility.Sign) is a command-line tool that helps you sign files using asymmetric keys. |
+| **Waher.Utility.Transform**        | .NET 6.0   |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
+| **Waher.Utility.Translate**        | .NET 6.0   |       | The [Waher.Utility.Translate](Utilities/Waher.Utility.Translate) is a command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly. |
 
 Web Services
 ----------------------
@@ -522,6 +522,6 @@ The [WebServices](WebServices) folder contains modules that add web service capa
 
 The folder also contains the following unit test projects:
 
-| Project                             | Type          | Project description |
-|-------------------------------------|---------------|---------------------|
-| **Waher.Webservice.Tesseract.Test** | .NET Core 3.1 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
+| Project                             | Type     | Project description |
+|-------------------------------------|----------|---------------------|
+| **Waher.Webservice.Tesseract.Test** | .NET 6.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |

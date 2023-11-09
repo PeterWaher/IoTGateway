@@ -3,6 +3,8 @@
 
 # Custom for Visual Studio
 *.cs     diff=csharp
+*.manifest text
+*.config diff=text
 
 # Standard to msysgit
 *.doc	 diff=astextplain
@@ -19,6 +21,4 @@
 *.WXS	 diff=astextplain
 *.wxl	 diff=astextplain
 *.WXL	 diff=astextplain
-*.manifest diff=astextplain
-*.config diff=astextplain
 

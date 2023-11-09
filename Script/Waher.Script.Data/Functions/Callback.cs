@@ -81,11 +81,13 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						throw new ScriptRuntimeException("Delegate type lacks an Invoke method.", this);
 
 					bool IsAsync = taskTypeInfo.IsAssignableFrom(ReturnType.GetTypeInfo());
+
 					string TypeName = Type.Name.Replace("`", "_GT_");
 					StringBuilder CSharp = new StringBuilder();
-
+					
 					CSharp.AppendLine("using System;");
 					CSharp.AppendLine("using Waher.Script;");
+					CSharp.AppendLine("using Waher.Script.Abstraction.Elements;");
 					CSharp.AppendLine("using Waher.Script.Data.Functions;");
 					CSharp.AppendLine("using Waher.Script.Model;");
 					CSharp.AppendLine();
@@ -123,6 +125,14 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 							CSharp.Append("async ");
 
 						AppendType(ReturnType, CSharp);
+
+						if (IsAsync)
+						{
+							if (ReturnType.IsConstructedGenericType)
+								ReturnType = ReturnType.GenericTypeArguments[0];
+							else
+								ReturnType = typeof(void);
+						}
 					}
 
 					CSharp.Append(" CallLambda(");
@@ -144,10 +154,15 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					CSharp.AppendLine(")");
 					CSharp.AppendLine("\t\t{");
 
+					CSharp.Append("\t\t\t");
+
+					if (ReturnType != typeof(void))
+						CSharp.Append("IElement Result = ");
+
 					if (IsAsync)
-						CSharp.Append("\t\t\tIElement Result = await this.Lambda.EvaluateAsync(");
+						CSharp.Append("await this.Lambda.EvaluateAsync(");
 					else
-						CSharp.Append("\t\t\tIElement Result = this.Lambda.Evaluate(");
+						CSharp.Append("this.Lambda.Evaluate(");
 
 					if (Parameters.Length == 0)
 						CSharp.Append("new IElement[0]");
@@ -176,13 +191,17 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 					CSharp.AppendLine(", this.Variables);");
 					CSharp.AppendLine();
-					if (ReturnType == typeof(IElement))
-						CSharp.AppendLine("\t\t\treturn Result;");
-					else
+
+					if (ReturnType != typeof(void))
 					{
-						CSharp.Append("\t\t\treturn (");
-						AppendType(ReturnType, CSharp);
-						CSharp.AppendLine(")Result.AssociatedObjectValue;");
+						if (ReturnType == typeof(IElement))
+							CSharp.AppendLine("\t\t\treturn Result;");
+						else
+						{
+							CSharp.Append("\t\t\treturn (");
+							AppendType(ReturnType, CSharp);
+							CSharp.AppendLine(")Result.AssociatedObjectValue;");
+						}
 					}
 
 					CSharp.AppendLine("\t\t}");

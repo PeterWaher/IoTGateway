@@ -1750,6 +1750,7 @@ namespace Waher.IoTGateway
 					case "netstandard.dll":
 					case "snappy32.dll":
 					case "snappy64.dll":
+					case "snappier.dll":
 					case "sni.dll":
 					case "sos.dll":
 					case "sos.netcore.dll":
@@ -1757,6 +1758,7 @@ namespace Waher.IoTGateway
 					case "windowsbase.dll":
 					case "waher.persistence.fileslw.dll":
 					case "waher.persistence.serialization.dll":
+					case "zstdsharp.dll":
 						return false;
 				}
 

@@ -137,7 +137,6 @@
 							<File Id='System.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.Primitives.dll' Vital='yes'/>
 							<File Id='System.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.TypeConverter.dll' Vital='yes'/>
 							<File Id='System.Configuration.dll' Name='System.Configuration.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Configuration.dll' Vital='yes'/>
-							<File Id='System.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Configuration.ConfigurationManager.dll' Vital='yes'/>
 							<File Id='System.Console.dll' Name='System.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Console.dll' Vital='yes'/>
 							<File Id='System.Core.dll' Name='System.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Core.dll' Vital='yes'/>
 							<File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.Common.dll' Vital='yes'/>
@@ -150,7 +149,6 @@
 							<File Id='System.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Debug.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.DiagnosticSource.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.dll' Vital='yes'/>
-							<File Id='System.Diagnostics.EventLog.Messages.dll' Name='System.Diagnostics.EventLog.Messages.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.Messages.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Process.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.PerformanceCounter.dll' Vital='yes'/>
@@ -161,7 +159,6 @@
 							<File Id='System.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Tracing.dll' Vital='yes'/>
 							<File Id='System.dll' Name='System.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.dll' Vital='yes'/>
 							<File Id='System.Drawing.dll' Name='System.Drawing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.dll' Vital='yes'/>
-							<File Id='System.Drawing.Common.dll' Name='System.Drawing.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.Common.dll' Vital='yes'/>
 							<File Id='System.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.Primitives.dll' Vital='yes'/>
 							<File Id='System.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Dynamic.Runtime.dll' Vital='yes'/>
 							<File Id='System.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Formats.Asn1.dll' Vital='yes'/>
@@ -252,11 +249,9 @@
 							<File Id='System.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.OpenSsl.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Pkcs.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
-							<File Id='System.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.ProtectedData.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Xml.dll' Name='System.Security.Cryptography.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Xml.dll' Vital='yes'/>
 							<File Id='System.Security.dll' Name='System.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.dll' Vital='yes'/>
-							<File Id='System.Security.Permissions.dll' Name='System.Security.Permissions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Permissions.dll' Vital='yes'/>
 							<File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.dll' Vital='yes'/>
 							<File Id='System.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.Windows.dll' Vital='yes'/>
 							<File Id='System.Security.SecureString.dll' Name='System.Security.SecureString.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.SecureString.dll' Vital='yes'/>
@@ -285,7 +280,6 @@
 							<File Id='System.Web.dll' Name='System.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Web.dll' Vital='yes'/>
 							<File Id='System.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Web.HttpUtility.dll' Vital='yes'/>
 							<File Id='System.Windows.dll' Name='System.Windows.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Windows.dll' Vital='yes'/>
-							<File Id='System.Windows.Extensions.dll' Name='System.Windows.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Windows.Extensions.dll' Vital='yes'/>
 							<File Id='System.Xml.dll' Name='System.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.dll' Vital='yes'/>
 							<File Id='System.Xml.Linq.dll' Name='System.Xml.Linq.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.Linq.dll' Vital='yes'/>
 							<File Id='System.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.ReaderWriter.dll' Vital='yes'/>
@@ -310,7 +304,6 @@
 							<RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Configuration.dll' Name='System.Configuration.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Core.dll' Name='System.Core.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall' />
@@ -323,7 +316,6 @@
 							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.Messages.dll' Name='System.Diagnostics.EventLog.Messages.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' On='uninstall' />
@@ -334,7 +326,6 @@
 							<RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.dll' Name='System.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Drawing.dll' Name='System.Drawing.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Drawing.Common.dll' Name='System.Drawing.Common.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' On='uninstall' />
@@ -424,12 +415,10 @@
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Xml.dll' Name='System.Security.Cryptography.Xml.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll' On='uninstall' />
@@ -458,7 +447,6 @@
 							<RemoveFile Id='RemoveSystem.Web.dll' Name='System.Web.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Windows.dll' Name='System.Windows.dll' On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Windows.Extensions.dll' Name='System.Windows.Extensions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.dll' Name='System.Xml.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.Linq.dll' Name='System.Xml.Linq.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall' />
@@ -471,6 +459,8 @@
 							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' On='uninstall' />
 						</Component>
 						<Component Id='MicrosoftLibraries' Guid='A9BAC7EA-59F6-4362-B44C-63B82A034C88'>
+							<File Id='AWSSDK.Core.dll' Name='AWSSDK.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\AWSSDK.Core.dll' Vital='yes' KeyPath='yes' />
+							<File Id='AWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\AWSSDK.SecurityToken.dll' Vital='yes' KeyPath='yes' />
 							<File Id='clrcompression.dll' Name='clrcompression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrcompression.dll' Vital='yes' KeyPath='yes' />
 							<File Id='clretwrc.dll' Name='clretwrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clretwrc.dll' Vital='yes' />
 							<File Id='clrjit.dll' Name='clrjit.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrjit.dll' Vital='yes' />
@@ -482,10 +472,10 @@
 							<File Id='Microsoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CodeAnalysis.dll' Vital='yes' />
 							<File Id='Microsoft.CSharp.dll' Name='Microsoft.CSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CSharp.dll' Vital='yes' />
 							<File Id='Microsoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.DiaSymReader.Native.x86.dll' Vital='yes' />
+							<File Id='Microsoft.Extensions.Logging.Abstractions.dll' Name='Microsoft.Extensions.Logging.Abstractions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Extensions.Logging.Abstractions.dll' Vital='yes' />
 							<File Id='Microsoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.Core.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Primitives.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Registry.dll' Vital='yes' />
-							<File Id='Microsoft.Win32.SystemEvents.dll' Name='Microsoft.Win32.SystemEvents.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.SystemEvents.dll' Vital='yes' />
 							<File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
 							<File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore.dll' Vital='yes' />
 							<File Id='mscordaccore_x86_x86_4.700.19.56402.dll' Name='mscordaccore_x86_x86_4.700.19.56402.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.700.19.56402.dll' Vital='yes' />
@@ -497,6 +487,8 @@
 							<File Id='SOS_README.md' Name='SOS_README.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SOS_README.md' Vital='yes'/>
 							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
 							<File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
+							<RemoveFile Id='RemoveAWSSDK.Core.dll' Name='AWSSDK.Core.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveAWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' On='uninstall'/>
 							<RemoveFile Id='Removeclrcompression.dll' Name='clrcompression.dll' On='uninstall'/>
 							<RemoveFile Id='Removeclretwrc.dll' Name='clretwrc.dll' On='uninstall'/>
 							<RemoveFile Id='Removeclrjit.dll' Name='clrjit.dll' On='uninstall'/>
@@ -508,10 +500,10 @@
 							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.CSharp.dll' Name='Microsoft.CSharp.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Extensions.Logging.Abstractions.dll' Name='Microsoft.Extensions.Logging.Abstractions.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveMicrosoft.Win32.SystemEvents.dll' Name='Microsoft.Win32.SystemEvents.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordaccore_x86_x86_4.700.19.56402.dll' Name='mscordaccore_x86_x86_4.700.19.56402.dll' On='uninstall'/>
@@ -527,34 +519,30 @@
 						<Component Id='ExternalLibraries' Guid='6545F5ED-1503-454E-9EB4-E211BF6E74B3'>
 							<File Id='DnsClient.dll' Name='DnsClient.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\DnsClient.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libSkiaSharp.dll' Vital='yes'/>
-							<File Id='libzstd.dll' Name='libzstd.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libzstd.dll' Vital='yes'/>
-							<File Id='mongocrypt.dll' Name='mongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mongocrypt.dll' Vital='yes'/>
 							<File Id='MongoDB.Bson.dll' Name='MongoDB.Bson.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Bson.dll' Vital='yes'/>
 							<File Id='MongoDB.Driver.dll' Name='MongoDB.Driver.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.dll' Vital='yes'/>
 							<File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.Core.dll' Vital='yes'/>
-							<File Id='MongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Libmongocrypt.dll' Vital='yes'/>
+							<File Id='mongocrypt.dll' Name='mongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mongocrypt.dll' Vital='yes'/>
 							<File Id='MySqlConnector.dll' Name='MySqlConnector.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MySqlConnector.dll' Vital='yes'/>
 							<File Id='Npgsql.dll' Name='Npgsql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Npgsql.dll' Vital='yes'/>
 							<File Id='sni.dll' Name='sni.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sni.dll' Vital='yes'/>
 							<File Id='SharpCompress.dll' Name='SharpCompress.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SharpCompress.dll' Vital='yes'/>
 							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SkiaSharp.dll' Vital='yes'/>
-							<File Id='snappy32.dll' Name='snappy32.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\snappy32.dll' Vital='yes'/>
-							<File Id='snappy64.dll' Name='snappy64.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\snappy64.dll' Vital='yes'/>
+							<File Id='Snappier.dll' Name='Snappier.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Snappier.dll' Vital='yes'/>
+							<File Id='ZstdSharp.dll' Name='ZstdSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ZstdSharp.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveDnsClient.dll' Name='DnsClient.dll' On='uninstall'/>
 							<RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
-							<RemoveFile Id='Removelibzstd.dll' Name='libzstd.dll' On='uninstall'/>
-							<RemoveFile Id='Removemongocrypt.dll' Name='mongocrypt.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Bson.dll' Name='MongoDB.Bson.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.dll' Name='MongoDB.Driver.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveMongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' On='uninstall'/>
+							<RemoveFile Id='mongocrypt.dll' Name='mongocrypt.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMySqlConnector.dll' Name='MySqlConnector.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveNpgsql.dll' Name='Npgsql.dll' On='uninstall'/>
 							<RemoveFile Id='Removesni.dll' Name='sni.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSharpCompress.dll' Name='SharpCompress.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
-							<RemoveFile Id='Removesnappy32.dll' Name='snappy32.dll' On='uninstall'/>
-							<RemoveFile Id='Removesnappy64.dll' Name='snappy64.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSnappier.dll' Name='Snappier.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveZstdSharp.dll' Name='ZstdSharp.dll' On='uninstall'/>
 						</Component>
 						<Component Id='MainExecutable' Guid='4A7EDBB4-9F37-4115-93B6-1BCBECD06486'>
 							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>

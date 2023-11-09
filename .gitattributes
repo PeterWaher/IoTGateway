@@ -4,7 +4,9 @@
 # Custom for Visual Studio
 *.cs     diff=csharp
 *.manifest text
-*.config diff=text
+*.config text
+*.wxs text
+*.wxl text
 
 # Standard to msysgit
 *.doc	 diff=astextplain

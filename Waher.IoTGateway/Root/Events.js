@@ -279,6 +279,11 @@ function Reload(Data)
 	window.location.reload(false);
 }
 
+function OpenUrl(Url)
+{
+	window.open(Url, "_blank");
+}
+
 function EndsWith(String, Suffix)
 {
 	var c = String.length;

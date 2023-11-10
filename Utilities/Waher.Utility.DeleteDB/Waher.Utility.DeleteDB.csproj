@@ -19,7 +19,7 @@
     <FileVersion>1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>

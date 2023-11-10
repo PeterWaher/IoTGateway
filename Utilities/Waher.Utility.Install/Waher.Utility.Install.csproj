@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm</RuntimeIdentifiers>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -22,7 +22,7 @@
     <FileVersion>1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <StartupObject>Waher.Utility.Install.Program</StartupObject>
@@ -54,6 +54,6 @@
     <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\netcoreapp2.0\win-x86&quot;&#xD;&#xA;" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;" />
   </Target>
 </Project>

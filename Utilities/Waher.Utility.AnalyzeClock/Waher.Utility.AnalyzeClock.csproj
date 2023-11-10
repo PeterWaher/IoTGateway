@@ -16,11 +16,11 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm</RuntimeIdentifiers>
     <StartupObject>Waher.Utility.AnalyzeClock.Program</StartupObject>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>

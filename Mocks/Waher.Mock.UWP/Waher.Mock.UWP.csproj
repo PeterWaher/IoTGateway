@@ -120,6 +120,10 @@
     <EmbeddedResource Include="Properties\Waher.Mock.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj">
+      <Project>{822e04e4-79fa-43e1-bdfc-775ee47236e7}</Project>
+      <Name>Waher.Content.QR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
       <Name>Waher.Content.Xml</Name>

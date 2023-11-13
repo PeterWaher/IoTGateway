@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-#if !WINDOWS_UWP
-using Gma.QrCodeNet.Encoding.Windows.Render;
-using Gma.QrCodeNet.Encoding;
-#endif
 using Waher.Content;
+using Waher.Content.QR;
 using Waher.Content.Xml;
 #if !WINDOWS_UWP
 using Waher.Content.Xsl;
@@ -18,6 +15,8 @@ using Waher.Content.Xsl;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using System.Collections.Generic;
+using Waher.Content.QR.Encoding;
 
 namespace Waher.Mock
 {
@@ -847,28 +846,31 @@ namespace Waher.Mock
 			return Client;
 		}
 
-#if !WINDOWS_UWP
 		/// <summary>
 		/// Prints a QR Code on the console output.
 		/// </summary>
 		/// <param name="URI">URI to encode.</param>
 		public static void PrintQRCode(string URI)
 		{
-			QrEncoder encoder = new QrEncoder(ErrorCorrectionLevel.M);
-
-			if (encoder.TryEncode(URI, out QrCode qrCode))
+			using (QrEncoder Encoder = new QrEncoder())
 			{
 				ConsoleColor Bak = Console.BackgroundColor;
-				BitMatrix Matrix = qrCode.Matrix;
-				int w = Matrix.Width;
-				int h = Matrix.Height;
+				QrMatrix M = Encoder.GenerateMatrix(CorrectionLevel.M, URI);
+				bool Pixel;
+				int w = M.Size;
+				int h = M.Size;
 				int x, y;
 
 				for (y = -3; y < h + 3; y++)
 				{
 					for (x = -3; x < w + 3; x++)
 					{
-						if (x >= 0 && x < w && y >= 0 && y < h && Matrix[x, y])
+						if (x >= 0 && x < w && y >= 0 && y < h)
+							Pixel = (((int)M.Dots[x, y]) & 1) != 0;
+						else
+							Pixel = false;
+
+						if (Pixel)
 						{
 							Console.BackgroundColor = ConsoleColor.Black;
 							Console.Out.Write("  ");
@@ -886,7 +888,7 @@ namespace Waher.Mock
 				Console.BackgroundColor = Bak;
 			}
 		}
-#endif
+
 		/// <summary>
 		/// Returns an URL to a Google Chart API QR Code encoding <paramref name="URI"/>.
 		/// </summary>

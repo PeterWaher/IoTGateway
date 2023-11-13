@@ -2622,6 +2622,13 @@
           "Waher.Script": "2.6.1"
         }
       },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Content.Xml/2.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -5358,6 +5365,13 @@
           "Waher.Runtime.Inventory": "1.1.5",
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "2.6.1"
+        }
+      },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/2.2.3": {
@@ -8134,6 +8148,13 @@
           "Waher.Script": "2.6.1"
         }
       },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Content.Xml/2.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -10879,6 +10900,13 @@
           "Waher.Runtime.Inventory": "1.1.5",
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "2.6.1"
+        }
+      },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/2.2.3": {
@@ -13664,6 +13692,13 @@
           "Waher.Script": "2.6.1"
         }
       },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Waher.Content.Xml/2.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -16409,6 +16444,13 @@
           "Waher.Runtime.Inventory": "1.1.5",
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "2.6.1"
+        }
+      },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/2.2.3": {
@@ -19192,6 +19234,13 @@
           "Waher.Runtime.Inventory": "1.1.5",
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "2.6.1"
+        }
+      },
+      "Waher.Content.QR/2.1.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/2.2.3": {
@@ -29157,6 +29206,11 @@
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
     },
+    "Waher.Content.QR/2.1.0": {
+      "type": "project",
+      "path": "../../Content/Waher.Content.QR/Waher.Content.QR.csproj",
+      "msbuildProject": "../../Content/Waher.Content.QR/Waher.Content.QR.csproj"
+    },
     "Waher.Content.Xml/2.2.3": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
@@ -29246,6 +29300,9 @@
       "frameworks": {
         "uap10.0.10240": {
           "projectReferences": {
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.QR\\Waher.Content.QR.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.QR\\Waher.Content.QR.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj"
             },

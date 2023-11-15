@@ -22,7 +22,7 @@ namespace Waher.Runtime.Transactions
 		public Transactions(TimeSpan TransactionTimeout)
 		{
 			this.transactions = new Cache<Guid, T>(int.MaxValue, TransactionTimeout, TransactionTimeout, true);
-			this.transactions.Removed += Transactions_Removed;
+			this.transactions.Removed += this.Transactions_Removed;
 
 			TransactionModule.Register(this);
 		}
@@ -55,7 +55,7 @@ namespace Waher.Runtime.Transactions
 		{
 			TransactionModule.Unregister(this);
 		
-			this.transactions.Removed -= Transactions_Removed;
+			this.transactions.Removed -= this.Transactions_Removed;
 			this.transactions.Clear();
 			this.transactions.Dispose();
 		}

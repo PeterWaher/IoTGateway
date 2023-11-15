@@ -22,7 +22,6 @@ namespace Waher.IoTGateway.WebResources
 	/// </summary>
 	public class StartExport : HttpSynchronousResource, IHttpPostMethod
 	{
-		internal static RNGCryptoServiceProvider rnd = new RNGCryptoServiceProvider();
 		internal static AesCryptoServiceProvider aes = GetCryptoProvider();
 
 		/// <summary>
@@ -216,14 +215,8 @@ namespace Waher.IoTGateway.WebResources
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
 
-					byte[] Key = new byte[32];
-					byte[] IV = new byte[16];
-
-					lock (rnd)
-					{
-						rnd.GetBytes(Key);
-						rnd.GetBytes(IV);
-					}
+					byte[] Key = Gateway.NextBytes(32);
+					byte[] IV = Gateway.NextBytes(16);
 
 					ICryptoTransform AesTransform = aes.CreateEncryptor(Key, IV);
 					CryptoStream cs = new CryptoStream(fs, AesTransform, CryptoStreamMode.Write);

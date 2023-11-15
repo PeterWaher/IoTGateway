@@ -19,7 +19,7 @@ namespace Waher.Utility.Extract.ExportFormats
 	public class Extractor : IExportFormat, IDisposable
 	{
 		private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private readonly AesCryptoServiceProvider aes;
+		private readonly Aes aes;
 		private readonly Dictionary<string, bool> collections;
 		private readonly Dictionary<string, bool> fileNames;
 		private readonly XmlWriterSettings settings;
@@ -61,13 +61,12 @@ namespace Waher.Utility.Extract.ExportFormats
 				WriteEndDocumentOnClose = true
 			};
 
-			this.aes = new AesCryptoServiceProvider()
-			{
-				BlockSize = 128,
-				KeySize = 256,
-				Mode = CipherMode.CBC,
-				Padding = PaddingMode.None
-			};
+			this.aes = Aes.Create();
+
+			this.aes.BlockSize = 128;
+			this.aes.KeySize = 256;
+			this.aes.Mode = CipherMode.CBC;
+			this.aes.Padding = PaddingMode.None;
 		}
 
 		public string FileName => string.Empty;

@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 #if !LW
 namespace Waher.Persistence.Files.Test
 #else
@@ -29,63 +31,63 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void Test_01_512bits()
 		{
-			this.Test("xTest_01_512bits", 512);
+			Test("xTest_01_512bits", 512);
 		}
 
 		[TestMethod]
 		public void Test_02_768bits()
 		{
-			this.Test("xTest_02_768bits", 768);
+			Test("xTest_02_768bits", 768);
 		}
 
 		[TestMethod]
 		public void Test_03_1024bits()
 		{
-			this.Test("Test_03_1024bits", 1024);
+			Test("Test_03_1024bits", 1024);
 		}
 
 		[TestMethod]
 		public void Test_04_2048bits()
 		{
-			this.Test("Test_04_2048bits", 2048);
+			Test("Test_04_2048bits", 2048);
 		}
 
 		[TestMethod]
 		public void Test_05_3072bits()
 		{
-			this.Test("Test_05_3072bits", 3072);
+			Test("Test_05_3072bits", 3072);
 		}
 
 		[TestMethod]
 		public void Test_06_4096bits()
 		{
-			this.Test("Test_06_4096bits", 4096);
+			Test("Test_06_4096bits", 4096);
 		}
 
 		[TestMethod]
 		public void Test_07_7680bits()
 		{
-			this.Test("Test_07_7680bits", 7680);
+			Test("Test_07_7680bits", 7680);
 		}
 
 		[TestMethod]
 		public void Test_08_15360bits()
 		{
-			this.Test("Test_08_15360bits", 15360);
+			Test("Test_08_15360bits", 15360);
 		}
 
-		private void Test(string Name, int Size)
+		private static void Test(string Name, int Size)
 		{
-			CspParameters CspParams = new CspParameters()
+			CspParameters CspParams = new()
 			{
 				Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.NoPrompt,
 				KeyContainerName = Name
 			};
 
-			Stopwatch Watch = new Stopwatch();
+			Stopwatch Watch = new();
 			Watch.Start();
 
-			RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(Size, CspParams);
+			RSACryptoServiceProvider rsa = new(Size, CspParams);
 
 			Watch.Stop();
 			double Ms = (1000.0d * Watch.ElapsedTicks) / Stopwatch.Frequency;
@@ -99,3 +101,5 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

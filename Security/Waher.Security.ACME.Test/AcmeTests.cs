@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Runtime.Inventory;
 using Waher.Security.PKCS;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace Waher.Security.ACME.Test
 {
 	[TestClass]
@@ -26,7 +28,7 @@ namespace Waher.Security.ACME.Test
 
 			try
 			{
-				CspParameters CspParams = new CspParameters()
+				CspParameters CspParams = new()
 				{
 					Flags = CspProviderFlags.UseMachineKeyStore,
 					KeyContainerName = directory
@@ -38,7 +40,7 @@ namespace Waher.Security.ACME.Test
 					RSA.Clear();
 				}*/
 
-				using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams);
+				using RSACryptoServiceProvider RSA = new(4096, CspParams);
 				Parameters = RSA.ExportParameters(true);
 			}
 			catch (CryptographicException ex)
@@ -52,11 +54,8 @@ namespace Waher.Security.ACME.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.client is null))
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 		}
 
 		[TestMethod]
@@ -117,13 +116,13 @@ namespace Waher.Security.ACME.Test
 			AcmeAccount Account = await this.client.GetAccount();
 			await Account.NewKey();
 
-			CspParameters CspParams = new CspParameters()
+			CspParameters CspParams = new()
 			{
 				Flags = CspProviderFlags.UseMachineKeyStore,
 				KeyContainerName = directory
 			};
 
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams);
+			using RSACryptoServiceProvider RSA = new(4096, CspParams);
 			RSA.ImportParameters(this.client.ExportAccountKey(true));
 		}
 
@@ -214,10 +213,10 @@ namespace Waher.Security.ACME.Test
 			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 
-			this.Print(Authorizations);
+			Print(Authorizations);
 		}
 
-		private void Print(params AcmeAuthorization[] Authorizations)
+		private static void Print(params AcmeAuthorization[] Authorizations)
 		{
 			foreach (AcmeAuthorization Authorization in Authorizations)
 			{
@@ -226,11 +225,11 @@ namespace Waher.Security.ACME.Test
 				Console.Out.WriteLine(Authorization.Status);
 				Console.Out.WriteLine();
 
-				this.Print(Authorization.Value, Authorization.Challenges);
+				Print(Authorization.Value, Authorization.Challenges);
 			}
 		}
 
-		private void Print(string DomainName, params AcmeChallenge[] Challenges)
+		private static void Print(string DomainName, params AcmeChallenge[] Challenges)
 		{
 			foreach (AcmeChallenge Challenge in Challenges)
 			{
@@ -270,7 +269,7 @@ namespace Waher.Security.ACME.Test
 				Console.Out.WriteLine();
 
 				AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
-				this.Print(Authorizations);
+				Print(Authorizations);
 			}
 		}
 
@@ -288,7 +287,7 @@ namespace Waher.Security.ACME.Test
 					{
 						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
 
-						this.Print(Authorization.Value, Challenge2);
+						Print(Authorization.Value, Challenge2);
 					}
 				}
 			}
@@ -298,7 +297,7 @@ namespace Waher.Security.ACME.Test
 			foreach (AcmeAuthorization Authorization in Authorizations)
 			{
 				AcmeAuthorization Authorization2 = await Authorization.Poll();
-				this.Print(Authorization2);
+				Print(Authorization2);
 			}
 		}
 
@@ -316,7 +315,7 @@ namespace Waher.Security.ACME.Test
 					{
 						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
 
-						this.Print(Authorization.Value, Challenge2);
+						Print(Authorization.Value, Challenge2);
 					}
 				}
 			}
@@ -326,14 +325,14 @@ namespace Waher.Security.ACME.Test
 			foreach (AcmeAuthorization Authorization in Authorizations)
 			{
 				AcmeAuthorization Authorization2 = await Authorization.Poll();
-				this.Print(Authorization2);
+				Print(Authorization2);
 			}
 		}
 
 		[TestMethod]
 		public async Task ACME_Test_15_FinalizeOrder()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
+			using RSACryptoServiceProvider RSA = new(4096);
 			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
 			await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 			{
@@ -362,3 +361,5 @@ namespace Waher.Security.ACME.Test
 
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

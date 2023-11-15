@@ -2,6 +2,8 @@
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 #if !LW
 namespace Waher.Persistence.Files.Test
 #else
@@ -15,54 +17,54 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void Test_01_512bits()
 		{
-			this.Test("Test_01_512bits", 512);
+			Test("Test_01_512bits", 512);
 		}
 
 		[TestMethod]
 		public void Test_02_1024bits()
 		{
-			this.Test("Test_02_1024bits", 1024);
+			Test("Test_02_1024bits", 1024);
 		}
 
 		[TestMethod]
 		public void Test_03_2048bits()
 		{
-			this.Test("Test_03_2048bits", 2048);
+			Test("Test_03_2048bits", 2048);
 		}
 
 		[TestMethod]
 		public void Test_04_3072bits()
 		{
-			this.Test("Test_04_3072bits", 3072);
+			Test("Test_04_3072bits", 3072);
 		}
 
 		[TestMethod]
 		public void Test_05_4096bits()
 		{
-			this.Test("Test_05_4096bits", 4096);
+			Test("Test_05_4096bits", 4096);
 		}
 
 		[TestMethod]
 		public void Test_06_7680bits()
 		{
-			this.Test("Test_06_7680bits", 7680);
+			Test("Test_06_7680bits", 7680);
 		}
 
 		[TestMethod]
 		public void Test_07_15360bits()
 		{
-			this.Test("Test_07_15360bits", 15360);
+			Test("Test_07_15360bits", 15360);
 		}
 
-		private void Test(string Name, int Size)
+		private static void Test(string Name, int Size)
 		{
-			CspParameters CspParams = new CspParameters()
+			CspParameters CspParams = new()
 			{
 				Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.NoPrompt,
 				KeyContainerName = Name
 			};
 
-			RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(Size, CspParams);
+			RSACryptoServiceProvider rsa = new(Size, CspParams);
 
 			RSAParameters Parameters = rsa.ExportParameters(true);
 			int i, c = Parameters.P.Length;
@@ -95,3 +97,5 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

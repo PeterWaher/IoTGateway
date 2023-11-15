@@ -6,7 +6,7 @@ namespace Waher.Networking.HTTP.Test
 {
 	internal class CookieWebClient : WebClient
 	{
-		private CookieContainer cookies = new CookieContainer();
+		private CookieContainer cookies = new();
 		private DateTime? ifModifiedSince = null;
 		private DateTime? ifUnmodifiedSince = null;
 		private string accept = null;
@@ -78,7 +78,7 @@ namespace Waher.Networking.HTTP.Test
 		private void CopyCookies(WebResponse Response)
 		{
 			if (Response is HttpWebResponse WebResponse)
-				cookies.Add(WebResponse.Cookies);
+				this.cookies.Add(WebResponse.Cookies);
 		}
 
 	}

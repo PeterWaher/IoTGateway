@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace Waher.Utility.Csp
 {
 	class Program
@@ -91,7 +93,7 @@ namespace Waher.Utility.Csp
 								Flags = Flags
 							};
 
-							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize, Csp))
+							using (RSACryptoServiceProvider RSA = new(KeySize, Csp))
 							{
 								Console.Out.WriteLine("Key created.");
 							}
@@ -104,7 +106,7 @@ namespace Waher.Utility.Csp
 								Flags = Flags | CspProviderFlags.UseExistingKey
 							};
 
-							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize, Csp))
+							using (RSACryptoServiceProvider RSA = new(KeySize, Csp))
 							{
 								RSA.PersistKeyInCsp = false;    // Deletes key.
 								RSA.Clear();
@@ -120,7 +122,7 @@ namespace Waher.Utility.Csp
 								Flags = Flags | CspProviderFlags.UseExistingKey
 							};
 
-							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(KeySize, Csp))
+							using (RSACryptoServiceProvider RSA = new(KeySize, Csp))
 							{
 								Parameters = RSA.ExportParameters(true);
 
@@ -151,3 +153,5 @@ namespace Waher.Utility.Csp
 		}
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

@@ -2,6 +2,8 @@
 using System.IO;
 using System.Security.Cryptography;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace Waher.Utility.DeleteDB
 {
 	/// <summary>
@@ -93,7 +95,7 @@ namespace Waher.Utility.DeleteDB
 
 						if (Encryption)
 						{
-							CspParameters CspParameters = new CspParameters()
+							CspParameters CspParameters = new()
 							{
 								Flags = CspProviderFlags.UseExistingKey | CspProviderFlags.UseMachineKeyStore,
 								KeyContainerName = File
@@ -101,11 +103,10 @@ namespace Waher.Utility.DeleteDB
 
 							try
 							{
-								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(CspParameters))
-								{
-									RSA.PersistKeyInCsp = false;    // Deletes key.
-									RSA.Clear();
-								}
+								using RSACryptoServiceProvider RSA = new(CspParameters);
+								
+								RSA.PersistKeyInCsp = false;    // Deletes key.
+								RSA.Clear();
 							}
 							catch (CryptographicException ex)
 							{
@@ -141,3 +142,5 @@ namespace Waher.Utility.DeleteDB
 
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

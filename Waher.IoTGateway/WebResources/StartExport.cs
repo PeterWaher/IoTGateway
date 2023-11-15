@@ -22,7 +22,7 @@ namespace Waher.IoTGateway.WebResources
 	/// </summary>
 	public class StartExport : HttpSynchronousResource, IHttpPostMethod
 	{
-		internal static AesCryptoServiceProvider aes = GetCryptoProvider();
+		internal static Aes aes = GetCryptoProvider();
 
 		/// <summary>
 		/// Starts data export
@@ -32,15 +32,14 @@ namespace Waher.IoTGateway.WebResources
 		{
 		}
 
-		private static AesCryptoServiceProvider GetCryptoProvider()
+		private static Aes GetCryptoProvider()
 		{
-			AesCryptoServiceProvider Result = new AesCryptoServiceProvider()
-			{
-				BlockSize = 128,
-				KeySize = 256,
-				Mode = CipherMode.CBC,
-				Padding = PaddingMode.None
-			};
+			Aes Result = Aes.Create();
+
+			Result.BlockSize = 128;
+			Result.KeySize = 256;
+			Result.Mode = CipherMode.CBC;
+			Result.Padding = PaddingMode.None;
 
 			return Result;
 		}

@@ -6,6 +6,8 @@ using System.Threading;
 using Waher.Events;
 using Waher.Persistence;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace Waher.IoTGateway.Svc
 {
 	/// <summary>
@@ -291,3 +293,5 @@ namespace Waher.IoTGateway.Svc
 		}
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+
+#pragma warning disable CA1416 // Validate platform compatibility
 
 namespace Waher.IoTGateway.Svc
 {
@@ -296,3 +297,5 @@ namespace Waher.IoTGateway.Svc
 
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

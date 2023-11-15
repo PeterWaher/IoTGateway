@@ -1,8 +1,9 @@
-﻿using System;
-using Waher.Script;
+﻿using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+
+#pragma warning disable CA1416 // Validate platform compatibility
 
 namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
 {
@@ -79,3 +80,5 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         }
     }
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

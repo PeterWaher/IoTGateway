@@ -18,6 +18,8 @@ using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 using System.Diagnostics;
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace Waher.IoTGateway.Svc
 {
 	/// <summary>
@@ -528,3 +530,5 @@ namespace Waher.IoTGateway.Svc
 
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

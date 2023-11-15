@@ -58,7 +58,7 @@ namespace Waher.IoTGateway.Svc
 					using StreamWriter w = File.CreateText(FileName);
 					w.Write("Type: ");
 
-					if (!(e.ExceptionObject is null))
+					if (e.ExceptionObject is not null)
 						w.WriteLine(e.ExceptionObject.GetType().FullName);
 					else
 						w.WriteLine("null");
@@ -69,7 +69,7 @@ namespace Waher.IoTGateway.Svc
 					w.WriteLine();
 					if (e.ExceptionObject is Exception ex)
 					{
-						while (!(ex is null))
+						while (ex is not null)
 						{
 							w.WriteLine(ex.Message);
 							w.WriteLine();
@@ -81,7 +81,7 @@ namespace Waher.IoTGateway.Svc
 					}
 					else
 					{
-						if (!(e.ExceptionObject is null))
+						if (e.ExceptionObject is not null)
 							w.WriteLine(e.ExceptionObject.ToString());
 
 						w.WriteLine();
@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.Svc
 
 				if (e.ExceptionObject is Exception ex2)
 					Log.Critical(ex2);
-				else if (!(e.ExceptionObject is null))
+				else if (e.ExceptionObject is not null)
 					Log.Critical(e.ExceptionObject.ToString());
 				else
 					Log.Critical("Unexpected null exception thrown.");
@@ -375,7 +375,7 @@ namespace Waher.IoTGateway.Svc
 					new KeyValuePair<string, object>("Service Name", ServiceName),
 					new KeyValuePair<string, object>("Instance Name", InstanceName));
 
-				using GatewayService Service = new GatewayService(ServiceName, InstanceName);
+				using GatewayService Service = new(ServiceName, InstanceName);
 				ServiceBase.Run(Service);
 			}
 			catch (Exception ex)
@@ -415,7 +415,7 @@ namespace Waher.IoTGateway.Svc
 					return;
 				}
 
-				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
 				Gateway.OnTerminate += (sender, e) => Done.Set();
 				Console.CancelKeyPress += (sender, e) => Gateway.Terminate();
 
@@ -492,7 +492,7 @@ namespace Waher.IoTGateway.Svc
 		private static void InstallService(string ServiceName, string InstanceName, string DisplayName, string Description, 
 			ServiceStartType StartType, bool Immediate, ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
-			ServiceInstaller host = new ServiceInstaller(ServiceName, InstanceName);
+			ServiceInstaller host = new(ServiceName, InstanceName);
 			int i;
 
 			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
@@ -520,7 +520,7 @@ namespace Waher.IoTGateway.Svc
 
 		private static void UninstallService(string ServiceName, string InstanceName)
 		{
-			ServiceInstaller host = new ServiceInstaller(ServiceName, InstanceName);
+			ServiceInstaller host = new(ServiceName, InstanceName);
 
 			if (host.Uninstall())
 				Console.Out.WriteLine("Service successfully uninstalled.");

@@ -48,7 +48,7 @@ namespace Waher.IoTGateway.Svc
 					Started = false;
 				else
 				{
-					using PendingTimer Timer = new PendingTimer(this);
+					using PendingTimer Timer = new(this);
 
 					Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -142,7 +142,7 @@ namespace Waher.IoTGateway.Svc
 					Started = false;
 				else
 				{
-					using PendingTimer Timer = new PendingTimer(this);
+					using PendingTimer Timer = new(this);
 
 					this.starting = true;
 					try
@@ -177,7 +177,7 @@ namespace Waher.IoTGateway.Svc
 				case PowerBroadcastStatus.OemEvent:
 				case PowerBroadcastStatus.PowerStatusChange:
 				case PowerBroadcastStatus.QuerySuspend:
-					this.Flush();
+					Flush();
 					return true;
 
 				case PowerBroadcastStatus.ResumeAutomatic:
@@ -266,9 +266,9 @@ namespace Waher.IoTGateway.Svc
 			Log.Notice("Service is being stopped.");
 			try
 			{
-				using PendingTimer Timer = new PendingTimer(this);
+				using PendingTimer Timer = new(this);
 
-				this.Flush();
+				Flush();
 				Gateway.Stop().Wait();
 				Log.Terminate();
 			}
@@ -278,7 +278,7 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private void Flush()
+		private static void Flush()
 		{
 			if (Database.HasProvider)
 				Database.Provider.Flush().Wait();

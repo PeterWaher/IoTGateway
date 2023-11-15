@@ -3803,7 +3803,7 @@ namespace Waher.IoTGateway
 			}
 			else
 			{
-				if (DomainOrHost == "localhost")
+				if (DomainOrHost == "localhost" || string.IsNullOrEmpty(DomainOrHost))
 					return true;
 
 				if (!(webServer is null))

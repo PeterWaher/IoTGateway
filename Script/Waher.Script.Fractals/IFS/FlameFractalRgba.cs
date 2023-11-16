@@ -189,8 +189,9 @@ namespace Waher.Script.Fractals.IFS
                     }
 
                     CurrentFunction.SetColor(Graph.ToColor(FlameItem));
-                }
-                else if (FlameItem is IFlameVariation FlameVariation)
+                    CurrentFunction = null;
+				}
+				else if (FlameItem is IFlameVariation FlameVariation)
                 {
                     if (CurrentFunction is null)
                     {
@@ -515,7 +516,7 @@ namespace Waher.Script.Fractals.IFS
             yMin = yCenter - rDelta / (2 * AspectRatio);
             yMax = yMin + rDelta / AspectRatio;
 
-            int NrGames = Parallel ? System.Environment.ProcessorCount : 1;
+            int NrGames = Parallel ? Environment.ProcessorCount : 1;
 
             if (NrGames <= 1)
             {

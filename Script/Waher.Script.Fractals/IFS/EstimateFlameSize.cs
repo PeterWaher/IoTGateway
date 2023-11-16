@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
-using Waher.Script.Functions.Scalar;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
@@ -124,8 +123,9 @@ namespace Waher.Script.Fractals.IFS
 					cl.ToHsl(out float H, out float S, out float L);
                     
                     CurrentFunction.SetColorHsl(H, S, L);
-                }
-                else if (FlameItem is IFlameVariation Var)
+                    CurrentFunction = null;
+				}
+				else if (FlameItem is IFlameVariation Var)
                 {
                     if (CurrentFunction is null)
                     {

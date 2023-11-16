@@ -179,8 +179,9 @@ namespace Waher.Script.Fractals.IFS
 					cl.ToHsl(out float H, out float S, out float L);
 
 					CurrentFunction.SetColorHsl(H, S, L);
-                }
-                else if (FlameItem is IFlameVariation FlameVariation)
+                    CurrentFunction = null;
+				}
+				else if (FlameItem is IFlameVariation FlameVariation)
                 {
                     if (CurrentFunction is null)
                     {

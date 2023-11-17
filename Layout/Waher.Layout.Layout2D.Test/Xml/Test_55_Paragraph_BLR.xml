@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
+          background="WhiteBackground" pen="BlackPen"
+          font="Text" textColor="Black">
+	<SolidPen id="BlackPen" color="Black" width="1px"/>
+	<SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+	<SolidPen id="GreenPen" color="Green" width="2mm"/>
+	<SolidPen id="RedPen" color="Red" width="2mm"/>
+	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
+	<SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+	<Font id="Text" name="Arial" size="18pt" color="Black"/>
+	<Font id="Text2" name="Courier New" size="24pt" color="Blue"/>
+	<Overlays>
+		<Cell width="100%" height="100%">
+			<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+			<ForEach variable="k" expression="(10..90|10)+'%'">
+				<Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+				<Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+			</ForEach>
+		</Cell>
+		<Cell width="100%" height="100%">
+			<Margins left="20%" right="20%" top="20%" bottom="20%">
+				<Rectangle fill="GreenBackground" pen="BlackPen">
+					<Paragraph font="Text" halign="Left" valign="BaseLine">
+						<Text text="This is normal text. "/>
+						<Bold>
+							<Text text="This is bold text. "/>
+						</Bold>
+						<Italic>
+							<Text text="This is italic text. "/>
+						</Italic>
+						<Bold>
+							<Italic>
+								<Text text="This is bold and italic text. "/>
+							</Italic>
+						</Bold>
+						<Underline>
+							<Text text="This is underlined text. "/>
+						</Underline>
+						<StrikeThrough>
+							<Text text="This is text that is stricken through. "/>
+						</StrikeThrough>
+						<Superscript>
+							<Text text="This is "/>
+							<Underline>
+								<Text text="superscript"/>
+							</Underline>
+							<Text text=" text. "/>
+						</Superscript>
+						<Subscript>
+							<Text text="This is "/>
+							<Underline>
+								<Text text="subscript"/>
+							</Underline>
+							<Text text=" text. "/>
+						</Subscript>
+						<Text text="a"/>
+						<Superscript>
+							<Text text="2"/>
+						</Superscript>
+						<Text text="+b"/>
+						<Superscript>
+							<Text text="2"/>
+						</Superscript>
+						<Text text="=c"/>
+						<Superscript>
+							<Text text="2"/>
+						</Superscript>
+						<Text text=". x"/>
+						<Subscript>
+							<Text text="i+1"/>
+						</Subscript>
+						<Text text="=x"/>
+						<Subscript>
+							<Text text="i"/>
+						</Subscript>
+						<Superscript>
+							<Text text="2"/>
+						</Superscript>
+						<Text text="+c. "/>
+						<Text text="x"/>
+						<Superscript>
+							<Text text="y"/>
+							<Superscript>
+								<Text text="z"/>
+							</Superscript>
+						</Superscript>
+						<Text text=" x"/>
+						<Subscript>
+							<Text text="y"/>
+							<Subscript>
+								<Text text="z"/>
+							</Subscript>
+						</Subscript>
+						<Text text=" "/>
+						<TextColor color="Red">
+							<Text text="This is text written in red. "/>
+						</TextColor>
+						<FontRef font="Text2">
+							<Text text="This text is written using another font. "/>
+						</FontRef>
+						<InlineScript expression="'This text is returned from script.'"/>
+					</Paragraph>
+				</Rectangle>
+			</Margins>
+		</Cell>
+	</Overlays>
+</Layout2D>

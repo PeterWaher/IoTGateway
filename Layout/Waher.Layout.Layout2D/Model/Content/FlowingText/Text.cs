@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -78,5 +81,84 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			if (Destination is Text Dest)
 				Dest.text = this.text?.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			EvaluationResult<string> Text = await this.text.TryEvaluate(State.Session);
+			if (Text.Ok)
+				AddSegments(Segments, Text.Result, State);
+		}
+
+		/// <summary>
+		/// Reduces text into segments.
+		/// </summary>
+		/// <param name="Segments">List of segments</param>
+		/// <param name="Text">Text to reduce to segments and add to the list of segments.</param>
+		/// <param name="State">Drawing state.</param>
+		public static void AddSegments(List<Segment> Segments, string Text, DrawingState State)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool Empty = true;
+
+			foreach (char ch in Text)
+			{
+				if (char.IsWhiteSpace(ch))
+				{
+					if (!Empty)
+					{
+						AddSegment(Segments, sb.ToString(), true, State);
+						sb.Clear();
+						Empty = true;
+					}
+					else
+						AddSegment(Segments, string.Empty, true, State);
+				}
+				else
+				{
+					sb.Append(ch);
+					Empty = false;
+				}
+			}
+
+			if (!Empty)
+				AddSegment(Segments, sb.ToString(), false, State);
+		}
+
+		private static void AddSegment(List<Segment> Segments, string Text, bool SpaceAfter, DrawingState State)
+		{
+			Segment Segment = new Segment()
+			{
+				Text = Text,
+				Paint = State.Text,
+				Font = State.Font,
+				SpaceAfter = SpaceAfter,
+				DeltaY = 0
+			};
+
+			SKRect Bounds = new SKRect();
+			State.Text.MeasureText(Text, ref Bounds);
+			Segment.Bounds = Bounds;
+
+			Bounds = new SKRect();
+			if (Segment.SpaceAfter)
+			{
+				State.Text.MeasureText("x x", ref Bounds);
+
+				SKRect Bounds2 = new SKRect();
+				State.Text.MeasureText("xx", ref Bounds2);
+
+				Bounds.Left -= Bounds2.Left;
+				Bounds.Right -= Bounds2.Right;
+			}
+			Segment.SpaceBounds = Bounds;
+
+			Segments.Add(Segment);
+		}
+
 	}
 }

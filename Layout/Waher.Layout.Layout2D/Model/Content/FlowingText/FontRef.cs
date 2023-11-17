@@ -1,13 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Fonts;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
 	/// <summary>
 	/// Represents text using a specific font in flowing text.
 	/// </summary>
-	public class FontRef : LayoutElement, IFlowingText
+	public class FontRef : EmbeddedText
 	{
 		private StringAttribute font;
 
@@ -78,6 +81,34 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 
 			if (Destination is FontRef Dest)
 				Dest.font = this.font?.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public override async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			EvaluationResult<string> FontId = await this.font.TryEvaluate(State.Session);
+
+			if (FontId.Ok && 
+				this.Document.TryGetElement(FontId.Result, out ILayoutElement E) && 
+				E is Font Font)
+			{
+				SKFont Bak = State.Font;
+				SKPaint Bak2 = State.Text;
+
+				State.Font = Font.FontDef;
+				State.Text = Font.Text;
+
+				await base.MeasureSegments(Segments, State);
+
+				State.Font = Bak;
+				State.Text = Bak2;
+			}
+			else
+				await base.MeasureSegments(Segments, State);
 		}
 	}
 }

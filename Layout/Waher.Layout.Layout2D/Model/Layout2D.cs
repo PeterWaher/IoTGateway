@@ -170,7 +170,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Pen Pen)
 			{
-				penDef = Pen;
+				this.penDef = Pen;
 				PenBak = State.ShapePen;
 				State.ShapePen = Pen.Paint;
 			}
@@ -180,7 +180,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Background Background)
 			{
-				backgroundDef = Background;
+				this.backgroundDef = Background;
 				BackgroundBak = State.ShapeFill;
 				State.ShapeFill = Background.Paint;
 			}

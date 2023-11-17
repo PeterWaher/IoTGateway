@@ -1770,6 +1770,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText">
             <summary>
             Abstract base class of embedded text elements in flowing text.
@@ -1804,6 +1811,13 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef">
             <summary>
@@ -1853,10 +1867,24 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.IFlowingText">
             <summary>
             Base interface for flowing text
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.IFlowingText.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript">
             <summary>
@@ -1906,6 +1934,13 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic">
             <summary>
             Represents a segment of italic text in flowing text.
@@ -1930,6 +1965,150 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Row">
+            <summary>
+            Contains information about a row of text in a paragraph of flowing text.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Segments">
+            <summary>
+            Segments
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Bounds">
+            <summary>
+            Bounds of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Width">
+            <summary>
+            Width of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Height">
+            <summary>
+            Height of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Top">
+            <summary>
+            Top of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Bottom">
+            <summary>
+            Bottom of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.BaseLine">
+            <summary>
+            Position on base-line.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Dispose">
+            <summary>
+            <see cref="T:System.IDisposable"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment">
+            <summary>
+            Contains information about a segment of flowing text.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Text">
+            <summary>
+            Text segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Font">
+            <summary>
+            Font state.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Paint">
+            <summary>
+            Paint state.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Bounds">
+            <summary>
+            Bounds of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.SpaceBounds">
+            <summary>
+            Bounds of a space character.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Width">
+            <summary>
+            Width of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Height">
+            <summary>
+            Height of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Top">
+            <summary>
+            Top of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Bottom">
+            <summary>
+            Bottom of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.SpaceWidth">
+            <summary>
+            Width of a space character.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.SpaceHeight">
+            <summary>
+            Height of a space character.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.LinePos">
+            <summary>
+            Position on optional horizontal line.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.DeltaY">
+            <summary>
+            Y-offset of segment.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.SpaceAfter">
+            <summary>
+            If there's white-space after the segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.Dispose">
+            <summary>
+            <see cref="T:System.IDisposable"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Segment.TranslateY(System.Single)">
+            <summary>
+            Moves the segment along the Y-axis.
+            </summary>
+            <param name="DeltaY">Delta-Y</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough">
             <summary>
@@ -1956,6 +2135,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript">
             <summary>
             Represents a segment of subscript text in flowing text.
@@ -1981,6 +2167,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript">
             <summary>
             Represents a segment of superscript text in flowing text.
@@ -2005,6 +2198,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Text">
             <summary>
@@ -2054,6 +2254,21 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.AddSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},System.String,Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Reduces text into segments.
+            </summary>
+            <param name="Segments">List of segments</param>
+            <param name="Text">Text to reduce to segments and add to the list of segments.</param>
+            <param name="State">Drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor">
             <summary>
             Represents a text color segment in flowing text.
@@ -2102,6 +2317,13 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline">
             <summary>
             Represents a segment of underline text in flowing text.
@@ -2126,6 +2348,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline.MeasureSegments(System.Collections.Generic.List{Waher.Layout.Layout2D.Model.Content.FlowingText.Segment},Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures text segments to a list of segments.
+            </summary>
+            <param name="Segments">List of segments.</param>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.Label">
             <summary>
@@ -2231,6 +2460,16 @@
             Font
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Paragraph.HorizontalAlignmentAttribute">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Paragraph.VerticalAlignmentAttribute">
+            <summary>
+            Degrees
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
@@ -2267,6 +2506,25 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.DoMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.Script">
             <summary>
@@ -5557,6 +5815,11 @@
             Abstract base class for fonts.
             </summary>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Fonts.Font.DefaultLineHeightRelative">
+            <summary>
+            Line height by default is 40% larger than height of text.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Abstract base class for fonts.
@@ -5577,6 +5840,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.SizeAttribute">
             <summary>
             Size
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.LineHeightAttribute">
+            <summary>
+            Line Height
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.WeightAttribute">
@@ -5640,6 +5908,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Text">
             <summary>
             Measured Text
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.LineHeight">
+            <summary>
+            Line height.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.LineHeightExplicit">
+            <summary>
+            If line-height is explicitly defined
             </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment">

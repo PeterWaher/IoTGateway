@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -77,6 +79,30 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 
 			if (Destination is TextColor Dest)
 				Dest.color = this.color?.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public override async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			EvaluationResult<SKColor> Color = await this.color.TryEvaluate(State.Session);
+
+			if (Color.Ok)
+			{
+				SKPaint Bak = State.Text;
+			
+				State.Text = State.Text.Clone();
+				State.Text.Color = Color.Result;
+
+				await base.MeasureSegments(Segments, State);
+
+				State.Text = Bak;
+			}
+			else
+				await base.MeasureSegments(Segments, State);
 		}
 	}
 }

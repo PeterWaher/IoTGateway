@@ -198,14 +198,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				case FlexibleOrder.HorizontalVertical:
 				default:
 					float Size = this.ExplicitWidth ?? this.Parent?.InnerWidth ?? State.AreaWidth;
-					HorizontalAlignment HAlignment = await this.halign.Evaluate<HorizontalAlignment>(State.Session,
+					HorizontalAlignment HAlignment = await this.halign.Evaluate(State.Session,
 						HorizontalDirection == HorizontalDirection.LeftRight ? HorizontalAlignment.Left : HorizontalAlignment.Right);
 
 					return new FlexibleHorizontalCells(State.Session, Size, HorizontalDirection, VerticalDirection, HAlignment);
 
 				case FlexibleOrder.VerticalHorizontal:
 					Size = this.ExplicitHeight ?? this.Parent?.InnerHeight ?? State.AreaHeight;
-					VerticalAlignment VAlignment = await this.valign.Evaluate<VerticalAlignment>(State.Session,
+					VerticalAlignment VAlignment = await this.valign.Evaluate(State.Session,
 						VerticalDirection == VerticalDirection.TopDown ? VerticalAlignment.Top : VerticalAlignment.Bottom);
 
 					return new FlexibleVerticalCells(State.Session, Size, HorizontalDirection, VerticalDirection, VAlignment);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
@@ -99,6 +100,20 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 
 					Dest.text = Children;
 				}
+			}
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public virtual async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			if (!(this.text is null))
+			{
+				foreach (IFlowingText Text in this.text)
+					await Text.MeasureSegments(Segments, State);
 			}
 		}
 

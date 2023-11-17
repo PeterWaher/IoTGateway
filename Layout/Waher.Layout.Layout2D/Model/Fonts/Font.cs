@@ -10,8 +10,14 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 	/// </summary>
 	public class Font : LayoutElement
 	{
+		/// <summary>
+		/// Line height by default is 40% larger than height of text.
+		/// </summary>
+		public const float DefaultLineHeightRelative = 1.4f;
+
 		private StringAttribute name;
 		private LengthAttribute size;
+		private LengthAttribute lineHeight;
 		private EnumAttribute<SKFontStyleWeight> weight;
 		private EnumAttribute<SKFontStyleWidth> width;
 		private EnumAttribute<SKFontStyleSlant> slant;
@@ -48,6 +54,15 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			get => this.size;
 			set => this.size = value;
+		}
+
+		/// <summary>
+		/// Line Height
+		/// </summary>
+		public LengthAttribute LineHeightAttribute
+		{
+			get => this.lineHeight;
+			set => this.lineHeight = value;
 		}
 
 		/// <summary>
@@ -94,6 +109,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			this.name = new StringAttribute(Input, "name");
 			this.size = new LengthAttribute(Input, "size");
+			this.lineHeight = new LengthAttribute(Input, "lineHeight");
 			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
 			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
 			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
@@ -112,6 +128,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 
 			this.name?.Export(Output);
 			this.size?.Export(Output);
+			this.lineHeight?.Export(Output);
 			this.weight?.Export(Output);
 			this.width?.Export(Output);
 			this.slant?.Export(Output);
@@ -141,6 +158,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 			{
 				Dest.name = this.name?.CopyIfNotPreset();
 				Dest.size = this.size?.CopyIfNotPreset();
+				Dest.lineHeight = this.lineHeight?.CopyIfNotPreset();
 				Dest.weight = this.weight?.CopyIfNotPreset();
 				Dest.width = this.width?.CopyIfNotPreset();
 				Dest.slant = this.slant?.CopyIfNotPreset();
@@ -166,6 +184,18 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 			if (SizeLength.Ok)
 				State.CalcDrawingSize(SizeLength.Result, ref Size, false);
 
+			this.lineHeightValue = Size * DefaultLineHeightRelative;
+			EvaluationResult<Length> LineHeightLength = await this.lineHeight.TryEvaluate(State.Session);
+			if (LineHeightLength.Ok)
+			{
+				State.CalcDrawingSize(LineHeightLength.Result, ref this.lineHeightValue, false);
+				this.lineHeightExplicit = true;
+			}
+			else
+				this.lineHeightExplicit = false;
+
+			this.lineHeightValue = this.lineHeightValue * State.PixelsPerInch / 72;
+
 			EvaluationResult<SKFontStyleWeight> WeightValue = await this.weight.TryEvaluate(State.Session);
 			if (WeightValue.Ok)
 				Weight = (int)WeightValue.Result;
@@ -187,7 +217,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 				Edging = SKFontEdging.SubpixelAntialias,
 				Hinting = SKFontHinting.Full,
 				Subpixel = true,
-				Size = (float)(Size * State.PixelsPerInch / 72),
+				Size = Size * State.PixelsPerInch / 72,
 				Typeface = SKTypeface.FromFamilyName(Name, Weight, Width, Slant)
 			};
 
@@ -206,6 +236,8 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 
 		private SKFont font;
 		private SKPaint text;
+		private float lineHeightValue;
+		private bool lineHeightExplicit;
 
 		/// <summary>
 		/// Measured Font
@@ -216,5 +248,15 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// Measured Text
 		/// </summary>
 		public SKPaint Text => this.text;
+
+		/// <summary>
+		/// Line height.
+		/// </summary>
+		public float LineHeight => this.lineHeightValue;
+
+		/// <summary>
+		/// If line-height is explicitly defined
+		/// </summary>
+		public bool LineHeightExplicit => this.lineHeightExplicit;
 	}
 }

@@ -1,6 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using SkiaSharp;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Script;
+using Waher.Script.Exceptions;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -77,6 +82,43 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 
 			if (Destination is InlineScript Dest)
 				Dest.expression = this.expression?.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			EvaluationResult<Expression> Parsed = await this.expression.TryEvaluate(State.Session);
+			if (Parsed.Ok)
+			{
+				object Result;
+
+				try
+				{
+					Result = await Parsed.Result.EvaluateAsync(State.Session);
+				}
+				catch (ScriptReturnValueException ex)
+				{
+					Result = ex.ReturnValue;
+				}
+				catch (ScriptAbortedException)
+				{
+					State.Session.CancelAbort();
+					Result = "Script execution aborted due to timeout.";
+				}
+				catch (Exception ex)
+				{
+					Result = ex;
+				}
+
+				string s = Result?.ToString();
+
+				if (!string.IsNullOrEmpty(s))
+					Text.AddSegments(Segments, s, State);
+			}
 		}
 	}
 }

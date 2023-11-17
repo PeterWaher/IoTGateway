@@ -294,5 +294,77 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			await this.Test("Test_43_HorizontalBars");
 		}
+
+		[TestMethod]
+		public async Task Test_44_Paragraph_TL()
+		{
+			await this.Test("Test_44_Paragraph_TL");
+		}
+
+		[TestMethod]
+		public async Task Test_45_Paragraph_TC()
+		{
+			await this.Test("Test_45_Paragraph_TC");
+		}
+
+		[TestMethod]
+		public async Task Test_46_Paragraph_TR()
+		{
+			await this.Test("Test_46_Paragraph_TR");
+		}
+
+		[TestMethod]
+		public async Task Test_47_Paragraph_BL()
+		{
+			await this.Test("Test_47_Paragraph_BL");
+		}
+
+		[TestMethod]
+		public async Task Test_48_Paragraph_BC()
+		{
+			await this.Test("Test_48_Paragraph_BC");
+		}
+
+		[TestMethod]
+		public async Task Test_49_Paragraph_BR()
+		{
+			await this.Test("Test_49_Paragraph_BR");
+		}
+
+		[TestMethod]
+		public async Task Test_50_Paragraph_CL()
+		{
+			await this.Test("Test_50_Paragraph_CL");
+		}
+
+		[TestMethod]
+		public async Task Test_51_Paragraph_CC()
+		{
+			await this.Test("Test_51_Paragraph_CC");
+		}
+
+		[TestMethod]
+		public async Task Test_52_Paragraph_CR()
+		{
+			await this.Test("Test_52_Paragraph_CR");
+		}
+
+		[TestMethod]
+		public async Task Test_53_Paragraph_BLL()
+		{
+			await this.Test("Test_53_Paragraph_BLL");
+		}
+
+		[TestMethod]
+		public async Task Test_54_Paragraph_BLC()
+		{
+			await this.Test("Test_54_Paragraph_BLC");
+		}
+
+		[TestMethod]
+		public async Task Test_55_Paragraph_BLR()
+		{
+			await this.Test("Test_55_Paragraph_BLR");
+		}
 	}
 }

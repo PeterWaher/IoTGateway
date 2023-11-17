@@ -1,4 +1,8 @@
-﻿namespace Waher.Layout.Layout2D.Model.Content.FlowingText
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
 	/// <summary>
 	/// Represents a segment of underline text in flowing text.
@@ -29,6 +33,26 @@
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new Underline(Document, Parent);
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public override async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			int i = Segments.Count;
+
+			await base.MeasureSegments(Segments, State);
+
+			int c = Segments.Count;
+
+			for (; i < c; i++)
+			{
+				Segment Segment = Segments[i];
+				Segment.LinePos = 2;
+			}
 		}
 	}
 }

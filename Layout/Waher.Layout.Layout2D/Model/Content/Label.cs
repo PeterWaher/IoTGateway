@@ -133,8 +133,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			await base.DoMeasureDimensions(State);
 
-			this.halignment = await this.halign.Evaluate< HorizontalAlignment>(State.Session, HorizontalAlignment.Left);
-			this.valignment = await this.valign.Evaluate<VerticalAlignment>(State.Session, VerticalAlignment.Top);
+			this.halignment = await this.halign.Evaluate(State.Session, HorizontalAlignment.Left);
+			this.valignment = await this.valign.Evaluate(State.Session, VerticalAlignment.Top);
 
 			if (!(this.font is null) && this.fontRef is null)
 			{

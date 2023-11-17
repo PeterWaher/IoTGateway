@@ -183,6 +183,7 @@
 			<xs:extension base="LayoutElement">
 				<xs:attribute name="name" type="xs:string" use="optional"/>
 				<xs:attribute name="size" type="Length" use="optional"/>
+				<xs:attribute name="lineHeight" type="Length" use="optional"/>
 				<xs:attribute name="weight" type="FontWeight" use="optional"/>
 				<xs:attribute name="width" type="FontWidth" use="optional"/>
 				<xs:attribute name="slant" type="FontSlant" use="optional"/>
@@ -826,11 +827,13 @@
 
 	<xs:complexType name="Paragraph">
 		<xs:complexContent>
-			<xs:extension base="LayoutArea">
+			<xs:extension base="Point">
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
 					<xs:group ref="FlowingText"/>
 				</xs:sequence>
 				<xs:attribute name="font" type="xs:string" use="optional"/>
+				<xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
+				<xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

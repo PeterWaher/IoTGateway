@@ -1,4 +1,8 @@
-﻿namespace Waher.Layout.Layout2D.Model.Content.FlowingText
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
 	/// <summary>
 	/// Represents a segment of italic text in flowing text.
@@ -29,6 +33,35 @@
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new Italic(Document, Parent);
+		}
+
+		/// <summary>
+		/// Measures text segments to a list of segments.
+		/// </summary>
+		/// <param name="Segments">List of segments.</param>
+		/// <param name="State">Current drawing state.</param>
+		public override async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		{
+			SKFont Bak = State.Font;
+			SKPaint Bak2 = State.Text;
+
+			State.Font = new SKFont()
+			{
+				Edging = SKFontEdging.SubpixelAntialias,
+				Hinting = SKFontHinting.Full,
+				Subpixel = true,
+				Size = Bak.Size,
+				Typeface = SKTypeface.FromFamilyName(Bak.Typeface.FamilyName,
+					Bak.Typeface.FontWeight, Bak.Typeface.FontWidth, SKFontStyleSlant.Italic)
+			};
+
+			State.Text = State.Text.Clone();
+			State.Text.Typeface = State.Font.Typeface;
+
+			await base.MeasureSegments(Segments, State);
+
+			State.Font = Bak;
+			State.Text = Bak2;
 		}
 	}
 }

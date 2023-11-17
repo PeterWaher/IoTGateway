@@ -22,7 +22,7 @@
 		<Cell width="100%" height="100%">
 			<Margins left="20%" right="20%" top="20%" bottom="20%">
 				<Rectangle fill="GreenBackground" pen="BlackPen">
-					<Paragraph font="Text" halign="Right" valign="Top">
+					<Paragraph font="Text" halign="Center" valign="Top">
 						<Text text="This is normal text. "/>
 						<Bold>
 							<Text text="This is bold text. "/>

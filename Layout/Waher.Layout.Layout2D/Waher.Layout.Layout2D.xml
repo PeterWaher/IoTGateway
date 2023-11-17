@@ -2008,9 +2008,9 @@
             Bottom of segment.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.BaseLine">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Indentation">
             <summary>
-            Position on base-line.
+            Indentation of row.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Row.Dispose">

@@ -355,50 +355,62 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			base.MeasurePositions(State);
 
+			float AreaWidth = this.Parent.InnerWidth ?? this.Parent.PotentialWidth ?? this.bounds.Width;
+			float AreaHeight = this.Parent.InnerHeight ?? this.Parent.PotentialHeight ?? this.bounds.Height;
+
+			this.Left = this.xCoordinate + this.bounds.Left;
+			this.Top = this.yCoordinate - this.bounds.Top;
+			this.Width = AreaWidth;
+			this.Height = AreaHeight;
+
 			if (this.defined)
 			{
+				float Delta;
+
 				switch (this.halignment)
 				{
 					case HorizontalAlignment.Left:
 					default:
-						this.Left = this.xCoordinate + this.bounds.Left;
+						Delta = 0;
 						break;
 
 					case HorizontalAlignment.Center:
-						this.xCoordinate -= this.bounds.Width / 2;
-						this.Left = this.xCoordinate;
+						Delta = (AreaWidth - this.bounds.Width) / 2;
+
+						foreach (Row Row in this.rows)
+							Row.Indentation = (this.bounds.Width - Row.Width) / 2;
+						
 						break;
 
 					case HorizontalAlignment.Right:
-						this.xCoordinate -= this.bounds.Width;
-						this.Left = this.xCoordinate;
+						Delta = AreaWidth - this.bounds.Width;
+
+						foreach (Row Row in this.rows)
+							Row.Indentation = this.bounds.Width - Row.Width;
+						
 						break;
 				}
+
+				this.Left = this.xCoordinate = Delta - this.bounds.Left;
 
 				switch (this.valignment)
 				{
 					case VerticalAlignment.Top:
 					default:
-						this.yCoordinate -= this.bounds.Top;
-						this.Top = this.yCoordinate;
+						Delta = 0;
 						break;
 
 					case VerticalAlignment.Center:
-						this.yCoordinate -= this.bounds.Top;
-						this.yCoordinate -= this.bounds.Height / 2;
-						this.Top = this.yCoordinate + this.bounds.Top + this.bounds.Height / 2;
+						Delta = (AreaHeight - this.bounds.Height) / 2;
 						break;
 
 					case VerticalAlignment.BaseLine:
-						this.Top = this.yCoordinate + this.bounds.Top;
-						break;
-
 					case VerticalAlignment.Bottom:
-						this.yCoordinate -= this.bounds.Top;
-						this.yCoordinate -= this.bounds.Height;
-						this.Top = this.yCoordinate + this.bounds.Top;
+						Delta = AreaHeight - this.bounds.Height;
 						break;
 				}
+
+				this.Top = this.yCoordinate = Delta - this.bounds.Top;
 			}
 		}
 
@@ -428,7 +440,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 					foreach (Segment Segment in Row.Segments)
 					{
-						x = this.xCoordinate + dx;
+						x = this.xCoordinate + dx + Row.Indentation;
 						y = this.yCoordinate + Row.Top - Segment.Top + Segment.DeltaY;
 
 						State.Canvas.DrawText(Segment.Text, x, y, Segment.Font, Segment.Paint);

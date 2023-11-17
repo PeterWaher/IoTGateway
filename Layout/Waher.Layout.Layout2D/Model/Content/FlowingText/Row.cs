@@ -40,9 +40,9 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		public float Bottom => this.Bounds.Bottom;
 
 		/// <summary>
-		/// Position on base-line.
+		/// Indentation of row.
 		/// </summary>
-		public float? BaseLine { get; set; }
+		public float Indentation { get; set; }
 
 		/// <summary>
 		/// <see cref="IDisposable"/>

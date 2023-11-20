@@ -259,7 +259,7 @@ namespace Waher.Content.Markdown.Layout2D
 					XmlDocument Doc = new XmlDocument();
 					Doc.LoadXml(Xml);
 
-					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc);
+					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
 					RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
 
 					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
@@ -484,8 +484,8 @@ namespace Waher.Content.Markdown.Layout2D
 				XmlDocument Doc = new XmlDocument();
 				Doc.LoadXml(Xml);
 
-				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc);
 				Variables Variables = Document.Settings.Variables;
+				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Variables);
 				RenderSettings Settings = await LayoutDoc.GetRenderSettings(Variables);
 
 				KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);

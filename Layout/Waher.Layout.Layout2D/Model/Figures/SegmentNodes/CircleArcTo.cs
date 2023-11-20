@@ -52,8 +52,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.radius = new LengthAttribute(Input, "radius");
-			this.clockwise = new BooleanAttribute(Input, "clockwise");
+			this.radius = new LengthAttribute(Input, "radius", this.Document);
+			this.clockwise = new BooleanAttribute(Input, "clockwise", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -91,8 +91,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 
 			if (Destination is CircleArcTo Dest)
 			{
-				Dest.radius = this.radius?.CopyIfNotPreset();
-				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
+				Dest.radius = this.radius?.CopyIfNotPreset(Destination.Document);
+				Dest.clockwise = this.clockwise?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

@@ -15,8 +15,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public EnumAttribute(string AttributeName, TEnum Value)
-			: base(AttributeName, Value)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public EnumAttribute(string AttributeName, TEnum Value, Layout2DDocument Document)
+			: base(AttributeName, Value, Document)
 		{
 		}
 
@@ -25,8 +26,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public EnumAttribute(XmlElement E, string AttributeName)
-			: base(E, AttributeName, true)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public EnumAttribute(XmlElement E, string AttributeName, Layout2DDocument Document)
+			: base(E, AttributeName, true, Document)
 		{
 		}
 
@@ -35,8 +37,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		public EnumAttribute(string AttributeName, Expression Expression)
-			: base(AttributeName, Expression)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public EnumAttribute(string AttributeName, Expression Expression, Layout2DDocument Document)
+			: base(AttributeName, Expression, Document)
 		{
 		}
 
@@ -65,13 +68,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// Copies the attribute object if undefined, or defined by an expression.
 		/// Returns a reference to itself, if preset (set by a constant value).
 		/// </summary>
+		/// <param name="ForDocument">Document that will host the new attribute.</param>
 		/// <returns>Attribute reference.</returns>
-		public EnumAttribute<TEnum> CopyIfNotPreset()
+		public EnumAttribute<TEnum> CopyIfNotPreset(Layout2DDocument ForDocument)
 		{
 			if (this.HasPresetValue)
 				return this;
 			else
-				return new EnumAttribute<TEnum>(this.Name, this.Expression);
+				return new EnumAttribute<TEnum>(this.Name, this.Expression, ForDocument);
 		}
 
 	}

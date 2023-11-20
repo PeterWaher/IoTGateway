@@ -129,11 +129,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.order = new EnumAttribute<FlexibleOrder>(Input, "order");
-			this.horizontalDirection = new EnumAttribute<HorizontalDirection>(Input, "horizontalDirection");
-			this.verticalDirection = new EnumAttribute<VerticalDirection>(Input, "verticalDirection");
-			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
-			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
+			this.order = new EnumAttribute<FlexibleOrder>(Input, "order", this.Document);
+			this.horizontalDirection = new EnumAttribute<HorizontalDirection>(Input, "horizontalDirection", this.Document);
+			this.verticalDirection = new EnumAttribute<VerticalDirection>(Input, "verticalDirection", this.Document);
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -174,11 +174,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Flexible Dest)
 			{
-				Dest.order = this.order?.CopyIfNotPreset();
-				Dest.horizontalDirection = this.horizontalDirection?.CopyIfNotPreset();
-				Dest.verticalDirection = this.verticalDirection?.CopyIfNotPreset();
-				Dest.halign = this.halign?.CopyIfNotPreset();
-				Dest.valign = this.valign?.CopyIfNotPreset();
+				Dest.order = this.order?.CopyIfNotPreset(Destination.Document);
+				Dest.horizontalDirection = this.horizontalDirection?.CopyIfNotPreset(Destination.Document);
+				Dest.verticalDirection = this.verticalDirection?.CopyIfNotPreset(Destination.Document);
+				Dest.halign = this.halign?.CopyIfNotPreset(Destination.Document);
+				Dest.valign = this.valign?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

@@ -52,8 +52,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.scaleX = new FloatAttribute(Input, "scaleX");
-			this.scaleY = new FloatAttribute(Input, "scaleY");
+			this.scaleX = new FloatAttribute(Input, "scaleX", this.Document);
+			this.scaleY = new FloatAttribute(Input, "scaleY", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -91,8 +91,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			if (Destination is Scale Dest)
 			{
-				Dest.scaleX = this.scaleX?.CopyIfNotPreset();
-				Dest.scaleY = this.scaleY?.CopyIfNotPreset();
+				Dest.scaleX = this.scaleX?.CopyIfNotPreset(Destination.Document);
+				Dest.scaleY = this.scaleY?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

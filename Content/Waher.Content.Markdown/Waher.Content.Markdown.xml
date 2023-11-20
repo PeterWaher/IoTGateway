@@ -5277,6 +5277,15 @@
             <param name="Title">Optional title.</param>
             <returns>If Markdown could be generated.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateMarkdown(System.Text.StringBuilder,System.Byte[],System.String,System.String)">
+            <summary>
+            Generates Markdown embedding an encoded image.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="Bin">Binary encoding of image.</param>
+            <param name="ContentType">Content-Type of image.</param>
+            <param name="Title">Optional title.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates HTML for the markdown element.
@@ -5290,12 +5299,20 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateUrl(System.String,System.String[],System.String@,System.String@)">
             <summary>
-            Generates a data URL of the encoded image.
+            Generates a data URL of an encoded image.
             </summary>
             <param name="Language">Language</param>
             <param name="Rows">Rows</param>
             <param name="ContentType">Content-Type of image.</param>
             <param name="Title">Optional associated title.</param>
+            <returns>Data URL.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateUrl(System.Byte[],System.String)">
+            <summary>
+            Generates a data URL of an encoded image.
+            </summary>
+            <param name="Binary">Binary representation of image.</param>
+            <param name="ContentType">Content-Type of image.</param>
             <returns>Data URL.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GetImageBase64(System.String[])">
@@ -6374,6 +6391,20 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.OutputWpf(System.Xml.XmlWriter,Waher.Content.Emoji.IImageSource,System.String)">
+            <summary>
+            Outputs an image to WPF XAML
+            </summary>
+            <param name="Output">WPF XAML output.</param>
+            <param name="Source">Image source.</param>
+            <param name="Title">Title of image.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.CheckDataUri(Waher.Content.Emoji.IImageSource)">
+            <summary>
+            Checks a Data URI image, that it contains a decodable image.
+            </summary>
+            <param name="Source">Image source.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
@@ -6384,6 +6415,13 @@
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.OutputXamarinForms(System.Xml.XmlWriter,Waher.Content.Emoji.IImageSource)">
+            <summary>
+            Outputs an image to Xamarin XAML
+            </summary>
+            <param name="Output">WPF XAML output.</param>
+            <param name="Source">Image source.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>

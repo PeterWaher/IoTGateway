@@ -49,8 +49,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.pen = new StringAttribute(Input, "pen");
-			this.fill = new StringAttribute(Input, "fill");
+			this.pen = new StringAttribute(Input, "pen", this.Document);
+			this.fill = new StringAttribute(Input, "fill", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -77,8 +77,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Figure Dest)
 			{
-				Dest.pen = this.pen?.CopyIfNotPreset();
-				Dest.fill = this.fill?.CopyIfNotPreset();
+				Dest.pen = this.pen?.CopyIfNotPreset(Destination.Document);
+				Dest.fill = this.fill?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

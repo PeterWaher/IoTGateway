@@ -55,8 +55,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.url = new StringAttribute(Input, "url");
-			this.alt = new StringAttribute(Input, "alt");
+			this.url = new StringAttribute(Input, "url", this.Document);
+			this.alt = new StringAttribute(Input, "alt", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -93,8 +93,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 			if (Destination is ImageUrl Dest)
 			{
-				Dest.url = this.url?.CopyIfNotPreset();
-				Dest.alt = this.alt?.CopyIfNotPreset();
+				Dest.url = this.url?.CopyIfNotPreset(Destination.Document);
+				Dest.alt = this.alt?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

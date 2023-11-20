@@ -52,8 +52,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.translateX = new LengthAttribute(Input, "translateX");
-			this.translateY = new LengthAttribute(Input, "translateY");
+			this.translateX = new LengthAttribute(Input, "translateX", this.Document);
+			this.translateY = new LengthAttribute(Input, "translateY", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -91,8 +91,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			if (Destination is Translate Dest)
 			{
-				Dest.translateX = this.translateX?.CopyIfNotPreset();
-				Dest.translateY = this.translateY?.CopyIfNotPreset();
+				Dest.translateX = this.translateX?.CopyIfNotPreset(Destination.Document);
+				Dest.translateY = this.translateY?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

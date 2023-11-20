@@ -273,6 +273,11 @@
             <param name="Session">Session variables.</param>
             <returns>Copy of layout document.</returns>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Layout2DDocument.Dynamic">
+            <summary>
+            If the layout is dynamic (i.e. contains script).
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
             Contains information about an actionable area in a generated image.
@@ -331,27 +336,30 @@
             </summary>
             <typeparam name="T">Type of attribute</typeparam>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,`0)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,`0,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Manages an attribute value or expression.
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.Xml.XmlElement,System.String,System.Boolean)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.Xml.XmlElement,System.String,System.Boolean,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Manages an attribute value or expression.
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
             <param name="CanEmbedScript">If script can be embedded.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Defines an undefined attribute.
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Name">
             <summary>
@@ -386,6 +394,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Defined">
             <summary>
             If the attribute is defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Document">
+            <summary>
+            Document hosting the attribute.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryParse(System.String,`0@)">
@@ -441,26 +454,29 @@
             Boolean attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,System.Boolean)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,System.Boolean,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Boolean attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Boolean attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Boolean attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.TryParse(System.String,System.Boolean@)">
             <summary>
@@ -477,11 +493,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute">
@@ -489,26 +506,29 @@
             Color attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,SkiaSharp.SKColor)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,SkiaSharp.SKColor,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Color attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Color attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Color attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.TryParse(System.String,SkiaSharp.SKColor@)">
             <summary>
@@ -525,11 +545,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1">
@@ -537,26 +558,29 @@
             Enumeration attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,`0)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,`0,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Enumeration attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Enumeration attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Enumeration attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.TryParse(System.String,`0@)">
             <summary>
@@ -573,11 +597,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1">
@@ -616,19 +641,21 @@
             Expression attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Expression attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Expression attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.TryParse(System.String,Waher.Script.Expression@)">
             <summary>
@@ -667,11 +694,12 @@
             or null if no expression is defined.
             </returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.Extensions">
@@ -820,26 +848,29 @@
             Floating point (Single) attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,System.Single)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,System.Single,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Floating point (Single) attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Floating point (Single) attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Floating point (Single) attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.TryConvert(System.Object,System.Single@)">
             <summary>
@@ -864,11 +895,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute">
@@ -876,26 +908,29 @@
             Length attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Layout.Layout2D.Model.Length)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Layout.Layout2D.Model.Length,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Length attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Length attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Length attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.TryConvert(System.Object,Waher.Layout.Layout2D.Model.Length@)">
             <summary>
@@ -920,11 +955,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute">
@@ -932,26 +968,29 @@
             Positive integer attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,System.Int32)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,System.Int32,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Positive integer attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Positive integer attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Positive integer attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.TryConvert(System.Object,System.Int32@)">
             <summary>
@@ -976,11 +1015,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.StringAttribute">
@@ -988,26 +1028,29 @@
             String attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             String attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Value">Attribute value.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.Xml.XmlElement,System.String,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             String attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,Waher.Script.Expression,Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             String attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+            <param name="Document">Document hosting the attribute.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.TryConvert(System.Object,System.String@)">
             <summary>
@@ -1032,11 +1075,12 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.CopyIfNotPreset">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.CopyIfNotPreset(Waher.Layout.Layout2D.Layout2DDocument)">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
+            <param name="ForDocument">Document that will host the new attribute.</param>
             <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Background">

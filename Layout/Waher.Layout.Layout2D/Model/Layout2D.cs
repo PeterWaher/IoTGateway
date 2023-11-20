@@ -83,10 +83,10 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.font = new StringAttribute(Input, "font");
-			this.pen = new StringAttribute(Input, "pen");
-			this.background = new StringAttribute(Input, "background");
-			this.textColor = new ColorAttribute(Input, "textColor");
+			this.font = new StringAttribute(Input, "font", this.Document);
+			this.pen = new StringAttribute(Input, "pen", this.Document);
+			this.background = new StringAttribute(Input, "background", this.Document);
+			this.textColor = new ColorAttribute(Input, "textColor", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -126,10 +126,10 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (Destination is Layout2D Dest)
 			{
-				Dest.font = this.font?.CopyIfNotPreset();
-				Dest.pen = this.pen?.CopyIfNotPreset();
-				Dest.background = this.background?.CopyIfNotPreset();
-				Dest.textColor = this.textColor?.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset(Destination.Document);
+				Dest.pen = this.pen?.CopyIfNotPreset(Destination.Document);
+				Dest.background = this.background?.CopyIfNotPreset(Destination.Document);
+				Dest.textColor = this.textColor?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.CodeContent;
 using Waher.Content.Markdown.Model.SpanElements;
@@ -192,7 +193,10 @@ namespace Waher.Content.Markdown.Layout2D
 
 			Output.Append("<figure>");
 			Output.Append("<img src=\"");
-			Output.Append(XML.HtmlAttributeEncode(FileName));
+			if (Info.Dynamic)
+				Output.Append(ImageContent.GenerateUrl(Info.DynamicContent, "image/png"));
+			else
+				Output.Append(XML.HtmlAttributeEncode(FileName));
 
 			if (!string.IsNullOrEmpty(Info.Title))
 			{
@@ -223,6 +227,8 @@ namespace Waher.Content.Markdown.Layout2D
 		{
 			public string FileName;
 			public string Title;
+			public bool Dynamic;
+			public byte[] DynamicContent;
 		}
 
 		/// <summary>
@@ -267,8 +273,11 @@ namespace Waher.Content.Markdown.Layout2D
 					{
 						using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
 						{
-							byte[] Bin = Data.ToArray();
-							await Resources.WriteAllBytesAsync(Result.FileName, Bin);
+							Result.DynamicContent = Data.ToArray();
+							Result.Dynamic = LayoutDoc.Dynamic;
+
+							if (!LayoutDoc.Dynamic)
+								await Resources.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
 						}
 					}
 				}
@@ -296,7 +305,13 @@ namespace Waher.Content.Markdown.Layout2D
 			if (Info?.FileName is null)
 				return false;
 
-			return await ImageContent.GenerateMarkdownFromFile(Output, Info.FileName, Info.Title);
+			if (Info.Dynamic)
+			{
+				ImageContent.GenerateMarkdown(Output, Info.DynamicContent, "image/png", Info.Title);
+				return true;
+			}
+			else
+				return await ImageContent.GenerateMarkdownFromFile(Output, Info.FileName, Info.Title);
 		}
 
 		/// <summary>
@@ -332,14 +347,24 @@ namespace Waher.Content.Markdown.Layout2D
 			if (Info?.FileName is null)
 				return false;
 
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Info.FileName);
-			Output.WriteAttributeString("Stretch", "None");
+			if (Info.Dynamic)
+			{
+				await Model.Multimedia.ImageContent.OutputWpf(Output, new ImageSource()
+				{
+					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
+				}, Info.Title);
+			}
+			else
+			{
+				Output.WriteStartElement("Image");
+				Output.WriteAttributeString("Source", Info.FileName);
+				Output.WriteAttributeString("Stretch", "None");
 
-			if (!string.IsNullOrEmpty(Info.Title))
-				Output.WriteAttributeString("ToolTip", Info.Title);
+				if (!string.IsNullOrEmpty(Info.Title))
+					Output.WriteAttributeString("ToolTip", Info.Title);
 
-			Output.WriteEndElement();
+				Output.WriteEndElement();
+			}
 
 			return true;
 		}
@@ -360,9 +385,19 @@ namespace Waher.Content.Markdown.Layout2D
 			if (Info?.FileName is null)
 				return false;
 
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Info.FileName);
-			Output.WriteEndElement();
+			if (Info.Dynamic)
+			{
+				await Model.Multimedia.ImageContent.OutputXamarinForms(Output, new ImageSource()
+				{
+					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
+				});
+			}
+			else
+			{
+				Output.WriteStartElement("Image");
+				Output.WriteAttributeString("Source", Info.FileName);
+				Output.WriteEndElement();
+			}
 
 			return true;
 		}
@@ -382,6 +417,9 @@ namespace Waher.Content.Markdown.Layout2D
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
 				return false;
+
+			if (Info.Dynamic)
+				Info.FileName = await Model.Multimedia.ImageContent.GetTemporaryFile(Info.DynamicContent, "png");
 
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");

@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.condition = new ExpressionAttribute(Input, "condition");
+			this.condition = new ExpressionAttribute(Input, "condition", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			base.CopyContents(Destination);
 
 			if (Destination is Case Dest)
-				Dest.condition = this.condition?.CopyIfNotPreset();
+				Dest.condition = this.condition?.CopyIfNotPreset(Destination.Document);
 		}
 	}
 }

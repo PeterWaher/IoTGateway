@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.columns = new PositiveIntegerAttribute(Input, "columns");
+			this.columns = new PositiveIntegerAttribute(Input, "columns", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			base.CopyContents(Destination);
 
 			if (Destination is Grid Dest)
-				Dest.columns = this.columns?.CopyIfNotPreset();
+				Dest.columns = this.columns?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

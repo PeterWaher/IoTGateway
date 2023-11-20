@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.cid = new StringAttribute(Input, "cid");
+			this.cid = new StringAttribute(Input, "cid", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -77,7 +77,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 			base.CopyContents(Destination);
 
 			if (Destination is ImageInternal Dest)
-				Dest.cid = this.cid?.CopyIfNotPreset();
+				Dest.cid = this.cid?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

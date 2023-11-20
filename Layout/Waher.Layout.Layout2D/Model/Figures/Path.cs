@@ -70,9 +70,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			await base.FromXml(Input);
 		
-			this.head = new StringAttribute(Input, "head");
-			this.tail = new StringAttribute(Input, "tail");
-			this.shapeFill = new StringAttribute(Input, "shapeFill");
+			this.head = new StringAttribute(Input, "head", this.Document);
+			this.tail = new StringAttribute(Input, "tail", this.Document);
+			this.shapeFill = new StringAttribute(Input, "shapeFill", this.Document);
 
 			this.segments = this.GetSegments();
 		}
@@ -134,9 +134,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Path Dest)
 			{
-				Dest.head = this.head?.CopyIfNotPreset();
-				Dest.tail = this.tail?.CopyIfNotPreset();
-				Dest.shapeFill = this.shapeFill?.CopyIfNotPreset();
+				Dest.head = this.head?.CopyIfNotPreset(Destination.Document);
+				Dest.tail = this.tail?.CopyIfNotPreset(Destination.Document);
+				Dest.shapeFill = this.shapeFill?.CopyIfNotPreset(Destination.Document);
 
 				Dest.segments = Dest.GetSegments();
 			}

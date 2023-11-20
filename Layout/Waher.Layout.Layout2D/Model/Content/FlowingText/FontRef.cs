@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.font = new StringAttribute(Input, "font");
+			this.font = new StringAttribute(Input, "font", this.Document);
 			
 			return base.FromXml(Input);
 		}
@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is FontRef Dest)
-				Dest.font = this.font?.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

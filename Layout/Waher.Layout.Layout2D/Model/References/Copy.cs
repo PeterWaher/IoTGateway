@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.@ref = new StringAttribute(Input, "ref");
+			this.@ref = new StringAttribute(Input, "ref", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model.References
 			base.CopyContents(Destination);
 
 			if (Destination is Copy Dest)
-				Dest.@ref = this.@ref?.CopyIfNotPreset();
+				Dest.@ref = this.@ref?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

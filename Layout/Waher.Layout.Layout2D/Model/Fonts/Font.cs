@@ -107,13 +107,13 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.name = new StringAttribute(Input, "name");
-			this.size = new LengthAttribute(Input, "size");
-			this.lineHeight = new LengthAttribute(Input, "lineHeight");
-			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
-			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
-			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
-			this.color = new ColorAttribute(Input, "color");
+			this.name = new StringAttribute(Input, "name", this.Document);
+			this.size = new LengthAttribute(Input, "size", this.Document);
+			this.lineHeight = new LengthAttribute(Input, "lineHeight", this.Document);
+			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight", this.Document);
+			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width", this.Document);
+			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant", this.Document);
+			this.color = new ColorAttribute(Input, "color", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -156,13 +156,13 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 
 			if (Destination is Font Dest)
 			{
-				Dest.name = this.name?.CopyIfNotPreset();
-				Dest.size = this.size?.CopyIfNotPreset();
-				Dest.lineHeight = this.lineHeight?.CopyIfNotPreset();
-				Dest.weight = this.weight?.CopyIfNotPreset();
-				Dest.width = this.width?.CopyIfNotPreset();
-				Dest.slant = this.slant?.CopyIfNotPreset();
-				Dest.color = this.color?.CopyIfNotPreset();
+				Dest.name = this.name?.CopyIfNotPreset(Destination.Document);
+				Dest.size = this.size?.CopyIfNotPreset(Destination.Document);
+				Dest.lineHeight = this.lineHeight?.CopyIfNotPreset(Destination.Document);
+				Dest.weight = this.weight?.CopyIfNotPreset(Destination.Document);
+				Dest.width = this.width?.CopyIfNotPreset(Destination.Document);
+				Dest.slant = this.slant?.CopyIfNotPreset(Destination.Document);
+				Dest.color = this.color?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

@@ -46,7 +46,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.expression = new ExpressionAttribute(Input, "expression");
+			this.expression = new ExpressionAttribute(Input, "expression", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -81,7 +81,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is InlineScript Dest)
-				Dest.expression = this.expression?.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

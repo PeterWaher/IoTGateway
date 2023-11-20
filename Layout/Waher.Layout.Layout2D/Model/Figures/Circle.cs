@@ -43,7 +43,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.radius = new LengthAttribute(Input, "radius");
+			this.radius = new LengthAttribute(Input, "radius", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			base.CopyContents(Destination);
 
 			if (Destination is Circle Dest)
-				Dest.radius = this.radius?.CopyIfNotPreset();
+				Dest.radius = this.radius?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

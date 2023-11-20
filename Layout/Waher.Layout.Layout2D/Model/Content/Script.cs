@@ -95,10 +95,12 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.expression = new ExpressionAttribute(Input, "expression");
-			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
-			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
-			this.font = new StringAttribute(Input, "font");
+			this.Document.Dynamic = true;
+
+			this.expression = new ExpressionAttribute(Input, "expression", this.Document);
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
+			this.font = new StringAttribute(Input, "font", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -138,10 +140,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Script Dest)
 			{
-				Dest.expression = this.expression?.CopyIfNotPreset();
-				Dest.halign = this.halign?.CopyIfNotPreset();
-				Dest.valign = this.valign?.CopyIfNotPreset();
-				Dest.font = this.font?.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset(Destination.Document);
+				Dest.halign = this.halign?.CopyIfNotPreset(Destination.Document);
+				Dest.valign = this.valign?.CopyIfNotPreset(Destination.Document);
+				Dest.font = this.font?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 
@@ -197,7 +199,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						this.cid = this.Document.AddContent(Pixels);
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							CidAttribute = new StringAttribute("cid", this.cid)
+							CidAttribute = new StringAttribute("cid", this.cid, this.Document)
 						};
 					}
 					else if (Result is SKImage Img)
@@ -205,7 +207,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						this.cid = this.Document.AddContent(Img);
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							CidAttribute = new StringAttribute("cid", this.cid)
+							CidAttribute = new StringAttribute("cid", this.cid, this.Document)
 						};
 					}
 					else if (Result is Exception ex)
@@ -220,11 +222,11 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							new Label(this.Document, Vertical)
 							{
-								TextAttribute = new StringAttribute("text", ex.Message)
+								TextAttribute = new StringAttribute("text", ex.Message, this.Document)
 							},
 							new Margins(this.Document, Vertical)
 							{
-								TopAttribute = new LengthAttribute("top", new Length(1, LengthUnit.Em))
+								TopAttribute = new LengthAttribute("top", new Length(1, LengthUnit.Em), this.Document)
 							}
 						};
 
@@ -232,7 +234,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							Children.Add(new Label(this.Document, Vertical)
 							{
-								TextAttribute = new StringAttribute("text", Row)
+								TextAttribute = new StringAttribute("text", Row, this.Document)
 							});
 						}
 
@@ -249,7 +251,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 					{
 						this.evaluated = new Label(this.Document, this)
 						{
-							TextAttribute = new StringAttribute("text", Result.ToString()),
+							TextAttribute = new StringAttribute("text", Result.ToString(), this.Document),
 							XAttribute = this.XAttribute,
 							YAttribute = this.YAttribute,
 							HorizontalAlignmentAttribute = this.HorizontalAlignmentAttribute,

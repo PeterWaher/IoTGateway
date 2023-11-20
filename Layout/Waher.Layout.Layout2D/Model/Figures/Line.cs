@@ -53,8 +53,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.head = new StringAttribute(Input, "head");
-			this.tail = new StringAttribute(Input, "tail");
+			this.head = new StringAttribute(Input, "head", this.Document);
+			this.tail = new StringAttribute(Input, "tail", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -92,8 +92,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Line Dest)
 			{
-				Dest.head = this.head?.CopyIfNotPreset();
-				Dest.tail = this.tail?.CopyIfNotPreset();
+				Dest.head = this.head?.CopyIfNotPreset(Destination.Document);
+				Dest.tail = this.tail?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

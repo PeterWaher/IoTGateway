@@ -62,9 +62,9 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.sigmaX = new FloatAttribute(Input, "sigmaX");
-			this.sigmaY = new FloatAttribute(Input, "sigmaY");
-			this.tileMode = new EnumAttribute<SKShaderTileMode>(Input, "tileMode");
+			this.sigmaX = new FloatAttribute(Input, "sigmaX", this.Document);
+			this.sigmaY = new FloatAttribute(Input, "sigmaY", this.Document);
+			this.tileMode = new EnumAttribute<SKShaderTileMode>(Input, "tileMode", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -103,9 +103,9 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Blur Dest)
 			{
-				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset();
-				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset();
-				Dest.tileMode = this.tileMode?.CopyIfNotPreset();
+				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset(Destination.Document);
+				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset(Destination.Document);
+				Dest.tileMode = this.tileMode?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 	}

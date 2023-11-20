@@ -59,8 +59,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.expression = new ExpressionAttribute(Input, "expression");
-			this.variable = new StringAttribute(Input, "variable");
+			this.expression = new ExpressionAttribute(Input, "expression", this.Document);
+			this.variable = new StringAttribute(Input, "variable", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -98,8 +98,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is ForEach Dest)
 			{
-				Dest.expression = this.expression?.CopyIfNotPreset();
-				Dest.variable = this.variable?.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset(Destination.Document);
+				Dest.variable = this.variable?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

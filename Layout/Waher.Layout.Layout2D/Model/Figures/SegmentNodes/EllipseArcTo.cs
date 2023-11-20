@@ -62,9 +62,9 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.radiusX = new LengthAttribute(Input, "radiusX");
-			this.radiusY = new LengthAttribute(Input, "radiusY");
-			this.clockwise = new BooleanAttribute(Input, "clockwise");
+			this.radiusX = new LengthAttribute(Input, "radiusX", this.Document);
+			this.radiusY = new LengthAttribute(Input, "radiusY", this.Document);
+			this.clockwise = new BooleanAttribute(Input, "clockwise", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -103,9 +103,9 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 
 			if (Destination is EllipseArcTo Dest)
 			{
-				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
-				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset(Destination.Document);
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset(Destination.Document);
+				Dest.clockwise = this.clockwise?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

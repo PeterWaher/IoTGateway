@@ -74,10 +74,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.text = new StringAttribute(Input, "text");
-			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
-			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
-			this.font = new StringAttribute(Input, "font");
+			this.text = new StringAttribute(Input, "text", this.Document);
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
+			this.font = new StringAttribute(Input, "font", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -117,10 +117,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Label Dest)
 			{
-				Dest.text = this.text?.CopyIfNotPreset();
-				Dest.halign = this.halign?.CopyIfNotPreset();
-				Dest.valign = this.valign?.CopyIfNotPreset();
-				Dest.font = this.font?.CopyIfNotPreset();
+				Dest.text = this.text?.CopyIfNotPreset(Destination.Document);
+				Dest.halign = this.halign?.CopyIfNotPreset(Destination.Document);
+				Dest.valign = this.valign?.CopyIfNotPreset(Destination.Document);
+				Dest.font = this.font?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

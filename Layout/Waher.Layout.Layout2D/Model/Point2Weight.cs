@@ -36,7 +36,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.w = new FloatAttribute(Input, "w");
+			this.w = new FloatAttribute(Input, "w", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -60,7 +60,7 @@ namespace Waher.Layout.Layout2D.Model
 			base.CopyContents(Destination);
 
 			if (Destination is Point2Weight Dest)
-				Dest.w = this.w?.CopyIfNotPreset();
+				Dest.w = this.w?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

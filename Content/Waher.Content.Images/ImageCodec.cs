@@ -114,7 +114,7 @@ namespace Waher.Content.Images
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if ((Object is SKImage || Object is SKBitmap) && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if ((Object is SKImage || Object is SKBitmap) && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;

@@ -13,8 +13,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public PositiveIntegerAttribute(string AttributeName, int Value)
-			: base(AttributeName, Value)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public PositiveIntegerAttribute(string AttributeName, int Value, Layout2DDocument Document)
+			: base(AttributeName, Value, Document)
 		{
 		}
 
@@ -23,8 +24,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public PositiveIntegerAttribute(XmlElement E, string AttributeName)
-			: base(E, AttributeName, true)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public PositiveIntegerAttribute(XmlElement E, string AttributeName, Layout2DDocument Document)
+			: base(E, AttributeName, true, Document)
 		{
 		}
 
@@ -33,8 +35,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		public PositiveIntegerAttribute(string AttributeName, Expression Expression)
-			: base(AttributeName, Expression)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public PositiveIntegerAttribute(string AttributeName, Expression Expression, Layout2DDocument Document)
+			: base(AttributeName, Expression, Document)
 		{
 		}
 
@@ -83,13 +86,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// Copies the attribute object if undefined, or defined by an expression.
 		/// Returns a reference to itself, if preset (set by a constant value).
 		/// </summary>
+		/// <param name="ForDocument">Document that will host the new attribute.</param>
 		/// <returns>Attribute reference.</returns>
-		public PositiveIntegerAttribute CopyIfNotPreset()
+		public PositiveIntegerAttribute CopyIfNotPreset(Layout2DDocument ForDocument)
 		{
 			if (this.HasPresetValue)
 				return this;
 			else
-				return new PositiveIntegerAttribute(this.Name, this.Expression);
+				return new PositiveIntegerAttribute(this.Name, this.Expression, ForDocument);
 		}
 
 	}

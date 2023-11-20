@@ -18,8 +18,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public LengthAttribute(string AttributeName, Length Value)
-			: base(AttributeName, Value)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public LengthAttribute(string AttributeName, Length Value, Layout2DDocument Document)
+			: base(AttributeName, Value, Document)
 		{
 		}
 
@@ -28,8 +29,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public LengthAttribute(XmlElement E, string AttributeName)
-			: base(E, AttributeName, true)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public LengthAttribute(XmlElement E, string AttributeName, Layout2DDocument Document)
+			: base(E, AttributeName, true, Document)
 		{
 		}
 
@@ -38,8 +40,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		public LengthAttribute(string AttributeName, Expression Expression)
-			: base(AttributeName, Expression)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public LengthAttribute(string AttributeName, Expression Expression, Layout2DDocument Document)
+			: base(AttributeName, Expression, Document)
 		{
 		}
 
@@ -319,13 +322,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// Copies the attribute object if undefined, or defined by an expression.
 		/// Returns a reference to itself, if preset (set by a constant value).
 		/// </summary>
+		/// <param name="ForDocument">Document that will host the new attribute.</param>
 		/// <returns>Attribute reference.</returns>
-		public LengthAttribute CopyIfNotPreset()
+		public LengthAttribute CopyIfNotPreset(Layout2DDocument ForDocument)
 		{
 			if (this.HasPresetValue)
 				return this;
 			else
-				return new LengthAttribute(this.Name, this.Expression);
+				return new LengthAttribute(this.Name, this.Expression, ForDocument);
 		}
 
 	}

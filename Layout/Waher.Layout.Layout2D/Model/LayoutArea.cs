@@ -132,15 +132,15 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.width = new LengthAttribute(Input, "width");
-			this.height = new LengthAttribute(Input, "height");
-			this.maxWidth = new LengthAttribute(Input, "maxWidth");
-			this.maxHeight = new LengthAttribute(Input, "maxHeight");
-			this.minWidth = new LengthAttribute(Input, "minWidth");
-			this.minHeight = new LengthAttribute(Input, "minHeight");
-			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio");
-			this.overflow = new EnumAttribute<Overflow>(Input, "overflow");
-			this.onClick = new ExpressionAttribute(Input, "onClick");
+			this.width = new LengthAttribute(Input, "width", this.Document);
+			this.height = new LengthAttribute(Input, "height", this.Document);
+			this.maxWidth = new LengthAttribute(Input, "maxWidth", this.Document);
+			this.maxHeight = new LengthAttribute(Input, "maxHeight", this.Document);
+			this.minWidth = new LengthAttribute(Input, "minWidth", this.Document);
+			this.minHeight = new LengthAttribute(Input, "minHeight", this.Document);
+			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio", this.Document);
+			this.overflow = new EnumAttribute<Overflow>(Input, "overflow", this.Document);
+			this.onClick = new ExpressionAttribute(Input, "onClick", this.Document);
 		
 			return base.FromXml(Input);
 		}
@@ -174,15 +174,15 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (Destination is LayoutArea Dest)
 			{
-				Dest.width = this.width?.CopyIfNotPreset();
-				Dest.height = this.height?.CopyIfNotPreset();
-				Dest.maxWidth = this.maxWidth?.CopyIfNotPreset();
-				Dest.maxHeight = this.maxHeight?.CopyIfNotPreset();
-				Dest.minWidth = this.minWidth?.CopyIfNotPreset();
-				Dest.minHeight = this.minHeight?.CopyIfNotPreset();
-				Dest.keepAspectRatio = this.keepAspectRatio?.CopyIfNotPreset();
-				Dest.overflow = this.overflow?.CopyIfNotPreset();
-				Dest.onClick = this.onClick?.CopyIfNotPreset();
+				Dest.width = this.width?.CopyIfNotPreset(Destination.Document);
+				Dest.height = this.height?.CopyIfNotPreset(Destination.Document);
+				Dest.maxWidth = this.maxWidth?.CopyIfNotPreset(Destination.Document);
+				Dest.maxHeight = this.maxHeight?.CopyIfNotPreset(Destination.Document);
+				Dest.minWidth = this.minWidth?.CopyIfNotPreset(Destination.Document);
+				Dest.minHeight = this.minHeight?.CopyIfNotPreset(Destination.Document);
+				Dest.keepAspectRatio = this.keepAspectRatio?.CopyIfNotPreset(Destination.Document);
+				Dest.overflow = this.overflow?.CopyIfNotPreset(Destination.Document);
+				Dest.onClick = this.onClick?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

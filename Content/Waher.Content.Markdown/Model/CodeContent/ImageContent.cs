@@ -104,19 +104,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			{
 				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
 
-				Output.Append("```");
-				Output.Append(ContentType);
-
-				if (!string.IsNullOrEmpty(Title))
-				{
-					Output.Append(':');
-					Output.Append(Title);
-				}
-
-				Output.AppendLine();
-				Output.AppendLine(Convert.ToBase64String(Bin));
-				Output.AppendLine("```");
-				Output.AppendLine();
+				GenerateMarkdown(Output, Bin, ContentType, Title);
 
 				return true;
 			}
@@ -124,6 +112,30 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			{
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// Generates Markdown embedding an encoded image.
+		/// </summary>
+		/// <param name="Output">Markdown output.</param>
+		/// <param name="Bin">Binary encoding of image.</param>
+		/// <param name="ContentType">Content-Type of image.</param>
+		/// <param name="Title">Optional title.</param>
+		public static void GenerateMarkdown(StringBuilder Output, byte[] Bin, string ContentType, string Title)
+		{
+			Output.Append("```");
+			Output.Append(ContentType);
+
+			if (!string.IsNullOrEmpty(Title))
+			{
+				Output.Append(':');
+				Output.Append(Title);
+			}
+
+			Output.AppendLine();
+			Output.AppendLine(Convert.ToBase64String(Bin));
+			Output.AppendLine("```");
+			Output.AppendLine();
 		}
 
 		/// <summary>
@@ -159,7 +171,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		}
 
 		/// <summary>
-		/// Generates a data URL of the encoded image.
+		/// Generates a data URL of an encoded image.
 		/// </summary>
 		/// <param name="Language">Language</param>
 		/// <param name="Rows">Rows</param>
@@ -178,6 +190,24 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			Output.Append(ContentType);
 			Output.Append(";base64,");
 			Output.Append(GetImageBase64(Rows));
+
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates a data URL of an encoded image.
+		/// </summary>
+		/// <param name="Binary">Binary representation of image.</param>
+		/// <param name="ContentType">Content-Type of image.</param>
+		/// <returns>Data URL.</returns>
+		public static string GenerateUrl(byte[] Binary, string ContentType)
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append("data:");
+			Output.Append(ContentType);
+			Output.Append(";base64,");
+			Output.Append(Convert.ToBase64String(Binary));
 
 			return Output.ToString();
 		}

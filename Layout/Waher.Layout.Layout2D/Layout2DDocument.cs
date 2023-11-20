@@ -603,12 +603,22 @@ namespace Waher.Layout.Layout2D
 
 			Layout2DDocument Result = new Layout2DDocument(Session, Attachments)
 			{
-				root = this.root.Copy(null)
+				root = this.root.Copy(null),
+				Dynamic = this.Dynamic
 			};
 
 			Result.root.RegisterIDs(Session);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// If the layout is dynamic (i.e. contains script).
+		/// </summary>
+		public bool Dynamic
+		{
+			get;
+			internal set;
 		}
 
 	}

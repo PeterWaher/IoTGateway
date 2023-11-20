@@ -13,8 +13,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public StringAttribute(string AttributeName, string Value)
-			: base(AttributeName, Value)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public StringAttribute(string AttributeName, string Value, Layout2DDocument Document)
+			: base(AttributeName, Value, Document)
 		{
 		}
 
@@ -23,8 +24,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public StringAttribute(XmlElement E, string AttributeName)
-			: base(E, AttributeName, true)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public StringAttribute(XmlElement E, string AttributeName, Layout2DDocument Document)
+			: base(E, AttributeName, true, Document)
 		{
 		}
 
@@ -33,8 +35,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		public StringAttribute(string AttributeName, Expression Expression)
-			: base(AttributeName, Expression)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public StringAttribute(string AttributeName, Expression Expression, Layout2DDocument Document)
+			: base(AttributeName, Expression, Document)
 		{
 		}
 
@@ -76,13 +79,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// Copies the attribute object if undefined, or defined by an expression.
 		/// Returns a reference to itself, if preset (set by a constant value).
 		/// </summary>
+		/// <param name="ForDocument">Document that will host the new attribute.</param>
 		/// <returns>Attribute reference.</returns>
-		public StringAttribute CopyIfNotPreset()
+		public StringAttribute CopyIfNotPreset(Layout2DDocument ForDocument)
 		{
 			if (this.HasPresetValue)
 				return this;
 			else
-				return new StringAttribute(this.Name, this.Expression);
+				return new StringAttribute(this.Name, this.Expression, ForDocument);
 		}
 	}
 }

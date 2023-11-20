@@ -81,11 +81,11 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.dX = new LengthAttribute(Input, "dX");
-			this.dY = new LengthAttribute(Input, "dY");
-			this.sigmaX = new FloatAttribute(Input, "sigmaX");
-			this.sigmaY = new FloatAttribute(Input, "sigmaY");
-			this.color = new ColorAttribute(Input, "color");
+			this.dX = new LengthAttribute(Input, "dX", this.Document);
+			this.dY = new LengthAttribute(Input, "dY", this.Document);
+			this.sigmaX = new FloatAttribute(Input, "sigmaX", this.Document);
+			this.sigmaY = new FloatAttribute(Input, "sigmaY", this.Document);
+			this.color = new ColorAttribute(Input, "color", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -126,11 +126,11 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Shadow Dest)
 			{
-				Dest.dX = this.dX?.CopyIfNotPreset();
-				Dest.dY = this.dY?.CopyIfNotPreset();
-				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset();
-				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset();
-				Dest.color = this.color?.CopyIfNotPreset();
+				Dest.dX = this.dX?.CopyIfNotPreset(Destination.Document);
+				Dest.dY = this.dY?.CopyIfNotPreset(Destination.Document);
+				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset(Destination.Document);
+				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset(Destination.Document);
+				Dest.color = this.color?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 	}

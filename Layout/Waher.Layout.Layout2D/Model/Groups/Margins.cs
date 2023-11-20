@@ -72,10 +72,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.left = new LengthAttribute(Input, "left");
-			this.right = new LengthAttribute(Input, "right");
-			this.top = new LengthAttribute(Input, "top");
-			this.bottom = new LengthAttribute(Input, "bottom");
+			this.left = new LengthAttribute(Input, "left", this.Document);
+			this.right = new LengthAttribute(Input, "right", this.Document);
+			this.top = new LengthAttribute(Input, "top", this.Document);
+			this.bottom = new LengthAttribute(Input, "bottom", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -115,10 +115,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Margins Dest)
 			{
-				Dest.left = this.left?.CopyIfNotPreset();
-				Dest.right = this.right?.CopyIfNotPreset();
-				Dest.top = this.top?.CopyIfNotPreset();
-				Dest.bottom = this.bottom?.CopyIfNotPreset();
+				Dest.left = this.left?.CopyIfNotPreset(Destination.Document);
+				Dest.right = this.right?.CopyIfNotPreset(Destination.Document);
+				Dest.top = this.top?.CopyIfNotPreset(Destination.Document);
+				Dest.bottom = this.bottom?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

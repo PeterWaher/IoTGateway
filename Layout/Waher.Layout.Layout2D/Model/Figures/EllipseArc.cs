@@ -110,13 +110,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.radiusX = new LengthAttribute(Input, "radiusX");
-			this.radiusY = new LengthAttribute(Input, "radiusY");
-			this.startDegrees = new FloatAttribute(Input, "startDegrees");
-			this.endDegrees = new FloatAttribute(Input, "endDegrees");
-			this.spanDegrees = new FloatAttribute(Input, "spanDegrees");
-			this.clockwise = new BooleanAttribute(Input, "clockwise");
-			this.center = new BooleanAttribute(Input, "center");
+			this.radiusX = new LengthAttribute(Input, "radiusX", this.Document);
+			this.radiusY = new LengthAttribute(Input, "radiusY", this.Document);
+			this.startDegrees = new FloatAttribute(Input, "startDegrees", this.Document);
+			this.endDegrees = new FloatAttribute(Input, "endDegrees", this.Document);
+			this.spanDegrees = new FloatAttribute(Input, "spanDegrees", this.Document);
+			this.clockwise = new BooleanAttribute(Input, "clockwise", this.Document);
+			this.center = new BooleanAttribute(Input, "center", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -159,13 +159,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is EllipseArc Dest)
 			{
-				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
-				Dest.startDegrees = this.startDegrees?.CopyIfNotPreset();
-				Dest.endDegrees = this.endDegrees?.CopyIfNotPreset();
-				Dest.spanDegrees = this.spanDegrees?.CopyIfNotPreset();
-				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
-				Dest.center = this.center?.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset(Destination.Document);
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset(Destination.Document);
+				Dest.startDegrees = this.startDegrees?.CopyIfNotPreset(Destination.Document);
+				Dest.endDegrees = this.endDegrees?.CopyIfNotPreset(Destination.Document);
+				Dest.spanDegrees = this.spanDegrees?.CopyIfNotPreset(Destination.Document);
+				Dest.clockwise = this.clockwise?.CopyIfNotPreset(Destination.Document);
+				Dest.center = this.center?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

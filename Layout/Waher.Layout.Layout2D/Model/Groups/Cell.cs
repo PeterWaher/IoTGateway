@@ -133,11 +133,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
-			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
-			this.colSpan = new PositiveIntegerAttribute(Input, "colSpan");
-			this.rowSpan = new PositiveIntegerAttribute(Input, "rowSpan");
-			this.border = new StringAttribute(Input, "border");
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
+			this.colSpan = new PositiveIntegerAttribute(Input, "colSpan", this.Document);
+			this.rowSpan = new PositiveIntegerAttribute(Input, "rowSpan", this.Document);
+			this.border = new StringAttribute(Input, "border", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -178,11 +178,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Cell Dest)
 			{
-				Dest.halign = this.halign?.CopyIfNotPreset();
-				Dest.valign = this.valign?.CopyIfNotPreset();
-				Dest.colSpan = this.colSpan?.CopyIfNotPreset();
-				Dest.rowSpan = this.rowSpan?.CopyIfNotPreset();
-				Dest.border = this.border?.CopyIfNotPreset();
+				Dest.halign = this.halign?.CopyIfNotPreset(Destination.Document);
+				Dest.valign = this.valign?.CopyIfNotPreset(Destination.Document);
+				Dest.colSpan = this.colSpan?.CopyIfNotPreset(Destination.Document);
+				Dest.rowSpan = this.rowSpan?.CopyIfNotPreset(Destination.Document);
+				Dest.border = this.border?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

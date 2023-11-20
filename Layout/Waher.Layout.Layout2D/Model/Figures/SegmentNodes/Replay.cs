@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.@ref = new StringAttribute(Input, "ref");
+			this.@ref = new StringAttribute(Input, "ref", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -77,7 +77,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			base.CopyContents(Destination);
 
 			if (Destination is Replay Dest)
-				Dest.@ref = this.@ref?.CopyIfNotPreset();
+				Dest.@ref = this.@ref?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

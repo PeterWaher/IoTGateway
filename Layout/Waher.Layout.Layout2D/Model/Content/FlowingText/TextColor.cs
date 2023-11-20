@@ -43,7 +43,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.color = new ColorAttribute(Input, "color");
+			this.color = new ColorAttribute(Input, "color", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is TextColor Dest)
-				Dest.color = this.color?.CopyIfNotPreset();
+				Dest.color = this.color?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

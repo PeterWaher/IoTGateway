@@ -36,7 +36,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.distance = new LengthAttribute(Input, "distance");
+			this.distance = new LengthAttribute(Input, "distance", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -60,7 +60,7 @@ namespace Waher.Layout.Layout2D.Model
 			base.CopyContents(Destination);
 
 			if (Destination is Distance Dest)
-				Dest.distance = this.distance?.CopyIfNotPreset();
+				Dest.distance = this.distance?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

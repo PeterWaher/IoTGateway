@@ -86,9 +86,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			await base.FromXml(Input);
 
-			this.font = new StringAttribute(Input, "font");
-			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
-			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
+			this.font = new StringAttribute(Input, "font", this.Document);
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
 
 			List<IFlowingText> Children = new List<IFlowingText>();
 
@@ -157,9 +157,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Paragraph Dest)
 			{
-				Dest.font = this.font?.CopyIfNotPreset();
-				Dest.halign = this.halign?.CopyIfNotPreset();
-				Dest.valign = this.valign?.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset(Destination.Document);
+				Dest.halign = this.halign?.CopyIfNotPreset(Destination.Document);
+				Dest.valign = this.valign?.CopyIfNotPreset(Destination.Document);
 
 				if (!(this.text is null))
 				{

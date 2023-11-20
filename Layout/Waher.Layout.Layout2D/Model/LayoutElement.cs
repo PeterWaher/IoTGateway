@@ -496,8 +496,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Input">XML definition.</param>
 		public virtual Task FromXml(XmlElement Input)
 		{
-			this.id = new StringAttribute(Input, "id");
-			this.visible = new BooleanAttribute(Input, "visible");
+			this.id = new StringAttribute(Input, "id", this.Document);
+			this.visible = new BooleanAttribute(Input, "visible", this.Document);
 
 			return Task.CompletedTask;
 		}
@@ -552,8 +552,8 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			if (Destination is LayoutElement Dest)
 			{
-				Dest.id = this.id?.CopyIfNotPreset();
-				Dest.visible = this.visible?.CopyIfNotPreset();
+				Dest.id = this.id?.CopyIfNotPreset(Destination.Document);
+				Dest.visible = this.visible?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

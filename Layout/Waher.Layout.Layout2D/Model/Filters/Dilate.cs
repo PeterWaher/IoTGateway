@@ -51,8 +51,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.radiusX = new LengthAttribute(Input, "radiusX");
-			this.radiusY = new LengthAttribute(Input, "radiusY");
+			this.radiusX = new LengthAttribute(Input, "radiusX", this.Document);
+			this.radiusY = new LengthAttribute(Input, "radiusY", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -90,8 +90,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Dilate Dest)
 			{
-				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset(Destination.Document);
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 	}

@@ -43,7 +43,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.resource = new StringAttribute(Input, "resource");
+			this.resource = new StringAttribute(Input, "resource", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 			base.CopyContents(Destination);
 
 			if (Destination is ImageResource Dest)
-				Dest.resource = this.resource?.CopyIfNotPreset();
+				Dest.resource = this.resource?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

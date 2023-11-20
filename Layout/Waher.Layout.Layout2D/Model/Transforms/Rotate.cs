@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.degrees = new FloatAttribute(Input, "degrees");
+			this.degrees = new FloatAttribute(Input, "degrees", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -77,7 +77,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			base.CopyContents(Destination);
 
 			if (Destination is Rotate Dest)
-				Dest.degrees = this.degrees?.CopyIfNotPreset();
+				Dest.degrees = this.degrees?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

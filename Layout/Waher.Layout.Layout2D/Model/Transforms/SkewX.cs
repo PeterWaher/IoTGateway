@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.factor = new FloatAttribute(Input, "factor");
+			this.factor = new FloatAttribute(Input, "factor", this.Document);
 			return base.FromXml(Input);
 		}
 
@@ -77,7 +77,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			base.CopyContents(Destination);
 
 			if (Destination is SkewX Dest)
-				Dest.factor = this.factor?.CopyIfNotPreset();
+				Dest.factor = this.factor?.CopyIfNotPreset(Destination.Document);
 		}
 
 		/// <summary>

@@ -56,9 +56,9 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.x2 = new LengthAttribute(Input, "x2");
-			this.y2 = new LengthAttribute(Input, "y2");
-			this.ref2 = new StringAttribute(Input, "ref2");
+			this.x2 = new LengthAttribute(Input, "x2", this.Document);
+			this.y2 = new LengthAttribute(Input, "y2", this.Document);
+			this.ref2 = new StringAttribute(Input, "ref2", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -86,9 +86,9 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (Destination is Point2 Dest)
 			{
-				Dest.x2 = this.x2?.CopyIfNotPreset();
-				Dest.y2 = this.y2?.CopyIfNotPreset();
-				Dest.ref2 = this.ref2?.CopyIfNotPreset();
+				Dest.x2 = this.x2?.CopyIfNotPreset(Destination.Document);
+				Dest.y2 = this.y2?.CopyIfNotPreset(Destination.Document);
+				Dest.ref2 = this.ref2?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

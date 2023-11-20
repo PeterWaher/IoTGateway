@@ -89,10 +89,10 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.width = new LengthAttribute(Input, "width");
-			this.cap = new EnumAttribute<SKStrokeCap>(Input, "cap");
-			this.join = new EnumAttribute<SKStrokeJoin>(Input, "join");
-			this.miter = new LengthAttribute(Input, "miter");
+			this.width = new LengthAttribute(Input, "width", this.Document);
+			this.cap = new EnumAttribute<SKStrokeCap>(Input, "cap", this.Document);
+			this.join = new EnumAttribute<SKStrokeJoin>(Input, "join", this.Document);
+			this.miter = new LengthAttribute(Input, "miter", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -121,10 +121,10 @@ namespace Waher.Layout.Layout2D.Model.Pens
 
 			if (Destination is Pen Dest)
 			{
-				Dest.width = this.width?.CopyIfNotPreset();
-				Dest.cap = this.cap?.CopyIfNotPreset();
-				Dest.join = this.join?.CopyIfNotPreset();
-				Dest.miter = this.miter?.CopyIfNotPreset();
+				Dest.width = this.width?.CopyIfNotPreset(Destination.Document);
+				Dest.cap = this.cap?.CopyIfNotPreset(Destination.Document);
+				Dest.join = this.join?.CopyIfNotPreset(Destination.Document);
+				Dest.miter = this.miter?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

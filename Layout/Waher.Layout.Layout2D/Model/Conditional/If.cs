@@ -75,7 +75,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			await base.FromXml(Input);
 
-			this.condition = new ExpressionAttribute(Input, "condition");
+			this.condition = new ExpressionAttribute(Input, "condition", this.Document);
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
@@ -146,7 +146,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is If Dest)
 			{
-				Dest.condition = this.condition?.CopyIfNotPreset();
+				Dest.condition = this.condition?.CopyIfNotPreset(Destination.Document);
 				Dest.ifTrue = this.ifTrue?.Copy(Dest) as LayoutContainer;
 				Dest.ifFalse = this.ifFalse?.Copy(Dest) as LayoutContainer;
 			}

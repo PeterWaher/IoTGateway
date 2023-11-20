@@ -203,7 +203,13 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			return Task.CompletedTask;
 		}
 
-		internal static async Task OutputWpf(XmlWriter Output, IImageSource Source, string Title)
+		/// <summary>
+		/// Outputs an image to WPF XAML
+		/// </summary>
+		/// <param name="Output">WPF XAML output.</param>
+		/// <param name="Source">Image source.</param>
+		/// <param name="Title">Title of image.</param>
+		public static async Task OutputWpf(XmlWriter Output, IImageSource Source, string Title)
 		{
 			Source = await CheckDataUri(Source);
 
@@ -233,7 +239,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			Output.WriteEndElement();
 		}
 
-		internal static async Task<IImageSource> CheckDataUri(IImageSource Source)
+		/// <summary>
+		/// Checks a Data URI image, that it contains a decodable image.
+		/// </summary>
+		/// <param name="Source">Image source.</param>
+		public static async Task<IImageSource> CheckDataUri(IImageSource Source)
 		{
 			string Url = Source.Url;
 			int i;
@@ -287,7 +297,12 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			return Task.CompletedTask;
 		}
 
-		internal static async Task OutputXamarinForms(XmlWriter Output, IImageSource Source)
+		/// <summary>
+		/// Outputs an image to Xamarin XAML
+		/// </summary>
+		/// <param name="Output">WPF XAML output.</param>
+		/// <param name="Source">Image source.</param>
+		public static async Task OutputXamarinForms(XmlWriter Output, IImageSource Source)
 		{
 			Source = await CheckDataUri(Source);
 
@@ -333,7 +348,6 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						string FileName = Document.Settings.GetFileName(Document.FileName, Url);
 						if (!File.Exists(FileName))
 							continue;
-
 					}
 
 					using (TemporaryStream f = P.Value)

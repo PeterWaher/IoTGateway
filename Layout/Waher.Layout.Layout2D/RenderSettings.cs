@@ -62,7 +62,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Invalid width.", nameof(Width));
+					throw new ArgumentException("Invalid width.", nameof(this.Width));
 
 				this.width = value;
 			}
@@ -77,7 +77,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Invalid height.", nameof(Height));
+					throw new ArgumentException("Invalid height.", nameof(this.Height));
 
 				this.height = value;
 			}
@@ -92,7 +92,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Invalid zoom factor.", nameof(Zoom));
+					throw new ArgumentException("Invalid zoom factor.", nameof(this.Zoom));
 
 				this.zoom = value;
 			}
@@ -152,7 +152,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (string.IsNullOrEmpty(value))
-					throw new ArgumentException("Invalid font name.", nameof(FontName));
+					throw new ArgumentException("Invalid font name.", nameof(this.FontName));
 
 				this.fontName = value;
 			}
@@ -167,7 +167,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Invalid font size.", nameof(FontSize));
+					throw new ArgumentException("Invalid font size.", nameof(this.FontSize));
 
 				this.fontSize = value;
 			}
@@ -182,7 +182,7 @@ namespace Waher.Layout.Layout2D
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentException("Invalid number of pixels per inch.", nameof(PixelsPerInch));
+					throw new ArgumentException("Invalid number of pixels per inch.", nameof(this.PixelsPerInch));
 
 				this.pixelsPerInch = value;
 			}

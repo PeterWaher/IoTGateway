@@ -19,18 +19,21 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		private readonly bool hasPresetValue;
 		private readonly Expression expression;
 		private readonly string name;
+		private readonly Layout2DDocument document;
 
 		/// <summary>
 		/// Manages an attribute value or expression.
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public Attribute(string AttributeName, T Value)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public Attribute(string AttributeName, T Value, Layout2DDocument Document)
 		{
 			this.name = AttributeName;
 			this.presetValue = Value;
 			this.hasPresetValue = true;
 			this.expression = null;
+			this.document = Document;
 		}
 
 		/// <summary>
@@ -39,9 +42,11 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="CanEmbedScript">If script can be embedded.</param>
-		public Attribute(XmlElement E, string AttributeName, bool CanEmbedScript)
+		/// <param name="Document">Document hosting the attribute.</param>
+		public Attribute(XmlElement E, string AttributeName, bool CanEmbedScript, Layout2DDocument Document)
 		{
 			this.name = AttributeName;
+			this.document = Document;
 
 			if (E.HasAttribute(this.name))
 			{
@@ -58,6 +63,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 						this.presetValue = default;
 						this.hasPresetValue = false;
 						this.expression = Exp;
+						Document.Dynamic = true;
 
 						return;
 					}
@@ -89,12 +95,17 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		protected Attribute(string AttributeName, Expression Expression)
+		/// <param name="Document">Document hosting the attribute.</param>
+		protected Attribute(string AttributeName, Expression Expression, Layout2DDocument Document)
 		{
 			this.name = AttributeName;
 			this.presetValue = default;
 			this.hasPresetValue = false;
 			this.expression = Expression;
+			this.document = Document;
+
+			if (!(this.expression is null))
+				this.document.Dynamic = true;
 		}
 
 		/// <summary>
@@ -131,6 +142,11 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// If the attribute is defined.
 		/// </summary>
 		public bool Defined => this.hasPresetValue || !(this.expression is null);
+
+		/// <summary>
+		/// Document hosting the attribute.
+		/// </summary>
+		public Layout2DDocument Document => this.document;
 
 		/// <summary>
 		/// Tries to parse a string value

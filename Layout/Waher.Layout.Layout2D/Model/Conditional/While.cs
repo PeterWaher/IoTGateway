@@ -58,8 +58,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="Input">XML definition.</param>
 		public override Task FromXml(XmlElement Input)
 		{
-			this.expression = new ExpressionAttribute(Input, "expression");
-			this.testAfter = new BooleanAttribute(Input, "testAfter");
+			this.expression = new ExpressionAttribute(Input, "expression", this.Document);
+			this.testAfter = new BooleanAttribute(Input, "testAfter", this.Document);
 
 			return base.FromXml(Input);
 		}
@@ -97,8 +97,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is While Dest)
 			{
-				Dest.expression = this.expression?.CopyIfNotPreset();
-				Dest.testAfter = this.testAfter?.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset(Destination.Document);
+				Dest.testAfter = this.testAfter?.CopyIfNotPreset(Destination.Document);
 			}
 		}
 

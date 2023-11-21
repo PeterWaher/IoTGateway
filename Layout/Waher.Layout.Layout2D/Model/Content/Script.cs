@@ -196,18 +196,30 @@ namespace Waher.Layout.Layout2D.Model.Content
 					{
 						GraphSettings Settings = G.GetSettings(State.Session);
 						PixelInformation Pixels = G.CreatePixels(Settings);
-						this.cid = this.Document.AddContent(Pixels);
+						this.cid = this.Document.AddContent(Pixels.CreateBitmap());
+						this.Width = Pixels.Width;
+						this.Height = Pixels.Height;
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							CidAttribute = new StringAttribute("cid", this.cid, this.Document)
+							CidAttribute = new StringAttribute("cid", this.cid, this.Document),
+							XAttribute = this.XAttribute,
+							YAttribute = this.YAttribute,
+							Width = Pixels.Width,
+							Height = Pixels.Height
 						};
 					}
 					else if (Result is SKImage Img)
 					{
 						this.cid = this.Document.AddContent(Img);
+						this.Width = Img.Width;
+						this.Height = Img.Height;
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							CidAttribute = new StringAttribute("cid", this.cid, this.Document)
+							CidAttribute = new StringAttribute("cid", this.cid, this.Document),
+							XAttribute = this.XAttribute,
+							YAttribute = this.YAttribute,
+							Width = Img.Width,
+							Height = Img.Height
 						};
 					}
 					else if (Result is Exception ex)
@@ -242,10 +254,6 @@ namespace Waher.Layout.Layout2D.Model.Content
 						T.Children = new ILayoutElement[] { Vertical };
 
 						this.evaluated = Vertical;
-					}
-					else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
-					{
-						// TODO
 					}
 					else
 					{

@@ -366,5 +366,11 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			await this.Test("Test_55_Paragraph_BLR");
 		}
+
+		[TestMethod]
+		public async Task Test_56_ImageScript()
+		{
+			await this.Test("Test_56_ImageScript");
+		}
 	}
 }

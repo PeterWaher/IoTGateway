@@ -417,6 +417,11 @@ purposes.
 						<xs:documentation>Role reference parameter.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name='contractReferenceParameter' type='ContractReferenceParameter'>
+					<xs:annotation>
+						<xs:documentation>Contract reference parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
@@ -749,6 +754,61 @@ purposes.
 				<xs:attribute name='required' type='xs:boolean' use='optional' default='false'>
 					<xs:annotation>
 						<xs:documentation>If existance of the signatory and property value is required or not for the contract to be complete.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='ContractReferenceParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a reference to a smart contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:sequence>
+					<xs:element name='label' type='HumanReadableText' minOccurs='0' maxOccurs='unbounded'>
+						<xs:annotation>
+							<xs:documentation>Human-readable label to be shown in stead of a reference, in contract text.</xs:documentation>
+							<xs:documentation>Note: Multiple localized labels can be provided.</xs:documentation>
+							<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name='value' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>The value of the parameter, containing the ID of the contract that is being referenced.</xs:documentation>
+						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='required' type='xs:boolean' use='optional' default='false'>
+					<xs:annotation>
+						<xs:documentation>If the reference parameter is required or not.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='localName' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the local name of the machine-readable part of the referenced contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='namespace' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the namespace of the machine-readable part of the referenced contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='templateId' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the Template ID of the referenced contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='provider' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the provider of the referenced contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='creatorRole' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the role the creator must have in the referenced contract.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>

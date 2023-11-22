@@ -209,6 +209,9 @@ namespace Waher.Networking.XMPP.Contracts
 					return true;
 			}
 
+			if (!XmppClient.BareJidRegEx.IsMatch(this.value))
+				return false;
+
 			if (!(Client is null) && Client.Client.State == XmppState.Connected)
 			{
 				Contract Contract;
@@ -340,9 +343,6 @@ namespace Waher.Networking.XMPP.Contracts
 
 							Labels.Add(Text);
 							break;
-
-						default:
-							return false;
 					}
 				}
 			}
@@ -358,6 +358,24 @@ namespace Waher.Networking.XMPP.Contracts
 			this.creatorRole = Xml.HasAttribute("creatorRole") ? XML.Attribute(Xml, "creatorRole") : null;
 
 			return true;
+		}
+
+		/// <summary>
+		/// If a local name of a child XML element is recognized.
+		/// </summary>
+		/// <param name="LocalName">Local name.</param>
+		/// <returns>If recognized.</returns>
+		protected override bool IsChildLocalNameRecognized(string LocalName)
+		{
+			switch (LocalName)
+			{
+				case "label": // Smart contract
+				case "Label": // Simplified (ex. state machine note command).
+					return true;
+
+				default:
+					return base.IsChildLocalNameRecognized(LocalName);
+			}
 		}
 	}
 }

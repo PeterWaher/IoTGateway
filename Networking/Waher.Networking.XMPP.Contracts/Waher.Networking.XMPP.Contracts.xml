@@ -627,6 +627,13 @@
             <param name="Xml">XML definition.</param>
             <returns>If import was successful.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractReferenceParameter.IsChildLocalNameRecognized(System.String)">
+            <summary>
+            If a local name of a child XML element is recognized.
+            </summary>
+            <param name="LocalName">Local name.</param>
+            <returns>If recognized.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSchemasGetter">
             <summary>
             Getter for well-known contract schemas.
@@ -5630,6 +5637,13 @@
             </summary>
             <param name="Xml">XML definition.</param>
             <returns>If import was successful.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.IsChildLocalNameRecognized(System.String)">
+            <summary>
+            If a local name of a child XML element is recognized.
+            </summary>
+            <param name="LocalName">Local name.</param>
+            <returns>If recognized.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ParsedContract">
             <summary>

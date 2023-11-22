@@ -203,6 +203,9 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (N is XmlElement E)
 				{
+					if (E.NamespaceURI != Xml.NamespaceURI)
+						return false;
+
 					switch (E.LocalName)
 					{
 						case "description": // Smart contract
@@ -222,7 +225,9 @@ namespace Waher.Networking.XMPP.Contracts
 							break;
 
 						default:
-							return false;
+							if (!this.IsChildLocalNameRecognized(E.LocalName))
+								return false;
+							break;
 					}
 				}
 			}
@@ -230,6 +235,24 @@ namespace Waher.Networking.XMPP.Contracts
 			this.Descriptions = Descriptions.ToArray();
 
 			return true;
+		}
+
+		/// <summary>
+		/// If a local name of a child XML element is recognized.
+		/// </summary>
+		/// <param name="LocalName">Local name.</param>
+		/// <returns>If recognized.</returns>
+		protected virtual bool IsChildLocalNameRecognized(string LocalName)
+		{
+			switch (LocalName)
+			{
+				case "description": // Smart contract
+				case "Description": // Simplified (ex. state machine note command).
+					return true;
+
+				default:
+					return false;
+			}
 		}
 	}
 }

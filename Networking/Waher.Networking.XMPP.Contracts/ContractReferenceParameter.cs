@@ -52,8 +52,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string LocalName
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.localName;
+			set => this.localName = value;
 		}
 
 		/// <summary>

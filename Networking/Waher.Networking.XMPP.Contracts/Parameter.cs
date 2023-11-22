@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string guide = string.Empty;
 		private string exp = string.Empty;
 		private Expression parsed = null;
+		private bool transient = false;
 
 		/// <summary>
 		/// Parameter name
@@ -51,6 +52,15 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// If parameter is transient (i.e. only available in transit, and not persisted)
+		/// </summary>
+		public bool Transient
+		{
+			get => this.transient;
+			set => this.transient = value;
+		}
+
+		/// <summary>
 		/// Parameter value.
 		/// </summary>
 		public abstract object ObjectValue
@@ -80,7 +90,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public virtual async Task<bool> IsParameterValid(Variables Variables)
+		[Obsolete("Use the IsParameterValid(Variables, ContractsClient) overload for full validation.")]
+		public Task<bool> IsParameterValid(Variables Variables)
+		{
+			return this.IsParameterValid(Variables, null);
+		}
+
+		/// <summary>
+		/// Checks if the parameter value is valid.
+		/// </summary>
+		/// <param name="Variables">Collection of parameter values.</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
+		/// <returns>If parameter value is valid.</returns>
+		public virtual async Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
 			if (!string.IsNullOrEmpty(this.exp))
 			{
@@ -172,6 +194,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.guide = XML.Attribute(Xml, "guide");
 			this.exp = XML.Attribute(Xml, "exp");
+			this.transient = XML.Attribute(Xml, "transient", false);
 			this.parsed = null;
 
 			List<HumanReadableText> Descriptions = new List<HumanReadableText>();

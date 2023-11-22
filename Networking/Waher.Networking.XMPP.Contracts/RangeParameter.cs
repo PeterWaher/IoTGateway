@@ -79,8 +79,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Checks if the parameter value is valid.
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public override Task<bool> IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
 			int Diff;
 
@@ -105,7 +106,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return Task.FromResult(false);
 			}
 
-			return base.IsParameterValid(Variables);
+			return base.IsParameterValid(Variables, Client);
 		}
 
 	}

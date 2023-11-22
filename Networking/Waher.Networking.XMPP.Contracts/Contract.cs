@@ -334,10 +334,22 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="Exception">If XML is invalid.</exception>
 		public static Task<ParsedContract> Parse(XmlDocument Xml)
 		{
+			return Parse(Xml, null);
+		}
+
+		/// <summary>
+		/// Validates a contract XML Document, and returns the contract definition in it.
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
+		/// <returns>Parsed contract, or null if it contains errors.</returns>
+		/// <exception cref="Exception">If XML is invalid.</exception>
+		public static Task<ParsedContract> Parse(XmlDocument Xml, ContractsClient Client)
+		{
 			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts,
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
-			return Parse(Xml.DocumentElement);
+			return Parse(Xml.DocumentElement, Client);
 		}
 
 		private static readonly XmlSchema identitiesSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.LegalIdentities.xsd");
@@ -351,7 +363,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		public static async Task<ParsedContract> Parse(XmlElement Xml)
+		[Obsolete("Use the Parse(XmlElement Xml, ContractsClient Client) overload instead.")]
+		public static Task<ParsedContract> Parse(XmlElement Xml)
+		{
+			return Parse(Xml, null);
+		}
+
+		/// <summary>
+		/// Parses a contract from is XML representation.
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
+		/// <returns>Parsed contract, or null if it contains errors.</returns>
+		public static async Task<ParsedContract> Parse(XmlElement Xml, ContractsClient Client)
 		{
 			bool HasVisibility = false;
 			Contract Result = new Contract();
@@ -696,6 +720,10 @@ namespace Waher.Networking.XMPP.Contracts
 										P2 = new RoleParameter();
 										break;
 
+									case "contractReferenceParameter":
+										P2 = new ContractReferenceParameter();
+										break;
+
 									default:
 										return null;
 								}
@@ -945,7 +973,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (Parameter Parameter in Parameters)
 			{
-				if (!await Parameter.IsParameterValid(Variables))
+				if (!await Parameter.IsParameterValid(Variables, Client))
 				{
 					ParsedContract.ParametersValid = false;
 					break;

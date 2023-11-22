@@ -57,7 +57,7 @@ namespace Waher.IoTGateway.Setup.Legal
 					PreserveWhitespace = true
 				};
 				Doc.LoadXml(this.contractXml);
-				ParsedContract Parsed = await Contract.Parse(Doc.DocumentElement);
+				ParsedContract Parsed = await Contract.Parse(Doc.DocumentElement, Gateway.ContractsClient);
 				this.contract = Parsed.Contract;
 			}
 

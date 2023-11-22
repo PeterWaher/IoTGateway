@@ -62,6 +62,9 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
 				}
 
+				if (this.Transient)
+					Xml.Append("\" transient=\"true");
+
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
 					Xml.Append("\"/>");
 				else
@@ -80,13 +83,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Checks if the parameter value is valid.
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public override Task<bool> IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
 			if (!(this.value.HasValue))
 				return Task.FromResult(false);
 
-			return base.IsParameterValid(Variables);
+			return base.IsParameterValid(Variables, Client);
 		}
 
 		/// <summary>

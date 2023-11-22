@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts

@@ -767,12 +767,21 @@ purposes.
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
 				<xs:sequence>
-					<xs:element name='label' type='HumanReadableText' minOccurs='0' maxOccurs='unbounded'>
+					<xs:element name='label' minOccurs='0' maxOccurs='unbounded'>
 						<xs:annotation>
 							<xs:documentation>Human-readable label to be shown in stead of a reference, in contract text.</xs:documentation>
 							<xs:documentation>Note: Multiple localized labels can be provided.</xs:documentation>
 							<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
 						</xs:annotation>
+						<xs:complexType>
+							<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+							<xs:attribute ref='xml:lang' use='optional'>
+								<xs:annotation>
+									<xs:documentation>Language used in the human-readable text.</xs:documentation>
+									<xs:documentation>If no language is specified, the description will be considered the default description.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
 				<xs:attribute name='value' type='xs:string' use='optional'>

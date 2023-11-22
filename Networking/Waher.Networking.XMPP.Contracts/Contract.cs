@@ -332,6 +332,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
 		/// <exception cref="Exception">If XML is invalid.</exception>
+		[Obsolete("Use the Parse(XmlDocument Xml, ContractsClient Client) overload instead.")]
 		public static Task<ParsedContract> Parse(XmlDocument Xml)
 		{
 			return Parse(Xml, null);

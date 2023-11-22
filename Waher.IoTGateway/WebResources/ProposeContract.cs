@@ -72,7 +72,7 @@ namespace Waher.IoTGateway.WebResources
 
 				if (Posted is XmlDocument Doc)
 				{
-					ParsedContract ParsedContract = await Contract.Parse(Doc);
+					ParsedContract ParsedContract = await Contract.Parse(Doc, Gateway.ContractsClient);
 					if (ParsedContract.HasStatus)
 						throw new ForbiddenException("Contract must not have a status section.");
 

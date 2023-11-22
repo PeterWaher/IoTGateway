@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 using Waher.Persistence;
 using Waher.Script;
 
@@ -15,7 +16,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class ContractReferenceParameter : Parameter
 	{
-		private HumanReadableText[] labels = null;
+		private Label[] labels = null;
 		private CaseInsensitiveString value = CaseInsensitiveString.Empty;
 		private string localName = string.Empty;
 		private string @namespace = string.Empty;
@@ -32,7 +33,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Human-readable label to be shown in stead of a reference, in contract text, in different languages.
 		/// </summary>
-		public HumanReadableText[] Labels
+		public Label[] Labels
 		{
 			get => this.labels;
 			set => this.labels = value;
@@ -182,8 +183,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (!(this.labels is null))
 					{
-						foreach (HumanReadableText Label in this.labels)
-							Label.Serialize(Xml, "label", false);
+						foreach (Label Label in this.labels)
+							Label.Serialize(Xml);
 					}
 
 					Xml.Append("</contractReferenceParameter>");
@@ -320,7 +321,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!await base.Import(Xml))
 				return false;
 
-			List<HumanReadableText> Labels = new List<HumanReadableText>();
+			List<Label> Labels = new List<Label>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -329,19 +330,19 @@ namespace Waher.Networking.XMPP.Contracts
 					switch (E.LocalName)
 					{
 						case "label": // Smart contract
-							HumanReadableText Text = HumanReadableText.Parse(E);
-							if (Text is null || !await Text.IsWellDefined())
+							Label Label = Label.Parse(E);
+							if (Label is null || !await Label.IsWellDefined())
 								return false;
 
-							Labels.Add(Text);
+							Labels.Add(Label);
 							break;
 
 						case "Label": // Simplified (ex. state machine note command).
-							Text = HumanReadableText.ParseSimplified(E);
-							if (Text is null || !await Text.IsWellDefined())
+							Label = Label.ParseSimplified(E);
+							if (Label is null || !await Label.IsWellDefined())
 								return false;
 
-							Labels.Add(Text);
+							Labels.Add(Label);
 							break;
 					}
 				}

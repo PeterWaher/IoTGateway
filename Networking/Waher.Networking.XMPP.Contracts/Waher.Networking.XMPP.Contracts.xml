@@ -4978,6 +4978,36 @@
             <param name="Indentation">Current indentation.</param>
             <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.Label">
+            <summary>
+            Label
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.HumanReadable.Label.Language">
+            <summary>
+            Language of label
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the element in normalized form.
+            </summary>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.Parse(System.Xml.XmlElement)">
+            <summary>
+            Class representing human-readable text.
+            </summary>
+            <param name="Xml">XML representation.</param>
+            <returns>Human-readable text.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.ParseSimplified(System.Xml.XmlElement)">
+            <summary>
+            Parses simplified human readable text.
+            </summary>
+            <param name="Xml">XML representation.</param>
+            <returns>Human-readable text.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput">
             <summary>
             Builds Markdown

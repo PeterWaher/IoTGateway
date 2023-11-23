@@ -58,10 +58,34 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 					break;
 
 				case MarkdownType.ForRendering:
-					object Value = Settings.Contract[this.name];
+					object Value;
 
-					if (!(Value is null) && !(Settings.Contract is null))
-						Value = Settings.Contract.FormatParameterValue(this.name, Value);
+					if (Settings.Contract is null)
+						Value = null;
+					else
+					{
+						int i;
+
+						if (Settings.Contract.TryGetParameter(this.name, out Contracts.Parameter Parameter))
+							Value = Parameter.ObjectValue;
+						else if ((i = this.name.IndexOf('.')) > 0 &&
+							Settings.Contract.TryGetParameter(this.name.Substring(0, i), out Parameter) &&
+							Parameter is ContractReferenceParameter ContractReferenceParameter)
+						{
+							if (ContractReferenceParameter.Reference is null ||
+								!ContractReferenceParameter.Reference.TryGetParameter(this.name.Substring(i + 1), out Parameter))
+							{
+								Value = null;
+							}
+							else
+								Value = Parameter.ObjectValue;
+						}
+						else
+							Value = null;
+
+						if (!(Value is null))
+							Value = Settings.Contract.FormatParameterValue(this.name, Value);
+					}
 
 					if (Value is null)
 					{

@@ -1446,6 +1446,30 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Tries to get a parameter object, given its name.
+		/// </summary>
+		/// <param name="Name">Parameter name.</param>
+		/// <param name="Parameter">Parameter object, if found.</param>
+		/// <returns>If a parameter with the given name was found.</returns>
+		public bool TryGetParameter(string Name, out Parameter Parameter)
+		{
+			if (!(this.parameters is null))
+			{
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Name == Name)
+					{
+						Parameter = P;
+						return true;
+					}
+				}
+			}
+
+			Parameter = null;
+			return false;
+		}
+
+		/// <summary>
 		/// Access to contract parameters.
 		/// </summary>
 		/// <param name="Key"></param>
@@ -1454,33 +1478,18 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (!(this.parameters is null))
-				{
-					foreach (Parameter P in this.parameters)
-					{
-						if (P.Name == Key)
-							return P.ObjectValue;
-					}
-				}
-
-				return null;
+				if (this.TryGetParameter(Key, out Parameter Parameter))
+					return Parameter.ObjectValue;
+				else
+					return null;
 			}
 
 			set
 			{
-				if (!(this.parameters is null))
-				{
-					foreach (Parameter P in this.parameters)
-					{
-						if (P.Name == Key)
-						{
-							P.SetValue(value);
-							return;
-						}
-					}
-				}
-
-				throw new IndexOutOfRangeException("A parameter named " + Key + " not found.");
+				if (this.TryGetParameter(Key, out Parameter Parameter))
+					Parameter.SetValue(value);
+				else
+					throw new IndexOutOfRangeException("A parameter named " + Key + " not found.");
 			}
 		}
 

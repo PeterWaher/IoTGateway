@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
-using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 using Waher.Persistence;
 using Waher.Script;
 
@@ -18,6 +17,7 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private Label[] labels = null;
 		private CaseInsensitiveString value = CaseInsensitiveString.Empty;
+		private Contract reference = null;
 		private string localName = string.Empty;
 		private string @namespace = string.Empty;
 		private string templateId = string.Empty;
@@ -101,6 +101,11 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.required;
 			set => this.required = value;
 		}
+
+		/// <summary>
+		/// Loaded reference contract. The contract is loaded during parameter validation.
+		/// </summary>
+		public Contract Reference => this.reference;
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -215,34 +220,37 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(Client is null) && Client.Client.State == XmppState.Connected)
 			{
-				Contract Contract;
-
 				try
 				{
-					Contract = await Client.GetContractAsync(this.value);
-					if (Contract is null)
+					if (this.reference is null || this.reference.ContractId != this.value)
+					{
+						this.reference = null;
+						this.reference = await Client.GetContractAsync(this.value);
+					}
+
+					if (this.reference is null)
 						return false;
 
 					if (!string.IsNullOrEmpty(this.localName) &&
-						this.localName != Contract.ForMachinesLocalName)
+						this.localName != this.reference.ForMachinesLocalName)
 					{
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.@namespace) &&
-						this.@namespace != Contract.ForMachinesNamespace)
+						this.@namespace != this.reference.ForMachinesNamespace)
 					{
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.templateId) &&
-						this.templateId != Contract.TemplateId)
+						this.templateId != this.reference.TemplateId)
 					{
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.provider) &&
-						this.provider != Contract.Provider)
+						this.provider != this.reference.Provider)
 					{
 						return false;
 					}
@@ -252,7 +260,7 @@ namespace Waher.Networking.XMPP.Contracts
 						// TODO
 					}
 
-					ContractStatus Status = await Client.ValidateAsync(Contract, true);
+					ContractStatus Status = await Client.ValidateAsync(this.reference, true);
 					if (Status != ContractStatus.Valid)
 						return false;
 				}
@@ -263,7 +271,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Dictionary<string, object> ContractParameters = new Dictionary<string, object>();
 
-				foreach (Parameter P in Contract.Parameters)
+				foreach (Parameter P in this.reference.Parameters)
 					ContractParameters[P.Name] = P.ObjectValue;
 
 				Variables[this.Name] = ContractParameters;

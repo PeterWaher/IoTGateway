@@ -446,6 +446,14 @@
             </summary>
             <returns>Tags</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.TryGetParameter(System.String,Waher.Networking.XMPP.Contracts.Parameter@)">
+            <summary>
+            Tries to get a parameter object, given its name.
+            </summary>
+            <param name="Name">Parameter name.</param>
+            <param name="Parameter">Parameter object, if found.</param>
+            <returns>If a parameter with the given name was found.</returns>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.Item(System.String)">
             <summary>
             Access to contract parameters.
@@ -576,6 +584,11 @@
         <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceParameter.Required">
             <summary>
             If the reference parameter is required or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceParameter.Reference">
+            <summary>
+            Loaded reference contract. The contract is loaded during parameter validation.
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractReferenceParameter.Serialize(System.Text.StringBuilder,System.Boolean)">

@@ -108,7 +108,7 @@ Machine-Readable Information
 -------------------------------
 
 ```base64xml
-{{Base64Encode(Utf8Encode(PrettyXml(Contract.ForMachines)))}}
+((Base64Encode(Utf8Encode(PrettyXml(Contract.ForMachines) ) ) ))
 ```
 
 Client Signatures

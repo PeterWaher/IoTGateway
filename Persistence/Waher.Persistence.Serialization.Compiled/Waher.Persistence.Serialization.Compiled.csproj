@@ -17,10 +17,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>object serialization compilation</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.7.7</AssemblyVersion>
-    <FileVersion>1.7.7</FileVersion>
+    <AssemblyVersion>1.7.8</AssemblyVersion>
+    <FileVersion>1.7.8</FileVersion>
     <RootNamespace>Waher.Persistence.Serialization</RootNamespace>
-    <Version>1.7.7</Version>
+    <Version>1.7.8</Version>
   </PropertyGroup>
 
   <ItemGroup>

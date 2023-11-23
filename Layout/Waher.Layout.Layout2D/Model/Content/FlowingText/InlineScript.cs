@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Script;
 using Waher.Script.Exceptions;
@@ -111,7 +112,8 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				}
 				catch (Exception ex)
 				{
-					Result = ex;
+					ex = Log.UnnestException(ex);
+					Result = ex.Message;
 				}
 
 				string s = Result?.ToString();

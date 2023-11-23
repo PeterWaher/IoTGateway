@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content;
+using Waher.Events;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Groups;
@@ -12,7 +13,6 @@ using Waher.Layout.Layout2D.Model.Transforms;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
-using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Layout.Layout2D.Model.Content
@@ -180,7 +180,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 					}
 					catch (Exception ex)
 					{
-						Result = ex;
+						ex = Log.UnnestException(ex);
+						Result = ex.Message;
 					}
 
 					if (!string.IsNullOrEmpty(this.cid))

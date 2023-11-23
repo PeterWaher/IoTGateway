@@ -67,7 +67,19 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 						int i;
 
 						if (Settings.Contract.TryGetParameter(this.name, out Contracts.Parameter Parameter))
+						{
+							if (Parameter is ContractReferenceParameter ContractReferenceParameter
+								&& !(ContractReferenceParameter.Labels is null) &&
+								ContractReferenceParameter.Labels.Length > 0)
+							{
+								foreach (Label Label in ContractReferenceParameter.Labels)
+									Label.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+
+								break;
+							}
+
 							Value = Parameter.ObjectValue;
+						}
 						else if ((i = this.name.IndexOf('.')) > 0 &&
 							Settings.Contract.TryGetParameter(this.name.Substring(0, i), out Parameter) &&
 							Parameter is ContractReferenceParameter ContractReferenceParameter)

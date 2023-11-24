@@ -72,8 +72,14 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 								&& !(ContractReferenceParameter.Labels is null) &&
 								ContractReferenceParameter.Labels.Length > 0)
 							{
+								Markdown.Append('[');
+
 								foreach (Label Label in ContractReferenceParameter.Labels)
 									Label.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+
+								Markdown.Append("](iotsc:");
+								Markdown.Append(ContractReferenceParameter.Value.Value);
+								Markdown.Append(')');
 
 								break;
 							}

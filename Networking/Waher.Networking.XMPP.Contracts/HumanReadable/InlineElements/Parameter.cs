@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Persistence;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -72,14 +73,19 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 								&& !(ContractReferenceParameter.Labels is null) &&
 								ContractReferenceParameter.Labels.Length > 0)
 							{
-								Markdown.Append('[');
+								bool HasReference = !CaseInsensitiveString.IsNullOrEmpty(ContractReferenceParameter.Value);
+
+								if (HasReference)
+									Markdown.Append('[');
 
 								foreach (Label Label in ContractReferenceParameter.Labels)
 									Label.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
-
-								Markdown.Append("](iotsc:");
-								Markdown.Append(ContractReferenceParameter.Value.Value);
-								Markdown.Append(')');
+								if (HasReference)
+								{
+									Markdown.Append("](iotsc:");
+									Markdown.Append(ContractReferenceParameter.Value.Value);
+									Markdown.Append(')');
+								}
 
 								break;
 							}

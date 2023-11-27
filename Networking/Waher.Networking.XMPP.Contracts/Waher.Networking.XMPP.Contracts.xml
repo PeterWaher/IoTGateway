@@ -515,6 +515,104 @@
             <param name="Language">Desired language</param>
             <returns>Markdown</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType)">
+            <summary>
+            Selects a human-readable text, and generates a Markdown document from it.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <param name="Type">Type of markdown to generate.</param>
+            <returns>Markdown document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToPlainText(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String)">
+            <summary>
+            Selects a human-readable text, and generates a plain-text document from it.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Plain-text document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToHTML(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String)">
+            <summary>
+            Selects a human-readable text, and generates a HTML document from it.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>HTML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToXAML(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String)">
+            <summary>
+            Selects a human-readable text, and generates a XAML document from it.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>XAML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToXamarinForms(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String)">
+            <summary>
+            Selects a human-readable text, and generates a Xamaring Forms XAML document from it.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Xamarin Forms XAML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType)">
+            <summary>
+            Selects a label, and generates a Markdown document from it.
+            </summary>
+            <param name="Label">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <param name="Type">Type of markdown to generate.</param>
+            <returns>Markdown document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToPlainText(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String)">
+            <summary>
+            Selects a label, and generates a plain-text document from it.
+            </summary>
+            <param name="Label">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Plain-text document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToHTML(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String)">
+            <summary>
+            Selects a label, and generates a HTML document from it.
+            </summary>
+            <param name="Label">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>HTML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToXAML(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String)">
+            <summary>
+            Selects a label, and generates a XAML document from it.
+            </summary>
+            <param name="Label">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>XAML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToXamarinForms(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String)">
+            <summary>
+            Selects a label, and generates a Xamaring Forms XAML document from it.
+            </summary>
+            <param name="Label">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Xamarin Forms XAML document.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Select(Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableText[],System.String)">
+            <summary>
+            Selects a human-readable text, from a collection of texts, based on currently selected language.
+            </summary>
+            <param name="Text">Collection of texts in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Selected text..</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Select(Waher.Networking.XMPP.Contracts.HumanReadable.Label[],System.String)">
+            <summary>
+            Selects a human-readable text, from a collection of texts, based on currently selected language.
+            </summary>
+            <param name="Label">Collection of labels in different languages.</param>
+            <param name="Language">Language</param>
+            <returns>Selected text..</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Contract.TrySetRoleParameters(System.String,System.Int32,Waher.Networking.XMPP.Contracts.LegalIdentity)">
             <summary>
             Tries to set role parameters.
@@ -4566,6 +4664,13 @@
             <param name="Elements">Elements to serialize.</param>
             <param name="EncapsulatingElementName">Encapsulating element name.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.HumanReadableElement.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
             <summary>
             Generates markdown for the human-readable text.
@@ -5020,6 +5125,56 @@
             </summary>
             <param name="Xml">XML representation.</param>
             <returns>Human-readable text.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateMarkdown(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateMarkdown(Waher.Networking.XMPP.Contracts.Contract,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <param name="Type">Type of Markdown to generate</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateMarkdown(Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownSettings)">
+            <summary>
+            Generates markdown for the human-readable text.
+            </summary>
+            <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GeneratePlainText(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates plain text for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>Plain text</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateHTML(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates HTML for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>HTML</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateXAML(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates WPF XAML for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>WPF XAML</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.HumanReadable.Label.GenerateXamarinForms(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Generates Xamarin.Forms XAML for the human-readable text.
+            </summary>
+            <param name="Contract">Contract, of which the human-readable text is part.</param>
+            <returns>Xamarin.Forms XAML</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownOutput">
             <summary>

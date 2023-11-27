@@ -33,7 +33,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private ClientSignature[] clientSignatures = null;
 		private Attachment[] attachments = null;
 		private ServerSignature serverSignature = null;
-		private Waher.Security.HashFunction contentSchemaHashFunction = Waher.Security.HashFunction.SHA256;
+		private Security.HashFunction contentSchemaHashFunction = Security.HashFunction.SHA256;
 		private ContractState state = ContractState.Proposed;
 		private ContractVisibility visibility = ContractVisibility.CreatorAndParts;
 		private ContractParts partsMode = ContractParts.ExplicitlyDefined;
@@ -861,7 +861,7 @@ namespace Waher.Networking.XMPP.Contracts
 									break;
 
 								case "schemaHashFunction":
-									if (Enum.TryParse<Waher.Security.HashFunction>(Attr.Value, out Waher.Security.HashFunction H))
+									if (Enum.TryParse(Attr.Value, out Security.HashFunction H))
 										Result.contentSchemaHashFunction = H;
 									else
 										return null;
@@ -1611,32 +1611,125 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.ToXamarinForms(this.forHumans, Language);
 		}
 
-		internal string ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
+		/// <summary>
+		/// Selects a human-readable text, and generates a Markdown document from it.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Type">Type of markdown to generate.</param>
+		/// <returns>Markdown document.</returns>
+		public string ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
 		{
 			return this.Select(Text, Language)?.GenerateMarkdown(this, Type);
 		}
 
-		internal Task<string> ToPlainText(HumanReadableText[] Text, string Language)
+		/// <summary>
+		/// Selects a human-readable text, and generates a plain-text document from it.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Plain-text document.</returns>
+		public Task<string> ToPlainText(HumanReadableText[] Text, string Language)
 		{
 			return this.Select(Text, Language)?.GeneratePlainText(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal Task<string> ToHTML(HumanReadableText[] Text, string Language)
+		/// <summary>
+		/// Selects a human-readable text, and generates a HTML document from it.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>HTML document.</returns>
+		public Task<string> ToHTML(HumanReadableText[] Text, string Language)
 		{
 			return this.Select(Text, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal Task<string> ToXAML(HumanReadableText[] Text, string Language)
+		/// <summary>
+		/// Selects a human-readable text, and generates a XAML document from it.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>XAML document.</returns>
+		public Task<string> ToXAML(HumanReadableText[] Text, string Language)
 		{
 			return this.Select(Text, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal Task<string> ToXamarinForms(HumanReadableText[] Text, string Language)
+		/// <summary>
+		/// Selects a human-readable text, and generates a Xamaring Forms XAML document from it.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Xamarin Forms XAML document.</returns>
+		public Task<string> ToXamarinForms(HumanReadableText[] Text, string Language)
 		{
 			return this.Select(Text, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal HumanReadableText Select(HumanReadableText[] Text, string Language)
+		/// <summary>
+		/// Selects a label, and generates a Markdown document from it.
+		/// </summary>
+		/// <param name="Label">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Type">Type of markdown to generate.</param>
+		/// <returns>Markdown document.</returns>
+		public string ToMarkdown(Label[] Label, string Language, MarkdownType Type)
+		{
+			return this.Select(Label, Language)?.GenerateMarkdown(this, Type);
+		}
+
+		/// <summary>
+		/// Selects a label, and generates a plain-text document from it.
+		/// </summary>
+		/// <param name="Label">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Plain-text document.</returns>
+		public Task<string> ToPlainText(Label[] Label, string Language)
+		{
+			return this.Select(Label, Language)?.GeneratePlainText(this) ?? Task.FromResult<string>(null);
+		}
+
+		/// <summary>
+		/// Selects a label, and generates a HTML document from it.
+		/// </summary>
+		/// <param name="Label">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>HTML document.</returns>
+		public Task<string> ToHTML(Label[] Label, string Language)
+		{
+			return this.Select(Label, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
+		}
+
+		/// <summary>
+		/// Selects a label, and generates a XAML document from it.
+		/// </summary>
+		/// <param name="Label">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>XAML document.</returns>
+		public Task<string> ToXAML(Label[] Label, string Language)
+		{
+			return this.Select(Label, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
+		}
+
+		/// <summary>
+		/// Selects a label, and generates a Xamaring Forms XAML document from it.
+		/// </summary>
+		/// <param name="Label">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Xamarin Forms XAML document.</returns>
+		public Task<string> ToXamarinForms(Label[] Label, string Language)
+		{
+			return this.Select(Label, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
+		}
+
+		/// <summary>
+		/// Selects a human-readable text, from a collection of texts, based on currently selected language.
+		/// </summary>
+		/// <param name="Text">Collection of texts in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Selected text..</returns>
+		public HumanReadableText Select(HumanReadableText[] Text, string Language)
 		{
 			if (Text is null)
 				return null;
@@ -1644,6 +1737,31 @@ namespace Waher.Networking.XMPP.Contracts
 			HumanReadableText First = null;
 
 			foreach (HumanReadableText T in Text)
+			{
+				if (string.Compare(T.Language, Language, StringComparison.CurrentCultureIgnoreCase) == 0)
+					return T;
+
+				if (First is null)
+					First = T;
+			}
+
+			return First;
+		}
+
+		/// <summary>
+		/// Selects a human-readable text, from a collection of texts, based on currently selected language.
+		/// </summary>
+		/// <param name="Label">Collection of labels in different languages.</param>
+		/// <param name="Language">Language</param>
+		/// <returns>Selected text..</returns>
+		public Label Select(Label[] Label, string Language)
+		{
+			if (Label is null)
+				return null;
+
+			Label First = null;
+
+			foreach (Label T in Label)
 			{
 				if (string.Compare(T.Language, Language, StringComparison.CurrentCultureIgnoreCase) == 0)
 					return T;

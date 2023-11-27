@@ -80,6 +80,16 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// Generates markdown for the human-readable text.
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public void GenerateMarkdown(MarkdownOutput Markdown, MarkdownSettings Settings)
+		{
+			this.GenerateMarkdown(Markdown, 1, 0, Settings);
+		}
+
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>

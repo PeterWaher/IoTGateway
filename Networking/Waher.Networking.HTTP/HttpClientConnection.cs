@@ -548,10 +548,7 @@ namespace Waher.Networking.HTTP
 
 								if (Request.Session is null)
 								{
-									Request.Session = new Script.Variables()
-									{
-										{ "Global", HttpServer.globalVariables }
-									};
+									Request.Session = HttpServer.CreatesVariables();
 									Request.tempSession = true;
 								}
 							}

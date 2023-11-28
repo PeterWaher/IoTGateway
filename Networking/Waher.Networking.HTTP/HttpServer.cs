@@ -58,6 +58,11 @@ namespace Waher.Networking.HTTP
 
 		internal static readonly Variables globalVariables = new Variables();
 
+		/// <summary>
+		/// Reference to global collection of variables.
+		/// </summary>
+		public static Variables GlobalVariables => globalVariables;
+
 #if WINDOWS_UWP
 		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
@@ -1620,17 +1625,24 @@ namespace Waher.Networking.HTTP
 
 			if (CreateIfNotFound)
 			{
-				Result = new Variables()
-				{
-					{ "Global", globalVariables }
-				};
-
+				Result = CreatesVariables();
 				this.sessions.Add(SessionId, Result);
-
 				return Result;
 			}
 			else
 				return null;
+		}
+
+		/// <summary>
+		/// Creates a new collection of variables, that contains access to the global set of variables..
+		/// </summary>
+		/// <returns>Variables collection.</returns>
+		public static Variables CreatesVariables()
+		{
+			return new Variables()
+			{
+				{ "Global", globalVariables }
+			};
 		}
 
 		internal bool SetSession(string SessionId, Variables Variables)
@@ -1975,7 +1987,7 @@ namespace Waher.Networking.HTTP
 
 				return Exists;
 			}
-			else 
+			else
 			{
 				FileName = null;
 				return false;

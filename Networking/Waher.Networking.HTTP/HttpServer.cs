@@ -1625,7 +1625,7 @@ namespace Waher.Networking.HTTP
 
 			if (CreateIfNotFound)
 			{
-				Result = CreatesVariables();
+				Result = CreateVariables();
 				this.sessions.Add(SessionId, Result);
 				return Result;
 			}
@@ -1637,7 +1637,7 @@ namespace Waher.Networking.HTTP
 		/// Creates a new collection of variables, that contains access to the global set of variables..
 		/// </summary>
 		/// <returns>Variables collection.</returns>
-		public static Variables CreatesVariables()
+		public static Variables CreateVariables()
 		{
 			return new Variables()
 			{

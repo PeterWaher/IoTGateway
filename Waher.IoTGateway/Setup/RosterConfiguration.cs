@@ -195,9 +195,10 @@ namespace Waher.IoTGateway.Setup
 		{
 			string FileName = Path.Combine(Gateway.RootFolder, "Settings", "RosterItems.md");
 			string Markdown = await Resources.ReadAllTextAsync(FileName);
-			Variables v = new Variables(
-				new Variable("Contacts", Contacts),
-				new Variable("Requests", SubscriptionRequests));
+			Variables v = HttpServer.CreateVariables();
+			v["Contacts"] = Contacts;
+			v["Requests"] = SubscriptionRequests;
+
 			MarkdownSettings Settings = new MarkdownSettings(Gateway.Emoji1_24x24, true, v);
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, FileName, string.Empty, string.Empty);
 			string Html = await Doc.GenerateHTML();

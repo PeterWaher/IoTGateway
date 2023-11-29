@@ -83,7 +83,7 @@ empty(Item.UserName) ? "Add new user" : Item.UserName
 }}
 ===================
 
-<form action="User.md" method="post" enctype="multipart/form-data">
+<form action="User.md" method="post">
 <fieldset>
 <legend>User definition</legend>
 

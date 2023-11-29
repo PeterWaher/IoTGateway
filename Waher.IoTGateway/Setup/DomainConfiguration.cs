@@ -606,7 +606,7 @@ namespace Waher.IoTGateway.Setup
 
 			await Status.Invoke(this, "Checking current IP Address.");
 
-			Variables Variables = new Variables();
+			Variables Variables = HttpServer.CreateVariables();
 			object Result;
 
 			try

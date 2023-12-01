@@ -180,9 +180,8 @@ namespace Waher.Persistence.Files
 			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
-			if (Leaf is null)
-				throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
+			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
+				?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
 
 			await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 
@@ -207,9 +206,8 @@ namespace Waher.Persistence.Files
 				if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 					return false;
 
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
-				if (Leaf is null)
-					throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
+					?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
 
 				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 			}
@@ -435,9 +433,8 @@ namespace Waher.Persistence.Files
 			Type ObjectType = Object.GetType();
 			IObjectSerializer Serializer = await this.objectFile.Provider.GetObjectSerializer(ObjectType);
 
-			byte[] Key = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Key is null)
-				throw new KeyNotFoundException("Object not found.");
+			byte[] Key = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			return await this.indexFile.GetRankLocked(Key);
 		}

@@ -68,22 +68,37 @@ namespace Waher.Script.Operators
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		public override Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			string s = this.nrArguments.ToString();
 
-			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
-			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   (!(v.ValueObject is ILambdaExpression f)))
+			if ((Variables.TryGetVariable(this.functionName + " " + s, out Variable v) ||
+			   Variables.TryGetVariable(this.functionName, out v)) &&
+			   v.ValueObject is ILambdaExpression f)
 			{
-				if (this.nullCheck)
-					return ObjectValue.Null;
-				else if (this.nrArguments == 1)
-					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
-				else
-					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
+				return this.EvaluateAsync(Variables, f);
 			}
 
+			if (Variables.TryGetVariable("Global", out v) &&
+				v.ValueObject is Variables GlobalVariables &&
+				(GlobalVariables.TryGetVariable(this.functionName + " " + s, out v) ||
+			   GlobalVariables.TryGetVariable(this.functionName, out v)) &&
+			   v.ValueObject is ILambdaExpression f2)
+			{
+				return this.EvaluateAsync(Variables, f2);
+			}
+
+			if (this.nullCheck)
+				return Task.FromResult<IElement>(ObjectValue.Null);
+			
+			if (this.nrArguments == 1)
+				throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
+			else
+				throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
+		}
+
+		private async Task<IElement> EvaluateAsync(Variables Variables, ILambdaExpression f)
+		{ 
 			IElement[] Arg = new IElement[this.nrArguments];
 			ScriptNode Node;
 			int i;

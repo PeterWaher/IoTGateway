@@ -93,6 +93,13 @@ namespace Waher.Script.Model
 						return new ObjectVector(Elements);
 					}
 				}
+
+				if (Variables.TryGetVariable("Global", out v) &&
+					v.ValueObject is Variables GlobalVariables &&
+					GlobalVariables.TryGetVariable(this.variableName, out v))
+				{
+					return v.ValueElement;
+				}
 			}
 
 			throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);

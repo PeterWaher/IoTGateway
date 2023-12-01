@@ -102,7 +102,11 @@ namespace Waher.Script.Functions.DateAndTime
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
 
-				if (Obj is long L)
+				if (Obj is System.DateTime TP)
+					return new DateTimeValue(TP.ToLocalTime());
+				else if (Obj is System.DateTimeOffset TPO)
+					return new DateTimeValue(TPO.ToLocalTime().DateTime);
+				else if (Obj is long L)
 					return new DateTimeValue(new System.DateTime(L, DateTimeKind.Local));
 				else if (Obj is double Dbl)
 					return new DateTimeValue(new System.DateTime((long)Dbl, DateTimeKind.Local));
@@ -110,7 +114,7 @@ namespace Waher.Script.Functions.DateAndTime
 				{
 					string s = Obj?.ToString() ?? string.Empty;
 
-					if (DateTime.TryParse(s, out System.DateTime TP))
+					if (DateTime.TryParse(s, out TP))
 					{
 						if (TP.Kind != DateTimeKind.Local)
 							TP = new System.DateTime(TP.Year, TP.Month, TP.Day, TP.Hour, TP.Minute, TP.Second, TP.Millisecond, DateTimeKind.Local);

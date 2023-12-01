@@ -102,7 +102,9 @@ namespace Waher.Script.Functions.DateAndTime
 			{
 				object Obj = Arguments[0].AssociatedObjectValue;
 
-				if (Obj is System.DateTimeOffset TPO)
+				if (Obj is System.DateTime TP)
+					return new DateTimeValue(TP);
+				else if (Obj is System.DateTimeOffset TPO)
 					return new DateTimeValue(TPO.DateTime);
 				else if (Obj is long L)
 					return new DateTimeValue(FromInteger(L, DateTimeKind.Unspecified));
@@ -112,7 +114,7 @@ namespace Waher.Script.Functions.DateAndTime
 				{
 					string s = Obj?.ToString() ?? string.Empty;
 
-					if (TryParse(s, out System.DateTime TP))
+					if (TryParse(s, out TP))
 						return new DateTimeValue(TP);
 					else
 						throw new ScriptRuntimeException("Unable to parse DateTime value: " + s, this);

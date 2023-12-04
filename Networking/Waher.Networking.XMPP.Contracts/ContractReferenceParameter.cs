@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private Label[] labels = null;
 		private CaseInsensitiveString value = CaseInsensitiveString.Empty;
 		private Contract reference = null;
+		private ContractStatus? referenceStatus = null;
 		private string localName = string.Empty;
 		private string @namespace = string.Empty;
 		private string templateId = string.Empty;
@@ -225,6 +226,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (this.reference is null || this.reference.ContractId != this.value)
 					{
 						this.reference = null;
+						this.referenceStatus = null;
 						this.reference = await Client.GetContractAsync(this.value);
 					}
 
@@ -260,8 +262,10 @@ namespace Waher.Networking.XMPP.Contracts
 						// TODO
 					}
 
-					ContractStatus Status = await Client.ValidateAsync(this.reference, true);
-					if (Status != ContractStatus.Valid)
+					if (!this.referenceStatus.HasValue)
+						this.referenceStatus = await Client.ValidateAsync(this.reference, true);
+
+					if (this.referenceStatus != ContractStatus.Valid)
 						return false;
 				}
 				catch (Exception)

@@ -3983,6 +3983,13 @@ namespace Waher.Networking.XMPP.Contracts
 			string[] Namespaces = new string[Schemas.Count];
 			Schemas.Keys.CopyTo(Namespaces, 0);
 
+			string ContractComponent;
+			int i = Contract.ContractId.IndexOf('@');
+			if (i < 0)
+				ContractComponent = this.componentAddress;
+			else
+				ContractComponent = Contract.ContractId.Substring(i + 1);
+
 			foreach (string Namespace in Namespaces)
 			{
 				if (Schemas.TryGetValue(Namespace, out Schema) && !(Schema is null))
@@ -3996,7 +4003,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					SchemaDigest = null;
 
-				this.GetSchema(Namespace, SchemaDigest, (_, e) =>
+				this.GetSchema(ContractComponent, Namespace, SchemaDigest, (_, e) =>
 				{
 					if (e.Ok)
 					{

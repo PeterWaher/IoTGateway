@@ -56,7 +56,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
       <dependency id="Waher.Runtime.Inventory" version="1.1.5"/>
       <dependency id="Waher.Runtime.Temporary" version="1.0.0"/>
       <dependency id="Waher.Runtime.Threading" version="1.2.1"/>
-			<dependency id="Waher.Script" version="2.6.2"/>
+			<dependency id="Waher.Script" version="2.6.3"/>
 			<dependency id="Waher.Security" version="1.0.8"/>
     </dependencies>
   </metadata>

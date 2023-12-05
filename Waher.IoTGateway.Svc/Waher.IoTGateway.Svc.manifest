@@ -285,6 +285,8 @@
 	<Assembly fileName='Waher.Content.Markdown.Web.pdb'/>
 	<Assembly fileName='Waher.Content.QR.dll'/>
 	<Assembly fileName='Waher.Content.QR.pdb'/>
+	<Assembly fileName='Waher.Content.Rss.dll'/>
+	<Assembly fileName='Waher.Content.Rss.pdb'/>
 	<Assembly fileName='Waher.Content.Semantic.dll'/>
 	<Assembly fileName='Waher.Content.Semantic.pdb'/>
 	<Assembly fileName='Waher.Content.SystemFiles.dll'/>

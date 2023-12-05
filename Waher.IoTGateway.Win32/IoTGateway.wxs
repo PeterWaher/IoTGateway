@@ -578,6 +578,7 @@
 							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.dll' Vital='yes'/>
 							<File Id='Waher.Content.QR.dll' Name='Waher.Content.QR.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.dll' Vital='yes'/>
+							<File Id='Waher.Content.Rss.dll' Name='Waher.Content.Rss.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Rss.dll' Vital='yes'/>
 							<File Id='Waher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.dll' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.dll' Vital='yes'/>
@@ -708,6 +709,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.dll' Name='Waher.Content.QR.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Rss.dll' Name='Waher.Content.Rss.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
@@ -835,6 +837,7 @@
 							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.pdb' Vital='yes'/>
 							<File Id='Waher.Content.QR.pdb' Name='Waher.Content.QR.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Rss.pdb' Name='Waher.Content.Rss.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Rss.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.pdb' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.pdb' Vital='yes'/>
@@ -938,6 +941,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.pdb' Name='Waher.Content.QR.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Rss.pdb' Name='Waher.Content.Rss.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>

@@ -19,8 +19,8 @@ namespace Waher.Content
 		/// <summary>
 		/// Contains control characters.
 		/// </summary>
-		public static readonly char[] ControlCharacters = new char[] 
-		{ 
+		public static readonly char[] ControlCharacters = new char[]
+		{
 			'\x00', '\x01','\x02','\x03','\x04','\x05','\x06','\x07',
 			'\x08', '\x09','\x0a','\x0b','\x0c','\x0d','\x0e','\x0f',
 			'\x10', '\x11','\x12','\x13','\x14','\x15','\x16','\x17',
@@ -180,9 +180,9 @@ namespace Waher.Content
 			string MonthStr = M.Groups["Month"].Value;
 			int Month = Array.IndexOf(months, MonthStr) + 1;
 			int Year = int.Parse(M.Groups["Year"].Value);
-			int Hour = int.Parse(M.Groups["Hour"].Value);
-			int Minute = int.Parse(M.Groups["Minute"].Value);
-			int Second = int.Parse(M.Groups["Second"].Value);
+			int Hour = ParseOptionalInt(M.Groups["Hour"].Value, 0);
+			int Minute = ParseOptionalInt(M.Groups["Minute"].Value, 0);
+			int Second = ParseOptionalInt(M.Groups["Second"].Value, 0);
 			string TimeZoneStr = M.Groups["TimeZone"].Value;
 			TimeSpan TimeZone;
 
@@ -313,6 +313,14 @@ namespace Waher.Content
 
 			Value = new DateTimeOffset(Year, Month, Day, Hour, Minute, Second, TimeZone);
 			return true;
+		}
+
+		private static int ParseOptionalInt(string s, int Default)
+		{
+			if (string.IsNullOrEmpty(s))
+				return Default;
+			else
+				return int.Parse(s);
 		}
 
 		private static readonly Regex rfc822datetime = new Regex(@"^((?'WeekDay'Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s*)?(?'Day'\d+)\s+(?'Month'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(?'Year'\d+)\s+(?'Hour'\d+)[:](?'Minute'\d+)([:](?'Second'\d+))?\s+(?'TimeZone'UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z]|[+-]\d{4})\s*([(].*[)])?$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -879,7 +887,7 @@ namespace Waher.Content
 		#endregion
 
 		#region Number of decimals
-		
+
 		/// <summary>
 		/// Calculates the number of decimals of a floating-point number.
 		/// </summary>

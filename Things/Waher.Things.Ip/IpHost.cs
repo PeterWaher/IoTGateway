@@ -10,7 +10,6 @@ using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
-using Waher.Script.Constants;
 
 namespace Waher.Things.Ip
 {

@@ -192,11 +192,6 @@ namespace Waher.Things.Semantic.Nodes
 							Fields.Add(new StringField(this, Now, "Channel, Image, Description", Channel.Image.Description, FieldType.Identity, FieldQoS.AutomaticReadout));
 					}
 
-					if (!(Channel.Extensions is null))
-					{
-						// TODO
-					}
-
 					if (!(Channel.Items is null))
 					{
 						foreach (RssItem Item in Channel.Items)
@@ -223,35 +218,47 @@ namespace Waher.Things.Semantic.Nodes
 
 							if (!(Item.Guid is null))
 							{
-								// TODO
+								Fields.Add(new StringField(this, Publication, "Guid", Item.Guid.Id, FieldType.Historical, FieldQoS.AutomaticReadout));
+								Fields.Add(new BooleanField(this, Publication, "Guid, IsPermaLink", Item.Guid.IsPermaLink, FieldType.Historical, FieldQoS.AutomaticReadout));
 							}
 
 							if (!(Item.Source is null))
 							{
-								// TODO
+								if (!(Item.Source.Url is null))
+									Fields.Add(new StringField(this, Publication, "Source, URL", Item.Source.Url.ToString(), FieldType.Historical, FieldQoS.AutomaticReadout));
+							
+								if (!string.IsNullOrEmpty(Item.Source.Title))
+									Fields.Add(new StringField(this, Publication, "Source, Title", Item.Source.Title, FieldType.Historical, FieldQoS.AutomaticReadout));
 							}
 
 							if (!(Item.Enclosure is null))
 							{
-								// TODO
+								if (!(Item.Enclosure.Url is null))
+									Fields.Add(new StringField(this, Publication, "Enclosure, URL", Item.Enclosure.Url.ToString(), FieldType.Historical, FieldQoS.AutomaticReadout));
+
+								if (!string.IsNullOrEmpty(Item.Enclosure.ContentType))
+									Fields.Add(new StringField(this, Publication, "Enclosure, Content-Type", Item.Enclosure.ContentType, FieldType.Historical, FieldQoS.AutomaticReadout));
+
+								if (Item.Enclosure.Length > 0)
+									Fields.Add(new Int64Field(this, Publication, "Enclosure, Length", Item.Enclosure.Length, FieldType.Historical, FieldQoS.AutomaticReadout));
 							}
 
 							if (!(Item.Categories is null))
 							{
-								// TODO
-							}
+								int i = 0;
 
-							if (!(Item.Extensions is null))
-							{
-								// TODO
+								foreach (RssCategory Category in Item.Categories)
+								{
+									string s = "Category " + (++i).ToString();
+
+									Fields.Add(new StringField(this, Publication, s + ", Name", Category.Name, FieldType.Historical, FieldQoS.AutomaticReadout));
+
+									if (!(Category.Domain is null))
+										Fields.Add(new StringField(this, Now, s + ", Domain", Category.Domain.ToString(), FieldType.Historical, FieldQoS.AutomaticReadout));
+								}
 							}
 						}
 					}
-				}
-
-				if (!(Doc.Extensions is null))
-				{
-					// TODO
 				}
 
 				if (!(Doc.Warnings is null) && Doc.Warnings.Length > 0)

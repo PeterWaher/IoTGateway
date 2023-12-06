@@ -91,6 +91,7 @@ namespace Waher.Client.WPF
 			Types.Initialize(typeof(MainWindow).Assembly,
 				typeof(Content.InternetContent).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
+				typeof(Content.Rss.RssDocument).Assembly,
 				typeof(MarkdownDocument).Assembly,
 				typeof(Consolidator).Assembly,
 				typeof(GraphViz).Assembly,

@@ -21,7 +21,7 @@ namespace Waher.Content.Rss
 
 			List<RssWarning> Warnings = new List<RssWarning>();
 			List<RssItem> Items = new List<RssItem>();
-			List<string> Categories = new List<string>();
+			List<RssCategory> Categories = new List<RssCategory>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -78,7 +78,9 @@ namespace Waher.Content.Rss
 							break;
 
 						case "category":
-							Categories.Add(E.InnerText);
+							RssCategory Category = new RssCategory(E, BaseUri);
+							Warnings.AddRange(Category.Warnings);
+							Categories.Add(Category);
 							break;
 
 						case "generator":
@@ -115,11 +117,17 @@ namespace Waher.Content.Rss
 							Items.Add(Item);
 							break;
 
-						case "cloud":		// TODO
-						case "rating":		// TODO
-						case "textInput":	// TODO
-						case "skipHours":	// TODO
-						case "skipDays":	// TODO
+						case "cloud":
+							if (!(this.Cloud is null))
+								Warnings.Add(new RssWarning(E, "Cloud service already defined for channel."));
+							else
+								this.Cloud = new RssCloud(E, BaseUri);
+							break;
+
+						case "rating":      // TODO
+						case "textInput":   // TODO
+						case "skipHours":   // TODO
+						case "skipDays":    // TODO
 						default:
 							Warnings.Add(new RssWarning(E));
 							break;
@@ -197,7 +205,7 @@ namespace Waher.Content.Rss
 		/// Specify one or more categories that the channel belongs to. Follows the same rules 
 		/// as the <item>-level category element.
 		/// </summary>
-		public string[] Categories { get; } = null;
+		public RssCategory[] Categories { get; } = null;
 
 		/// <summary>
 		/// A string indicating the program used to generate the channel.
@@ -210,6 +218,11 @@ namespace Waher.Content.Rss
 		/// RSS file on a Web server 25 years from now and wonder what it is.
 		/// </summary>
 		public Uri Documentation { get; } = null;
+
+		/// <summary>
+		/// Reference to web service that supports the rssCloud interface.
+		/// </summary>
+		public RssCloud Cloud { get; } = null;
 
 		/// <summary>
 		/// ttl stands for time to live. It's a number of minutes that indicates how long a 

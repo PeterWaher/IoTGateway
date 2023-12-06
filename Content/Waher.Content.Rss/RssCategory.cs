@@ -6,34 +6,34 @@ using Waher.Content.Xml;
 namespace Waher.Content.Rss
 {
 	/// <summary>
-	/// RSS channel that the item came from.
+	/// Identifies a categorization taxonomy.
 	/// </summary>
-	public class RssSource
+	public class RssCategory
 	{
 		/// <summary>
-		/// RSS channel that the item came from.
+		/// Identifies a categorization taxonomy.
 		/// </summary>
 		/// <param name="Xml">XML Definition</param>
 		/// <param name="BaseUri">Base URI</param>
-		public RssSource(XmlElement Xml, Uri BaseUri)
+		public RssCategory(XmlElement Xml, Uri BaseUri)
 		{
 			if (Xml is null)
 				throw new ArgumentNullException(nameof(Xml));
 
 			List<RssWarning> Warnings = new List<RssWarning>();
 
-			this.Title = Xml.InnerText;
+			this.Name = Xml.InnerText;
 
 			if (Xml.HasAttribute("url"))
 			{
 				string s = XML.Attribute(Xml, "url");
 				if (Uri.TryCreate(BaseUri, s, out Uri Url))
-					this.Url = Url;
+					this.Domain = Url;
 				else
 					Warnings.Add(new RssWarning(Xml, "Invalid URI: " + s));
 			}
 			else
-				this.Url = null;
+				this.Domain = null;
 
 			this.Warnings = Warnings.ToArray();
 		}
@@ -44,13 +44,13 @@ namespace Waher.Content.Rss
 		public RssWarning[] Warnings { get; }
 
 		/// <summary>
-		/// URL to the source.
+		/// Domain URL.
 		/// </summary>
-		public Uri Url { get; } = null;
+		public Uri Domain { get; } = null;
 
 		/// <summary>
-		/// Title of the source.
+		/// Name of category
 		/// </summary>
-		public string Title { get; }
+		public string Name { get; }
 	}
 }

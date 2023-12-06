@@ -30,7 +30,7 @@ namespace Waher.Content.Rss
 				throw new ArgumentNullException(nameof(Xml));
 
 			List<RssWarning> Warnings = new List<RssWarning>();
-			List<string> Categories = new List<string>();
+			List<RssCategory> Categories = new List<RssCategory>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -61,7 +61,9 @@ namespace Waher.Content.Rss
 							break;
 
 						case "category":
-							Categories.Add(E.InnerText);
+							RssCategory Category = new RssCategory(E, BaseUri);
+							Warnings.AddRange(Category.Warnings);
+							Categories.Add(Category);
 							break;
 
 						case "comments":
@@ -82,7 +84,7 @@ namespace Waher.Content.Rss
 							break;
 
 						case "guid":
-							this.Guid = E.InnerText;
+							this.Guid = new RssGuid(E);
 							break;
 
 						case "pubDate":
@@ -143,7 +145,7 @@ namespace Waher.Content.Rss
 		/// <summary>
 		/// Includes the item in one or more categories.
 		/// </summary>
-		public string[] Categories { get; } = null;
+		public RssCategory[] Categories { get; } = null;
 
 		/// <summary>
 		/// URL of a page for comments relating to the item.
@@ -158,7 +160,7 @@ namespace Waher.Content.Rss
 		/// <summary>
 		/// A string that uniquely identifies the item.
 		/// </summary>
-		public string Guid { get; } = null;
+		public RssGuid Guid { get; } = null;
 
 		/// <summary>
 		/// Indicates when the item was published.
@@ -169,6 +171,5 @@ namespace Waher.Content.Rss
 		/// The RSS channel that the item came from.
 		/// </summary>
 		public RssSource Source { get; } = null;
-
 	}
 }

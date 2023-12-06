@@ -101,8 +101,7 @@ namespace Waher.Content.Rss.Test
 			string ContentType = P.Value;
 
 			Assert.IsNotNull(Data);
-			Assert.AreEqual("application/rss+xml", ContentType);
+			Assert.AreEqual("application/rss+xml; charset=utf-8", ContentType);
 		}
-
 	}
 }

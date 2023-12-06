@@ -1521,7 +1521,7 @@ namespace Waher.Content.Markdown
 
 		private LinkedList<MarkdownElement> PrepareHeader(LinkedList<MarkdownElement> Content)
 		{
-			if (Content?.First.Value is NumberedList NumberedList &&
+			if (Content?.First?.Value is NumberedList NumberedList &&
 				Content.First.Next is null &&
 				NumberedList.HasOneChild &&
 				NumberedList.FirstChild is NumberedItem Item &&

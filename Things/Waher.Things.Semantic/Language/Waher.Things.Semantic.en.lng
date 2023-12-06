@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
+		<Namespace name="Waher.Things.Semantic.Nodes">
+			<String id="1">RSS Feed</String>
+			<String id="2">RSS</String>
+			<String id="3">URL:</String>
+			<String id="4">Link to RSS Feed.</String>
+			<String id="5">URL</String>
+		</Namespace>
 		<Namespace name="Waher.Things.Semantic.Sources">
 			<String id="1">Editable parameters for the node.</String>
 			<String id="2">Read all available sensor data from node.</String>

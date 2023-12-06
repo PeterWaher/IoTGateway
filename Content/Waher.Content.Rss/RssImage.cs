@@ -89,15 +89,15 @@ namespace Waher.Content.Rss
 		public Uri Url { get; } = null;
 
 		/// <summary>
-		/// Describes the image, it's used in the ALT attribute of the HTML <img> tag when the 
+		/// Describes the image, it's used in the ALT attribute of the HTML &lt;img&gt; tag when the 
 		/// channel is rendered in HTML.
 		/// </summary>
 		public string Title { get; }
 
 		/// <summary>
 		/// The URL of the site, when the channel is rendered, the image is a link to the 
-		/// site. (Note, in practice the image <title> and <link> should have the same value as 
-		/// the channel's <title> and <link>.
+		/// site. (Note, in practice the image &lt;title&gt; and &lt;link&gt; should have the same value as 
+		/// the channel's &lt;title&gt; and &lt;link&gt;.
 		/// </summary>
 		public Uri Link { get; } = null;
 

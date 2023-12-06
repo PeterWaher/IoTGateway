@@ -212,7 +212,7 @@ namespace Waher.Content.Rss
 
 		/// <summary>
 		/// Specify one or more categories that the channel belongs to. Follows the same rules 
-		/// as the <item>-level category element.
+		/// as the &lt;item&gt;-level category element.
 		/// </summary>
 		public RssCategory[] Categories { get; } = null;
 

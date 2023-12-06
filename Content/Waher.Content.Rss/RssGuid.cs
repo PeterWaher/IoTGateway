@@ -25,7 +25,7 @@ namespace Waher.Content.Rss
 		/// <summary>
 		/// If the guid element has an attribute named isPermaLink with a value of true, the reader 
 		/// may assume that it is a permalink to the item, that is, a url that can be opened in a Web 
-		/// browser, that points to the full item described by the <item> element.
+		/// browser, that points to the full item described by the &lt;item&gt; element.
 		/// </summary>
 		public bool IsPermaLink { get; }
 

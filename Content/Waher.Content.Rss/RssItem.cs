@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Rss
 {
@@ -31,6 +32,7 @@ namespace Waher.Content.Rss
 
 			List<RssWarning> Warnings = new List<RssWarning>();
 			List<RssCategory> Categories = new List<RssCategory>();
+			List<IRssExtension> Extensions = new List<IRssExtension>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -110,11 +112,18 @@ namespace Waher.Content.Rss
 					}
 				}
 				else
-					Warnings.Add(new RssWarning(E));
+				{
+					IRssExtension Extension = Types.FindBest<IRssExtension, XmlElement>(E);
+					if (Extension is null)
+						Warnings.Add(new RssWarning(E));
+					else
+						Extensions.Add(Extension.Create(E, BaseUri));
+				}
 			}
 
 			this.Warnings = Warnings.ToArray();
 			this.Categories = Categories.ToArray();
+			this.Extensions = Extensions.ToArray();
 		}
 
 		/// <summary>
@@ -171,5 +180,10 @@ namespace Waher.Content.Rss
 		/// The RSS channel that the item came from.
 		/// </summary>
 		public RssSource Source { get; } = null;
+
+		/// <summary>
+		/// Extensions
+		/// </summary>
+		public IRssExtension[] Extensions { get; } = null;
 	}
 }

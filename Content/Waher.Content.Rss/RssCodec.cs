@@ -164,7 +164,7 @@ namespace Waher.Content.Rss
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 			}
 
-			return XmlCodec.EncodeAsync(Doc.Xml, Encoding, ContentType);
+			return XmlCodec.EncodeXmlAsync(Doc.Xml, Encoding, ContentType);
 		}
 	}
 }

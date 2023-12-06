@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Rss
 {
@@ -33,24 +34,41 @@ namespace Waher.Content.Rss
 
 			List<RssChannel> Channels = new List<RssChannel>();
 			List<RssWarning> Warnings = new List<RssWarning>();
+			List<IRssExtension> Extensions = new List<IRssExtension>();
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
 				if (!(N is XmlElement E))
 					continue;
 
-				if (E.LocalName == "channel" && E.NamespaceURI == Xml.NamespaceURI)
+				if (E.NamespaceURI == Xml.NamespaceURI)
 				{
-					RssChannel Channel = new RssChannel(E, BaseUri);
-					Channels.Add(Channel);
-					Warnings.AddRange(Channel.Warnings);
+					switch (E.LocalName)
+					{
+						case "channel":
+							RssChannel Channel = new RssChannel(E, BaseUri);
+							Channels.Add(Channel);
+							Warnings.AddRange(Channel.Warnings);
+							break;
+
+						default:
+							Warnings.Add(new RssWarning(E));
+							break;
+					}
 				}
 				else
-					Warnings.Add(new RssWarning(E));
+				{
+					IRssExtension Extension = Types.FindBest<IRssExtension, XmlElement>(E);
+					if (Extension is null)
+						Warnings.Add(new RssWarning(E));
+					else
+						Extensions.Add(Extension.Create(E, BaseUri));
+				}
 			}
 
 			this.Channels = Channels.ToArray();
 			this.Warnings = Warnings.ToArray();
+			this.Extensions = Extensions.ToArray();
 		}
 
 		/// <summary>
@@ -72,5 +90,10 @@ namespace Waher.Content.Rss
 		/// Any warning messages created during parsing.
 		/// </summary>
 		public RssWarning[] Warnings { get; }
+
+		/// <summary>
+		/// Extensions
+		/// </summary>
+		public IRssExtension[] Extensions { get; } = null;
 	}
 }

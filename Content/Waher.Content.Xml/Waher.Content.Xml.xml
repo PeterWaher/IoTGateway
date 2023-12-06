@@ -89,6 +89,15 @@
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.EncodeAsync(System.Xml.XmlDocument,System.Text.Encoding,System.String)">
+            <summary>
+            Encodes an XML Document.
+            </summary>
+            <param name="Xml">XML Document to encode.</param>
+            <param name="Encoding">Character encoding to use.</param>
+            <param name="ContentType">Internet Content-Type to use.</param>
+            <returns>Encoded document.</returns>
+        </member>
         <member name="T:Waher.Content.Xml.Text.XmlDocumentJsonEncoder">
             <summary>
             Encodes an XML Document as a JSON object.

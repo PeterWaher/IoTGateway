@@ -205,29 +205,36 @@ namespace Waher.Content.Xml.Text
 			if (InternetContent.IsAccepted(XmlContentTypes, out string ContentType, AcceptedContentTypes))
 			{
 				if (Object is XmlDocument Doc)
-					return this.EncodeAsync(Doc, Encoding, ContentType);
+					return EncodeAsync(Doc, Encoding, ContentType);
 				else if (Object is XmlElement E)
 				{
 					Doc = new XmlDocument();
 					Doc.AppendChild(Doc.ImportNode(E, true));
-					return this.EncodeAsync(Doc, Encoding, ContentType);
+					return EncodeAsync(Doc, Encoding, ContentType);
 				}
 				else if (Object is NamedDictionary<string, object> Obj)
 				{
 					string Xml = XML.Encode(Obj);
-					return this.EncodeAsync(Xml, Encoding, ContentType);
+					return EncodeAsync(Xml, Encoding, ContentType);
 				}
 				else if (Object is NamedDictionary<string, IElement> Obj2)
 				{
 					string Xml = XML.Encode(NamedDictionary<string, object>.ToNamedDictionary(Obj2));
-					return this.EncodeAsync(Xml, Encoding, ContentType);
+					return EncodeAsync(Xml, Encoding, ContentType);
 				}
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 
-		private Task<KeyValuePair<byte[], string>> EncodeAsync(XmlDocument Doc, Encoding Encoding, string ContentType)
+		/// <summary>
+		/// Encodes an XML Document.
+		/// </summary>
+		/// <param name="Xml">XML Document to encode.</param>
+		/// <param name="Encoding">Character encoding to use.</param>
+		/// <param name="ContentType">Internet Content-Type to use.</param>
+		/// <returns>Encoded document.</returns>
+		public static Task<KeyValuePair<byte[], string>> EncodeAsync(XmlDocument Xml, Encoding Encoding, string ContentType)
 		{
 			MemoryStream ms = null;
 			XmlWriterSettings Settings;
@@ -252,7 +259,7 @@ namespace Waher.Content.Xml.Text
 
 				w = XmlWriter.Create(ms, Settings);
 
-				Doc.Save(w);
+				Xml.Save(w);
 				w.Flush();
 
 				Result = ms.ToArray();

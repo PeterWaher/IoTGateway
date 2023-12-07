@@ -2453,12 +2453,13 @@ library) or the Neuron^TM.
 
 ##### Token-related functions
 
-| Function            | Description                                                                            | Example             |
-|---------------------|----------------------------------------------------------------------------------------|---------------------|
-| `HistoryReport()`   | Generates a history report, in Markdown format, from inside a running state-machine.   | `HistoryReport()`   |
-| `PresentReport()`   | Generates a present report, in Markdown format, from inside a running state-machine.   | `PresentReport()`   |
-| `ProfilingReport()` | Generates a profiling report, in Markdown format, from inside a running state-machine. | `ProfilingReport()` |
-| `StateDiagram()`    | Generates a state diagram, in Markdown format, from inside a running state-machine.    | `StateDiagram()`    |
+| Function                         | Description                                                                                                                                                                                                           | Example                                        |
+|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
+| `HistoryReport()`                | Generates a history report, in Markdown format, from inside a running state-machine.                                                                                                                                  | `HistoryReport()`                              |
+| `LoadAttachments([ContentTypes]) | Loads attachments associated with the definition contract. If a content types are provided (a single scalar, or a vector of content-types), only attachments having such types will be loaded. Wildcards can be used. | `LoadAttachments(["text/markdown","image/*"])` |
+| `PresentReport()`                | Generates a present report, in Markdown format, from inside a running state-machine.                                                                                                                                  | `PresentReport()`                              |
+| `ProfilingReport()`              | Generates a profiling report, in Markdown format, from inside a running state-machine.                                                                                                                                | `ProfilingReport()`                            |
+| `StateDiagram()`                 | Generates a state diagram, in Markdown format, from inside a running state-machine.                                                                                                                                   | `StateDiagram()`                               |
 
 ##### XMPP-related functions
 

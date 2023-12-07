@@ -11,6 +11,14 @@ using Waher.Events;
 namespace Waher.Script
 {
 	/// <summary>
+	/// Converts a value to a printable string.
+	/// </summary>
+	/// <param name="Value">Value to print.</param>
+	/// <param name="Variables">Reference to current variables collection.</param>
+	/// <returns>String to print.</returns>
+	public delegate Task<string> ValuePrinter(object Value, Variables Variables);
+
+	/// <summary>
 	/// Collection of variables.
 	/// </summary>
 	public class Variables : IEnumerable<Variable>, IContextVariables
@@ -24,6 +32,7 @@ namespace Waher.Script
 		private IContextVariables contextVariables = null;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private volatile bool active = true;
+		private ValuePrinter printer = null;
 
 		/// <summary>
 		/// Collection of variables.
@@ -214,6 +223,16 @@ namespace Waher.Script
 		{
 			get => this.contextVariables;
 			set => this.contextVariables = value;
+		}
+
+		/// <summary>
+		/// Delegate that converts values to strings for (implicit) printing. Default is null, which will call the
+		/// <see cref="Object.ToString()"/> method to convert the value to a string.
+		/// </summary>
+		public ValuePrinter Printer
+		{
+			get => this.printer;
+			set => this.printer = value;
 		}
 
 		/// <summary>

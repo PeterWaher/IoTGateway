@@ -20,6 +20,10 @@ using Waher.Runtime.Text;
 using Waher.Script;
 using Waher.Content.Json;
 using Waher.Script.Model;
+using SkiaSharp;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Graphs;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Content.Markdown
 {
@@ -395,6 +399,7 @@ namespace Waher.Content.Markdown
 					{
 						UsesImplicitPrint = true;
 
+						ValuePrinter PrinterBak = Variables.Printer;
 						TextWriter Bak = Variables.ConsoleOut;
 						StringBuilder sb = new StringBuilder();
 
@@ -402,6 +407,7 @@ namespace Waher.Content.Markdown
 							await Variables.LockAsync();
 
 						Variables.ConsoleOut = new StringWriter(sb);
+						Variables.Printer = PrintMarkdown;
 						try
 						{
 							await Exp.EvaluateAsync(Variables);
@@ -410,6 +416,7 @@ namespace Waher.Content.Markdown
 						{
 							Variables.ConsoleOut.Flush();
 							Variables.ConsoleOut = Bak;
+							Variables.Printer = PrinterBak;
 
 							if (!FromScript)
 								Variables.Release();
@@ -458,11 +465,7 @@ namespace Waher.Content.Markdown
 				if (!(Result is null))
 				{
 					if (!(Result is string s3))
-					{
-						StringBuilder Html = new StringBuilder();
-						await InlineScript.GenerateHTML(Result, Html, false, Variables);
-						s3 = Html.ToString();
-					}
+						s3 = await PrintMarkdown(Result, Variables);
 
 					Markdown = Markdown.Insert(i, s3);
 					i += s3.Length;
@@ -472,6 +475,33 @@ namespace Waher.Content.Markdown
 			}
 
 			return new KeyValuePair<string, bool>(Markdown, IsDynamic);
+		}
+
+		private static async Task<string> PrintMarkdown(object Value, Variables Variables)
+		{
+			if (Value is null)
+				return string.Empty;
+
+			if (Value.GetType().GetTypeInfo().IsValueType || Value is string)
+				return Value.ToString();
+
+			if (Value is XmlDocument ||
+				Value is IToMatrix ||
+				Value is Graph ||
+				Value is PixelInformation ||
+				Value is SKImage ||
+				Value is MarkdownDocument ||
+				Value is MarkdownContent ||
+				Value is Exception ||
+				Value is IMatrix ||
+				Value is Array)
+			{
+				StringBuilder Output = new StringBuilder();
+				await InlineScript.GenerateMarkdown(Value, Output, false, Variables);
+				return Output.ToString();
+			}
+			else
+				return Value.ToString();
 		}
 
 		internal void CheckException(Exception ex)

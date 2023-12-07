@@ -24644,6 +24644,14 @@
         <member name="M:Waher.Script.Variable.ToString">
             <inheritdoc/>
         </member>
+        <member name="T:Waher.Script.ValuePrinter">
+            <summary>
+            Converts a value to a printable string.
+            </summary>
+            <param name="Value">Value to print.</param>
+            <param name="Variables">Reference to current variables collection.</param>
+            <returns>String to print.</returns>
+        </member>
         <member name="T:Waher.Script.Variables">
             <summary>
             Collection of variables.
@@ -24719,6 +24727,12 @@
         <member name="P:Waher.Script.Variables.ContextVariables">
             <summary>
             Variables available during the current context.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Variables.Printer">
+            <summary>
+            Delegate that converts values to strings for (implicit) printing. Default is null, which will call the
+            <see cref="M:System.Object.ToString"/> method to convert the value to a string.
             </summary>
         </member>
         <member name="M:Waher.Script.Variables.Lock">

@@ -12,7 +12,6 @@ using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Content.Markdown.Functions
 {
@@ -158,7 +157,7 @@ namespace Waher.Content.Markdown.Functions
 
 					E = Matrix.GetElement(Col, Row);
 
-					if (!(E is null))
+					if (!(E?.AssociatedObjectValue is null))
 					{
 						s = Evaluate(E);
 
@@ -326,6 +325,7 @@ namespace Waher.Content.Markdown.Functions
 			Graph.ToXml(Markdown);
 			Markdown.AppendLine();
 			Markdown.AppendLine("```");
+			Markdown.AppendLine();
 		}
 
 		/// <summary>
@@ -350,6 +350,7 @@ namespace Waher.Content.Markdown.Functions
 
 			Markdown.AppendLine("```image/png");
 			Markdown.AppendLine(Convert.ToBase64String(Bin));
+			Markdown.AppendLine("```");
 			Markdown.AppendLine();
 		}
 
@@ -377,6 +378,7 @@ namespace Waher.Content.Markdown.Functions
 
 				Markdown.AppendLine("```image/png");
 				Markdown.AppendLine(Convert.ToBase64String(Bin));
+				Markdown.AppendLine("```");
 				Markdown.AppendLine();
 			}
 

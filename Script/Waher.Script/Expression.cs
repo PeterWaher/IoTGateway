@@ -4437,6 +4437,7 @@ namespace Waher.Script
 		/// <returns>Transformed string.</returns>
 		public static async Task<string> TransformAsync(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
 		{
+			ValuePrinter Printer = Variables.Printer;
 			Expression Exp;
 			string Script, s2;
 			object Result;
@@ -4459,7 +4460,7 @@ namespace Waher.Script
 
 				if (!(Result is null))
 				{
-					s2 = Result.ToString();
+					s2 = Printer is null ? Result.ToString() : await Printer(Result, Variables);
 					s = s.Insert(i, s2);
 					i += s2.Length;
 				}

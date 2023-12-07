@@ -110,7 +110,7 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Encapsulated vector.</returns>
 		public static IVector Encapsulate(IElement[] Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
 		{
-			return Encapsulate((IEnumerable<IElement>)Elements, CanEncapsulateAsMatrix, Node);
+			return Encapsulate((ICollection<IElement>)Elements, CanEncapsulateAsMatrix, Node);
 		}
 
 		/// <summary>

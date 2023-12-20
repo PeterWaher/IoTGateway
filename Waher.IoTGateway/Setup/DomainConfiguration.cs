@@ -1278,7 +1278,7 @@ namespace Waher.IoTGateway.Setup
 									throw new Exception("Order invalid.");
 
 								default:
-									throw new Exception("Unable to validate oder.");
+									throw new Exception("Unable to validate order.");
 							}
 						}
 

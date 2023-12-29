@@ -1747,6 +1747,7 @@ namespace Waher.IoTGateway
 					case "mscorlib.dll":
 					case "mscorrc.debug.dll":
 					case "mscorrc.dll":
+					case "msquic.dll":
 					case "netstandard.dll":
 					case "snappy32.dll":
 					case "snappy64.dll":

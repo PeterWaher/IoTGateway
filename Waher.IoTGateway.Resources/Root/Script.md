@@ -2170,7 +2170,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `FromMarkdown(Markdown)`           | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
 | `InitScriptFile(FileName)`         | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
 | `JavascriptContent(s)`             | Encodes a string as a Javascript Content object for encoding, as results of web service calls. | [Example][JavascriptContentExample] |
-| `LoadMarkdown(FileName[,Headers])` | Loads a markdown file and preprocesses it before returning it as a string. By default, Markdown headers are removed. If you wish Markdown headers to be included, set `Headers´ to `true`. | [Example][LoadMarkdownExample] |
+| `LoadMarkdown(FileName[,Headers])` | Loads a markdown file and preprocesses it before returning it as a string. By default, Markdown headers are removed. If you wish Markdown headers to be included, set `Headers` to `true`. | [Example][LoadMarkdownExample] |
 | `MarkdownContent(s)`               | Encodes a string as a Markdown Content object for encoding, as results of web service calls. | [Example][MarkdownContentExample] |
 | `MarkdownEncode(s)`                | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
 | `MarkdownToHtml(s)`                | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |

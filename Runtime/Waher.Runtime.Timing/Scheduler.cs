@@ -25,6 +25,7 @@ namespace Waher.Runtime.Timing
 	public class Scheduler : IDisposable
 	{
 		private static readonly TimeSpan OnlyOnce = TimeSpan.FromMilliseconds(-1);
+		private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
 
 		private readonly SortedDictionary<DateTime, ScheduledEvent> events = new SortedDictionary<DateTime, ScheduledEvent>();
 		private readonly Random gen = new Random();
@@ -116,11 +117,15 @@ namespace Waher.Runtime.Timing
 
 					ToRemove.AddLast(Event.Key);
 
-					Task.Run((Action)Event.Value.Execute);
+					Task.Run(Event.Value.Execute);
 				}
 				else
 				{
-					this.timer = new Timer(this.TimerElapsed, null, TimeLeft, OnlyOnce);
+					if (TimeLeft < OneDay)
+						this.timer = new Timer(this.TimerElapsed, null, TimeLeft, OnlyOnce);
+					else
+						this.timer = new Timer(this.TimerElapsed, null, OneDay, OnlyOnce);
+
 					break;
 				}
 			}

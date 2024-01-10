@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Script.Functions.DateAndTime;
@@ -619,6 +620,307 @@ namespace Waher.Content
 				this.hours,
 				this.minutes,
 				this.seconds);
+		}
+
+		/// <summary>
+		/// Calculates the duration between two dates.
+		/// </summary>
+		/// <param name="From">Starting point.</param>
+		/// <param name="To">Ending point.</param>
+		/// <returns>Duration between.</returns>
+		public static Duration GetDurationBetween(System.DateTime From, System.DateTime To)
+		{
+			System.DateTime Temp;
+
+			if (From == To)
+				return Zero;
+
+			int Years, Months, Days, Hours, Minutes;
+			int DMonths = 0;
+			int DDays = 0;
+			int DHours = 0;
+			int DMinutes = 0;
+			int DSeconds = 0;
+			int DMilliSeconds = 0;
+			double Seconds;
+
+			if (From > To)
+			{
+				Years = To.Year - From.Year;
+				if (Years < 0)
+				{
+					Temp = From.AddYears(Years);
+					if (Temp < To)
+					{
+						From = From.AddYears(++Years);
+						DMonths = -12;
+					}
+					else
+						From = Temp;
+				}
+
+				if (From.Month != To.Month && (From.Day > 28 || To.Day > 28))
+				{
+					Months = 0;
+					Days = 1 - From.Day;
+					Temp = From.AddDays(Days);
+					if (Temp < To)
+						From = From.AddDays(++Days);
+					else
+					{
+						From = Temp;
+
+						while (From.Month != To.Month)
+						{
+							int i = -DaysInMonth(From.AddMonths(-1));
+							Temp = From.AddDays(i);
+							if (Temp < To)
+								break;
+							else
+							{
+								Days += i;
+								From = Temp;
+							}
+						}
+					}
+
+					if (From.Month != To.Month)
+					{
+						int Days2 = To.Day - 1 - DaysInMonth(To);
+						if (Days2 < 0)
+						{
+							Temp = From.AddDays(Days2);
+							if (Temp < To)
+							{
+								From = From.AddDays(++Days2);
+								DHours = -24;
+							}
+							else
+								From = Temp;
+						}
+
+						Days += Days2;
+					}
+				}
+				else
+				{
+					Months = To.Month - From.Month + DMonths;
+					if (Months < 0)
+					{
+						Temp = From.AddMonths(Months);
+						if (Temp < To)
+						{
+							From = From.AddMonths(++Months);
+							DDays = -DaysInMonth(From.AddMonths(-1));
+						}
+						else
+							From = Temp;
+					}
+
+					Days = To.Day - From.Day + DDays;
+					if (Days < 0)
+					{
+						Temp = From.AddDays(Days);
+						if (Temp < To)
+						{
+							From = From.AddDays(++Days);
+							DHours = -24;
+						}
+						else
+							From = Temp;
+					}
+				}
+
+				Hours = To.Hour - From.Hour + DHours;
+				if (Hours < 0)
+				{
+					Temp = From.AddHours(Hours);
+					if (Temp < To)
+					{
+						From = From.AddHours(++Hours);
+						DMinutes = -60;
+					}
+					else
+						From = Temp;
+				}
+
+				Minutes = To.Minute - From.Minute + DMinutes;
+				if (Minutes < 0)
+				{
+					Temp = From.AddMinutes(Minutes);
+					if (Temp < To)
+					{
+						From = From.AddMinutes(++Minutes);
+						DSeconds = -60;
+					}
+					else
+						From = Temp;
+				}
+
+				Seconds = To.Second - From.Second + DSeconds;
+				if (Seconds < 0)
+				{
+					Temp = From.AddSeconds(Seconds);
+					if (Temp < To)
+					{
+						From = From.AddSeconds(++Seconds);
+						DMilliSeconds = -1000;
+					}
+					else
+						From = Temp;
+				}
+
+				int Milliseconds = To.Millisecond - From.Millisecond + DMilliSeconds;
+
+				Seconds += Milliseconds * 0.001;
+
+				return new Duration(true, -Years, -Months, -Days, -Hours, -Minutes, -Seconds);
+			}
+			else
+			{
+				Years = To.Year - From.Year;
+				if (Years > 0)
+				{
+					Temp = From.AddYears(Years);
+					if (Temp > To)
+					{
+						From = From.AddYears(--Years);
+						DMonths = 12;
+					}
+					else
+						From = Temp;
+				}
+
+				if (From.Month != To.Month && (From.Day > 28 || To.Day > 28))
+				{
+					Months = 0;
+					Days = DaysInMonth(From) + 1 - From.Day;
+					Temp = From.AddDays(Days);
+					if (Temp > To)
+					{
+						From = From.AddDays(--Days);
+						DHours = 24;
+					}
+					else
+					{
+						From = Temp;
+
+						while (From.Month != To.Month)
+						{
+							int i = DaysInMonth(From);
+							Temp = From.AddDays(i);
+							if (Temp > To)
+							{
+								From = From.AddDays(--i);
+								DHours = 24;
+								Days += i;
+								break;
+							}
+							else
+							{
+								Days += i;
+								From = Temp;
+							}
+						}
+					}
+
+					if (DHours == 0)
+					{
+						int Days2 = To.Day - From.Day;
+						if (Days2 > 0)
+						{
+							Temp = From.AddDays(Days2);
+							if (Temp > To)
+							{
+								From = From.AddDays(--Days2);
+								DHours = 24;
+							}
+							else
+								From = Temp;
+						}
+
+						Days += Days2;
+					}
+				}
+				else
+				{
+					Months = To.Month - From.Month + DMonths;
+					if (Months > 0)
+					{
+						Temp = From.AddMonths(Months);
+						if (Temp > To)
+						{
+							From = From.AddMonths(--Months);
+							DDays = DaysInMonth(From);
+						}
+						else
+							From = Temp;
+					}
+
+					Days = To.Day - From.Day + DDays;
+					if (Days > 0)
+					{
+						Temp = From.AddDays(Days);
+						if (Temp > To)
+						{
+							From = From.AddDays(--Days);
+							DHours = 24;
+						}
+						else
+							From = Temp;
+					}
+				}
+
+				Hours = To.Hour - From.Hour + DHours;
+				if (Hours > 0)
+				{
+					Temp = From.AddHours(Hours);
+					if (Temp > To)
+					{
+						From = From.AddHours(--Hours);
+						DMinutes = 60;
+					}
+					else
+						From = Temp;
+				}
+
+				Minutes = To.Minute - From.Minute + DMinutes;
+				if (Minutes > 0)
+				{
+					Temp = From.AddMinutes(Minutes);
+					if (Temp > To)
+					{
+						From = From.AddMinutes(--Minutes);
+						DSeconds = 60;
+					}
+					else
+						From = Temp;
+				}
+
+				Seconds = To.Second - From.Second + DSeconds;
+				if (Seconds > 0)
+				{
+					Temp = From.AddSeconds(Seconds);
+					if (Temp > To)
+					{
+						From = From.AddSeconds(--Seconds);
+						DMilliSeconds = 1000;
+					}
+					else
+						From = Temp;
+				}
+
+				int Milliseconds = To.Millisecond - From.Millisecond + DMilliSeconds;
+
+				Seconds += Milliseconds * 0.001;
+		
+				return new Duration(false, Years, Months, Days, Hours, Minutes, Seconds);
+			}
+		}
+
+		private static int DaysInMonth(System.DateTime TP)
+		{
+			return System.DateTime.DaysInMonth(TP.Year, TP.Month);
 		}
 	}
 }

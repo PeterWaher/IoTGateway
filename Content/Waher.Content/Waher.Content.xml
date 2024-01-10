@@ -984,6 +984,14 @@
             </summary>
             <returns>Negated duration.</returns>
         </member>
+        <member name="M:Waher.Content.Duration.GetDurationBetween(System.DateTime,System.DateTime)">
+            <summary>
+            Calculates the duration between two dates.
+            </summary>
+            <param name="From">Starting point.</param>
+            <param name="To">Ending point.</param>
+            <returns>Duration between.</returns>
+        </member>
         <member name="T:Waher.Content.Getters.DataGetter">
             <summary>
             Gets data encoded into data URIs.

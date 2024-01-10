@@ -135,6 +135,11 @@ purposes.
 								<xs:documentation>CITY = City</xs:documentation>
 								<xs:documentation>REGION = Region, state</xs:documentation>
 								<xs:documentation>COUNTRY = Country</xs:documentation>
+								<xs:documentation>NATIONALITY = Nationality</xs:documentation>
+								<xs:documentation>GENDER = Gender (M or F)</xs:documentation>
+								<xs:documentation>BDAY = Birth Day</xs:documentation>
+								<xs:documentation>BMONTH = Birth Month</xs:documentation>
+								<xs:documentation>BYEAR = Birth Year</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						<xs:attribute name='value' type='xs:string' use='required'>

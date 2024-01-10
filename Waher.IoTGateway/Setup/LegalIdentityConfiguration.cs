@@ -1107,10 +1107,10 @@ namespace Waher.IoTGateway.Setup
 				Properties.Add(new Property("COUNTRY", this.country));
 
 			if (!string.IsNullOrEmpty(this.nationality))
-				Properties.Add(new Property("NATIONALITY", this.country));
+				Properties.Add(new Property("NATIONALITY", this.nationality));
 
 			if (!string.IsNullOrEmpty(this.gender))
-				Properties.Add(new Property("GENDER", this.country));
+				Properties.Add(new Property("GENDER", this.gender));
 
 			if (!(this.birthDate is null))
 			{

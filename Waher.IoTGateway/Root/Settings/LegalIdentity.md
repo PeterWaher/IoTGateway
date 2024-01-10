@@ -357,6 +357,7 @@ more information about their approval procedure.
 <option value=""{{empty(Config.Gender)?" selected":""}}/>
 <option value="M"{{Config.Gender=='M'?" selected":""}}>Male</option>
 <option value="F"{{Config.Gender=='F'?" selected":""}}>Female</option>
+<option value="X"{{Config.Gender=='X'?" selected":""}}>Other</option>
 </select>
 </p>
 

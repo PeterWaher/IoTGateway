@@ -271,6 +271,14 @@
             <param name="s">String</param>
             <returns>XML-decoded string.</returns>
         </member>
+        <member name="M:Waher.Content.Xml.XML.ParseDateTime(System.String)">
+            <summary>
+            Parses a <see cref="T:System.DateTime"/> from a string.
+            </summary>
+            <param name="s">String-representation of <see cref="T:System.DateTime"/>.</param>
+            <returns>Parsed value.</returns>
+            <exception cref="T:System.ArgumentException">If unable to parse value.</exception>
+        </member>
         <member name="M:Waher.Content.Xml.XML.TryParse(System.String,System.DateTime@)">
             <summary>
             Tries to decode a string encoded DateTime.
@@ -278,6 +286,14 @@
             <param name="s">Encoded value.</param>
             <param name="Value">Decoded value.</param>
             <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.ParseDateTimeOffset(System.String)">
+            <summary>
+            Parses a <see cref="T:System.DateTimeOffset"/> from a string.
+            </summary>
+            <param name="s">String-representation of <see cref="T:System.DateTimeOffset"/>.</param>
+            <returns>Parsed value.</returns>
+            <exception cref="T:System.ArgumentException">If unable to parse value.</exception>
         </member>
         <member name="M:Waher.Content.Xml.XML.TryParse(System.String,System.DateTimeOffset@)">
             <summary>

@@ -573,6 +573,20 @@ namespace Waher.Content.Xml
 		}
 
 		/// <summary>
+		/// Parses a <see cref="DateTime"/> from a string.
+		/// </summary>
+		/// <param name="s">String-representation of <see cref="DateTime"/>.</param>
+		/// <returns>Parsed value.</returns>
+		/// <exception cref="ArgumentException">If unable to parse value.</exception>
+		public static DateTime ParseDateTime(string s)
+		{
+			if (TryParse(s, out DateTime Result))
+				return Result;
+			else
+				throw new ArgumentException("Unable to parse DateTime: " + s, nameof(s));
+		}
+
+		/// <summary>
 		/// Tries to decode a string encoded DateTime.
 		/// </summary>
 		/// <param name="s">Encoded value.</param>
@@ -643,6 +657,20 @@ namespace Waher.Content.Xml
 
 			Value = DateTime.MinValue;
 			return false;
+		}
+
+		/// <summary>
+		/// Parses a <see cref="DateTimeOffset"/> from a string.
+		/// </summary>
+		/// <param name="s">String-representation of <see cref="DateTimeOffset"/>.</param>
+		/// <returns>Parsed value.</returns>
+		/// <exception cref="ArgumentException">If unable to parse value.</exception>
+		public static DateTimeOffset ParseDateTimeOffset(string s)
+		{
+			if (TryParse(s, out DateTimeOffset Result))
+				return Result;
+			else
+				throw new ArgumentException("Unable to parse DateTimeOffset: " + s, nameof(s));
 		}
 
 		/// <summary>

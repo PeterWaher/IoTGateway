@@ -43,6 +43,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss", "Conten
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss.Test", "Content\Waher.Content.Rss.Test\Waher.Content.Rss.Test.csproj", "{BB843CA5-82E4-44A7-8283-161579C5CE7A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Test", "Content\Waher.Content.Test\Waher.Content.Test.csproj", "{71859F40-5DFD-491F-B12F-2991B0142B21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{BB843CA5-82E4-44A7-8283-161579C5CE7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB843CA5-82E4-44A7-8283-161579C5CE7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB843CA5-82E4-44A7-8283-161579C5CE7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71859F40-5DFD-491F-B12F-2991B0142B21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71859F40-5DFD-491F-B12F-2991B0142B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71859F40-5DFD-491F-B12F-2991B0142B21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71859F40-5DFD-491F-B12F-2991B0142B21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

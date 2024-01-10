@@ -46,7 +46,17 @@ JoinOther(Properties[],Attachments[]):=
 	foreach Property in Properties do
 	(
 		Name:=Property.Name;
-		if (Name!="FIRST" and Name!="MIDDLE" and Name!="LAST" and Name!="PNR" and Name!="ADDR" and Name!="ADDR2" and Name!="ZIP" and Name!="AREA" and Name!="CITY" and Name!="REGION" and Name!="COUNTRY") then
+		if (Name!="FIRST" and 
+			Name!="MIDDLE" and 
+			Name!="LAST" and 
+			Name!="PNR" and 
+			Name!="ADDR" and 
+			Name!="ADDR2" and 
+			Name!="ZIP" and 
+			Name!="AREA" and 
+			Name!="CITY" and 
+			Name!="REGION" and 
+			Name!="COUNTRY") then
 		(
 			if First then
 				First:=false

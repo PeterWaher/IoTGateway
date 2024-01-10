@@ -77,6 +77,8 @@ namespace Waher.IoTGateway.Setup
 		private string city = string.Empty;
 		private string region = string.Empty;
 		private string country = string.Empty;
+		private string nationality = string.Empty;
+		private string gender = string.Empty;
 		private string orgName = string.Empty;
 		private string orgDepartment = string.Empty;
 		private string orgRole = string.Empty;
@@ -91,6 +93,7 @@ namespace Waher.IoTGateway.Setup
 		private AlternativeField[] altFields = null;
 		private AlternativeField[] passwordHashes = null;
 		private DateTime checkApprovedExpiry = DateTime.MinValue;
+		private DateTime? birthDate = null;
 
 		/// <summary>
 		/// Configures legal identity for the gateway.
@@ -225,6 +228,36 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Nationality
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Nationality
+		{
+			get => this.nationality;
+			set => this.nationality = value;
+		}
+
+		/// <summary>
+		/// Gender
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Gender
+		{
+			get => this.gender;
+			set => this.gender = value;
+		}
+
+		/// <summary>
+		/// Birth Date
+		/// </summary>
+		[DefaultValueNull]
+		public DateTime? BirthDate
+		{
+			get => this.birthDate;
+			set => this.birthDate = value;
+		}
+
+		/// <summary>
 		/// Organization Name
 		/// </summary>
 		[DefaultValueStringEmpty]
@@ -350,11 +383,7 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool ProtectWithPassword
 		{
-			get
-			{
-				return this.protectWithPassword;
-			}
-
+			get => this.protectWithPassword;
 			set
 			{
 				if (this.protectWithPassword != value)
@@ -548,6 +577,11 @@ namespace Waher.IoTGateway.Setup
 							{ "CITY", string.Empty },
 							{ "REGION", string.Empty },
 							{ "COUNTRY", string.Empty },
+							{ "NATIONALITY", string.Empty },
+							{ "GENDER", string.Empty },
+							{ "BDAY", string.Empty },
+							{ "BMONTH", string.Empty },
+							{ "BYEAR", string.Empty },
 							{ "FIRST", string.Empty },
 							{ "MIDDLE", string.Empty },
 							{ "LAST", string.Empty },
@@ -841,6 +875,9 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("city", out Obj) || !(Obj is string City) ||
 				!Parameters.TryGetValue("region", out Obj) || !(Obj is string Region) ||
 				!Parameters.TryGetValue("country", out Obj) || !(Obj is string Country) ||
+				!Parameters.TryGetValue("nationality", out Obj) || !(Obj is string Nationality) ||
+				!Parameters.TryGetValue("gender", out Obj) || !(Obj is string Gender) ||
+				!Parameters.TryGetValue("birthDate", out Obj) || !(Obj is string BirthDateStr) || 
 				!Parameters.TryGetValue("orgName", out Obj) || !(Obj is string OrgName) ||
 				!Parameters.TryGetValue("orgDepartment", out Obj) || !(Obj is string OrgDepartment) ||
 				!Parameters.TryGetValue("orgRole", out Obj) || !(Obj is string OrgRole) ||
@@ -884,6 +921,11 @@ namespace Waher.IoTGateway.Setup
 						case "CITY":
 						case "REGION":
 						case "COUNTRY":
+						case "NATIONALITY":
+						case "GENDER":
+						case "BDAY":
+						case "BMONTH":
+						case "BYEAR":
 						case "ORGNAME":
 						case "ORGDEPT":
 						case "ORGROLE":
@@ -908,6 +950,16 @@ namespace Waher.IoTGateway.Setup
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
+			if (!string.IsNullOrEmpty(BirthDateStr))
+			{
+				if (!DateTime.TryParse(BirthDateStr, out DateTime BirthDate))
+					throw new BadRequestException("Invalid birth date.");
+
+				this.birthDate = BirthDate;
+			}
+			else
+				this.birthDate = null;
+
 			this.useLegalIdentity = true;
 			this.firstName = FirstName;
 			this.middleName = MiddleName;
@@ -920,7 +972,8 @@ namespace Waher.IoTGateway.Setup
 			this.city = City;
 			this.region = Region;
 			this.country = Country;
-			this.orgName = OrgName;
+			this.nationality = Nationality;
+			this.gender = Gender;
 			this.orgDepartment = OrgDepartment;
 			this.orgRole = OrgRole;
 			this.orgNumber = OrgNr;
@@ -1052,6 +1105,19 @@ namespace Waher.IoTGateway.Setup
 
 			if (!string.IsNullOrEmpty(this.country))
 				Properties.Add(new Property("COUNTRY", this.country));
+
+			if (!string.IsNullOrEmpty(this.nationality))
+				Properties.Add(new Property("NATIONALITY", this.country));
+
+			if (!string.IsNullOrEmpty(this.gender))
+				Properties.Add(new Property("GENDER", this.country));
+
+			if (!(this.birthDate is null))
+			{
+				Properties.Add(new Property("BDAY", this.birthDate.Value.Day.ToString()));
+				Properties.Add(new Property("BMONTH", this.birthDate.Value.Month.ToString()));
+				Properties.Add(new Property("BYEAR", this.birthDate.Value.Year.ToString()));
+			}
 
 			if (!string.IsNullOrEmpty(this.orgName))
 				Properties.Add(new Property("ORGNAME", this.orgName));

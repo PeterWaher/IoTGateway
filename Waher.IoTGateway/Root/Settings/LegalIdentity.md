@@ -339,6 +339,31 @@ more information about their approval procedure.
 }}
 </select>
 </p>
+
+<p>
+<label for="Nationality">Nationality:</label>  
+<select id="Nationality" name="Nationality" style="width:20em" title="Nationality.">
+<option value=""{{empty(Config.Nationality)?" selected":""}}/>
+{{
+	foreach Country in Countries do
+		]]<option value="((Country.code))"((Config.Nationality=Country.code?" selected":""))>((Country.name))</option>[[
+}}
+</select>
+</p>
+
+<p>
+<label for="Gender">Gender:</label>  
+<select id="Gender" name="Gender" style="width:20em" title="Gender.">
+<option value=""{{empty(Config.Gender)?" selected":""}}/>
+<option value="M"{{Config.Gender=='M'?" selected":""}}>Male</option>
+<option value="F"{{Config.Gender=='F'?" selected":""}}>Female</option>
+</select>
+</p>
+
+<p>
+<label for="BirthDate">Birth Date:</label>  
+<input id="BirthDate" name="BirthDate" type="date" style="width:20em" title="Name of region." value="{{Config.BirthDate?.ToShortDateString()}}"/>
+</p>
 </fieldset>
 
 <fieldset>

@@ -10,7 +10,6 @@ using Waher.Things;
 using Waher.Networking.XMPP.Control.ControlOperations;
 using Waher.Things.ControlParameters;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Inventory;

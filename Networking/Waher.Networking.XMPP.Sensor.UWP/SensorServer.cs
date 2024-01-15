@@ -300,7 +300,7 @@ namespace Waher.Networking.XMPP.Sensor
 				{
 					ApprovedReadoutParameters P = await this.CanReadAsync(e.FromBareJid, Request);
 
-					if (P is null)
+					if (!(P is null))
 					{
 						Request.Nodes = P.Nodes;
 						Request.FieldNames = P.FieldNames;

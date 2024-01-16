@@ -235,7 +235,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							new Label(this.Document, Vertical)
 							{
-								TextAttribute = new StringAttribute("text", ex.Message, this.Document)
+								TextAttribute = new StringAttribute("text", ex.Message, this.Document),
+								FontAttribute = this.FontAttribute
 							},
 							new Margins(this.Document, Vertical)
 							{
@@ -247,7 +248,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							Children.Add(new Label(this.Document, Vertical)
 							{
-								TextAttribute = new StringAttribute("text", Row, this.Document)
+								TextAttribute = new StringAttribute("text", Row, this.Document),
+								FontAttribute = this.FontAttribute
 							});
 						}
 
@@ -264,7 +266,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 							XAttribute = this.XAttribute,
 							YAttribute = this.YAttribute,
 							HorizontalAlignmentAttribute = this.HorizontalAlignmentAttribute,
-							VerticalAlignmentAttribute = this.VerticalAlignmentAttribute
+							VerticalAlignmentAttribute = this.VerticalAlignmentAttribute,
+							FontAttribute = this.FontAttribute
 						};
 					}
 				}

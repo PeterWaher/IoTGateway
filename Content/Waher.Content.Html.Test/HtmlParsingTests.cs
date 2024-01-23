@@ -21,9 +21,9 @@ namespace Waher.Content.Html.Test
 				typeof(HtmlDocument).Assembly);
 		}
 
-		private async Task LoadAndParse(string Url)
+		private static async Task LoadAndParse(string Url)
 		{
-			using HttpClient Client = new HttpClient();
+			using HttpClient Client = new();
 			Client.Timeout = TimeSpan.FromMilliseconds(30000);
 			Client.DefaultRequestHeaders.ExpectContinue = false;
 			Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31");
@@ -44,7 +44,7 @@ namespace Waher.Content.Html.Test
 			Assert.IsNotNull(Doc.Body);
 			Assert.IsNotNull(Doc.Title);
 
-			List<HtmlNode> Todo = new List<HtmlNode>()
+			List<HtmlNode> Todo = new()
 			{
 				Doc.Root
 			};
@@ -74,7 +74,7 @@ namespace Waher.Content.Html.Test
 					if (E.HasChildren)
 						Todo.InsertRange(i, E.Children);
 
-					Assert.IsTrue(!(E.InnerHtml is null), "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
+					Assert.IsTrue(E.InnerHtml is not null, "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
 				}
 				else
 					Last = N.EndPosition;
@@ -82,7 +82,7 @@ namespace Waher.Content.Html.Test
 
 			PageMetaData MetaData = Doc.GetMetaData();
 
-			if (!(Doc.Meta is null))
+			if (Doc.Meta is not null)
 			{
 				foreach (Meta Meta in Doc.Meta)
 					Console.Out.WriteLine(Meta.OuterHtml);
@@ -98,31 +98,31 @@ namespace Waher.Content.Html.Test
 		[TestMethod]
 		public async Task HtmlParseTest_01_Google()
 		{
-			await this.LoadAndParse("http://google.com/");
+			await LoadAndParse("http://google.com/");
 		}
 
 		[TestMethod]
 		public async Task HtmlParseTest_02_Trocadero()
 		{
-			await this.LoadAndParse("http://www.kristianstadsbladet.se/tt-ekonomi/folkstorm-nar-trocadero-forsvinner/");
+			await LoadAndParse("http://www.kristianstadsbladet.se/tt-ekonomi/folkstorm-nar-trocadero-forsvinner/");
 		}
 
 		[TestMethod]
 		public async Task HtmlParseTest_03_TheGuardian()
 		{
-			await this.LoadAndParse("https://www.theguardian.com/technology/2018/mar/04/has-dopamine-got-us-hooked-on-tech-facebook-apps-addiction");
+			await LoadAndParse("https://www.theguardian.com/technology/2018/mar/04/has-dopamine-got-us-hooked-on-tech-facebook-apps-addiction");
 		}
 
 		[TestMethod]
 		public async Task HtmlParseTest_04_Cnbc()
 		{
-			await this.LoadAndParse("https://www.cnbc.com/2021/09/10/epic-games-v-apple-judge-reaches-decision-.html");
+			await LoadAndParse("https://www.cnbc.com/2021/09/10/epic-games-v-apple-judge-reaches-decision-.html");
 		}
 
 		[TestMethod]
 		public async Task HtmlParseTest_05_Amgreatness()
 		{
-			await this.LoadAndParse("https://amgreatness.com/2021/09/24/over-3000-doctors-and-scientists-sign-declaration-accusing-covid-policy-makers-of-crimes-against-humanity/");
+			await LoadAndParse("https://amgreatness.com/2021/09/24/over-3000-doctors-and-scientists-sign-declaration-accusing-covid-policy-makers-of-crimes-against-humanity/");
 		}
 	}
 }

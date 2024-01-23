@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Runtime.Text
 {
@@ -8,7 +7,7 @@ namespace Waher.Runtime.Text
 	/// Represents an Edit-script, converting one sequence of symbols to another.
 	/// </summary>
 	/// <typeparam name="T">Type of symbols used.</typeparam>
-	public class EditScript<T>
+	public class EditScript<T> : IEnumerable<Step<T>>
 	{
 		private readonly Step<T>[] steps;
 		private readonly T[] s1;
@@ -41,5 +40,24 @@ namespace Waher.Runtime.Text
 		/// Second sequence of symbols.
 		/// </summary>
 		public T[] S2 => this.s2;
+
+		/// <summary>
+		/// <see cref="IEnumerable{T}.GetEnumerator"/>
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public IEnumerator<Step<T>> GetEnumerator()
+		{
+			IEnumerable<Step<T>> Temp = this.steps;
+			return Temp.GetEnumerator();
+		}
+
+		/// <summary>
+		/// <see cref="IEnumerable.GetEnumerator"/>
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.steps.GetEnumerator();
+		}
 	}
 }

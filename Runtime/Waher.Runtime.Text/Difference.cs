@@ -225,7 +225,7 @@ namespace Waher.Runtime.Text
 		/// <returns>Sequence of rows.</returns>
 		public static string[] ExtractRows(string Text)
 		{
-			return Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+			return Text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 		}
 
 	}

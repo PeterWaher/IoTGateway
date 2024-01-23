@@ -97,6 +97,18 @@
             Second sequence of symbols.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Text.EditScript`1.GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.Generic.IEnumerable`1.GetEnumerator"/>
+            </summary>
+            <returns>Enumerator</returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.EditScript`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.IEnumerable.GetEnumerator"/>
+            </summary>
+            <returns>Enumerator</returns>
+        </member>
         <member name="T:Waher.Runtime.Text.HarmonizedTextMap">
             <summary>
             Maps strings of text to a harmonized set of strings using collections of

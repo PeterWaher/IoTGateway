@@ -55,14 +55,14 @@ namespace Waher.Utility.GenManifest
 		/// </summary>
 		static int Main(string[] args)
 		{
-			SortedDictionary<string, bool> AssemblyFiles = new SortedDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
-			FolderRec ContentFiles = new FolderRec()
+			SortedDictionary<string, bool> AssemblyFiles = new(StringComparer.InvariantCultureIgnoreCase);
+			FolderRec ContentFiles = new()
 			{
 				Folders = new SortedDictionary<string, FolderRec>(StringComparer.InvariantCultureIgnoreCase)
 			};
-			List<string> AssemblyFolderNames = new List<string>();
-			List<string> ContentFolderNames = new List<string>();
-			List<ProgramRec> ProgramFolders = new List<ProgramRec>();
+			List<string> AssemblyFolderNames = new();
+			List<string> ContentFolderNames = new();
+			List<ProgramRec> ProgramFolders = new();
 			Dictionary<string, bool> ExtensionsToIgnore = null;
 			Dictionary<string, bool> FoldersToIgnore = null;
 			string OutputFileName = null;
@@ -145,8 +145,7 @@ namespace Waher.Utility.GenManifest
 							if (i >= c)
 								throw new Exception("Missing folder.");
 
-							if (FoldersToIgnore is null)
-								FoldersToIgnore = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+							FoldersToIgnore ??= new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
 							s = args[i++];
 							FoldersToIgnore[s] = true;
@@ -156,8 +155,7 @@ namespace Waher.Utility.GenManifest
 							if (i >= c)
 								throw new Exception("Missing extension.");
 
-							if (ExtensionsToIgnore is null)
-								ExtensionsToIgnore = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+							ExtensionsToIgnore ??= new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
 							s = args[i++];
 							ExtensionsToIgnore[s] = true;
@@ -183,7 +181,7 @@ namespace Waher.Utility.GenManifest
 
 				if (ListSpecialFolders)
 				{
-					SortedDictionary<string, string> Mappings = new SortedDictionary<string, string>();
+					SortedDictionary<string, string> Mappings = new();
 					int MaxLen = 0;
 					int Len;
 
@@ -281,41 +279,39 @@ namespace Waher.Utility.GenManifest
 					OrderFiles(ExtensionsToIgnore, FoldersToIgnore, FolderName, ContentFiles.Folders);
 
 				XmlWriterSettings Settings = XML.WriterSettings(true, false);
+				using XmlWriter Output = XmlWriter.Create(OutputFileName, Settings);
 
-				using (XmlWriter Output = XmlWriter.Create(OutputFileName, Settings))
+				Output.WriteStartDocument();
+				Output.WriteStartElement("Module", Namespace);
+
+				foreach (string AssemblyFile in AssemblyFiles.Keys)
 				{
-					Output.WriteStartDocument();
-					Output.WriteStartElement("Module", Namespace);
+					Output.WriteStartElement("Assembly", Namespace);
+					Output.WriteAttributeString("fileName", AssemblyFile);
+					Output.WriteEndElement();
+				}
 
-					foreach (string AssemblyFile in AssemblyFiles.Keys)
+				ExportFolder(Output, ContentFiles.Folders, "Content");
+
+				foreach (ProgramRec Rec in ProgramFolders)
+				{
+					Output.WriteStartElement("External", Namespace);
+					Output.WriteAttributeString("folder", Rec.SpecialFolder.ToString());
+					Output.WriteAttributeString("name", Rec.Name);
+
+					FolderRec ExternalFiles = new()
 					{
-						Output.WriteStartElement("Assembly", Namespace);
-						Output.WriteAttributeString("fileName", AssemblyFile);
-						Output.WriteEndElement();
-					}
+						Folders = new SortedDictionary<string, FolderRec>(StringComparer.InvariantCultureIgnoreCase)
+					};
 
-					ExportFolder(Output, ContentFiles.Folders, "Content");
-
-					foreach (ProgramRec Rec in ProgramFolders)
-					{
-						Output.WriteStartElement("External", Namespace);
-						Output.WriteAttributeString("folder", Rec.SpecialFolder.ToString());
-						Output.WriteAttributeString("name", Rec.Name);
-
-						FolderRec ExternalFiles = new FolderRec()
-						{
-							Folders = new SortedDictionary<string, FolderRec>(StringComparer.InvariantCultureIgnoreCase)
-						};
-
-						OrderFiles(ExtensionsToIgnore, FoldersToIgnore, Rec.Folder, ExternalFiles.Folders);
-						ExportFolder(Output, ExternalFiles.Folders, "File");
-
-						Output.WriteEndElement();
-					}
+					OrderFiles(ExtensionsToIgnore, FoldersToIgnore, Rec.Folder, ExternalFiles.Folders);
+					ExportFolder(Output, ExternalFiles.Folders, "File");
 
 					Output.WriteEndElement();
-					Output.WriteEndDocument();
 				}
+
+				Output.WriteEndElement();
+				Output.WriteEndDocument();
 
 				return 0;
 			}
@@ -329,7 +325,7 @@ namespace Waher.Utility.GenManifest
 		private static bool IgnoreFile(Dictionary<string, bool> ExtensionsToIgnore, Dictionary<string, bool> FoldersToIgnore,
 			string FileName)
 		{
-			if (!(ExtensionsToIgnore is null))
+			if (ExtensionsToIgnore is not null)
 			{
 				string Extension = Path.GetExtension(FileName);
 
@@ -337,7 +333,7 @@ namespace Waher.Utility.GenManifest
 					return true;
 			}
 
-			if (!(FoldersToIgnore is null))
+			if (FoldersToIgnore is not null)
 			{
 				string Directory = Path.GetDirectoryName(FileName);
 
@@ -424,7 +420,7 @@ namespace Waher.Utility.GenManifest
 
 			foreach (KeyValuePair<string, FolderRec> P in Rec)
 			{
-				if (!(P.Value?.Folders is null))
+				if (P.Value?.Folders is not null)
 				{
 					Output.WriteStartElement("Folder", Namespace);
 					Output.WriteAttributeString("name", P.Key);

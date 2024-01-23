@@ -107,18 +107,14 @@ namespace Waher.Utility.Transform
 
 				string Xml = File.ReadAllText(InputFileName);
 
-				using (Stream f = File.OpenRead(XsltPath))
-				{
-					using (XmlReader r = XmlReader.Create(f))
-					{
-						XslCompiledTransform Xslt = new XslCompiledTransform();
-						Xslt.Load(r);
+				using Stream f = File.OpenRead(XsltPath);
+				using XmlReader r = XmlReader.Create(f);
+				XslCompiledTransform Xslt = new();
+				Xslt.Load(r);
 
-						Xml = XSL.Transform(Xml, Xslt);
+				Xml = XSL.Transform(Xml, Xslt);
 
-						File.WriteAllText(OutputFileName, Xml);
-					}
-				}
+				File.WriteAllText(OutputFileName, Xml);
 
 				return 0;
 			}

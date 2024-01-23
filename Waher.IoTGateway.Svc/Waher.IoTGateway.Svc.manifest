@@ -562,7 +562,11 @@
 	<Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Transform.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Transform.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>

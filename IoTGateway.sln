@@ -551,9 +551,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Socket.UWP", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.Socket.Test", "Events\Waher.Events.Socket.Test\Waher.Events.Socket.Test.csproj", "{335FC704-0C06-4E11-813A-6C58A0B80CE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Rss", "Content\Waher.Content.Rss\Waher.Content.Rss.csproj", "{EA40F54D-525F-452E-B0C7-0D281E866030}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss", "Content\Waher.Content.Rss\Waher.Content.Rss.csproj", "{EA40F54D-525F-452E-B0C7-0D281E866030}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Rss.Test", "Content\Waher.Content.Rss.Test\Waher.Content.Rss.Test.csproj", "{C81B6F60-4285-4444-9A77-BB10F6A3D98E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss.Test", "Content\Waher.Content.Rss.Test\Waher.Content.Rss.Test.csproj", "{C81B6F60-4285-4444-9A77-BB10F6A3D98E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.TextDiff", "Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj", "{E020153E-2016-4D74-B54B-5F5FC71250AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -6352,6 +6354,30 @@ Global
 		{C81B6F60-4285-4444-9A77-BB10F6A3D98E}.Release|x64.Build.0 = Release|Any CPU
 		{C81B6F60-4285-4444-9A77-BB10F6A3D98E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C81B6F60-4285-4444-9A77-BB10F6A3D98E}.Release|x86.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|ARM.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|ARM64.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|x64.Build.0 = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{E020153E-2016-4D74-B54B-5F5FC71250AB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -6590,6 +6616,7 @@ Global
 		{335FC704-0C06-4E11-813A-6C58A0B80CE9} = {1A06B80C-EDAE-46B3-B7B3-6F641EE03BA6}
 		{EA40F54D-525F-452E-B0C7-0D281E866030} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{C81B6F60-4285-4444-9A77-BB10F6A3D98E} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{E020153E-2016-4D74-B54B-5F5FC71250AB} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

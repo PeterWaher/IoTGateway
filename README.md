@@ -508,6 +508,7 @@ The [Utilities](Utilities) folder contains applications that help the developer 
 | **Waher.Utility.RegEx**            | .NET 6.0   |       | The [Waher.Utility.RegEx](Utilities/Waher.Utility.RegEx) is a command-line tool that helps you find content in files using regular expressions, and optionally either export the findings or replace them with something else. |
 | **Waher.Utility.RunScript**        | .NET 6.0   |       | The [Waher.Utility.RunScript](Utilities/Waher.Utility.RunScript) is a command-line tool that allows you to execute script. |
 | **Waher.Utility.Sign**             | .NET 6.0   |       | The [Waher.Utility.Sign](Utilities/Waher.Utility.Sign) is a command-line tool that helps you sign files using asymmetric keys. |
+| **Waher.Utility.TextDiff**         | .NET 6.0   |       | The [Waher.Utility.TextDiff](Utilities/Waher.Utility.TextDiff) is a command-line tool that compares two text files and outputs the differences between them. |
 | **Waher.Utility.Transform**        | .NET 6.0   |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
 | **Waher.Utility.Translate**        | .NET 6.0   |       | The [Waher.Utility.Translate](Utilities/Waher.Utility.Translate) is a command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly. |
 

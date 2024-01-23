@@ -1167,6 +1167,20 @@
 							<File Id='Waher.Utility.DeleteDB.pdb' Name='Waher.Utility.DeleteDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.DeleteDB.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.Utility.DeleteDB.pdb' Name='Waher.Utility.DeleteDB.pdb' On='uninstall'/>
 						</Component>
+						<Component Id='UtilityTextDiff' Guid='A7867918-EFBE-4D0E-8493-08EA6AE918A2'>
+							<File Id='Waher.Utility.TextDiff.exe' Name='Waher.Utility.TextDiff.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.TextDiff.dll' Name='Waher.Utility.TextDiff.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.dll' Vital='yes'/>
+							<File Id='Waher.Utility.TextDiff.deps.json' Name='Waher.Utility.TextDiff.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.deps.json' Vital='yes'/>
+							<File Id='Waher.Utility.TextDiff.runtimeconfig.json' Name='Waher.Utility.TextDiff.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.runtimeconfig.json' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.TextDiff.exe' Name='Waher.Utility.TextDiff.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.TextDiff.dll' Name='Waher.Utility.TextDiff.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.TextDiff.deps.json' Name='Waher.Utility.TextDiff.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.TextDiff.runtimeconfig.json' Name='Waher.Utility.TextDiff.runtimeconfig.json' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityTextDiffDebugFiles' Guid='8BE867CF-F9B0-471A-9130-B82CCABF3BE8'>
+							<File Id='Waher.Utility.TextDiff.pdb' Name='Waher.Utility.TextDiff.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.TextDiff.pdb' Name='Waher.Utility.TextDiff.pdb' On='uninstall'/>
+						</Component>
 						<Component Id='UtilityTransform' Guid='04CA1141-4A22-4EA3-B11C-E316ED0DAA38'>
 							<File Id='Waher.Utility.Transform.exe' Name='Waher.Utility.Transform.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.exe' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Utility.Transform.dll' Name='Waher.Utility.Transform.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.dll' Vital='yes'/>
@@ -1180,6 +1194,20 @@
 						<Component Id='UtilityTransformDebugFiles' Guid='C5BC42B0-E372-41BB-9D7E-F02DA9C38B4F'>
 							<File Id='Waher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityTranslate' Guid='48B5F78F-7419-40FE-A636-D742120E312E'>
+							<File Id='Waher.Utility.Translate.exe' Name='Waher.Utility.Translate.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.exe' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Utility.Translate.dll' Name='Waher.Utility.Translate.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.dll' Vital='yes'/>
+							<File Id='Waher.Utility.Translate.deps.json' Name='Waher.Utility.Translate.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.deps.json' Vital='yes'/>
+							<File Id='Waher.Utility.Translate.runtimeconfig.json' Name='Waher.Utility.Translate.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.runtimeconfig.json' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Translate.exe' Name='Waher.Utility.Translate.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Translate.dll' Name='Waher.Utility.Translate.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Translate.deps.json' Name='Waher.Utility.Translate.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Utility.Translate.runtimeconfig.json' Name='Waher.Utility.Translate.runtimeconfig.json' On='uninstall'/>
+						</Component>
+						<Component Id='UtilityTranslateDebugFiles' Guid='CF0BFC30-C79E-44A9-BAAD-E0C5706A802B'>
+							<File Id='Waher.Utility.Translate.pdb' Name='Waher.Utility.Translate.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.pdb' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Utility.Translate.pdb' Name='Waher.Utility.Translate.pdb' On='uninstall'/>
 						</Component>
 						<Component Id='UtilityExStat' Guid='AB60319A-BD68-4D51-AA67-4788815C6B28'>
 							<File Id='Waher.Utility.ExStat.exe' Name='Waher.Utility.ExStat.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.exe' Vital='yes' KeyPath='yes'/>
@@ -2256,7 +2284,9 @@
 				<ComponentRef Id='UtilityInstall' />
 				<ComponentRef Id='UtilityRegEx' />
 				<ComponentRef Id='UtilitySign' />
+				<ComponentRef Id='UtilityTextDiff' />
 				<ComponentRef Id='UtilityTransform' />
+				<ComponentRef Id='UtilityTranslate' />
 				<ComponentRef Id='UtilityExStat' />
         <ComponentRef Id='UtilityExtract' />
         <ComponentRef Id='UtilityGenManifest' />
@@ -2274,7 +2304,9 @@
 				<ComponentRef Id='UtilityInstallDebugFiles' />
 				<ComponentRef Id='UtilityRegExDebugFiles' />
 				<ComponentRef Id='UtilitySignDebugFiles' />
+				<ComponentRef Id='UtilityTextDiffDebugFiles' />
 				<ComponentRef Id='UtilityTransformDebugFiles' />
+				<ComponentRef Id='UtilityTranslateDebugFiles' />
 				<ComponentRef Id='UtilityExStatDebugFiles' />
         <ComponentRef Id='UtilityExtractDebugFiles' />
         <ComponentRef Id='UtilityGenManifestDebugFiles' />

@@ -72,8 +72,8 @@ namespace Waher.Utility.Install
 		{
 			try
 			{
-				LinkedList<KeyValuePair<string, string>> Packages = new LinkedList<KeyValuePair<string, string>>();
-				List<string> ManifestFiles = new List<string>();
+				LinkedList<KeyValuePair<string, string>> Packages = new();
+				List<string> ManifestFiles = new();
 				string ProgramDataFolder = null;
 				string ServerApplication = null;
 				string PackageFile = null;
@@ -282,7 +282,7 @@ namespace Waher.Utility.Install
 							Console.Out.WriteLine("Server is closed. Proceeding...");
 					}
 
-					if (!(Packages.First is null))
+					if (Packages.First is not null)
 					{
 						if (ManifestFiles.Count == 0)
 						{
@@ -309,7 +309,7 @@ namespace Waher.Utility.Install
 				}
 				finally
 				{
-					if (!(GatewayRunning is null))
+					if (GatewayRunning is not null)
 					{
 						if (GatewayRunningLocked)
 							GatewayRunning.Release();
@@ -318,7 +318,7 @@ namespace Waher.Utility.Install
 						GatewayRunning = null;
 					}
 
-					if (!(StartingServer is null))
+					if (StartingServer is not null)
 					{
 						if (StartingServerLocked)
 							StartingServer.Release();
@@ -412,7 +412,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Loading manifest file.");
 
-			XmlDocument Manifest = new XmlDocument()
+			XmlDocument Manifest = new()
 			{
 				PreserveWhitespace = true
 			};
@@ -454,7 +454,7 @@ namespace Waher.Utility.Install
 						Assembly A = Assembly.LoadFrom(SourceFileName);
 						AssemblyName AN = A.GetName();
 
-						if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 						{
 							foreach (KeyValuePair<string, object> P in Targets)
 							{
@@ -472,12 +472,12 @@ namespace Waher.Utility.Install
 										}
 									}
 
-									Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+									Dictionary<string, object> Dependencies2 = new();
 
 									foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
 										Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
-									Dictionary<string, object> Runtime = new Dictionary<string, object>()
+									Dictionary<string, object> Runtime = new()
 									{
 										{ Path.GetFileName(SourceFileName), new Dictionary<string,object>() }
 									};
@@ -491,7 +491,7 @@ namespace Waher.Utility.Install
 							}
 						}
 
-						if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+						if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
 							foreach (KeyValuePair<string, object> P in Libraries)
 							{
@@ -754,7 +754,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Loading manifest file.");
 
-			XmlDocument Manifest = new XmlDocument()
+			XmlDocument Manifest = new()
 			{
 				PreserveWhitespace = true
 			};
@@ -782,7 +782,7 @@ namespace Waher.Utility.Install
 						AssemblyName AN = A.GetName();
 						string Key = AN.Name + "/" + AN.Version.ToString();
 
-						if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 						{
 							Targets.Remove(Key);
 
@@ -805,7 +805,7 @@ namespace Waher.Utility.Install
 							}
 						}
 
-						if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+						if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
 							foreach (KeyValuePair<string, object> P in Libraries)
 							{
@@ -862,7 +862,7 @@ namespace Waher.Utility.Install
 				throw new Exception("Missing package file.");
 
 			string LocalName = Path.GetFileName(PackageFile);
-			SHAKE256 H = new SHAKE256(384);
+			SHAKE256 H = new(384);
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
@@ -907,7 +907,7 @@ namespace Waher.Utility.Install
 				{
 					Log.Informational("Loading manifest file.");
 
-					XmlDocument Manifest = new XmlDocument()
+					XmlDocument Manifest = new()
 					{
 						PreserveWhitespace = true
 					};
@@ -1158,7 +1158,7 @@ namespace Waher.Utility.Install
 		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
 			string LocalName = Path.GetFileName(FileName);
-			SHAKE256 H = new SHAKE256(384);
+			SHAKE256 H = new(384);
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
@@ -1173,7 +1173,7 @@ namespace Waher.Utility.Install
 			Aes.Padding = PaddingMode.Zeros;
 
 			using ICryptoTransform AesTransform = Aes.CreateDecryptor(AesKey, IV);
-			using CryptoStream Decrypted = new CryptoStream(Encrypted, AesTransform, CryptoStreamMode.Read);
+			using CryptoStream Decrypted = new(Encrypted, AesTransform, CryptoStreamMode.Read);
 
 			InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
@@ -1287,9 +1287,9 @@ namespace Waher.Utility.Install
 					{
 						string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
 						FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decompressed);
-						DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
-						DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
-						DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+						DateTime CreationTimeUtc = new((long)ReadVarLenUInt(Decompressed));
+						DateTime LastAccessTimeUtc = new((long)ReadVarLenUInt(Decompressed));
+						DateTime LastWriteTimeUtc = new((long)ReadVarLenUInt(Decompressed));
 						ulong Bytes = ReadVarLenUInt(Decompressed);
 						string FileName;
 
@@ -1328,7 +1328,7 @@ namespace Waher.Utility.Install
 
 										AssemblyName AN = A.GetName();
 
-										if (!(Deps is null) &&
+										if (Deps is not null &&
 											Deps.TryGetValue("targets", out object Obj) &&
 											Obj is Dictionary<string, object> Targets)
 										{
@@ -1348,12 +1348,12 @@ namespace Waher.Utility.Install
 														}
 													}
 
-													Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+													Dictionary<string, object> Dependencies2 = new();
 
 													foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
 														Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
-													Dictionary<string, object> Runtime = new Dictionary<string, object>()
+													Dictionary<string, object> Runtime = new()
 												{
 													{ Path.GetFileName(FileName), new Dictionary<string,object>() }
 												};
@@ -1367,7 +1367,7 @@ namespace Waher.Utility.Install
 											}
 										}
 
-										if (!(Deps is null) &&
+										if (Deps is not null &&
 											Deps.TryGetValue("libraries", out object Obj3) &&
 											Obj3 is Dictionary<string, object> Libraries)
 										{
@@ -1591,7 +1591,7 @@ namespace Waher.Utility.Install
 			Log.Informational("Loading package file.");
 
 			string LocalName = Path.GetFileName(PackageFile);
-			SHAKE256 H = new SHAKE256(384);
+			SHAKE256 H = new(384);
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
@@ -1665,7 +1665,7 @@ namespace Waher.Utility.Install
 										AssemblyName AN = A.GetName();
 										Key = AN.Name + "/" + AN.Version.ToString();
 
-										if (!(Deps is null) && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+										if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 										{
 											Targets.Remove(Key);
 
@@ -1688,7 +1688,9 @@ namespace Waher.Utility.Install
 											}
 										}
 
-										if (!(Deps is null) && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+										if (Deps is not null && 
+											Deps.TryGetValue("libraries", out object Obj3) &&
+											Obj3 is Dictionary<string, object> Libraries)
 										{
 											foreach (KeyValuePair<string, object> P in Libraries)
 											{

@@ -1,43 +1,49 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 
 namespace Waher.Runtime.Text.Test
 {
 	[TestClass]
 	public class MappingTests
 	{
-		private static HarmonizedTextMap maps;
+		private static HarmonizedTextMap wordStyleMaps;
 
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext _)
 		{
-			maps = new HarmonizedTextMap();
+			wordStyleMaps = CreateWordStyleMaps();
+		}
 
-			maps.RegisterMapping(@"H(EAD(ING)?)?\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"RUBRIK\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"RUBRIEK\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"ÜBERSCHRIFT\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"OVERSKRIFT\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"TITRE\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"TITOLO\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"TÍTULO\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"ЗАГОЛОВОК\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"OTSIKKO\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"NAGŁÓWEK\s*(?'N'\d+)", "H{N}");
-			maps.RegisterMapping(@"NADPIS\s*(?'N'\d+)", "H{N}");
+		private static HarmonizedTextMap CreateWordStyleMaps()
+		{
+			HarmonizedTextMap Result = new();
 
-			maps.RegisterMapping(@"NORMAL", "NORMAL");
-			maps.RegisterMapping(@"SUBTITLE", "NORMAL");
-			maps.RegisterMapping(@"BODY TEXT(\s+\d+)", "NORMAL");
+			Result.RegisterMapping(@"H(EAD(ING)?)?\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"RUBRIK\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"RUBRIEK\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"ÜBERSCHRIFT\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"OVERSKRIFT\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"TITRE\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"TITOLO\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"TÍTULO\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"ЗАГОЛОВОК\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"OTSIKKO\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"NAGŁÓWEK\s*(?'N'\d+)", "H{N}");
+			Result.RegisterMapping(@"NADPIS\s*(?'N'\d+)", "H{N}");
 
-			maps.RegisterMapping(@"TITLE", "TITLE");
-			maps.RegisterMapping(@"BOOK\s+TITLE", "TITLE");
+			Result.RegisterMapping(@"NORMAL", "NORMAL");
+			Result.RegisterMapping(@"SUBTITLE", "NORMAL");
+			Result.RegisterMapping(@"BODY TEXT(\s+\d+)", "NORMAL");
 
-			maps.RegisterMapping(@"LIST PARAGRAPH", "UL");
-			maps.RegisterMapping(@"LISTSTYCKE", "UL");
+			Result.RegisterMapping(@"TITLE", "TITLE");
+			Result.RegisterMapping(@"BOOK\s+TITLE", "TITLE");
 
-			maps.RegisterMapping(@"QUOTE", "QUOTE");
-			maps.RegisterMapping(@"INTENSE\s+QUOTE", "QUOTE");
+			Result.RegisterMapping(@"LIST PARAGRAPH", "UL");
+			Result.RegisterMapping(@"LISTSTYCKE", "UL");
+
+			Result.RegisterMapping(@"QUOTE", "QUOTE");
+			Result.RegisterMapping(@"INTENSE\s+QUOTE", "QUOTE");
+
+			return Result;
 		}
 
 		[DataTestMethod]
@@ -47,9 +53,9 @@ namespace Waher.Runtime.Text.Test
 		[DataRow("RUBRIK1", "H1")]
 		[DataRow("RUBRIK2", "H2")]
 		[DataRow("LISTSTYCKE", "UL")]
-		public void Test_08_WordStyles(string Input, string Expected)
+		public void Test_01_WordStyles(string Input, string Expected)
 		{
-			Assert.IsTrue(maps.TryMap(Input, out string Harmonized));
+			Assert.IsTrue(wordStyleMaps.TryMap(Input, out string Harmonized));
 			Assert.AreEqual(Expected, Harmonized);
 		}
 	}

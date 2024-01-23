@@ -134,8 +134,7 @@ namespace Waher.Utility.Extract
 							if (i >= c)
 								throw new Exception("Missing collection name.");
 
-							if (Collections is null)
-								Collections = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+							Collections ??= new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
 							Collections[args[i++]] = true;
 							break;
@@ -144,8 +143,7 @@ namespace Waher.Utility.Extract
 							if (i >= c)
 								throw new Exception("Missing file name.");
 
-							if (FileNames is null)
-								FileNames = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+							FileNames ??= new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
 							FileNames[args[i++]] = true;
 							break;
@@ -264,7 +262,7 @@ namespace Waher.Utility.Extract
 
 		private static async Task RestoreXml(Stream BackupFile, Extractor Import)
 		{
-			XmlReaderSettings Settings = new XmlReaderSettings()
+			XmlReaderSettings Settings = new()
 			{
 				Async = true,
 				CloseInput = true,
@@ -463,17 +461,15 @@ namespace Waher.Utility.Extract
 						case "MetaData":
 							if (r.Depth == 4 && BlockStarted)
 							{
-								using (XmlReader r2 = r.ReadSubtree())
-								{
-									r2.Read();
+								using XmlReader r2 = r.ReadSubtree();
+								r2.Read();
 
-									while (r2.Read())
+								while (r2.Read())
+								{
+									if (r2.IsStartElement())
 									{
-										if (r2.IsStartElement())
-										{
-											P = ReadValue(r2);
-											await Import.BlockMetaData(P.Key, P.Value);
-										}
+										P = ReadValue(r2);
+										await Import.BlockMetaData(P.Key, P.Value);
 									}
 								}
 							}
@@ -488,29 +484,8 @@ namespace Waher.Utility.Extract
 							if (r.Depth != 4 || !CollectionStarted || !BlockStarted)
 								throw new Exception("Entry element not expected.");
 
-							EntryType EntryType;
-
-							switch (r.LocalName)
-							{
-								case "New":
-									EntryType = EntryType.New;
-									break;
-
-								case "Update":
-									EntryType = EntryType.Update;
-									break;
-
-								case "Delete":
-									EntryType = EntryType.Delete;
-									break;
-
-								case "Clear":
-									EntryType = EntryType.Clear;
-									break;
-
-								default:
-									throw new Exception("Unexpected element: " + r.LocalName);
-							}
+							if (!Enum.TryParse(r.LocalName, out EntryType EntryType))
+								throw new Exception("Unexpected element: " + r.LocalName);
 
 							using (XmlReader r2 = r.ReadSubtree())
 							{
@@ -613,24 +588,23 @@ namespace Waher.Utility.Extract
 
 								string FileName = r.Value;
 
-								using (TemporaryFile fs = new TemporaryFile())
+								using TemporaryFile fs = new();
+								
+								while (r2.Read())
 								{
-									while (r2.Read())
+									if (r2.IsStartElement())
 									{
-										if (r2.IsStartElement())
+										while (r2.LocalName == "Chunk")
 										{
-											while (r2.LocalName == "Chunk")
-											{
-												string Base64 = r2.ReadElementContentAsString();
-												byte[] Data = Convert.FromBase64String(Base64);
-												fs.Write(Data, 0, Data.Length);
-											}
+											string Base64 = r2.ReadElementContentAsString();
+											byte[] Data = Convert.FromBase64String(Base64);
+											fs.Write(Data, 0, Data.Length);
 										}
 									}
-
-									fs.Position = 0;
-									await Import.ExportFile(FileName, fs);
 								}
+
+								fs.Position = 0;
+								await Import.ExportFile(FileName, fs);
 							}
 							break;
 
@@ -962,12 +936,12 @@ namespace Waher.Utility.Extract
 			}
 			while (r.MoveToNextAttribute());
 
-			if (!(ElementType is null))
+			if (ElementType is not null)
 			{
 				switch (PropertyType)
 				{
 					case "Array":
-						List<object> List = new List<object>();
+						List<object> List = new();
 
 						while (r.Read())
 						{
@@ -992,7 +966,7 @@ namespace Waher.Utility.Extract
 						break;
 
 					case "Obj":
-						GenericObject GenObj = new GenericObject(string.Empty, ElementType, Guid.Empty);
+						GenericObject GenObj = new(string.Empty, ElementType, Guid.Empty);
 						Value = GenObj;
 
 						while (r.Read())
@@ -1016,7 +990,7 @@ namespace Waher.Utility.Extract
 			}
 			else if (PropertyType == "Bin")
 			{
-				MemoryStream Bin = new MemoryStream();
+				MemoryStream Bin = new();
 
 				while (r.Read())
 				{
@@ -1060,209 +1034,206 @@ namespace Waher.Utility.Extract
 
 			byte Command;
 
-			using (BinaryReader r = new BinaryReader(BackupFile, Encoding.UTF8, true))
+			using BinaryReader r = new(BackupFile, Encoding.UTF8, true);
+			string s = r.ReadString();
+			if (s != Preamble)
+				throw new Exception("Invalid backup file.");
+
+			await Import.Start();
+
+			while ((Command = r.ReadByte()) != 0)
 			{
-				string s = r.ReadString();
-				if (s != Preamble)
-					throw new Exception("Invalid backup file.");
-
-				await Import.Start();
-
-				while ((Command = r.ReadByte()) != 0)
+				switch (Command)
 				{
-					switch (Command)
-					{
-						case 1:
-							throw new Exception("Obsolete file.");  // 1 is obsolete (previously XMPP Credentials)
+					case 1:
+						throw new Exception("Obsolete file.");  // 1 is obsolete (previously XMPP Credentials)
 
-						case 2: // Database
-							string CollectionName;
-							string ObjectId;
-							string TypeName;
-							string FieldName;
-							bool Ascending;
+					case 2: // Database
+						string CollectionName;
+						string ObjectId;
+						string TypeName;
+						string FieldName;
+						bool Ascending;
 
-							await Import.StartDatabase();
+						await Import.StartDatabase();
 
-							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						{
+							await Import.StartCollection(CollectionName);
+
+							byte b;
+
+							while ((b = r.ReadByte()) != 0)
 							{
-								await Import.StartCollection(CollectionName);
-
-								byte b;
-
-								while ((b = r.ReadByte()) != 0)
+								switch (b)
 								{
-									switch (b)
-									{
-										case 1:
-											await Import.StartIndex();
+									case 1:
+										await Import.StartIndex();
 
-											while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
-											{
-												Ascending = r.ReadBoolean();
-												await Import.ReportIndexField(FieldName, Ascending);
-											}
+										while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
+										{
+											Ascending = r.ReadBoolean();
+											await Import.ReportIndexField(FieldName, Ascending);
+										}
 
-											await Import.EndIndex();
-											break;
+										await Import.EndIndex();
+										break;
 
-										case 2:
-											ObjectId = r.ReadString();
-											TypeName = r.ReadString();
+									case 2:
+										ObjectId = r.ReadString();
+										TypeName = r.ReadString();
 
-											await Import.StartObject(ObjectId, TypeName);
+										await Import.StartObject(ObjectId, TypeName);
 
-											byte PropertyType = r.ReadByte();
-											string PropertyName = r.ReadString();
-											object PropertyValue;
+										byte PropertyType = r.ReadByte();
+										string PropertyName = r.ReadString();
+										object PropertyValue;
 
-											while (!string.IsNullOrEmpty(PropertyName))
-											{
-												PropertyValue = ReadValue(r, PropertyType);
-
-												await Import.ReportProperty(PropertyName, PropertyValue);
-
-												PropertyType = r.ReadByte();
-												PropertyName = r.ReadString();
-											}
-
-											await Import.EndObject();
-											break;
-
-										default:
-											throw new Exception("Unsupported collection section: " + b.ToString());
-									}
-								}
-
-								await Import.EndCollection();
-							}
-
-							await Import.EndDatabase();
-							break;
-
-						case 3: // Files
-							string FileName;
-							int MaxLen = 256 * 1024;
-							byte[] Buffer = new byte[MaxLen];
-
-							await Import.StartFiles();
-
-							while (!string.IsNullOrEmpty(FileName = r.ReadString()))
-							{
-								long Length = r.ReadInt64();
-
-								if (Path.IsPathRooted(FileName))
-									throw new Exception("Absolute path names not allowed: " + FileName);
-
-								using (TemporaryFile File = new TemporaryFile())
-								{
-									while (Length > 0)
-									{
-										int Nr = r.Read(Buffer, 0, (int)Math.Min(Length, MaxLen));
-										Length -= Nr;
-										File.Write(Buffer, 0, Nr);
-									}
-
-									File.Position = 0;
-									try
-									{
-										await Import.ExportFile(FileName, File);
-									}
-									catch (Exception ex)
-									{
-										Console.Out.WriteLine("Unable to extract " + FileName + ": " + ex.Message);
-									}
-								}
-							}
-
-							await Import.EndFiles();
-							break;
-
-						case 4:
-							throw new Exception("Export file contains reported errors.");
-
-						case 5:
-							throw new Exception("Export file contains reported exceptions.");
-
-						case 6: // Ledger
-
-							await Import.StartLedger();
-
-							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
-							{
-								await Import.StartCollection(CollectionName);
-
-								byte b;
-
-								while ((b = r.ReadByte()) != 0)
-								{
-									switch (b)
-									{
-										case 1:
-											string BlockID = r.ReadString();
-											await Import.StartBlock(BlockID);
-											break;
-
-										case 2:
-											ObjectId = r.ReadString();
-											TypeName = r.ReadString();
-											EntryType EntryType = (EntryType)r.ReadByte();
-											DateTimeKind Kind = (DateTimeKind)r.ReadByte();
-											long Ticks = r.ReadInt64();
-											DateTime DT = new DateTime(Ticks, Kind);
-											Ticks = r.ReadInt64();
-											Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
-											TimeSpan TS = new TimeSpan(Ticks);
-											DateTimeOffset EntryTimestamp = new DateTimeOffset(DT, TS);
-
-											await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
-
-											byte PropertyType = r.ReadByte();
-											string PropertyName = r.ReadString();
-											object PropertyValue;
-
-											while (!string.IsNullOrEmpty(PropertyName))
-											{
-												PropertyValue = ReadValue(r, PropertyType);
-												await Import.ReportProperty(PropertyName, PropertyValue);
-
-												PropertyType = r.ReadByte();
-												PropertyName = r.ReadString();
-											}
-
-											await Import.EndObject();
-											break;
-
-										case 3:
-											await Import.EndBlock();
-											break;
-
-										case 4:
-											PropertyName = r.ReadString();
-											PropertyType = r.ReadByte();
+										while (!string.IsNullOrEmpty(PropertyName))
+										{
 											PropertyValue = ReadValue(r, PropertyType);
 
-											await Import.BlockMetaData(PropertyName, PropertyValue);
-											break;
+											await Import.ReportProperty(PropertyName, PropertyValue);
 
-										default:
-											throw new Exception("Unsupported collection section: " + b.ToString());
-									}
+											PropertyType = r.ReadByte();
+											PropertyName = r.ReadString();
+										}
+
+										await Import.EndObject();
+										break;
+
+									default:
+										throw new Exception("Unsupported collection section: " + b.ToString());
 								}
-
-								await Import.EndCollection();
 							}
 
-							await Import.EndLedger();
-							break;
+							await Import.EndCollection();
+						}
 
-						default:
-							throw new Exception("Unsupported section: " + Command.ToString());
-					}
+						await Import.EndDatabase();
+						break;
+
+					case 3: // Files
+						string FileName;
+						int MaxLen = 256 * 1024;
+						byte[] Buffer = new byte[MaxLen];
+
+						await Import.StartFiles();
+
+						while (!string.IsNullOrEmpty(FileName = r.ReadString()))
+						{
+							long Length = r.ReadInt64();
+
+							if (Path.IsPathRooted(FileName))
+								throw new Exception("Absolute path names not allowed: " + FileName);
+
+							using TemporaryFile File = new();
+
+							while (Length > 0)
+							{
+								int Nr = r.Read(Buffer, 0, (int)Math.Min(Length, MaxLen));
+								Length -= Nr;
+								File.Write(Buffer, 0, Nr);
+							}
+
+							File.Position = 0;
+							try
+							{
+								await Import.ExportFile(FileName, File);
+							}
+							catch (Exception ex)
+							{
+								Console.Out.WriteLine("Unable to extract " + FileName + ": " + ex.Message);
+							}
+						}
+
+						await Import.EndFiles();
+						break;
+
+					case 4:
+						throw new Exception("Export file contains reported errors.");
+
+					case 5:
+						throw new Exception("Export file contains reported exceptions.");
+
+					case 6: // Ledger
+
+						await Import.StartLedger();
+
+						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						{
+							await Import.StartCollection(CollectionName);
+
+							byte b;
+
+							while ((b = r.ReadByte()) != 0)
+							{
+								switch (b)
+								{
+									case 1:
+										string BlockID = r.ReadString();
+										await Import.StartBlock(BlockID);
+										break;
+
+									case 2:
+										ObjectId = r.ReadString();
+										TypeName = r.ReadString();
+										EntryType EntryType = (EntryType)r.ReadByte();
+										DateTimeKind Kind = (DateTimeKind)r.ReadByte();
+										long Ticks = r.ReadInt64();
+										DateTime DT = new(Ticks, Kind);
+										Ticks = r.ReadInt64();
+										Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
+										TimeSpan TS = new(Ticks);
+										DateTimeOffset EntryTimestamp = new(DT, TS);
+
+										await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+
+										byte PropertyType = r.ReadByte();
+										string PropertyName = r.ReadString();
+										object PropertyValue;
+
+										while (!string.IsNullOrEmpty(PropertyName))
+										{
+											PropertyValue = ReadValue(r, PropertyType);
+											await Import.ReportProperty(PropertyName, PropertyValue);
+
+											PropertyType = r.ReadByte();
+											PropertyName = r.ReadString();
+										}
+
+										await Import.EndObject();
+										break;
+
+									case 3:
+										await Import.EndBlock();
+										break;
+
+									case 4:
+										PropertyName = r.ReadString();
+										PropertyType = r.ReadByte();
+										PropertyValue = ReadValue(r, PropertyType);
+
+										await Import.BlockMetaData(PropertyName, PropertyValue);
+										break;
+
+									default:
+										throw new Exception("Unsupported collection section: " + b.ToString());
+								}
+							}
+
+							await Import.EndCollection();
+						}
+
+						await Import.EndLedger();
+						break;
+
+					default:
+						throw new Exception("Unsupported section: " + Command.ToString());
 				}
-
-				await Import.End();
 			}
+
+			await Import.End();
 		}
 
 		private static object ReadValue(BinaryReader r, byte PropertyType)
@@ -1306,10 +1277,10 @@ namespace Waher.Utility.Extract
 				case TYPE_DATETIMEOFFSET:
 					Kind = (DateTimeKind)((int)r.ReadByte());
 					Ticks = r.ReadInt64();
-					DateTime DT = new DateTime(Ticks, Kind);
+					DateTime DT = new(Ticks, Kind);
 					Ticks = r.ReadInt64();
 					Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
-					TimeSpan TS = new TimeSpan(Ticks);
+					TimeSpan TS = new(Ticks);
 					return new DateTimeOffset(DT, TS);
 
 				case TYPE_CI_STRING:
@@ -1319,7 +1290,7 @@ namespace Waher.Utility.Extract
 					r.ReadString(); // Type name
 					long NrElements = r.ReadInt64();
 
-					List<object> List = new List<object>();
+					List<object> List = new();
 
 					while (NrElements > 0)
 					{
@@ -1332,7 +1303,7 @@ namespace Waher.Utility.Extract
 
 				case TYPE_OBJECT:
 					string TypeName = r.ReadString();
-					GenericObject Object = new GenericObject(string.Empty, TypeName, Guid.Empty);
+					GenericObject Object = new(string.Empty, TypeName, Guid.Empty);
 
 					PropertyType = r.ReadByte();
 					string PropertyName = r.ReadString();
@@ -1354,15 +1325,14 @@ namespace Waher.Utility.Extract
 
 		private static async Task RestoreCompressed(Stream BackupFile, Extractor Import)
 		{
-			using (GZipStream gz = new GZipStream(BackupFile, CompressionMode.Decompress, true))
-			{
-				await RestoreBinary(gz, Import);
-			}
+			using GZipStream gz = new(BackupFile, CompressionMode.Decompress, true);
+			
+			await RestoreBinary(gz, Import);
 		}
 
 		private static async Task<(ICryptoTransform, CryptoStream)> RestoreEncrypted(Stream BackupFile, Stream KeyFile, Extractor Import)
 		{
-			XmlDocument Doc = new XmlDocument()
+			XmlDocument Doc = new()
 			{
 				PreserveWhitespace = true
 			};
@@ -1389,7 +1359,7 @@ namespace Waher.Utility.Extract
 			byte[] IV = Convert.FromBase64String(KeyAes256.Attributes["iv"].Value);
 
 			ICryptoTransform AesTransform = Import.CreateDecryptor(Key, IV);
-			CryptoStream cs = new CryptoStream(BackupFile, AesTransform, CryptoStreamMode.Read);
+			CryptoStream cs = new(BackupFile, AesTransform, CryptoStreamMode.Read);
 
 			await RestoreCompressed(cs, Import);
 

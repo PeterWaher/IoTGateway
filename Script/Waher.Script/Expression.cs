@@ -3508,10 +3508,13 @@ namespace Waher.Script
 							IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
 
 							s = Constant.ConstantName;
-							if (Found.ContainsKey(s))
+							if (Found.TryGetValue(s, out IConstant PrevConstant))
 							{
-								Log.Warning("Constant with name " + s + " previously registered. Constant ignored.",
-									T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+								if (PrevConstant.GetType() != T)
+								{
+									Log.Warning("Constant with name " + s + " previously registered. Constant ignored.",
+										T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+								}
 							}
 							else
 								Found[s] = Constant;
@@ -3521,10 +3524,13 @@ namespace Waher.Script
 							{
 								foreach (string Alias in Aliases)
 								{
-									if (Found.ContainsKey(Alias))
+									if (Found.TryGetValue(Alias, out PrevConstant))
 									{
-										Log.Warning("Constant with name " + Alias + " previously registered. Constant ignored.",
-											T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+										if (PrevConstant.GetType() != T)
+										{
+											Log.Warning("Constant with name " + Alias + " previously registered. Constant ignored.",
+												T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+										}
 									}
 									else
 										Found[Alias] = Constant;

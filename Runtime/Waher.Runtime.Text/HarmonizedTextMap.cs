@@ -55,6 +55,11 @@ namespace Waher.Runtime.Text
 					this.mappings[RegexPattern] = Exp;
 				}
 
+				Dictionary<string, bool> Names = new Dictionary<string, bool>();
+
+				foreach (string Name in Exp.Expression.GetGroupNames())
+					Names[Name] = true;
+
 				List<KeyValuePair<int, string>> Parameters = new List<KeyValuePair<int, string>>();
 				int i = MapTo.IndexOf('{');
 				int j;
@@ -65,9 +70,16 @@ namespace Waher.Runtime.Text
 					if (j < 0)
 						break;
 
-					Parameters.Add(new KeyValuePair<int, string>(i, MapTo.Substring(i + 1, j - i - 1)));
-					MapTo = MapTo.Remove(i, j - i + 1);
-					i = MapTo.IndexOf('{', i);
+					string Name = MapTo.Substring(i + 1, j - i - 1);
+
+					if (Names.ContainsKey(Name))
+					{
+						Parameters.Add(new KeyValuePair<int, string>(i, Name));
+						MapTo = MapTo.Remove(i, j - i + 1);
+						i = MapTo.IndexOf('{', i);
+					}
+					else
+						i = MapTo.IndexOf('{', i + 1);
 				}
 
 				Parameters.Reverse();

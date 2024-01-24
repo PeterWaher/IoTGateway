@@ -529,10 +529,10 @@
           }
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -546,7 +546,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -2883,7 +2883,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -3626,10 +3626,10 @@
           "runtimes/win8-arm/native/clrcompression.dll": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -3643,7 +3643,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -5736,7 +5736,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -6515,10 +6515,10 @@
           "runtimes/win8-arm-aot/native/_._": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -6532,7 +6532,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -8625,7 +8625,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -9377,10 +9377,10 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -9394,7 +9394,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -11487,7 +11487,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -12275,10 +12275,10 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -12292,7 +12292,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -14385,7 +14385,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -15137,10 +15137,10 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -15154,7 +15154,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -17247,7 +17247,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -18035,10 +18035,10 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/2.88.6": {
+      "SkiaSharp/2.88.7": {
         "type": "package",
         "dependencies": {
-          "SkiaSharp.NativeAssets.UWP": "2.88.6",
+          "SkiaSharp.NativeAssets.UWP": "2.88.7",
           "System.Memory": "4.5.5"
         },
         "compile": {
@@ -18052,7 +18052,7 @@
           }
         }
       },
-      "SkiaSharp.NativeAssets.UWP/2.88.6": {
+      "SkiaSharp.NativeAssets.UWP/2.88.7": {
         "type": "package",
         "compile": {
           "lib/uap10.0.10240/_._": {}
@@ -20145,7 +20145,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "2.88.6",
+          "SkiaSharp": "2.88.7",
           "Waher.Content": "2.6.8",
           "Waher.Content.Xml": "2.2.5",
           "Waher.Events": "1.1.3",
@@ -25095,10 +25095,10 @@
         "runtimes/win8-arm/native/clrcompression.dll"
       ]
     },
-    "SkiaSharp/2.88.6": {
-      "sha512": "wdfeBAQrEQCbJIRgAiargzP1Uy+0grZiG4CSgBnhAgcJTsPzlifIaO73JRdwIlT3TyBoeU9jEqzwFUhl4hTYnQ==",
+    "SkiaSharp/2.88.7": {
+      "sha512": "LJHAMrbWO00J7jXWLWehyjqFo29T4VzABimfJb4nICqpEe3c/KvQGWL4ItON8ymzhxYOeFgyxeRzuNzO4GHSug==",
       "type": "package",
-      "path": "skiasharp/2.88.6",
+      "path": "skiasharp/2.88.7",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -25165,14 +25165,14 @@
         "lib/xamarinwatchos1.0/SkiaSharp.dll",
         "lib/xamarinwatchos1.0/SkiaSharp.pdb",
         "lib/xamarinwatchos1.0/SkiaSharp.xml",
-        "skiasharp.2.88.6.nupkg.sha512",
+        "skiasharp.2.88.7.nupkg.sha512",
         "skiasharp.nuspec"
       ]
     },
-    "SkiaSharp.NativeAssets.UWP/2.88.6": {
-      "sha512": "79oJucUMJhfK7pmACCl/UCeG2ADsd4o0pprD8J0zzULmvCag5Ni3suQMMzS+XlDuY8doambBThWrJ8XKOrt4UQ==",
+    "SkiaSharp.NativeAssets.UWP/2.88.7": {
+      "sha512": "cfaXYuM8+2cuStVJwz/tfPHLDPPhhd2XReDxFVFL1L/93KwKzs1Cirrh9eyraqzmVLjrRv6As/OG0jj4JWbiRA==",
       "type": "package",
-      "path": "skiasharp.nativeassets.uwp/2.88.6",
+      "path": "skiasharp.nativeassets.uwp/2.88.7",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -25195,7 +25195,7 @@
         "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll",
         "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
         "runtimes/win10-x86/nativeassets/uap10.0/zlib1.dll",
-        "skiasharp.nativeassets.uwp.2.88.6.nupkg.sha512",
+        "skiasharp.nativeassets.uwp.2.88.7.nupkg.sha512",
         "skiasharp.nativeassets.uwp.nuspec"
       ]
     },

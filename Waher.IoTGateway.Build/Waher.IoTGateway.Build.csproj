@@ -41,7 +41,9 @@
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>

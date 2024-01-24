@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Text;
+﻿using System.Text;
 using Waher.Content;
 using Waher.Runtime.Text;
 
@@ -25,9 +24,9 @@ namespace Waher.Utility.TextDiff
 			try
 			{
 				Encoding Encoding = Encoding.UTF8;
-				string FromFileName = null;
-				string ToFileName = null;
-				string OutputFileName = null;
+				string? FromFileName = null;
+				string? ToFileName = null;
+				string? OutputFileName = null;
 				string s;
 				int i = 0;
 				int c = args.Length;

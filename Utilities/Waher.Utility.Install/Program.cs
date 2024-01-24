@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -551,7 +552,7 @@ namespace Waher.Utility.Install
 			if (Copy1)
 			{
 				Log.Informational("Copying " + From + " to " + To, string.Empty, string.Empty, "FileCopy");
-				File.Copy(From, To, true);
+				FileCopyWithRetries(From, To);
 			}
 
 			if (!string.IsNullOrEmpty(To2))
@@ -578,11 +579,39 @@ namespace Waher.Utility.Install
 				if (Copy2)
 				{
 					Log.Informational("Copying " + From + " to " + To2, string.Empty, string.Empty, "FileCopy");
-					File.Copy(From, To2, true);
+					FileCopyWithRetries(From, To2);
 				}
 			}
 
 			return true;
+		}
+
+		private static void FileCopyWithRetries(string FromFileName, string ToFileName)
+		{
+			DateTime Start = DateTime.Now;
+			IOException LastException = null;
+
+			do
+			{
+				if (LastException is not null)
+					Thread.Sleep(1000);
+
+				try
+				{
+					File.Copy(FromFileName, ToFileName, true);
+					return;
+				}
+				catch (IOException ex)  // File might be temporarily locked
+				{
+					LastException = ex;
+				}
+			}
+			while (DateTime.Now.Subtract(Start).TotalSeconds < 30);
+
+			if (LastException is not null)
+				ExceptionDispatchInfo.Capture(LastException).Throw();
+
+			throw new IOException("Unable to file file " + FromFileName + " to " + ToFileName);
 		}
 
 		private enum CopyOptions
@@ -1688,7 +1717,7 @@ namespace Waher.Utility.Install
 											}
 										}
 
-										if (Deps is not null && 
+										if (Deps is not null &&
 											Deps.TryGetValue("libraries", out object Obj3) &&
 											Obj3 is Dictionary<string, object> Libraries)
 										{

@@ -126,7 +126,7 @@ namespace Waher.Utility.TextDiff
 					Output = new StreamWriter(OutputFileName, Encoding, new FileStreamOptions()
 					{
 						Access = FileAccess.Write,
-						Mode = FileMode.CreateNew
+						Mode = FileMode.Create
 					});
 					DisposeOutput = true;
 				}
@@ -141,11 +141,11 @@ namespace Waher.Utility.TextDiff
 						switch (Step.Operation)
 						{
 							case EditOperation.Delete:
-								NrRemoved++;
+								NrRemoved += Step.Symbols.Length;
 								break;
 
 							case EditOperation.Insert:
-								NrAdded++;
+								NrAdded += Step.Symbols.Length;
 								break;
 						}
 					}

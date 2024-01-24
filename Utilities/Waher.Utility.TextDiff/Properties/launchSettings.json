@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.TextDiff": {
+      "commandName": "Project",
+      "commandLineArgs": "-f \"C:\\My Projects\\BrokerBuildOutputPrev.manifest\" -t \"C:\\My Projects\\BrokerBuildOutput.manifest\" -o \"C:\\My Projects\\BrokerBuildOutput.diff\""
+    }
+  }
+}

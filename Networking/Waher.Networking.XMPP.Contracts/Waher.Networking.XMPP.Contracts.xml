@@ -5757,6 +5757,19 @@
             Parameter value.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.ErrorReason">
+            <summary>
+            After <see cref="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables)"/> or <see cref="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables,Waher.Networking.XMPP.Contracts.ContractsClient)"/> has been
+            execited, this property contains the reason why the validation failed.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.ErrorText">
+            <summary>
+            After <see cref="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables)"/> or <see cref="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables,Waher.Networking.XMPP.Contracts.ContractsClient)"/> has been
+            execited, this property may contain (depending on the value of <see cref="P:Waher.Networking.XMPP.Contracts.Parameter.ErrorReason"/>) textual information related
+            to why the validation failed.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Serialize(System.Text.StringBuilder)">
             <summary>
             Serializes the parameter, in normalized form.
@@ -5842,6 +5855,81 @@
             </summary>
             <param name="LocalName">Local name.</param>
             <returns>If recognized.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ParameterErrorReason">
+            <summary>
+            Enumeration of different parameter validation reasons.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.ScriptExpressionRejection">
+            <summary>
+            The parameter has a script expression for validation. The expression rejected the value.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.RegularExpressionRejection">
+            <summary>
+            The parameter has a regular expression for validation. The expression rejected the value.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.LacksValue">
+            <summary>
+            Parameter lacks a value.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.Exception">
+            <summary>
+            An exception was raised during validation. See the error text for an exception message.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.InvalidReference">
+            <summary>
+            Reference is not valid
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.UnableToGetContract">
+            <summary>
+            Unable to get referenced contract.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.InvalidContractNamespace">
+            <summary>
+            Reference contracts namespace is not valid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.InvalidTemplateId">
+            <summary>
+            Reference contracts template ID is not valid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.InvalidProvider">
+            <summary>
+            Reference contracts provider is not valid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.ContractNotValid">
+            <summary>
+            Referenced contract not valid. The error text contains the <see cref="T:Waher.Networking.XMPP.Contracts.ContractStatus"/> enumerated value specifying the error.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.BelowMin">
+            <summary>
+            Value below minimum value.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.AboveMax">
+            <summary>
+            Value above maximum value.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.TooShort">
+            <summary>
+            Value is too short.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ParameterErrorReason.TooLong">
+            <summary>
+            Value to too long.
+            </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ParsedContract">
             <summary>

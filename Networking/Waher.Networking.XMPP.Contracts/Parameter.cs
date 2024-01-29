@@ -17,6 +17,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private string name;
 		private string guide = string.Empty;
 		private string exp = string.Empty;
+		private ParameterErrorReason? errorReason = null;
+		private string errorText = null;
 		private Expression parsed = null;
 		private bool transient = false;
 
@@ -69,6 +71,27 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// After <see cref="IsParameterValid(Variables)"/> or <see cref="IsParameterValid(Variables, ContractsClient)"/> has been
+		/// execited, this property contains the reason why the validation failed.
+		/// </summary>
+		public ParameterErrorReason? ErrorReason
+		{
+			get => this.errorReason;
+			protected set => this.errorReason = value;
+		}
+
+		/// <summary>
+		/// After <see cref="IsParameterValid(Variables)"/> or <see cref="IsParameterValid(Variables, ContractsClient)"/> has been
+		/// execited, this property may contain (depending on the value of <see cref="ErrorReason"/>) textual information related
+		/// to why the validation failed.
+		/// </summary>
+		public string ErrorText
+		{
+			get => this.errorText;
+			protected set => this.errorText = value;
+		}
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
@@ -104,6 +127,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public virtual async Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
+			this.errorReason = null;
+			this.errorText = null;
+
 			if (!string.IsNullOrEmpty(this.exp))
 			{
 				try
@@ -111,7 +137,10 @@ namespace Waher.Networking.XMPP.Contracts
 					object Result = await this.Parsed.EvaluateAsync(Variables);
 
 					if (Result is bool b && !b)
+					{
+						this.errorReason = ParameterErrorReason.ScriptExpressionRejection;
 						return false;
+					}
 				}
 				catch (Exception)
 				{

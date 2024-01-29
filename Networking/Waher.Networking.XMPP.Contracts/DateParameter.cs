@@ -88,7 +88,12 @@ namespace Waher.Networking.XMPP.Contracts
 		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
 			if (this.Value.HasValue && this.Value.Value.TimeOfDay != TimeSpan.Zero)
+			{
+				this.ErrorReason = ParameterErrorReason.LacksValue;
+				this.ErrorText = null;
+
 				return Task.FromResult(false);
+			}
 
 			return base.IsParameterValid(Variables, Client);
 		}

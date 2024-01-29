@@ -70,6 +70,8 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			if (string.IsNullOrEmpty(this.Expression))
 			{
+				this.ErrorReason = ParameterErrorReason.LacksValue;
+				this.ErrorText = null;
 				this.value = null;
 				return false;
 			}
@@ -84,14 +86,20 @@ namespace Waher.Networking.XMPP.Contracts
 						this.value = (decimal)d;
 					else
 						this.value = Result;
+
+					this.ErrorReason = null;
+					this.ErrorText = null;
+
+					return true;
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					this.ErrorReason = ParameterErrorReason.Exception;
+					this.ErrorText = ex.Message;
+
 					this.value = null;
 					return false;
 				}
-
-				return true;
 			}
 		}
 

@@ -86,7 +86,12 @@ namespace Waher.Networking.XMPP.Contracts
 			int Diff;
 
 			if (!(this.Value.HasValue))
+			{
+				this.ErrorReason = ParameterErrorReason.LacksValue;
+				this.ErrorText = null;
+
 				return Task.FromResult(false);
+			}
 
 			IComparable<T> Compare = this.Value.Value;
 
@@ -95,7 +100,12 @@ namespace Waher.Networking.XMPP.Contracts
 				Diff = Compare.CompareTo(this.Min.Value);
 
 				if (Diff < 0 || (Diff == 0 && !this.MinIncluded))
+				{
+					this.ErrorReason = ParameterErrorReason.BelowMin;
+					this.ErrorText = null;
+
 					return Task.FromResult(false);
+				}
 			}
 
 			if (this.Max.HasValue)
@@ -103,7 +113,12 @@ namespace Waher.Networking.XMPP.Contracts
 				Diff = Compare.CompareTo(this.Max.Value);
 
 				if (Diff > 0 || (Diff == 0 && !this.MaxIncluded))
+				{
+					this.ErrorReason = ParameterErrorReason.AboveMax;
+					this.ErrorText = null;
+
 					return Task.FromResult(false);
+				}
 			}
 
 			return base.IsParameterValid(Variables, Client);

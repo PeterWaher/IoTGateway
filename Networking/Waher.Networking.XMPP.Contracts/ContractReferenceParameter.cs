@@ -208,16 +208,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public override async Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
+			this.ErrorReason = null;
+			this.ErrorText = null;
+
 			if (CaseInsensitiveString.IsNullOrEmpty(this.value))
 			{
 				if (this.required)
+				{
+					this.ErrorReason = ParameterErrorReason.LacksValue;
 					return false;
+				}
 				else
 					return true;
 			}
 
 			if (!XmppClient.BareJidRegEx.IsMatch(this.value))
+			{
+				this.ErrorReason = ParameterErrorReason.InvalidReference;
 				return false;
+			}
 
 			if (!(Client is null) && Client.Client.State == XmppState.Connected)
 			{
@@ -231,29 +240,35 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 
 					if (this.reference is null)
+					{
 						return false;
+					}
 
 					if (!string.IsNullOrEmpty(this.localName) &&
 						this.localName != this.reference.ForMachinesLocalName)
 					{
+						this.ErrorReason = ParameterErrorReason.UnableToGetContract;
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.@namespace) &&
 						this.@namespace != this.reference.ForMachinesNamespace)
 					{
+						this.ErrorReason = ParameterErrorReason.InvalidContractNamespace;
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.templateId) &&
 						this.templateId != this.reference.TemplateId)
 					{
+						this.ErrorReason = ParameterErrorReason.InvalidTemplateId;
 						return false;
 					}
 
 					if (!string.IsNullOrEmpty(this.provider) &&
 						this.provider != this.reference.Provider)
 					{
+						this.ErrorReason = ParameterErrorReason.InvalidProvider;
 						return false;
 					}
 
@@ -266,10 +281,18 @@ namespace Waher.Networking.XMPP.Contracts
 						this.referenceStatus = await Client.ValidateAsync(this.reference, true);
 
 					if (this.referenceStatus != ContractStatus.Valid)
+					{
+						this.ErrorReason = ParameterErrorReason.ContractNotValid;
+						this.ErrorText = this.referenceStatus.ToString();
+
 						return false;
+					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					this.ErrorReason = ParameterErrorReason.Exception;
+					this.ErrorText = ex.Message;
+
 					return false;
 				}
 

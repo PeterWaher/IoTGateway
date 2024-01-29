@@ -87,8 +87,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
-			if (!(this.value.HasValue))
+			if (!this.value.HasValue)
+			{
+				this.ErrorReason = ParameterErrorReason.LacksValue;
+				this.ErrorText = null;
+
 				return Task.FromResult(false);
+			}
 
 			return base.IsParameterValid(Variables, Client);
 		}

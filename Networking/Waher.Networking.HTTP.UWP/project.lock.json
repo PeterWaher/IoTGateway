@@ -2695,7 +2695,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5463,7 +5463,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8267,7 +8267,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11044,7 +11044,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13857,7 +13857,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16634,7 +16634,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19447,7 +19447,7 @@
           "Waher.Events": "1.1.3"
         }
       },
-      "Waher.Runtime.Text/1.1.1": {
+      "Waher.Runtime.Text/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -29412,7 +29412,7 @@
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
     },
-    "Waher.Runtime.Text/1.1.1": {
+    "Waher.Runtime.Text/1.1.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj"

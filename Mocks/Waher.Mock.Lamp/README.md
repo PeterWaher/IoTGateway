@@ -21,7 +21,7 @@ encodes an URI containing the meta-data necessary to claim the device.
 
 You can test the application by downloading a [binary executable](../../Executables/Waher.Mock.Lamp.zip). If you don't have an XMPP client
 you can use to chat with the sensor, or if the one you use does not support the XMPP IoT XEPs, you can also download the
-[WPF client](../../Executables/Waher.Client.WPF.zip) available in the solution.
+[WPF client](https://waher.se/Downloads/IoTClientSetup.exe) available in the solution.
 
 ## License
 

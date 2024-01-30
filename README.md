@@ -2,7 +2,7 @@ IoTGateway
 ======================
 
 **IoTGateway** is a C# implementation of an IoT gateway. It is self-contained, and includes all libraries and frameworks 
-it needs to operate. You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe?raw=true).
+it needs to operate. You can install it by using the following [IoT Gateway Setup application](https://waher.se/Downloads/IoTGatewaySetup.exe).
 Example applications also include binary downloads.
 
 Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided into different groups of projects and modules:
@@ -101,21 +101,21 @@ IoT Gateway
 
 The IoT Gateway is represented by the following set of projects. They are back-end server applications and perform 
 communiction with devices, as well as host online content.
-You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe?raw=true).
+You can install it by using the following [IoT Gateway Setup application](https://waher.se/Downloads/IoTGatewaySetup.exe).
 
 | Project                         | Type          | Link                                                                                   | Project description |
 |---------------------------------|---------------|----------------------------------------------------------------------------------------|---------------------|
-| **Waher.IoTClient.Setup**       | Wix           | [Installer](Executables/IoTClientSetup.exe?raw=true)                                   | The [Waher.IoTClient.Setup](Waher.IoTClient.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Client, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
-| **Waher.IoTClient.Win32**       | Wix           | [Installer](Executables/Waher.IoTClient.Win32.msi?raw=true)                            | The [Waher.IoTClient.Win32](Waher.IoTClient.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Client. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTClient.Setup**       | Wix           | [Installer](https://waher.se/Downloads/IoTClientSetup.exe)                             | The [Waher.IoTClient.Setup](Waher.IoTClient.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Client, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTClient.Win32**       | Wix           | [Installer](https://waher.se/Downloads/Waher.IoTClient.Win32.msi)                      | The [Waher.IoTClient.Win32](Waher.IoTClient.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Client. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
 | **Waher.IoTGateway**            | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.IoTGateway/)                              | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 | **Waher.IoTGateway.App**        | UWP           | [App Bundle Package](Executables/Waher.IoTGateway.App_x86_x64_arm.appxbundle?raw=true) | The [Waher.IoTGateway.App](Waher.IoTGateway.App) project is a Universal Windows Platform application version of the IoT Gateway. It can be installed on IoT devices running Windows 10 IoT. |
 | **Waher.IoTGateway.Build**      | .NET 6.0      |                                                                                        | The [Waher.IoTGateway.Build](Waher.IoTGateway.Build) project contains MSBuild script for building setup files. Can be used in an auto-build environment. |
-| **Waher.IoTGateway.Console**    | .NET 6.0      | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
+| **Waher.IoTGateway.Console**    | .NET 6.0      | [Installer](https://waher.se/Downloads/IoTGatewaySetup.exe)                            | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
 | **Waher.IoTGateway.Installers** | .NET 4.6.2    |                                                                                        | The [Waher.IoTGateway.Installers](Waher.IoTGateway.Installers) project defines custom actions used by the setup application to install the IoT Gateway and dependencies propertly. |
 | **Waher.IoTGateway.Resources**  | .NET Std 1.0  |                                                                                        | The [Waher.IoTGateway.Resources](Waher.IoTGateway.Resources) project contains resource files that are common to all IoT Gateway embodiments. |
-| **Waher.IoTGateway.Setup**      | Wix           | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Gateway, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
-| **Waher.IoTGateway.Svc**        | .NET 6.0      | [Installer](Executables/IoTGatewaySetup.exe?raw=true)                                  | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
-| **Waher.IoTGateway.Win32**      | Wix           | [Installer](Executables/Waher.IoTGateway.Win32.msi?raw=true)                           | The [Waher.IoTGateway.Win32](Waher.IoTGateway.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Gateway. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTGateway.Setup**      | Wix           | [Installer](https://waher.se/Downloads/IoTGatewaySetup.exe)                            | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Gateway, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTGateway.Svc**        | .NET 6.0      | [Installer](https://waher.se/Downloads/IoTGatewaySetup.exe)                            | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
+| **Waher.IoTGateway.Win32**      | Wix           | [Installer](https://waher.se/Downloads/Waher.IoTGateway.Win32.msi)                     | The [Waher.IoTGateway.Win32](Waher.IoTGateway.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Gateway. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
 
 Clients
 ----------------------
@@ -123,10 +123,10 @@ Clients
 The [Clients](Clients) folder contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
 can be run by users to perform different types of interaction with things or the network.
 
-| Project                          | Type       | Link                                                            | Project description |
-|----------------------------------|------------|-----------------------------------------------------------------|---------------------|
-| **Waher.Client.WPF**             | .NET 4.6.2 | [Installer](Executables/IoTClientSetup.exe?raw=true)            | The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. |
-| **Waher.Client.MqttEventViewer** | .NET 4.6.2 | [Executable](Executables/Waher.Client.MqttEventViewer?raw=true) | The [Waher.Client.MqttEventViewer](Clients/Client.MqttEventViewer) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| Project                          | Type       | Link                                                                | Project description |
+|----------------------------------|------------|---------------------------------------------------------------------|---------------------|
+| **Waher.Client.WPF**             | .NET 4.6.2 | [Installer](https://waher.se/Downloads/IoTClientSetup.exe)          | The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. |
+| **Waher.Client.MqttEventViewer** | .NET 4.6.2 | [Executable](Executables/Waher.Client.MqttEventViewer.zip?raw=true) | The [Waher.Client.MqttEventViewer](Clients/Client.MqttEventViewer) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 
 Content
 ----------------------

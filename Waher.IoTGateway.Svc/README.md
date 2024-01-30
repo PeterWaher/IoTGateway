@@ -47,7 +47,7 @@ If running the application under Linux, you also need administrative privileges 
 >
 >	I also had to manually configure Skype to not use HTTP and HTTPS ports for incoming calls.
 
-**Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, the
+**Note**: If using the [IoT Gateway installer](https://waher.se/Downloads/IoTGatewaySetup.exe) to install the application, the
 above is done as part of the installation. 
 
 ## Pluggable modules.
@@ -85,7 +85,7 @@ database providers, without having to update code in all pluggable modules.
 
 ## Installer
 
-You can also install the service using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
+You can also install the service using the [IoT Gateway installer](https://waher.se/Downloads/IoTGatewaySetup.exe).
 
 ## License
 

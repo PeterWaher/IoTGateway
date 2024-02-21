@@ -2781,7 +2781,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5732,7 +5732,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8719,7 +8719,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11679,7 +11679,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14675,7 +14675,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17635,7 +17635,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -20631,7 +20631,7 @@
           "Waher.Script.Graphs": "2.1.5"
         }
       },
-      "Waher.Content.Markdown.Contracts/3.0.0": {
+      "Waher.Content.Markdown.Contracts/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -30897,7 +30897,7 @@
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
     },
-    "Waher.Content.Markdown.Contracts/3.0.0": {
+    "Waher.Content.Markdown.Contracts/3.0.1": {
       "type": "project",
       "path": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj",
       "msbuildProject": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj"

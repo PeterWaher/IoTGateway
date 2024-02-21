@@ -43,6 +43,7 @@
             Generates Human-Readable XML for Smart Contracts from the markdown text.
             Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
             </summary>
+            <param name="Document">Markdown document being rendered.</param>
             <param name="XmlSettings">XML settings.</param>
             <returns>Smart Contract XML</returns>
         </member>
@@ -51,6 +52,7 @@
             Generates Human-Readable XML for Smart Contracts from the markdown text.
             Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
             </summary>
+            <param name="Document">Markdown document being rendered.</param>
             <param name="Output">Smart Contract XML will be output here.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
@@ -58,12 +60,13 @@
             Generates Human-Readable XML for Smart Contracts from the markdown text.
             Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
             </summary>
+            <param name="Document">Markdown document being rendered.</param>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="XmlSettings">XML settings.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Contracts.ContractsRenderer">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders Contracts XML from a Markdown document.
             </summary>
         </member>
         <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.XmlOutput">
@@ -76,6 +79,11 @@
             Local Name of container element, or null if none.
             </summary>
         </member>
+        <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.Namespace">
+            <summary>
+            Namespace of container element, or null if none specified.
+            </summary>
+        </member>
         <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.Level">
             <summary>
             Current section header level.
@@ -83,18 +91,35 @@
         </member>
         <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Xml.XmlWriterSettings,System.String)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders Contracts XML from a Markdown document.
             </summary>
             <param name="XmlSettings">XML-specific settings.</param>
             <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,System.String)">
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Xml.XmlWriterSettings,System.String,System.String)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders Contracts XML from a Markdown document.
             </summary>
-            <param name="Output">Markdown output.</param>
             <param name="XmlSettings">XML-specific settings.</param>
             <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+            <param name="Namespace">Namespace of container element, or null if none specified.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,System.String)">
+            <summary>
+            Renders Contracts XML from a Markdown document.
+            </summary>
+            <param name="Output">Contract XML output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,System.String,System.String)">
+            <summary>
+            Renders Contracts XML from a Markdown document.
+            </summary>
+            <param name="Output">Contract XML output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+            <param name="Namespace">Namespace of container element, or null if none specified.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Dispose">
             <inheritdoc/>

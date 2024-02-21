@@ -836,9 +836,9 @@ displayed, where the language is whatever comes after `base64`. This method can 
 if not aware at design time, and avoid conflicts with the Markdown parser. The following example shows how to present XML from script,
 in a readable manner, without interfering with the overall structure of the document:
 
-    ```base64xml
-    {{Base64Encode(Utf8Encode(PrettyXml(Xml)))}}
-    ```
+<pre><code class="nohighlight">&#96;&#96;&#96;base64xml
+&#123;&#123;Base64Encode(Utf8Encode(PrettyXml(Xml)))&#125;&#125;
+&#96;&#96;&#96;</code></pre>
 
 **Note**: By default, the `default.css` highlight style is used on the page, if syntax highlighting using [highlight.js](https://highlightjs.org/)
 is available. The library is accessible through the `/Highlight` web folder. You can control the style used for highlighting, by including a

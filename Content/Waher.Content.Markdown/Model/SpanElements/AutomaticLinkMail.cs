@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -30,66 +28,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string EMail => this.eMail;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('<');
-			Output.Append(this.eMail);
-			Output.Append('>');
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
-		{
-			string s = this.eMail;
-			byte[] Data = System.Text.Encoding.ASCII.GetBytes(s);
-			StringBuilder sb = new StringBuilder();
-
-			foreach (byte b in Data)
-			{
-				sb.Append("&#x");
-				sb.Append(b.ToString("X2"));
-				sb.Append(';');
-			}
-
-			s = sb.ToString();
-
-			sb.Clear();
-			Data = Encoding.ASCII.GetBytes("mailto:");
-			foreach (byte b in Data)
-			{
-				sb.Append("&#x");
-				sb.Append(b.ToString("X2"));
-				sb.Append(';');
-			}
-
-			Output.Append("<a href=\"");
-			Output.Append(sb.ToString());
-			Output.Append(s);
-			Output.Append("\">");
-			Output.Append(s);
-			Output.Append("</a>");
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			Output.Append(this.eMail);
-		
-			return Task.CompletedTask;
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -98,61 +40,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			Output.WriteStartElement("Hyperlink");
-			Output.WriteAttributeString("NavigateUri", "mailto:" + this.eMail);
-			Output.WriteValue(this.eMail);
-			Output.WriteEndElement();
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			string Bak = State.Hyperlink;
-			State.Hyperlink = "mailto:" + this.eMail;
-			Paragraph.GenerateXamarinFormsSpan(Output, State.Hyperlink, State);
-			State.Hyperlink = Bak;
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override Task GenerateLaTeX(StringBuilder Output)
-		{
-			Output.AppendLine(InlineText.EscapeLaTeX(this.eMail));
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("AutomaticLinkMail");
-			Output.WriteAttributeString("eMail", this.eMail);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.
@@ -178,19 +68,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Output.WriteElementString("text", this.eMail);
-		
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

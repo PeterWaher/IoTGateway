@@ -11,6 +11,6 @@ BodyOnly: 1
 ```xml
 {{
 Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]);
-Doc.ExportXml()
+Waher.Content.Markdown.Xml.XmlExtensions.ExportXml(Doc)
 }}
 ```

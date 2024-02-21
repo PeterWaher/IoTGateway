@@ -1,15 +1,12 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Markdown.Model.BlockElements;
-using Waher.Content.Xml;
+﻿using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
-	/// <summary>
-	/// Represents a hashtag.
-	/// </summary>
-	public class HashTag : MarkdownElement
+    /// <summary>
+    /// Represents a hashtag.
+    /// </summary>
+    public class HashTag : MarkdownElement
 	{
 		private readonly string tag;
 
@@ -30,61 +27,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Tag => this.tag;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('#');
-			Output.Append(this.tag);
-	
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("<mark");
-
-			HtmlSettings Settings = this.Document.Settings?.HtmlSettings;
-			string s = Settings?.HashtagClass;
-
-			if (!string.IsNullOrEmpty(s))
-			{
-				Output.Append(" class=\"");
-				Output.Append(XML.HtmlAttributeEncode(s));
-				Output.Append('"');
-			}
-
-			s = Settings?.HashtagClickScript;
-
-			if (!string.IsNullOrEmpty(s))
-			{
-				Output.Append(" onclick=\"");
-				Output.Append(XML.HtmlAttributeEncode(s));
-				Output.Append('"');
-			}
-
-			Output.Append('>');
-			Output.Append(this.tag);
-			Output.Append("</mark>");
-	
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			Output.Append(this.tag);
-	
-			return Task.CompletedTask;
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -93,66 +39,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			Output.WriteValue(this.tag);
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			Paragraph.GenerateXamarinFormsSpan(Output, this.tag, State);
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Output.WriteElementString("text", this.tag);
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override Task GenerateLaTeX(StringBuilder Output)
-		{
-			Output.Append("\\#");
-			Output.Append(this.tag);
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteElementString("Hashtag", this.tag);
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.

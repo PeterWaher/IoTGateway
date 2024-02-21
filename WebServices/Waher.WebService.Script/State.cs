@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content.Markdown.Model;
+using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.IoTGateway.ScriptExtensions.Constants;
@@ -481,7 +482,15 @@ namespace Waher.WebService.Script
 										Html.Append(this.FormatText(XML.HtmlValueEncode(cis.Value)));
 								}
 								else if (Item is MarkdownElement Element)
-									await Element.GenerateHTML(Html);
+								{
+									using (HtmlRenderer Renderer = new HtmlRenderer(Html, new HtmlSettings()
+									{
+										XmlEntitiesOnly = true
+									}))
+									{
+										await Element.Render(Renderer);
+									}
+								}
 								else
 									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
 							}

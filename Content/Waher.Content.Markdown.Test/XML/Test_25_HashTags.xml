@@ -10,15 +10,15 @@
 		</Header>
 		<Paragraph>
 			<InlineText>This </InlineText>
-			<Hashtag>paragraph</Hashtag>
+			<HashTag>paragraph</HashTag>
 			<InlineText> contains </InlineText>
-			<Hashtag>3</Hashtag>
+			<HashTag>3</HashTag>
 			<InlineText> </InlineText>
-			<Hashtag>hashtags</Hashtag>
+			<HashTag>hashtags</HashTag>
 			<InlineText>.</InlineText>
 		</Paragraph>
 		<Paragraph>
-			<Hashtag>Hashtags</Hashtag>
+			<HashTag>Hashtags</HashTag>
 			<InlineText> at the beginning of a row works, as headers require space after # and the tag.</InlineText>
 		</Paragraph>
 	</elements>

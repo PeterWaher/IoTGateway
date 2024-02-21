@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Model

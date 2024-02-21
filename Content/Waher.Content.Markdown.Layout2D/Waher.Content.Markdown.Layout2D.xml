@@ -41,46 +41,16 @@
             </summary>
             <param name="Document">Document containing the instance.</param>
         </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesMarkdown">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderHtml(Waher.Content.Markdown.Rendering.HtmlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            If (transportable) Markdown is handled.
+            Generates HTML for the code content.
             </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesHTML">
-            <summary>
-            If HTML is handled.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesPlainText">
-            <summary>
-            If Plain Text is handled.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesXAML">
-            <summary>
-            If XAML is handled.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesLaTeX">
-            <summary>
-            If LaTeX is handled.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesSmartContract">
-            <summary>
-            If smart-contract XML is handled.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
-            <summary>
-            Generates HTML for the markdown element.
-            </summary>
-            <param name="Output">HTML will be output here.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],Waher.Script.Variables)">
             <summary>
@@ -91,62 +61,60 @@
             <param name="Session">Session variables.</param>
             <returns>File name</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateMarkdown(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderMarkdown(Waher.Content.Markdown.Rendering.MarkdownRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates (transportanle) Markdown for the markdown element.
+            Generates Markdown for the code content.
             </summary>
-            <param name="Output">Markdown will be output here.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderText(Waher.Content.Markdown.Rendering.TextRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates Plain Text for the markdown element.
+            Generates plain text for the code content.
             </summary>
-            <param name="Output">HTML will be output here.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates WPF XAML for the markdown element.
+            Generates WPF XAML for the code content.
             </summary>
-            <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates Xamarin.Forms XAML for the markdown element.
+            Generates Xamarin.Forms XAML for the code content.
             </summary>
-            <param name="Output">XAML will be output here.</param>
-            <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateLaTeX(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates LaTeX text for the markdown element.
+            Generates LaTeX for the code content.
             </summary>
-            <param name="Output">LaTeX will be output here.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
@@ -172,18 +140,16 @@
             <param name="Session">Current variables.</param>
             <returns>Transformed object.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateSmartContractXml(System.Xml.XmlWriter,Waher.Content.Markdown.Model.SmartContractRenderState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates Human-Readable XML for Smart Contracts from the markdown text.
-            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            Generates smart contract XML for the code content.
             </summary>
-            <param name="Output">Smart Contract XML will be output here.</param>
-            <param name="State">Current rendering state.</param>
+            <param name="Renderer">Renderer.</param>
             <param name="Rows">Code rows.</param>
-            <param name="Language">Language used.</param>
-            <param name="Indent">Additional indenting.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
             <param name="Document">Markdown document containing element.</param>
-            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+            <returns>If renderer was able to generate output.</returns>
         </member>
     </members>
 </doc>

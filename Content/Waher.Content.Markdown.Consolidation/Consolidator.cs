@@ -464,9 +464,9 @@ namespace Waher.Content.Markdown.Consolidation
 									if (!(Doc?.Table is null))
 									{
 										if (Table is null)
-											Table = new ConsolidatedTable(P.Key, Doc.Table);
+											Table = await ConsolidatedTable.CreateAsync(P.Key, Doc.Table);
 										else
-											Table.Add(P.Key, Doc.Table);
+											await Table.Add(P.Key, Doc.Table);
 									}
 								}
 							}

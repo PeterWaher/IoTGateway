@@ -11,6 +11,6 @@ BodyOnly: 1
 ```xml
 {{
 Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]);
-Doc.GenerateXAML(Waher.Content.Xml.XML.WriterSettings(true,true))
+Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Doc,Waher.Content.Xml.XML.WriterSettings(true,true))
 }}
 ```

@@ -24,6 +24,7 @@ using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown
 {
@@ -69,7 +70,6 @@ namespace Waher.Content.Markdown
 		private MarkdownDocument detail = null;
 		private readonly MarkdownSettings settings;
 		private int lastFootnote = 0;
-		private bool footnoteBacklinksAdded = false;
 		private bool syntaxHighlighting = false;
 		private bool includesTableOfContents = false;
 		private bool isDynamic = false;
@@ -496,9 +496,11 @@ namespace Waher.Content.Markdown
 				Value is IMatrix ||
 				Value is Array)
 			{
-				StringBuilder Output = new StringBuilder();
-				await InlineScript.GenerateMarkdown(Value, Output, false, Variables);
-				return Output.ToString();
+				using (MarkdownRenderer Renderer = new MarkdownRenderer())
+				{
+					await Renderer.RenderObject(Value, false, Variables);
+					return Renderer.ToString();
+				}
 			}
 			else
 				return Value.ToString();
@@ -673,8 +675,12 @@ namespace Waher.Content.Markdown
 
 					Elements.AddLast(CodeBlock);
 
-					if (!string.IsNullOrEmpty(s) && !CodeBlock.HasHandler)
-						this.syntaxHighlighting = true;
+					if (!this.syntaxHighlighting && !string.IsNullOrEmpty(CodeBlock.Language))
+					{
+						ICodeContentHtmlRenderer HtmlRenderer = CodeBlock.CodeContentHandler<ICodeContentHtmlRenderer>();
+						if (HtmlRenderer is null)
+							this.syntaxHighlighting = true;
+					}
 
 					BlockIndex = i;
 					continue;
@@ -2233,8 +2239,11 @@ namespace Waher.Content.Markdown
 										ch2 = State.PeekNextNonWhitespaceChar(true);
 									}
 
-									foreach (MarkdownElement E in ChildElements)
-										E.GeneratePlainText(Text);
+									using (TextRenderer Renderer = new TextRenderer(Text))
+									{
+										foreach (MarkdownElement E in ChildElements)
+											E.Render(Renderer);
+									}
 
 									this.references[Text.ToString().ToLower()] = new Multimedia(this, null,
 										Elements.First is null && State.PeekNextChar() == 0, Items.ToArray());
@@ -2253,8 +2262,11 @@ namespace Waher.Content.Markdown
 
 								if (string.IsNullOrEmpty(Title))
 								{
-									foreach (MarkdownElement E in ChildElements)
-										E.GeneratePlainText(Text);
+									using (TextRenderer Renderer = new TextRenderer(Text))
+									{
+										foreach (MarkdownElement E in ChildElements)
+											E.Render(Renderer);
+									}
 
 									Title = Text.ToString();
 									Text.Clear();
@@ -4573,7 +4585,7 @@ namespace Waher.Content.Markdown
 
 								if (FirstCharOnLine && State.PeekNextNonWhitespaceCharSameRow(false) == 0)
 								{
-									IMultimediaContent Handler = Multimedia.GetMultimediaHandler(Url);
+									IMultimediaContent Handler = Multimedia.GetMultimediaHandler<IMultimediaHtmlRenderer>(Url);
 									if (!(Handler is null) && Handler.EmbedInlineLink(Url))
 									{
 										ChildElements = new LinkedList<MarkdownElement>();
@@ -4830,7 +4842,7 @@ namespace Waher.Content.Markdown
 			return s.EndsWith(Suffix);
 		}
 
-		private static bool IsSuffixedBy(string s, char ch, out int Count)
+		/*private static bool IsSuffixedBy(string s, char ch, out int Count)
 		{
 			int c = s.Length;
 
@@ -4842,7 +4854,7 @@ namespace Waher.Content.Markdown
 				return false;
 
 			return true;
-		}
+		}*/
 
 		private static bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
 		{
@@ -5020,13 +5032,9 @@ namespace Waher.Content.Markdown
 			bool ExpectPeriod;
 
 			if (ch == '*' || ch == '+' || ch == '-')
-			{
 				ExpectPeriod = false;
-			}
 			else if (ch == '#')
-			{
 				ExpectPeriod = true;
-			}
 			else if (ch == '[')
 			{
 				ExpectPeriod = false;
@@ -5073,73 +5081,29 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates Markdown from the markdown text.
+		/// Renders the document using provided output format.
 		/// </summary>
-		/// <returns>Markdown</returns>
-		public async Task<string> GenerateMarkdown()
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateMarkdown(Output);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates Markdown from the markdown text.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public async Task GenerateMarkdown(StringBuilder Output)
+		/// <param name="Output">Output</param>
+		public async Task RenderDocument(IRenderer Output)
 		{
 			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
 			{
 				await this.LoadMasterIfNotLoaded(Master[0].Key);
-				await this.master.GenerateMarkdown(Output, false);
+				this.master.ClearFootnoteReferences();
+				await Output.RenderDocument(this.master, false);
 			}
 			else
-				await this.GenerateMarkdown(Output, false);
+			{
+				this.ClearFootnoteReferences();
+				await Output.RenderDocument(this, false);
+			}
 
 			this.ProcessAsyncTasks();
 		}
 
 		/// <summary>
-		/// Generates Markdown from the markdown text.
+		/// Clears any footnote references.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Inclusion">If the Markdown is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal async Task GenerateMarkdown(StringBuilder Output, bool Inclusion)
-		{
-			this.ClearFootnoteReferences();
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateMarkdown(Output);
-
-			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
-			{
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (!Guid.TryParse(Key, out _) &&
-						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.AppendLine();
-						Output.AppendLine();
-						Output.Append("[^");
-						Output.Append(Key);
-						Output.Append("]:");
-
-						StringBuilder sb = new StringBuilder();
-
-						await Footnote.GenerateMarkdown(sb);
-
-						foreach (string Row in sb.ToString().Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
-						{
-							Output.Append('\t');
-							Output.AppendLine(Row);
-						}
-					}
-				}
-			}
-		}
-
 		private void ClearFootnoteReferences()
 		{
 			if (!(this.footnotes is null))
@@ -5150,32 +5114,9 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates HTML from the markdown text.
+		/// Order of footnotes.
 		/// </summary>
-		/// <returns>HTML</returns>
-		public async Task<string> GenerateHTML()
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateHTML(Output);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates HTML from the markdown text.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public async Task GenerateHTML(StringBuilder Output)
-		{
-			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
-			{
-				await this.LoadMasterIfNotLoaded(Master[0].Key);
-				await this.master.GenerateHTML(Output, false);
-			}
-			else
-				await this.GenerateHTML(Output, false);
-
-			this.ProcessAsyncTasks();
-		}
+		public IEnumerable<string> FootnoteOrder => this.footnoteOrder;
 
 		private async Task LoadMasterIfNotLoaded(string MasterMetaValue)
 		{
@@ -5308,433 +5249,9 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates HTML from the markdown text.
+		/// If referenced footnotes need to be rendered.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal async Task GenerateHTML(StringBuilder Output, bool Inclusion)
-		{
-			this.ClearFootnoteReferences();
-
-			if (this.settings.HtmlSettings is null)
-				this.settings.HtmlSettings = new HtmlSettings();
-
-			if (!Inclusion && this.metaData.TryGetValue("BODYONLY", out KeyValuePair<string, bool>[] Values))
-			{
-				if (CommonTypes.TryParse(Values[0].Key, out bool b) && b)
-					Inclusion = true;
-			}
-
-			if (!Inclusion)
-			{
-				StringBuilder sb = null;
-				string Title;
-				string Description;
-				string s2;
-				bool First;
-
-				Output.AppendLine("<!DOCTYPE html>");
-				Output.AppendLine("<html itemscope itemtype=\"http://schema.org/WebPage\">");
-				Output.AppendLine("<head>");
-
-				if (this.metaData.TryGetValue("TITLE", out Values))
-				{
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						if (sb is null)
-							sb = new StringBuilder();
-						else
-							sb.Append(' ');
-
-						sb.Append(P.Key);
-					}
-
-					if (this.metaData.TryGetValue("SUBTITLE", out Values))
-					{
-						sb.Append(" -");
-						foreach (KeyValuePair<string, bool> P in Values)
-						{
-							sb.Append(' ');
-							sb.Append(P.Key);
-						}
-					}
-
-					Title = XML.HtmlAttributeEncode(sb.ToString());
-					sb = null;
-
-					Output.Append("<title>");
-					if (string.IsNullOrEmpty(Title))
-						Output.Append(' ');
-					else
-						Output.Append(Title);
-					Output.AppendLine("</title>");
-
-					Output.Append("<meta itemprop=\"name\" content=\"");
-					Output.Append(Title);
-					Output.AppendLine("\"/>");
-
-					Output.Append("<meta name=\"twitter:title\" content=\"");
-					Output.Append(Title);
-					Output.AppendLine("\"/>");
-
-					Output.Append("<meta name=\"og:title\" content=\"");
-					Output.Append(Title);
-					Output.AppendLine("\"/>");
-				}
-				else
-					Output.AppendLine("<title> </title>");
-
-				if (this.metaData.TryGetValue("DESCRIPTION", out Values))
-				{
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						if (sb is null)
-							sb = new StringBuilder();
-						else
-							sb.Append(' ');
-
-						sb.Append(P.Key);
-					}
-
-					if (!(sb is null))
-					{
-						Description = XML.HtmlAttributeEncode(sb.ToString());
-
-						Output.Append("<meta itemprop=\"description\" content=\"");
-						Output.Append(Description);
-						Output.AppendLine("\"/>");
-
-						Output.Append("<meta name=\"twitter:description\" content=\"");
-						Output.Append(Description);
-						Output.AppendLine("\"/>");
-
-						Output.Append("<meta name=\"og:description\" content=\"");
-						Output.Append(Description);
-						Output.AppendLine("\"/>");
-					}
-				}
-
-				if (this.metaData.TryGetValue("AUTHOR", out Values))
-				{
-					if (sb is null || string.IsNullOrEmpty(s2 = sb.ToString()))
-						sb = new StringBuilder("Author:");
-					else
-					{
-						char ch = s2[s2.Length - 1];
-
-						if (!char.IsPunctuation(ch))
-							sb.Append(',');
-
-						sb.Append(" Author:");
-					}
-
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						sb.Append(' ');
-						sb.Append(P.Key);
-					}
-				}
-
-				if (this.metaData.TryGetValue("DATE", out Values))
-				{
-					if (sb is null || string.IsNullOrEmpty(s2 = sb.ToString()))
-						sb = new StringBuilder("Date:");
-					else
-					{
-						char ch = s2[s2.Length - 1];
-
-						if (!char.IsPunctuation(ch))
-							sb.Append(',');
-
-						sb.Append(" Date:");
-					}
-
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						sb.Append(' ');
-						sb.Append(P.Key);
-					}
-				}
-
-				if (!(sb is null))
-				{
-					Output.Append("<meta name=\"description\" content=\"");
-					Output.Append(XML.HtmlAttributeEncode(sb.ToString()));
-					Output.AppendLine("\"/>");
-				}
-
-				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.metaData)
-				{
-					switch (MetaData.Key)
-					{
-						case "ACCESS-CONTROL-ALLOW-ORIGIN":
-						case "ALLOWSCRIPTTAG":
-						case "ALTERNATE":
-						case "AUDIOAUTOPLAY":
-						case "AUDIOCONTROLS":
-						case "BODYONLY":
-						case "CONTENT-SECURITY-POLICY":
-						case "COPYRIGHT":
-						case "CACHE-CONTROL":
-						case "CSS":
-						case "DATE":
-						case "DESCRIPTION":
-						case "HELP":
-						case "ICON":
-						case "INIT":
-						case "JAVASCRIPT":
-						case "LOGIN":
-						case "MASTER":
-						case "NEXT":
-						case "PARAMETER":
-						case "PUBLIC-KEY-PINS":
-						case "PREV":
-						case "PREVIOUS":
-						case "PRIVILEGE":
-						case "SCRIPT":
-						case "STRICT-TRANSPORT-SECURITY":
-						case "SUBTITLE":
-						case "SUNSET":
-						case "TITLE":
-						case "USERVARIABLE":
-						case "VARY":
-						case "VIDEOAUTOPLAY":
-						case "VIDEOCONTROLS":
-							break;
-
-						case "KEYWORDS":
-							First = true;
-							Output.Append("<meta name=\"keywords\" content=\"");
-
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								if (First)
-									First = false;
-								else
-									Output.Append(", ");
-
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-							}
-
-							Output.AppendLine("\"/>");
-							break;
-
-						case "AUTHOR":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<meta name=\"author\" content=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "IMAGE":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								s2 = XML.HtmlAttributeEncode(P.Key);
-
-								Output.Append("<meta itemprop=\"image\" content=\"");
-								Output.Append(s2);
-								Output.AppendLine("\"/>");
-
-								Output.Append("<meta name=\"twitter:image\" content=\"");
-								Output.Append(s2);
-								Output.AppendLine("\"/>");
-
-								Output.Append("<meta name=\"og:image\" content=\"");
-								Output.Append(s2);
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "WEB":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<meta name=\"og:url\" content=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "REFRESH":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<meta http-equiv=\"refresh\" content=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "VIEWPORT":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<meta name=\"viewport\" content=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						default:
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<meta name=\"");
-								Output.Append(XML.HtmlAttributeEncode(MetaData.Key));
-								Output.Append("\" content=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
-								Output.AppendLine("\"/>");
-							}
-							break;
-					}
-				}
-
-				bool HighlightStyle = false;
-
-				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.metaData)
-				{
-					switch (MetaData.Key)
-					{
-						case "COPYRIGHT":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<link rel=\"copyright\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "PREVIOUS":
-						case "PREV":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-
-								Output.Append("<link rel=\"prev\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "NEXT":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<link rel=\"next\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "ALTERNATE":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<link rel=\"alternate\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "HELP":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<link rel=\"help\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "ICON":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<link rel=\"shortcut icon\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "CSS":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								s2 = this.CheckURL(P.Key, null);
-								if (s2.StartsWith("/Highlight/styles/", StringComparison.OrdinalIgnoreCase))
-									HighlightStyle = true;
-
-								Output.Append("<link rel=\"stylesheet\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(s2));
-								Output.AppendLine("\"/>");
-							}
-							break;
-
-						case "JAVASCRIPT":
-							foreach (KeyValuePair<string, bool> P in MetaData.Value)
-							{
-								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
-								Output.AppendLine("\"></script>");
-							}
-							break;
-					}
-				}
-
-				if (this.syntaxHighlighting)
-				{
-					if (!HighlightStyle)
-						Output.AppendLine("<link rel=\"stylesheet\" href=\"/highlight/styles/default.css\">");
-
-					Output.AppendLine("<script src=\"/highlight/highlight.pack.js\"></script>");
-					Output.AppendLine("<script>hljs.initHighlightingOnLoad();</script>");
-				}
-
-				Output.AppendLine("</head>");
-				Output.AppendLine("<body>");
-			}
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateHTML(Output);
-
-			if (this.NeedsToDisplayFootnotes)
-			{
-				Output.AppendLine("<div class=\"footnotes\">");
-				Output.AppendLine("<hr />");
-				Output.AppendLine("<ol>");
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnoteNumberByKey.TryGetValue(Key, out int Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.Append("<li id=\"fn-");
-						Output.Append(Nr.ToString());
-						Output.Append("\">");
-
-						if (!this.footnoteBacklinksAdded)
-						{
-							InlineHTML Backlink = new InlineHTML(this, "<a href=\"#fnref-" + Nr.ToString() + "\" class=\"footnote-backref\">&#8617;</a>");
-
-							if (Footnote.LastChild is Paragraph P)
-								P.AddChildren(Backlink);
-							else
-								Footnote.AddChildren(Backlink);
-						}
-
-						await Footnote.GenerateHTML(Output);
-
-						Output.AppendLine("</li>");
-					}
-				}
-
-				this.footnoteBacklinksAdded = true;
-
-				Output.AppendLine("</ol>");
-				Output.AppendLine("</div>");
-			}
-
-			if (!Inclusion)
-			{
-				Output.AppendLine("</body>");
-				Output.Append("</html>");
-			}
-		}
-
-		private bool NeedsToDisplayFootnotes
+		internal bool NeedsToDisplayFootnotes
 		{
 			get
 			{
@@ -5790,6 +5307,74 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <returns>Markdown</returns>
+		public async Task<string> GenerateMarkdown()
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.GenerateMarkdown(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public async Task GenerateMarkdown(StringBuilder Output)
+		{
+			using (MarkdownRenderer Renderer = new MarkdownRenderer(Output))
+			{
+				await this.RenderDocument(Renderer);
+			}
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <returns>HTML</returns>
+		public async Task<string> GenerateHTML()
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.GenerateHTML(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		public Task GenerateHTML(StringBuilder Output)
+		{
+			return this.GenerateHTML(Output, new HtmlSettings());
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <param name="HtmlSettings">HTML-specific settings.</param>
+		/// <returns>HTML</returns>
+		public async Task<string> GenerateHTML(HtmlSettings HtmlSettings)
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.GenerateHTML(Output, HtmlSettings);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="HtmlSettings">HTML-specific settings.</param>
+		public async Task GenerateHTML(StringBuilder Output, HtmlSettings HtmlSettings)
+		{
+			using (HtmlRenderer Renderer = new HtmlRenderer(Output, HtmlSettings))
+			{
+				await this.RenderDocument(Renderer);
+			}
+		}
+
+		/// <summary>
 		/// Generates Plain Text from the markdown text.
 		/// </summary>
 		/// <returns>Plain Text</returns>
@@ -5806,614 +5391,18 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">Plain Text will be output here.</param>
 		public async Task GeneratePlainText(StringBuilder Output)
 		{
-			this.ClearFootnoteReferences();
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GeneratePlainText(Output);
-
-			if (this.NeedsToDisplayFootnotes)
+			using (TextRenderer Renderer = new TextRenderer(Output))
 			{
-				Output.AppendLine(new string('-', 80));
-				Output.AppendLine();
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnotes.TryGetValue(Key, out Footnote Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.Append('[');
-
-						if (this.footnoteNumberByKey.TryGetValue(Key, out int Nr))
-							Output.Append(Nr.ToString());
-						else
-							Output.Append(Key);
-
-						Output.Append("] ");
-
-						await Footnote.GeneratePlainText(Output);
-					}
-				}
-			}
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <returns>WPF XAML</returns>
-		public Task<string> GenerateXAML()
-		{
-			return this.GenerateXAML(XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <param name="XmlSettings">XML settings.</param>
-		/// <returns>WPF XAML</returns>
-		public async Task<string> GenerateXAML(XmlWriterSettings XmlSettings)
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateXAML(Output, XmlSettings);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">WPF XAML will be output here.</param>
-		public Task GenerateXAML(StringBuilder Output)
-		{
-			return this.GenerateXAML(Output, XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">WPF XAML will be output here.</param>
-		/// <param name="XmlSettings">XML settings.</param>
-		public async Task GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
-		{
-			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
-			{
-				await this.GenerateXAML(w, false);
-			}
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">WPF XAML will be output here.</param>
-		public async Task GenerateXAML(XmlWriter Output)
-		{
-			await this.GenerateXAML(Output, false);
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">Widows XAML will be output here.</param>
-		/// <param name="Inclusion">If the XAML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal async Task GenerateXAML(XmlWriter Output, bool Inclusion)
-		{
-			this.ClearFootnoteReferences();
-
-			if (this.settings.XamlSettings is null)
-				this.settings.XamlSettings = new XamlSettings();
-
-			if (!Inclusion)
-			{
-				Output.WriteStartElement("StackPanel", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
-				Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2006/xaml");
-			}
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateXAML(Output, TextAlignment.Left);
-
-			if (this.NeedsToDisplayFootnotes)
-			{
-				Footnote Footnote;
-				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
-					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," +
-					this.settings.XamlSettings.ParagraphMarginBottom.ToString();
-				string Scale = CommonTypes.Encode(this.settings.XamlSettings.SuperscriptScale);
-				string Offset = this.settings.XamlSettings.SuperscriptOffset.ToString();
-				int Nr;
-				int Row = 0;
-
-				Output.WriteElementString("Separator", string.Empty);
-
-				Output.WriteStartElement("Grid");
-				Output.WriteStartElement("Grid.ColumnDefinitions");
-
-				Output.WriteStartElement("ColumnDefinition");
-				Output.WriteAttributeString("Width", "Auto");
-				Output.WriteEndElement();
-
-				Output.WriteStartElement("ColumnDefinition");
-				Output.WriteAttributeString("Width", "*");
-				Output.WriteEndElement();
-
-				Output.WriteEndElement();
-				Output.WriteStartElement("Grid.RowDefinitions");
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.WriteStartElement("RowDefinition");
-						Output.WriteAttributeString("Height", "Auto");
-						Output.WriteEndElement();
-					}
-				}
-
-				Output.WriteEndElement();
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.WriteStartElement("TextBlock");
-						Output.WriteAttributeString("Text", Nr.ToString());
-						Output.WriteAttributeString("Margin", FootnoteMargin);
-						Output.WriteAttributeString("Grid.Column", "0");
-						Output.WriteAttributeString("Grid.Row", Row.ToString());
-
-						Output.WriteStartElement("TextBlock.LayoutTransform");
-						Output.WriteStartElement("TransformGroup");
-
-						Output.WriteStartElement("ScaleTransform");
-						Output.WriteAttributeString("ScaleX", Scale);
-						Output.WriteAttributeString("ScaleY", Scale);
-						Output.WriteEndElement();
-
-						Output.WriteStartElement("TranslateTransform");
-						Output.WriteAttributeString("Y", Offset);
-						Output.WriteEndElement();
-
-						Output.WriteEndElement();
-						Output.WriteEndElement();
-						Output.WriteEndElement();
-
-						if (Footnote.InlineSpanElement && !Footnote.OutsideParagraph)
-						{
-							Output.WriteStartElement("TextBlock");
-							Output.WriteAttributeString("TextWrapping", "Wrap");
-						}
-						else
-							Output.WriteStartElement("StackPanel");
-
-						Output.WriteAttributeString("Grid.Column", "1");
-						Output.WriteAttributeString("Grid.Row", Row.ToString());
-
-						await Footnote.GenerateXAML(Output, TextAlignment.Left);
-						Output.WriteEndElement();
-
-						Row++;
-					}
-				}
-
-				Output.WriteEndElement();
-			}
-
-			if (!Inclusion)
-			{
-				Output.WriteEndElement();
-				Output.Flush();
+				await this.RenderDocument(Renderer);
 			}
 		}
 
 		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// Gets the multimedia information referenced by a label.
 		/// </summary>
-		/// <returns>Xamarin.Forms XAML</returns>
-		public Task<string> GenerateXamarinForms()
-		{
-			return this.GenerateXamarinForms(XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
-		/// </summary>
-		/// <param name="XmlSettings">XML settings.</param>
-		/// <returns>Xamarin.Forms XAML</returns>
-		public async Task<string> GenerateXamarinForms(XmlWriterSettings XmlSettings)
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateXamarinForms(Output, XmlSettings);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		public Task GenerateXamarinForms(StringBuilder Output)
-		{
-			return this.GenerateXamarinForms(Output, XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		/// <param name="XmlSettings">XML settings.</param>
-		public async Task GenerateXamarinForms(StringBuilder Output, XmlWriterSettings XmlSettings)
-		{
-			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
-			{
-				await this.GenerateXamarinForms(w, false);
-			}
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		public async Task GenerateXamarinForms(XmlWriter Output)
-		{
-			await this.GenerateXamarinForms(Output, false);
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">Widows XamarinForms will be output here.</param>
-		/// <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal async Task GenerateXamarinForms(XmlWriter Output, bool Inclusion)
-		{
-			this.ClearFootnoteReferences();
-
-			if (this.settings.XamlSettings is null)
-				this.settings.XamlSettings = new XamlSettings();
-
-			if (!Inclusion)
-			{
-				Output.WriteStartElement("StackLayout", "http://xamarin.com/schemas/2014/forms");
-				Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2009/xaml");
-				Output.WriteAttributeString("Spacing", "0");
-			}
-
-			XamarinRenderingState State = new XamarinRenderingState();
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateXamarinForms(Output, State);
-
-			if (this.NeedsToDisplayFootnotes)
-			{
-				Footnote Footnote;
-				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
-					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," +
-					this.settings.XamlSettings.ParagraphMarginBottom.ToString();
-				string Scale = CommonTypes.Encode(this.settings.XamlSettings.SuperscriptScale);
-				string Offset = this.settings.XamlSettings.SuperscriptOffset.ToString();
-				int Nr;
-				int Row = 0;
-
-				Output.WriteStartElement("BoxView");
-				Output.WriteAttributeString("HeightRequest", "1");
-				Output.WriteAttributeString("BackgroundColor", this.settings.XamlSettings.TableCellBorderColor);
-				Output.WriteAttributeString("HorizontalOptions", "FillAndExpand");
-				Output.WriteAttributeString("Margin", this.settings.XamlSettings.ParagraphMargins);
-				Output.WriteEndElement();
-
-				Output.WriteStartElement("Grid");
-				Output.WriteAttributeString("RowSpacing", "0");
-				Output.WriteAttributeString("ColumnSpacing", "0");
-
-				Output.WriteStartElement("Grid.ColumnDefinitions");
-
-				Output.WriteStartElement("ColumnDefinition");
-				Output.WriteAttributeString("Width", "Auto");
-				Output.WriteEndElement();
-
-				Output.WriteStartElement("ColumnDefinition");
-				Output.WriteAttributeString("Width", "*");
-				Output.WriteEndElement();
-
-				Output.WriteEndElement();
-				Output.WriteStartElement("Grid.RowDefinitions");
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.WriteStartElement("RowDefinition");
-						Output.WriteAttributeString("Height", "Auto");
-						Output.WriteEndElement();
-					}
-				}
-
-				Output.WriteEndElement();
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (this.footnoteNumberByKey.TryGetValue(Key, out Nr) &&
-						this.footnotes.TryGetValue(Key, out Footnote) &&
-						Footnote.Referenced)
-					{
-						Output.WriteStartElement("ContentView");
-						Output.WriteAttributeString("Margin", FootnoteMargin);
-						Output.WriteAttributeString("Grid.Column", "0");
-						Output.WriteAttributeString("Grid.Row", Row.ToString());
-						Output.WriteAttributeString("Scale", Scale);
-						Output.WriteAttributeString("TranslationY", Offset);
-
-						Output.WriteStartElement("Label");
-						Output.WriteAttributeString("Text", Nr.ToString());
-						Output.WriteEndElement();
-						Output.WriteEndElement();
-
-						Output.WriteStartElement("ContentView");
-						Output.WriteAttributeString("Grid.Column", "1");
-						Output.WriteAttributeString("Grid.Row", Row.ToString());
-						await Footnote.GenerateXamarinForms(Output, State);
-						Output.WriteEndElement();
-
-						Row++;
-					}
-				}
-
-				Output.WriteEndElement();
-			}
-
-			if (!Inclusion)
-			{
-				Output.WriteEndElement();
-				Output.Flush();
-			}
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <returns>Smart Contract XML</returns>
-		public Task<string> GenerateSmartContractXml()
-		{
-			return this.GenerateSmartContractXml(XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="XmlSettings">XML settings.</param>
-		/// <returns>Smart Contract XML</returns>
-		public async Task<string> GenerateSmartContractXml(XmlWriterSettings XmlSettings)
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateSmartContractXml(Output, XmlSettings);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		public Task GenerateSmartContractXml(StringBuilder Output)
-		{
-			return this.GenerateSmartContractXml(Output, XML.WriterSettings(false, true));
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="XmlSettings">XML settings.</param>
-		public async Task GenerateSmartContractXml(StringBuilder Output, XmlWriterSettings XmlSettings)
-		{
-			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
-
-			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
-			{
-				await this.GenerateSmartContractXml(w, null);
-			}
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		public async Task GenerateSmartContractXml(XmlWriter Output)
-		{
-			await this.GenerateSmartContractXml(Output, null);
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
-		internal async Task GenerateSmartContractXml(XmlWriter Output, string LocalName)
-		{
-			this.ClearFootnoteReferences();
-
-			if (this.settings.XamlSettings is null)
-				this.settings.XamlSettings = new XamlSettings();
-
-			if (!string.IsNullOrEmpty(LocalName))
-				Output.WriteStartElement(LocalName);
-
-			SmartContractRenderState State = new SmartContractRenderState();
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateSmartContractXml(Output, State);
-
-			while (State.Level > 0)
-			{
-				Output.WriteEndElement();
-				Output.WriteEndElement();
-				State.Level--;
-			}
-
-			if (this.NeedsToDisplayFootnotes)
-			{
-				int ExpectedNr = 1;
-				bool FootNotesAdded = false;
-
-				foreach (string Key in this.footnoteOrder)
-				{
-					if (!this.footnoteNumberByKey.TryGetValue(Key, out int Nr) ||
-						Nr != ExpectedNr ||
-						!this.footnotes.TryGetValue(Key, out Footnote Note))
-					{
-						continue;
-					}
-
-					ExpectedNr++;
-
-					if (!FootNotesAdded)
-					{
-						FootNotesAdded = true;
-						Output.WriteElementString("separator", string.Empty);
-						Output.WriteStartElement("numberedItems");
-					}
-
-					Output.WriteStartElement("item");
-					await Note.GenerateSmartContractXml(Output, State);
-					Output.WriteEndElement();
-				}
-
-				if (FootNotesAdded)
-					Output.WriteEndElement();
-			}
-
-			if (!string.IsNullOrEmpty(LocalName))
-			{
-				Output.WriteEndElement();
-				Output.Flush();
-			}
-		}
-
-		/// <summary>
-		/// Exports the parsed document to XML.
-		/// </summary>
-		/// <returns>XML String.</returns>
-		public string ExportXml()
-		{
-			StringBuilder Xml = new StringBuilder();
-			this.ExportXml(Xml);
-			return Xml.ToString();
-		}
-
-		/// <summary>
-		/// Exports the parsed document to XML.
-		/// </summary>
-		/// <param name="Xml">XML Output.</param>
-		public void ExportXml(StringBuilder Xml)
-		{
-			this.ExportXml(Xml, XML.WriterSettings(true, true));
-		}
-
-		/// <summary>
-		/// Exports the parsed document to XML.
-		/// </summary>
-		/// <param name="Xml">XML Output.</param>
-		/// <param name="Settings">XML Settings.</param>
-		public void ExportXml(StringBuilder Xml, XmlWriterSettings Settings)
-		{
-			using (XmlWriter w = XmlWriter.Create(Xml, Settings))
-			{
-				this.ExportXml(w);
-				w.Flush();
-			}
-		}
-
-		/// <summary>
-		/// Exports the parsed document to XML.
-		/// </summary>
-		/// <param name="Xml">XML Output.</param>
-		public void ExportXml(XmlWriter Xml)
-		{
-			Xml.WriteStartElement("parsedMakdown", "http://waher.se/Schema/Markdown.xsd");
-			Xml.WriteAttributeString("isDynamic", CommonTypes.Encode(this.isDynamic));
-
-			if (!(this.metaData is null))
-			{
-				Xml.WriteStartElement("metaData");
-
-				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> P in this.metaData)
-				{
-					Xml.WriteStartElement("tag", P.Key);
-
-					foreach (KeyValuePair<string, bool> P2 in P.Value)
-					{
-						Xml.WriteStartElement("value", P2.Key);
-						Xml.WriteAttributeString("lineBreak", CommonTypes.Encode(P2.Value));
-						Xml.WriteEndElement();
-					}
-
-					Xml.WriteEndElement();
-				}
-
-				Xml.WriteEndElement();
-			}
-
-			Xml.WriteStartElement("elements");
-
-			foreach (MarkdownElement E in this.elements)
-				E.Export(Xml);
-
-			Xml.WriteEndElement();
-
-			if (!(this.references is null))
-			{
-				Xml.WriteStartElement("references");
-
-				foreach (KeyValuePair<string, Multimedia> P in this.references)
-				{
-					Xml.WriteStartElement("reference");
-					Xml.WriteAttributeString("key", P.Key);
-
-					P.Value.Export(Xml);
-
-					Xml.WriteEndElement();
-				}
-
-				Xml.WriteEndElement();
-			}
-
-			if (!(this.footnoteOrder is null))
-			{
-				Xml.WriteStartElement("footnotes");
-
-				foreach (string s in this.footnoteOrder)
-				{
-					if (this.footnotes.TryGetValue(s, out Footnote F))
-						F.Export(Xml);
-				}
-
-				Xml.WriteEndElement();
-			}
-
-			Xml.WriteEndElement();
-		}
-
-		internal Multimedia GetReference(string Label)
+		/// <param name="Label">Label</param>
+		/// <returns>Multimedia information if found, null otherwise.</returns>
+		public Multimedia GetReference(string Label)
 		{
 			if (this.references.TryGetValue(Label.ToLower(), out Multimedia Result))
 				return Result;
@@ -6495,37 +5484,29 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Meta-data
+		/// </summary>
+		public IEnumerable<KeyValuePair<string, KeyValuePair<string, bool>[]>> MetaData => this.metaData;
+
+		/// <summary>
+		/// Multimedia references
+		/// </summary>
+		public IEnumerable<KeyValuePair<string, Multimedia>> References => this.references;
+
+		/// <summary>
 		/// Author(s) of document.
 		/// </summary>
-		public string[] Author
-		{
-			get
-			{
-				return this.GetMetaData("Author");
-			}
-		}
+		public string[] Author => this.GetMetaData("Author");
 
 		/// <summary>
 		/// Link to copyright statement.
 		/// </summary>
-		public string[] Copyright
-		{
-			get
-			{
-				return this.GetMetaData("Copyright");
-			}
-		}
+		public string[] Copyright => this.GetMetaData("Copyright");
 
 		/// <summary>
 		/// Link to previous document, in a paginated set of documents.
 		/// </summary>
-		public string[] Previous
-		{
-			get
-			{
-				return this.Merge(this.GetMetaData("Previous"), this.GetMetaData("Prev"));
-			}
-		}
+		public string[] Previous => this.Merge(this.GetMetaData("Previous"), this.GetMetaData("Prev"));
 
 		private string[] Merge(string[] L1, string[] L2)
 		{
@@ -6547,191 +5528,89 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Link to next document, in a paginated set of documents.
 		/// </summary>
-		public string[] Next
-		{
-			get
-			{
-				return this.GetMetaData("Next");
-			}
-		}
+		public string[] Next => this.GetMetaData("Next");
 
 		/// <summary>
 		/// Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.
 		/// </summary>
-		public string[] CSS
-		{
-			get
-			{
-				return this.GetMetaData("CSS");
-			}
-		}
+		public string[] CSS => this.GetMetaData("CSS");
 
 		/// <summary>
 		/// Link(s) to JavaScript files(s) that should be includedin the generated HTML page.
 		/// </summary>
-		public string[] JavaScript
-		{
-			get
-			{
-				return this.GetMetaData("JAVASCRIPT");
-			}
-		}
+		public string[] JavaScript => this.GetMetaData("JAVASCRIPT");
 
 		/// <summary>
 		/// Links to server-side script files that should be included before processing the page.
 		/// </summary>
-		public string[] Script
-		{
-			get
-			{
-				return this.GetMetaData("SCRIPT");
-			}
-		}
+		public string[] Script => this.GetMetaData("SCRIPT");
 
 		/// <summary>
 		/// Links to server-side script files that should be executed before before processing the page.
 		/// Initialization script are only executed once. To execute init script again, a new version
 		/// (timestamp) of the file must be present.
 		/// </summary>
-		public string[] InitializationScript
-		{
-			get
-			{
-				return this.GetMetaData("INIT");
-			}
-		}
+		public string[] InitializationScript => this.GetMetaData("INIT");
 
 		/// <summary>
 		/// Name of a query parameter recognized by the page.
 		/// </summary>
-		public string[] Parameters
-		{
-			get
-			{
-				return this.GetMetaData("PARAMETER");
-			}
-		}
+		public string[] Parameters => this.GetMetaData("PARAMETER");
 
 		/// <summary>
 		/// (Publication) date of document.
 		/// </summary>
-		public string[] Date
-		{
-			get
-			{
-				return this.GetMetaData("Date");
-			}
-		}
+		public string[] Date => this.GetMetaData("Date");
 
 		/// <summary>
 		/// Description of document.
 		/// </summary>
-		public string[] Description
-		{
-			get
-			{
-				return this.GetMetaData("Description");
-			}
-		}
+		public string[] Description => this.GetMetaData("Description");
 
 		/// <summary>
 		/// Link to image for page.
 		/// </summary>
-		public string[] Image
-		{
-			get
-			{
-				return this.GetMetaData("Image");
-			}
-		}
+		public string[] Image => this.GetMetaData("Image");
 
 		/// <summary>
 		/// Keywords.
 		/// </summary>
-		public string[] Keywords
-		{
-			get
-			{
-				return this.GetMetaData("Keywords");
-			}
-		}
+		public string[] Keywords => this.GetMetaData("Keywords");
 
 		/// <summary>
 		/// Subtitle of document.
 		/// </summary>
-		public string[] Subtitle
-		{
-			get
-			{
-				return this.GetMetaData("Subtitle");
-			}
-		}
+		public string[] Subtitle => this.GetMetaData("Subtitle");
 
 		/// <summary>
 		/// Title of document.
 		/// </summary>
-		public string[] Title
-		{
-			get
-			{
-				return this.GetMetaData("Title");
-			}
-		}
+		public string[] Title => this.GetMetaData("Title");
 
 		/// <summary>
 		/// Link to web page
 		/// </summary>
-		public string[] Web
-		{
-			get
-			{
-				return this.GetMetaData("Web");
-			}
-		}
+		public string[] Web => this.GetMetaData("Web");
 
 		/// <summary>
 		/// Tells the browser to refresh the page after a given number of seconds.
 		/// </summary>
-		public string[] Refresh
-		{
-			get
-			{
-				return this.GetMetaData("Refresh");
-			}
-		}
+		public string[] Refresh => this.GetMetaData("Refresh");
 
 		/// <summary>
 		/// Name of the variable that will hold a reference to the IUser interface for the currently logged in user.
 		/// </summary>
-		public string[] UserVariable
-		{
-			get
-			{
-				return this.GetMetaData("UserVariable");
-			}
-		}
+		public string[] UserVariable => this.GetMetaData("UserVariable");
 
 		/// <summary>
 		/// Link to a login page. This page will be shown if the user variable does not contain a user.
 		/// </summary>
-		public string[] Login
-		{
-			get
-			{
-				return this.GetMetaData("Login");
-			}
-		}
+		public string[] Login => this.GetMetaData("Login");
 
 		/// <summary>
 		/// Requered user privileges to display page.
 		/// </summary>
-		public string[] Privileges
-		{
-			get
-			{
-				return this.GetMetaData("Privileges");
-			}
-		}
+		public string[] Privileges => this.GetMetaData("Privileges");
 
 		/// <summary>
 		/// Tries to get the number of a footnote, given its key.
@@ -7063,8 +5942,8 @@ namespace Waher.Content.Markdown
 		public static async Task<string> Compare(string Old, string New, MarkdownSettings Settings, bool KeepUnchanged,
 			params Type[] TransparentExceptionTypes)
 		{
-			MarkdownDocument OldDoc = await MarkdownDocument.CreateAsync(Old, Settings, TransparentExceptionTypes);
-			MarkdownDocument NewDoc = await MarkdownDocument.CreateAsync(New, Settings, TransparentExceptionTypes);
+			MarkdownDocument OldDoc = await CreateAsync(Old, Settings, TransparentExceptionTypes);
+			MarkdownDocument NewDoc = await CreateAsync(New, Settings, TransparentExceptionTypes);
 			MarkdownDocument DiffDoc = await Compare(OldDoc, NewDoc, KeepUnchanged);
 
 			return await DiffDoc.GenerateMarkdown();
@@ -7080,7 +5959,7 @@ namespace Waher.Content.Markdown
 		{
 			// TODO: Meta-data
 
-			MarkdownDocument Result = await MarkdownDocument.CreateAsync(string.Empty, this.settings, this.transparentExceptionTypes);
+			MarkdownDocument Result = await CreateAsync(string.Empty, this.settings, this.transparentExceptionTypes);
 			IEnumerable<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
 
 			foreach (MarkdownElement E in Edit)
@@ -7393,7 +6272,10 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		internal void ProcessAsyncTasks()
+		/// <summary>
+		/// Processes any registered asynchronous tasks. This method is normally only called from renderers of documents.
+		/// </summary>
+		public void ProcessAsyncTasks()
 		{
 			KeyValuePair<AsyncMarkdownProcessing, object>[] Tasks;
 
@@ -7536,180 +6418,6 @@ namespace Waher.Content.Markdown
 		/// To what extent the object supports JSON encoding.
 		/// </summary>
 		public Grade CanEncodeJson => Grade.NotAtAll;   // Document reference from child nodes create a stack overflow.
-
-
-		/// <summary>
-		/// Generates HTML from the markdown text.
-		/// </summary>
-		/// <returns>HTML</returns>
-		public async Task<string> GenerateLaTeX()
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.GenerateLaTeX(Output);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Generates HTML from the markdown text.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public async Task GenerateLaTeX(StringBuilder Output)
-		{
-			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
-			{
-				await this.LoadMasterIfNotLoaded(Master[0].Key);
-				await this.master.GenerateLaTeX(Output, false);
-			}
-			else
-				await this.GenerateLaTeX(Output, false);
-
-			this.ProcessAsyncTasks();
-		}
-
-		/// <summary>
-		/// Generates HTML from the markdown text.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal async Task GenerateLaTeX(StringBuilder Output, bool Inclusion)
-		{
-			this.ClearFootnoteReferences();
-
-			if (this.settings.LaTeXSettings is null)
-				this.settings.LaTeXSettings = new LaTeXSettings();
-
-			if (!Inclusion && this.metaData.TryGetValue("BODYONLY", out KeyValuePair<string, bool>[] Values))
-			{
-				if (CommonTypes.TryParse(Values[0].Key, out bool b) && b)
-					Inclusion = true;
-			}
-
-			if (!Inclusion)
-			{
-				bool MakeTitle = false;
-
-				Output.Append("\\documentclass[");
-				Output.Append(this.settings.LaTeXSettings.DefaultFontSize.ToString());
-				Output.Append("pt, ");
-
-				switch (this.settings.LaTeXSettings.PaperFormat)
-				{
-					case LaTeXPaper.A4:
-					default:
-						Output.Append("a4paper");
-						break;
-
-					case LaTeXPaper.Letter:
-						Output.Append("letterpaper");
-						break;
-				}
-
-				Output.Append("]{");
-				switch (this.settings.LaTeXSettings.DocumentClass)
-				{
-					case LaTeXDocumentClass.Article:
-					default:
-						Output.Append("article");
-						break;
-
-					case LaTeXDocumentClass.Report:
-						Output.Append("report");
-						break;
-
-					case LaTeXDocumentClass.Book:
-						Output.Append("book");
-						break;
-
-					case LaTeXDocumentClass.Standalone:
-						Output.Append("standalone");
-						break;
-				}
-				Output.AppendLine("}");
-
-				// Strike-out cf. https://tex.stackexchange.com/questions/546884/strikethrough-command-in-latex
-				Output.AppendLine("\\newlength{\\wdth}");
-				Output.AppendLine("\\newcommand{\\strike}[1]{\\settowidth{\\wdth}{#1}\\rlap{\\rule[.5ex]{\\wdth}{.4pt}}#1}");
-
-				if (this.metaData.TryGetValue("TITLE", out Values))
-				{
-					MakeTitle = true;
-
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						Output.Append("\\title{");
-						Output.Append(P.Key);
-						Output.AppendLine("}");
-					}
-
-					if (this.metaData.TryGetValue("SUBTITLE", out Values))
-					{
-						foreach (KeyValuePair<string, bool> P2 in Values)
-						{
-							Output.Append("\\subtitle{");
-							Output.Append(P2.Key);
-							Output.AppendLine("}");
-						}
-					}
-				}
-
-				if (this.metaData.TryGetValue("AUTHOR", out Values))
-				{
-					MakeTitle = true;
-
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						Output.Append("\\author{");
-						Output.Append(P.Key);
-						Output.AppendLine("}");
-					}
-				}
-
-				if (this.metaData.TryGetValue("DATE", out Values))
-				{
-					MakeTitle = true;
-
-					foreach (KeyValuePair<string, bool> P in Values)
-					{
-						Output.Append("\\date{");
-						Output.Append(P.Key);
-						Output.AppendLine("}");
-					}
-				}
-
-				// Todo-lists in LaTeX, cf. https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
-
-				Output.AppendLine("\\usepackage{enumitem}");
-				Output.AppendLine("\\usepackage{amssymb}");
-				Output.AppendLine("\\usepackage{graphicx}");
-				Output.AppendLine("\\usepackage{pifont}");
-				Output.AppendLine("\\usepackage{multirow}");
-				Output.AppendLine("\\usepackage{ragged2e}");
-				Output.AppendLine("\\newlist{tasklist}{itemize}{2}");
-				Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
-				Output.AppendLine("\\newcommand{\\checkmarksymbol}{\\ding{51}}");
-				Output.AppendLine("\\newcommand{\\checked}{\\rlap{$\\square$}{\\raisebox{2pt}{\\large\\hspace{1pt}\\checkmarksymbol}}\\hspace{-2.5pt}}");
-				Output.AppendLine("\\begin{document}");
-
-				if (MakeTitle)
-					Output.AppendLine("\\maketitle");
-
-				if (this.metaData.TryGetValue("DESCRIPTION", out Values))
-				{
-					Output.AppendLine("\\begin{abstract}");
-
-					foreach (KeyValuePair<string, bool> P in Values)
-						Output.AppendLine(InlineText.EscapeLaTeX(P.Key));
-
-					Output.AppendLine("\\end{abstract}");
-				}
-			}
-
-			foreach (MarkdownElement E in this.elements)
-				await E.GenerateLaTeX(Output);
-
-			if (!Inclusion)
-				Output.AppendLine("\\end{document}");
-		}
 
 		// TODO: Footnotes in included markdown files.
 	}

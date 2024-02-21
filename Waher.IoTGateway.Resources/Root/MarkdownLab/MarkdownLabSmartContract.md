@@ -11,6 +11,6 @@ BodyOnly: 1
 ```xml
 {{
 Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]);
-Doc.GenerateSmartContractXml(Waher.Content.Xml.XML.WriterSettings(true,true))
+Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Doc,Waher.Content.Xml.XML.WriterSettings(true,true))
 }}
 ```

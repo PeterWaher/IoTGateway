@@ -1,4 +1,4 @@
-﻿namespace Waher.Content.Markdown
+﻿namespace Waher.Content.Markdown.Latex
 {
 	/// <summary>
 	/// Document class of LaTeX output.

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Waher.Runtime.Inventory;
+﻿using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -23,76 +19,5 @@ namespace Waher.Content.Markdown.Model
 		/// </summary>
 		/// <param name="Url">Inline link.</param>
 		bool EmbedInlineLink(string Url);
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document);
-
-		/// <summary>
-		/// Generates Plain Text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GeneratePlainText(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document);
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items, 
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document);
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, MultimediaItem[] Items,
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document);
-
-		/// <summary>
-		/// Generates LaTeX text for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document);
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
-			MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph,
-			MarkdownDocument Document);
 	}
 }

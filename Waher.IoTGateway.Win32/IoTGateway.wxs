@@ -567,10 +567,15 @@
 							<File Id='Waher.Content.Images.dll' Name='Waher.Content.Images.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Images.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Contracts.dll' Name='Waher.Content.Markdown.Contracts.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.GraphViz.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Latex.dll' Name='Waher.Content.Markdown.Latex.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Latex.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Layout2D.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Wpf.dll' Name='Waher.Content.Markdown.Wpf.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Wpf.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xamarin.dll' Name='Waher.Content.Markdown.Xamarin.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xamarin.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xml.dll' Name='Waher.Content.Markdown.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Content.QR.dll' Name='Waher.Content.QR.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.dll' Vital='yes'/>
 							<File Id='Waher.Content.Rss.dll' Name='Waher.Content.Rss.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Rss.dll' Vital='yes'/>
 							<File Id='Waher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.dll' Vital='yes'/>
@@ -698,10 +703,15 @@
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Contracts.dll' Name='Waher.Content.Markdown.Contracts.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Latex.dll' Name='Waher.Content.Markdown.Latex.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Wpf.dll' Name='Waher.Content.Markdown.Wpf.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xamarin.dll' Name='Waher.Content.Markdown.Xamarin.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xml.dll' Name='Waher.Content.Markdown.Xml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.dll' Name='Waher.Content.QR.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Rss.dll' Name='Waher.Content.Rss.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Semantic.dll' Name='Waher.Content.Semantic.dll' On='uninstall'/>

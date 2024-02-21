@@ -9,60 +9,60 @@
 			<DefinitionTerms>
 				<InlineText>Apple</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Orange</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 		<HorizontalRule />
 		<DefinitionList>
 			<DefinitionTerms>
 				<InlineText>Apple</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Orange</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 		<HorizontalRule />
 		<DefinitionList>
 			<DefinitionTerms>
 				<InlineText>Apple</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
 				</NestedBlock>
 				<NestedBlock>
 					<InlineText>An American computer company.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Orange</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 		<HorizontalRule />
 		<DefinitionList>
@@ -72,45 +72,45 @@
 					<InlineText>Term 2</InlineText>
 				</NestedBlock>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>Definition a</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Term 3</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<InlineText>Definition b</InlineText>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 		<HorizontalRule />
 		<DefinitionList>
 			<DefinitionTerms>
 				<InlineText>Apple</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<Paragraph>
 					<InlineText>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</InlineText>
 				</Paragraph>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Orange</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<Paragraph>
 					<InlineText>The fruit of an evergreen tree of the genus Citrus.</InlineText>
 				</Paragraph>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 		<HorizontalRule />
 		<DefinitionList>
 			<DefinitionTerms>
 				<InlineText>Term 1</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>This is a definition with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</InlineText>
@@ -122,11 +122,11 @@
 				<Paragraph>
 					<InlineText>Second definition for term 1, also wrapped in a paragraph because of the blank line preceding it.</InlineText>
 				</Paragraph>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 			<DefinitionTerms>
 				<InlineText>Term 2</InlineText>
 			</DefinitionTerms>
-			<DefinitionDescription>
+			<DefinitionDescriptions>
 				<NestedBlock>
 					<Paragraph>
 						<InlineText>This definition has a code block, a blockquote and a list.</InlineText>
@@ -148,7 +148,7 @@
 						</NumberedItem>
 					</NumberedList>
 				</NestedBlock>
-			</DefinitionDescription>
+			</DefinitionDescriptions>
 		</DefinitionList>
 	</elements>
 	<references />

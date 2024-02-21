@@ -1,7 +1,5 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Markdown.Model.BlockElements;
+﻿using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -29,37 +27,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public int Code => this.code;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
-		{
-			return this.GenerateHTML(Output);
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("&#");
-			Output.Append(this.code.ToString());
-			Output.Append(';');
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			Output.Append((char)this.code);
-
-			return Task.CompletedTask;
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -68,65 +39,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			Output.WriteValue(new string((char)this.code, 1));
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			Paragraph.GenerateXamarinFormsSpan(Output, new string((char)this.code, 1), State);
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Output.WriteElementString("text", new string((char)this.code, 1));
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override Task GenerateLaTeX(StringBuilder Output)
-		{
-			Output.Append(InlineText.EscapeLaTeX(new string((char)this.code, 1)));
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteElementString("HtmlEntityUnicode", this.code.ToString());
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.

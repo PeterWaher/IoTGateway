@@ -1,6 +1,5 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -37,204 +36,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public int CheckPosition => this.checkPosition;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			await PrefixedBlock(Output, this.Child, this.isChecked ? "[x]\t" : "[ ]\t", "\t");
-			Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("<li class=\"taskListItem\"><input disabled=\"disabled");
-			
-			if (this.checkPosition > 0)
-			{
-				Output.Append("\" id=\"item");
-				Output.Append(this.checkPosition.ToString());
-				Output.Append("\" data-position=\"");
-				Output.Append(this.checkPosition.ToString());
-			}
-
-			Output.Append("\" type=\"checkbox\"");
-
-			if (this.isChecked)
-				Output.Append(" checked=\"checked\"");
-
-			Output.Append("/><span></span><label class=\"taskListItemLabel\"");
-
-			if (this.checkPosition > 0)
-			{
-				Output.Append(" for=\"item");
-				Output.Append(this.checkPosition.ToString());
-				Output.Append("\"");
-			}
-
-			Output.Append('>');
-
-			if (this.Child is NestedBlock NestedBlock)
-			{
-				bool EndLabel = true;
-				bool First = true;
-
-				foreach (MarkdownElement E in NestedBlock.Children)
-				{
-					if (First)
-					{
-						First = false;
-
-						if (E.InlineSpanElement)
-							await E.GenerateHTML(Output);
-						else
-						{
-							await NestedBlock.GenerateHTML(Output);
-							break;
-						}
-					}
-					else
-					{
-						if (!E.InlineSpanElement)
-						{
-							Output.Append("</label>");
-							EndLabel = false;
-						}
-
-						await E.GenerateHTML(Output);
-					}
-				}
-
-				if (EndLabel)
-					Output.Append("</label>");
-
-				Output.AppendLine("</li>");
-			}
-			else
-			{
-				await this.Child.GenerateHTML(Output);
-				Output.AppendLine("</label></li>");
-			}
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			if (this.isChecked)
-				Output.Append("[X] ");
-			else
-				Output.Append("[ ] ");
-
-			StringBuilder sb = new StringBuilder();
-			await this.Child.GeneratePlainText(sb);
-
-			string s = sb.ToString();
-
-			Output.Append(s);
-
-			if (!s.EndsWith("\n"))
-				Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Output.WriteStartElement("row");
-			Output.WriteStartElement("cell");
-			Output.WriteAttributeString("alignment", "Center");
-			Output.WriteAttributeString("colSpan", "1");
-			Output.WriteAttributeString("header", "false");
-			Output.WriteElementString("text", this.isChecked ? "✓" : " ");
-			Output.WriteEndElement();
-
-			Output.WriteStartElement("cell");
-			Output.WriteAttributeString("alignment", "Left");
-			Output.WriteAttributeString("colSpan", "1");
-			Output.WriteAttributeString("header", "false");
-
-			await this.Child.GenerateSmartContractXml(Output, State);
-			
-			Output.WriteEndElement();
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			return this.Child.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			return this.Child.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			Output.Append("\\item");
-
-			if (this.isChecked)
-				Output.Append("[\\checked]");
-
-			Output.Append('{');
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
-			Output.AppendLine("}");
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => this.Child.InlineSpanElement;
-
-		/// <summary>
-		/// Gets margins for content.
-		/// </summary>
-		/// <param name="TopMargin">Top margin.</param>
-		/// <param name="BottomMargin">Bottom margin.</param>
-		internal override void GetMargins(out int TopMargin, out int BottomMargin)
-		{
-			this.Child.GetMargins(out TopMargin, out BottomMargin);
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("TaskItem");
-			Output.WriteAttributeString("isChecked", CommonTypes.Encode(this.isChecked));
-			this.ExportChild(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => this.Child.InlineSpanElement;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

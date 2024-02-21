@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Waher.Content.Markdown
+namespace Waher.Content.Markdown.Wpf
 {
 	/// <summary>
 	/// Contains settings that the XAML export uses to customize XAML output.

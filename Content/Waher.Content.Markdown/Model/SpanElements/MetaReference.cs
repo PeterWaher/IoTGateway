@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Markdown.Model.BlockElements;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Rendering;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -33,66 +29,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Key => this.key;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
-		{
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
-
-					Output.Append(MarkdownDocument.Encode(P.Key));
-					if (P.Value)
-					{
-						Output.AppendLine("  ");
-						FirstOnRow = true;
-					}
-				}
-			}
-
-			return Task.CompletedTask;
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// Tries to get meta-data from the document.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
+		/// <param name="Values">Values, if found.</param>
+		/// <returns>If meta-data was found.</returns>
+		public bool TryGetMetaData(out KeyValuePair<string, bool>[] Values)
 		{
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
-
-					Output.Append(XML.HtmlValueEncode(P.Key));
-					if (P.Value)
-					{
-						Output.AppendLine("<br/>");
-						FirstOnRow = true;
-					}
-				}
-			}
-	
-			return Task.CompletedTask;
-		}
-
-		private bool TryGetMetaData(out KeyValuePair<string, bool>[] Values)
-		{
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document?.TryGetMetaData(this.key, out Values) ?? false)
 				return true;
 
 			Variables Variables = this.Document.Settings.Variables;
@@ -106,35 +55,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			return false;
 		}
 
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
-
-					Output.Append(P.Key);
-					if (P.Value)
-					{
-						Output.AppendLine();
-						FirstOnRow = true;
-					}
-				}
-			}
-
-			return Task.CompletedTask;
-		}
-
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -142,128 +62,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.WriteValue(' ');
-
-					Output.WriteValue(P.Key);
-					if (P.Value)
-					{
-						Output.WriteElementString("LineBreak", string.Empty);
-						FirstOnRow = true;
-					}
-				}
-			}
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			StringBuilder sb = new StringBuilder();
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						sb.Append(' ');
-
-					sb.Append(P.Key);
-					if (P.Value)
-					{
-						sb.Append(Environment.NewLine);
-						FirstOnRow = true;
-					}
-				}
-			}
-
-			Paragraph.GenerateXamarinFormsSpan(Output, sb.ToString(), State);
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Output.WriteStartElement("parameter");
-			Output.WriteAttributeString("name", this.key);
-			Output.WriteEndElement();
-		
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override Task GenerateLaTeX(StringBuilder Output)
-		{
-			bool FirstOnRow = true;
-
-			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
-			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
-
-					Output.Append(InlineText.EscapeLaTeX(P.Key));
-
-					if (P.Value)
-					{
-						Output.AppendLine();
-						FirstOnRow = true;
-					}
-				}
-			}
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("MetaReference");
-			Output.WriteAttributeString("key", this.key);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.

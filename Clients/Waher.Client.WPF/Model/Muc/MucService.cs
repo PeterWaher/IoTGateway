@@ -36,17 +36,17 @@ namespace Waher.Client.WPF.Model.Muc
 				{ string.Empty, new Loading(this) }
 			};
 
-			this.mucClient.OccupantPresence += MucClient_OccupantPresence;
-			this.mucClient.OccupantRequest += MucClient_OccupantRequest;
-			this.mucClient.PrivateMessageReceived += MucClient_PrivateMessageReceived;
-			this.mucClient.RegistrationRequest += MucClient_RegistrationRequest;
-			this.mucClient.RoomDeclinedInvitationReceived += MucClient_RoomDeclinedInvitationReceived;
-			this.mucClient.RoomDestroyed += MucClient_RoomDestroyed;
-			this.mucClient.RoomInvitationReceived += MucClient_RoomInvitationReceived;
-			this.mucClient.RoomMessage += MucClient_RoomMessage;
-			this.mucClient.RoomOccupantMessage += MucClient_RoomOccupantMessage;
-			this.mucClient.RoomPresence += MucClient_RoomPresence;
-			this.mucClient.RoomSubject += MucClient_RoomSubject;
+			this.mucClient.OccupantPresence += this.MucClient_OccupantPresence;
+			this.mucClient.OccupantRequest += this.MucClient_OccupantRequest;
+			this.mucClient.PrivateMessageReceived += this.MucClient_PrivateMessageReceived;
+			this.mucClient.RegistrationRequest += this.MucClient_RegistrationRequest;
+			this.mucClient.RoomDeclinedInvitationReceived += this.MucClient_RoomDeclinedInvitationReceived;
+			this.mucClient.RoomDestroyed += this.MucClient_RoomDestroyed;
+			this.mucClient.RoomInvitationReceived += this.MucClient_RoomInvitationReceived;
+			this.mucClient.RoomMessage += this.MucClient_RoomMessage;
+			this.mucClient.RoomOccupantMessage += this.MucClient_RoomOccupantMessage;
+			this.mucClient.RoomPresence += this.MucClient_RoomPresence;
+			this.mucClient.RoomSubject += this.MucClient_RoomSubject;
 			this.handlersAdded = true;
 		}
 
@@ -78,17 +78,17 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			if (this.handlersAdded)
 			{
-				this.mucClient.OccupantPresence -= MucClient_OccupantPresence;
-				this.mucClient.OccupantRequest -= MucClient_OccupantRequest;
-				this.mucClient.PrivateMessageReceived -= MucClient_PrivateMessageReceived;
-				this.mucClient.RegistrationRequest -= MucClient_RegistrationRequest;
-				this.mucClient.RoomDeclinedInvitationReceived -= MucClient_RoomDeclinedInvitationReceived;
-				this.mucClient.RoomDestroyed -= MucClient_RoomDestroyed;
-				this.mucClient.RoomInvitationReceived -= MucClient_RoomInvitationReceived;
-				this.mucClient.RoomMessage -= MucClient_RoomMessage;
-				this.mucClient.RoomOccupantMessage -= MucClient_RoomOccupantMessage;
-				this.mucClient.RoomPresence -= MucClient_RoomPresence;
-				this.mucClient.RoomSubject -= MucClient_RoomSubject;
+				this.mucClient.OccupantPresence -= this.MucClient_OccupantPresence;
+				this.mucClient.OccupantRequest -= this.MucClient_OccupantRequest;
+				this.mucClient.PrivateMessageReceived -= this.MucClient_PrivateMessageReceived;
+				this.mucClient.RegistrationRequest -= this.MucClient_RegistrationRequest;
+				this.mucClient.RoomDeclinedInvitationReceived -= this.MucClient_RoomDeclinedInvitationReceived;
+				this.mucClient.RoomDestroyed -= this.MucClient_RoomDestroyed;
+				this.mucClient.RoomInvitationReceived -= this.MucClient_RoomInvitationReceived;
+				this.mucClient.RoomMessage -= this.MucClient_RoomMessage;
+				this.mucClient.RoomOccupantMessage -= this.MucClient_RoomOccupantMessage;
+				this.mucClient.RoomPresence -= this.MucClient_RoomPresence;
+				this.mucClient.RoomSubject -= this.MucClient_RoomSubject;
 				this.handlersAdded = false;
 			}
 		}

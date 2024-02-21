@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -31,89 +30,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public bool AloneInParagraph => this.aloneInParagraph;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('!');
-			await base.GenerateMarkdown(Output);
-
-			if (this.aloneInParagraph)
-			{
-				Output.AppendLine();
-				Output.AppendLine();
-			}
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.Label);
-
-			if (!(Multimedia is null))
-				await Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			await base.GeneratePlainText(Output);
-
-			if (this.aloneInParagraph)
-			{
-				Output.AppendLine();
-				Output.AppendLine();
-			}
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.Label);
-
-			if (!(Multimedia is null))
-			{
-				await Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children,
-					this.aloneInParagraph, this.Document);
-			}
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.Label);
-
-			if (!(Multimedia is null))
-			{
-				await Multimedia.MultimediaHandler.GenerateXamarinForms(Output, State, Multimedia.Items, this.Children,
-					this.aloneInParagraph, this.Document);
-			}
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph => true;
+		public override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.
@@ -149,38 +79,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 			Multimedia.IncrementStatistics(Statistics, Multimedia?.Items);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.Label);
-
-			if (!(Multimedia is null))
-			{
-				await Multimedia.MultimediaHandler.GenerateLaTeX(Output, Multimedia.Items, this.Children,
-					this.aloneInParagraph, this.Document);
-			}
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.Label);
-
-			if (!(Multimedia is null))
-			{
-				await Multimedia.MultimediaHandler.GenerateSmartContractXml(Output, State,
-					Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
-			}
 		}
 	}
 }

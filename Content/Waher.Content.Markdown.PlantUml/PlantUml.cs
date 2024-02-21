@@ -1,14 +1,18 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
+using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.CodeContent;
-using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Wpf;
+using Waher.Content.Markdown.Xamarin;
 using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -24,7 +28,8 @@ namespace Waher.Content.Markdown.PlantUml
 	/// <summary>
 	/// Class managing PlantUML integration into Markdown documents.
 	/// </summary>
-	public class PlantUml : IImageCodeContent
+	public class PlantUml : IImageCodeContent, ICodeContentHtmlRenderer, ICodeContentTextRenderer, ICodeContentMarkdownRenderer,
+		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
@@ -221,46 +226,17 @@ namespace Waher.Content.Markdown.PlantUml
 		}
 
 		/// <summary>
-		/// If (transportable) Markdown is handled.
+		/// Generates HTML for the code content.
 		/// </summary>
-		public bool HandlesMarkdown => true;
-
-		/// <summary>
-		/// If HTML is handled.
-		/// </summary>
-		public bool HandlesHTML => true;
-
-		/// <summary>
-		/// If Plain Text is handled.
-		/// </summary>
-		public bool HandlesPlainText => true;
-
-		/// <summary>
-		/// If XAML is handled.
-		/// </summary>
-		public bool HandlesXAML => true;
-
-		/// <summary>
-		/// If LaTeX is handled.
-		/// </summary>
-		public bool HandlesLaTeX => true;
-
-		/// <summary>
-		/// If smart-contract XML is handled.
-		/// </summary>
-		public bool HandlesSmartContract => true;
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
+			StringBuilder Output = Renderer.Output;
 			bool GenerateIfNotExists = asyncHtmlOutput is null;
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Svg, GenerateIfNotExists);
 			if (GenerateIfNotExists || File.Exists(Info.ImageFileName))
@@ -302,33 +278,38 @@ namespace Waher.Content.Markdown.PlantUml
 
 		private async Task ExecutePlantUml(object State)
 		{
-			AsyncState AsyncState = (AsyncState)State;
-			StringBuilder Output = new StringBuilder();
-
-			try
+			using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
 			{
-				await this.ExecutePlantUml(AsyncState.Type, AsyncState.GraphInfos.ToArray());
+				XmlEntitiesOnly = true
+			}))
+			{
+				AsyncState AsyncState = (AsyncState)State;
 
-				foreach (GraphInfo Info in AsyncState.GraphInfos)
+				try
 				{
-					Output.Clear();
+					await this.ExecutePlantUml(AsyncState.Type, AsyncState.GraphInfos.ToArray());
 
-					this.GenerateHTML(Output, Info);
-					await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Info.AsyncId, Output.ToString());
-					Info.Sent = true;
+					foreach (GraphInfo Info in AsyncState.GraphInfos)
+					{
+						Renderer.Clear();
+
+						this.GenerateHTML(Renderer.Output, Info);
+						await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Info.AsyncId, Renderer.ToString());
+						Info.Sent = true;
+					}
 				}
-			}
-			catch (Exception ex)
-			{
-				Output.Clear();
-				await InlineScript.GenerateHTML(ex, Output, true, new Variables());
-
-				string s = Output.ToString();
-
-				foreach (GraphInfo Info in AsyncState.GraphInfos)
+				catch (Exception ex)
 				{
-					if (!Info.Sent)
-						await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Info.AsyncId, s);
+					Renderer.Clear();
+					await Renderer.RenderObject(ex, true, new Variables());
+
+					string s = Renderer.ToString();
+
+					foreach (GraphInfo Info in AsyncState.GraphInfos)
+					{
+						if (!Info.Sent)
+							await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Info.AsyncId, s);
+					}
 				}
 			}
 		}
@@ -491,65 +472,65 @@ namespace Waher.Content.Markdown.PlantUml
 			GraphInfo Result = await this.GetGraphInfo(Language, Rows, Type);
 
 			if (GenerateIfNotExists && !File.Exists(Result.ImageFileName))
-				await this.ExecutePlantUml(Type, Result)
-;
+				await this.ExecutePlantUml(Type, Result);
 			return Result;
 		}
 
 		/// <summary>
-		/// Generates (transportanle) Markdown for the markdown element.
+		/// Generates Markdown for the code content.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
-			return await ImageContent.GenerateMarkdownFromFile(Output, Info.ImageFileName, Info.Title);
+			return await ImageContent.GenerateMarkdownFromFile(Renderer.Output, Info.ImageFileName, Info.Title);
 		}
 
 
 		/// <summary>
-		/// Generates Plain Text for the markdown element.
+		/// Generates plain text for the code content.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Svg, true);
 			if (Info is null)
 				return false;
 
-			Output.AppendLine(Info.Title);
+			Renderer.Output.AppendLine(Info.Title);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
+		/// Generates WPF XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
+
+			XmlWriter Output = Renderer.XmlOutput;
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Info.ImageFileName);
@@ -562,22 +543,22 @@ namespace Waher.Content.Markdown.PlantUml
 
 			return true;
 		}
-
 		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// Generates Xamarin.Forms XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
+
+			XmlWriter Output = Renderer.XmlOutput;
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Info.ImageFileName);
@@ -587,18 +568,18 @@ namespace Waher.Content.Markdown.PlantUml
 		}
 
 		/// <summary>
-		/// Generates LaTeX text for the markdown element.
+		/// Generates LaTeX for the code content.
 		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
-			MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			StringBuilder Output = Renderer.Output;
 
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");
@@ -610,7 +591,7 @@ namespace Waher.Content.Markdown.PlantUml
 			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("\\caption{");
-				Output.Append(InlineText.EscapeLaTeX(Info.Title));
+				Output.Append(LatexRenderer.EscapeLaTeX(Info.Title));
 				Output.AppendLine("}");
 			}
 
@@ -660,18 +641,15 @@ namespace Waher.Content.Markdown.PlantUml
 		}
 
 		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// Generates smart contract XML for the code content.
 		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
-			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderContractXml(ContractsRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			try
 			{
@@ -685,6 +663,7 @@ namespace Waher.Content.Markdown.PlantUml
 				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
 					return false;
 
+				XmlWriter Output = Renderer.XmlOutput;
 				int Width = Image.Width;
 				int Height = Image.Height;
 

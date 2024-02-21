@@ -4,12 +4,14 @@
 <paragraph>
 	<text>It is written in two columns.</text>
 </paragraph>
+<separator />
 <paragraph>
 	<text>This is section 2.</text>
 </paragraph>
 <paragraph>
 	<text>It is written in one column.</text>
 </paragraph>
+<separator />
 <paragraph>
 	<text>This is section 3.</text>
 </paragraph>

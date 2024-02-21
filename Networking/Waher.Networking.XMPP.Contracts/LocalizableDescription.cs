@@ -63,27 +63,5 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			return Contract.ToPlainText(this.descriptions, Language);
 		}
-
-		/// <summary>
-		/// Creates a human-readable WPF XAML document for the contract.
-		/// </summary>
-		/// <param name="Language">Desired language</param>
-		/// <param name="Contract">Contract hosting the object.</param>
-		/// <returns>Markdown</returns>
-		public Task<string> ToXAML(string Language, Contract Contract)
-		{
-			return Contract.ToXAML(this.descriptions, Language);
-		}
-
-		/// <summary>
-		/// Creates a human-readable Xamarin.Forms XAML document for the contract.
-		/// </summary>
-		/// <param name="Language">Desired language</param>
-		/// <param name="Contract">Contract hosting the object.</param>
-		/// <returns>Markdown</returns>
-		public Task<string> ToXamarinForms(string Language, Contract Contract)
-		{
-			return Contract.ToXamarinForms(this.descriptions, Language);
-		}
 	}
 }

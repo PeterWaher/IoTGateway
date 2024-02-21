@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
+using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -109,8 +110,6 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Script element.</returns>
 		public static async Task<IElement> Evaluate(MarkdownElement Element)
 		{
-			StringBuilder sb;
-
 			if (Element is Model.BlockElements.Table Table)
 			{
 				if (Table.Headers.Length == 1)
@@ -157,7 +156,7 @@ namespace Waher.Content.Markdown.Functions
 						return await Model.CodeContent.GraphContent.GetGraph(CodeBlock.Rows);
 
 					case "xml":
-						sb = new StringBuilder();
+						StringBuilder sb = new StringBuilder();
 
 						foreach (string Row in CodeBlock.Rows)
 							sb.AppendLine(Row);
@@ -168,7 +167,9 @@ namespace Waher.Content.Markdown.Functions
 						return new ObjectValue(Doc);
 
 					default:
-						if (CodeBlock.Handler is IImageCodeContent ImageCodeContent)
+						ICodeContentHtmlRenderer Renderer = CodeBlock.CodeContentHandler<ICodeContentHtmlRenderer>();
+
+						if (Renderer is IImageCodeContent ImageCodeContent)
 						{
 							PixelInformation Pixels = await ImageCodeContent.GenerateImage(CodeBlock.Rows, Language, Element.Document);
 							return new GraphBitmap(Pixels);
@@ -179,24 +180,26 @@ namespace Waher.Content.Markdown.Functions
 			else if (Element is null)
 				return ObjectValue.Null;
 
-			sb = new StringBuilder();
-			await Element.GeneratePlainText(sb);
-			string s = sb.ToString().Trim();
+			using (TextRenderer Renderer2 = new TextRenderer())
+			{
+				await Element.Render(Renderer2);
+				string s = Renderer2.ToString().Trim();
 
-			if (CommonTypes.TryParse(s, out double d))
-				return new DoubleNumber(d);
-			else if (CommonTypes.TryParse(s, out bool b))
-				return new BooleanValue(b);
-			else if (Measurement.TryParse(s, out Measurement M))
-				return M;
-			else if (PhysicalQuantity.TryParse(s, out PhysicalQuantity Q))
-				return Q;
-			else if (XML.TryParse(s, out DateTime TP))
-				return new DateTimeValue(TP);
-			else if (Element is Model.SpanElements.InlineText)
-				return new StringValue(s);
-			else
-				return new ObjectValue(Element);
+				if (CommonTypes.TryParse(s, out double d))
+					return new DoubleNumber(d);
+				else if (CommonTypes.TryParse(s, out bool b))
+					return new BooleanValue(b);
+				else if (Measurement.TryParse(s, out Measurement M))
+					return M;
+				else if (PhysicalQuantity.TryParse(s, out PhysicalQuantity Q))
+					return Q;
+				else if (XML.TryParse(s, out DateTime TP))
+					return new DateTimeValue(TP);
+				else if (Element is Model.SpanElements.InlineText)
+					return new StringValue(s);
+				else
+					return new ObjectValue(Element);
+			}
 		}
 	}
 }

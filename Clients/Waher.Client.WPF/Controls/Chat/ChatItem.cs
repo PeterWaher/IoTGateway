@@ -11,6 +11,7 @@ using Waher.Content.Markdown.Model;
 using Waher.Events;
 using Waher.Client.WPF.Model;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Wpf;
 
 namespace Waher.Client.WPF.Controls.Chat
 {
@@ -68,7 +69,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 			if (Markdown is null)
 			{
-				XamlSettings Settings = ChatView.GetMarkdownSettings().XamlSettings;
+				XamlSettings Settings = ChatView.GetXamlSettings();
 
 				Result.formattedMessage = new TextBlock()
 				{
@@ -159,18 +160,18 @@ namespace Waher.Client.WPF.Controls.Chat
 			{
 				if (!(Markdown is null))
 				{
-					string XAML = await Markdown.GenerateXAML();
+					string XAML = await Markdown.GenerateXAML(ChatView.GetXamlSettings());
 					this.formattedMessage = XamlReader.Parse(XAML);
 
 					if (this.formattedMessage is DependencyObject Root)
 						this.AddEventHandlers(Root);
 				}
 				else
-					this.formattedMessage = Message;
+					this.formattedMessage = this.Message;
 			}
 			catch (Exception)
 			{
-				this.formattedMessage = Message;
+				this.formattedMessage = this.Message;
 			}
 		}
 
@@ -184,7 +185,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				foreach (Inline Inline in TextBlock.Inlines)
 				{
 					if (Inline is Hyperlink Hyperlink)
-						Hyperlink.Click += Hyperlink_Click;
+						Hyperlink.Click += this.Hyperlink_Click;
 				}
 			}
 

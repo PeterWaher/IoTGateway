@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Emoji;
+using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.CodeContent;
-using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Wpf;
+using Waher.Content.Markdown.Xamarin;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D;
@@ -23,7 +27,8 @@ namespace Waher.Content.Markdown.Layout2D
 	/// <summary>
 	/// Class managing 2D XML Layout integration into Markdown documents.
 	/// </summary>
-	public class XmlLayout : IImageCodeContent, IXmlVisualizer
+	public class XmlLayout : IImageCodeContent, IXmlVisualizer, ICodeContentMarkdownRenderer, ICodeContentHtmlRenderer, ICodeContentTextRenderer,
+		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
@@ -143,45 +148,15 @@ namespace Waher.Content.Markdown.Layout2D
 		}
 
 		/// <summary>
-		/// If (transportable) Markdown is handled.
+		/// Generates HTML for the code content.
 		/// </summary>
-		public bool HandlesMarkdown => true;
-
-		/// <summary>
-		/// If HTML is handled.
-		/// </summary>
-		public bool HandlesHTML => true;
-
-		/// <summary>
-		/// If Plain Text is handled.
-		/// </summary>
-		public bool HandlesPlainText => true;
-
-		/// <summary>
-		/// If XAML is handled.
-		/// </summary>
-		public bool HandlesXAML => true;
-
-		/// <summary>
-		/// If LaTeX is handled.
-		/// </summary>
-		public bool HandlesLaTeX => true;
-
-		/// <summary>
-		/// If smart-contract XML is handled.
-		/// </summary>
-		public bool HandlesSmartContract => true;
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
@@ -190,6 +165,8 @@ namespace Waher.Content.Markdown.Layout2D
 			string FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!FileName.StartsWith("/"))
 				FileName = "/" + FileName;
+
+			StringBuilder Output = Renderer.Output;
 
 			Output.Append("<figure>");
 			Output.Append("<img src=\"");
@@ -291,15 +268,15 @@ namespace Waher.Content.Markdown.Layout2D
 		}
 
 		/// <summary>
-		/// Generates (transportanle) Markdown for the markdown element.
+		/// Generates Markdown for the code content.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
@@ -307,49 +284,50 @@ namespace Waher.Content.Markdown.Layout2D
 
 			if (Info.Dynamic)
 			{
-				ImageContent.GenerateMarkdown(Output, Info.DynamicContent, "image/png", Info.Title);
+				ImageContent.GenerateMarkdown(Renderer.Output, Info.DynamicContent, "image/png", Info.Title);
 				return true;
 			}
 			else
-				return await ImageContent.GenerateMarkdownFromFile(Output, Info.FileName, Info.Title);
+				return await ImageContent.GenerateMarkdownFromFile(Renderer.Output, Info.FileName, Info.Title);
 		}
 
 		/// <summary>
-		/// Generates Plain Text for the markdown element.
+		/// Generates plain text for the code content.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
-			Output.AppendLine(Info.Title);
+			Renderer.Output.AppendLine(Info.Title);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
+		/// Generates WPF XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
 				return false;
 
+			XmlWriter Output = Renderer.XmlOutput;
+
 			if (Info.Dynamic)
 			{
-				await Model.Multimedia.ImageContent.OutputWpf(Output, new ImageSource()
+				await Wpf.Multimedia.ImageContent.OutputWpf(Output, new ImageSource()
 				{
 					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
 				}, Info.Title);
@@ -370,24 +348,25 @@ namespace Waher.Content.Markdown.Layout2D
 		}
 
 		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// Generates Xamarin.Forms XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
 				return false;
 
+			XmlWriter Output = Renderer.XmlOutput;
+
 			if (Info.Dynamic)
 			{
-				await Model.Multimedia.ImageContent.OutputXamarinForms(Output, new ImageSource()
+				await Xamarin.Multimedia.ImageContent.OutputXamarinForms(Output, new ImageSource()
 				{
 					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
 				});
@@ -403,16 +382,15 @@ namespace Waher.Content.Markdown.Layout2D
 		}
 
 		/// <summary>
-		/// Generates LaTeX text for the markdown element.
+		/// Generates LaTeX for the code content.
 		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
-			MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
 			if (Info?.FileName is null)
@@ -420,6 +398,8 @@ namespace Waher.Content.Markdown.Layout2D
 
 			if (Info.Dynamic)
 				Info.FileName = await Model.Multimedia.ImageContent.GetTemporaryFile(Info.DynamicContent, "png");
+
+			StringBuilder Output = Renderer.Output;
 
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");
@@ -431,7 +411,7 @@ namespace Waher.Content.Markdown.Layout2D
 			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("\\caption{");
-				Output.Append(InlineText.EscapeLaTeX(Info.Title));
+				Output.Append(LatexRenderer.EscapeLaTeX(Info.Title));
 				Output.AppendLine("}");
 			}
 
@@ -492,18 +472,15 @@ namespace Waher.Content.Markdown.Layout2D
 		}
 
 		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// Generates smart contract XML for the code content.
 		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
-			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderContractXml(ContractsRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			try
 			{
@@ -525,6 +502,7 @@ namespace Waher.Content.Markdown.Layout2D
 				Variables Variables = Document.Settings.Variables;
 				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Variables);
 				RenderSettings Settings = await LayoutDoc.GetRenderSettings(Variables);
+				XmlWriter Output = Renderer.XmlOutput;
 
 				KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
 

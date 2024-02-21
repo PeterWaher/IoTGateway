@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -21,28 +24,37 @@ namespace Waher.Content.Markdown.Consolidation
 		private readonly Dictionary<long, MarkdownElement> cells = new Dictionary<long, MarkdownElement>();
 		private readonly Dictionary<int, TextAlignment> columnAlignments = new Dictionary<int, TextAlignment>();
 		private readonly Dictionary<int, string> sources = new Dictionary<int, string>();
-		private readonly object synchObj = new object();
+		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
 
 		/// <summary>
 		/// Represents a consolidated table.
 		/// </summary>
-		/// <param name="Source">Source of table.</param>
 		/// <param name="MarkdownTable">Markdown table.</param>
-		public ConsolidatedTable(string Source, Table MarkdownTable)
+		private ConsolidatedTable(Table MarkdownTable)
 		{
-			int i, j;
-
 			this.nrColumns = MarkdownTable.Columns;
 			this.nrHeaderRows = MarkdownTable.Headers.Length;
 			this.nrCellRows = MarkdownTable.Rows.Length;
 			this.caption = MarkdownTable.Caption;
 			this.id = MarkdownTable.Id;
+		}
+
+		/// <summary>
+		/// Creates a consolidated table.
+		/// </summary>
+		/// <param name="Source">Source of table.</param>
+		/// <param name="MarkdownTable">Markdown table.</param>
+		/// <returns>Consolidated table instance.</returns>
+		public static async Task<ConsolidatedTable> CreateAsync(string Source, Table MarkdownTable)
+		{
+			ConsolidatedTable Result = new ConsolidatedTable(MarkdownTable);
+			int i, j;
 
 			i = 0;
 			foreach (TextAlignment Alignment in MarkdownTable.Alignments)
 			{
-				this.columnIndices[this.GetHeaderKey(MarkdownTable.Headers, i)] = i;
-				this.columnAlignments[i++] = Alignment;
+				Result.columnIndices[await Result.GetHeaderKey(MarkdownTable.Headers, i)] = i;
+				Result.columnAlignments[i++] = Alignment;
 			}
 
 			i = 0;
@@ -50,7 +62,7 @@ namespace Waher.Content.Markdown.Consolidation
 			{
 				j = 0;
 				foreach (MarkdownElement Element in Row)
-					this.headers[(((long)i) << 32) + j++] = Element;
+					Result.headers[(((long)i) << 32) + j++] = Element;
 
 				i++;
 			}
@@ -60,13 +72,15 @@ namespace Waher.Content.Markdown.Consolidation
 			{
 				j = 0;
 				foreach (MarkdownElement Element in Row)
-					this.cells[(((long)i) << 32) + j++] = Element;
+					Result.cells[(((long)i) << 32) + j++] = Element;
 
-				this.sources[i++] = Source;
+				Result.sources[i++] = Source;
 			}
+
+			return Result;
 		}
 
-		private string GetHeaderKey(MarkdownElement[][] Headers, int ColumnIndex)
+		private async Task<string> GetHeaderKey(MarkdownElement[][] Headers, int ColumnIndex)
 		{
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
@@ -79,7 +93,7 @@ namespace Waher.Content.Markdown.Consolidation
 					sb.AppendLine();
 
 				if (ColumnIndex < Row.Length)
-					Row[ColumnIndex].GenerateMarkdown(sb);
+					await Row[ColumnIndex].GenerateMarkdown(sb);
 			}
 
 			return sb.ToString();
@@ -88,42 +102,66 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// Number of columns.
 		/// </summary>
-		public int NrColumns
+		public Task<int> NrColumns => this.GetNrColumns();
+
+		/// <summary>
+		/// Gets the number of columns.
+		/// </summary>
+		/// <returns>Number of columns.</returns>
+		public async Task<int> GetNrColumns()
 		{
-			get
+			await this.synchObj.WaitAsync();
+			try
 			{
-				lock (this.synchObj)
-				{
-					return this.nrColumns;
-				}
+				return this.nrColumns;
+			}
+			finally
+			{
+				this.synchObj.Release();
 			}
 		}
 
 		/// <summary>
 		/// Number of header rows.
 		/// </summary>
-		public int NrHeaderRows
+		public Task<int> NrHeaderRows => this.GetNrHeaderRows();
+
+		/// <summary>
+		/// Gets the number of header rows.
+		/// </summary>
+		/// <returns>Number of header rows.</returns>
+		public async Task<int> GetNrHeaderRows()
 		{
-			get
+			await this.synchObj.WaitAsync();
+			try
 			{
-				lock (this.synchObj)
-				{
-					return this.nrHeaderRows;
-				}
+				return this.nrHeaderRows;
+			}
+			finally
+			{
+				this.synchObj.Release();
 			}
 		}
 
 		/// <summary>
 		/// Number of cell rows.
 		/// </summary>
-		public int NrCellRows
+		public Task<int> NrCellRows => this.GetNrCellRows();
+
+		/// <summary>
+		/// Gets the number of cell rows.
+		/// </summary>
+		/// <returns>Number of cell rows.</returns>
+		public async Task<int> GetNrCellRows()
 		{
-			get
+			await this.synchObj.WaitAsync();
+			try
 			{
-				lock (this.synchObj)
-				{
-					return this.nrCellRows;
-				}
+				return this.nrCellRows;
+			}
+			finally
+			{
+				this.synchObj.Release();
 			}
 		}
 
@@ -132,14 +170,19 @@ namespace Waher.Content.Markdown.Consolidation
 		/// </summary>
 		/// <param name="Column">Zero-based column index.</param>
 		/// <returns>Column alignment.</returns>
-		public TextAlignment GetAlignment(int Column)
+		public async Task<TextAlignment> GetAlignment(int Column)
 		{
-			lock (this.synchObj)
+			await this.synchObj.WaitAsync();
+			try
 			{
 				if (Column < 0 || Column > this.nrColumns)
 					throw new ArgumentOutOfRangeException("Invalid column.", nameof(Column));
 
 				return this.columnAlignments.TryGetValue(Column, out TextAlignment Alignment) ? Alignment : TextAlignment.Left;
+			}
+			finally
+			{
+				this.synchObj.Release();
 			}
 		}
 
@@ -148,9 +191,10 @@ namespace Waher.Content.Markdown.Consolidation
 		/// </summary>
 		/// <param name="Source">Source of table.</param>
 		/// <param name="MarkdownTable">Table to add</param>
-		public void Add(string Source, Table MarkdownTable)
+		public async Task Add(string Source, Table MarkdownTable)
 		{
-			lock (this.synchObj)
+			await this.synchObj.WaitAsync();
+			try
 			{
 				if (this.caption != MarkdownTable.Caption)
 					this.caption = string.Empty;
@@ -168,7 +212,7 @@ namespace Waher.Content.Markdown.Consolidation
 				i = 0;
 				foreach (TextAlignment Alignment in MarkdownTable.Alignments)
 				{
-					Key = this.GetHeaderKey(MarkdownTable.Headers, i);
+					Key = await this.GetHeaderKey(MarkdownTable.Headers, i);
 
 					if (!this.columnIndices.TryGetValue(Key, out i2))
 					{
@@ -202,15 +246,20 @@ namespace Waher.Content.Markdown.Consolidation
 					this.sources[i2++] = Source;
 				}
 			}
+			finally
+			{
+				this.synchObj.Release();
+			}
 		}
 
 		/// <summary>
 		/// Exports the consolidated table to Markdown.
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
-		public void Export(StringBuilder Markdown)
+		public async Task Export(StringBuilder Markdown)
 		{
-			lock (this.synchObj)
+			await this.synchObj.WaitAsync();
+			try
 			{
 				int i, j;
 
@@ -227,7 +276,7 @@ namespace Waher.Content.Markdown.Consolidation
 							else
 							{
 								Markdown.Append(' ');
-								E.GenerateMarkdown(Markdown);
+								await E.GenerateMarkdown(Markdown);
 								Markdown.Append(" |");
 							}
 						}
@@ -287,7 +336,7 @@ namespace Waher.Content.Markdown.Consolidation
 							else
 							{
 								Markdown.Append(' ');
-								E.GenerateMarkdown(Markdown);
+								await E.GenerateMarkdown(Markdown);
 								Markdown.Append(" |");
 							}
 						}
@@ -297,6 +346,10 @@ namespace Waher.Content.Markdown.Consolidation
 
 					Markdown.AppendLine();
 				}
+			}
+			finally
+			{
+				this.synchObj.Release();
 			}
 		}
 

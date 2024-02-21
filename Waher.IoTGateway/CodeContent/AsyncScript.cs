@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
-using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Wpf;
+using Waher.Content.Markdown.Xamarin;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
@@ -17,7 +20,8 @@ namespace Waher.IoTGateway.CodeContent
 	/// <summary>
 	/// Class managing asynchronous script execution in Markdown documents.
 	/// </summary>
-	public class AsyncScript : ICodeContent
+	public class AsyncScript : ICodeContent, ICodeContentHtmlRenderer, ICodeContentTextRenderer, ICodeContentMarkdownRenderer,
+		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
 		private static readonly AsyncMarkdownHtmlContent asyncHtmlOutput = new AsyncMarkdownHtmlContent();
 
@@ -74,45 +78,15 @@ namespace Waher.IoTGateway.CodeContent
 		}
 
 		/// <summary>
-		/// If (transportable) Markdown is handled.
+		/// Generates HTML for the code content.
 		/// </summary>
-		public bool HandlesMarkdown => true;
-
-		/// <summary>
-		/// If HTML is handled.
-		/// </summary>
-		public bool HandlesHTML => true;
-
-		/// <summary>
-		/// If Plain Text is handled.
-		/// </summary>
-		public bool HandlesPlainText => true;
-
-		/// <summary>
-		/// If XAML is handled.
-		/// </summary>
-		public bool HandlesXAML => true;
-
-		/// <summary>
-		/// If LaTeX is handled.
-		/// </summary>
-		public bool HandlesLaTeX => true;
-
-		/// <summary>
-		/// If smart-contract XML is handled.
-		/// </summary>
-		public bool HandlesSmartContract => true;
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string Title;
 			int i = Language.IndexOf(':');
@@ -123,7 +97,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			AsyncState State = new AsyncState()
 			{
-				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Title),
+				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title),
 				Script = this.BuildExpression(Rows),
 				Variables = HttpServer.CreateVariables(),
 				ImplicitPrint = new StringBuilder()
@@ -174,10 +148,14 @@ namespace Waher.IoTGateway.CodeContent
 			{
 				try
 				{
-					StringBuilder Html2 = new StringBuilder();
-					await InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
-
-					await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html2.ToString(), true);
+					using (HtmlRenderer Renderer2 = new HtmlRenderer(new HtmlSettings()
+					{
+						XmlEntitiesOnly = true
+					}))
+					{
+						await Renderer2.RenderObject(e.Preview.AssociatedObjectValue, true, Variables);
+						await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer2.ToString(), true);
+					}
 				}
 				catch (Exception ex)
 				{
@@ -185,166 +163,165 @@ namespace Waher.IoTGateway.CodeContent
 				}
 			};
 
-			StringBuilder Html = new StringBuilder();
-
-			Variables.OnPreview += Preview;
-			try
+			using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
 			{
-				object Result = await this.Evaluate(Script, Variables);
-
-				string Printed = ImplicitPrint.ToString();
-				if (!string.IsNullOrEmpty(Printed))
+				XmlEntitiesOnly = true
+			}))
+			{
+				Variables.OnPreview += Preview;
+				try
 				{
-					StringBuilder sb = new StringBuilder();
-					sb.AppendLine("BodyOnly: 1");
+					object Result = await this.Evaluate(Script, Variables);
 
-					if (this.document.Settings.AllowScriptTag)
-						sb.AppendLine("AllowScriptTag: 1");
+					string Printed = ImplicitPrint.ToString();
+					if (!string.IsNullOrEmpty(Printed))
+					{
+						StringBuilder sb = new StringBuilder();
+						sb.AppendLine("BodyOnly: 1");
 
-					sb.AppendLine();
-					sb.Append(Printed);
+						if (this.document.Settings.AllowScriptTag)
+							sb.AppendLine("AllowScriptTag: 1");
 
-					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
+						sb.AppendLine();
+						sb.Append(Printed);
 
-					await Doc.GenerateHTML(Html);
+						MarkdownDocument Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
+
+						await Doc.RenderDocument(Renderer);
+					}
+					 
+					await Renderer.RenderObject(Result, true, Variables);
+				}
+				catch (Exception ex)
+				{
+					Renderer.Clear();
+					await Renderer.RenderObject(ex, true, Variables);
+				}
+				finally
+				{
+					Variables.OnPreview -= Preview;
 				}
 
-				await InlineScript.GenerateHTML(Result, Html, true, Variables);
+				await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer.ToString(), false);
 			}
-			catch (Exception ex)
-			{
-				Html.Clear();
-				await InlineScript.GenerateHTML(ex, Html, true, Variables);
-			}
-			finally
-			{
-				Variables.OnPreview -= Preview;
-			}
-
-			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Html.ToString(), false);
 		}
+
 		/// <summary>
-		/// Generates (transportanle) Markdown for the markdown element.
+		/// Generates Markdown for the code content.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateMarkdown(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GenerateMarkdown(Result, Output, true, Variables);
+			await Renderer.RenderObject(Result, true, Variables);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates Plain Text for the markdown element.
+		/// Generates plain text for the code content.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GeneratePlainText(Result, Output, true);
+			await Renderer.RenderObject(Result, true);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
+		/// Generates WPF XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GenerateXAML(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
+			await Renderer.RenderObject(Result, true, Variables);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// Generates Xamarin.Forms XAML for the code content.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GenerateXamarinForms(Result, Output, State, true, Variables, Document.Settings.XamlSettings);
+			await Renderer.RenderObject(Result, true, Variables);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates LaTeX text for the markdown element.
+		/// Generates LaTeX for the code content.
 		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
-			MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GenerateLaTeX(Result, Output, true, Variables);
+			await Renderer.RenderObject(Result, true, Variables);
 
 			return true;
 		}
 
 		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// Generates smart contract XML for the code content.
 		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Rows">Code rows.</param>
-		/// <param name="Language">Language used.</param>
-		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language.</param>
+		/// <param name="Indent">Code block indentation.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
-			string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		/// <returns>If renderer was able to generate output.</returns>
+		public async Task<bool> RenderContractXml(ContractsRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript.GenerateSmartContractXml(Result, Output, true, Variables, State);
+			await Renderer.RenderObject(Result, true, Variables);
 
 			return true;
 		}

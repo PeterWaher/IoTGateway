@@ -11,9 +11,9 @@ BodyOnly: 1
 ```
 {{
 Settings:=Create(Waher.Content.Markdown.MarkdownSettings);
-Settings.LaTeXSettings:=Create(Waher.Content.Markdown.LaTeXSettings);
-Settings.LaTeXSettings.DocumentClass:=Waher.Content.Markdown.LaTeXDocumentClass.Article;
+LaTeXSettings:=Create(Waher.Content.Markdown.LaTeXSettings);
+LaTeXSettings.DocumentClass:=Waher.Content.Markdown.LaTeXDocumentClass.Article;
 Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,Settings,[]);
-Doc.GenerateLaTeX()
+Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Doc,LaTeXSettings)
 }}
 ```

@@ -314,10 +314,15 @@
     <ProjectReference Include="..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Rss\Waher.Content.Rss.csproj" />

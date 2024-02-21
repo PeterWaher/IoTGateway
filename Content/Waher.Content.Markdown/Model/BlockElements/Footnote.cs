@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -13,6 +12,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private readonly string key;
 		private bool referenced;
 		private bool tableCellContents;
+		private bool backlinkAdded;
 
 		/// <summary>
 		/// Footnote reference
@@ -47,7 +47,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// If the Footnote has been referenced during rendering, and therefore needs
 		/// to be shown at the end of the rendering process.
 		/// </summary>
-		internal bool Referenced
+		public bool Referenced
 		{
 			get => this.referenced;
 			set => this.referenced = value;
@@ -63,34 +63,19 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// If a backlink has been added to the footnote.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
+		public bool BacklinkAdded
 		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
+			get => this.backlinkAdded;
+			set => this.backlinkAdded = value;
 		}
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateMarkdown(Output);
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GeneratePlainText(Output);
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -99,41 +84,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
+		public override bool InlineSpanElement
 		{
 			get
 			{
@@ -142,22 +95,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				else
 					return false;
 			}
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Footnote");
-			Output.WriteAttributeString("key", this.key);
-
-			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
-				Output.WriteAttributeString("nr", Nr.ToString());
-
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
 		}
 
 		/// <summary>

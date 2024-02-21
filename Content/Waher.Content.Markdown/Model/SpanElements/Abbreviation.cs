@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -31,82 +29,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Description => this.description;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('[');
-			await base.GenerateMarkdown(Output);
-			Output.Append("](abbr:");
-			Output.Append(this.description);
-			Output.Append(')');
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("<abbr data-title=\"");
-			Output.Append(XML.HtmlAttributeEncode(this.description).Replace(" ", "&nbsp;"));
-			Output.Append("\">");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
-
-			Output.Append("</abbr>");
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Abbreviation");
-			Output.WriteAttributeString("description", this.description);
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,
@@ -167,6 +98,5 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Statistics.NrAbbreviations++;
 		}
-
 	}
 }

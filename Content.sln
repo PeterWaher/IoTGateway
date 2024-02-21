@@ -45,6 +45,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss.Test", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Test", "Content\Waher.Content.Test\Waher.Content.Test.csproj", "{71859F40-5DFD-491F-B12F-2991B0142B21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Wpf", "Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj", "{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xamarin", "Content\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj", "{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Latex", "Content\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj", "{F4213FA2-F1DE-44AC-97D4-AE591AE2E8BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Contracts", "Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj", "{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xml", "Content\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj", "{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +145,26 @@ Global
 		{71859F40-5DFD-491F-B12F-2991B0142B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71859F40-5DFD-491F-B12F-2991B0142B21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71859F40-5DFD-491F-B12F-2991B0142B21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4213FA2-F1DE-44AC-97D4-AE591AE2E8BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4213FA2-F1DE-44AC-97D4-AE591AE2E8BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4213FA2-F1DE-44AC-97D4-AE591AE2E8BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4213FA2-F1DE-44AC-97D4-AE591AE2E8BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

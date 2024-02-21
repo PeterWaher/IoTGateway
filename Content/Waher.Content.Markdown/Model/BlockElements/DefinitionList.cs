@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -32,71 +30,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			await base.GenerateMarkdown(Output);
-			Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Output.AppendLine("<dl>");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
-
-			Output.AppendLine("</dl>");
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			StringBuilder sb = new StringBuilder();
-			string s;
-			string s2 = Environment.NewLine + Environment.NewLine;
-			bool LastIsParagraph = false;
-			bool FirstTerm = true;
-
-			s = Output.ToString();
-			if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
-				Output.AppendLine();
-
-			foreach (MarkdownElement E in this.Children)
-			{
-				if (E is DefinitionTerms)
-				{
-					if (FirstTerm)
-						FirstTerm = false;
-					else
-						Output.AppendLine();
-				}
-
-				await E.GeneratePlainText(sb);
-				s = sb.ToString();
-				sb.Clear();
-				Output.Append(s);
-
-				LastIsParagraph = s.EndsWith(s2);
-			}
-
-			if (!LastIsParagraph)
-				Output.AppendLine();
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph => true;
+		public override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If elements of this type should be joined over paragraphs.
@@ -104,105 +46,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		internal override bool JoinOverParagraphs => true;
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			int State = 0;
-
-			Output.AppendLine("\\begin{description}");
-
-			foreach (MarkdownElement E in this.Children)
-			{
-				if (E is DefinitionTerms Terms)
-				{
-					switch (State)
-					{
-						case 0:
-							Output.Append("\\item[");
-							await Terms.GenerateLaTeX(Output);
-							State++;
-							break;
-
-						case 1:
-							Output.Append(", ");
-							await Terms.GenerateLaTeX(Output);
-							break;
-
-						case 2:
-							Output.AppendLine("}");
-							Output.Append("\\item[");
-							State--;
-							await Terms.GenerateLaTeX(Output);
-							break;
-					}
-				}
-				else if (E is DefinitionDescriptions Descriptions)
-				{
-					switch (State)
-					{
-						case 0:
-							Output.Append("\\item{");
-							await Descriptions.GenerateLaTeX(Output);
-							State += 2;
-							break;
-
-						case 1:
-							Output.Append("]{");
-							await Descriptions.GenerateLaTeX(Output);
-							State++;
-							break;
-
-						case 2:
-							Output.AppendLine();
-							await Descriptions.GenerateLaTeX(Output);
-							break;
-					}
-				}
-			}
-
-			switch (State)
-			{
-				case 1:
-					Output.AppendLine("]{}");
-					break;
-
-				case 2:
-					Output.AppendLine("}");
-					break;
-			}
-
-			Output.AppendLine("\\end{description}");
-			Output.AppendLine();
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => false;
+		public override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Adds children to the element.
@@ -219,15 +65,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				else
 					base.AddChildren((IEnumerable<MarkdownElement>)new MarkdownElement[] { E });
 			}
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			this.Export(Output, "DefinitionList");
 		}
 
 		/// <summary>

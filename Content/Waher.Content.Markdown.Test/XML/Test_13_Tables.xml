@@ -118,18 +118,134 @@
 			</HeaderRow>
 			<Row>
 				<Cell>
-					<FootnoteReference key="e11" />
+					<FootnoteReference key="e11">
+						<Footnote key="e11">
+							<Table caption="" id="" columns="2">
+								<Column alignment="Left" />
+								<Column alignment="Right" />
+								<HeaderRow>
+									<HeaderCell>
+										<InlineText>Info about cell</InlineText>
+									</HeaderCell>
+									<Continue />
+								</HeaderRow>
+								<Row>
+									<Cell>
+										<InlineText>Row</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>1</InlineText>
+									</Cell>
+								</Row>
+								<Row>
+									<Cell>
+										<InlineText>Column</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>1</InlineText>
+									</Cell>
+								</Row>
+							</Table>
+						</Footnote>
+					</FootnoteReference>
 				</Cell>
 				<Cell>
-					<FootnoteReference key="e12" />
+					<FootnoteReference key="e12">
+						<Footnote key="e12">
+							<Table caption="" id="" columns="2">
+								<Column alignment="Left" />
+								<Column alignment="Right" />
+								<HeaderRow>
+									<HeaderCell>
+										<InlineText>Info about cell</InlineText>
+									</HeaderCell>
+									<Continue />
+								</HeaderRow>
+								<Row>
+									<Cell>
+										<InlineText>Row</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>1</InlineText>
+									</Cell>
+								</Row>
+								<Row>
+									<Cell>
+										<InlineText>Column</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>2</InlineText>
+									</Cell>
+								</Row>
+							</Table>
+						</Footnote>
+					</FootnoteReference>
 				</Cell>
 			</Row>
 			<Row>
 				<Cell>
-					<FootnoteReference key="e21" />
+					<FootnoteReference key="e21">
+						<Footnote key="e21">
+							<Table caption="" id="" columns="2">
+								<Column alignment="Left" />
+								<Column alignment="Right" />
+								<HeaderRow>
+									<HeaderCell>
+										<InlineText>Info about cell</InlineText>
+									</HeaderCell>
+									<Continue />
+								</HeaderRow>
+								<Row>
+									<Cell>
+										<InlineText>Row</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>2</InlineText>
+									</Cell>
+								</Row>
+								<Row>
+									<Cell>
+										<InlineText>Column</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>1</InlineText>
+									</Cell>
+								</Row>
+							</Table>
+						</Footnote>
+					</FootnoteReference>
 				</Cell>
 				<Cell>
-					<FootnoteReference key="e22" />
+					<FootnoteReference key="e22">
+						<Footnote key="e22">
+							<Table caption="" id="" columns="2">
+								<Column alignment="Left" />
+								<Column alignment="Right" />
+								<HeaderRow>
+									<HeaderCell>
+										<InlineText>Info about cell</InlineText>
+									</HeaderCell>
+									<Continue />
+								</HeaderRow>
+								<Row>
+									<Cell>
+										<InlineText>Row</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>2</InlineText>
+									</Cell>
+								</Row>
+								<Row>
+									<Cell>
+										<InlineText>Column</InlineText>
+									</Cell>
+									<Cell>
+										<InlineText>2</InlineText>
+									</Cell>
+								</Row>
+							</Table>
+						</Footnote>
+					</FootnoteReference>
 				</Cell>
 			</Row>
 		</Table>
@@ -181,118 +297,4 @@
 		</Table>
 	</elements>
 	<references />
-	<footnotes>
-		<Footnote key="e11">
-			<Table caption="" id="" columns="2">
-				<Column alignment="Left" />
-				<Column alignment="Right" />
-				<HeaderRow>
-					<HeaderCell>
-						<InlineText>Info about cell</InlineText>
-					</HeaderCell>
-					<Continue />
-				</HeaderRow>
-				<Row>
-					<Cell>
-						<InlineText>Row</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>1</InlineText>
-					</Cell>
-				</Row>
-				<Row>
-					<Cell>
-						<InlineText>Column</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>1</InlineText>
-					</Cell>
-				</Row>
-			</Table>
-		</Footnote>
-		<Footnote key="e12">
-			<Table caption="" id="" columns="2">
-				<Column alignment="Left" />
-				<Column alignment="Right" />
-				<HeaderRow>
-					<HeaderCell>
-						<InlineText>Info about cell</InlineText>
-					</HeaderCell>
-					<Continue />
-				</HeaderRow>
-				<Row>
-					<Cell>
-						<InlineText>Row</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>1</InlineText>
-					</Cell>
-				</Row>
-				<Row>
-					<Cell>
-						<InlineText>Column</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>2</InlineText>
-					</Cell>
-				</Row>
-			</Table>
-		</Footnote>
-		<Footnote key="e21">
-			<Table caption="" id="" columns="2">
-				<Column alignment="Left" />
-				<Column alignment="Right" />
-				<HeaderRow>
-					<HeaderCell>
-						<InlineText>Info about cell</InlineText>
-					</HeaderCell>
-					<Continue />
-				</HeaderRow>
-				<Row>
-					<Cell>
-						<InlineText>Row</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>2</InlineText>
-					</Cell>
-				</Row>
-				<Row>
-					<Cell>
-						<InlineText>Column</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>1</InlineText>
-					</Cell>
-				</Row>
-			</Table>
-		</Footnote>
-		<Footnote key="e22">
-			<Table caption="" id="" columns="2">
-				<Column alignment="Left" />
-				<Column alignment="Right" />
-				<HeaderRow>
-					<HeaderCell>
-						<InlineText>Info about cell</InlineText>
-					</HeaderCell>
-					<Continue />
-				</HeaderRow>
-				<Row>
-					<Cell>
-						<InlineText>Row</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>2</InlineText>
-					</Cell>
-				</Row>
-				<Row>
-					<Cell>
-						<InlineText>Column</InlineText>
-					</Cell>
-					<Cell>
-						<InlineText>2</InlineText>
-					</Cell>
-				</Row>
-			</Table>
-		</Footnote>
-	</footnotes>
 </parsedMakdown>

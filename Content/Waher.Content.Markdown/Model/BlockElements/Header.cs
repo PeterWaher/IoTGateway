@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
+using Waher.Events;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -11,8 +13,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Header : BlockElementChildren
 	{
+		private readonly TaskCompletionSource<bool> idCompletionSource;
+		private bool idCalculated;
+		private string id;
 		private readonly string row;
-		private readonly string id;
 		private readonly int level;
 		private readonly bool prefix;
 
@@ -31,14 +35,62 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.prefix = Prefix;
 			this.row = Row;
 
-			StringBuilder sb = new StringBuilder();
+			string s = null;
 
-			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(sb);
+			foreach (MarkdownElement E in Children)
+			{
+				if (E is InlineText Text)
+				{
+					if (s is null)
+						s = Text.Value;
+					else
+					{
+						s = null;
+						break;
+					}
+				}
+			}
 
-			string s = sb.ToString();
-			sb.Clear();
+			if (s is null)
+			{
+				this.idCompletionSource = new TaskCompletionSource<bool>();
+				this.idCalculated = false;
+				this.CalcId();
+			}
+			else
+			{
+				this.id = this.GetId(s, new StringBuilder());
+				this.idCalculated = true;
+			}
+		}
 
+		private async void CalcId()
+		{
+			try
+			{
+				StringBuilder sb = new StringBuilder();
+				string s;
+
+				using (TextRenderer Renderer = new TextRenderer(sb))
+				{
+					await this.Render(Renderer);
+					s = Renderer.ToString();
+				}
+
+				sb.Clear();
+
+				this.id = this.GetId(s, sb);
+				this.idCalculated = true;
+				this.idCompletionSource.TrySetResult(true);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private string GetId(string s, StringBuilder sb)
+		{
 			bool FirstCharInWord = false;
 
 			foreach (char ch in s)
@@ -58,7 +110,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					sb.Append(char.ToLower(ch));
 			}
 
-			this.id = sb.ToString();
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -67,303 +119,38 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public int Level => this.level;
 
 		/// <summary>
+		/// If header is defined using a prefix.
+		/// </summary>
+		public bool Prefix => this.prefix;
+
+		/// <summary>
+		/// Row definition
+		/// </summary>
+		public string Row => this.row;
+
+		/// <summary>
 		/// ID of header.
 		/// </summary>
-		public string Id => this.id;
+		public Task<string> Id => this.GetId();
 
-		/// <summary>
-		/// Generates Markdown for the markdown element.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
+		private async Task<string> GetId()
 		{
-			if (this.prefix)
-			{
-				Output.Append(this.row);
-				Output.Append(' ');
-			}
+			if (!this.idCalculated)
+				await this.idCompletionSource.Task;
 
-			await base.GenerateMarkdown(Output);
-			Output.AppendLine();
-
-			if (!this.prefix)
-				Output.AppendLine(this.row);
-
-			Output.AppendLine();
+			return this.id;
 		}
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("<h");
-			Output.Append(this.level.ToString());
-
-			if (!string.IsNullOrEmpty(this.id))
-			{
-				Output.Append(" id=\"");
-				Output.Append(XML.HtmlAttributeEncode(this.id));
-				Output.Append("\"");
-			}
-
-			if (this.Document.IncludesTableOfContents)
-				Output.Append(" class=\"tocReference\"");
-
-			Output.Append('>');
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
-
-			Output.Append("</h");
-			Output.Append(this.level.ToString());
-			Output.AppendLine(">");
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			if (this.level <= 2)
-			{
-				int Len = Output.Length;
-
-				foreach (MarkdownElement E in this.Children)
-					await E.GeneratePlainText(Output);
-
-				Len = Output.Length - Len + 3;
-				Output.AppendLine();
-				Output.AppendLine(new string(this.level == 1 ? '=' : '-', Len));
-				Output.AppendLine();
-			}
-			else
-			{
-				Output.Append(new string('#', this.level));
-				Output.Append(' ');
-
-				foreach (MarkdownElement E in this.Children)
-					await E.GeneratePlainText(Output);
-
-				Output.AppendLine();
-				Output.AppendLine();
-			}
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			XamlSettings Settings = this.Document.Settings.XamlSettings;
-
-			Output.WriteStartElement("TextBlock");
-			Output.WriteAttributeString("TextWrapping", "Wrap");
-			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
-			if (TextAlignment != TextAlignment.Left)
-				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-
-			if (this.level > 0 && this.level <= Settings.HeaderFontSize.Length)
-			{
-				Output.WriteAttributeString("FontSize", Settings.HeaderFontSize[this.level - 1].ToString());
-				Output.WriteAttributeString("Foreground", Settings.HeaderForegroundColor[this.level - 1].ToString());
-			}
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXAML(Output, TextAlignment);
-
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			XamlSettings Settings = this.Document.Settings.XamlSettings;
-			Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
-
-			Output.WriteStartElement("Label");
-			Output.WriteAttributeString("LineBreakMode", "WordWrap");
-			XamarinFormsLabelAlignment(Output, State);
-
-			if (this.level > 0 && this.level <= Settings.HeaderFontSize.Length)
-			{
-				Output.WriteAttributeString("FontSize", Settings.HeaderFontSize[this.level - 1].ToString());
-				Output.WriteAttributeString("TextColor", Settings.HeaderForegroundColor[this.level - 1].ToString());
-			}
-
-			Output.WriteAttributeString("TextType", "Html");
-
-			StringBuilder Html = new StringBuilder();
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Html);
-
-			Output.WriteCData(Html.ToString());
-
-			Output.WriteEndElement();
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Writes a text-alignment attribute to a Xamarin.Forms label element.
-		/// </summary>
-		/// <param name="Output">XML output</param>
-		/// <param name="State">Current rendering state.</param>
-		public static void XamarinFormsLabelAlignment(XmlWriter Output, XamarinRenderingState State)
-		{
-			switch (State.TextAlignment)
-			{
-				case TextAlignment.Left:
-					Output.WriteAttributeString("HorizontalTextAlignment", "Start");
-					break;
-
-				case TextAlignment.Right:
-					Output.WriteAttributeString("HorizontalTextAlignment", "End");
-					break;
-
-				case TextAlignment.Center:
-					Output.WriteAttributeString("HorizontalTextAlignment", "Center");
-					break;
-			}
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			while (State.Level >= this.level)
-			{
-				Output.WriteEndElement();
-				Output.WriteEndElement();
-				State.Level--;
-			}
-
-			Output.WriteStartElement("section");
-			Output.WriteStartElement("header");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateSmartContractXml(Output, State);
-
-			Output.WriteEndElement();
-			Output.WriteStartElement("body");
-
-			State.Level++;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			string Command;
-
-			switch (this.Document.Settings.LaTeXSettings.DocumentClass)
-			{
-				case LaTeXDocumentClass.Book:
-				case LaTeXDocumentClass.Report:
-					switch (this.level)
-					{
-						case 1:
-							Command = "part";
-							break;
-
-						case 2:
-							Command = "chapter";
-							break;
-
-						case 3:
-							Command = "section";
-							break;
-
-						case 4:
-							Command = "subsection";
-							break;
-
-						case 5:
-							Command = "subsubsection";
-							break;
-
-						case 6:
-							Command = "paragraph";
-							break;
-
-						case 7:
-						default:
-							Command = "subparagraph";
-							break;
-					}
-					break;
-
-				case LaTeXDocumentClass.Article:
-				case LaTeXDocumentClass.Standalone:
-				default:
-					switch (this.level)
-					{
-						case 1:
-							Command = "section";
-							break;
-
-						case 2:
-							Command = "subsection";
-							break;
-
-						case 3:
-							Command = "subsubsection";
-							break;
-
-						case 4:
-							Command = "paragraph";
-							break;
-
-						case 5:
-						default:
-							Command = "subparagraph";
-							break;
-					}
-					break;
-			}
-
-			Output.Append('\\');
-			Output.Append(Command);
-			Output.Append("*{");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
-			Output.AppendLine("}");
-			Output.AppendLine();
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => false;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Header");
-			Output.WriteAttributeString("id", this.id);
-			Output.WriteAttributeString("level", this.level.ToString());
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

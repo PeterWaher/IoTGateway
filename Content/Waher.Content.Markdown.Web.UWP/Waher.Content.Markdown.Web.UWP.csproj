@@ -113,6 +113,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarkdownToHtmlConverter.cs" />
+    <Compile Include="MarkdownToLatexConverter.cs" />
+    <Compile Include="MarkdownToSmartContractConverter.cs" />
+    <Compile Include="MarkdownToTextConverter.cs" />
+    <Compile Include="MarkdownToXamarinConverter.cs" />
+    <Compile Include="MarkdownToXamlConverter.cs" />
+    <Compile Include="MarkdownToXmlConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptExtensions\Page.cs" />
     <Compile Include="WebScript\WsCodec.cs" />
@@ -143,6 +149,26 @@
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
       <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
       <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj">
+      <Project>{b9d1ef63-3216-45b2-a5d8-aa14b78575d6}</Project>
+      <Name>Waher.Content.Markdown.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj">
+      <Project>{4e95c552-9fe8-4e5c-9a0d-811646eb5a87}</Project>
+      <Name>Waher.Content.Markdown.Latex</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj">
+      <Project>{c342d6f2-8f1c-4bcb-acb8-ba0c9f5e9de9}</Project>
+      <Name>Waher.Content.Markdown.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj">
+      <Project>{de9aa799-83f3-4a17-a91f-17af7443dd9e}</Project>
+      <Name>Waher.Content.Markdown.Xamarin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj">
+      <Project>{08e94e1d-71b3-4820-b4f3-2450403d726c}</Project>
+      <Name>Waher.Content.Markdown.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>

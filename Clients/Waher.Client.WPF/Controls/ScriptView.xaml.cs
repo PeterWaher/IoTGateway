@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using SkiaSharp;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Wpf;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -36,7 +37,7 @@ namespace Waher.Client.WPF.Controls
 
 		public ScriptView()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 
 			this.variables = new Variables()
 			{
@@ -76,7 +77,7 @@ namespace Waher.Client.WPF.Controls
 					Tag = Exp
 				};
 
-				ScriptBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+				ScriptBlock.PreviewMouseDown += this.TextBlock_PreviewMouseDown;
 
 				this.HistoryPanel.Children.Add(ScriptBlock);
 				this.HistoryScrollViewer.ScrollToBottom();
@@ -203,7 +204,7 @@ namespace Waher.Client.WPF.Controls
 					}
 
 					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), ChatView.GetMarkdownSettings());
-					string XAML = await Doc.GenerateXAML();
+					string XAML = await Doc.GenerateXAML(ChatView.GetXamlSettings());
 
 					if (XamlReader.Parse(XAML) is UIElement Parsed)
 						return this.AddBlock(ScriptBlock, Parsed);
@@ -305,7 +306,7 @@ namespace Waher.Client.WPF.Controls
 					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States)
 				};
 
-				ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+				ImageBlock.PreviewMouseDown += this.ImageBlock_PreviewMouseDown;
 
 				this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
 			}
@@ -598,7 +599,7 @@ namespace Waher.Client.WPF.Controls
 								Tag = Exp
 							};
 
-							ScriptBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+							ScriptBlock.PreviewMouseDown += this.TextBlock_PreviewMouseDown;
 
 							this.HistoryPanel.Children.Add(ScriptBlock);
 							break;
@@ -638,7 +639,7 @@ namespace Waher.Client.WPF.Controls
 								Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Width, Height, null, null)
 							};
 
-							ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+							ImageBlock.PreviewMouseDown += this.ImageBlock_PreviewMouseDown;
 
 							this.HistoryPanel.Children.Add(ImageBlock);
 							break;

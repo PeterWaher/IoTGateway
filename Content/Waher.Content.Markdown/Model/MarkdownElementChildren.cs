@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -138,38 +136,6 @@ namespace Waher.Content.Markdown.Model
 		public abstract MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document);
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateMarkdown(Output);
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GeneratePlainText(Output);
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateSmartContractXml(Output, State);
-		}
-
-		/// <summary>
 		/// If elements of this type should be joined over paragraphs.
 		/// </summary>
 		internal virtual bool JoinOverParagraphs => false;
@@ -195,31 +161,6 @@ namespace Waher.Content.Markdown.Model
 			}
 
 			return true;
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		/// <param name="ElementName">Name of element.</param>
-		public void Export(XmlWriter Output, string ElementName)
-		{
-			Output.WriteStartElement(ElementName);
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Exports the child elements to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		protected virtual void ExportChildren(XmlWriter Output)
-		{
-			if (!(this.children is null))
-			{
-				foreach (MarkdownElement E in this.children)
-					E.Export(Output);
-			}
 		}
 
 		/// <summary>

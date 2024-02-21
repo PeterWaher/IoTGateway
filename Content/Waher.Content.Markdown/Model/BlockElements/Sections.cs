@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -33,92 +32,20 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public int InitialNrColumns => this.initialNrColumns;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Initial row
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
-		{
-			if (!string.IsNullOrEmpty(this.initialRow))
-			{
-				Output.AppendLine(this.initialRow);
-				Output.AppendLine();
-			}
-
-			return base.GenerateMarkdown(Output);
-		}
+		public string InitialRow => this.initialRow;
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			SectionSeparator.GenerateSectionHTML(Output, this.initialNrColumns);
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
-
-			Output.AppendLine("</section>");
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GeneratePlainText(Output);
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => false;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Sections");
-			Output.WriteAttributeString("nrColumns", this.initialNrColumns.ToString());
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

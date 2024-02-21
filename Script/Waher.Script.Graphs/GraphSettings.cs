@@ -41,7 +41,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 1)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(Width));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.Width));
 
 				this.width = value;
 			}
@@ -56,7 +56,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 1)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(Height));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.Height));
 
 				this.height = value;
 			}
@@ -89,7 +89,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(AxisWidth));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.AxisWidth));
 
 				this.axisWidth = value;
 			}
@@ -113,7 +113,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(GridWidth));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.GridWidth));
 
 				this.gridWidth = value;
 			}
@@ -128,7 +128,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginTop));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.MarginTop));
 
 				this.marginTop = value;
 			}
@@ -143,7 +143,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginBottom));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.MarginBottom));
 
 				this.marginBottom = value;
 			}
@@ -158,7 +158,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginLeft));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.MarginLeft));
 
 				this.marginLeft = value;
 			}
@@ -173,7 +173,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginRight));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.MarginRight));
 
 				this.marginRight = value;
 			}
@@ -188,7 +188,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(MarginLabel));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.MarginLabel));
 
 				this.marginLabel = value;
 			}
@@ -203,7 +203,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (string.IsNullOrEmpty(value))
-					throw new ArgumentException("Value cannot be empty.", nameof(FontName));
+					throw new ArgumentException("Value cannot be empty.", nameof(this.FontName));
 
 				this.fontName = value;
 			}
@@ -218,7 +218,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(LabelFontSize));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.LabelFontSize));
 
 				this.labelFontSize = value;
 			}
@@ -233,7 +233,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(ApproxNrLabelsX));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.ApproxNrLabelsX));
 
 				this.approxNrLabelsX = value;
 			}
@@ -248,7 +248,7 @@ namespace Waher.Script.Graphs
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(ApproxNrLabelsY));
+					throw new ArgumentOutOfRangeException("Value must be non-negative.", nameof(this.ApproxNrLabelsY));
 
 				this.approxNrLabelsY = value;
 			}

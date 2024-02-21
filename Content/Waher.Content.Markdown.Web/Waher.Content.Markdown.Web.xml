@@ -63,6 +63,33 @@
             HTML settings for automatically converted content.
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToLatexConverter">
+            <summary>
+            Converts Markdown documents to LaTeX documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToLatexConverter.#ctor">
+            <summary>
+            Converts Markdown documents to LaTeX documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToLatexConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToLatexConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToLatexConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter">
             <summary>
             Converts Markdown documents to IEEE 1451.99 Smart Contract XML documents.

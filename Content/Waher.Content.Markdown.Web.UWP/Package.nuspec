@@ -18,7 +18,12 @@
 			<group targetFramework="UAP10.0">
 				<dependency id="Waher.Content" version="2.6.8"/>
 				<dependency id="Waher.Content.Emoji" version="2.0.0"/>
-				<dependency id="Waher.Content.Markdown" version="2.9.4"/>
+				<dependency id="Waher.Content.Markdown" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Contracts" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Latex" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Wpf" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Xamarin" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Xml" version="3.0.0"/>
 				<dependency id="Waher.Networking.HTTP.UWP" version="2.6.1"/>
 				<dependency id="Waher.Runtime.Inventory" version="1.1.5"/>
 				<dependency id="Waher.Script" version="2.6.6"/>

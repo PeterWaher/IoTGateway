@@ -9,6 +9,7 @@ using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Web
 {
@@ -145,7 +146,6 @@ namespace Waher.Content.Markdown.Web
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
-				HtmlSettings = htmlSettings,
 				ResourceMap = Request.Server
 			};
 
@@ -353,7 +353,7 @@ namespace Waher.Content.Markdown.Web
 		/// <returns>Conversion result.</returns>
 		protected virtual Task<string> DoConversion(MarkdownDocument Doc)
 		{
-			return Doc.GenerateHTML();
+			return Doc.GenerateHTML(htmlSettings);
 		}
 
 		private bool CopyHttpHeader(string Name, MarkdownDocument Doc, HttpResponse Response)

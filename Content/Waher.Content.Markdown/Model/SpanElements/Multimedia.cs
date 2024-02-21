@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Events;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -14,7 +13,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class Multimedia : MarkdownElementChildren
 	{
+		private static readonly Dictionary<Type, IMultimediaRenderer[]> renderersPerType = new Dictionary<Type, IMultimediaRenderer[]>();
+
 		private IMultimediaContent handler = null;
+		private Type handlerType = null;
 		private readonly MultimediaItem[] items;
 		private readonly bool aloneInParagraph;
 
@@ -43,89 +45,24 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public bool AloneInParagraph => this.aloneInParagraph;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			bool First = true;
-
-			Output.Append("![");
-			await base.GenerateMarkdown(Output);
-			Output.Append(']');
-
-			foreach (MultimediaItem Item in this.items)
-			{
-				if (First)
-					First = false;
-				else if (this.aloneInParagraph)
-				{
-					Output.AppendLine();
-					Output.Append('\t');
-				}
-
-				Output.Append('(');
-				Output.Append(Item.Url);
-
-				if (!string.IsNullOrEmpty(Item.Title))
-				{
-					Output.Append(" \"");
-					Output.Append(Item.Title.Replace("\"", "\\\""));
-					Output.Append('"');
-				}
-
-				if (Item.Width.HasValue)
-				{
-					Output.Append(' ');
-					Output.Append(Item.Width.Value.ToString());
-
-					if (Item.Height.HasValue)
-					{
-						Output.Append(' ');
-						Output.Append(Item.Height.Value.ToString());
-					}
-				}
-
-				Output.Append(')');
-			}
-
-			if (this.aloneInParagraph)
-			{
-				Output.AppendLine();
-				Output.AppendLine();
-			}
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
-		{
-			return this.MultimediaHandler.GenerateHTML(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			return this.MultimediaHandler.GeneratePlainText(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// Multimedia handler.
 		/// </summary>
-		public IMultimediaContent MultimediaHandler
+		public T MultimediaHandler<T>()
+			where T : IMultimediaRenderer
 		{
-			get
+			if (this.handlerType is null || this.handlerType != typeof(T))
 			{
-				if (this.handler is null)
-					this.handler = GetMultimediaHandler(this.items);
-
-				return this.handler;
+				this.handler = GetMultimediaHandler<T>(this.items);
+				this.handlerType = typeof(T);
 			}
+
+			return (T)this.handler;
 		}
 
 		/// <summary>
@@ -133,7 +70,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="URLs">Set of URLs, or file names.</param>
 		/// <returns>Best multimedia handler.</returns>
-		public static IMultimediaContent GetMultimediaHandler(params string[] URLs)
+		public static IMultimediaContent GetMultimediaHandler<T>(params string[] URLs)
+			where T : IMultimediaRenderer
 		{
 			int i, c = URLs.Length;
 			MultimediaItem[] Items = new MultimediaItem[c];
@@ -141,7 +79,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			for (i = 0; i < c; i++)
 				Items[i] = new MultimediaItem(null, URLs[i], string.Empty, null, null);
 
-			return GetMultimediaHandler(Items);
+			return GetMultimediaHandler<T>(Items);
 		}
 
 		/// <summary>
@@ -149,149 +87,96 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Items">Set of multimedia items.</param>
 		/// <returns>Best multimedia handler.</returns>
-		public static IMultimediaContent GetMultimediaHandler(params MultimediaItem[] Items)
+		public static T GetMultimediaHandler<T>(params MultimediaItem[] Items)
+			where T : IMultimediaRenderer
 		{
-			IMultimediaContent Best = null;
+			T Best = default;
 			Grade BestGrade = Grade.NotAtAll;
 			Grade CurrentGrade;
+			bool HasBest = false;
 
 			foreach (MultimediaItem Item in Items)
 			{
-				foreach (IMultimediaContent Handler in Handlers)
+				foreach (IMultimediaContent Handler in GetRenderers<T>())
 				{
 					CurrentGrade = Handler.Supports(Item);
-					if (CurrentGrade > BestGrade)
+					if (CurrentGrade > BestGrade && Handler is T TypedHandler)
 					{
-						Best = Handler;
+						Best = TypedHandler;
 						BestGrade = CurrentGrade;
+						HasBest = true;
 					}
 				}
 
-				if (!(Best is null))
+				if (HasBest)
 					break;
 			}
 
-			return Best;    // Will allways not be null, since Multimedia.LinkContent will be chosen by default if no better is found.
+			return Best;
 		}
 
 		/// <summary>
 		/// Multimedia handlers.
 		/// </summary>
-		public static IMultimediaContent[] Handlers
+		public static IMultimediaRenderer[] GetRenderers<T>()
+			where T : IMultimediaRenderer
 		{
-			get
+			lock (renderersPerType)
 			{
-				lock (synchObject)
+				if (!renderersPerType.TryGetValue(typeof(T), out IMultimediaRenderer[] Renderers))
 				{
-					if (handlers is null)
+					List<IMultimediaRenderer> Handlers = new List<IMultimediaRenderer>();
+					IMultimediaRenderer Handler;
+
+					foreach (Type Type in Types.GetTypesImplementingInterface(typeof(T)))
 					{
-						List<IMultimediaContent> Handlers = new List<IMultimediaContent>();
-						IMultimediaContent Handler;
+						ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+						if (CI is null)
+							continue;
 
-						foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IMultimediaContent)))
+						try
 						{
-							ConstructorInfo CI = Types.GetDefaultConstructor(Type);
-							if (CI is null)
-								continue;
-
-							try
-							{
-								Handler = (IMultimediaContent)CI.Invoke(Types.NoParameters);
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-								continue;
-							}
-
-							Handlers.Add(Handler);
+							Handler = (IMultimediaRenderer)CI.Invoke(Types.NoParameters);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							continue;
 						}
 
-						handlers = Handlers.ToArray();
-						Types.OnInvalidated += Types_OnInvalidated;
+						Handlers.Add(Handler);
 					}
+
+					Renderers = Handlers.ToArray();
+					renderersPerType[typeof(T)] = Renderers;
 				}
-				return handlers;
+
+				return Renderers;
 			}
+		}
+
+		static Multimedia()
+		{
+			Types.OnInvalidated += Types_OnInvalidated;
 		}
 
 		private static void Types_OnInvalidated(object sender, EventArgs e)
 		{
-			lock (synchObject)
+			lock (renderersPerType)
 			{
-				handlers = null;
+				renderersPerType.Clear();
 			}
-		}
-
-		private static IMultimediaContent[] handlers = null;
-		private readonly static object synchObject = new object();
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			return this.MultimediaHandler.GenerateXAML(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			return this.MultimediaHandler.GenerateXamarinForms(Output, State, this.items, this.Children, this.aloneInParagraph, this.Document);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override Task GenerateLaTeX(StringBuilder Output)
-		{
-			return this.MultimediaHandler.GenerateLaTeX(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			return this.MultimediaHandler.GenerateSmartContractXml(Output, State,
-				this.Items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph => true;
+		public override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Multimedia");
-			Output.WriteAttributeString("aloneInParagraph", CommonTypes.Encode(this.aloneInParagraph));
-			this.ExportChildren(Output);
-
-			foreach (MultimediaItem Item in this.items)
-				Item.Export(Output);
-
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

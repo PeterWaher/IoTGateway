@@ -34,6 +34,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />

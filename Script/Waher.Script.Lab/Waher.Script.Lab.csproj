@@ -339,6 +339,10 @@
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj">
+      <Project>{c342d6f2-8f1c-4bcb-acb8-ba0c9f5e9de9}</Project>
+      <Name>Waher.Content.Markdown.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>

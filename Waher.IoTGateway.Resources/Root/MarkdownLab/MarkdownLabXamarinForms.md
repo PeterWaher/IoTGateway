@@ -11,6 +11,6 @@ BodyOnly: 1
 ```xml
 {{
 Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]);
-Doc.GenerateXamarinForms(Waher.Content.Xml.XML.WriterSettings(true,true))
+Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Doc,Waher.Content.Xml.XML.WriterSettings(true,true))
 }}
 ```

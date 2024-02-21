@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Threading.Tasks;
+using System;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -46,52 +44,27 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// Gets the parsed Markdown referenced to by a Multi-media item.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		public override async Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-            bool AloneInParagraph, MarkdownDocument Document)
-        {
-            Variables Variables = Document.Settings.Variables;
-            Variables?.Push();
+		/// <param name="Item">Multi-media item.</param>
+		/// <param name="ParentURL">URL to parent document.</param>
+		/// <returns>Parsed Markdown document.</returns>
+		public static async Task<MarkdownDocument> GetMarkdown(MultimediaItem Item, string ParentURL)
+		{
+			int i = Item.Url.IndexOf('?');
+			string Query;
+			string FileName;
 
-            try
-            {
-                foreach (MultimediaItem Item in Items)
-                {
-                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-                    await Markdown.GenerateHTML(Output, true);
-
-                    if (AloneInParagraph)
-                        Output.AppendLine();
-                }
-            }
-            finally
-            {
-                Variables?.Pop();
-            }
-        }
-
-        private async Task<MarkdownDocument> GetMarkdown(MultimediaItem Item, string ParentURL)
-        {
-            int i = Item.Url.IndexOf('?');
-            string Query;
-            string FileName;
-
-            if (i < 0)
-            {
-                Query = null;
-                FileName = Item.Url;
-            }
-            else
-            {
-                Query = Item.Url.Substring(i + 1);
-                FileName = Item.Url.Substring(0, i);
-            }
+			if (i < 0)
+			{
+				Query = null;
+				FileName = Item.Url;
+			}
+			else
+			{
+				Query = Item.Url.Substring(i + 1);
+				FileName = Item.Url.Substring(0, i);
+			}
 
 			if (!string.IsNullOrEmpty(ParentURL))
 			{
@@ -99,7 +72,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					ParentURL = NewUri.ToString();
 			}
 
-            MarkdownDocument Document = Item.Document;
+			MarkdownDocument Document = Item.Document;
 			MarkdownSettings Settings = Document.Settings;
 
 			FileName = Settings.GetFileName(Document.FileName, FileName);
@@ -134,157 +107,31 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			string MarkdownText = await Resources.ReadAllTextAsync(FileName);
-            MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Settings, FileName, string.Empty, ParentURL);
-            Markdown.Master = Document;
+			MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Settings, FileName, string.Empty, ParentURL);
+			Markdown.Master = Document;
 
-            MarkdownDocument Loop = Document;
+			MarkdownDocument Loop = Document;
 
 			while (!(Loop is null))
-            {
-                if (Loop.FileName == FileName)
-                    throw new Exception("Circular reference detected.");
+			{
+				if (Loop.FileName == FileName)
+					throw new Exception("Circular reference detected.");
 
 				MarkdownDocument.CopyMetaDataTags(Loop, Markdown, false);
 
 				Loop = Loop.Master;
-            }
-
-            return Markdown;
-        }
-
-		/// <summary>
-		/// Generates Plain Text for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		public override async Task GeneratePlainText(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-            bool AloneInParagraph, MarkdownDocument Document)
-        {
-            Variables Variables = Document.Settings.Variables;
-            Variables?.Push();
-
-            try
-            {
-                foreach (MultimediaItem Item in Items)
-                {
-                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-                    await Markdown.GeneratePlainText(Output);
-
-                    if (AloneInParagraph)
-                        Output.AppendLine();
-                }
-            }
-            finally
-            {
-                Variables?.Pop();
-            }
-        }
-
-        /// <summary>
-        /// Generates WPF XAML for the markdown element.
-        /// </summary>
-        /// <param name="Output">XAML will be output here.</param>
-        /// <param name="TextAlignment">Alignment of text in element.</param>
-        /// <param name="Items">Multimedia items.</param>
-        /// <param name="ChildNodes">Child nodes.</param>
-        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-        /// <param name="Document">Markdown document containing element.</param>
-        public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
-            IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
-        {
-            Variables Variables = Document.Settings.Variables;
-            Variables?.Push();
-
-            try
-            {
-                foreach (MultimediaItem Item in Items)
-                {
-                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-                    await Markdown.GenerateXAML(Output, true);
-                }
-            }
-            finally
-            {
-                Variables?.Pop();
-            }
-        }
-
-        /// <summary>
-        /// Generates Xamarin.Forms XAML for the markdown element.
-        /// </summary>
-        /// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-        /// <param name="Items">Multimedia items.</param>
-        /// <param name="ChildNodes">Child nodes.</param>
-        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-        /// <param name="Document">Markdown document containing element.</param>
-        public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, MultimediaItem[] Items,
-            IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
-        {
-            Variables Variables = Document.Settings.Variables;
-            Variables?.Push();
-
-            try
-            {
-                foreach (MultimediaItem Item in Items)
-                {
-                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-                    await Markdown.GenerateXamarinForms(Output, true);
-                }
-            }
-            finally
-            {
-                Variables?.Pop();
-            }
-        }
-
-		/// <summary>
-		/// Generates LaTeX text for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
-		{
-			Variables Variables = Document.Settings.Variables;
-			Variables?.Push();
-
-			try
-			{
-				foreach (MultimediaItem Item in Items)
-				{
-					MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-					await Markdown.GenerateLaTeX(Output);
-
-					if (AloneInParagraph)
-						Output.AppendLine();
-				}
 			}
-			finally
-			{
-				Variables?.Pop();
-			}
+
+			return Markdown;
 		}
 
 		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// Includes a markdown document from a file.
 		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
+		/// <param name="Renderer">Renderer.</param>
 		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State,
-			MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
+		public static async Task ProcessInclusion(Renderer Renderer, MultimediaItem[] Items, MarkdownDocument Document)
 		{
 			Variables Variables = Document.Settings.Variables;
 			Variables?.Push();
@@ -293,8 +140,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			{
 				foreach (MultimediaItem Item in Items)
 				{
-					MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
-					await Markdown.GenerateSmartContractXml(Output);
+					MarkdownDocument Markdown = await GetMarkdown(Item, Document.URL);
+					await Renderer.RenderDocument(Markdown, true);
 				}
 			}
 			finally

@@ -4,10 +4,10 @@ This example mixes footnotes[^fn1] and tables\.
 
 ### Table with large cells
 
-| &nbsp;||
+| &nbsp;        ||
 |:---|:---|
-| [^n1]| [^n2]|
-| [^n3]| [^n4]|
+| [^n1]  | [^n2]  |
+| [^n3]  | [^n4]  |
 
 The purpose is to see if footnotes[^fn2] and tables with complex cells interfere with each other\.
 

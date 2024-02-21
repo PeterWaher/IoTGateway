@@ -1,11 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model
 {
+	/// <summary>
+	/// Where baselign of horizontally organized elements are rendered.
+	/// </summary>
+	public enum BaselineAlignment
+	{
+		/// <summary>
+		/// Center-aligned
+		/// </summary>
+		Center,
+
+		/// <summary>
+		/// Aligned along base-line
+		/// </summary>
+		Baseline
+	}
+
 	/// <summary>
 	/// Abstract base class for all markdown elements.
 	/// </summary>
@@ -68,63 +83,20 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public abstract Task GenerateMarkdown(StringBuilder Output);
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public abstract Task GenerateHTML(StringBuilder Output);
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public abstract Task GeneratePlainText(StringBuilder Output);
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public abstract Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment);
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public abstract Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State);
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public virtual Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			return Task.CompletedTask;	// Do nothing by default
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public abstract Task GenerateLaTeX(StringBuilder Output);
+		/// <param name="Output">Renderer</param>
+		public abstract Task Render(IRenderer Output);
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal virtual bool OutsideParagraph => false;
+		public virtual bool OutsideParagraph => false;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal abstract bool InlineSpanElement
+		public abstract bool InlineSpanElement
 		{
 			get;
 		}
@@ -132,28 +104,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Baseline alignment
 		/// </summary>
-		internal virtual string BaselineAlignment => "Center";
-
-		/// <summary>
-		/// Gets margins for content.
-		/// </summary>
-		/// <param name="TopMargin">Top margin.</param>
-		/// <param name="BottomMargin">Bottom margin.</param>
-		internal virtual void GetMargins(out int TopMargin, out int BottomMargin)
-		{
-			if (this.InlineSpanElement && !this.OutsideParagraph)
-			{
-				TopMargin = 0;
-				BottomMargin = 0;
-			}
-			else
-			{
-				XamlSettings Settings = this.Document.Settings.XamlSettings;
-
-				TopMargin = Settings.ParagraphMarginTop;
-				BottomMargin = Settings.ParagraphMarginBottom;
-			}
-		}
+		public virtual BaselineAlignment BaselineAlignment => BaselineAlignment.Center;
 
 		/// <summary>
 		/// Loops through all child-elements for the element.
@@ -164,214 +115,6 @@ namespace Waher.Content.Markdown.Model
 		public virtual bool ForEach(MarkdownElementHandler Callback, object State)
 		{
 			return Callback(this, State);
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public abstract void Export(XmlWriter Output);
-
-		/// <summary>
-		/// Prefixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="Prefix">Block prefix</param>
-		protected static Task PrefixedBlock(StringBuilder Output, MarkdownElement Child, string Prefix)
-		{
-			return PrefixedBlock(Output, Child, Prefix, Prefix);
-		}
-
-		/// <summary>
-		/// Prefixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="Prefix">Block prefix</param>
-		protected static Task PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, string Prefix)
-		{
-			return PrefixedBlock(Output, Children, Prefix, Prefix);
-		}
-
-		/// <summary>
-		/// Prefixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
-		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		protected static Task PrefixedBlock(StringBuilder Output, MarkdownElement Child, string PrefixFirstRow, string PrefixNextRows)
-		{
-			return PrefixedBlock(Output, new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows);
-		}
-
-		/// <summary>
-		/// Prefixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
-		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		protected static async Task PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
-			string PrefixFirstRow, string PrefixNextRows)
-		{
-			StringBuilder Temp = new StringBuilder();
-
-			foreach (MarkdownElement E in Children)
-				await E.GenerateMarkdown(Temp);
-
-			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
-			string[] Rows = s.Split('\n');
-			int i, c = Rows.Length;
-
-			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
-				c--;
-
-			for (i = 0; i < c; i++)
-			{
-				Output.Append(PrefixFirstRow);
-				Output.AppendLine(Rows[i]);
-				PrefixFirstRow = PrefixNextRows;
-			}
-		}
-
-		/// <summary>
-		/// Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="Suffix">Block suffix</param>
-		protected static Task SuffixedBlock(StringBuilder Output, MarkdownElement Child, string Suffix)
-		{
-			return SuffixedBlock(Output, Child, Suffix, Suffix);
-		}
-
-		/// <summary>
-		/// Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="Suffix">Block suffix</param>
-		protected static Task SuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, string Suffix)
-		{
-			return SuffixedBlock(Output, Children, Suffix, Suffix);
-		}
-
-		/// <summary>
-		/// Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
-		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		protected static Task SuffixedBlock(StringBuilder Output, MarkdownElement Child, string SuffixFirstRow, string SuffixNextRows)
-		{
-			return SuffixedBlock(Output, new MarkdownElement[] { Child }, SuffixFirstRow, SuffixNextRows);
-		}
-
-		/// <summary>
-		/// Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
-		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		protected static async Task SuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
-			string SuffixFirstRow, string SuffixNextRows)
-		{
-			StringBuilder Temp = new StringBuilder();
-
-			foreach (MarkdownElement E in Children)
-				await E.GenerateMarkdown(Temp);
-
-			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
-			string[] Rows = s.Split('\n');
-			int i, c = Rows.Length;
-
-			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
-				c--;
-
-			for (i = 0; i < c; i++)
-			{
-				Output.Append(Rows[i]);
-				Output.AppendLine(SuffixFirstRow);
-				SuffixFirstRow = SuffixNextRows;
-			}
-		}
-
-		/// <summary>
-		/// Prefixes and Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="Prefix">Block prefix</param>
-		/// <param name="Suffix">Block suffix</param>
-		protected static Task PrefixSuffixedBlock(StringBuilder Output, MarkdownElement Child, string Prefix, string Suffix)
-		{
-			return PrefixSuffixedBlock(Output, Child, Prefix, Prefix, Suffix, Suffix);
-		}
-
-		/// <summary>
-		/// Prefixes and Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="Prefix">Block prefix</param>
-		/// <param name="Suffix">Block suffix</param>
-		protected static Task PrefixSuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, 
-			string Prefix, string Suffix)
-		{
-			return PrefixSuffixedBlock(Output, Children, Prefix, Prefix, Suffix, Suffix);
-		}
-
-		/// <summary>
-		/// Prefixes and Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Child">Child element.</param>
-		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
-		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
-		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		protected static Task PrefixSuffixedBlock(StringBuilder Output, MarkdownElement Child,
-			string PrefixFirstRow, string PrefixNextRows, string SuffixFirstRow, string SuffixNextRows)
-		{
-			return PrefixSuffixedBlock(Output, new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows, SuffixFirstRow, SuffixNextRows);
-		}
-
-		/// <summary>
-		/// Prefixes and Suffixes a block of markdown.
-		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		/// <param name="Children">Child elements.</param>
-		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
-		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
-		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		protected static async Task PrefixSuffixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
-			string PrefixFirstRow, string PrefixNextRows, string SuffixFirstRow, string SuffixNextRows)
-		{
-			StringBuilder Temp = new StringBuilder();
-
-			foreach (MarkdownElement E in Children)
-				await E.GenerateMarkdown(Temp);
-
-			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
-			string[] Rows = s.Split('\n');
-			int i, c = Rows.Length;
-
-			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
-				c--;
-
-			for (i = 0; i < c; i++)
-			{
-				Output.Append(PrefixFirstRow);
-				Output.Append(Rows[i]);
-				Output.AppendLine(SuffixFirstRow);
-				PrefixFirstRow = PrefixNextRows;
-				SuffixFirstRow = SuffixNextRows;
-			}
 		}
 
 		/// <summary>
@@ -417,9 +160,11 @@ namespace Waher.Content.Markdown.Model
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			StringBuilder Result = new StringBuilder();
-			this.GenerateMarkdown(Result);
-			return Result.ToString();
+			using (MarkdownRenderer Renderer = new MarkdownRenderer())
+			{
+				this.Render(Renderer);
+				return Renderer.ToString();
+			}
 		}
 
 		/// <summary>

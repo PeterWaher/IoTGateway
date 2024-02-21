@@ -151,14 +151,24 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		}
 
 		/// <summary>
+		/// Generates a parsed markdown document for the human-readable text.
+		/// </summary>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		/// <returns>Parsed Markdown</returns>
+		public async Task<MarkdownDocument> GenerateMarkdownDocument(Contract Contract)
+		{
+			string Markdown = this.GenerateMarkdown(Contract);
+			return await MarkdownDocument.CreateAsync(Markdown);
+		}
+
+		/// <summary>
 		/// Generates plain text for the human-readable text.
 		/// </summary>
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
 		/// <returns>Plain text</returns>
 		public async Task<string> GeneratePlainText(Contract Contract)
 		{
-			string Markdown = this.GenerateMarkdown(Contract);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
+			MarkdownDocument Doc = await this.GenerateMarkdownDocument(Contract);
 			return await Doc.GeneratePlainText();
 		}
 
@@ -169,34 +179,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <returns>HTML</returns>
 		public async Task<string> GenerateHTML(Contract Contract)
 		{
-			string Markdown = this.GenerateMarkdown(Contract);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
+			MarkdownDocument Doc = await this.GenerateMarkdownDocument(Contract);
 			return await Doc.GenerateHTML();
 		}
-
-		/// <summary>
-		/// Generates WPF XAML for the human-readable text.
-		/// </summary>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		/// <returns>WPF XAML</returns>
-		public async Task<string> GenerateXAML(Contract Contract)
-		{
-			string Markdown = this.GenerateMarkdown(Contract);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
-			return await Doc .GenerateXAML();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the human-readable text.
-		/// </summary>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		/// <returns>Xamarin.Forms XAML</returns>
-		public async Task<string> GenerateXamarinForms(Contract Contract)
-		{
-			string Markdown = this.GenerateMarkdown(Contract);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
-			return await Doc .GenerateXamarinForms();
-		}
-
 	}
 }

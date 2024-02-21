@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Html;
-using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
 using Waher.Runtime.Inventory;
-using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Semantic
@@ -86,16 +85,20 @@ namespace Waher.Content.Semantic
 					Html = CommonTypes.Encode(Result.BooleanResult.Value);
 				else
 				{
-					StringBuilder sb = new StringBuilder();
-					await InlineScript.GenerateHTML(Result.ToMatrix(), sb, true, new Script.Variables());
-					Html = sb.ToString();
+					using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()))
+					{
+						await Renderer.RenderObject(Result.ToMatrix(), true, new Script.Variables());
+						Html = Renderer.ToString();
+					}
 				}
 			}
 			else if (Object is ObjectMatrix M)
 			{
-				StringBuilder sb = new StringBuilder();
-				await InlineScript.GenerateHTML(M, sb, true, new Script.Variables());
-				Html = sb.ToString();
+				using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()))
+				{
+					await Renderer.RenderObject(M, true, new Script.Variables());
+					Html = Renderer.ToString();
+				}
 			}
 			else if (Object is bool b)
 				Html = CommonTypes.Encode(b);

@@ -508,6 +508,10 @@
       <Project>{82808905-5784-4a02-b137-a47b0142a46e}</Project>
       <Name>Waher.Content.Markdown.PlantUml</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj">
+      <Project>{c342d6f2-8f1c-4bcb-acb8-ba0c9f5e9de9}</Project>
+      <Name>Waher.Content.Markdown.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>

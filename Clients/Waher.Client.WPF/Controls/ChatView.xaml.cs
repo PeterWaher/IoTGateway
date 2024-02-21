@@ -25,6 +25,8 @@ using Waher.Events;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Model.Muc;
+using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Wpf;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -115,17 +117,23 @@ namespace Waher.Client.WPF.Controls
 
 		public static MarkdownSettings GetMarkdownSettings()
 		{
-			return new MarkdownSettings(Emoji1_24x24, false)
+			return new MarkdownSettings(Emoji1_24x24, false);
+		}
+
+		public static HtmlSettings GetHtmlSettings()
+		{
+			return new HtmlSettings()
 			{
-				HtmlSettings = new HtmlSettings()
-				{
-					XmlEntitiesOnly = true
-				},
-				XamlSettings = new XamlSettings()
-				{
-					TableCellRowBackgroundColor1 = "#20404040",
-					TableCellRowBackgroundColor2 = "#10808080"
-				}
+				XmlEntitiesOnly = true
+			};
+		}
+
+		public static XamlSettings GetXamlSettings()
+		{
+			return new XamlSettings()
+			{
+				TableCellRowBackgroundColor1 = "#20404040",
+				TableCellRowBackgroundColor2 = "#10808080"
 			};
 		}
 

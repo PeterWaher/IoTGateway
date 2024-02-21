@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Markdown.Model.SpanElements;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Rendering;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 
@@ -16,7 +14,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class CodeBlock : BlockElement
 	{
-		private readonly ICodeContent handler;
+		private ICodeContent handler;
+		private Type handlerType = null;
 		private readonly string[] rows;
 		private readonly string indentString;
 		private readonly string language;
@@ -53,8 +52,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.indent = Indent;
 			this.indentString = this.indent <= 0 ? string.Empty : new string('\t', this.indent);
 			this.language = Language;
-			this.handler = GetCodeBlockHandler(this.language);
-			this.handler?.Register(Document);
 		}
 
 		/// <summary>
@@ -68,18 +65,22 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public string[] Rows => this.rows;
 
 		/// <summary>
-		/// If code block has an assignated handler.
+		/// Multimedia handler.
 		/// </summary>
-		public bool HasHandler => !(this.handler is null);
+		public T CodeContentHandler<T>()
+			where T : ICodeContentRenderer
+		{
+			if (this.handlerType is null || this.handlerType != typeof(T))
+			{
+				this.handler = GetCodeBlockHandler<T>(this.language);
+				this.handlerType = typeof(T);
+			}
 
-		/// <summary>
-		/// Code block handler.
-		/// </summary>
-		public ICodeContent Handler => this.handler;
+			return (T)this.handler;
+		}
 
-		private static ICodeContent[] codeContents = null;
 		private static IXmlVisualizer[] xmlVisualizers = null;
-		private readonly static Dictionary<string, ICodeContent[]> codeContentHandlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<Type, Dictionary<string, ICodeContentRenderer[]>> codeContentHandlers = new Dictionary<Type, Dictionary<string, ICodeContentRenderer[]>>();
 		private readonly static Dictionary<string, IXmlVisualizer[]> xmlVisualizerHandlers = new Dictionary<string, IXmlVisualizer[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static CodeBlock()
@@ -90,10 +91,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 		private static void Init()
 		{
-			List<ICodeContent> CodeContents = new List<ICodeContent>();
+			List<ICodeContentRenderer> CodeContents = new List<ICodeContentRenderer>();
 			List<IXmlVisualizer> XmlVisualizers = new List<IXmlVisualizer>();
 
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContent)))
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContentRenderer)))
 			{
 				ConstructorInfo CI = Types.GetDefaultConstructor(T);
 				if (CI is null)
@@ -101,7 +102,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				try
 				{
-					ICodeContent CodeContent = (ICodeContent)CI.Invoke(Types.NoParameters);
+					ICodeContentRenderer CodeContent = (ICodeContentRenderer)CI.Invoke(Types.NoParameters);
 					CodeContents.Add(CodeContent);
 				}
 				catch (Exception ex)
@@ -129,7 +130,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			lock (codeContentHandlers)
 			{
-				codeContents = CodeContents.ToArray();
 				codeContentHandlers.Clear();
 			}
 
@@ -140,23 +140,42 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 		}
 
-		internal static ICodeContent GetCodeBlockHandler(string Language)
+		internal static T GetCodeBlockHandler<T>(string Language)
+			where T : ICodeContentRenderer
 		{
-			ICodeContent[] Handlers;
+			ICodeContentRenderer[] Handlers;
 
 			if (string.IsNullOrEmpty(Language))
-				return null;
+				return default;
 
 			lock (codeContentHandlers)
 			{
-				if (!codeContentHandlers.TryGetValue(Language, out Handlers))
+				if (!codeContentHandlers.TryGetValue(typeof(T), out Dictionary<string, ICodeContentRenderer[]> PerLanguage))
 				{
-					List<ICodeContent> List = new List<ICodeContent>();
+					PerLanguage = new Dictionary<string, ICodeContentRenderer[]>();
+					codeContentHandlers[typeof(T)] = PerLanguage;
+				}
 
-					foreach (ICodeContent Content in codeContents)
+				if (!PerLanguage.TryGetValue(Language, out Handlers))
+				{
+					List<ICodeContentRenderer> List = new List<ICodeContentRenderer>();
+
+					foreach (Type T2 in Types.GetTypesImplementingInterface(typeof(T)))
 					{
-						if (Content.Supports(Language) > Grade.NotAtAll)
-							List.Add(Content);
+						ConstructorInfo CI = Types.GetDefaultConstructor(T2);
+						if (CI is null)
+							continue;
+
+						try
+						{
+							T CodeContent = (T)CI.Invoke(Types.NoParameters);
+							if (CodeContent.Supports(Language) > Grade.NotAtAll)
+								List.Add(CodeContent);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
 
 					if (List.Count > 0)
@@ -164,24 +183,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					else
 						Handlers = null;
 
-					codeContentHandlers[Language] = Handlers;
+					PerLanguage[Language] = Handlers;
 				}
 			}
 
 			if (Handlers is null)
-				return null;
+				return default;
 
-			ICodeContent Best = null;
+			T Best = default;
 			Grade BestGrade = Grade.NotAtAll;
 			Grade ContentGrade;
 
-			foreach (ICodeContent Content in Handlers)
+			foreach (ICodeContentRenderer Content in Handlers)
 			{
 				ContentGrade = Content.Supports(Language);
-				if (ContentGrade > BestGrade)
+				if (ContentGrade > BestGrade && Content is T TypedContent)
 				{
 					BestGrade = ContentGrade;
-					Best = Content;
+					Best = TypedContent;
 				}
 			}
 
@@ -238,401 +257,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			if (!(this.handler is null) && this.handler.HandlesMarkdown)
-			{
-				try
-				{
-					if (await this.handler.GenerateMarkdown(Output, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
-
-			int Max = 2;
-
-			foreach (string Row in this.rows)
-			{
-				int i = 0;
-
-				foreach (char ch in Row)
-				{
-					if (ch == '`')
-						i++;
-					else
-					{
-						if (i > Max)
-							Max = i;
-
-						i = 0;
-					}
-				}
-
-				if (i > Max)
-					Max = i;
-			}
-
-			string s = new string('`', Max + 1);
-
-			Output.Append(s);
-			Output.AppendLine(this.language);
-
-			foreach (string Row in this.rows)
-				Output.AppendLine(Row);
-
-			Output.AppendLine(s);
-			Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			if (!(this.handler is null) && this.handler.HandlesHTML)
-			{
-				try
-				{
-					if (await this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-
-					Output.AppendLine("<font class=\"error\">");
-
-					if (ex is AggregateException ex2)
-					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-						{
-							Output.Append("<p>");
-							Output.Append(XML.HtmlValueEncode(ex3.Message));
-							Output.AppendLine("</p>");
-						}
-					}
-					else
-					{
-						Output.Append("<p>");
-						Output.Append(XML.HtmlValueEncode(ex.Message));
-						Output.Append("</p>");
-					}
-
-					Output.Append("</font>");
-				}
-			}
-
-			int i;
-
-			Output.Append("<pre><code class=\"");
-
-			if (string.IsNullOrEmpty(this.language))
-				Output.Append("nohighlight");
-			else
-				Output.Append(XML.Encode(this.language));
-
-			Output.Append("\">");
-
-			for (i = this.start; i <= this.end; i++)
-			{
-				Output.Append(this.indentString);
-				Output.AppendLine(XML.HtmlValueEncode(this.rows[i]));
-			}
-
-			Output.AppendLine("</code></pre>");
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			if (!(this.handler is null))
-			{
-				if (this.handler.HandlesPlainText)
-				{
-					try
-					{
-						if (await this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
-							return;
-					}
-					catch (Exception ex)
-					{
-						ex = Log.UnnestException(ex);
-
-						if (ex is AggregateException ex2)
-						{
-							foreach (Exception ex3 in ex2.InnerExceptions)
-								Output.AppendLine(ex3.Message);
-						}
-						else
-							Output.AppendLine(ex.Message);
-					}
-				}
-			}
-			else
-			{
-				int i;
-
-				for (i = this.start; i <= this.end; i++)
-				{
-					Output.Append(this.indentString);
-					Output.AppendLine(this.rows[i]);
-				}
-
-				Output.AppendLine();
-			}
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			XamlSettings Settings = this.Document.Settings.XamlSettings;
-
-			if (!(this.handler is null) && this.handler.HandlesXAML)
-			{
-				try
-				{
-					if (await this.handler.GenerateXAML(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-
-					if (ex is AggregateException ex2)
-					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-						{
-							Output.WriteStartElement("TextBlock");
-							Output.WriteAttributeString("TextWrapping", "Wrap");
-							Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
-
-							if (TextAlignment != TextAlignment.Left)
-								Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-
-							Output.WriteAttributeString("Foreground", "Red");
-							Output.WriteValue(ex3.Message);
-							Output.WriteEndElement();
-						}
-					}
-					else
-					{
-						Output.WriteStartElement("TextBlock");
-						Output.WriteAttributeString("TextWrapping", "Wrap");
-						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
-						if (TextAlignment != TextAlignment.Left)
-							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-
-						Output.WriteAttributeString("Foreground", "Red");
-						Output.WriteValue(ex.Message);
-						Output.WriteEndElement();
-					}
-				}
-			}
-
-			bool First = true;
-
-			Output.WriteStartElement("TextBlock");
-			Output.WriteAttributeString("xml", "space", null, "preserve");
-			Output.WriteAttributeString("TextWrapping", "NoWrap");
-			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
-			Output.WriteAttributeString("FontFamily", "Courier New");
-			if (TextAlignment != TextAlignment.Left)
-				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-
-			foreach (string Row in this.rows)
-			{
-				if (First)
-					First = false;
-				else
-					Output.WriteElementString("LineBreak", string.Empty);
-
-				Output.WriteValue(Row);
-			}
-
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			XamlSettings Settings = this.Document.Settings.XamlSettings;
-
-			if (!(this.handler is null) && this.handler.HandlesXAML)
-			{
-				try
-				{
-					if (await this.handler.GenerateXamarinForms(Output, State, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-
-					if (ex is AggregateException ex2)
-					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-						{
-							Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
-							Output.WriteStartElement("Label");
-							Output.WriteAttributeString("LineBreakMode", "WordWrap");
-							Output.WriteAttributeString("TextColor", "Red");
-							Output.WriteValue(ex3.Message);
-							Output.WriteEndElement();
-							Output.WriteEndElement();
-						}
-					}
-					else
-					{
-						Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
-						Output.WriteStartElement("Label");
-						Output.WriteAttributeString("LineBreakMode", "WordWrap");
-						Output.WriteAttributeString("TextColor", "Red");
-						Output.WriteValue(ex.Message);
-						Output.WriteEndElement();
-						Output.WriteEndElement();
-					}
-				}
-			}
-
-			Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
-			Output.WriteStartElement("StackLayout");
-			Output.WriteAttributeString("Orientation", "Vertical");
-
-			foreach (string Row in this.rows)
-			{
-				Output.WriteStartElement("Label");
-				Output.WriteAttributeString("LineBreakMode", "NoWrap");
-				Header.XamarinFormsLabelAlignment(Output, State);
-				Output.WriteAttributeString("FontFamily", "Courier New");
-				Output.WriteAttributeString("Text", Row);
-				Output.WriteEndElement();
-			}
-
-			Output.WriteEndElement();
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			if (!(this.handler is null) && this.handler.HandlesLaTeX)
-			{
-				try
-				{
-					if (await this.handler.GenerateLaTeX(Output, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception ex)
-				{
-					bool First = true;
-
-					ex = Log.UnnestException(ex);
-
-					Output.AppendLine("\\texttt{\\color{red}");
-
-					if (ex is AggregateException ex2)
-					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-						{
-							foreach (string Row in ex3.Message.Replace("\r\n", "\n").
-								Replace('\r', '\n').Split('\n'))
-							{
-								if (First)
-									First = false;
-								else
-									Output.AppendLine("\\\\");
-
-								Output.Append(InlineText.EscapeLaTeX(Row));
-							}
-						}
-					}
-					else
-					{
-						foreach (string Row in ex.Message.Replace("\r\n", "\n").
-							Replace('\r', '\n').Split('\n'))
-						{
-							if (First)
-								First = false;
-							else
-								Output.AppendLine("\\\\");
-
-							Output.Append(InlineText.EscapeLaTeX(Row));
-						}
-					}
-
-					Output.AppendLine("}");
-					Output.AppendLine();
-				}
-			}
-
-			Output.Append("\\texttt{");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
-			Output.AppendLine("}");
-			Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			if (!(this.handler is null) && this.handler.HandlesSmartContract)
-			{
-				try
-				{
-					if (await this.handler.GenerateSmartContractXml(Output, State, this.rows, this.language, this.indent, this.Document))
-						return;
-				}
-				catch (Exception)
-				{
-					// Continue
-				}
-			}
-
-			Output.WriteStartElement("paragraph");
-
-			bool First = true;
-
-			foreach (string Row in this.rows)
-			{
-				if (First)
-					First = false;
-				else
-					Output.WriteElementString("lineBreak", string.Empty);
-
-				Output.WriteElementString("text", Row);
-			}
-
-			Output.WriteEndElement();
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// Code block indentation.
@@ -640,28 +268,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public int Indent => this.indent;
 
 		/// <summary>
-		/// If the element is an inline span element.
+		/// String used for indentation.
 		/// </summary>
-		internal override bool InlineSpanElement => false;
+		public string IndentString => this.indentString;
 
 		/// <summary>
-		/// Exports the element to XML.
+		/// If the element is an inline span element.
 		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("CodeBlock");
-			Output.WriteAttributeString("language", this.language);
-			Output.WriteAttributeString("start", this.start.ToString());
-			Output.WriteAttributeString("end", this.end.ToString());
-			Output.WriteAttributeString("indent", this.indent.ToString());
-			Output.WriteAttributeString("indentString", this.indentString);
+		public override bool InlineSpanElement => false;
 
-			foreach (string s in this.rows)
-				Output.WriteElementString("Row", s);
+		/// <summary>
+		/// Start row index
+		/// </summary>
+		public int Start => this.start;
 
-			Output.WriteEndElement();
-		}
+		/// <summary>
+		/// End row index.
+		/// </summary>
+		public int End => this.end;
 
 		/// <summary>
 		/// If the current object has same meta-data as <paramref name="E"/>

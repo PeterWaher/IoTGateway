@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -103,134 +102,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override bool IsBlockElement => this.hasBlocks;
 
 		/// <summary>
-		/// Generates HTML for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Output);
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GeneratePlainText(Output);
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			if (this.HasOneChild)
-				await this.FirstChild.GenerateXAML(Output, TextAlignment);
-			else
-			{
-				bool SpanOpen = false;
-
-				foreach (MarkdownElement E in this.Children)
-				{
-					if (E.InlineSpanElement)
-					{
-						if (!SpanOpen)
-						{
-							Output.WriteStartElement("TextBlock");
-							Output.WriteAttributeString("TextWrapping", "Wrap");
-							if (TextAlignment != TextAlignment.Left)
-								Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-							SpanOpen = true;
-						}
-					}
-					else
-					{
-						if (SpanOpen)
-						{
-							Output.WriteEndElement();
-							SpanOpen = false;
-						}
-					}
-
-					await E.GenerateXAML(Output, TextAlignment);
-				}
-
-				if (SpanOpen)
-					Output.WriteEndElement();
-			}
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			if (this.HasOneChild)
-				await this.FirstChild.GenerateXamarinForms(Output, State);
-			else
-			{
-				StringBuilder Html = null;
-
-				foreach (MarkdownElement E in this.Children)
-				{
-					if (E.InlineSpanElement)
-					{
-						if (Html is null)
-							Html = new StringBuilder();
-
-						await E.GenerateHTML(Html);
-					}
-					else
-					{
-						if (!(Html is null))
-						{
-							Output.WriteStartElement("Label");
-							Output.WriteAttributeString("LineBreakMode", "WordWrap");
-							Header.XamarinFormsLabelAlignment(Output, State);
-							Output.WriteAttributeString("TextType", "Html");
-							Output.WriteCData(Html.ToString());
-							Output.WriteEndElement();
-
-							Html = null;
-						}
-
-						await E.GenerateXamarinForms(Output, State);
-					}
-				}
-
-				if (!(Html is null))
-				{
-					Output.WriteStartElement("Label");
-					Output.WriteAttributeString("LineBreakMode", "WordWrap");
-					Header.XamarinFormsLabelAlignment(Output, State);
-					Output.WriteAttributeString("TextType", "Html");
-					Output.WriteCData(Html.ToString());
-					Output.WriteEndElement();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
+		public override bool InlineSpanElement
 		{
 			get
 			{
@@ -239,38 +119,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				else
 					return false;
 			}
-		}
-
-		/// <summary>
-		/// Gets margins for content.
-		/// </summary>
-		/// <param name="TopMargin">Top margin.</param>
-		/// <param name="BottomMargin">Bottom margin.</param>
-		internal override void GetMargins(out int TopMargin, out int BottomMargin)
-		{
-			bool First = true;
-
-			TopMargin = BottomMargin = 0;
-
-			foreach (MarkdownElement E in this.Children)
-			{
-				if (First)
-				{
-					First = false;
-					E.GetMargins(out TopMargin, out BottomMargin);
-				}
-				else
-					E.GetMargins(out int _, out BottomMargin);
-			}
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			this.Export(Output, "NestedBlock");
 		}
 
 		/// <summary>

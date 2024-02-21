@@ -1,7 +1,5 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Markdown.Model.SpanElements;
+﻿using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -30,136 +28,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public string Prefix => this.prefix;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			await PrefixedBlock(Output, this.Child, this.prefix + "\t", "\t");
-			Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Output.Append("<li");
-
-			if (!(this.Document.Detail is null))
-			{
-				if (this.Child is Link Link)
-				{
-					if (string.Compare(this.Document.Detail.ResourceName, Link.Url, true) == 0)
-						Output.Append(" class=\"active\"");
-				}
-				else if (this.Child is LinkReference LinkReference)
-				{
-					string Label = LinkReference.Label;
-					SpanElements.Multimedia Multimedia = this.Document.GetReference(Label);
-
-					if (!(Multimedia is null) && Multimedia.Items.Length == 1 && string.Compare(Multimedia.Items[0].Url, this.Document.Detail.ResourceName, true) == 0)
-						Output.Append(" class=\"active\"");
-				}
-			}
-
-			Output.Append('>');
-			await this.Child.GenerateHTML(Output);
-			Output.AppendLine("</li>");
-		}
-
-		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
-		{
-			Output.Append(this.prefix);
-			Output.Append(' ');
-
-			StringBuilder sb = new StringBuilder();
-			await this.Child.GeneratePlainText(sb);
-
-			string s = sb.ToString();
-
-			Output.Append(s);
-
-			if (!s.EndsWith("\n"))
-				Output.AppendLine();
-		}
-
-		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			return this.Child.GenerateXAML(Output, TextAlignment);
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			return this.Child.GenerateXamarinForms(Output, State);
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			return NumberedItem.GenerateSmartContractXmlItem(this.Child, Output, State);
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			Output.Append("\\item{");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
-			Output.AppendLine("}");
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => this.Child.InlineSpanElement;
-
-		/// <summary>
-		/// Gets margins for content.
-		/// </summary>
-		/// <param name="TopMargin">Top margin.</param>
-		/// <param name="BottomMargin">Bottom margin.</param>
-		internal override void GetMargins(out int TopMargin, out int BottomMargin)
-		{
-			this.Child.GetMargins(out TopMargin, out BottomMargin);
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("UnnumberedItem");
-			Output.WriteAttributeString("prefix", this.prefix);
-			this.ExportChild(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => this.Child.InlineSpanElement;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

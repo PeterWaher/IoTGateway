@@ -12,6 +12,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Wpf;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -240,7 +241,7 @@ namespace Waher.Script.Lab
 				}
 
 				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), GetMarkdownSettings());
-				string XAML = await Doc.GenerateXAML();
+				string XAML = await Doc.GenerateXAML(GetXamlSettings());
 
 				TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
 
@@ -260,13 +261,15 @@ namespace Waher.Script.Lab
 
 		public static MarkdownSettings GetMarkdownSettings()
 		{
-			return new MarkdownSettings(null, false)
+			return new MarkdownSettings(null, false);
+		}
+
+		public static XamlSettings GetXamlSettings()
+		{
+			return new XamlSettings()
 			{
-				XamlSettings = new XamlSettings()
-				{
-					TableCellRowBackgroundColor1 = "#20404040",
-					TableCellRowBackgroundColor2 = "#10808080"
-				}
+				TableCellRowBackgroundColor1 = "#20404040",
+				TableCellRowBackgroundColor2 = "#10808080"
 			};
 		}
 

@@ -1,5 +1,6 @@
 ﻿using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Xml;
 
 namespace Waher.Content.Markdown.Web
 {
@@ -42,7 +43,7 @@ namespace Waher.Content.Markdown.Web
 		/// <returns>Conversion result.</returns>
 		protected override Task<string> DoConversion(MarkdownDocument Doc)
 		{
-			return Task.FromResult(Doc.ExportXml());
+			return Doc.ExportXml();
 		}
 
 	}

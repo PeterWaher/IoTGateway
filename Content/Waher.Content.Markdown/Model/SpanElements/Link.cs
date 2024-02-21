@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -40,76 +37,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Title => this.title;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('[');
-			await base.GenerateMarkdown(Output);
-			Output.Append("](");
-			Output.Append(this.url);
-
-			if (!string.IsNullOrEmpty(this.title))
-			{
-				Output.Append(" \"");
-				Output.Append(this.title.Replace("\"", "\\\""));
-				Output.Append('"');
-			}
-
-			Output.Append(')');
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override Task GenerateHTML(StringBuilder Output)
-		{
-			return GenerateHTML(Output, this.url, this.title, this.Children, this.Document);
-		}
-
-		/// <summary>
-		/// Generates HTML for a link.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="Document">Markdown document.</param>
-		public static async Task GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes,
-			MarkdownDocument Document)
-		{
-			bool IsRelative = Url.IndexOf(':') < 0;
-
-			if (!IsRelative && Url.StartsWith("javascript:", StringComparison.OrdinalIgnoreCase))
-			{
-				Output.Append("<a href=\"#\" onclick=\"");
-				Output.Append(XML.HtmlAttributeEncode(System.Net.WebUtility.UrlDecode(Url.Substring(11))));
-				IsRelative = true;
-			}
-			else
-			{
-				Output.Append("<a href=\"");
-				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url, null)));
-			}
-
-			if (!string.IsNullOrEmpty(Title))
-			{
-				Output.Append("\" title=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
-			}
-
-			if (!IsRelative)
-				Output.Append("\" target=\"_blank");
-
-			Output.Append("\">");
-
-			foreach (MarkdownElement E in ChildNodes)
-				await E.GenerateHTML(Output);
-
-			Output.Append("</a>");
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -118,82 +49,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			return GenerateXAML(Output, TextAlignment, this.url, this.title, this.Children, this.Document);
-		}
-
-		/// <summary>
-		/// Generates XAML for a link.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="Document">Markdown document.</param>
-		public static async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title,
-			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
-		{
-			Output.WriteStartElement("Hyperlink");
-			Output.WriteAttributeString("NavigateUri", Document.CheckURL(Url, null));
-
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
-
-			foreach (MarkdownElement E in ChildNodes)
-				await E.GenerateXAML(Output, TextAlignment);
-
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			string Bak = State.Hyperlink;
-			State.Hyperlink = this.url;
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-
-			State.Hyperlink = Bak;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("Link");
-			Output.WriteAttributeString("url", this.url);
-			Output.WriteAttributeString("title", this.title);
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

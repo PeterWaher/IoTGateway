@@ -76,6 +76,7 @@ using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Runtime.Threading;
 using Waher.Content.Markdown.Functions;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.IoTGateway
 {
@@ -3353,8 +3354,7 @@ namespace Waher.IoTGateway
 		/// Sends a graph as a notification message to configured notification recipients.
 		/// </summary>
 		/// <param name="Graph">Graph to send.</param>
-		/// <param name="Settings">Graph settings.</param>
-		public static Task SendNotification(Graph Graph, GraphSettings Settings)
+		public static Task SendNotification(Graph Graph)
 		{
 			return SendNotification(ToMarkdown.GraphToMarkdown(Graph));
 		}
@@ -3430,15 +3430,15 @@ namespace Waher.IoTGateway
 			{
 				MarkdownSettings Settings = new MarkdownSettings()
 				{
-					ParseMetaData = false,
-					HtmlSettings = new HtmlSettings()
-					{
-						XmlEntitiesOnly = true
-					}
+					ParseMetaData = false
+				};
+				HtmlSettings HtmlSettings = new HtmlSettings()
+				{
+					XmlEntitiesOnly = true
 				};
 				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 				string Text = TextVersion ? await Doc.GeneratePlainText() : null;
-				string Html = HtmlVersion ? HtmlDocument.GetBody(await Doc.GenerateHTML()) : null;
+				string Html = HtmlVersion ? HtmlDocument.GetBody(await Doc.GenerateHTML(HtmlSettings)) : null;
 
 				return (Text, Html);
 			}

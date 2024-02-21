@@ -9,27 +9,52 @@
             Represents a consolidated table.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.#ctor(System.String,Waher.Content.Markdown.Model.BlockElements.Table)">
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.#ctor(Waher.Content.Markdown.Model.BlockElements.Table)">
             <summary>
             Represents a consolidated table.
             </summary>
+            <param name="MarkdownTable">Markdown table.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.CreateAsync(System.String,Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Creates a consolidated table.
+            </summary>
             <param name="Source">Source of table.</param>
             <param name="MarkdownTable">Markdown table.</param>
+            <returns>Consolidated table instance.</returns>
         </member>
         <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrColumns">
             <summary>
             Number of columns.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.GetNrColumns">
+            <summary>
+            Gets the number of columns.
+            </summary>
+            <returns>Number of columns.</returns>
+        </member>
         <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrHeaderRows">
             <summary>
             Number of header rows.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.GetNrHeaderRows">
+            <summary>
+            Gets the number of header rows.
+            </summary>
+            <returns>Number of header rows.</returns>
+        </member>
         <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrCellRows">
             <summary>
             Number of cell rows.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.GetNrCellRows">
+            <summary>
+            Gets the number of cell rows.
+            </summary>
+            <returns>Number of cell rows.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.GetAlignment(System.Int32)">
             <summary>

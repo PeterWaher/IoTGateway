@@ -20,12 +20,12 @@
 			<InlineText>Alt text 2</InlineText>
 			<MultimediaItem url="/path/to/img.jpg" title="Optional title" extension="" contentType="" />
 		</Multimedia>
-		<LinkReference label="id">
+		<MultimediaReference label="id">
 			<InlineText>Alt text 3</InlineText>
-		</LinkReference>
-		<LinkReference label="id2">
+		</MultimediaReference>
+		<MultimediaReference label="id2">
 			<InlineText>Alt text 4</InlineText>
-		</LinkReference>
+		</MultimediaReference>
 		<Multimedia aloneInParagraph="true">
 			<InlineText>Alt text 5</InlineText>
 			<MultimediaItem url="/path/to/img.jpg" title="" extension="" contentType="" width="320" height="200" />
@@ -34,18 +34,18 @@
 			<InlineText>Alt text 6</InlineText>
 			<MultimediaItem url="/path/to/img.jpg" title="Optional title 2" extension="" contentType="" width="320" height="200" />
 		</Multimedia>
-		<LinkReference label="id3">
+		<MultimediaReference label="id3">
 			<InlineText>Alt text 7</InlineText>
-		</LinkReference>
-		<LinkReference label="id4">
+		</MultimediaReference>
+		<MultimediaReference label="id4">
 			<InlineText>Alt text 8</InlineText>
-		</LinkReference>
-		<LinkReference label="id5">
+		</MultimediaReference>
+		<MultimediaReference label="id5">
 			<InlineText>Alt text 9</InlineText>
-		</LinkReference>
-		<LinkReference label="id6">
+		</MultimediaReference>
+		<MultimediaReference label="id6">
 			<InlineText>Alt text 10</InlineText>
-		</LinkReference>
+		</MultimediaReference>
 		<Multimedia aloneInParagraph="true">
 			<InlineText>Your browser does not support the audio tag</InlineText>
 			<MultimediaItem url="/local/music.mp3" title="" extension="" contentType="" />
@@ -95,24 +95,24 @@
 			<MultimediaItem url="video4.3gp" title="" extension="" contentType="" width="320" height="200" />
 			<MultimediaItem url="video5.flv" title="" extension="" contentType="" width="320" height="200" />
 		</Multimedia>
-		<LinkReference label="mid1">
+		<MultimediaReference label="mid1">
 			<InlineText>MultiImage1</InlineText>
-		</LinkReference>
-		<LinkReference label="mid2">
+		</MultimediaReference>
+		<MultimediaReference label="mid2">
 			<InlineText>MultiImage2</InlineText>
-		</LinkReference>
-		<LinkReference label="mid3">
+		</MultimediaReference>
+		<MultimediaReference label="mid3">
 			<InlineText>MultiImage3</InlineText>
-		</LinkReference>
-		<LinkReference label="mid4">
+		</MultimediaReference>
+		<MultimediaReference label="mid4">
 			<InlineText>MultiAudio1</InlineText>
-		</LinkReference>
-		<LinkReference label="mid5">
+		</MultimediaReference>
+		<MultimediaReference label="mid5">
 			<InlineText>MultiVideo1</InlineText>
-		</LinkReference>
-		<LinkReference label="mid6">
+		</MultimediaReference>
+		<MultimediaReference label="mid6">
 			<InlineText>MultiVideo2</InlineText>
-		</LinkReference>
+		</MultimediaReference>
 		<Multimedia aloneInParagraph="true">
 			<InlineText>Google</InlineText>
 			<MultimediaItem url="http://google.com/" title="" extension="" contentType="" width="1200" height="300" />

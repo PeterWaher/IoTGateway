@@ -6,22 +6,19 @@ using Waher.Script.Model;
 
 namespace Waher.Content.Markdown
 {
-	/// <summary>
-	/// Delegate for expression authorization methods.
-	/// </summary>
-	/// <param name="Expression">Expression to be authorized.</param>
-	/// <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
-	/// <see cref="ScriptNode"/> that is prohibited is returned.</returns>
-	public delegate Task<ScriptNode> AuthorizeExpression(Expression Expression);
+    /// <summary>
+    /// Delegate for expression authorization methods.
+    /// </summary>
+    /// <param name="Expression">Expression to be authorized.</param>
+    /// <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
+    /// <see cref="ScriptNode"/> that is prohibited is returned.</returns>
+    public delegate Task<ScriptNode> AuthorizeExpression(Expression Expression);
 
 	/// <summary>
 	/// Contains settings that the Markdown parser uses to customize its behavior.
 	/// </summary>
 	public class MarkdownSettings
 	{
-		private XamlSettings xamlSettings = null;
-		private HtmlSettings htmlSettings = null;
-		private LaTeXSettings latexSettings = null;
 		private IEmojiSource emojiSource;
 		private Variables variables;
 		private AuthorizeExpression authorizeExpression;
@@ -230,33 +227,5 @@ namespace Waher.Content.Markdown
 
 			return FileName;
 		}
-
-		/// <summary>
-		/// XAML Settings used for XAML rendering.
-		/// </summary>
-		public XamlSettings XamlSettings
-		{
-			get => this.xamlSettings;
-			set => this.xamlSettings = value;
-		}
-
-		/// <summary>
-		/// HTML Settings used for HTML rendering.
-		/// </summary>
-		public HtmlSettings HtmlSettings
-		{
-			get => this.htmlSettings;
-			set => this.htmlSettings = value;
-		}
-
-		/// <summary>
-		/// LaTeX Settings used for LaTeX rendering.
-		/// </summary>
-		public LaTeXSettings LaTeXSettings
-		{
-			get => this.latexSettings;
-			set => this.latexSettings = value;
-		}
-
 	}
 }

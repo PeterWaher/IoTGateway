@@ -1592,26 +1592,6 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Creates a human-readable WPF XAML document for the contract.
-		/// </summary>
-		/// <param name="Language">Desired language</param>
-		/// <returns>Markdown</returns>
-		public Task<string> ToXAML(string Language)
-		{
-			return this.ToXAML(this.forHumans, Language);
-		}
-
-		/// <summary>
-		/// Creates a human-readable Xamarin.Forms XAML document for the contract.
-		/// </summary>
-		/// <param name="Language">Desired language</param>
-		/// <returns>Markdown</returns>
-		public Task<string> ToXamarinForms(string Language)
-		{
-			return this.ToXamarinForms(this.forHumans, Language);
-		}
-
-		/// <summary>
 		/// Selects a human-readable text, and generates a Markdown document from it.
 		/// </summary>
 		/// <param name="Text">Collection of texts in different languages.</param>
@@ -1646,28 +1626,6 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Selects a human-readable text, and generates a XAML document from it.
-		/// </summary>
-		/// <param name="Text">Collection of texts in different languages.</param>
-		/// <param name="Language">Language</param>
-		/// <returns>XAML document.</returns>
-		public Task<string> ToXAML(HumanReadableText[] Text, string Language)
-		{
-			return this.Select(Text, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
-		}
-
-		/// <summary>
-		/// Selects a human-readable text, and generates a Xamaring Forms XAML document from it.
-		/// </summary>
-		/// <param name="Text">Collection of texts in different languages.</param>
-		/// <param name="Language">Language</param>
-		/// <returns>Xamarin Forms XAML document.</returns>
-		public Task<string> ToXamarinForms(HumanReadableText[] Text, string Language)
-		{
-			return this.Select(Text, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
-		}
-
-		/// <summary>
 		/// Selects a label, and generates a Markdown document from it.
 		/// </summary>
 		/// <param name="Label">Collection of texts in different languages.</param>
@@ -1699,28 +1657,6 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task<string> ToHTML(Label[] Label, string Language)
 		{
 			return this.Select(Label, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
-		}
-
-		/// <summary>
-		/// Selects a label, and generates a XAML document from it.
-		/// </summary>
-		/// <param name="Label">Collection of texts in different languages.</param>
-		/// <param name="Language">Language</param>
-		/// <returns>XAML document.</returns>
-		public Task<string> ToXAML(Label[] Label, string Language)
-		{
-			return this.Select(Label, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
-		}
-
-		/// <summary>
-		/// Selects a label, and generates a Xamaring Forms XAML document from it.
-		/// </summary>
-		/// <param name="Label">Collection of texts in different languages.</param>
-		/// <param name="Language">Language</param>
-		/// <returns>Xamarin Forms XAML document.</returns>
-		public Task<string> ToXamarinForms(Label[] Label, string Language)
-		{
-			return this.Select(Label, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
 		}
 
 		/// <summary>

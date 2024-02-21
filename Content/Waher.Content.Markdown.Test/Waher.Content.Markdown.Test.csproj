@@ -1101,6 +1101,11 @@
     <ProjectReference Include="..\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>

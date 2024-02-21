@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -30,34 +29,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Label => this.label;
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Renders the element.
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override async Task GenerateMarkdown(StringBuilder Output)
-		{
-			Output.Append('[');
-			await base.GenerateMarkdown(Output);
-			Output.Append("][");
-			Output.Append(this.label);
-			Output.Append(']');
-		}
-
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		public override async Task GenerateHTML(StringBuilder Output)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.label);
-
-			if (!(Multimedia is null))
-				await Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children, this.Document);
-			else
-			{
-				foreach (MarkdownElement E in this.Children)
-					await E.GenerateHTML(Output);
-			}
-		}
+		/// <param name="Output">Renderer</param>
+		public override Task Render(IRenderer Output) => Output.Render(this);
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -66,72 +41,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates WPF XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.label);
-
-			if (!(Multimedia is null))
-			{
-				await Link.GenerateXAML(Output, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children,
-					this.Document);
-			}
-			else
-			{
-				foreach (MarkdownElement E in this.Children)
-					await E.GenerateXAML(Output, TextAlignment);
-			}
-		}
-
-		/// <summary>
-		/// Generates Xamarin.Forms XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
-		{
-			Multimedia Multimedia = this.Document.GetReference(this.label);
-
-			string Bak = State.Hyperlink;
-
-			if (!(Multimedia is null))
-				State.Hyperlink = Multimedia.Items[0].Url;
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateXamarinForms(Output, State);
-
-			State.Hyperlink = Bak;
-		}
-
-		/// <summary>
-		/// Generates LaTeX for the markdown element.
-		/// </summary>
-		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
-		{
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-		}
-
-		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement => true;
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteStartElement("LinkReference");
-			Output.WriteAttributeString("label", this.label);
-			this.ExportChildren(Output);
-			Output.WriteEndElement();
-		}
+		public override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

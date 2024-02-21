@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model
@@ -51,26 +49,6 @@ namespace Waher.Content.Markdown.Model
 		public abstract MarkdownElementSingleChild Create(MarkdownElement Child, MarkdownDocument Document);
 
 		/// <summary>
-		/// Generates plain text for the markdown element.
-		/// </summary>
-		/// <param name="Output">Plain text will be output here.</param>
-		public override Task GeneratePlainText(StringBuilder Output)
-		{
-			return this.child?.GeneratePlainText(Output) ?? Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
-		/// </summary>
-		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="State">Current rendering state.</param>
-		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
-		{
-			return this.child?.GenerateSmartContractXml(Output, State) ?? Task.CompletedTask;
-		}
-
-		/// <summary>
 		/// Loops through all child-elements for the element.
 		/// </summary>
 		/// <param name="Callback">Method called for each one of the elements.</param>
@@ -85,27 +63,6 @@ namespace Waher.Content.Markdown.Model
 				return false;
 
 			return true;
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		/// <param name="ElementName">Name of element.</param>
-		public void Export(XmlWriter Output, string ElementName)
-		{
-			Output.WriteStartElement(ElementName);
-			this.ExportChild(Output);
-			Output.WriteEndElement();
-		}
-
-		/// <summary>
-		/// Exports the child element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		protected virtual void ExportChild(XmlWriter Output)
-		{
-			this.child?.Export(Output);
 		}
 
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Contracts;
 
 namespace Waher.Content.Markdown.Web
 {

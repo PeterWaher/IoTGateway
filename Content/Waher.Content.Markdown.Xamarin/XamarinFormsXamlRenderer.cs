@@ -17,7 +17,7 @@ using Waher.Script.Operators.Matrices;
 namespace Waher.Content.Markdown.Xamarin
 {
 	/// <summary>
-	/// Renders XAML (WPF flavour) from a Markdown document.
+	/// Renders XAML (Xamarin.Forms flavour) from a Markdown document.
 	/// </summary>
 	public class XamarinFormsXamlRenderer : Renderer
 	{
@@ -82,7 +82,7 @@ namespace Waher.Content.Markdown.Xamarin
 		public string Hyperlink = null;
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders XAML (Xamarin.Forms flavour) from a Markdown document.
 		/// </summary>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		/// <param name="XamlSettings">XAML-specific settings.</param>
@@ -94,9 +94,9 @@ namespace Waher.Content.Markdown.Xamarin
 		}
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders XAML (Xamarin.Forms flavour) from a Markdown document.
 		/// </summary>
-		/// <param name="Output">Markdown output.</param>
+		/// <param name="Output">XAML output.</param>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		/// <param name="XamlSettings">XAML-specific settings.</param>
 		public XamarinFormsXamlRenderer(StringBuilder Output, XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
@@ -442,11 +442,8 @@ namespace Waher.Content.Markdown.Xamarin
 		/// Generates WPF XAML from Script output.
 		/// </summary>
 		/// <param name="Result">Script output.</param>
-		/// <param name="State">Xamarin.Forms XAML Rendering State.</param>
-		/// <param name="Output">HTML output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
-		/// <param name="XamlSettings">XAML Settings</param>
 		public async Task RenderObject(object Result, bool AloneInParagraph, Variables Variables)
 		{
 			if (Result is null)
@@ -863,6 +860,7 @@ namespace Waher.Content.Markdown.Xamarin
 		/// <summary>
 		/// Gets margins for content.
 		/// </summary>
+		/// <param name="Element">Element to render.</param>
 		/// <param name="TopMargin">Top margin.</param>
 		/// <param name="BottomMargin">Bottom margin.</param>
 		private void GetMargins(MarkdownElement Element, out int TopMargin, out int BottomMargin)
@@ -1146,8 +1144,6 @@ namespace Waher.Content.Markdown.Xamarin
 		/// <summary>
 		/// Writes a text-alignment attribute to a Xamarin.Forms label element.
 		/// </summary>
-		/// <param name="Output">XML output</param>
-		/// <param name="State">Current rendering state.</param>
 		public void RenderLabelAlignment()
 		{
 			switch (this.Alignment)

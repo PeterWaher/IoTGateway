@@ -25,6 +25,7 @@ namespace Waher.Content.Markdown.Contracts
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
+		/// <param name="Document">Markdown document being rendered.</param>
 		/// <param name="XmlSettings">XML settings.</param>
 		/// <returns>Smart Contract XML</returns>
 		public static async Task<string> GenerateSmartContractXml(this MarkdownDocument Document, XmlWriterSettings XmlSettings)
@@ -38,6 +39,7 @@ namespace Waher.Content.Markdown.Contracts
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
+		/// <param name="Document">Markdown document being rendered.</param>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		public static Task GenerateSmartContractXml(this MarkdownDocument Document, StringBuilder Output)
 		{
@@ -48,6 +50,7 @@ namespace Waher.Content.Markdown.Contracts
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
+		/// <param name="Document">Markdown document being rendered.</param>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		/// <param name="XmlSettings">XML settings.</param>
 		public static async Task GenerateSmartContractXml(this MarkdownDocument Document, StringBuilder Output, XmlWriterSettings XmlSettings)

@@ -79,7 +79,7 @@ namespace Waher.Content.Markdown.Wpf
 		/// <summary>
 		/// Renders XAML (WPF flavour) from a Markdown document.
 		/// </summary>
-		/// <param name="Output">Markdown output.</param>
+		/// <param name="Output">XAML output.</param>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		/// <param name="XamlSettings">XAML-specific settings.</param>
 		public WpfXamlRenderer(StringBuilder Output, XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
@@ -460,7 +460,6 @@ namespace Waher.Content.Markdown.Wpf
 		/// <param name="Result">Script output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
-		/// <param name="XamlSettings">XAML Settings</param>
 		public async Task RenderObject(object Result, bool AloneInParagraph, Variables Variables)
 		{
 			if (Result is null)
@@ -883,6 +882,7 @@ namespace Waher.Content.Markdown.Wpf
 		/// <summary>
 		/// Gets margins for content.
 		/// </summary>
+		/// <param name="Element">Element to render.</param>
 		/// <param name="TopMargin">Top margin.</param>
 		/// <param name="BottomMargin">Bottom margin.</param>
 		private void GetMargins(MarkdownElement Element, out int TopMargin, out int BottomMargin)

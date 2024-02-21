@@ -11,7 +11,7 @@ using Waher.Content.Xml;
 namespace Waher.Content.Markdown.Xml
 {
 	/// <summary>
-	/// Renders XAML (WPF flavour) from a Markdown document.
+	/// Renders XML from a Markdown document.
 	/// </summary>
 	public class XmlRenderer : Renderer
 	{
@@ -23,16 +23,15 @@ namespace Waher.Content.Markdown.Xml
 		private bool elementsOpen = false;
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders XML from a Markdown document.
 		/// </summary>
-		/// <param name="XmlSettings">XML-specific settings.</param>
 		public XmlRenderer()
 			: this(XML.WriterSettings(false, true))
 		{
 		}
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders XML from a Markdown document.
 		/// </summary>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		public XmlRenderer(XmlWriterSettings XmlSettings)
@@ -42,9 +41,9 @@ namespace Waher.Content.Markdown.Xml
 		}
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders XML from a Markdown document.
 		/// </summary>
-		/// <param name="Output">Markdown output.</param>
+		/// <param name="Output">XML output.</param>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		public XmlRenderer(StringBuilder Output, XmlWriterSettings XmlSettings)
 			: base(Output)
@@ -189,7 +188,7 @@ namespace Waher.Content.Markdown.Xml
 		/// <summary>
 		/// Exports the element to XML.
 		/// </summary>
-		/// <param name="Element">Element to export</param>
+		/// <param name="_">Element to export</param>
 		/// <param name="ElementName">Name of element.</param>
 		private void RenderElement(MarkdownElement _, string ElementName)
 		{

@@ -1,0 +1,433 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Xml</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Xml.XmlExtensions">
+            <summary>
+            Markdown rendering extensions for Xamarin.Forms XAML.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlExtensions.ExportXml(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Exports the parsed document to XML.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <returns>XML String.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlExtensions.ExportXml(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder)">
+            <summary>
+            Exports the parsed document to XML.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlExtensions.ExportXml(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Exports the parsed document to XML.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Xml">XML Output.</param>
+            <param name="Settings">XML Settings.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xml.XmlRenderer">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xml.XmlRenderer.xmlOutput">
+            <summary>
+            XML output
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor(System.Xml.XmlWriterSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderDocumentHeader">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderFootnotes">
+            <summary>
+            Renders footnotes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderDocumentFooter">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderElement(Waher.Content.Markdown.Model.MarkdownElementChildren,System.String)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Element">Element to export</param>
+            <param name="ElementName">Name of element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderElement(Waher.Content.Markdown.Model.MarkdownElementSingleChild,System.String)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Element">Element to export</param>
+            <param name="ElementName">Name of element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.RenderElement(Waher.Content.Markdown.Model.MarkdownElement,System.String)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Element">Element to export</param>
+            <param name="ElementName">Name of element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Delete)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.DetailsReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.EmojiReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Emphasize)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.FootnoteReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HashTag)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntity)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineCode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineHTML)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Insert)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LineBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Link)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LinkReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MetaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Multimedia)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MultimediaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.StrikeThrough)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Strong)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SubScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SuperScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Underline)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BlockQuote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BulletList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CenterAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CodeBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CommentBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionTerms)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DeleteBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Footnote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Header)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HtmlBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InsertBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InvisibleBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.LeftAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.MarginAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NestedBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Paragraph)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.RightAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Sections)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.SectionSeparator)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.UnnumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,699 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Latex</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Latex.CodeContent.GraphContent">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.CodeContent.GraphContent.#ctor">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.CodeContent.GraphContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.CodeContent.ImageContent">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.CodeContent.ImageContent.#ctor">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.CodeContent.ImageContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.ICodeContentLatexRenderer">
+            <summary>
+            Interface for code content LaTeX renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.ICodeContentLatexRenderer.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.IMultimediaLatexRenderer">
+            <summary>
+            Interface for multimedia content LaTeX renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.IMultimediaLatexRenderer.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.LatexExtensions">
+            <summary>
+            Markdown rendering extensions for LaTeX.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <returns>LaTeX</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Waher.Content.Markdown.MarkdownDocument,Waher.Content.Markdown.Latex.LaTeXSettings)">
+            <summary>
+            Generates LaTeX from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">LaTeX will be output here.</param>
+            <returns>LaTeX</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,Waher.Content.Markdown.Latex.LaTeXSettings)">
+            <summary>
+            Generates LaTeX from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="LaTeXSettings">LaTeX settings.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.LatexRenderer">
+            <summary>
+            Renders LaTeX from a Markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LatexRenderer.LatexSettings">
+            <summary>
+            LaTeX settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.#ctor(Waher.Content.Markdown.Latex.LaTeXSettings)">
+            <summary>
+            Renders LaTeX from a Markdown document.
+            </summary>
+            <param name="LatexSettings">LaTeX settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.#ctor(System.Text.StringBuilder,Waher.Content.Markdown.Latex.LaTeXSettings)">
+            <summary>
+            Renders LaTeX from a Markdown document.
+            </summary>
+            <param name="Output">LaTeX output.</param>
+            <param name="LatexSettings">LaTeX settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.RenderDocumentHeader">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.RenderDocumentFooter">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.EscapeLaTeX(System.String)">
+            <summary>
+            Escapes text for output in a LaTeX document.
+            </summary>
+            <param name="s">String to escape.</param>
+            <returns>Escaped string.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Delete)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.DetailsReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.EmojiReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Emphasize)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.FootnoteReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HashTag)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntity)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineCode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineHTML)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.RenderObject(System.Object,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates HTML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Insert)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LineBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Link)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LinkReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MetaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Multimedia)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MultimediaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.StrikeThrough)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Strong)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SubScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SuperScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Underline)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BlockQuote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BulletList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CenterAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CodeBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CommentBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionTerms)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DeleteBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Footnote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Header)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HtmlBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InsertBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InvisibleBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.LeftAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.MarginAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NestedBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Paragraph)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.RightAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Sections)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.SectionSeparator)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LatexRenderer.Render(Waher.Content.Markdown.Model.BlockElements.UnnumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.LaTeXDocumentClass">
+            <summary>
+            Document class of LaTeX output.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXDocumentClass.Article">
+            <summary>
+            LaTeX Article
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXDocumentClass.Report">
+            <summary>
+            LaTeX Report
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXDocumentClass.Book">
+            <summary>
+            LaTeX Book
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXDocumentClass.Standalone">
+            <summary>
+            Standalone output
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.LaTeXPaper">
+            <summary>
+            LaTeX output paper format
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXPaper.Letter">
+            <summary>
+            Letter paper output
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Latex.LaTeXPaper.A4">
+            <summary>
+            A4 paper output
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.LaTeXSettings">
+            <summary>
+            Contains settings that the LaTeX export uses to customize LaTeX output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.LaTeXSettings.#ctor">
+            <summary>
+            Contains settings that the LaTeX export uses to customize LaTeX output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Latex.LaTeXSettings.DocumentClass">
+            <summary>
+            Document class of LaTeX output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Latex.LaTeXSettings.PaperFormat">
+            <summary>
+            Document output paper format.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Latex.LaTeXSettings.DefaultFontSize">
+            <summary>
+            Default font size, in points (pt)
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.AudioContent">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.AudioContent.#ctor">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.AudioContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.ImageContent">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.ImageContent.#ctor">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.ImageContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.MarkdownContent">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.MarkdownContent.#ctor">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.MarkdownContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.TableOfContents">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.TableOfContents.#ctor">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.TableOfContents.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.VideoContent">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.VideoContent.#ctor">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.VideoContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.WebPageContent">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.WebPageContent.#ctor">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.WebPageContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Latex.Multimedia.YouTubeContent">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.YouTubeContent.#ctor">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Latex.Multimedia.YouTubeContent.RenderLatex(Waher.Content.Markdown.Latex.LatexRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,889 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Wpf</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Wpf.CodeContent.GraphContent">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.CodeContent.GraphContent.#ctor">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.CodeContent.GraphContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.CodeContent.ImageContent">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.CodeContent.ImageContent.#ctor">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.CodeContent.ImageContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.ICodeContentWpfXamlRenderer">
+            <summary>
+            Interface for code content WPF XAML renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.ICodeContentWpfXamlRenderer.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.IMultimediaWpfXamlRenderer">
+            <summary>
+            Interface for multimedia content WPF XAML renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.IMultimediaWpfXamlRenderer.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.AudioContent">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.AudioContent.#ctor">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.AudioContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.ImageContent">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.ImageContent.#ctor">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.ImageContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Renderer">Renderer</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.ImageContent.OutputWpf(System.Xml.XmlWriter,Waher.Content.Emoji.IImageSource,System.String)">
+            <summary>
+            Outputs an image to WPF XAML
+            </summary>
+            <param name="Output">WPF XAML output.</param>
+            <param name="Source">Image source.</param>
+            <param name="Title">Title of image.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.MarkdownContent">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.MarkdownContent.#ctor">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.MarkdownContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.TableOfContents">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.TableOfContents.#ctor">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.TableOfContents.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.VideoContent">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.VideoContent.#ctor">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.VideoContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.WebPageContent">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.WebPageContent.#ctor">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.WebPageContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.Multimedia.YouTubeContent">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.YouTubeContent.#ctor">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.Multimedia.YouTubeContent.RenderWpfXaml(Waher.Content.Markdown.Wpf.WpfXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.WpfExtensions">
+            <summary>
+            Markdown rendering extensions for WPF XAML.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <returns>WPF XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="XmlSettings">XML settings.</param>
+            <returns>WPF XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">WPF XAML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">WPF XAML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings,Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">WPF XAML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">WPF XAML will be output here.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfExtensions.GenerateXAML(Waher.Content.Markdown.MarkdownDocument,Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+            <returns>WPF XAML</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.WpfXamlRenderer">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Wpf.WpfXamlRenderer.XmlOutput">
+            <summary>
+            XML output
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Wpf.WpfXamlRenderer.XamlSettings">
+            <summary>
+            XAML settings.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Alignment">
+            <summary>
+            Current text-alignment.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.#ctor">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.#ctor(System.Xml.XmlWriterSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.#ctor(Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XamlSettings">XAML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.#ctor(System.Xml.XmlWriterSettings,Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="XamlSettings">XAML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,Waher.Content.Markdown.Wpf.XamlSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="XamlSettings">XAML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.RenderDocument(Waher.Content.Markdown.MarkdownDocument,System.Boolean)">
+            <summary>
+            Renders a document.
+            </summary>
+            <param name="Document">Document to render.</param>
+            <param name="Inclusion">If the rendered output is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.RenderDocumentHeader">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.RenderFootnotes">
+            <summary>
+            Renders footnotes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.RenderDocumentFooter">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Delete)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.DetailsReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.EmojiReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Emphasize)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.FootnoteReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HashTag)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntity)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineCode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineHTML)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.RenderObject(System.Object,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates WPF XAML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+            <param name="XamlSettings">XAML Settings</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Insert)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LineBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Link)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(System.String,System.String,System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates XAML for a link.
+            </summary>
+            <param name="Url">URL</param>
+            <param name="Title">Optional title.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="Document">Markdown document.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LinkReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MetaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Multimedia)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MultimediaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.StrikeThrough)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Strong)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SubScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SuperScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Underline)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BlockQuote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BulletList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.GetMargins(Waher.Content.Markdown.Model.MarkdownElement,System.Int32@,System.Int32@)">
+            <summary>
+            Gets margins for content.
+            </summary>
+            <param name="TopMargin">Top margin.</param>
+            <param name="BottomMargin">Bottom margin.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CenterAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CodeBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CommentBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionTerms)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DeleteBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Footnote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Header)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HtmlBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InsertBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InvisibleBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.LeftAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.MarginAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NestedBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Paragraph)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.RightAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Sections)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.SectionSeparator)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.UnnumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Wpf.XamlSettings">
+            <summary>
+            Contains settings that the XAML export uses to customize XAML output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Wpf.XamlSettings.#ctor">
+            <summary>
+            Contains settings that the XAML export uses to customize XAML output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ParagraphMargins">
+            <summary>
+            Paragraph margins.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ParagraphMarginLeft">
+            <summary>
+            Left margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ParagraphMarginTop">
+            <summary>
+            Top margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ParagraphMarginRight">
+            <summary>
+            Right margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ParagraphMarginBottom">
+            <summary>
+            Bottom margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.BlockQuoteBorderColor">
+            <summary>
+            Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.BlockQuoteBorderThickness">
+            <summary>
+            Block Quote border thickness
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.BlockQuoteMargin">
+            <summary>
+            Block Quote margin (from outside left margin to border)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.BlockQuotePadding">
+            <summary>
+            Block Quote padding (from border to inside left margin)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.InsertedBlockQuoteBorderColor">
+            <summary>
+            Inserted Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.DeletedBlockQuoteBorderColor">
+            <summary>
+            Deleted Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.HeaderFontSize">
+            <summary>
+            Header font sizes for different levels. Index corresponds to header level - 1.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.HeaderForegroundColor">
+            <summary>
+            Header foreground colors for different levels. Index corresponds to header level - 1.
+            
+            NOTE: Property is an array of strings, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.ListContentMargin">
+            <summary>
+            Margin between list item bullet and list item content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellPadding">
+            <summary>
+            TableCell padding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellPaddingLeft">
+            <summary>
+            Left padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellPaddingTop">
+            <summary>
+            Top padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellPaddingRight">
+            <summary>
+            Right padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellPaddingBottom">
+            <summary>
+            Bottom padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellBorderColor">
+            <summary>
+            Table cell border color.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellBorderThickness">
+            <summary>
+            Table cell border thickness.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellRowBackgroundColor1">
+            <summary>
+            Optional background color for tables, odd row numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.TableCellRowBackgroundColor2">
+            <summary>
+            Optional background color for tables, even row numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.DefinitionSeparator">
+            <summary>
+            Distance between definitions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.DefinitionMargin">
+            <summary>
+            Left margin for definitions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.SuperscriptScale">
+            <summary>
+            Superscript scaling, compared to the normal font size.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.SuperscriptOffset">
+            <summary>
+            Superscript vertical offset.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.FootnoteSeparator">
+            <summary>
+            Space between footnote and text in the footnote section.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.DefaultGraphWidth">
+            <summary>
+            Default graph width
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Wpf.XamlSettings.DefaultGraphHeight">
+            <summary>
+            Default graph height
+            </summary>
+        </member>
+    </members>
+</doc>

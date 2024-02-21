@@ -19,6 +19,8 @@ https://waher.se/Markdown.md</Description>
     <PackageTags>Markdown XAML Xamarin Forms</PackageTags>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

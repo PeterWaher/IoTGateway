@@ -1,0 +1,656 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Contracts</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Contracts.CodeContent.GraphContent">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.CodeContent.GraphContent.#ctor">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.CodeContent.GraphContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.ContractsExtensions">
+            <summary>
+            Markdown rendering extensions for Smart Contracts.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <returns>Smart Contract XML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Waher.Content.Markdown.MarkdownDocument,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="XmlSettings">XML settings.</param>
+            <returns>Smart Contract XML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsExtensions.GenerateSmartContractXml(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.ContractsRenderer">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.XmlOutput">
+            <summary>
+            XML output
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.LocalName">
+            <summary>
+            Local Name of container element, or null if none.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Contracts.ContractsRenderer.Level">
+            <summary>
+            Current section header level.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Xml.XmlWriterSettings,System.String)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,System.String)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.RenderDocument(Waher.Content.Markdown.MarkdownDocument,System.Boolean)">
+            <summary>
+            Renders a document.
+            </summary>
+            <param name="Document">Document to render.</param>
+            <param name="Inclusion">If the rendered output is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.RenderDocumentHeader">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.RenderFootnotes">
+            <summary>
+            Renders footnotes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.RenderDocumentFooter">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Delete)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.DetailsReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.EmojiReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Emphasize)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.FootnoteReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HashTag)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntity)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineCode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineHTML)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.RenderObject(System.Object,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Insert)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LineBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Link)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LinkReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MetaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Multimedia)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MultimediaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.StrikeThrough)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Strong)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SubScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SuperScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Underline)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BlockQuote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BulletList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CenterAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CodeBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CommentBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionTerms)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DeleteBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Footnote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Header)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HtmlBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InsertBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InvisibleBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.LeftAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.MarginAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NestedBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Paragraph)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.RightAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Sections)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.SectionSeparator)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ContractsRenderer.Render(Waher.Content.Markdown.Model.BlockElements.UnnumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.ICodeContentContractsRenderer">
+            <summary>
+            Interface for code content contract renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.ICodeContentContractsRenderer.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.IMultimediaContractsRenderer">
+            <summary>
+            Interface for multimedia content contract renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.IMultimediaContractsRenderer.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.AudioContent">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.AudioContent.#ctor">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.AudioContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.ImageContent">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.ImageContent.#ctor">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.ImageContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.MarkdownContent">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.MarkdownContent.#ctor">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.MarkdownContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.TableOfContents">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.TableOfContents.#ctor">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.TableOfContents.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.VideoContent">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.VideoContent.#ctor">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.VideoContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.WebPageContent">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.WebPageContent.#ctor">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.WebPageContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Contracts.Multimedia.YouTubeContent">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.YouTubeContent.#ctor">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Contracts.Multimedia.YouTubeContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Rendering.CodeContent.ImageContent">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Rendering.CodeContent.ImageContent.#ctor">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Rendering.CodeContent.ImageContent.RenderContractXml(Waher.Content.Markdown.Contracts.ContractsRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates smart contract XML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+    </members>
+</doc>

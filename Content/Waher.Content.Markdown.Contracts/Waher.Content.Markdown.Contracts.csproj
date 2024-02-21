@@ -19,6 +19,8 @@ https://waher.se/Markdown.md</Description>
     <PackageTags>Markdown XML Smart Contract IEEE P1451.99</PackageTags>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

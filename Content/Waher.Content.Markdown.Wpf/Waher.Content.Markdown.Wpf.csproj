@@ -19,6 +19,8 @@ https://waher.se/Markdown.md</Description>
     <PackageTags>Markdown XAML WPF</PackageTags>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,916 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Xamarin</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Xamarin.CodeContent.GraphContent">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.CodeContent.GraphContent.#ctor">
+            <summary>
+            Script graph content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.CodeContent.GraphContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.CodeContent.ImageContent">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.CodeContent.ImageContent.#ctor">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.CodeContent.ImageContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.ICodeContentXamarinFormsXamlRenderer">
+            <summary>
+            Interface for code content Xamarin.Forms XAML renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.ICodeContentXamarinFormsXamlRenderer.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the code content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language.</param>
+            <param name="Indent">Code block indentation.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If renderer was able to generate output.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.IMultimediaXamarinFormsXamlRenderer">
+            <summary>
+            Interface for multimedia content WPF XAML renderers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.IMultimediaXamarinFormsXamlRenderer.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.AudioContent">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.AudioContent.#ctor">
+            <summary>
+            Audio content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.AudioContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.ImageContent">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.ImageContent.#ctor">
+            <summary>
+            Image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.ImageContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Renderer">Renderer</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.ImageContent.OutputXamarinForms(System.Xml.XmlWriter,Waher.Content.Emoji.IImageSource)">
+            <summary>
+            Outputs an image to Xamarin XAML
+            </summary>
+            <param name="Output">WPF XAML output.</param>
+            <param name="Source">Image source.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.MarkdownContent">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.MarkdownContent.#ctor">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.MarkdownContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.TableOfContents">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.TableOfContents.#ctor">
+            <summary>
+            Table of Contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.TableOfContents.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.VideoContent">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.VideoContent.#ctor">
+            <summary>
+            Video content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.VideoContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.WebPageContent">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.WebPageContent.#ctor">
+            <summary>
+            Web Page content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.WebPageContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.YouTubeContent">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.YouTubeContent.#ctor">
+            <summary>
+            YouTube content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.Multimedia.YouTubeContent.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the multimedia content.
+            </summary>
+            <param name="Renderer">Renderer.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions">
+            <summary>
+            Markdown rendering extensions for Xamarin.Forms XAML.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <returns>Xamarin.Forms XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="XmlSettings">XML settings.</param>
+            <returns>Xamarin.Forms XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,System.Xml.XmlWriterSettings,Waher.Content.Markdown.Xamarin.XamlSettings)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,Waher.Content.Markdown.Xamarin.XamlSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Output">WPF XAML will be output here.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,Waher.Content.Markdown.Xamarin.XamlSettings)">
+            <summary>
+            Generates WPF XAML from the markdown text.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="XamlSettings">XAML Settings.</param>
+            <returns>WPF XAML</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.XmlOutput">
+            <summary>
+            XML output
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.XamlSettings">
+            <summary>
+            XAML settings.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Alignment">
+            <summary>
+            Current text-alignment.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Bold">
+            <summary>
+            If text is bold
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Italic">
+            <summary>
+            If text is italic
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.StrikeThrough">
+            <summary>
+            If text is stricken through
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Underline">
+            <summary>
+            If text is underlined
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Superscript">
+            <summary>
+            If text is superscript
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Subscript">
+            <summary>
+            If text is subscript
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Code">
+            <summary>
+            If text is inline code.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.InLabel">
+            <summary>
+            If rendering is inside a label.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Hyperlink">
+            <summary>
+            Link, if rendering a hyperlink, null otherwise.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.#ctor(System.Xml.XmlWriterSettings,Waher.Content.Markdown.Xamarin.XamlSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="XamlSettings">XAML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,Waher.Content.Markdown.Xamarin.XamlSettings)">
+            <summary>
+            Renders XAML (WPF flavour) from a Markdown document.
+            </summary>
+            <param name="Output">Markdown output.</param>
+            <param name="XmlSettings">XML-specific settings.</param>
+            <param name="XamlSettings">XAML-specific settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderDocument(Waher.Content.Markdown.MarkdownDocument,System.Boolean)">
+            <summary>
+            Renders a document.
+            </summary>
+            <param name="Document">Document to render.</param>
+            <param name="Inclusion">If the rendered output is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderDocumentHeader">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderFootnotes">
+            <summary>
+            Renders footnotes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderDocumentFooter">
+            <summary>
+            Renders the document header.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Delete)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.DetailsReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.EmojiReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Emphasize)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.FootnoteReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HashTag)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntity)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineCode)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineHTML)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderObject(System.Object,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates WPF XAML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="State">Xamarin.Forms XAML Rendering State.</param>
+            <param name="Output">HTML output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+            <param name="XamlSettings">XAML Settings</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Insert)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LineBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Link)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.LinkReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MetaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Multimedia)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.MultimediaReference)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.StrikeThrough)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Strong)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SubScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.SuperScript)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Underline)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BlockQuote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.BulletList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.GetMargins(Waher.Content.Markdown.Model.MarkdownElement,System.Int32@,System.Int32@)">
+            <summary>
+            Gets margins for content.
+            </summary>
+            <param name="TopMargin">Top margin.</param>
+            <param name="BottomMargin">Bottom margin.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CenterAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CodeBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.CommentBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DefinitionTerms)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.DeleteBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Footnote)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Header)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderLabelAlignment">
+            <summary>
+            Writes a text-alignment attribute to a Xamarin.Forms label element.
+            </summary>
+            <param name="Output">XML output</param>
+            <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HtmlBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InsertBlocks)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.InvisibleBreak)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.LeftAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.MarginAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NestedBlock)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.NumberedList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Paragraph)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.RightAligned)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Sections)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.SectionSeparator)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.TaskList)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.UnnumberedItem)">
+            <summary>
+            Renders <paramref name="Element"/>.
+            </summary>
+            <param name="Element">Element to render</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Xamarin.XamlSettings">
+            <summary>
+            Contains settings that the XAML export uses to customize XAML output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Xamarin.XamlSettings.#ctor">
+            <summary>
+            Contains settings that the XAML export uses to customize XAML output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ParagraphMargins">
+            <summary>
+            Paragraph margins.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ParagraphMarginLeft">
+            <summary>
+            Left margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ParagraphMarginTop">
+            <summary>
+            Top margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ParagraphMarginRight">
+            <summary>
+            Right margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ParagraphMarginBottom">
+            <summary>
+            Bottom margin for paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.BlockQuoteBorderColor">
+            <summary>
+            Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.BlockQuoteBorderThickness">
+            <summary>
+            Block Quote border thickness
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.BlockQuoteMargin">
+            <summary>
+            Block Quote margin (from outside left margin to border)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.BlockQuotePadding">
+            <summary>
+            Block Quote padding (from border to inside left margin)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.InsertedBlockQuoteBorderColor">
+            <summary>
+            Inserted Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.DeletedBlockQuoteBorderColor">
+            <summary>
+            Deleted Block Quote border color.
+            
+            NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.HeaderFontSize">
+            <summary>
+            Header font sizes for different levels. Index corresponds to header level - 1.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.HeaderForegroundColor">
+            <summary>
+            Header foreground colors for different levels. Index corresponds to header level - 1.
+            
+            NOTE: Property is an array of strings, to allow generation of XAML where access to WPF libraries is not available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.ListContentMargin">
+            <summary>
+            Margin between list item bullet and list item content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellPadding">
+            <summary>
+            TableCell padding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellPaddingLeft">
+            <summary>
+            Left padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellPaddingTop">
+            <summary>
+            Top padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellPaddingRight">
+            <summary>
+            Right padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellPaddingBottom">
+            <summary>
+            Bottom padding for table cells.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellBorderColor">
+            <summary>
+            Table cell border color.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellBorderThickness">
+            <summary>
+            Table cell border thickness.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellRowBackgroundColor1">
+            <summary>
+            Optional background color for tables, odd row numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.TableCellRowBackgroundColor2">
+            <summary>
+            Optional background color for tables, even row numbers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.DefinitionSeparator">
+            <summary>
+            Distance between definitions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.DefinitionMargin">
+            <summary>
+            Left margin for definitions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.SuperscriptScale">
+            <summary>
+            Superscript scaling, compared to the normal font size.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.SuperscriptOffset">
+            <summary>
+            Superscript vertical offset.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.FootnoteSeparator">
+            <summary>
+            Space between footnote and text in the footnote section.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.DefaultGraphWidth">
+            <summary>
+            Default graph width
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Xamarin.XamlSettings.DefaultGraphHeight">
+            <summary>
+            Default graph height
+            </summary>
+        </member>
+    </members>
+</doc>

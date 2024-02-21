@@ -15,7 +15,7 @@ using Waher.Script.Operators.Matrices;
 namespace Waher.Content.Markdown.Contracts
 {
 	/// <summary>
-	/// Renders XAML (WPF flavour) from a Markdown document.
+	/// Renders Contracts XML from a Markdown document.
 	/// </summary>
 	public class ContractsRenderer : Renderer
 	{
@@ -30,33 +30,63 @@ namespace Waher.Content.Markdown.Contracts
 		public readonly string LocalName;
 
 		/// <summary>
+		/// Namespace of container element, or null if none specified.
+		/// </summary>
+		public readonly string Namespace;
+
+		/// <summary>
 		/// Current section header level.
 		/// </summary>
 		public int Level = 0;
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders Contracts XML from a Markdown document.
 		/// </summary>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
 		public ContractsRenderer(XmlWriterSettings XmlSettings, string LocalName)
+			: this(XmlSettings, LocalName, null)
+		{
+		}
+
+		/// <summary>
+		/// Renders Contracts XML from a Markdown document.
+		/// </summary>
+		/// <param name="XmlSettings">XML-specific settings.</param>
+		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+		/// <param name="Namespace">Namespace of container element, or null if none specified.</param>
+		public ContractsRenderer(XmlWriterSettings XmlSettings, string LocalName, string Namespace)
 			: base()
 		{
 			this.XmlOutput = XmlWriter.Create(this.Output, XmlSettings);
 			this.LocalName = LocalName;
+			this.Namespace = Namespace;
 		}
 
 		/// <summary>
-		/// Renders XAML (WPF flavour) from a Markdown document.
+		/// Renders Contracts XML from a Markdown document.
 		/// </summary>
-		/// <param name="Output">Markdown output.</param>
+		/// <param name="Output">Contract XML output.</param>
 		/// <param name="XmlSettings">XML-specific settings.</param>
 		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
 		public ContractsRenderer(StringBuilder Output, XmlWriterSettings XmlSettings, string LocalName)
+			: this(Output, XmlSettings, LocalName, null)
+		{
+		}
+
+		/// <summary>
+		/// Renders Contracts XML from a Markdown document.
+		/// </summary>
+		/// <param name="Output">Contract XML output.</param>
+		/// <param name="XmlSettings">XML-specific settings.</param>
+		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+		/// <param name="Namespace">Namespace of container element, or null if none specified.</param>
+		public ContractsRenderer(StringBuilder Output, XmlWriterSettings XmlSettings, string LocalName, string Namespace)
 			: base(Output)
 		{
 			this.XmlOutput = XmlWriter.Create(this.Output, XmlSettings);
 			this.LocalName = LocalName;
+			this.Namespace = Namespace;
 		}
 
 		/// <inheritdoc/>
@@ -92,7 +122,12 @@ namespace Waher.Content.Markdown.Contracts
 		public override Task RenderDocumentHeader()
 		{
 			if (!string.IsNullOrEmpty(this.LocalName))
-				this.XmlOutput.WriteStartElement(this.LocalName);
+			{
+				if (string.IsNullOrEmpty(this.Namespace))
+					this.XmlOutput.WriteStartElement(this.LocalName);
+				else
+					this.XmlOutput.WriteStartElement(this.LocalName, this.Namespace);
+			}
 
 			return Task.CompletedTask;
 		}

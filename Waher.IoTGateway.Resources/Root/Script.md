@@ -3,6 +3,7 @@ Description: Script syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-26
 Author: Peter Waher
 Master: /Master.md
+Javascript: /Events.js
 
 Script syntax reference
 =============================

@@ -836,10 +836,16 @@
 							<File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Contracts.pdb' Name='Waher.Content.Markdown.Contracts.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.GraphViz.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Latex.pdb' Name='Waher.Content.Markdown.Latex.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Latex.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Layout2D.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Wpf.pdb' Name='Waher.Content.Markdown.Wpf.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Wpf.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xamarin.pdb' Name='Waher.Content.Markdown.Xamarin.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xamarin.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xml.pdb' Name='Waher.Content.Markdown.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.QR.pdb' Name='Waher.Content.QR.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Rss.pdb' Name='Waher.Content.Rss.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Rss.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.pdb' Vital='yes'/>
@@ -940,10 +946,16 @@
 							<RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Contracts.pdb' Name='Waher.Content.Markdown.Contracts.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Latex.pdb' Name='Waher.Content.Markdown.Latex.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Wpf.pdb' Name='Waher.Content.Markdown.Wpf.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xamarin.pdb' Name='Waher.Content.Markdown.Xamarin.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xml.pdb' Name='Waher.Content.Markdown.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.pdb' Name='Waher.Content.QR.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Rss.pdb' Name='Waher.Content.Rss.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Semantic.pdb' Name='Waher.Content.Semantic.pdb' On='uninstall'/>

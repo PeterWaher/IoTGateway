@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts
+﻿namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// Class defining a role
@@ -47,6 +45,5 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.canRevoke;
 			set => this.canRevoke = value;
 		}
-
 	}
 }

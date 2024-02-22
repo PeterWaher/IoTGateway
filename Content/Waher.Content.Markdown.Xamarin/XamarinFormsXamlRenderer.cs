@@ -439,7 +439,7 @@ namespace Waher.Content.Markdown.Xamarin
 		}
 
 		/// <summary>
-		/// Generates WPF XAML from Script output.
+		/// Generates Xamarin.Forms XAML from Script output.
 		/// </summary>
 		/// <param name="Result">Script output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>

@@ -71,10 +71,10 @@ namespace Waher.Content.Markdown.Xamarin
 		}
 
 		/// <summary>
-		/// Generates WPF XAML from the markdown text.
+		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="Output">WPF XAML will be output here.</param>
+		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
 		/// <param name="XamlSettings">XAML Settings.</param>
 		public static async Task GenerateXamarinForms(this MarkdownDocument Document, StringBuilder Output, XamlSettings XamlSettings)
 		{
@@ -85,11 +85,11 @@ namespace Waher.Content.Markdown.Xamarin
 		}
 
 		/// <summary>
-		/// Generates WPF XAML from the markdown text.
+		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="XamlSettings">XAML Settings.</param>
-		/// <returns>WPF XAML</returns>
+		/// <returns>Xamarin.Forms XAML</returns>
 		public static async Task<string> GenerateXamarinForms(this MarkdownDocument Document, XamlSettings XamlSettings)
 		{
 			StringBuilder Output = new StringBuilder();

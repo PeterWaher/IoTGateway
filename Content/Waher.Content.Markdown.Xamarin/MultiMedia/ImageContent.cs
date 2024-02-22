@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Xamarin.Multimedia
 		/// <summary>
 		/// Outputs an image to Xamarin XAML
 		/// </summary>
-		/// <param name="Output">WPF XAML output.</param>
+		/// <param name="Output">Xamarin.Forms XAML output.</param>
 		/// <param name="Source">Image source.</param>
 		public static async Task OutputXamarinForms(XmlWriter Output, IImageSource Source)
 		{

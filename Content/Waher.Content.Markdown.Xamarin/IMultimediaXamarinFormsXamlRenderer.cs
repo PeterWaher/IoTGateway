@@ -6,7 +6,7 @@ using Waher.Content.Markdown.Rendering;
 namespace Waher.Content.Markdown.Xamarin
 {
 	/// <summary>
-	/// Interface for multimedia content WPF XAML renderers.
+	/// Interface for multimedia content Xamarin.Forms XAML renderers.
 	/// </summary>
 	public interface IMultimediaXamarinFormsXamlRenderer : IMultimediaRenderer
 	{

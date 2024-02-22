@@ -33,7 +33,7 @@
         </member>
         <member name="T:Waher.Content.Markdown.Xml.XmlRenderer">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XML from a Markdown document.
             </summary>
         </member>
         <member name="F:Waher.Content.Markdown.Xml.XmlRenderer.xmlOutput">
@@ -43,21 +43,20 @@
         </member>
         <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XML from a Markdown document.
             </summary>
-            <param name="XmlSettings">XML-specific settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor(System.Xml.XmlWriterSettings)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XML from a Markdown document.
             </summary>
             <param name="XmlSettings">XML-specific settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XML from a Markdown document.
             </summary>
-            <param name="Output">Markdown output.</param>
+            <param name="Output">XML output.</param>
             <param name="XmlSettings">XML-specific settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Dispose">
@@ -96,7 +95,7 @@
             <summary>
             Exports the element to XML.
             </summary>
-            <param name="Element">Element to export</param>
+            <param name="_">Element to export</param>
             <param name="ElementName">Name of element.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xml.XmlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.Abbreviation)">

@@ -333,7 +333,7 @@
             <summary>
             Renders XAML (WPF flavour) from a Markdown document.
             </summary>
-            <param name="Output">Markdown output.</param>
+            <param name="Output">XAML output.</param>
             <param name="XmlSettings">XML-specific settings.</param>
             <param name="XamlSettings">XAML-specific settings.</param>
         </member>
@@ -453,7 +453,6 @@
             <param name="Result">Script output.</param>
             <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
             <param name="Variables">Current variables.</param>
-            <param name="XamlSettings">XAML Settings</param>
         </member>
         <member name="M:Waher.Content.Markdown.Wpf.WpfXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
             <summary>
@@ -558,6 +557,7 @@
             <summary>
             Gets margins for content.
             </summary>
+            <param name="Element">Element to render.</param>
             <param name="TopMargin">Top margin.</param>
             <param name="BottomMargin">Bottom margin.</param>
         </member>

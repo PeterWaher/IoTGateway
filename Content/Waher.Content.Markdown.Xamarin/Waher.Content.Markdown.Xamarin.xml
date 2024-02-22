@@ -286,7 +286,7 @@
         </member>
         <member name="T:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XAML (Xamarin.Forms flavour) from a Markdown document.
             </summary>
         </member>
         <member name="F:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.XmlOutput">
@@ -351,16 +351,16 @@
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.#ctor(System.Xml.XmlWriterSettings,Waher.Content.Markdown.Xamarin.XamlSettings)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XAML (Xamarin.Forms flavour) from a Markdown document.
             </summary>
             <param name="XmlSettings">XML-specific settings.</param>
             <param name="XamlSettings">XAML-specific settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.#ctor(System.Text.StringBuilder,System.Xml.XmlWriterSettings,Waher.Content.Markdown.Xamarin.XamlSettings)">
             <summary>
-            Renders XAML (WPF flavour) from a Markdown document.
+            Renders XAML (Xamarin.Forms flavour) from a Markdown document.
             </summary>
-            <param name="Output">Markdown output.</param>
+            <param name="Output">XAML output.</param>
             <param name="XmlSettings">XML-specific settings.</param>
             <param name="XamlSettings">XAML-specific settings.</param>
         </member>
@@ -478,11 +478,8 @@
             Generates WPF XAML from Script output.
             </summary>
             <param name="Result">Script output.</param>
-            <param name="State">Xamarin.Forms XAML Rendering State.</param>
-            <param name="Output">HTML output.</param>
             <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
             <param name="Variables">Current variables.</param>
-            <param name="XamlSettings">XAML Settings</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.SpanElements.InlineText)">
             <summary>
@@ -578,6 +575,7 @@
             <summary>
             Gets margins for content.
             </summary>
+            <param name="Element">Element to render.</param>
             <param name="TopMargin">Top margin.</param>
             <param name="BottomMargin">Bottom margin.</param>
         </member>
@@ -639,8 +637,6 @@
             <summary>
             Writes a text-alignment attribute to a Xamarin.Forms label element.
             </summary>
-            <param name="Output">XML output</param>
-            <param name="State">Current rendering state.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.Render(Waher.Content.Markdown.Model.BlockElements.HorizontalRule)">
             <summary>

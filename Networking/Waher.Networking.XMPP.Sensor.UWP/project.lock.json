@@ -2844,7 +2844,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -2873,7 +2873,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5749,7 +5749,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -5778,7 +5778,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8690,7 +8690,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -8719,7 +8719,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11604,7 +11604,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -11633,7 +11633,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14554,7 +14554,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -14583,7 +14583,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17468,7 +17468,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -17497,7 +17497,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -20418,7 +20418,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.5",
-          "Waher.Runtime.Profiling": "1.0.7"
+          "Waher.Runtime.Profiling": "1.0.8"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -20447,7 +20447,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.7": {
+      "Waher.Runtime.Profiling/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -30615,7 +30615,7 @@
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
     },
-    "Waher.Runtime.Profiling/1.0.7": {
+    "Waher.Runtime.Profiling/1.0.8": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj"

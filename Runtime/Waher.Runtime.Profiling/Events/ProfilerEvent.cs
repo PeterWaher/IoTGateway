@@ -85,7 +85,7 @@ namespace Waher.Runtime.Profiling.Events
 			string s = this.PlantUmlState;
 
 			if (s.StartsWith("{") && s.EndsWith("}"))
-				Output.Append(s);
+				Output.AppendLine(s);
 			else
 			{
 				Output.Append("\"");

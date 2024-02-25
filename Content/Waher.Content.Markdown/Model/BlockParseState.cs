@@ -6,20 +6,27 @@ namespace Waher.Content.Markdown.Model
 {
 	internal class BlockParseState
 	{
-		private readonly string[] rows;
-		private readonly int[] positions;
+		private readonly List<Block> blocks;
+		private string[] rows;
+		private int[] positions;
 		private string currentRow;
 		private int current;
-		private readonly int start;
-		private readonly int end;
+		private int blockIndex;
+		private readonly int endBlock;
+		private int start;
+		private int end;
 		private int pos;
 		private int len;
 		private bool lineBreakAfter;
 		private readonly bool preserveCrLf;
 		private char lastChar = (char)0;
 
-		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf)
+		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf, List<Block> Blocks, int BlockIndex,
+			int EndBlock)
 		{
+			this.blocks = Blocks;
+			this.blockIndex = BlockIndex;
+			this.endBlock = EndBlock;
 			this.rows = Rows;
 			this.positions = Positions;
 			this.current = this.start = Start;
@@ -37,11 +44,14 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
+		public List<Block> Blocks => this.blocks;
 		public string[] Rows => this.rows;
 		public int[] Positions => this.positions;
 		public int Start => this.start;
 		public int End => this.end;
 		public int Current => this.current;
+		public int BlockIndex => this.blockIndex;
+		public int EndBlock => this.endBlock;
 		public bool PreserveCrLf => this.preserveCrLf;
 
 		public char NextNonWhitespaceChar()
@@ -413,9 +423,43 @@ namespace Waher.Content.Markdown.Model
 			int c = Token.Length;
 			char ch;
 
-			while ((ch = this.NextChar()) != 0)
+			while (true)
 			{
-				if (char.ToUpper(ch) == Token[i])
+				ch = this.NextChar();
+
+				if (ch == 0)
+				{
+					if (!(this.blocks is null) && this.blockIndex < this.endBlock)
+					{
+						Block Next = this.blocks[++this.blockIndex];
+
+						this.rows = Next.Rows;
+						this.positions = Next.Positions;
+						this.current = this.start = Next.Start;
+						this.end = Next.End;
+						this.currentRow = this.rows[this.current];
+						this.lineBreakAfter = this.currentRow.EndsWith("  ");
+						this.pos = 0;
+						this.len = this.currentRow.Length;  // >= 1
+
+						if (this.lineBreakAfter)
+						{
+							this.currentRow = this.currentRow.Substring(0, this.len - 2);
+							this.len -= 2;
+						}
+
+						sb.AppendLine();
+						sb.AppendLine();
+					}
+					else
+					{
+						if (i > 0)
+							sb.Append(Token.Substring(0, i));
+
+						return sb.ToString();
+					}
+				}
+				else if (char.ToUpper(ch) == Token[i])
 				{
 					i++;
 					if (i >= c)
@@ -432,11 +476,6 @@ namespace Waher.Content.Markdown.Model
 					sb.Append(ch);
 				}
 			}
-
-			if (i > 0)
-				sb.Append(Token.Substring(0, i));
-
-			return sb.ToString();
 		}
 
 	}

@@ -900,9 +900,7 @@ namespace Waher.Content.Markdown
 						{
 							foreach (Block SegmentItem in Segment.RemovePrefix(s2, 4))
 							{
-								LastItem = new UnnumberedItem(this, s2, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
-
+								LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, this.ParseBlock(SegmentItem)));
 								Items.AddLast(LastItem);
 							}
 						}
@@ -1017,8 +1015,8 @@ namespace Waher.Content.Markdown
 							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
 							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
 							{
-								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, 
+									new NestedBlock(this, this.ParseBlock(SegmentItem)));
 
 								Items.AddLast(LastItem);
 							}
@@ -1127,8 +1125,8 @@ namespace Waher.Content.Markdown
 						{
 							foreach (Block SegmentItem in Segment.Item1.RemovePrefix(Segment.Item2, 4))
 							{
-								LastItem = new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+								LastItem = new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3, 
+									new NestedBlock(this, this.ParseBlock(SegmentItem)));
 
 								Items.AddLast(LastItem);
 							}
@@ -1244,8 +1242,8 @@ namespace Waher.Content.Markdown
 							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
 							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
 							{
-								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, new NestedBlock(this,
-									this.ParseBlock(SegmentItem.Rows, SegmentItem.Positions, SegmentItem.Start, SegmentItem.End)));
+								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2, 
+									new NestedBlock(this, this.ParseBlock(SegmentItem)));
 
 								Items.AddLast(LastItem);
 							}
@@ -1524,7 +1522,7 @@ namespace Waher.Content.Markdown
 					continue;
 				}
 
-				Content = this.ParseBlock(Rows, Block.Positions, Block.Start, c);
+				Content = this.ParseBlock(Block, Blocks, ref BlockIndex, EndBlock);
 				if (!(Content.First is null))
 				{
 					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
@@ -1582,17 +1580,37 @@ namespace Waher.Content.Markdown
 
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int[] Positions)
 		{
-			return this.ParseBlock(Rows, Positions, 0, Rows.Length - 1);
+			int BlockIndex = 0;
+			return this.ParseBlock(Rows, Positions, 0, Rows.Length - 1, null, ref BlockIndex, 0);
+		}
+
+		private LinkedList<MarkdownElement> ParseBlock(Block Block)
+		{
+			int BlockIndex = 0;
+			return this.ParseBlock(Block.Rows, Block.Positions, Block.Start, Block.End, null, ref BlockIndex, 0);
+		}
+
+		private LinkedList<MarkdownElement> ParseBlock(Block Block, List<Block> Blocks, ref int BlockIndex, int EndBlock)
+		{
+			return this.ParseBlock(Block.Rows, Block.Positions, Block.Start, Block.End, Blocks, ref BlockIndex, EndBlock);
 		}
 
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow)
 		{
+			int BlockIndex = 0;
+			return this.ParseBlock(Rows, Positions, StartRow, EndRow, null, ref BlockIndex, 0);
+		}
+
+		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow, List<Block> Blocks, 
+			ref int BlockIndex, int EndBlock)
+		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			bool PreserveCrLf = Rows[StartRow].StartsWith("<") && Rows[EndRow].EndsWith(">");
-			BlockParseState State = new BlockParseState(Rows, Positions, StartRow, EndRow, PreserveCrLf);
+			BlockParseState State = new BlockParseState(Rows, Positions, StartRow, EndRow, PreserveCrLf, Blocks, BlockIndex, EndBlock);
 
 			this.ParseBlock(State, (char)0, 1, Elements, true);
 
+			BlockIndex = State.BlockIndex;
 			return Elements;
 		}
 

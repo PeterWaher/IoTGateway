@@ -34,7 +34,7 @@ namespace Waher.Content.Markdown.Latex
 		/// Generates LaTeX from the markdown text.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="LaTeXSettings">LaTeX settings.</param>
 		/// <returns>LaTeX</returns>
 		public static async Task<string> GenerateLaTeX(this MarkdownDocument Document, LaTeXSettings LaTeXSettings)
 		{

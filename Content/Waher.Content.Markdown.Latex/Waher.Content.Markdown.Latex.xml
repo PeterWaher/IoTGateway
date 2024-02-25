@@ -101,7 +101,7 @@
             Generates LaTeX from the markdown text.
             </summary>
             <param name="Document">Markdown document.</param>
-            <param name="Output">LaTeX will be output here.</param>
+            <param name="LaTeXSettings">LaTeX settings.</param>
             <returns>LaTeX</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Latex.LatexExtensions.GenerateLaTeX(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,Waher.Content.Markdown.Latex.LaTeXSettings)">

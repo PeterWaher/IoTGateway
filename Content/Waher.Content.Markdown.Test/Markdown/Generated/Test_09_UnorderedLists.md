@@ -1,43 +1,30 @@
 ﻿Unordered lists use asterisks, pluses, and hyphens — interchangably — as list markers\:
 
 *	Red
-
 *	Green
-
 *	Blue
-
 
 is equivalent to\:
 
 +	Red
-
 +	Green
-
 +	Blue
-
 
 and\:
 
 -	Red
-
 -	Green
-
 -	Blue
-
 
 To make lists look nice, you can wrap items with hanging indents\:
 
 *	Lorem ipsum dolor sit amet, consectetuer adipiscing elit\. Aliquam hendrerit mi posuere lectus\. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus\.
-
 *	Donec sit amet nisl\. Aliquam semper ipsum sit amet velit\. Suspendisse id sem consectetuer libero luctus adipiscing\.
-
 
 But if you want to be lazy, you don’t have to\:
 
 *	Lorem ipsum dolor sit amet, consectetuer adipiscing elit\. Aliquam hendrerit mi posuere lectus\. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus\.
-
 *	Donec sit amet nisl\. Aliquam semper ipsum sit amet velit\. Suspendisse id sem consectetuer libero luctus adipiscing\.
-
 
 On separate lines\:
 
@@ -92,70 +79,52 @@ To put a code block within a list item, the code block needs to be indented twic
 Nested lists\:
 
 *	Item 1
-
 *	Item 2 
 	
 	*	Item 2a
-	
 	*	Item 2b
-	
 	
 
 
 Nested lists 2\:
 
 *	Item 1
-
 *	Item 2 
 	
 	#.	Item 2a
-	
 	#.	Item 2b
-	
 	
 
 *	Item 3
-
 
 Nested lists 3\:
 
 *	Item 1
-
 *	Item 2 
 	
 	2.	Item 2a
-	
 	3.	Item 2b
-	
 	
 
 *	Item 3
-
 
 Three levels\:
 
 *	Item 1
-
 *	Item 2 
 	
 	*	Item 2a
-	
 	*	Item 2b 
 		
 		*	Item 2bi
-		
 		*	Item 2bii
-		
 		*	Item 2biii
-		
 		
 	
 	*	Item 2c
 	
-	
 
 *	Item 3
-
 
 Multi\-paragraph, multi\-level lists\:
 
@@ -243,20 +212,15 @@ Multi\-paragraph, multi\-level lists\:
 Starting with simple items, continuing with block items\:
 
 *	Item 1\.
-
 *	Item 2\.
-
 *	Item 3\.
-
 *	Item 4\.
 	
 	Item 4 has a second paragraph\.
 	
 
 *	Item 5\.
-
 *	Item 6\.
-
 
 Multi\-paragraph, multi\-level lists\:
 
@@ -283,7 +247,6 @@ Multi\-paragraph, multi\-level lists\:
 		Second paragraph of item 2\.2
 		
 		*	Unchecked subsubitem
-		
 		*	Checked subsubitem
 			
 			```
@@ -294,9 +257,7 @@ Multi\-paragraph, multi\-level lists\:
 			
 		
 		*	Second checked subsubitem
-		
 		*	Second unchecked subsubitem
-		
 		
 	
 	*	Second checked subitem
@@ -322,24 +283,17 @@ Nested indentation\:
 *	*	Header 1
 		
 		*	Header 1\.1
-		
 		*	Header 1\.2
-		
 		*	Header 1\.3
-		
 		*	Header 1\.4
-		
 		
 	
 	
 	*	Header 2
 		
 		*	Header 2\.1
-		
 		*	Header 2\.2
-		
 		*	Header 2\.3
-		
 		
 	
 	

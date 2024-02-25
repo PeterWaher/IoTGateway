@@ -65,9 +65,7 @@ Term 2
 :	>	
 :	
 :	1.	first list item
-:	
 :	2.	second list item
-:	
 :	
 
 

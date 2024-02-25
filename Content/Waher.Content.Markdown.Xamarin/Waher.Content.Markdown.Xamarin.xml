@@ -64,7 +64,7 @@
         </member>
         <member name="T:Waher.Content.Markdown.Xamarin.IMultimediaXamarinFormsXamlRenderer">
             <summary>
-            Interface for multimedia content WPF XAML renderers.
+            Interface for multimedia content Xamarin.Forms XAML renderers.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.IMultimediaXamarinFormsXamlRenderer.RenderXamarinFormsXaml(Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
@@ -121,7 +121,7 @@
             <summary>
             Outputs an image to Xamarin XAML
             </summary>
-            <param name="Output">WPF XAML output.</param>
+            <param name="Output">Xamarin.Forms XAML output.</param>
             <param name="Source">Image source.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Xamarin.Multimedia.MarkdownContent">
@@ -270,19 +270,19 @@
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,System.Text.StringBuilder,Waher.Content.Markdown.Xamarin.XamlSettings)">
             <summary>
-            Generates WPF XAML from the markdown text.
+            Generates Xamarin.Forms XAML from the markdown text.
             </summary>
             <param name="Document">Markdown document.</param>
-            <param name="Output">WPF XAML will be output here.</param>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
             <param name="XamlSettings">XAML Settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsExtensions.GenerateXamarinForms(Waher.Content.Markdown.MarkdownDocument,Waher.Content.Markdown.Xamarin.XamlSettings)">
             <summary>
-            Generates WPF XAML from the markdown text.
+            Generates Xamarin.Forms XAML from the markdown text.
             </summary>
             <param name="Document">Markdown document.</param>
             <param name="XamlSettings">XAML Settings.</param>
-            <returns>WPF XAML</returns>
+            <returns>Xamarin.Forms XAML</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer">
             <summary>
@@ -475,7 +475,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Xamarin.XamarinFormsXamlRenderer.RenderObject(System.Object,System.Boolean,Waher.Script.Variables)">
             <summary>
-            Generates WPF XAML from Script output.
+            Generates Xamarin.Forms XAML from Script output.
             </summary>
             <param name="Result">Script output.</param>
             <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>

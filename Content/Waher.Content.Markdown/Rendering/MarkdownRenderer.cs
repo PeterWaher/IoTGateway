@@ -1053,7 +1053,9 @@ namespace Waher.Content.Markdown.Rendering
 				Prefix = "#.\t";
 
 			await this.PrefixedBlock(Element.Child, Prefix, "\t");
-			this.Output.AppendLine();
+
+			if (Element.Child.IsBlockElement)
+				this.Output.AppendLine();
 		}
 
 		/// <summary>
@@ -1261,7 +1263,9 @@ namespace Waher.Content.Markdown.Rendering
 		public override async Task Render(TaskItem Element)
 		{
 			await this.PrefixedBlock(Element.Child, Element.IsChecked ? "[x]\t" : "[ ]\t", "\t");
-			this.Output.AppendLine();
+
+			if (Element.Child.IsBlockElement)
+				this.Output.AppendLine();
 		}
 
 		/// <summary>
@@ -1281,7 +1285,9 @@ namespace Waher.Content.Markdown.Rendering
 		public override async Task Render(UnnumberedItem Element)
 		{
 			await this.PrefixedBlock(Element.Child, Element.Prefix + "\t", "\t");
-			this.Output.AppendLine();
+
+			if (Element.Child.IsBlockElement)
+				this.Output.AppendLine();
 		}
 
 		#endregion

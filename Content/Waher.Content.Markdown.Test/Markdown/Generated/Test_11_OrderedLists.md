@@ -1,34 +1,24 @@
 ﻿Ordered lists use numbers followed by periods\:
 
 1.	Bird
-
 2.	McHale
-
 3.	Parish
-
 
 Ordered lists retain numbers used\:
 
 3.	Bird
-
 2.	McHale
-
 1.	Parish
-
 
 To make lists look nice, you can wrap items with hanging indents\:
 
 1.	Lorem ipsum dolor sit amet, consectetuer adipiscing elit\. Aliquam hendrerit mi posuere lectus\. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus\.
-
 2.	Donec sit amet nisl\. Aliquam semper ipsum sit amet velit\. Suspendisse id sem consectetuer libero luctus adipiscing\.
-
 
 But if you want to be lazy, you don’t have to\:
 
 1.	Lorem ipsum dolor sit amet, consectetuer adipiscing elit\. Aliquam hendrerit mi posuere lectus\. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus\.
-
 2.	Donec sit amet nisl\. Aliquam semper ipsum sit amet velit\. Suspendisse id sem consectetuer libero luctus adipiscing\.
-
 
 On separate lines\:
 
@@ -83,72 +73,53 @@ To put a code block within a list item, the code block needs to be indented twic
 Nested lists\:
 
 1.	Item 1
-
 2.	Item 2 
 	
 	-	Item 2a
-	
 	-	Item 2b
-	
 	
 
 3.	Item 3
-
 
 Nested lists 2\:
 
 1.	Item 1
-
 2.	Item 2 
 	
 	#.	Item 2a
-	
 	#.	Item 2b
-	
 	
 
 3.	Item 3
-
 
 Nested lists 3\:
 
 1.	Item 1
-
 2.	Item 2 
 	
 	2.	Item 2a
-	
 	3.	Item 2b
-	
 	
 
 3.	Item 3
-
 
 Three levels\:
 
 1.	Item 1
-
 2.	Item 2 
 	
 	1.	Item 2a
-	
 	2.	Item 2b 
 		
 		1.	Item 2bi
-		
 		2.	Item 2bii
-		
 		3.	Item 2biii
-		
 		
 	
 	3.	Item 2c
 	
-	
 
 3.	Item 3
-
 
 Multi\-paragraph, multi\-level lists\:
 
@@ -236,20 +207,15 @@ Multi\-paragraph, multi\-level lists\:
 Starting with simple items, continuing with block items\:
 
 1.	Item 1\.
-
 2.	Item 2\.
-
 3.	Item 3\.
-
 4.	Item 4\.
 	
 	Item 4 has a second paragraph\.
 	
 
 5.	Item 5\.
-
 6.	Item 6\.
-
 
 Multi\-paragraph, multi\-level lists\:
 
@@ -276,7 +242,6 @@ Multi\-paragraph, multi\-level lists\:
 		Second paragraph of item 2\.2
 		
 		1.	Unchecked subsubitem
-		
 		2.	Checked subsubitem
 			
 			```
@@ -287,9 +252,7 @@ Multi\-paragraph, multi\-level lists\:
 			
 		
 		3.	Second checked subsubitem
-		
 		4.	Second unchecked subsubitem
-		
 		
 	
 	3.	Second checked subitem
@@ -315,24 +278,17 @@ Nested indentation\:
 1.	1.	Header 1
 		
 		1.	Header 1\.1
-		
 		2.	Header 1\.2
-		
 		3.	Header 1\.3
-		
 		4.	Header 1\.4
-		
 		
 	
 	
 	2.	Header 2
 		
 		1.	Header 2\.1
-		
 		2.	Header 2\.2
-		
 		3.	Header 2\.3
-		
 		
 	
 	

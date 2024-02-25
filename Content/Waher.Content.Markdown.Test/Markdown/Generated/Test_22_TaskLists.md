@@ -1,40 +1,28 @@
 ﻿Simple task list\:
 
 [ ]	Unchecked
-
 [x]	Checked
-
 [x]	Also checked
-
 
 Nested task list\:
 
 [ ]	Unchecked
-
 [x]	Checked 
 	
 	[ ]	Unchecked subitem
-	
 	[x]	Checked subitem 
 		
 		[ ]	Unchecked subsubitem
-		
 		[x]	Checked subsubitem
-		
 		[x]	Second checked subsubitem
-		
 		[ ]	Second unchecked subsubitem
-		
 		
 	
 	[x]	Second checked subitem
-	
 	[ ]	Second unchecked subitem
-	
 	
 
 [x]	Also checked
-
 
 Multi\-paragraph, multi\-level lists\:
 
@@ -61,7 +49,6 @@ Multi\-paragraph, multi\-level lists\:
 		Second paragraph of item 2\.2
 		
 		[ ]	Unchecked subsubitem
-		
 		[x]	Checked subsubitem
 			
 			```
@@ -72,9 +59,7 @@ Multi\-paragraph, multi\-level lists\:
 			
 		
 		[x]	Second checked subsubitem
-		
 		[ ]	Second unchecked subsubitem
-		
 		
 	
 	[x]	Second checked subitem
@@ -100,24 +85,17 @@ Nested indentation\:
 [ ]	[x]	Header 1
 		
 		[x]	Header 1\.1
-		
 		[ ]	Header 1\.2
-		
 		[x]	Header 1\.3
-		
 		[x]	Header 1\.4
-		
 		
 	
 	
 	[ ]	Header 2
 		
 		[x]	Header 2\.1
-		
 		[x]	Header 2\.2
-		
 		[ ]	Header 2\.3
-		
 		
 	
 	

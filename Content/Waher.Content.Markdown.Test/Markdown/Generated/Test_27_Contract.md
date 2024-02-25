@@ -25,9 +25,7 @@ Upon the signature of this contract, the **Buyer** consigns to the **Auctioneer*
 The consignment concludes at the end of **** days from the signature of the agreement, or when the first *acceptable* bid of ** ** is received\. If no bids are available when the auction expires, the consignment concludes without any payments being processed\. Otherwise, two payments will be made\:
 
 *	An instant payment representing the agreed upon price for the best or first accepted bid plus the agreed upon commission, as a percentage of the price \(** \%**\), will be made from the **Buyer** to the *Auctioneer*\.
-
 *	An instant payment representing the agreed upon price for the best or first accepted bid, will be made from the **Auctioneer** to the **Seller**\. The **Auctioneer** keeps its ** \%** as payment for its services\.
-
 
 All payments will be made using *e\-Daler*\. A buyer without funds in their *wallet* will have their request for tender invalidated, and the sale assignment cancelled\.
 

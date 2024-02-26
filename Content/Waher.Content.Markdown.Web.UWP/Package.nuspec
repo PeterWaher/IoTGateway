@@ -19,7 +19,7 @@
 				<dependency id="Waher.Content" version="2.6.8"/>
 				<dependency id="Waher.Content.Emoji" version="2.0.0"/>
 				<dependency id="Waher.Content.Markdown" version="3.0.0"/>
-				<dependency id="Waher.Content.Markdown.Contracts" version="3.0.0"/>
+				<dependency id="Waher.Content.Markdown.Contracts" version="3.0.2"/>
 				<dependency id="Waher.Content.Markdown.Latex" version="3.0.0"/>
 				<dependency id="Waher.Content.Markdown.Wpf" version="3.0.0"/>
 				<dependency id="Waher.Content.Markdown.Xamarin" version="3.0.0"/>

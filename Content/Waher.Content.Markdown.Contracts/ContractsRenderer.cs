@@ -114,6 +114,8 @@ namespace Waher.Content.Markdown.Contracts
 				this.XmlOutput.WriteEndElement();
 				this.Level--;
 			}
+
+			this.XmlOutput.Flush();
 		}
 
 		/// <summary>

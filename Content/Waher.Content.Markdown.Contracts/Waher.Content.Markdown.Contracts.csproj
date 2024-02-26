@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -17,8 +17,8 @@ https://waher.se/Markdown.md</Description>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown XML Smart Contract IEEE P1451.99</PackageTags>
-    <AssemblyVersion>3.0.2</AssemblyVersion>
-    <FileVersion>3.0.2</FileVersion>
+    <AssemblyVersion>3.0.3</AssemblyVersion>
+    <FileVersion>3.0.3</FileVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.xml</DocumentationFile>
   </PropertyGroup>

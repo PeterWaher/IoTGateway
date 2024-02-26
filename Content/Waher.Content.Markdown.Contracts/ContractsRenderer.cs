@@ -181,10 +181,9 @@ namespace Waher.Content.Markdown.Contracts
 		public override Task RenderDocumentFooter()
 		{
 			if (!string.IsNullOrEmpty(this.LocalName))
-			{
 				this.XmlOutput.WriteEndElement();
-				this.XmlOutput.Flush();
-			}
+			
+			this.XmlOutput.Flush();
 
 			return Task.CompletedTask;
 		}

@@ -452,63 +452,67 @@ namespace Waher.Utility.Install
 							}
 						}
 
-						Assembly A = Assembly.LoadFrom(SourceFileName);
-						AssemblyName AN = A.GetName();
-
-						if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (SourceFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
+							SourceFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
-							foreach (KeyValuePair<string, object> P in Targets)
+							Assembly A = Assembly.LoadFrom(SourceFileName);
+							AssemblyName AN = A.GetName();
+
+							if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 							{
-								if (P.Value is Dictionary<string, object> Target)
+								foreach (KeyValuePair<string, object> P in Targets)
 								{
-									foreach (KeyValuePair<string, object> P2 in Target)
+									if (P.Value is Dictionary<string, object> Target)
 									{
-										if (P2.Key.StartsWith(ServerName.Name + "/") &&
-											P2.Value is Dictionary<string, object> App &&
-											App.TryGetValue("dependencies", out object Obj2) &&
-											Obj2 is Dictionary<string, object> Dependencies)
+										foreach (KeyValuePair<string, object> P2 in Target)
 										{
-											Dependencies[AN.Name] = AN.Version.ToString();
-											break;
+											if (P2.Key.StartsWith(ServerName.Name + "/") &&
+												P2.Value is Dictionary<string, object> App &&
+												App.TryGetValue("dependencies", out object Obj2) &&
+												Obj2 is Dictionary<string, object> Dependencies)
+											{
+												Dependencies[AN.Name] = AN.Version.ToString();
+												break;
+											}
 										}
+
+										Dictionary<string, object> Dependencies2 = new();
+
+										foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+											Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+
+										Dictionary<string, object> Runtime = new()
+										{
+											{ Path.GetFileName(SourceFileName), new Dictionary<string,object>() }
+										};
+
+										Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+										{
+											{ "dependencies", Dependencies2 },
+											{ "runtime", Runtime }
+										};
 									}
-
-									Dictionary<string, object> Dependencies2 = new();
-
-									foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
-										Dependencies2[Dependency.Name] = Dependency.Version.ToString();
-
-									Dictionary<string, object> Runtime = new()
-									{
-										{ Path.GetFileName(SourceFileName), new Dictionary<string,object>() }
-									};
-
-									Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-									{
-										{ "dependencies", Dependencies2 },
-										{ "runtime", Runtime }
-									};
 								}
 							}
-						}
 
-						if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-						{
-							foreach (KeyValuePair<string, object> P in Libraries)
+							if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 							{
-								if (P.Key.StartsWith(AN.Name + "/"))
+								foreach (KeyValuePair<string, object> P in Libraries)
 								{
-									Libraries.Remove(P.Key);
-									break;
+									if (P.Key.StartsWith(AN.Name + "/"))
+									{
+										Libraries.Remove(P.Key);
+										break;
+									}
 								}
-							}
 
-							Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-							{
-								{ "type", "project" },
-								{ "serviceable", false },
-								{ "sha512", string.Empty }
-							};
+								Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+								{
+									{ "type", "project" },
+									{ "serviceable", false },
+									{ "sha512", string.Empty }
+								};
+							}
 						}
 					}
 				}
@@ -807,41 +811,45 @@ namespace Waher.Utility.Install
 					{
 						(string FileName, string AppFileName) = GetFileName(E, AppFolder);
 
-						Assembly A = Assembly.LoadFrom(AppFileName);
-						AssemblyName AN = A.GetName();
-						string Key = AN.Name + "/" + AN.Version.ToString();
-
-						if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						if (AppFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
+							AppFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
-							Targets.Remove(Key);
+							Assembly A = Assembly.LoadFrom(AppFileName);
+							AssemblyName AN = A.GetName();
+							string Key = AN.Name + "/" + AN.Version.ToString();
 
-							foreach (KeyValuePair<string, object> P in Targets)
+							if (Deps is not null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 							{
-								if (P.Value is Dictionary<string, object> Target)
+								Targets.Remove(Key);
+
+								foreach (KeyValuePair<string, object> P in Targets)
 								{
-									foreach (KeyValuePair<string, object> P2 in Target)
+									if (P.Value is Dictionary<string, object> Target)
 									{
-										if (P2.Key.StartsWith(ServerName.Name + "/") &&
-											P2.Value is Dictionary<string, object> App &&
-											App.TryGetValue("dependencies", out object Obj2) &&
-											Obj2 is Dictionary<string, object> Dependencies)
+										foreach (KeyValuePair<string, object> P2 in Target)
 										{
-											Dependencies.Remove(AN.Name);
-											break;
+											if (P2.Key.StartsWith(ServerName.Name + "/") &&
+												P2.Value is Dictionary<string, object> App &&
+												App.TryGetValue("dependencies", out object Obj2) &&
+												Obj2 is Dictionary<string, object> Dependencies)
+											{
+												Dependencies.Remove(AN.Name);
+												break;
+											}
 										}
 									}
 								}
 							}
-						}
 
-						if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-						{
-							foreach (KeyValuePair<string, object> P in Libraries)
+							if (Deps is not null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 							{
-								if (P.Key.StartsWith(AN.Name + "/"))
+								foreach (KeyValuePair<string, object> P in Libraries)
 								{
-									Libraries.Remove(P.Key);
-									break;
+									if (P.Key.StartsWith(AN.Name + "/"))
+									{
+										Libraries.Remove(P.Key);
+										break;
+									}
 								}
 							}
 						}
@@ -960,7 +968,13 @@ namespace Waher.Utility.Install
 						{
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
-							CopyFile(2, SourceFileName, FileName, Compressed);
+							if (SourceFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
+								SourceFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+							{
+								CopyFile(2, SourceFileName, FileName, Compressed);
+							}
+							else
+								CopyFile(1, SourceFileName, FileName, Compressed);
 
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{

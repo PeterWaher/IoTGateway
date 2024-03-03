@@ -556,6 +556,7 @@
   <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Install.manifest' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>

@@ -24,7 +24,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => nameof(Length);
+        public override string FunctionName => nameof(this.Length);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

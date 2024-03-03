@@ -1328,7 +1328,7 @@ namespace Waher.Utility.Install
 							case 2: // Assembly file
 								FileName = Path.Combine(AppFolder, RelativeName);
 
-								if (ContentOnly || b == 1)
+								if (ContentOnly)
 								{
 									Log.Notice("Skipping file: " + FileName, string.Empty, string.Empty, "FileSkip");
 									SkipBytes(Decompressed, Bytes, Buffer);

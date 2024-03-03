@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// Encapsulates css content.
 	/// </summary>
-	public class CssContent : FunctionOneScalarVariable
+	public class CssContent : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Encapsulates css content.

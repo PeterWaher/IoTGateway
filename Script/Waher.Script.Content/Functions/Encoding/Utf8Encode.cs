@@ -7,7 +7,7 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// Utf8Encode(Data)
 	/// </summary>
-	public class Utf8Encode : FunctionOneScalarVariable
+	public class Utf8Encode : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Utf8Encode(Data)

@@ -8,7 +8,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 	/// <summary>
 	/// FileLastAccessTime(FileName)
 	/// </summary>
-	public class FileLastAccessTime : FunctionOneScalarVariable
+	public class FileLastAccessTime : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// FileLastAccessTime(FileName)

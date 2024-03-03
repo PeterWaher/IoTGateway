@@ -9,7 +9,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 	/// Gets information about a tab, the URI used, query parameters, session ID and 
 	/// session variables. If tab is not found, `null` is returned.
 	/// </summary>
-	public class GetTabInformation : FunctionOneScalarVariable
+	public class GetTabInformation : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Gets information about a tab, the URI used, query parameters, session ID and 

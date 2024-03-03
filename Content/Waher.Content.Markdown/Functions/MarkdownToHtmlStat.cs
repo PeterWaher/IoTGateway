@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// MarkdownToHtmlStat(s)
 	/// </summary>
-	public class MarkdownToHtmlStat : FunctionOneScalarVariable
+	public class MarkdownToHtmlStat : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// MarkdownToHtmlStat(x)

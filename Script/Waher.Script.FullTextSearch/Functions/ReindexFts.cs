@@ -10,7 +10,7 @@ namespace Waher.Script.FullTextSearch.Functions
 	/// <summary>
 	/// Reindexes the full-text-search index defined by `Index`.
 	/// </summary>
-	public class ReindexFts : FunctionOneScalarVariable
+	public class ReindexFts : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Reindexes the full-text-search index defined by `Index`.

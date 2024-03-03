@@ -16,7 +16,7 @@ namespace Waher.Content.Markdown.Functions
 	/// Executes script from a file, if not executed before, or if file timestamp has changed.
 	/// Corresponds to the INIT meta-data tag in Markdown.
 	/// </summary>
-	public class InitScriptFile : FunctionOneScalarVariable
+	public class InitScriptFile : FunctionOneScalarStringVariable
 	{
 		private static readonly Dictionary<string, DateTime> lastExecuted = new Dictionary<string, DateTime>();
 

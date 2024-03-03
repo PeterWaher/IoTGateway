@@ -10,7 +10,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 	/// Removes a script resource added using the `ScriptResource` function. The function returns a Boolean value 
 	/// showing if such a resource was found and removed.
 	/// </summary>
-	public class RemoveScriptResource : FunctionOneScalarVariable
+	public class RemoveScriptResource : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Removes a script resource added using the `ScriptResource` function. The function returns a Boolean value 

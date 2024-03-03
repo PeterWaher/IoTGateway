@@ -8,7 +8,7 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// Base64Decode(Base64)
 	/// </summary>
-	public class Base64Decode : FunctionOneScalarVariable
+	public class Base64Decode : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Base64Decode(Base64)

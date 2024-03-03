@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// MarkdownEncode(s)
 	/// </summary>
-	public class MarkdownEncode : FunctionOneScalarVariable
+	public class MarkdownEncode : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// MarkdownEncode(x)

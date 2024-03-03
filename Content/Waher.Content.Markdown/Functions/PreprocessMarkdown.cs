@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// PreprocessMarkdown(Markdown)
 	/// </summary>
-	public class PreprocessMarkdown : FunctionOneScalarVariable
+	public class PreprocessMarkdown : FunctionOneScalarStringVariable
     {
 		/// <summary>
 		/// PreprocessMarkdown(Markdown)

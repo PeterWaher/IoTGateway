@@ -7711,63 +7711,7 @@
             Optional aliases. If there are no aliases for the function, null is returned.
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(System.Double,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
         <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(System.String,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
-            <summary>
-            Evaluates the function on a scalar argument.
-            </summary>
-            <param name="Argument">Function argument.</param>
-            <param name="Variables">Variables collection.</param>
-            <returns>Function result.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -8096,6 +8040,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Strings.IsNotEmpty">
             <summary>
             IsNotEmpty(s)
@@ -8120,7 +8080,63 @@
             Optional aliases. If there are no aliases for the function, null is returned.
             </summary>
         </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsNotEmpty.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -11376,6 +11392,124 @@
         <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrixAsync(Waher.Script.Objects.Matrices.BooleanMatrix,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Model.FunctionOneScalarStringVariable">
+            <summary>
+            Base class for funcions of one scalar string variable.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Base class for funcions of one scalar string variable.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(Waher.Script.Objects.Measurement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarStringVariable.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>

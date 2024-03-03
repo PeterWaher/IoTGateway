@@ -4537,7 +4537,7 @@ namespace Waher.Script
 		/// <returns>String representation of value.</returns>
 		public static string ToString(Complex Value)
 		{
-			return "(" + ToString(Value.Real) + "," + ToString(Value.Imaginary) + ")";
+			return "(" + ToString(Value.Real) + ", " + ToString(Value.Imaginary) + ")";
 		}
 
 		/// <summary>

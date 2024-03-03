@@ -19,7 +19,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// Converts markdown to an element.
 	/// </summary>
-	public class FromMarkdown : FunctionOneScalarVariable
+	public class FromMarkdown : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Converts markdown to an element.

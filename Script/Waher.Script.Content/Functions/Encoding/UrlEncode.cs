@@ -7,8 +7,8 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// UrlEncode(s)
 	/// </summary>
-	public class UrlEncode : FunctionOneScalarVariable
-    {
+	public class UrlEncode : FunctionOneScalarStringVariable
+	{
 		/// <summary>
 		/// UrlEncode(x)
 		/// </summary>

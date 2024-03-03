@@ -8,7 +8,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 	/// <summary>
 	/// FileAttributes(FileName)
 	/// </summary>
-	public class FileAttributes : FunctionOneScalarVariable
+	public class FileAttributes : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// FileAttributes(FileName)

@@ -8,7 +8,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 	/// <summary>
 	/// FileCreationTime(FileName)
 	/// </summary>
-	public class FileCreationTime : FunctionOneScalarVariable
+	public class FileCreationTime : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// FileCreationTime(FileName)

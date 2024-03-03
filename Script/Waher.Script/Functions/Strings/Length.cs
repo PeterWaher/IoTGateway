@@ -7,7 +7,7 @@ namespace Waher.Script.Functions.Strings
     /// <summary>
     /// Length(s)
     /// </summary>
-    public class Length : FunctionOneScalarVariable
+    public class Length : FunctionOneScalarStringVariable
     {
         /// <summary>
         /// Length(x)

@@ -2,8 +2,6 @@
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Runtime.Profiling;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;

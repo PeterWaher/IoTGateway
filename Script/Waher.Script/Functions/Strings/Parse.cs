@@ -7,8 +7,8 @@ namespace Waher.Script.Functions.Strings
     /// <summary>
     /// Parse(s)
     /// </summary>
-    public class Parse : FunctionOneScalarVariable
-    {
+    public class Parse : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// Parse(x)
         /// </summary>

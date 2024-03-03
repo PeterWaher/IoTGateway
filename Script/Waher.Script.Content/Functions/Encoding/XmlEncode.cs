@@ -8,8 +8,8 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// XmlEncode(s)
 	/// </summary>
-	public class XmlEncode : FunctionOneScalarVariable
-    {
+	public class XmlEncode : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// XmlEncode(x)
         /// </summary>

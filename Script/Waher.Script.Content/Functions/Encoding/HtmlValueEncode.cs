@@ -8,8 +8,8 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// HtmlValueEncode(s)
 	/// </summary>
-	public class HtmlValueEncode : FunctionOneScalarVariable
-    {
+	public class HtmlValueEncode : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// HtmlValueEncode(x)
         /// </summary>

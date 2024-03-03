@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -11,7 +10,7 @@ namespace Waher.Script.Graphs.Functions.Colors
 	/// <summary>
 	/// Returns a color value from a string.
 	/// </summary>
-	public class Color : FunctionOneScalarVariable
+	public class Color : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Returns a color value from a string.

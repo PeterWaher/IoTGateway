@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// ParseMarkdown(Markdown)
 	/// </summary>
-	public class ParseMarkdown : FunctionOneScalarVariable
+	public class ParseMarkdown : FunctionOneScalarStringVariable
     {
 		/// <summary>
 		/// ParseMarkdown(Markdown)

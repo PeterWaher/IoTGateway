@@ -12,7 +12,7 @@ namespace Waher.Content.Markdown.Functions
 	/// Executes script from a file.
 	/// Corresponds to the SCRIPT meta-data tag in Markdown.
 	/// </summary>
-	public class ScriptFile : FunctionOneScalarVariable
+	public class ScriptFile : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Executes script from a file, if not executed before, or if file timestamp has changed.

@@ -7,8 +7,8 @@ namespace Waher.Script.Functions.Strings
     /// <summary>
     /// Trim(s)
     /// </summary>
-    public class Trim : FunctionOneScalarVariable
-    {
+    public class Trim : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// Trim(x)
         /// </summary>

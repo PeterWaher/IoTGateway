@@ -9,7 +9,7 @@ namespace Waher.Script.Cryptography.Functions.Encoding
 	/// <summary>
 	/// HexDecode(Hex)
 	/// </summary>
-	public class HexDecode : FunctionOneScalarVariable
+	public class HexDecode : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// HexDecode(Hex)

@@ -11,7 +11,7 @@ namespace Waher.Script.Functions.Scalar
     /// <summary>
     /// Uri(x)
     /// </summary>
-    public class Uri : FunctionOneScalarVariable
+    public class Uri : FunctionOneScalarStringVariable
     {
         /// <summary>
         /// Uri(x)

@@ -111,5 +111,27 @@ namespace Waher.Script.Functions.Strings
 		{
 			return BooleanValue.False;
 		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(PhysicalQuantity Argument, Variables Variables)
+		{
+			return BooleanValue.False;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(Measurement Argument, Variables Variables)
+		{
+			return BooleanValue.False;
+		}
 	}
 }

@@ -9,7 +9,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 	/// <summary>
 	/// Gets the current count of a counter
 	/// </summary>
-	public class GetCounter : FunctionOneScalarVariable
+	public class GetCounter : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Gets the current count of a counter

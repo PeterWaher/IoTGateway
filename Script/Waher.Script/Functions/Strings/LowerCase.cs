@@ -7,8 +7,8 @@ namespace Waher.Script.Functions.Strings
     /// <summary>
     /// LowerCase(s)
     /// </summary>
-    public class LowerCase : FunctionOneScalarVariable
-    {
+    public class LowerCase : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// LowerCase(x)
         /// </summary>

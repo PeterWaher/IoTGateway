@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// Encapsulates markdown content.
 	/// </summary>
-	public class MarkdownContent : FunctionOneScalarVariable
+	public class MarkdownContent : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Encapsulates markdown content.

@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Functions
 	/// <summary>
 	/// Encapsulates javascript content.
 	/// </summary>
-	public class JavascriptContent : FunctionOneScalarVariable
+	public class JavascriptContent : FunctionOneScalarStringVariable
 	{
 		/// <summary>
 		/// Encapsulates javascript content.

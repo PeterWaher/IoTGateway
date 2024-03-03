@@ -8,8 +8,8 @@ namespace Waher.Script.Content.Functions.Encoding
 	/// <summary>
 	/// HtmlAttributeEncode(s)
 	/// </summary>
-	public class HtmlAttributeEncode : FunctionOneScalarVariable
-    {
+	public class HtmlAttributeEncode : FunctionOneScalarStringVariable
+	{
         /// <summary>
         /// HtmlAttributeEncode(x)
         /// </summary>

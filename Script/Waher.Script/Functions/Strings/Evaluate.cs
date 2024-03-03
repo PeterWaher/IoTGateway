@@ -8,7 +8,7 @@ namespace Waher.Script.Functions.Strings
     /// <summary>
     /// Evaluate(s)
     /// </summary>
-    public class Evaluate : FunctionOneScalarVariable
+    public class Evaluate : FunctionOneScalarStringVariable
     {
         /// <summary>
         /// Evaluate(x)

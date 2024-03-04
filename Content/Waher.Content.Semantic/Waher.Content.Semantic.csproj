@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>The library contains encoders and decoders of semantic information, using well-known formats defined by the W3C for the semantic web, such as Turtle, RDF/XML and SPARQL results. Library also contains abstraction layer and extensiblea architecture for literals, as well as interfaces for semantic cubes for procedural access of semantic information.</Description>
-    <Copyright>Copyright © Waher Data AB 2023. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2023-2024. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Semantic</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

@@ -36,7 +36,7 @@
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[This is an example of <b>bold text</b>.]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[© Waher Data AB 2016-2023. All rights reserved.]]></Label>
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[© Waher Data AB 2016-2024. All rights reserved.]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[AT&amp;T]]></Label>

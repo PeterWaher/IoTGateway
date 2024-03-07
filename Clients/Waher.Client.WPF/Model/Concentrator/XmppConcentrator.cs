@@ -172,7 +172,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				if (Node is DataSource DataSource)
 				{
-					if (XmppAccountNode.IsOnline)
+					if (this.XmppAccountNode.IsOnline)
 						DataSource.UnsubscribeFromEvents();
 
 					lock (this.dataSources)

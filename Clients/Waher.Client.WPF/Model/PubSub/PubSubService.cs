@@ -99,10 +99,10 @@ namespace Waher.Client.WPF.Model.PubSub
 				{ string.Empty, new Loading(this) }
 			};
 
-			this.pubSubClient.ItemNotification += PubSubClient_ItemNotification;
-			this.pubSubClient.ItemRetracted += PubSubClient_ItemRetracted;
-			this.pubSubClient.NodePurged += PubSubClient_NodePurged;
-			this.pubSubClient.SubscriptionRequest += PubSubClient_SubscriptionRequest;
+			this.pubSubClient.ItemNotification += this.PubSubClient_ItemNotification;
+			this.pubSubClient.ItemRetracted += this.PubSubClient_ItemRetracted;
+			this.pubSubClient.NodePurged += this.PubSubClient_NodePurged;
+			this.pubSubClient.SubscriptionRequest += this.PubSubClient_SubscriptionRequest;
 		}
 
 		private Task PubSubClient_SubscriptionRequest(object Sender, SubscriptionRequestEventArgs e)

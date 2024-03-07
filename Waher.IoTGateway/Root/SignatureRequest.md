@@ -3,7 +3,7 @@ Description: This page displays a request to sign a smart contract.
 Date: 2020-02-28
 Author: Peter Waher
 Master: /Master.md
-JavaScript: Events.js
+JavaScript: /Events.js
 JavaScript: SignatureRequest.js
 JavaScript: Settings/Next.js
 UserVariable: User

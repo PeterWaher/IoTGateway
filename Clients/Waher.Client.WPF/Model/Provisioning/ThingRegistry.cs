@@ -56,7 +56,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		private async void ProcessUnhandled()
 		{
-			foreach (MessageEventArgs Message in Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
+			foreach (MessageEventArgs Message in this.Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
 			{
 				try
 				{

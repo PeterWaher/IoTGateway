@@ -401,7 +401,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 					MainWindow.UpdateGui(() =>
 					{
-						Service?.Account?.View?.NodeAdded(this, Item);
+						this.Service?.Account?.View?.NodeAdded(this, Item);
 						this.OnUpdated();
 						return Task.CompletedTask;
 					});
@@ -415,7 +415,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				MainWindow.UpdateGui(() =>
 				{
-					Service?.Account?.View?.NodeRemoved(this, N);
+					this.Service?.Account?.View?.NodeRemoved(this, N);
 					this.OnUpdated();
 					return Task.CompletedTask;
 				});
@@ -439,7 +439,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			MainWindow.UpdateGui(() =>
 			{
 				foreach (TreeNode Node in ToRemove)
-					Service?.Account?.View?.NodeRemoved(this, Node);
+					this.Service?.Account?.View?.NodeRemoved(this, Node);
 
 				this.OnUpdated();
 
@@ -461,7 +461,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				IsEnabled = true,
 			});
 
-			MenuItem.Click += Purge_Click;
+			MenuItem.Click += this.Purge_Click;
 		}
 
 		private void Purge_Click(object sender, RoutedEventArgs e)

@@ -3,7 +3,7 @@ Description: This page allows the user to propose a new contract.
 Date: 2020-06-26
 Author: Peter Waher
 Master: /Master.md
-JavaScript: Events.js
+JavaScript: /Events.js
 JavaScript: ProposeContract.js
 UserVariable: User
 Privilege: Admin.Legal.ProposeContract

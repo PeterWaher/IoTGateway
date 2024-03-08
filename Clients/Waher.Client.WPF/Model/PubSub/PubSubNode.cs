@@ -14,6 +14,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Things.DisplayableParameters;
 using Waher.Client.WPF.Dialogs;
 using System.Windows.Controls;
+using Waher.Client.WPF.Dialogs.PubSub;
 
 namespace Waher.Client.WPF.Model.PubSub
 {
@@ -449,11 +450,19 @@ namespace Waher.Client.WPF.Model.PubSub
 
 		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
 		{
+			MenuItem MenuItem;
+
 			base.AddContexMenuItems(ref CurrentGroup, Menu);
 
-			CurrentGroup = "PubSubNode";
+			this.GroupSeparator(ref CurrentGroup, "PubSubNode", Menu);
 
-			MenuItem MenuItem;
+			Menu.Items.Add(MenuItem = new MenuItem()
+			{
+				Header = "Affiliations...",
+				IsEnabled = true,
+			});
+
+			MenuItem.Click += this.Affiliations_Click;
 
 			Menu.Items.Add(MenuItem = new MenuItem()
 			{
@@ -484,6 +493,85 @@ namespace Waher.Client.WPF.Model.PubSub
 				{
 					MainWindow.ErrorBox(ex.Message);
 				}
+			}
+		}
+
+		private void Affiliations_Click(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				this.Service.PubSubClient.GetAffiliations(this.node, (sender2, e2) =>
+				{
+					MainWindow.MouseDefault();
+
+					MainWindow.UpdateGui(() =>
+					{
+						if (!e2.Ok)
+							MainWindow.ErrorBox("Unable to get the affiliations for the node: " + e2.ErrorText);
+
+						AffiliationsForm Form = new AffiliationsForm(this.node)
+						{
+							Owner = MainWindow.currentInstance
+						};
+
+						foreach (Affiliation Affiliation in e2.Affiliations)
+						{
+							ListViewItem Item = new ListViewItem()
+							{
+								Content = new AffiliationItem(Affiliation)
+							};
+
+							Form.AffiliationView.Items.Add(Item);
+						}
+
+						bool? b = Form.ShowDialog();
+						if (b.HasValue && b.Value)
+						{
+							List<KeyValuePair<string, AffiliationStatus>> Affiliations = new List<KeyValuePair<string, AffiliationStatus>>();
+
+							foreach (ListViewItem Item in Form.AffiliationView.Items)
+							{
+								if (Item.Content is AffiliationItem AffiliationItem)
+								{
+									Affiliations.Add(new KeyValuePair<string, AffiliationStatus>(
+										AffiliationItem.Affiliation.Jid,
+										AffiliationItem.Affiliation.Status));
+								}
+							}
+
+							Mouse.OverrideCursor = Cursors.Wait;
+							try
+							{
+								this.Service.PubSubClient.UpdateAffiliations(this.node, Affiliations, (sender3, e3) =>
+								{
+									MainWindow.MouseDefault();
+
+									if (e3.Ok)
+										MainWindow.SuccessBox("Affiliations updated for the node.");
+									else
+										MainWindow.ErrorBox("Unable to update affiliations for the node: " + e3.ErrorText);
+
+									return Task.CompletedTask;
+								}, null);
+							}
+							catch (Exception ex)
+							{
+								MainWindow.ErrorBox(ex.Message);
+							}
+						}
+
+						return Task.CompletedTask;
+					});
+
+					return Task.CompletedTask;
+
+				}, null);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
 			}
 		}
 

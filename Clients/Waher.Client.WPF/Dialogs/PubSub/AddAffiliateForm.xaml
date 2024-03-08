@@ -1,0 +1,32 @@
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.PubSub.AddAffiliateForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add affiliate" Height="200" Width="300" WindowStartupLocation="CenterOwner">
+	<DockPanel Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=Jid}">
+		<DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+			<StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+				<Button Content="Add" Height="23" HorizontalAlignment="Left" Name="AddButton" VerticalAlignment="Top" Width="75" IsDefault="True"
+                    Margin="5,0,5,0" ToolTip="Add the Room to your list of rooms on this service." Click="AddButton_Click" IsEnabled="False" />
+				<Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" VerticalAlignment="Top" Width="75"
+                    Margin="5,0,5,0" ToolTip="Closes the dialog without adding a new room." IsCancel="True" Click="CancelButton_Click"/>
+			</StackPanel>
+		</DockPanel>
+		<DockPanel DockPanel.Dock="Top" Margin="0,8,0,8">
+			<StackPanel Orientation="Vertical" Margin="8,8,8,0">
+				<Label Content="JID:" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" />
+				<TextBox Height="23" HorizontalAlignment="Stretch" Name="Jid" VerticalAlignment="Top" 
+                 ToolTip="Enter the Bare JID of the affiliate to add to the node." TextChanged="Jid_TextChanged" />
+				<Label Content="Affiliation:" Height="28" HorizontalAlignment="Left" Name="label2" VerticalAlignment="Top" />
+				<ComboBox Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Top" ToolTip="Affiliation for JID."
+						  SelectionChanged="ComboBox_SelectionChanged" Name="Affiliation">
+					<ComboBoxItem>Owner</ComboBoxItem>
+					<ComboBoxItem>Publisher</ComboBoxItem>
+					<ComboBoxItem>Publish Only</ComboBoxItem>
+					<ComboBoxItem>Member</ComboBoxItem>
+					<ComboBoxItem>None</ComboBoxItem>
+					<ComboBoxItem>Outcast</ComboBoxItem>
+				</ComboBox>
+			</StackPanel>
+		</DockPanel>
+	</DockPanel>
+</Window>

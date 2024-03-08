@@ -325,7 +325,7 @@ namespace Waher.Client.WPF.Model
 
 				if (SubscriptionState == SubscriptionState.None || SubscriptionState == SubscriptionState.From)
 				{
-					CurrentGroup = "Subscriptions";
+					this.GroupSeparator(ref CurrentGroup, "Subscriptions", Menu);
 
 					if (SubscriptionState == SubscriptionState.None)
 						s = "../Graphics/To.png";
@@ -349,7 +349,7 @@ namespace Waher.Client.WPF.Model
 
 				if (SubscriptionState == SubscriptionState.To || SubscriptionState == SubscriptionState.Both)
 				{
-					CurrentGroup = "Subscriptions";
+					this.GroupSeparator(ref CurrentGroup, "Subscriptions", Menu);
 
 					if (SubscriptionState == SubscriptionState.To)
 						s = "../Graphics/None.png";

@@ -340,6 +340,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\PubSub\AddAffiliateForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PubSub\AffiliationsForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Xmpp\IqResultFrom.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -361,6 +369,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\ITabView.cs" />
+    <Compile Include="Dialogs\PubSub\AddAffiliateForm.xaml.cs">
+      <DependentUpon>AddAffiliateForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\PubSub\AffiliationItem.cs" />
+    <Compile Include="Dialogs\PubSub\AffiliationsForm.xaml.cs">
+      <DependentUpon>AffiliationsForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Xmpp\IqResultFrom.xaml.cs">
       <DependentUpon>IqResultFrom.xaml</DependentUpon>
     </Compile>

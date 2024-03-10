@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,7 +68,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
+		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -157,7 +158,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpxClient HttpxClient;
-			string BareJid;
+			string BareJid = Uri.UserInfo + "@" + Uri.Authority;
 			string FullJid;
 			string LocalUrl;
 
@@ -166,40 +167,56 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
 					throw new InvalidOperationException("Service is being shut down.");
 
-				GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
+				if (string.Compare(BareJid, Proxy.DefaultXmppClient.BareJID, true) == 0 &&
+					Proxy.DefaultXmppClient.TryGetExtension(out HttpxServer Server))
+				{
+					return await Server.GetLocalTempStreamAsync(Uri.PathAndQuery + Uri.Fragment);
+				}
+				else
+				{
+					GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
 
-				BareJid = Rec.BareJid;
-				FullJid = Rec.FullJid;
-				HttpxClient = Rec.HttpxClient;
-				LocalUrl = Rec.LocalUrl;
+					BareJid = Rec.BareJid;
+					FullJid = Rec.FullJid;
+					HttpxClient = Rec.HttpxClient;
+					LocalUrl = Rec.LocalUrl;
+				}
 			}
 			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
 			{
 				if (XmppClient.Disposed)
 					throw new InvalidOperationException("Service is being shut down.");
 
-				if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
-					throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
-
-				HttpxClient = HttpxClient2;
-
-				if (string.IsNullOrEmpty(Uri.UserInfo))
-					FullJid = BareJid = Uri.Authority;
+				if (string.Compare(BareJid, XmppClient.BareJID, true) == 0 &&
+					XmppClient.TryGetExtension(out HttpxServer Server))
+				{
+					return await Server.GetLocalTempStreamAsync(Uri.PathAndQuery + Uri.Fragment);
+				}
 				else
 				{
-					BareJid = Uri.UserInfo + "@" + Uri.Authority;
+					if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
+						throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
 
-					RosterItem Item = XmppClient.GetRosterItem(BareJid);
+					HttpxClient = HttpxClient2;
 
-					if (Item is null)
-						throw new ConflictException("No approved presence subscription with " + BareJid + ".");
-					else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
-						throw new ServiceUnavailableException(BareJid + " is not online.");
+					if (string.IsNullOrEmpty(Uri.UserInfo))
+						FullJid = BareJid = Uri.Authority;
 					else
-						FullJid = Item.LastPresenceFullJid;
-				}
+					{
+						BareJid = Uri.UserInfo + "@" + Uri.Authority;
 
-				LocalUrl = Uri.PathAndQuery + Uri.Fragment;
+						RosterItem Item = XmppClient.GetRosterItem(BareJid);
+
+						if (Item is null)
+							throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+						else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
+							throw new ServiceUnavailableException(BareJid + " is not online.");
+						else
+							FullJid = Item.LastPresenceFullJid;
+					}
+
+					LocalUrl = Uri.PathAndQuery + Uri.Fragment;
+				}
 			}
 			else
 				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");

@@ -8,15 +8,22 @@ using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using System.Security.Cryptography.X509Certificates;
+using Waher.Content;
+using System.Runtime.ExceptionServices;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
 	/// <summary>
 	/// HTTPX server.
 	/// </summary>
-	public class HttpxServer : IDisposable
+	public class HttpxServer : XmppExtension, IDisposable
 	{
-		private readonly XmppClient client;
+		/// <summary>
+		/// String identifying the extension on the client.
+		/// </summary>
+		public const string ExtensionId = "XEP-0332-s";
+
 		private readonly HttpServer server;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
@@ -30,8 +37,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Server">HTTP Server.</param>
 		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		public HttpxServer(XmppClient Client, HttpServer Server, int MaxChunkSize)
+			: base(Client)
 		{
-			this.client = Client;
 			this.server = Server;
 			this.maxChunkSize = MaxChunkSize;
 
@@ -41,6 +48,16 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.client.RegisterIqGetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
 			this.client.RegisterMessageHandler("cancel", HttpxClient.Namespace, this.CancelReceived, false);
 		}
+
+		/// <summary>
+		/// Associated HTTP server.
+		/// </summary>
+		public HttpServer HttpServer => this.server;
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { ExtensionId };
 
 		/// <summary>
 		/// If end-to-end encryption is required to be able to access web content via HTTPX.
@@ -73,13 +90,15 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
 			HttpxChunks.UnregisterChunkReceiver(this.client);
 
 			this.client.UnregisterIqSetHandler("req", HttpxClient.Namespace, this.ReqReceived, true);
 			this.client.UnregisterIqGetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
 			this.client.UnregisterMessageHandler("cancel", HttpxClient.Namespace, this.CancelReceived, false);
+
+			base.Dispose();
 		}
 
 		private async Task ReqReceived(object Sender, IqEventArgs e)
@@ -362,6 +381,30 @@ namespace Waher.Networking.XMPP.HTTPX
 			HttpxResponse.CancelChunkedTransfer(e.From, e.To, StreamId);
 
 			return Task.CompletedTask;
+		}
+
+		internal async Task<KeyValuePair<string, TemporaryStream>> GetLocalTempStreamAsync(string LocalUrl)
+		{
+			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new Script.Variables());
+			int Code = T.Item1;
+			string ContentType = T.Item2;
+			byte[] Bin = T.Item3;
+
+			if (Code < 200 || Code >= 300)
+				throw new HttpException(Code, HttpException.GetStatusMessage(Code), Bin, ContentType);
+
+			TemporaryStream f = new TemporaryStream();
+			try
+			{
+				await f.WriteAsync(Bin, 0, Bin.Length);
+			}
+			catch (Exception ex)
+			{
+				f.Dispose();
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return new KeyValuePair<string, TemporaryStream>(ContentType, f);
 		}
 
 	}

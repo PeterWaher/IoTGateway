@@ -22,6 +22,11 @@ namespace Waher.Networking.XMPP.HTTPX
 	public class HttpxClient : XmppExtension
 	{
 		/// <summary>
+		/// String identifying the extension on the client.
+		/// </summary>
+		public const string ExtensionId = "XEP-0332-c";
+
+		/// <summary>
 		/// urn:xmpp:http
 		/// </summary>
 		public const string Namespace = "urn:xmpp:http";
@@ -70,7 +75,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// Implemented extensions.
 		/// </summary>
-		public override string[] Extensions => new string[] { "XEP-0332" };
+		public override string[] Extensions => new string[] { ExtensionId };
 
 		/// <summary>
 		/// Optional end-to-end encryption interface to use in requests.

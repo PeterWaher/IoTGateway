@@ -30,7 +30,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Label, and the position of the following label.</returns>
 		public async Task<KeyValuePair<string, long>> ReadLabel(long Position)
 		{
-			KeyValuePair<byte[], long> P = await ReadBlock(Position);
+			KeyValuePair<byte[], long> P = await this.ReadBlock(Position);
 			return new KeyValuePair<string, long>(Encoding.UTF8.GetString(P.Key), P.Value);
 		}
 
@@ -269,7 +269,7 @@ namespace Waher.Persistence.Files
 				if (this.labelsByCode.TryGetValue(FieldCode, out string Result))
 					return Result;
 				else
-					throw Database.FlagForRepair(this.CollectionName, "Field code unknown, Collection: " + this.CollectionName);
+					throw Database.FlagForRepair(this.CollectionName, "Field code unknown (" + FieldCode.ToString() + "), Collection: " + this.CollectionName);
 			}
 			finally
 			{

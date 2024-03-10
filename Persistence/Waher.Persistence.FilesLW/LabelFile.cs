@@ -30,7 +30,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Label, and the position of the following label.</returns>
 		public async Task<KeyValuePair<string, long>> ReadLabel(long Position)
 		{
-			KeyValuePair<byte[], long> P = await ReadBlock(Position);
+			KeyValuePair<byte[], long> P = await this.ReadBlock(Position);
 			return new KeyValuePair<string, long>(Encoding.UTF8.GetString(P.Key), P.Value);
 		}
 

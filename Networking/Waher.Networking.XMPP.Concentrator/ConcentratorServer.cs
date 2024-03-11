@@ -2547,12 +2547,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node.HasCommands)
 				{
-					foreach (ICommand Command in await Node.Commands)
-					{
-						if (!await Command.CanExecuteAsync(Caller))
-							continue;
+					IEnumerable<ICommand> Commands = await Node.Commands;
 
-						await ExportXml(Xml, Command, Language);
+					if (!(Commands is null))
+					{
+						foreach (ICommand Command in Commands)
+						{
+							if (!await Command.CanExecuteAsync(Caller))
+								continue;
+
+							await ExportXml(Xml, Command, Language);
+						}
 					}
 				}
 
@@ -2615,10 +2620,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			if (Node.HasCommands)
 			{
-				foreach (ICommand C in await Node.Commands)
+				IEnumerable<ICommand> Commands = await Node.Commands;
+
+				if (!(Commands is null))
 				{
-					if (C.CommandID == CommandId)
-						return C;
+					foreach (ICommand C in Commands)
+					{
+						if (C.CommandID == CommandId)
+							return C;
+					}
 				}
 			}
 
@@ -3442,20 +3452,30 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					CommonCommands = new Dictionary<ICommand, bool>(commandComparerInstance);
 
-					foreach (ICommand Command in await Node.Commands)
+					IEnumerable<ICommand> Commands = await Node.Commands;
+
+					if (!(Commands is null))
 					{
-						if (await Command.CanExecuteAsync(Caller))
-							CommonCommands[Command] = true;
+						foreach (ICommand Command in Commands)
+						{
+							if (await Command.CanExecuteAsync(Caller))
+								CommonCommands[Command] = true;
+						}
 					}
 				}
 				else
 				{
 					Dictionary<ICommand, bool> CommonCommands2 = new Dictionary<ICommand, bool>(commandComparerInstance);
+					IEnumerable<ICommand> Commands = await Node.Commands;
 
-					foreach (ICommand Command in await Node.Commands)
+					if (!(Commands is null))
 					{
-						if (CommonCommands.ContainsKey(Command) && await Command.CanExecuteAsync(Caller))
-							CommonCommands2[Command] = true;
+
+						foreach (ICommand Command in Commands)
+						{
+							if (CommonCommands.ContainsKey(Command) && await Command.CanExecuteAsync(Caller))
+								CommonCommands2[Command] = true;
+						}
 					}
 
 					CommonCommands = CommonCommands2;

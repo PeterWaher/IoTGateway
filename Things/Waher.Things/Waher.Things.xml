@@ -40,6 +40,22 @@
             Default language code.
             </summary>
         </member>
+        <member name="T:Waher.Things.Attributes.DynamicOptionsAttribute">
+            <summary>
+            Defines an option to display when editing the parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Attributes.DynamicOptionsAttribute.#ctor(System.String)">
+            <summary>
+            Defines a method for retrieving a dynamic set of options to display when editing the parameter.
+            </summary>
+            <param name="MethodName">Name of method on object that can be used to retrieve a dynamic set of options.</param>
+        </member>
+        <member name="P:Waher.Things.Attributes.DynamicOptionsAttribute.MethodName">
+            <summary>
+            Name of method on object that can be used to retrieve a dynamic set of options.
+            </summary>
+        </member>
         <member name="T:Waher.Things.Attributes.HeaderAttribute">
             <summary>
             Defines a localizable header string for the property.

@@ -163,6 +163,39 @@ namespace Waher.Networking.XMPP.Concentrator
 							else
 								Options.Add(new KeyValuePair<string, string>(OptionAttribute.Label, OptionAttribute.Option.ToString()));
 						}
+						else if (Attr is DynamicOptionsAttribute DynamicOptions)
+						{
+							MethodInfo MI = T.GetRuntimeMethod(DynamicOptions.MethodName, Types.NoTypes)
+								?? throw new Exception("Dynamic options method (" + DynamicOptions.MethodName +
+									") missing on editable object of type " + T.FullName + ".");
+
+							object Result = MI.Invoke(EditableObject, Types.NoParameters);
+
+							if (!(Result is null))
+							{
+								if (!(Result is OptionAttribute[] OptionAttributes))
+								{
+									throw new Exception("Expected an OptionAttribute array (or null) as a result from calling " +
+										DynamicOptions.MethodName + " on editable objects of type " + T.FullName + ".");
+								}
+
+								if (Options is null)
+									Options = new List<KeyValuePair<string, string>>();
+
+								foreach (OptionAttribute OptionAttribute2 in OptionAttributes)
+								{
+									StringId = OptionAttribute2.StringId;
+									if (StringId > 0)
+									{
+										Options.Add(new KeyValuePair<string, string>(
+											await Namespace.GetStringAsync(StringId, OptionAttribute2.Label),
+											OptionAttribute2.Option.ToString()));
+									}
+									else
+										Options.Add(new KeyValuePair<string, string>(OptionAttribute2.Label, OptionAttribute2.Option.ToString()));
+								}
+							}
+						}
 						else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 							ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);
 						else if (Attr is RangeAttribute RangeAttribute)
@@ -665,6 +698,31 @@ namespace Waher.Networking.XMPP.Concentrator
 							HasOptions = true;
 							if (Field.ValueString == OptionAttribute.Option.ToString())
 								ValidOption = true;
+						}
+						else if (Attr is DynamicOptionsAttribute DynamicOptions)
+						{
+							MethodInfo MI = T.GetRuntimeMethod(DynamicOptions.MethodName, Types.NoTypes)
+								?? throw new Exception("Dynamic options method (" + DynamicOptions.MethodName +
+									") missing on editable object of type " + T.FullName + ".");
+
+							object Result = MI.Invoke(EditableObject, Types.NoParameters);
+
+							if (!(Result is null))
+							{
+								if (!(Result is OptionAttribute[] OptionAttributes))
+								{
+									throw new Exception("Expected an OptionAttribute array (or null) as a result from calling " +
+										DynamicOptions.MethodName + " on editable objects of type " + T.FullName + ".");
+								}
+
+								HasOptions = true;
+
+								foreach (OptionAttribute OptionAttribute2 in OptionAttributes)
+								{
+									if (Field.ValueString == OptionAttribute2.Option.ToString())
+										ValidOption = true;
+								}
+							}
 						}
 						else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 							ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);

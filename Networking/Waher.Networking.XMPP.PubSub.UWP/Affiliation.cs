@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.XMPP.PubSub
+﻿namespace Waher.Networking.XMPP.PubSub
 {
 	/// <summary>
 	/// Contains information about a user affiliation.

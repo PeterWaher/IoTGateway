@@ -278,16 +278,16 @@ namespace Waher.Things.Files
 					await Statistics.Start();
 				try
 				{
-					string[] Files = Directory.GetFiles(this.folderPath,
-						string.IsNullOrEmpty(Filter) ? "*.*" : this.FileFilter,
+					DirectoryInfo DirInfo = new DirectoryInfo(this.folderPath);
+					FileInfo[] Files = DirInfo.GetFiles(string.IsNullOrEmpty(Filter) ? "*.*" : this.FileFilter,
 						Options == SynchronizationOptions.IncludeSubfolders ?
 						SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-					foreach (string File in Files)
+					foreach (FileInfo File in Files)
 					{
 						try
 						{
-							await this.OnChanged(File, Statistics);
+							await this.OnChanged(File.FullName, Statistics);
 						}
 						catch (Exception ex)
 						{

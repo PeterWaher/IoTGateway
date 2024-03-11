@@ -945,7 +945,7 @@ namespace Waher.Content
 		#region Byte Order Mark
 
 		/// <summary>
-		/// Gets a string from its binary representation, taking
+		/// Gets the encoding of a string from a its binary representation, taking
 		/// any Byte Order Mark (BOM) into account.
 		/// 
 		/// If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
@@ -954,15 +954,18 @@ namespace Waher.Content
 		/// <param name="Data">Binary Data</param>
 		/// <param name="DefaultEncoding">Default encoding to use, in case
 		/// a Byte Order Mark (BOM) is not found in the binary representation.</param>
-		/// <returns>Decoded string</returns>
-		public static string GetString(byte[] Data, Encoding DefaultEncoding)
+		/// <param name="BomLength">Length of Byte Order Mark (BOM).</param>
+		/// <returns>Encoding</returns>
+		public static Encoding GetEncoding(byte[] Data, Encoding DefaultEncoding, out int BomLength)
 		{
+			BomLength = 0;
+
 			if (Data is null)
-				return null;
+				return DefaultEncoding ?? ISO_8859_1;
 
 			int c = Data.Length;
 			if (c == 0)
-				return string.Empty;
+				return DefaultEncoding ?? ISO_8859_1;
 
 			/************************************************************
 			 * See: https://en.wikipedia.org/wiki/Byte_order_mark
@@ -981,36 +984,35 @@ namespace Waher.Content
 			 ************************************************************/
 
 
-			Encoding Encoding = DefaultEncoding ?? ISO_8859_1;
-			int Offset = 0;
+			BomLength = 0;
 
 			if (c >= 3 && Data[0] == 0xef && Data[1] == 0xbb && Data[2] == 0xbf)
 			{
-				Encoding = Encoding.UTF8;
-				Offset = 3;
+				BomLength = 3;
+				return Encoding.UTF8;
 			}
 			else if (c >= 2 && Data[0] == 0xfe && Data[1] == 0xff)
 			{
-				Encoding = Encoding.BigEndianUnicode;
-				Offset = 2;
+				BomLength = 2;
+				return Encoding.BigEndianUnicode;
 			}
 			else if (c >= 2 && Data[0] == 0xff && Data[1] == 0xfe)
 			{
 				if (c >= 4 && Data[2] == 0 && Data[3] == 0)
 				{
-					Encoding = Encoding.UTF32;
-					Offset = 4;
+					BomLength = 4;
+					return Encoding.UTF32;
 				}
 				else
 				{
-					Encoding = Encoding.Unicode;
-					Offset = 2;
+					BomLength = 2;
+					return Encoding.Unicode;
 				}
 			}
 			else if (c >= 4 && Data[0] == 0 && Data[1] == 0 && Data[2] == 0xfe && Data[3] == 0xff)
 			{
-				Encoding = BigEndianUnicode32;
-				Offset = 4;
+				BomLength = 4;
+				return BigEndianUnicode32;
 			}
 			else if (c >= 4 && Data[0] == 0x2b && Data[1] == 0x2f && Data[2] == 0x76)
 			{
@@ -1018,17 +1020,17 @@ namespace Waher.Content
 					Data[3] == 0x2b ||
 					Data[3] == 0x2f)
 				{
-					Encoding = Encoding.UTF7;
-					Offset = 4;
+					BomLength = 4;
+					return Encoding.UTF7;
 				}
 				else if (Data[3] == 0x38)
 				{
 					if (c >= 5 && Data[4] == 0x2d)
-						Offset = 5;
+						BomLength = 5;
 					else
-						Offset = 4;
+						BomLength = 4;
 
-					Encoding = Encoding.UTF7;
+					return Encoding.UTF7;
 				}
 			}
 			else if (c >= 3 && Data[0] == 0xf7 && Data[1] == 0x64 && Data[2] == 0x4c)
@@ -1041,9 +1043,30 @@ namespace Waher.Content
 				throw new ArgumentException("BOCU encoding not supported.", nameof(Data));
 			else if (c >= 4 && Data[0] == 0x84 && Data[1] == 0x31 && Data[2] == 0x95 && Data[3] == 0x33)
 			{
-				Encoding = GB18030;
-				Offset = 4;
+				BomLength = 4;
+				return GB18030;
 			}
+
+			return DefaultEncoding ?? ISO_8859_1;
+		}
+
+		/// <summary>
+		/// Gets a string from its binary representation, taking
+		/// any Byte Order Mark (BOM) into account.
+		/// 
+		/// If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
+		/// is used, if defined. If not, ISO-8859-1 is used
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="DefaultEncoding">Default encoding to use, in case
+		/// a Byte Order Mark (BOM) is not found in the binary representation.</param>
+		/// <returns>Decoded string</returns>
+		public static string GetString(byte[] Data, Encoding DefaultEncoding)
+		{
+			if (Data is null)
+				return null;
+
+			Encoding Encoding = GetEncoding(Data, DefaultEncoding, out int Offset);
 
 			return Encoding.GetString(Data, Offset, Data.Length - Offset);
 		}

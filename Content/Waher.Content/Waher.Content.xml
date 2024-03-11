@@ -530,6 +530,20 @@
             <param name="s">Value</param>
             <returns>Number of decimals.</returns>
         </member>
+        <member name="M:Waher.Content.CommonTypes.GetEncoding(System.Byte[],System.Text.Encoding,System.Int32@)">
+            <summary>
+            Gets the encoding of a string from a its binary representation, taking
+            any Byte Order Mark (BOM) into account.
+            
+            If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
+            is used, if defined. If not, ISO-8859-1 is used
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="DefaultEncoding">Default encoding to use, in case
+            a Byte Order Mark (BOM) is not found in the binary representation.</param>
+            <param name="BomLength">Length of Byte Order Mark (BOM).</param>
+            <returns>Encoding</returns>
+        </member>
         <member name="M:Waher.Content.CommonTypes.GetString(System.Byte[],System.Text.Encoding)">
             <summary>
             Gets a string from its binary representation, taking

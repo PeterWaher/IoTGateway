@@ -461,56 +461,61 @@ namespace Waher.Things.Semantic.Sources
 					new UriNode(IoTConcentrator.Commands),
 					Commands));
 
-				foreach (ICommand Command in await Node.Commands)
+				IEnumerable<ICommand> NodeCommands = await Node.Commands;
+
+				if (!(Commands is null))
 				{
-					if (!await Command.CanExecuteAsync(Caller))
-						continue;
+					foreach (ICommand Command in NodeCommands)
+					{
+						if (!await Command.CanExecuteAsync(Caller))
+							continue;
 
-					UriNode CommandUriNode = new UriNode(GetCommandUri(Node, Command));
+						UriNode CommandUriNode = new UriNode(GetCommandUri(Node, Command));
 
-					Result.Add(new SemanticTriple(
-						Commands,
-						new UriNode(Rdf.ListItem(++ItemIndex)),
-						CommandUriNode));
+						Result.Add(new SemanticTriple(
+							Commands,
+							new UriNode(Rdf.ListItem(++ItemIndex)),
+							CommandUriNode));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(DublinCore.Terms.Type),
-						new UriNode(IoTConcentrator.Command)));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(DublinCore.Terms.Type),
+							new UriNode(IoTConcentrator.Command)));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(RdfSchema.Label),
-						new StringLiteral(await Command.GetNameAsync(Language))));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(RdfSchema.Label),
+							new StringLiteral(await Command.GetNameAsync(Language))));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(IoTConcentrator.CommandId),
-						new StringLiteral(Command.CommandID)));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(IoTConcentrator.CommandId),
+							new StringLiteral(Command.CommandID)));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(IoTConcentrator.SortCategory),
-						new StringLiteral(Command.SortCategory)));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(IoTConcentrator.SortCategory),
+							new StringLiteral(Command.SortCategory)));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(IoTConcentrator.SortKey),
-						new StringLiteral(Command.SortKey)));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(IoTConcentrator.SortKey),
+							new StringLiteral(Command.SortKey)));
 
-					Result.Add(new SemanticTriple(
-						CommandUriNode,
-						new UriNode(IoTConcentrator.CommandType),
-						new CustomLiteral(Command.Type.ToString(), IoTConcentrator.CommandType.AbsoluteUri)));
+						Result.Add(new SemanticTriple(
+							CommandUriNode,
+							new UriNode(IoTConcentrator.CommandType),
+							new CustomLiteral(Command.Type.ToString(), IoTConcentrator.CommandType.AbsoluteUri)));
 
-					AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Success,
-						await Command.GetSuccessStringAsync(Language));
+						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Success,
+							await Command.GetSuccessStringAsync(Language));
 
-					AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Failure,
-						await Command.GetFailureStringAsync(Language));
+						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Failure,
+							await Command.GetFailureStringAsync(Language));
 
-					AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Confirmation,
-						await Command.GetConfirmationStringAsync(Language));
+						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Confirmation,
+							await Command.GetConfirmationStringAsync(Language));
+					}
 				}
 			}
 

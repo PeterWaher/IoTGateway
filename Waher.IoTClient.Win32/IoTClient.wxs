@@ -227,10 +227,14 @@
 							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
 						</Component>
 						<Component Id='ExternalLibraries' Guid='65C7C4CA-DE10-4838-8301-B23824CDFA23'>
-							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes' KeyPath='yes'/>
+							<File Id='ICSharpCode.AvalonEdit.dll' Name='ICSharpCode.AvalonEdit.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll' Vital='yes'/>
+							<File Id='ICSharpCode.AvalonEdit.xml' Name='ICSharpCode.AvalonEdit.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.xml' Vital='yes'/>
 							<File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\x86\libSkiaSharp.dll' Vital='yes'/>
-							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
+							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveICSharpCode.AvalonEdit.dll' Name='ICSharpCode.AvalonEdit.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveICSharpCode.AvalonEdit.xml' Name='ICSharpCode.AvalonEdit.xml' On='uninstall'/>
 						</Component>
 						<Component Id='MainExecutable' Guid='CF8BB89B-C017-4945-AF9E-B18FDB4E2EE9'>
 							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>

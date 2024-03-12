@@ -120,6 +120,9 @@
     <Compile Include="ByteRangeInterval.cs" />
     <Compile Include="CommunicationStatistics.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
+    <Compile Include="ContentEncodings\DeflateContentEncoding.cs" />
+    <Compile Include="ContentEncodings\GZipContentEncoding.cs" />
+    <Compile Include="ContentEncodings\IContentEncoding.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
@@ -332,6 +335,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Authentication\*.cs" "$(ProjectDir)Authentication" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ContentEncodings\*.cs" "$(ProjectDir)ContentEncodings" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ClientErrors\*.cs" "$(ProjectDir)Exceptions\ClientErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.cs" "$(ProjectDir)Exceptions\Redirections" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y

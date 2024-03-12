@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
@@ -56,10 +55,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <inheritdoc/>
-		public override string TypeName
-		{
-			get { return "jid-single"; }
-		}
+		public override string TypeName => "jid-single";
 
 		/// <summary>
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.

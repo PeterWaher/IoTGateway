@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
@@ -56,10 +55,6 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <inheritdoc/>
-		public override string TypeName
-		{
-			get { return "list-multi"; }
-		}
-
+		public override string TypeName => "list-multi";
 	}
 }

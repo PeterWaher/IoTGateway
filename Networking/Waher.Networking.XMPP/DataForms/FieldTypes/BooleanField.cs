@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Content;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -57,10 +56,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <inheritdoc/>
-		public override string TypeName
-		{
-			get { return "boolean"; }
-		}
+		public override string TypeName => "boolean";
 
 		/// <summary>
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.

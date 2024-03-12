@@ -101,6 +101,61 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Gets the default status message, given a status code.
+		/// </summary>
+		/// <param name="StatusCode">Status code.</param>
+		/// <returns>Status message.</returns>
+		public static string GetStatusMessage(int StatusCode)
+		{
+			switch (StatusCode)
+			{
+				// Client errors
+				case BadRequestException.Code: return BadRequestException.StatusMessage;
+				case ConflictException.Code: return ConflictException.StatusMessage;
+				case FailedDependencyException.Code: return FailedDependencyException.StatusMessage;
+				case ForbiddenException.Code: return ForbiddenException.StatusMessage;
+				case GoneException.Code: return GoneException.StatusMessage;
+				case LockedException.Code: return LockedException.StatusMessage;
+				case MethodNotAllowedException.Code: return MethodNotAllowedException.StatusMessage;
+				case MisdirectedRequestException.Code: return MisdirectedRequestException.StatusMessage;
+				case NotAcceptableException.Code: return NotAcceptableException.StatusMessage;
+				case NotFoundException.Code: return NotFoundException.StatusMessage;
+				case PreconditionFailedException.Code: return PreconditionFailedException.StatusMessage;
+				case PreconditionRequiredException.Code: return PreconditionRequiredException.StatusMessage;
+				case RangeNotSatisfiableException.Code: return RangeNotSatisfiableException.StatusMessage;
+				case RequestTimeoutException.Code: return RequestTimeoutException.StatusMessage;
+				case TooManyRequestsException.Code: return TooManyRequestsException.StatusMessage;
+				case UnauthorizedException.Code: return UnauthorizedException.StatusMessage;
+				case UnavailableForLegalReasonsException.Code: return UnavailableForLegalReasonsException.StatusMessage;
+				case UnprocessableEntityException.Code: return UnprocessableEntityException.StatusMessage;
+				case UnsupportedMediaTypeException.Code: return UnsupportedMediaTypeException.StatusMessage;
+				case UpgradeRequiredException.Code: return UpgradeRequiredException.StatusMessage;
+
+				// Redirections
+				case SeeOtherException.Code: return SeeOtherException.StatusMessage;
+				case TemporaryRedirectException.Code: return TemporaryRedirectException.StatusMessage;
+				case UseProxyException.Code: return UseProxyException.StatusMessage;
+				case FoundException.Code: return FoundException.StatusMessage;
+				case MovedPermanentlyException.Code: return MovedPermanentlyException.StatusMessage;
+				case NotModifiedException.Code: return NotModifiedException.StatusMessage;
+
+				// Server errors
+				case BadGatewayException.Code: return BadGatewayException.StatusMessage;
+				case GatewayTimeoutException.Code: return GatewayTimeoutException.StatusMessage;
+				case InsufficientStorageException.Code: return InsufficientStorageException.StatusMessage;
+				case InternalServerErrorException.Code: return InternalServerErrorException.StatusMessage;
+				case LoopDetectedException.Code: return LoopDetectedException.StatusMessage;
+				case NetworkAuthenticationRequiredException.Code: return NetworkAuthenticationRequiredException.StatusMessage;
+				case NotExtendedException.Code: return NotExtendedException.StatusMessage;
+				case NotImplementedException.Code: return NotImplementedException.StatusMessage;
+				case ServiceUnavailableException.Code: return ServiceUnavailableException.StatusMessage;
+				case VariantAlsoNegotiatesException.Code: return VariantAlsoNegotiatesException.StatusMessage;
+
+				default: return "Error";
+			}
+		}
+
+		/// <summary>
 		/// Joins two sets (possibly empty) of header arrays.
 		/// </summary>
 		/// <param name="Headers1">First array of headers.</param>

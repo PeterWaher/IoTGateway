@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SyntaxDefinition name="SmartContractMarkdown" extensions=".md" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<Color name="Paragraph" foreground="Black" />
+	<Color name="Heading1" foreground="Navy" fontSize="20" />
+	<Color name="Heading2" foreground="Navy" fontSize="18" />
+	<Color name="Heading3" foreground="Navy" fontSize="16" />
+	<Color name="Heading4" foreground="Navy" fontSize="14" />
+	<Color name="Heading5" foreground="Navy" fontSize="12" />
+	<Color name="BulletItem" foreground="Maroon" />
+	<Color name="Italic" fontStyle="italic" />
+	<Color name="Bold" fontWeight="bold" />
+	<Color name="Underline" underline="true" />
+	<Color name="StrikeThrough" strikethrough="true" />
+	<Color name="Escape" foreground="Magenta" />
+	<Color name="Parameter" foreground="Blue" />
+	<Color name="Subscript" foreground="Green" />
+	<Color name="Superscript" foreground="Red" />
+
+	<RuleSet name="SpanFormat" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoBold" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoItalic" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoUnderline" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoStrikeThrough" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoSubscript" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Superscript" multiline="true" begin="(?&lt;!\\)\^\[" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSuperscript"/>
+	</RuleSet>
+
+	<RuleSet name="SpanFormatNoSuperscript" ignoreCase="true">
+		<Span color="Escape" begin="\\" end="."/>
+		<Span color="Parameter" begin="(?&lt;!\\)\[%" end="]"/>
+		<Span color="Bold" multiline="true" begin="(?&lt;!\\)\*\*" end="(?&lt;!\\)\*\*" ruleSet="SpanFormatNoBold"/>
+		<Span color="Italic" multiline="true" begin="(?&lt;![\*\\])\*(?!\*)" end="(?&lt;![\*\\])\*(?!\*)" ruleSet="SpanFormatNoItalic"/>
+		<Span color="Underline" multiline="true" begin="(?&lt;![_\\])_(?!_)" end="(?&lt;![_\\])_(?!_)" ruleSet="SpanFormatNoUnderline"/>
+		<Span color="StrikeThrough" multiline="true" begin="(?&lt;![~\\])~(?!~)" end="(?&lt;![~\\])~(?!~)" ruleSet="SpanFormatNoStrikeThrough"/>
+		<Span color="Subscript" multiline="true" begin="(?&lt;![\^\\])\[(?!%)" end="(?&lt;!\\)\]" ruleSet="SpanFormatNoSubscript"/>
+	</RuleSet>
+
+	<RuleSet ignoreCase="true">
+		<Span color="Paragraph" multiline="true" begin="^(?!\r?$)" end="\r?$\r?$">
+			<RuleSet ignoreCase="true">
+				<Span color="BulletItem" begin="^(\*|\#\.)[ \t]+" ruleSet="SpanFormat"/>
+				<Span color="Heading1" begin="^#\s" ruleSet="SpanFormat"/>
+				<Span color="Heading2" begin="^#{2}\s" ruleSet="SpanFormat"/>
+				<Span color="Heading3" begin="^#{3}\s" ruleSet="SpanFormat"/>
+				<Span color="Heading4" begin="^#{4}\s" ruleSet="SpanFormat"/>
+				<Span color="Heading5" begin="^#{5,}\s" ruleSet="SpanFormat"/>
+				<Import ruleSet="SpanFormat"/>
+			</RuleSet>
+		</Span>
+	</RuleSet>
+</SyntaxDefinition>

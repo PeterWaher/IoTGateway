@@ -1,11 +1,16 @@
-﻿using System;
+﻿using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
+using Waher.Client.WPF.Dialogs.AvalonExtensions;
 using Waher.Content;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
@@ -348,7 +353,7 @@ namespace Waher.Client.WPF.Dialogs
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-		
+
 			return TextBox;
 		}
 
@@ -904,14 +909,154 @@ namespace Waher.Client.WPF.Dialogs
 
 		private Control Layout(Panel Container, TextMultiField Field, DataForm _)
 		{
-			TextBox TextBox = this.LayoutTextBox(Container, Field);
-			TextBox.TextChanged += this.TextBox_TextChanged;
-			TextBox.AcceptsReturn = true;
-			TextBox.AcceptsTab = true;
-			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-			TextBox.TextWrapping = TextWrapping.Wrap;
+			this.LayoutControlLabel(Container, Field);
 
-			return TextBox;
+			NonScrollingTextEditor Editor = new NonScrollingTextEditor()
+			{
+				Name = VarToName(Field.Var),
+				Text = Field.ValueString,
+				IsReadOnly = Field.ReadOnly,
+				ToolTip = Field.Description,
+				Margin = new Thickness(0, 0, 0, 5)
+			};
+
+			if (Field.HasError)
+				Editor.Background = new SolidColorBrush(Colors.PeachPuff);
+			else if (Field.NotSame)
+				Editor.Background = new SolidColorBrush(Colors.LightGray);
+
+			Container.Children.Add(Editor);
+			Editor.Tag = this.LayoutErrorLabel(Container, Field);
+
+			Editor.TextChanged += this.Editor_TextChanged;
+			Editor.BorderBrush = new SolidColorBrush(SystemColors.ActiveBorderColor);
+			Editor.BorderThickness = new Thickness(1);
+			Editor.Padding = new Thickness(5, 2, 5, 2);
+			Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+			Editor.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+			Editor.HorizontalAlignment = HorizontalAlignment.Stretch;
+			Editor.Height = double.NaN;
+			Editor.Width = double.NaN;
+			Editor.Options.ShowSpaces = false;
+			Editor.Options.ShowTabs = false;
+
+			string ContentType = Field.ContentType?.ToLower() ?? "text/plain";
+			string SyntaxHighlightingResource = null;
+
+			switch (ContentType)
+			{
+				case "text/plain":
+					Editor.WordWrap = true;
+					break;
+
+				case "text/markdown":
+					Editor.WordWrap = true;
+					SyntaxHighlightingResource = "Markdown.xshd";
+					break;
+
+				case "text/css":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					SyntaxHighlightingResource = "CSS.xshd";
+					break;
+
+				case "text/sgml":
+				case "text/csv":
+				case "text/tab-separated-values":
+				case "application/x-turtle":
+				case "text/turtle":
+				case "application/sparql-query":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					break;
+
+				case "application/json":
+				case "text/x-json":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					SyntaxHighlightingResource = "JSON.xshd";
+					break;
+
+				case "text/xml":
+				case "application/xml":
+				case "text/xsl":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					SyntaxHighlightingResource = "XML.xshd";
+					break;
+
+				case "application/javascript":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					SyntaxHighlightingResource = "JavaScript.xshd";
+					break;
+
+				case "text/html":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = true;
+					SyntaxHighlightingResource = "HTML.xshd";
+					break;
+
+				case "text/richtext":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					break;
+
+				case "application/x-webscript":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					break;
+
+				case "text/x-cssx":
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+					SyntaxHighlightingResource = "CSS.xshd";
+					break;
+
+				default:
+					Editor.FontFamily = new FontFamily("Courier New");
+					Editor.WordWrap = false;
+					Editor.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+					if (ContentType.StartsWith("application/") && ContentType.EndsWith("+json"))
+						SyntaxHighlightingResource = "JSON.xshd";
+					else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+xml"))
+						SyntaxHighlightingResource = "XML.xshd";
+					
+					break;
+			}
+
+			if (!string.IsNullOrEmpty(SyntaxHighlightingResource))
+			{
+				// AvalodEdit Syntax Highlight files:
+				//
+				// CSS, HTML, JavaScript, JSON, XML.
+				// Source: https://github.com/icsharpcode/AvalonEdit/tree/master/ICSharpCode.AvalonEdit/Highlighting/Resources
+				//
+				// Markdown:
+				// Source: https://github.com/Trust-Anchor-Group/LegalLab/tree/main/LegalLab/Models/Design/AvalonExtensions
+
+				Type AppType = typeof(App);
+
+				using (Stream XshdStream = AppType.Assembly.GetManifestResourceStream(AppType.Namespace + ".Dialogs.AvalonExtensions." +
+					SyntaxHighlightingResource))
+				{
+					using (XmlReader XshdReader = new XmlTextReader(XshdStream))
+					{
+						Editor.SyntaxHighlighting = HighlightingLoader.Load(XshdReader, HighlightingManager.Instance);
+					}
+				}
+			}
+
+			return Editor;
 		}
 
 		private Control Layout(Panel Container, TextPrivateField Field, DataForm _)
@@ -1078,6 +1223,41 @@ namespace Waher.Client.WPF.Dialogs
 			else
 			{
 				TextBox.Background = null;
+
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
+
+				this.CheckOkButtonEnabled();
+			}
+		}
+
+		private void Editor_TextChanged(object sender, EventArgs e)
+		{
+			if (!(sender is NonScrollingTextEditor Editor))
+				return;
+
+			string Var = NameToVar(Editor.Name);
+			Field Field = this.form[Var];
+			if (Field is null)
+				return;
+
+			TextBlock ErrorLabel = (TextBlock)Editor.Tag;
+
+			Field.SetValue(Editor.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
+
+			if (Field.HasError)
+			{
+				Editor.Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
+			}
+			else
+			{
+				Editor.Background = null;
 
 				if (!(ErrorLabel is null))
 					ErrorLabel.Visibility = Visibility.Collapsed;

@@ -73,6 +73,9 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.0.90, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AvalonEdit.6.3.0.90\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
     <Reference Include="SkiaSharp, Version=2.88.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SkiaSharp.2.88.7\lib\net462\SkiaSharp.dll</HintPath>
     </Reference>
@@ -115,6 +118,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -194,6 +198,7 @@
     </Compile>
     <Compile Include="Controls\Sniffers\SniffItem.cs" />
     <Compile Include="Controls\Sniffers\TabSniffer.cs" />
+    <Compile Include="Dialogs\AvalonExtensions\NonScrollingTextEditor.cs" />
     <Compile Include="Dialogs\Muc\BanOccupantForm.xaml.cs">
       <DependentUpon>BanOccupantForm.xaml</DependentUpon>
     </Compile>
@@ -441,6 +446,12 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\Markdown.xshd" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\CSS.xshd" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\HTML.xshd" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\JavaScript.xshd" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\JSON.xshd" />
+    <EmbeddedResource Include="Dialogs\AvalonExtensions\XML.xshd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

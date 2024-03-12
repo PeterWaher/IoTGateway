@@ -223,6 +223,7 @@
     <Compile Include=".bak\Waher.Script\IContextVariables.cs" />
     <Compile Include=".bak\Waher.Script\Model\Extensions.cs" />
     <Compile Include=".bak\Waher.Script\Model\FunctionOneMatrixVariable.cs" />
+    <Compile Include=".bak\Waher.Script\Model\FunctionOneScalarStringVariable.cs" />
     <Compile Include=".bak\Waher.Script\Model\FunctionZeroVariables.cs" />
     <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
     <Compile Include=".bak\Waher.Script\Model\IEvaluateAsync.cs" />

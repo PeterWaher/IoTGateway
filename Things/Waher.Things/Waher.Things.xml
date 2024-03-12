@@ -14,6 +14,22 @@
             Includes the alpha channel of a color property.
             </summary>
         </member>
+        <member name="T:Waher.Things.Attributes.ContentTypeAttribute">
+            <summary>
+            Defines the Content-Type of a multi-row property. Acts as a hint to clients, on how the text can be edited.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Attributes.ContentTypeAttribute.#ctor(System.String)">
+            <summary>
+            Defines the Content-Type of a multi-row property. Acts as a hint to clients, on how the text can be edited.
+            </summary>
+            <param name="ContentType">Internet Content-Type.</param>
+        </member>
+        <member name="P:Waher.Things.Attributes.ContentTypeAttribute.ContentType">
+            <summary>
+            Internet Content-Type.
+            </summary>
+        </member>
         <member name="T:Waher.Things.Attributes.DateOnlyAttribute">
             <summary>
             Only edits the date of the underlying DateTime property.
@@ -40,14 +56,32 @@
             Default language code.
             </summary>
         </member>
+        <member name="T:Waher.Things.Attributes.DynamicContentTypeAttribute">
+            <summary>
+            Defines a method that returns a Content-Type string or <see cref="T:Waher.Things.Attributes.ContentTypeAttribute"/> of a multi-row property.
+            Acts as a hint to clients, on how the text can be edited.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Attributes.DynamicContentTypeAttribute.#ctor(System.String)">
+            <summary>
+            Defines a method that returns a Content-Type string or <see cref="T:Waher.Things.Attributes.ContentTypeAttribute"/> of a multi-row property.
+            Acts as a hint to clients, on how the text can be edited.
+            </summary>
+            <param name="MethodName">Name of method on object that can be used to retrieve a dynamic set of options.</param>
+        </member>
+        <member name="P:Waher.Things.Attributes.DynamicContentTypeAttribute.MethodName">
+            <summary>
+            Name of method on object that can be used to retrieve a dynamic set of options.
+            </summary>
+        </member>
         <member name="T:Waher.Things.Attributes.DynamicOptionsAttribute">
             <summary>
-            Defines an option to display when editing the parameter.
+            Defines a method that returns an array of options to display when editing the parameter.
             </summary>
         </member>
         <member name="M:Waher.Things.Attributes.DynamicOptionsAttribute.#ctor(System.String)">
             <summary>
-            Defines a method for retrieving a dynamic set of options to display when editing the parameter.
+            Defines a method that returns an array of options to display when editing the parameter.
             </summary>
             <param name="MethodName">Name of method on object that can be used to retrieve a dynamic set of options.</param>
         </member>

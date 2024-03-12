@@ -431,6 +431,7 @@ namespace Waher.Networking.XMPP.DataForms
 			ValidationMethod ValidationMethod = null;
 			Field Field;
 			string Error = null;
+			string ContentType = null;
 			bool Required = false;
 			bool PostBack = false;
 			bool ReadOnly = false;
@@ -532,6 +533,10 @@ namespace Waher.Networking.XMPP.DataForms
 
 					case "error":
 						Error = N2.InnerText;
+						break;
+
+					case "contentType":
+						ContentType = N2.InnerText;
 						break;
 				}
 			}
@@ -662,7 +667,7 @@ namespace Waher.Networking.XMPP.DataForms
 				case "text-multi":
 					Field = new TextMultiField(this, Var, Label, Required,
 						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
-						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame, ContentType);
 					break;
 
 				case "text-private":

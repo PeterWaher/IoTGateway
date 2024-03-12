@@ -97,13 +97,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Value as a single string. If field contains multiple values, they will be concatenated into a single string, each one delimited by a CRLF.
 		/// </summary>
-		public string ValueString
-		{
-			get
-			{
-				return XmppClient.Concat(this.valueStrings);
-			}
-		}
+		public string ValueString => XmppClient.Concat(this.valueStrings);
 
 		/// <summary>
 		/// Options, as (Key=M2H Label, Value=M2M Value) pairs.
@@ -137,7 +131,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// If the field has an error. Any error message is available in the <see cref="Error"/> property.
 		/// </summary>
-		public bool HasError { get { return !string.IsNullOrEmpty(this.error); } }
+		public bool HasError => !string.IsNullOrEmpty(this.error);
 
 		/// <summary>
 		/// Flags the field as requiring server post-back after having been edited.
@@ -216,8 +210,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 					Result = Parsed.ToArray();
 
-					if (!(this.validationMethod is null))
-						this.validationMethod.Validate(this, this.dataType, Result, Value);
+					this.validationMethod?.Validate(this, this.dataType, Result, Value);
 				}
 			}
 
@@ -325,8 +318,7 @@ namespace Waher.Networking.XMPP.DataForms
 					Output.Append(XML.Encode(this.dataType.TypeName));
 					Output.Append("'>");
 
-					if (!(this.validationMethod is null))
-						this.validationMethod.Serialize(Output);
+					this.validationMethod?.Serialize(Output);
 
 					Output.Append("</xdv:validate>");
 				}
@@ -343,8 +335,6 @@ namespace Waher.Networking.XMPP.DataForms
 					Output.Append(XML.Encode(this.error));
 					Output.Append("</xdd:error>");
 				}
-
-
 			}
 
 			if (!(this.valueStrings is null))
@@ -381,8 +371,15 @@ namespace Waher.Networking.XMPP.DataForms
 			return true;
 		}
 
-		internal virtual void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		/// <summary>
+		/// Allows fields to add additional information to the XML serialization of the field.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		/// <param name="ValuesOnly">If only values are to be output.</param>
+		/// <param name="IncludeLabels">If labels are to be included.</param>
+		public virtual void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
 		{
+			// Do nothing by default.
 		}
 
 		/// <summary>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -61,17 +60,20 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <inheritdoc/>
-		public override string TypeName
-		{
-			get { return "fixed"; }
-		}
+		public override string TypeName => "fixed";
 
 		/// <summary>
 		/// Media content to display in the field.
 		/// </summary>
 		public Media Media => this.media;
 
-		internal override void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		/// <summary>
+		/// Allows fields to add additional information to the XML serialization of the field.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		/// <param name="ValuesOnly">If only values are to be output.</param>
+		/// <param name="IncludeLabels">If labels are to be included.</param>
+		public override void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
 		{
 			base.AnnotateField(Output, ValuesOnly, IncludeLabels);
 

@@ -52,6 +52,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				string ToolTip;
 				string PageLabel;
 				string SectionLabel;
+				string ContentType;
 				string s;
 				int StringId;
 				int PagePriority;
@@ -104,6 +105,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					TextAttributes = null;
 					ValidationMethod = null;
 					Options = null;
+					ContentType = null;
 					Required = Masked = Alpha = DateOnly = false;
 					ReadOnly = !(PropertyInfo is null) && !PropertyInfo.CanWrite;
 					PagePriority = PageAttribute.DefaultPriority;
@@ -196,6 +198,29 @@ namespace Waher.Networking.XMPP.Concentrator
 								}
 							}
 						}
+						else if (Attr is ContentTypeAttribute ContentTypeAttribute)
+							ContentType = ContentTypeAttribute.ContentType;
+						else if (Attr is DynamicContentTypeAttribute DynamicContentTypeAttribute)
+						{
+							MethodInfo MI = T.GetRuntimeMethod(DynamicContentTypeAttribute.MethodName, Types.NoTypes)
+								?? throw new Exception("Dynamic Content-Type method (" + DynamicContentTypeAttribute.MethodName +
+									") missing on editable object of type " + T.FullName + ".");
+
+							object Result = MI.Invoke(EditableObject, Types.NoParameters);
+
+							if (!(Result is null))
+							{
+								if (Result is ContentTypeAttribute ContentTypeAttribute2)
+									ContentType = ContentTypeAttribute2.ContentType;
+								else if (Result is string s2)
+									ContentType = s2;
+								else
+								{
+									throw new Exception("Expected an ContentTypeAttribute or string (or null) as a result from calling " +
+										DynamicContentTypeAttribute.MethodName + " on editable objects of type " + T.FullName + ".");
+								}
+							}
+						}
 						else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 							ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);
 						else if (Attr is RangeAttribute RangeAttribute)
@@ -242,7 +267,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Options is null)
 						{
 							Field = new TextMultiField(Parameters, PropertyName, Header, Required, (string[])PropertyValue,
-								null, ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
+								null, ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false, ContentType);
 						}
 						else
 						{

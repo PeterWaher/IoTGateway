@@ -35,6 +35,7 @@ namespace Waher.Things.Script
 		[Header(3, "Sensor-data script:")]
 		[ToolTip(4, "Script that returns sensor-data fields.")]
 		[Text(TextPosition.AfterField, 5, "Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the \"this\" variable to refer to this node.")]
+		[ContentType("application/x-webscript")]
 		public string[] SensorScript
 		{
 			get => this.sensorScript;

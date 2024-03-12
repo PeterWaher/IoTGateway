@@ -139,7 +139,13 @@ namespace Waher.Networking.XMPP.DataForms
 			internal set => this.url = value;
 		}
 
-		internal void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		/// <summary>
+		/// Allows fields to add additional information to the XML serialization of the field.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		/// <param name="ValuesOnly">If only values are to be output.</param>
+		/// <param name="IncludeLabels">If labels are to be included.</param>
+		public void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
 		{
 			Output.Append("<media xmlns='urn:xmpp:media-element'");
 

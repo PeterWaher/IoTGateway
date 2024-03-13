@@ -2,19 +2,20 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Networking.HTTP.ContentEncodings
+namespace Waher.Networking.HTTP.Brotli
 {
 	/// <summary>
-	/// Content-Encoding: gzip
+	/// Content-Encoding: br
 	/// </summary>
-	public class GZipContentEncoding : IContentEncoding
+	public class BrotliContentEncoding : IContentEncoding
 	{
 		/// <summary>
 		/// Label identifying the Content-Encoding
 		/// </summary>
-		public string Label => "gzip";
+		public string Label => "br";
 
 		/// <summary>
 		/// How well the Content-Encoding handles the encoding specified by <paramref name="Label"/>.
@@ -31,31 +32,31 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// <returns>Encoder</returns>
 		public TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength)
 		{
-			GZipEncoder Encoder = new GZipEncoder(Output, ExpectedContentLength);
+			BrotliEncoder Encoder = new BrotliEncoder(Output, ExpectedContentLength);
 			Encoder.PrepareForCompression();
 			return Encoder;
 		}
 
 		/// <summary>
-		/// Class performing gzip encoding and decoding.
+		/// Class performing br encoding and decoding.
 		/// </summary>
-		private class GZipEncoder : TransferEncoding
+		private class BrotliEncoder : TransferEncoding
 		{
-			private TransferEncoding uncompressedStream;
-			private MemoryStream ms = null;
-			private GZipStream gzipEncoder = null;
-			private GZipStream gzipDecoder = null;
+			private TransferEncoding? uncompressedStream;
+			private MemoryStream? ms = null;
+			private BrotliStream? brEncoder = null;
+			private BrotliStream? brDecoder = null;
 			private long? bytesLeft;
 			private int pos = 0;
 			private bool dataWritten = false;
 			private bool finished = false;
 
 			/// <summary>
-			/// Class performing gzip encoding and decoding.
+			/// Class performing br encoding and decoding.
 			/// </summary>
 			/// <param name="UncompressedStream">Output stream.</param>
 			/// <param name="ExpectedContentLength">Expected content length, if known.</param>
-			public GZipEncoder(TransferEncoding UncompressedStream, long? ExpectedContentLength)
+			public BrotliEncoder(TransferEncoding UncompressedStream, long? ExpectedContentLength)
 				: base(null, UncompressedStream)
 			{
 				this.uncompressedStream = UncompressedStream;
@@ -68,7 +69,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			public void PrepareForCompression()
 			{
 				this.ms = new MemoryStream();
-				this.gzipEncoder = new GZipStream(this.ms, CompressionMode.Compress, true);
+				this.brEncoder = new BrotliStream(this.ms, CompressionMode.Compress, true);
 			}
 
 			/// <summary>
@@ -78,7 +79,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			/// <param name="ExpectContent">If content is expected.</param>
 			public override Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
 			{
-				return this.uncompressedStream.BeforeContentAsync(Response, ExpectContent);
+				return this.uncompressedStream!.BeforeContentAsync(Response, ExpectContent);
 			}
 
 			/// <summary>
@@ -117,7 +118,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 						if (NrBytes > this.bytesLeft.Value)
 							NrBytes = (int)this.bytesLeft.Value;
 
-						await this.gzipEncoder.WriteAsync(Data, Offset, NrBytes);
+						await this.brEncoder!.WriteAsync(Data, Offset, NrBytes);
 
 						this.bytesLeft -= NrBytes;
 						if (this.bytesLeft <= 0)
@@ -127,7 +128,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 						}
 					}
 					else
-						await this.gzipEncoder.WriteAsync(Data, Offset, NrBytes);
+						await this.brEncoder!.WriteAsync(Data, Offset, NrBytes);
 				}
 
 				return true;
@@ -140,20 +141,20 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			{
 				if (this.dataWritten)
 				{
-					await this.gzipEncoder.FlushAsync();
+					await this.brEncoder!.FlushAsync();
 					this.dataWritten = false;
 
-					byte[] Data = this.ms.ToArray();
+					byte[] Data = this.ms!.ToArray();
 					int c = Data.Length;
 					if (this.pos < c)
 					{
 						c -= this.pos;
-						if (!await this.uncompressedStream.EncodeAsync(Data, this.pos, c))
+						if (!await this.uncompressedStream!.EncodeAsync(Data, this.pos, c))
 							return false;
 						this.pos += c;
 					}
 
-					return await this.uncompressedStream.FlushAsync();
+					return await this.uncompressedStream!.FlushAsync();
 				}
 
 				return true;
@@ -165,7 +166,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			public override async Task<bool> ContentSentAsync()
 			{
 				await this.FlushAsync();
-				return await this.uncompressedStream.ContentSentAsync();
+				return await this.uncompressedStream!.ContentSentAsync();
 			}
 
 			/// <summary>
@@ -176,11 +177,11 @@ namespace Waher.Networking.HTTP.ContentEncodings
 				this.uncompressedStream?.Dispose();
 				this.uncompressedStream = null;
 
-				this.gzipEncoder?.Dispose();
-				this.gzipEncoder = null;
+				this.brEncoder?.Dispose();
+				this.brEncoder = null;
 
-				this.gzipDecoder?.Dispose();
-				this.gzipDecoder = null;
+				this.brDecoder?.Dispose();
+				this.brDecoder = null;
 
 				this.ms?.Dispose();
 				this.ms = null;
@@ -191,12 +192,12 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			/// <summary>
 			/// If encoding of data was invalid.
 			/// </summary>
-			public override bool InvalidEncoding => this.uncompressedStream.InvalidEncoding;
+			public override bool InvalidEncoding => this.uncompressedStream!.InvalidEncoding;
 
 			/// <summary>
 			/// If the transfer failed.
 			/// </summary>
-			public override bool TransferError => this.uncompressedStream.TransferError;
+			public override bool TransferError => this.uncompressedStream!.TransferError;
 		}
 	}
 }

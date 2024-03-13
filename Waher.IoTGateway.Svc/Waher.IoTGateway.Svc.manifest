@@ -337,6 +337,8 @@
 	<Assembly fileName='Waher.Networking.DNS.pdb'/>
 	<Assembly fileName='Waher.Networking.HTTP.dll'/>
 	<Assembly fileName='Waher.Networking.HTTP.pdb'/>
+	<Assembly fileName='Waher.Networking.HTTP.Brotli.dll'/>
+	<Assembly fileName='Waher.Networking.HTTP.Brotli.pdb'/>
 	<Assembly fileName='Waher.Networking.Modbus.dll'/>
 	<Assembly fileName='Waher.Networking.Modbus.pdb'/>
 	<Assembly fileName='Waher.Networking.MQTT.dll'/>

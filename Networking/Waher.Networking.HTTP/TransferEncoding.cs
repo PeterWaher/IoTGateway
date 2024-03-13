@@ -39,6 +39,16 @@ namespace Waher.Networking.HTTP
 		/// Base class for all transfer encodings.
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
+		/// <param name="ClientStream">Underlying client stream</param>
+		public TransferEncoding(IBinaryTransmission Output, TransferEncoding ClientStream)
+			: this(Output, ClientStream.clientConnection)
+		{
+		}
+
+		/// <summary>
+		/// Base class for all transfer encodings.
+		/// </summary>
+		/// <param name="Output">Decoded output.</param>
 		/// <param name="ClientConnection">Client connection.</param>
 		internal TransferEncoding(IBinaryTransmission Output, HttpClientConnection ClientConnection)
 		{

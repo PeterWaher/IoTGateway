@@ -52,6 +52,7 @@
     <ProjectReference Include="..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Networking\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.SMTP\Waher.Networking.SMTP.csproj" />

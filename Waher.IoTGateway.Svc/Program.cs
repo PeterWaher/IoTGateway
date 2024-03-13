@@ -17,6 +17,7 @@ using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 using System.Diagnostics;
+using Waher.Networking.HTTP.Brotli;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -345,6 +346,8 @@ namespace Waher.IoTGateway.Svc
 				}
 				else
 				{
+					BrotliContentEncoding _ = new();	// Just make sure assembly is included, to be later found and indexed by the inventory.
+
 					if (AsConsole)
 					{
 						Log.Informational("Running as console application.");

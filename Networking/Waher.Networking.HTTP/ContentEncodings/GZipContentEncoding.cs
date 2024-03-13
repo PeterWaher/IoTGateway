@@ -56,7 +56,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			/// <param name="UncompressedStream">Output stream.</param>
 			/// <param name="ExpectedContentLength">Expected content length, if known.</param>
 			public GZipEncoder(TransferEncoding UncompressedStream, long? ExpectedContentLength)
-				: base(null, UncompressedStream.clientConnection)
+				: base(null, UncompressedStream)
 			{
 				this.uncompressedStream = UncompressedStream;
 				this.bytesLeft = ExpectedContentLength;

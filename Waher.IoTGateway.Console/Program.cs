@@ -9,6 +9,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -98,7 +99,7 @@ namespace Waher.IoTGateway.Console
 
 						w.Write("Type: ");
 
-						if (!(e.ExceptionObject is null))
+						if (e.ExceptionObject is not null)
 							w.WriteLine(e.ExceptionObject.GetType().FullName);
 						else
 							w.WriteLine("null");
@@ -109,7 +110,7 @@ namespace Waher.IoTGateway.Console
 						w.WriteLine();
 						if (e.ExceptionObject is Exception ex)
 						{
-							while (!(ex is null))
+							while (ex is not null)
 							{
 								w.WriteLine(ex.Message);
 								w.WriteLine();
@@ -121,7 +122,7 @@ namespace Waher.IoTGateway.Console
 						}
 						else
 						{
-							if (!(e.ExceptionObject is null))
+							if (e.ExceptionObject is not null)
 								w.WriteLine(e.ExceptionObject.ToString());
 
 							w.WriteLine();
@@ -133,7 +134,7 @@ namespace Waher.IoTGateway.Console
 
 					if (e.ExceptionObject is Exception ex2)
 						Log.Critical(ex2);
-					else if (!(e.ExceptionObject is null))
+					else if (e.ExceptionObject is not null)
 						Log.Critical(e.ExceptionObject.ToString());
 					else
 						Log.Critical("Unexpected null exception thrown.");
@@ -155,6 +156,8 @@ namespace Waher.IoTGateway.Console
 					e.SetObserved();
 				};
 
+				BrotliContentEncoding _ = new();    // Just make sure assembly is included, to be later found and indexed by the inventory.
+
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 
@@ -165,7 +168,7 @@ namespace Waher.IoTGateway.Console
 					return;
 				}
 
-				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
 				Gateway.OnTerminate += (sender, e) => Done.Set();
 				System.Console.CancelKeyPress += (sender, e) => Gateway.Terminate();
 

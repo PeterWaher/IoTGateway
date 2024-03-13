@@ -27,10 +27,11 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// Gets an encoder.
 		/// </summary>
 		/// <param name="Output">Output stream.</param>
+		/// <param name="ExpectedContentLength">Expected content length, if known.</param>
 		/// <returns>Encoder</returns>
-		public TransferEncoding GetEncoder(TransferEncoding Output)
+		public TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength)
 		{
-			DeflateEncoder Encoder = new DeflateEncoder(Output);
+			DeflateEncoder Encoder = new DeflateEncoder(Output, ExpectedContentLength);
 			Encoder.PrepareForCompression();
 			return Encoder;
 		}
@@ -44,17 +45,21 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			private MemoryStream ms = null;
 			private DeflateStream deflateEncoder = null;
 			private DeflateStream deflateDecoder = null;
+			private long? bytesLeft;
 			private int pos = 0;
 			private bool dataWritten = false;
+			private bool finished = false;
 
 			/// <summary>
 			/// Class performing gzip encoding and decoding.
 			/// </summary>
 			/// <param name="UncompressedStream">Output stream.</param>
-			public DeflateEncoder(TransferEncoding UncompressedStream)
-				: base(null, UncompressedStream.clientConnection)
+			/// <param name="ExpectedContentLength">Expected content length, if known.</param>
+			public DeflateEncoder(TransferEncoding UncompressedStream, long? ExpectedContentLength)
+				: base(null, UncompressedStream)
 			{
 				this.uncompressedStream = UncompressedStream;
+				this.bytesLeft = ExpectedContentLength;
 			}
 
 			/// <summary>
@@ -102,8 +107,27 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			{
 				if (NrBytes > 0)
 				{
-					await this.deflateEncoder.WriteAsync(Data, Offset, NrBytes);
+					if (this.finished)
+						return false;
+
 					this.dataWritten = true;
+
+					if (this.bytesLeft.HasValue)
+					{
+						if (NrBytes > this.bytesLeft.Value)
+							NrBytes = (int)this.bytesLeft.Value;
+
+						await this.deflateEncoder.WriteAsync(Data, Offset, NrBytes);
+
+						this.bytesLeft -= NrBytes;
+						if (this.bytesLeft <= 0)
+						{
+							this.finished = true;
+							await this.FlushAsync();
+						}
+					}
+					else
+						await this.deflateEncoder.WriteAsync(Data, Offset, NrBytes);
 				}
 
 				return true;

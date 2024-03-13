@@ -753,7 +753,7 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);
 
-							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding);
+							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength);
 						}
 					}
 					else

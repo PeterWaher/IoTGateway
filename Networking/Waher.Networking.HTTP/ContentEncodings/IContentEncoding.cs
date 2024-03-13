@@ -16,7 +16,8 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// Gets an encoder.
 		/// </summary>
 		/// <param name="Output">Output stream.</param>
+		/// <param name="ExpectedContentLength">Expected content length, if known.</param>
 		/// <returns>Encoder</returns>
-		TransferEncoding GetEncoder(TransferEncoding Output);
+		TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength);
 	}
 }

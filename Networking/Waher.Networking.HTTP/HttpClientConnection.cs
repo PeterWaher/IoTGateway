@@ -1,18 +1,18 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Json;
 using Waher.Events;
-using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Temporary;
 using Waher.Security;
-using Waher.Content.Json;
 
 namespace Waher.Networking.HTTP
 {
@@ -312,6 +312,13 @@ namespace Waher.Networking.HTTP
 		{
 			if (this.dataStream is null)
 			{
+				if (!(this.header.ContentEncoding is null))		// TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
+				{
+					await this.SendResponse(null, null, new HttpException(UnsupportedMediaTypeException.Code,
+						UnsupportedMediaTypeException.StatusMessage, "Content-Encoding not supported."), false);
+					return true;
+				}
+
 				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
 				if (!(TransferEncoding is null))
 				{

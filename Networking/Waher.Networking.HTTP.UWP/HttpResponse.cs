@@ -9,6 +9,7 @@ using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Networking.HTTP.ContentEncodings;
 
 namespace Waher.Networking.HTTP
 {
@@ -96,7 +97,7 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = ClientConnection;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
-			
+
 			if (!(Request is null))
 				Request.Response = this;
 		}
@@ -401,7 +402,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Releases the unmanaged resources used by the System.IO.StreamWriter and optionally releases the managed resources.
 		/// </summary>
-		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
+		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		public void Dispose()
 		{
 			this.disposed = true;
@@ -432,9 +433,9 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Clears all buffers for the current writer and causes any buffered data to be written to the underlying stream.
 		/// </summary>
-		/// <exception cref="System.ObjectDisposedException">The current writer is closed.</exception>
-		/// <exception cref="System.IO.IOException">An I/O error has occurred.</exception>
-		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
+		/// <exception cref="ObjectDisposedException">The current writer is closed.</exception>
+		/// <exception cref="IOException">An I/O error has occurred.</exception>
+		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		public Task Flush()
 		{
 			return this.transferEncoding?.FlushAsync() ?? Task.CompletedTask;
@@ -444,8 +445,8 @@ namespace Waher.Networking.HTTP
 		/// Asynchronously clears all buffers for the current writer and causes any buffered data to be written to the underlying device.
 		/// </summary>
 		/// <returns>A task that represents the asynchronous flush operation.</returns>
-		/// <exception cref="System.ObjectDisposedException">The text writer is disposed.</exception>
-		/// <exception cref="System.InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
+		/// <exception cref="ObjectDisposedException">The text writer is disposed.</exception>
+		/// <exception cref="InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
 		[Obsolete("Use Flush() method instead.")]
 		public Task FlushAsync()
 		{
@@ -725,7 +726,9 @@ namespace Waher.Networking.HTTP
 						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 					}
 
-					if (this.contentLength.HasValue)
+					IContentEncoding ContentEncoding = this.httpRequest.Header.AcceptEncoding?.TryGetBestContentEncoder();
+
+					if (this.contentLength.HasValue && ContentEncoding is null)
 					{
 						Output.Append("\r\nContent-Length: ");
 						Output.Append(this.contentLength.Value.ToString());
@@ -736,8 +739,22 @@ namespace Waher.Networking.HTTP
 					else if (ExpectContent)
 					{
 						Output.Append("\r\nTransfer-Encoding: chunked");
+
 						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
 							DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
+
+						if (!(ContentEncoding is null) &&
+							(!this.contentLength.HasValue || this.contentLength.Value < 128 * 1024 * 1024) &&
+							(string.IsNullOrEmpty(this.contentType) ||
+							!(this.contentType.StartsWith("image/") ||
+							this.contentType.StartsWith("audio/") ||
+							this.contentType.StartsWith("video/"))))
+						{
+							Output.Append("\r\nContent-Encoding: ");
+							Output.Append(ContentEncoding.Label);
+
+							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding);
+						}
 					}
 					else
 					{
@@ -1028,10 +1045,10 @@ namespace Waher.Networking.HTTP
 		/// Writes a character to the stream.
 		/// </summary>
 		/// <param name="value">The character to write to the text stream.</param>
-		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
-		/// <exception cref="System.ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer is full, 
+		/// <exception cref="IOException">An I/O error occurs.</exception>
+		/// <exception cref="ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer is full, 
 		/// and current writer is closed.</exception>
-		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
 		public Task Write(char value)
@@ -1044,10 +1061,10 @@ namespace Waher.Networking.HTTP
 		/// Writes a character array to the stream.
 		/// </summary>
 		/// <param name="buffer">A character array containing the data to write. If buffer is null, nothing is written.</param>
-		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
-		/// <exception cref="System.ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="IOException">An I/O error occurs.</exception>
+		/// <exception cref="ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and current writer is closed.</exception>
-		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
 		public Task Write(char[] buffer)
@@ -1060,12 +1077,12 @@ namespace Waher.Networking.HTTP
 		/// Writes a string to the stream.
 		/// </summary>
 		/// <param name="value">The string to write to the stream. If value is null, nothing is written.</param>
-		/// <exception cref="System.ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and current writer is closed.</exception>
-		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
-		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
+		/// <exception cref="IOException">An I/O error occurs.</exception>
 		public Task Write(string value)
 		{
 			this.encodingUsed = true;
@@ -1078,13 +1095,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="buffer">A character array containing the data to write.</param>
 		/// <param name="index">The index into buffer at which to begin writing.</param>
 		/// <param name="count">The number of characters to read from buffer.</param>
-		/// <exception cref="System.ArgumentNullException">buffer is null.</exception>
-		/// <exception cref="System.ArgumentException">The buffer length minus index is less than count.</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">index or count is negative.</exception>
-		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
-		/// <exception cref="System.ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="ArgumentNullException">buffer is null.</exception>
+		/// <exception cref="ArgumentException">The buffer length minus index is less than count.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">index or count is negative.</exception>
+		/// <exception cref="IOException">An I/O error occurs.</exception>
+		/// <exception cref="ObjectDisposedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and current writer is closed.</exception>
-		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
+		/// <exception cref="NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
 		public Task Write(char[] buffer, int index, int count)

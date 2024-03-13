@@ -51,6 +51,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 			{
 				encoders.Clear();
 			}
+
+			encoderLabels = GetEncoderLabels();
 		}
 
 		/// <summary>

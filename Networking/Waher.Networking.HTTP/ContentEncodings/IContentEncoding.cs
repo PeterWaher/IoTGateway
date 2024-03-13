@@ -11,5 +11,12 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// Label identifying the Content-Encoding
 		/// </summary>
 		string Label { get; }
+
+		/// <summary>
+		/// Gets an encoder.
+		/// </summary>
+		/// <param name="Output">Output stream.</param>
+		/// <returns>Encoder</returns>
+		TransferEncoding GetEncoder(TransferEncoding Output);
 	}
 }

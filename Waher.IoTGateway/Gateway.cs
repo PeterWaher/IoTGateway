@@ -113,6 +113,11 @@ namespace Waher.IoTGateway
 	/// </summary>
 	public static class Gateway
 	{
+		/// <summary>
+		/// Gateway.config
+		/// </summary>
+		public const string GatewayConfigLocalFileName = "Gateway.config";
+
 		private const int MaxChunkSize = 4096;
 
 		private static readonly LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
@@ -325,12 +330,12 @@ namespace Waher.IoTGateway
 					PreserveWhitespace = true
 				};
 
-				string GatewayConfigFileName = appDataFolder + "Gateway.config";
+				string GatewayConfigFileName = ConfigFilePath;
 				if (!File.Exists(GatewayConfigFileName))
-					GatewayConfigFileName = "Gateway.config";
+					GatewayConfigFileName = GatewayConfigLocalFileName;
 
 				Config.Load(GatewayConfigFileName);
-				XSL.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
+				XSL.Validate(GatewayConfigLocalFileName, Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				IDatabaseProvider DatabaseProvider = null;
@@ -498,7 +503,7 @@ namespace Waher.IoTGateway
 				}
 
 				if (DatabaseProvider is null)
-					throw new Exception("Database provider not defined in Gateway.config.");
+					throw new Exception("Database provider not defined in " + GatewayConfigLocalFileName + ".");
 
 				Database.CollectionRepaired += Database_CollectionRepaired;
 
@@ -1996,99 +2001,71 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Domain certificate.
 		/// </summary>
-		public static X509Certificate2 Certificate
-		{
-			get { return certificate; }
-		}
+		public static X509Certificate2 Certificate => certificate;
 
 		/// <summary>
 		/// Domain name.
 		/// </summary>
-		public static CaseInsensitiveString Domain
-		{
-			get { return domain; }
-		}
+		public static CaseInsensitiveString Domain => domain;
 
 		/// <summary>
 		/// Alternative domain names
 		/// </summary>
-		public static CaseInsensitiveString[] AlternativeDomains
-		{
-			get { return alternativeDomains; }
-		}
+		public static CaseInsensitiveString[] AlternativeDomains => alternativeDomains;
 
 		/// <summary>
 		/// Name of the current instance. Default instance=<see cref="string.Empty"/>
 		/// </summary>
-		public static string InstanceName
-		{
-			get { return instance; }
-		}
+		public static string InstanceName => instance;
 
 		/// <summary>
 		/// Application data folder.
 		/// </summary>
-		public static string AppDataFolder
-		{
-			get { return appDataFolder; }
-		}
+		public static string AppDataFolder => appDataFolder;
 
 		/// <summary>
 		/// Runtime folder.
 		/// </summary>
-		public static string RuntimeFolder
-		{
-			get { return runtimeFolder; }
-		}
+		public static string RuntimeFolder => runtimeFolder;
 
 		/// <summary>
 		/// Web root folder.
 		/// </summary>
-		public static string RootFolder
-		{
-			get { return rootFolder; }
-		}
+		public static string RootFolder => rootFolder;
 
 		/// <summary>
 		/// Root folder resource.
 		/// </summary>
-		public static HttpFolderResource Root
-		{
-			get { return root; }
-		}
+		public static HttpFolderResource Root => root;
 
 		/// <summary>
 		/// Application Name.
 		/// </summary>
 		public static string ApplicationName
 		{
-			get { return applicationName; }
-			internal set { applicationName = value; }
+			get => applicationName;
+			internal set => applicationName = value;
 		}
 
 		/// <summary>
 		/// Emojis.
 		/// </summary>
-		public static Emoji1LocalFiles Emoji1_24x24
-		{
-			get { return emoji1_24x24; }
-		}
+		public static Emoji1LocalFiles Emoji1_24x24 => emoji1_24x24;
 
 		/// <summary>
 		/// If the gateway is being configured.
 		/// </summary>
-		public static bool Configuring
-		{
-			get { return configuring; }
-		}
+		public static bool Configuring => configuring;
 
 		/// <summary>
 		/// Internal Database provider.
 		/// </summary>
-		public static IDatabaseProvider InternalDatabase
-		{
-			get { return internalProvider; }
-		}
+		public static IDatabaseProvider InternalDatabase => internalProvider;
+
+		/// <summary>
+		/// Full path to Gateway.config file.
+		/// </summary>
+		public static string ConfigFilePath => Path.Combine(appDataFolder, GatewayConfigLocalFileName);
 
 		/// <summary>
 		/// Gets the port numbers defined for a given protocol in the configuration file.

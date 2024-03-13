@@ -947,7 +947,7 @@ namespace Waher.IoTGateway.Setup
 
 										if (!OnlySelectedCollections)
 										{
-											if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+											if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
 												ImportGatewayConfig(fs);
 											else
 												await Import.ExportFile(FileName, fs);
@@ -1586,7 +1586,7 @@ namespace Waher.IoTGateway.Setup
 									{
 										try
 										{
-											if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+											if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
 												ImportGatewayConfig(File);
 											else
 												await Import.ExportFile(FileName, File);
@@ -1730,7 +1730,7 @@ namespace Waher.IoTGateway.Setup
 			};
 			Doc.Load(File);
 
-			string OriginalFileName = Path.Combine(Gateway.AppDataFolder, "Gateway.config");
+			string OriginalFileName = Gateway.ConfigFilePath;
 			XmlDocument Original = new XmlDocument()
 			{
 				PreserveWhitespace = true

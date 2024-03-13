@@ -299,9 +299,9 @@ namespace Waher.IoTGateway.Svc
 					InstallService(ServiceName, InstanceName, DisplayName, Description, StartType, Immediate,
 						new ServiceFailureActions(TimeSpan.FromDays(1), null, null, new ScAction[]
 						{
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(15) },
-							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromHours(1) }
+							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
+							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(15) },
+							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromHours(1) }
 						}), Credentials);
 
 					return 0;

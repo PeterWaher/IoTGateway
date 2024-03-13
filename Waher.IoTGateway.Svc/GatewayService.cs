@@ -213,7 +213,7 @@ namespace Waher.IoTGateway.Svc
 		{
 			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 			{
-				new KeyValuePair<string, object>("SessionId", changeDescription.SessionId)
+				new("SessionId", changeDescription.SessionId)
 			};
 
 			switch (changeDescription.Reason)

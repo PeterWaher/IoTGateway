@@ -64,6 +64,7 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>

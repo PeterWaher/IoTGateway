@@ -32,6 +32,7 @@ namespace Waher.Networking.HTTP
 		private string server = null;
 		private string contentLanguage = null;
 		private string contentType = null;
+		private string eTag = null;
 		private string statusMessage = "OK";
 		private long? contentLength = null;
 		private int statusCode = 200;
@@ -287,6 +288,13 @@ namespace Waher.Networking.HTTP
 					this.challenges.Add(Value);
 					break;
 
+				case "etag":
+					if (Value.Length > 1 && Value[0] == '"' && Value[Value.Length - 1] == '"')
+						this.eTag = Value.Substring(1, Value.Length - 2);
+					else
+						this.eTag = Value;
+					break;
+
 				default:
 					if (this.customHeaders is null)
 						this.customHeaders = new Dictionary<string, string>();
@@ -328,6 +336,9 @@ namespace Waher.Networking.HTTP
 					Headers.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 			}
 
+			if (!string.IsNullOrEmpty(this.eTag))
+				Headers.Add(new KeyValuePair<string, string>("ETag", this.eTag));
+
 			if (!(this.customHeaders is null))
 			{
 				foreach (KeyValuePair<string, string> P in this.customHeaders)
@@ -358,6 +369,7 @@ namespace Waher.Networking.HTTP
 				case "CONTENT-LANGUAGE": return this.contentLanguage;
 				case "CONTENT-TYPE": return this.contentType;
 				case "CONTENT-LENGTH": return this.contentLength.HasValue ? this.contentLength.Value.ToString() : null;
+				case "ETAG": return this.eTag;
 
 				case "SET-COOKIE":
 					if (!(this.cookies is null))
@@ -726,7 +738,7 @@ namespace Waher.Networking.HTTP
 						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 					}
 
-					IContentEncoding ContentEncoding = this.httpRequest.Header.AcceptEncoding?.TryGetBestContentEncoder();
+					IContentEncoding ContentEncoding = this.httpRequest.Header.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
 
 					if (this.contentLength.HasValue && ContentEncoding is null)
 					{
@@ -744,7 +756,7 @@ namespace Waher.Networking.HTTP
 							DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
 
 						if (!(ContentEncoding is null) &&
-							(!this.contentLength.HasValue || this.contentLength.Value < 128 * 1024 * 1024) &&
+							(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
 							(string.IsNullOrEmpty(this.contentType) ||
 							!(this.contentType.StartsWith("image/") ||
 							this.contentType.StartsWith("audio/") ||
@@ -753,7 +765,8 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);
 
-							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength);
+							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+								this.contentLength.HasValue ? this.eTag : null);
 						}
 					}
 					else
@@ -772,6 +785,12 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nWWW-Authenticate: ");
 							Output.Append(Challenge);
 						}
+					}
+
+					if (!string.IsNullOrEmpty(this.eTag))
+					{
+						Output.Append("\r\nETag: ");
+						Output.Append(this.eTag);
 					}
 
 					if (!(this.customHeaders is null))

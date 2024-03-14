@@ -11,12 +11,16 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldAcceptEncoding : HttpFieldAcceptRecords
 	{
-		private static readonly Dictionary<string, IContentEncoding> encoders = new Dictionary<string, IContentEncoding>();
-		private static string[] encoderLabels = GetEncoderLabels();
+		private static readonly Dictionary<string, IContentEncoding> dynamicEncoders = new Dictionary<string, IContentEncoding>();
+		private static readonly Dictionary<string, IContentEncoding> staticEncoders = new Dictionary<string, IContentEncoding>();
+		private static readonly object syncObject = new object();
+		private static string[] dynamicEncoderLabels = GetEncoderLabels(true, true);
+		private static string[] staticEncoderLabels = GetEncoderLabels(false, false);
 
-		private static string[] GetEncoderLabels()
+		private static string[] GetEncoderLabels(bool Dynamic, bool FirstTime)
 		{
 			Dictionary<string, bool> Labels = new Dictionary<string, bool>();
+			bool Supported;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IContentEncoding)))
 			{
@@ -26,7 +30,13 @@ namespace Waher.Networking.HTTP.HeaderFields
 					if (Encoder is null)
 						continue;
 
-					Labels[Encoder.Label] = true;
+					if (Dynamic)
+						Supported = Encoder.SupportsDynamicEncoding;
+					else
+						Supported = Encoder.SupportsStaticEncoding;
+
+					if (Supported)
+						Labels[Encoder.Label] = true;
 
 					if (Encoder is IDisposable Disposable)
 						Disposable.Dispose();
@@ -40,19 +50,22 @@ namespace Waher.Networking.HTTP.HeaderFields
 			string[] Result = new string[Labels.Count];
 			Labels.Keys.CopyTo(Result, 0);
 
-			Types.OnInvalidated += Types_OnInvalidated;
+			if (FirstTime)
+				Types.OnInvalidated += Types_OnInvalidated;
 
 			return Result;
 		}
 
 		private static void Types_OnInvalidated(object sender, System.EventArgs e)
 		{
-			lock (encoders)
+			lock (syncObject)
 			{
-				encoders.Clear();
+				dynamicEncoders.Clear();
+				staticEncoders.Clear();
 			}
 
-			encoderLabels = GetEncoderLabels();
+			dynamicEncoderLabels = GetEncoderLabels(true, false);
+			staticEncoderLabels = GetEncoderLabels(false, false);
 		}
 
 		/// <summary>
@@ -61,33 +74,35 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <param name="Key">HTTP Field Name</param>
 		/// <param name="Value">HTTP Field Value</param>
 		public HttpFieldAcceptEncoding(string Key, string Value)
-			: base(Key, Value)
+				: base(Key, Value)
 		{
 		}
 
 		/// <summary>
 		/// Tries to get an <see cref="IContentEncoding"/> that best matches this header.
 		/// </summary>
+		/// <param name="ETag">Optional ETag header value.</param>
 		/// <returns>Best <see cref="IContentEncoding"/>, or null if not found.</returns>
-		public IContentEncoding TryGetBestContentEncoder()
+		public IContentEncoding TryGetBestContentEncoder(string ETag)
 		{
 			IContentEncoding Result;
+			bool Dynamic = string.IsNullOrEmpty(ETag);
 
-			string BestLabel = this.GetBestAlternative(encoderLabels);
+			string BestLabel = this.GetBestAlternative(Dynamic ? dynamicEncoderLabels : staticEncoderLabels);
 			if (string.IsNullOrEmpty(BestLabel))
 				return null;
 
-            lock (encoders)
+			lock (syncObject)
 			{
-				if (encoders.TryGetValue(BestLabel, out Result))
+				if ((Dynamic ? dynamicEncoders : staticEncoders).TryGetValue(BestLabel, out Result))
 					return Result;
 			}
 
 			Result = Types.FindBest<IContentEncoding, string>(BestLabel);
 
-			lock (encoders)
+			lock (syncObject)
 			{
-				if (encoders.TryGetValue(BestLabel, out IContentEncoding Result2))
+				if ((Dynamic ? dynamicEncoders : staticEncoders).TryGetValue(BestLabel, out IContentEncoding Result2))
 				{
 					if (Result is IDisposable Disposable)
 						Disposable.Dispose();
@@ -95,7 +110,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 					return Result2;
 				}
 				else
-					encoders[BestLabel] = Result;
+					(Dynamic ? dynamicEncoders : staticEncoders)[BestLabel] = Result;
 			}
 
 			return Result;

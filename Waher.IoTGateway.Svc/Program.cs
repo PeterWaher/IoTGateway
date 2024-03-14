@@ -346,8 +346,6 @@ namespace Waher.IoTGateway.Svc
 				}
 				else
 				{
-					BrotliContentEncoding _ = new();	// Just make sure assembly is included, to be later found and indexed by the inventory.
-
 					if (AsConsole)
 					{
 						Log.Informational("Running as console application.");
@@ -473,6 +471,15 @@ namespace Waher.IoTGateway.Svc
 			bool Compiled = XML.Attribute(DatabaseConfig, "compiled", true);
 
 			Types.SetModuleParameter("Data", Folder);
+
+			try
+			{
+				BrotliContentEncoding.Init(Gateway.AppDataFolder);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 
 			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
 				System.Text.Encoding.UTF8, TimeoutMs, Encrypted, Compiled);

@@ -114,7 +114,7 @@ namespace Waher.Networking.HTTP
 				if (!(Request.Header.IfNoneMatch is null) && Request.Header.IfNoneMatch.Value == this.etag)
 					throw new NotModifiedException();
 
-				Response.SetHeader("ETag", "\"" + this.etag + "\"");
+				Response.SetHeader("ETag", this.etag);
 
 				long l = f.Length;
 				long Pos = 0;

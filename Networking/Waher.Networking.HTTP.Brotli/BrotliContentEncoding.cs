@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
-using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Timing;
 
 namespace Waher.Networking.HTTP.Brotli
 {
@@ -12,10 +12,25 @@ namespace Waher.Networking.HTTP.Brotli
 	/// </summary>
 	public class BrotliContentEncoding : IContentEncoding
 	{
+		private static readonly Random rnd = new Random();
+		private static Scheduler? scheduler = null;
+		private static string? appDataFolder = null;
+		private static string? brotliFolder = null;
+
 		/// <summary>
 		/// Label identifying the Content-Encoding
 		/// </summary>
 		public string Label => "br";
+
+		/// <summary>
+		/// If encoding can be used for dynamic encoding.
+		/// </summary>
+		public bool SupportsDynamicEncoding => false;       // Brotly encoding is slow, but efficient, suitable only for static content.
+
+		/// <summary>
+		/// If encoding can be used for static encoding.
+		/// </summary>
+		public bool SupportsStaticEncoding => true;
 
 		/// <summary>
 		/// How well the Content-Encoding handles the encoding specified by <paramref name="Label"/>.
@@ -29,175 +44,112 @@ namespace Waher.Networking.HTTP.Brotli
 		/// </summary>
 		/// <param name="Output">Output stream.</param>
 		/// <param name="ExpectedContentLength">Expected content length, if known.</param>
+		/// <param name="ETag">Optional ETag value for content.</param>
 		/// <returns>Encoder</returns>
-		public TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength)
+		public TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength, string ETag)
 		{
-			BrotliEncoder Encoder = new BrotliEncoder(Output, ExpectedContentLength);
+			string? CompressedFileName;
+
+			if (!string.IsNullOrEmpty(brotliFolder))
+			{
+				CompressedFileName = Path.Combine(brotliFolder, ETag + ".br");
+
+				if (File.Exists(CompressedFileName))
+					return new BrotliReturner(CompressedFileName, Output);
+			}
+			else
+				CompressedFileName = null;
+
+			BrotliEncoder Encoder = new BrotliEncoder(CompressedFileName, Output, ExpectedContentLength);
 			Encoder.PrepareForCompression();
 			return Encoder;
 		}
 
 		/// <summary>
-		/// Class performing br encoding and decoding.
+		/// Initializes the Brotli-compression integration.
 		/// </summary>
-		private class BrotliEncoder : TransferEncoding
+		/// <param name="AppDataFolder">Content application data folder. This folder would correspond to the Gateway ProgramData folder.
+		/// Compressed files will be maintained in a subfolder to this folder named "Brotli".</param>
+		public static void Init(string AppDataFolder)
 		{
-			private TransferEncoding? uncompressedStream;
-			private MemoryStream? ms = null;
-			private BrotliStream? brEncoder = null;
-			private BrotliStream? brDecoder = null;
-			private long? bytesLeft;
-			private int pos = 0;
-			private bool dataWritten = false;
-			private bool finished = false;
-
-			/// <summary>
-			/// Class performing br encoding and decoding.
-			/// </summary>
-			/// <param name="UncompressedStream">Output stream.</param>
-			/// <param name="ExpectedContentLength">Expected content length, if known.</param>
-			public BrotliEncoder(TransferEncoding UncompressedStream, long? ExpectedContentLength)
-				: base(null, UncompressedStream)
+			try
 			{
-				this.uncompressedStream = UncompressedStream;
-				this.bytesLeft = ExpectedContentLength;
-			}
+				appDataFolder = AppDataFolder;
+				brotliFolder = Path.Combine(appDataFolder, "Brotli");
 
-			/// <summary>
-			/// Prepares the encoder for compression
-			/// </summary>
-			public void PrepareForCompression()
-			{
-				this.ms = new MemoryStream();
-				this.brEncoder = new BrotliStream(this.ms, CompressionMode.Compress, true);
-			}
+				if (!Directory.Exists(brotliFolder))
+					Directory.CreateDirectory(brotliFolder);
 
-			/// <summary>
-			/// Is called when the header is complete, and before content is being transferred.
-			/// </summary>
-			/// <param name="Response">HTTP Response object.</param>
-			/// <param name="ExpectContent">If content is expected.</param>
-			public override Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
-			{
-				return this.uncompressedStream!.BeforeContentAsync(Response, ExpectContent);
-			}
-
-			/// <summary>
-			/// Is called when new binary data has been received that needs to be decoded.
-			/// </summary>
-			/// <param name="Data">Data buffer.</param>
-			/// <param name="Offset">Offset where binary data begins.</param>
-			/// <param name="NrRead">Number of bytes read.</param>
-			/// <returns>
-			/// Bits 0-31: >Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the rest is part of a separate message.
-			/// Bit 32: If decoding has completed.
-			/// Bit 33: If transmission to underlying stream failed.
-			/// </returns>
-			public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
-			{
-				return Task.FromResult(0x100000000UL);  // TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
-			}
-
-			/// <summary>
-			/// Is called when new binary data is to be sent and needs to be encoded.
-			/// </summary>
-			/// <param name="Data">Data buffer.</param>
-			/// <param name="Offset">Offset where binary data begins.</param>
-			/// <param name="NrBytes">Number of bytes to encode.</param>
-			public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
-			{
-				if (NrBytes > 0)
+				if (scheduler is null)
 				{
-					if (this.finished)
-						return false;
-
-					this.dataWritten = true;
-
-					if (this.bytesLeft.HasValue)
-					{
-						if (NrBytes > this.bytesLeft.Value)
-							NrBytes = (int)this.bytesLeft.Value;
-
-						await this.brEncoder!.WriteAsync(Data, Offset, NrBytes);
-
-						this.bytesLeft -= NrBytes;
-						if (this.bytesLeft <= 0)
-						{
-							this.finished = true;
-							await this.FlushAsync();
-						}
-					}
+					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+						scheduler = Scheduler;
 					else
-						await this.brEncoder!.WriteAsync(Data, Offset, NrBytes);
-				}
-
-				return true;
-			}
-
-			/// <summary>
-			/// Sends any remaining data to the client.
-			/// </summary>
-			public override async Task<bool> FlushAsync()
-			{
-				if (this.dataWritten)
-				{
-					await this.brEncoder!.FlushAsync();
-					this.dataWritten = false;
-
-					byte[] Data = this.ms!.ToArray();
-					int c = Data.Length;
-					if (this.pos < c)
 					{
-						c -= this.pos;
-						if (!await this.uncompressedStream!.EncodeAsync(Data, this.pos, c))
-							return false;
-						this.pos += c;
-					}
+						scheduler = new Scheduler();
 
-					return await this.uncompressedStream!.FlushAsync();
+						Log.Terminating += (sender, e) =>
+						{
+							scheduler?.Dispose();
+							scheduler = null;
+						};
+					}
 				}
 
-				return true;
+				DeleteOldFiles(TimeSpan.FromDays(7));
 			}
-
-			/// <summary>
-			/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
-			/// </summary>
-			public override async Task<bool> ContentSentAsync()
+			catch (Exception ex)
 			{
-				await this.FlushAsync();
-				return await this.uncompressedStream!.ContentSentAsync();
+				Log.Critical(ex);
 			}
-
-			/// <summary>
-			/// <see cref="IDisposable.Dispose"/>
-			/// </summary>
-			public override void Dispose()
-			{
-				this.uncompressedStream?.Dispose();
-				this.uncompressedStream = null;
-
-				this.brEncoder?.Dispose();
-				this.brEncoder = null;
-
-				this.brDecoder?.Dispose();
-				this.brDecoder = null;
-
-				this.ms?.Dispose();
-				this.ms = null;
-
-				base.Dispose();
-			}
-
-			/// <summary>
-			/// If encoding of data was invalid.
-			/// </summary>
-			public override bool InvalidEncoding => this.uncompressedStream!.InvalidEncoding;
-
-			/// <summary>
-			/// If the transfer failed.
-			/// </summary>
-			public override bool TransferError => this.uncompressedStream!.TransferError;
 		}
+
+		private static void DeleteOldFiles(object P)
+		{
+			if (P is TimeSpan MaxAge)
+				DeleteOldFiles(MaxAge, true);
+		}
+
+		/// <summary>
+		/// Deletes generated files older than <paramref name="MaxAge"/>.
+		/// </summary>
+		/// <param name="MaxAge">Age limit.</param>
+		/// <param name="Reschedule">If rescheduling should be done.</param>
+		public static void DeleteOldFiles(TimeSpan MaxAge, bool Reschedule)
+		{
+			DateTime Limit = DateTime.Now - MaxAge;
+			int Count = 0;
+
+			DirectoryInfo BrotliFolder = new DirectoryInfo(brotliFolder);
+			FileInfo[] Files = BrotliFolder.GetFiles("*.*");
+
+			foreach (FileInfo FileInfo in Files)
+			{
+				if (FileInfo.LastAccessTime < Limit)
+				{
+					try
+					{
+						File.Delete(FileInfo.FullName);
+						Count++;
+					}
+					catch (Exception ex)
+					{
+						Log.Error("Unable to delete old file: " + ex.Message, FileInfo.FullName);
+					}
+				}
+			}
+
+			if (Count > 0)
+				Log.Informational(Count.ToString() + " old file(s) deleted.", brotliFolder);
+
+			if (Reschedule)
+			{
+				lock (rnd)
+				{
+					scheduler?.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, MaxAge);
+				}
+			}
+		}
+
 	}
 }

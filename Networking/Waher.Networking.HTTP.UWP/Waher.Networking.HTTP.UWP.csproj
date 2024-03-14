@@ -121,7 +121,9 @@
     <Compile Include="CommunicationStatistics.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
     <Compile Include="ContentEncodings\DeflateContentEncoding.cs" />
+    <Compile Include="ContentEncodings\DeflateEncoder.cs" />
     <Compile Include="ContentEncodings\GZipContentEncoding.cs" />
+    <Compile Include="ContentEncodings\GZipEncoder.cs" />
     <Compile Include="ContentEncodings\IContentEncoding.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />

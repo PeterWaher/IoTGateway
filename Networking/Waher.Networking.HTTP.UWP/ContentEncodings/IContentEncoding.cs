@@ -13,11 +13,22 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		string Label { get; }
 
 		/// <summary>
+		/// If encoding can be used for dynamic encoding.
+		/// </summary>
+		bool SupportsDynamicEncoding { get; }
+
+		/// <summary>
+		/// If encoding can be used for static encoding.
+		/// </summary>
+		bool SupportsStaticEncoding { get; }
+
+		/// <summary>
 		/// Gets an encoder.
 		/// </summary>
 		/// <param name="Output">Output stream.</param>
 		/// <param name="ExpectedContentLength">Expected content length, if known.</param>
+		/// <param name="ETag">Optional ETag value for content.</param>
 		/// <returns>Encoder</returns>
-		TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength);
+		TransferEncoding GetEncoder(TransferEncoding Output, long? ExpectedContentLength, string ETag);
 	}
 }

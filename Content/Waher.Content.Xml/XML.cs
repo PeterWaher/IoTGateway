@@ -1027,11 +1027,23 @@ namespace Waher.Content.Xml
 		/// <returns>Settings object.</returns>
 		public static XmlWriterSettings WriterSettings(bool Indent, bool OmitXmlDeclaration)
 		{
+			return WriterSettings(Indent, OmitXmlDeclaration, Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// Gets an XML writer settings object.
+		/// </summary>
+		/// <param name="Indent">If output should be indented.</param>
+		/// <param name="OmitXmlDeclaration">If the XML declaration should be omitted.</param>
+		/// <param name="Encoding">Character encoding</param>
+		/// <returns>Settings object.</returns>
+		public static XmlWriterSettings WriterSettings(bool Indent, bool OmitXmlDeclaration, Encoding Encoding)
+		{
 			XmlWriterSettings Settings = new XmlWriterSettings()
 			{
 				CloseOutput = false,
 				ConformanceLevel = ConformanceLevel.Document,
-				Encoding = System.Text.Encoding.UTF8
+				Encoding = Encoding
 			};
 
 			if (Indent)

@@ -427,6 +427,15 @@
             <param name="OmitXmlDeclaration">If the XML declaration should be omitted.</param>
             <returns>Settings object.</returns>
         </member>
+        <member name="M:Waher.Content.Xml.XML.WriterSettings(System.Boolean,System.Boolean,System.Text.Encoding)">
+            <summary>
+            Gets an XML writer settings object.
+            </summary>
+            <param name="Indent">If output should be indented.</param>
+            <param name="OmitXmlDeclaration">If the XML declaration should be omitted.</param>
+            <param name="Encoding">Character encoding</param>
+            <returns>Settings object.</returns>
+        </member>
         <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String)">
             <summary>
             Checks if a string is valid XML

@@ -147,18 +147,21 @@ namespace Waher.Content.Markdown.GraphViz
 			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 
-			foreach (string FileName in Directory.GetFiles(graphVizFolder, "*.*"))
+			DirectoryInfo GraphVizFolder = new DirectoryInfo(graphVizFolder);
+			FileInfo[] Files = GraphVizFolder.GetFiles("*.*");
+
+			foreach (FileInfo FileInfo in Files)
 			{
-				if (File.GetLastAccessTime(FileName) < Limit)
+				if (FileInfo.LastAccessTime < Limit)
 				{
 					try
 					{
-						File.Delete(FileName);
+						File.Delete(FileInfo.FullName);
 						Count++;
 					}
 					catch (Exception ex)
 					{
-						Log.Error("Unable to delete old file: " + ex.Message, FileName);
+						Log.Error("Unable to delete old file: " + ex.Message, FileInfo.FullName);
 					}
 				}
 			}

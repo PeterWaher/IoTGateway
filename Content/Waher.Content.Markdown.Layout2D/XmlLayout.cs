@@ -90,18 +90,21 @@ namespace Waher.Content.Markdown.Layout2D
 			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 
-			foreach (string FileName in Directory.GetFiles(layoutFolder, "*.*"))
+			DirectoryInfo LayoutFolder = new DirectoryInfo(layoutFolder);
+			FileInfo[] Files = LayoutFolder.GetFiles("*.*");
+
+			foreach (FileInfo FileInfo in Files)
 			{
-				if (File.GetLastAccessTime(FileName) < Limit)
+				if (FileInfo.LastAccessTime < Limit)
 				{
 					try
 					{
-						File.Delete(FileName);
+						File.Delete(FileInfo.FullName);
 						Count++;
 					}
 					catch (Exception ex)
 					{
-						Log.Error("Unable to delete old file: " + ex.Message, FileName);
+						Log.Error("Unable to delete old file: " + ex.Message, FileInfo.FullName);
 					}
 				}
 			}

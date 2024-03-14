@@ -213,11 +213,49 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="FileName">Filename.</param>
 		/// <param name="Data">Binary data</param>
-		public static async Task WriteAllBytesAsync(string FileName, byte[] Data)
+		public static Task WriteAllBytesAsync(string FileName, byte[] Data)
+		{
+			return WriteAllBytesAsync(FileName, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Creates a binary file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Offset">Offset into <paramref name="Data"/> to start.</param>
+		/// <param name="Length">Number of bytes to write.</param>
+		public static async Task WriteAllBytesAsync(string FileName, byte[] Data, int Offset, int Length)
 		{
 			using (FileStream fs = File.Create(FileName))
 			{
-				await fs.WriteAsync(Data, 0, Data.Length);
+				await fs.WriteAsync(Data, Offset, Length);
+			}
+		}
+
+		/// <summary>
+		/// Appends a binary file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Data">Binary data</param>
+		public static Task AppendAllBytesAsync(string FileName, byte[] Data)
+		{
+			return AppendAllBytesAsync(FileName, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Appends a binary file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Offset">Offset into <paramref name="Data"/> to start.</param>
+		/// <param name="Length">Number of bytes to write.</param>
+		public static async Task AppendAllBytesAsync(string FileName, byte[] Data, int Offset, int Length)
+		{
+			using (FileStream fs = File.OpenWrite(FileName))
+			{
+				fs.Position = fs.Length;
+				await fs.WriteAsync(Data, Offset, Length);
 			}
 		}
 

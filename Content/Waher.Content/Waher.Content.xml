@@ -4326,6 +4326,31 @@
             <param name="FileName">Filename.</param>
             <param name="Data">Binary data</param>
         </member>
+        <member name="M:Waher.Content.Resources.WriteAllBytesAsync(System.String,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Creates a binary file asynchronously.
+            </summary>
+            <param name="FileName">Filename.</param>
+            <param name="Data">Binary data</param>
+            <param name="Offset">Offset into <paramref name="Data"/> to start.</param>
+            <param name="Length">Number of bytes to write.</param>
+        </member>
+        <member name="M:Waher.Content.Resources.AppendAllBytesAsync(System.String,System.Byte[])">
+            <summary>
+            Appends a binary file asynchronously.
+            </summary>
+            <param name="FileName">Filename.</param>
+            <param name="Data">Binary data</param>
+        </member>
+        <member name="M:Waher.Content.Resources.AppendAllBytesAsync(System.String,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Appends a binary file asynchronously.
+            </summary>
+            <param name="FileName">Filename.</param>
+            <param name="Data">Binary data</param>
+            <param name="Offset">Offset into <paramref name="Data"/> to start.</param>
+            <param name="Length">Number of bytes to write.</param>
+        </member>
         <member name="M:Waher.Content.Resources.WriteAllTextAsync(System.String,System.String)">
             <summary>
             Creates a text file asynchronously.

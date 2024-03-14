@@ -2,26 +2,26 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.HTTP.Brotli
+namespace Waher.Networking.HTTP.ContentEncodings
 {
 	/// <summary>
-	/// Class returning a br-encoded file.
+	/// Class returning a precompressed file.
 	/// </summary>
-	public class BrotliReturner : TransferEncoding
+	public class PrecompressedFileReturner : TransferEncoding
 	{
-		private readonly string compressedFileName;
-		private TransferEncoding? uncompressedStream;
+		private readonly FileInfo precompressedFile;
+		private TransferEncoding uncompressedStream;
 		private bool finished = false;
 
 		/// <summary>
-		/// Class returning a br-encoded file.
+		/// Class returning a precompressed file.
 		/// </summary>
-		/// <param name="CompressedFileName">File name of compressed file to generate.</param>
+		/// <param name="PrecompressedFile">Reference to precompressed file.</param>
 		/// <param name="UncompressedStream">Output stream.</param>
-		public BrotliReturner(string CompressedFileName, TransferEncoding UncompressedStream)
+		public PrecompressedFileReturner(FileInfo PrecompressedFile, TransferEncoding UncompressedStream)
 			: base(null, UncompressedStream)
 		{
-			this.compressedFileName = CompressedFileName;
+			this.precompressedFile = PrecompressedFile;
 			this.uncompressedStream = UncompressedStream;
 		}
 
@@ -32,7 +32,7 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <param name="ExpectContent">If content is expected.</param>
 		public override Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
 		{
-			return this.uncompressedStream!.BeforeContentAsync(Response, ExpectContent);
+			return this.uncompressedStream.BeforeContentAsync(Response, ExpectContent);
 		}
 
 		/// <summary>
@@ -64,25 +64,27 @@ namespace Waher.Networking.HTTP.Brotli
 
 			this.finished = true;
 
-			using FileStream fs = File.OpenRead(this.compressedFileName);
-			long Pos = 0;
-			long Length = fs.Length;
-			byte[] Buffer = new byte[(int)Math.Min(Length, 65536)];
-
-			while (Pos < Length)
+			using (FileStream fs = File.OpenRead(this.precompressedFile.FullName))
 			{
-				NrBytes = (int)Math.Min(Length - Pos, 65536);
-				NrBytes = await fs.ReadAsync(Buffer, 0, NrBytes);
-				if (NrBytes <= 0)
-					throw new IOException("Unexpected end of file.");
+				long Pos = 0;
+				long Length = fs.Length;
+				byte[] Buffer = new byte[(int)Math.Min(Length, 65536)];
 
-				if (!await this.uncompressedStream!.EncodeAsync(Buffer, 0, NrBytes))
-					return false;
+				while (Pos < Length)
+				{
+					NrBytes = (int)Math.Min(Length - Pos, 65536);
+					NrBytes = await fs.ReadAsync(Buffer, 0, NrBytes);
+					if (NrBytes <= 0)
+						throw new IOException("Unexpected end of file.");
 
-				Pos += NrBytes;
+					if (!await this.uncompressedStream.EncodeAsync(Buffer, 0, NrBytes))
+						return false;
+
+					Pos += NrBytes;
+				}
+
+				return true;
 			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -90,7 +92,7 @@ namespace Waher.Networking.HTTP.Brotli
 		/// </summary>
 		public override Task<bool> FlushAsync()
 		{
-			return this.uncompressedStream!.FlushAsync();
+			return this.uncompressedStream.FlushAsync();
 		}
 
 		/// <summary>
@@ -99,7 +101,7 @@ namespace Waher.Networking.HTTP.Brotli
 		public override async Task<bool> ContentSentAsync()
 		{
 			await this.FlushAsync();
-			return await this.uncompressedStream!.ContentSentAsync();
+			return await this.uncompressedStream.ContentSentAsync();
 		}
 
 		/// <summary>
@@ -116,11 +118,11 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <summary>
 		/// If encoding of data was invalid.
 		/// </summary>
-		public override bool InvalidEncoding => this.uncompressedStream!.InvalidEncoding;
+		public override bool InvalidEncoding => this.uncompressedStream.InvalidEncoding;
 
 		/// <summary>
 		/// If the transfer failed.
 		/// </summary>
-		public override bool TransferError => this.uncompressedStream!.TransferError;
+		public override bool TransferError => this.uncompressedStream.TransferError;
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Waher.Runtime.Inventory;
+﻿using System.IO;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.ContentEncodings
 {
@@ -41,6 +42,16 @@ namespace Waher.Networking.HTTP.ContentEncodings
 			DeflateEncoder Encoder = new DeflateEncoder(Output, ExpectedContentLength);
 			Encoder.PrepareForCompression();
 			return Encoder;
+		}
+
+		/// <summary>
+		/// Tries to get a reference to the precompressed file, if available.
+		/// </summary>
+		/// <param name="ETag">Optional ETag value for content.</param>
+		/// <returns>Reference to precompressed file, if available, or null if not.</returns>
+		public FileInfo TryGetPrecompressedFile(string ETag)
+		{
+			return null;
 		}
 	}
 }

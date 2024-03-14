@@ -750,11 +750,6 @@ namespace Waher.Networking.HTTP
 					}
 					else if (ExpectContent)
 					{
-						Output.Append("\r\nTransfer-Encoding: chunked");
-
-						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
-							DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
-
 						if (!(ContentEncoding is null) &&
 							(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
 							(string.IsNullOrEmpty(this.contentType) ||
@@ -765,8 +760,35 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);
 
-							this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
-								this.contentLength.HasValue ? this.eTag : null);
+							FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+
+							if (PrecompressedFile?.Exists ?? false)
+							{
+								Output.Append("\r\nContent-Length: ");
+								Output.Append(PrecompressedFile.Length.ToString());
+
+								this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
+									PrecompressedFile.Length, this.clientConnection, this.txText, this.encoding);
+
+								this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+							}
+							else
+							{
+								Output.Append("\r\nTransfer-Encoding: chunked");
+
+								this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
+									DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
+
+								this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+									this.contentLength.HasValue ? this.eTag : null);
+							}
+						}
+						else
+						{
+							Output.Append("\r\nTransfer-Encoding: chunked");
+
+							this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
+								DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
 						}
 					}
 					else

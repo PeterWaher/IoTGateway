@@ -125,6 +125,7 @@
     <Compile Include="ContentEncodings\GZipContentEncoding.cs" />
     <Compile Include="ContentEncodings\GZipEncoder.cs" />
     <Compile Include="ContentEncodings\IContentEncoding.cs" />
+    <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />

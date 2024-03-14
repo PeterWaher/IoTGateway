@@ -51,18 +51,28 @@ namespace Waher.Networking.HTTP.Brotli
 			string? CompressedFileName;
 
 			if (!string.IsNullOrEmpty(brotliFolder))
-			{
 				CompressedFileName = Path.Combine(brotliFolder, ETag + ".br");
-
-				if (File.Exists(CompressedFileName))
-					return new BrotliReturner(CompressedFileName, Output);
-			}
 			else
 				CompressedFileName = null;
 
 			BrotliEncoder Encoder = new BrotliEncoder(CompressedFileName, Output, ExpectedContentLength);
 			Encoder.PrepareForCompression();
 			return Encoder;
+		}
+
+		/// <summary>
+		/// Tries to get a reference to the precompressed file, if available.
+		/// </summary>
+		/// <param name="ETag">Optional ETag value for content.</param>
+		/// <returns>Reference to precompressed file, if available, or null if not.</returns>
+		public FileInfo? TryGetPrecompressedFile(string ETag)
+		{
+			if (string.IsNullOrEmpty(ETag) || string.IsNullOrEmpty(brotliFolder))
+				return null;
+
+			string CompressedFileName = Path.Combine(brotliFolder, ETag + ".br");
+
+			return new FileInfo(CompressedFileName);
 		}
 
 		/// <summary>

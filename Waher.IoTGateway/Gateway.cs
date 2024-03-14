@@ -118,6 +118,16 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public const string GatewayConfigLocalFileName = "Gateway.config";
 
+		/// <summary>
+		/// GatewayConfiguration
+		/// </summary>
+		public const string GatewayConfigLocalName = "GatewayConfiguration";
+
+		/// <summary>
+		/// http://waher.se/Schema/GatewayConfiguration.xsd
+		/// </summary>
+		public const string GatewayConfigNamespace = "http://waher.se/Schema/GatewayConfiguration.xsd";
+
 		private const int MaxChunkSize = 4096;
 
 		private static readonly LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
@@ -335,7 +345,7 @@ namespace Waher.IoTGateway
 					GatewayConfigFileName = GatewayConfigLocalFileName;
 
 				Config.Load(GatewayConfigFileName);
-				XSL.Validate(GatewayConfigLocalFileName, Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
+				XSL.Validate(GatewayConfigLocalFileName, Config, GatewayConfigLocalName, GatewayConfigNamespace,
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				IDatabaseProvider DatabaseProvider = null;

@@ -24,6 +24,13 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		bool SupportsStaticEncoding { get; }
 
 		/// <summary>
+		/// Configures support for the algorithm.
+		/// </summary>
+		/// <param name="Dynamic">Compression of dynamicly generated files supported.</param>
+		/// <param name="Static">Compression of static files supported.</param>
+		void ConfigureSupport(bool Dynamic, bool Static);
+
+		/// <summary>
 		/// Gets an encoder.
 		/// </summary>
 		/// <param name="Output">Output stream.</param>

@@ -56,7 +56,15 @@ namespace Waher.Networking.HTTP.HeaderFields
 			return Result;
 		}
 
-		private static void Types_OnInvalidated(object sender, System.EventArgs e)
+		private static void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			ContentEncodingsReconfigured();
+		}
+
+		/// <summary>
+		/// If Content-Encodings have been reconfigured.
+		/// </summary>
+		public static void ContentEncodingsReconfigured()
 		{
 			lock (syncObject)
 			{

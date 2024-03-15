@@ -8,6 +8,9 @@ namespace Waher.Networking.HTTP.ContentEncodings
 	/// </summary>
 	public class GZipContentEncoding : IContentEncoding
 	{
+		private static bool compressDynamic = true;
+		private static bool compressStatic = true;
+
 		/// <summary>
 		/// Label identifying the Content-Encoding
 		/// </summary>
@@ -16,12 +19,23 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// <summary>
 		/// If encoding can be used for dynamic encoding.
 		/// </summary>
-		public bool SupportsDynamicEncoding => true;
+		public bool SupportsDynamicEncoding => compressDynamic;
 
 		/// <summary>
 		/// If encoding can be used for static encoding.
 		/// </summary>
-		public bool SupportsStaticEncoding => true;
+		public bool SupportsStaticEncoding => compressStatic;
+
+		/// <summary>
+		/// Configures support for the algorithm.
+		/// </summary>
+		/// <param name="Dynamic">Compression of dynamicly generated files supported.</param>
+		/// <param name="Static">Compression of static files supported.</param>
+		public void ConfigureSupport(bool Dynamic, bool Static)
+		{
+			compressDynamic = Dynamic;
+			compressStatic = Static;
+		}
 
 		/// <summary>
 		/// How well the Content-Encoding handles the encoding specified by <paramref name="Label"/>.

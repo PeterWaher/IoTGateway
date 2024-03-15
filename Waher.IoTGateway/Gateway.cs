@@ -77,6 +77,9 @@ using Waher.Things.SensorData;
 using Waher.Runtime.Threading;
 using Waher.Content.Markdown.Functions;
 using Waher.Content.Markdown.Rendering;
+using Waher.Networking.HTTP.ContentEncodings;
+using System.Runtime.CompilerServices;
+using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.IoTGateway
 {
@@ -372,6 +375,28 @@ namespace Waher.IoTGateway
 							case "MutualTls":
 								ClientCertificates = XML.Attribute(E, "clientCertificates", ClientCertificates.NotUsed);
 								TrustClientCertificates = XML.Attribute(E, "trustCertificates", false);
+								break;
+
+							case "ContentEncodings":
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2.LocalName == "ContentEncoding")
+									{
+										XmlElement E2 = (XmlElement)N2;
+										string Method = XML.Attribute(E2, "method");
+										bool Dynamic = XML.Attribute(E2, "dynamic", true);
+										bool Static = XML.Attribute(E2, "static", true);
+
+										IContentEncoding Encoding = Types.FindBest<IContentEncoding, string>(Method);
+
+										if (Encoding is null)
+											Log.Error("Content-Encoding not found: " + Method, GatewayConfigLocalFileName);
+										else
+											Encoding.ConfigureSupport(Dynamic, Static);
+									}
+								}
+
+								HttpFieldAcceptEncoding.ContentEncodingsReconfigured();
 								break;
 
 							case "ExportExceptions":

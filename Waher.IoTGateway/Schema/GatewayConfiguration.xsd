@@ -48,6 +48,22 @@
 						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="ContentEncodings" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Specifies rules for content-encoding (compression) via the web server.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ContentEncoding" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="method" type="xs:string" use="required"/>
+									<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="true"/>
+									<xs:attribute name="static" type="xs:boolean" use="optional" default="true"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="Database">
 					<xs:annotation>
 						<xs:documentation>Defines the use of a local file-based object database.</xs:documentation>

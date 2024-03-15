@@ -16,6 +16,8 @@ namespace Waher.Networking.HTTP.Brotli
 		private static Scheduler? scheduler = null;
 		private static string? appDataFolder = null;
 		private static string? brotliFolder = null;
+		private static bool compressDynamic = false;
+		private static bool compressStatic = true;
 
 		/// <summary>
 		/// Label identifying the Content-Encoding
@@ -25,12 +27,23 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <summary>
 		/// If encoding can be used for dynamic encoding.
 		/// </summary>
-		public bool SupportsDynamicEncoding => false;       // Brotly encoding is slow, but efficient, suitable only for static content.
+		public bool SupportsDynamicEncoding => compressDynamic;
 
 		/// <summary>
 		/// If encoding can be used for static encoding.
 		/// </summary>
-		public bool SupportsStaticEncoding => true;
+		public bool SupportsStaticEncoding => compressStatic;
+
+		/// <summary>
+		/// Configures support for the algorithm.
+		/// </summary>
+		/// <param name="Dynamic">Compression of dynamicly generated files supported.</param>
+		/// <param name="Static">Compression of static files supported.</param>
+		public void ConfigureSupport(bool Dynamic, bool Static)
+		{
+			compressDynamic = Dynamic;
+			compressStatic = Static;
+		}
 
 		/// <summary>
 		/// How well the Content-Encoding handles the encoding specified by <paramref name="Label"/>.

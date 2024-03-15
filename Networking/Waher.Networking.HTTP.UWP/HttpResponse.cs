@@ -755,7 +755,8 @@ namespace Waher.Networking.HTTP
 							(string.IsNullOrEmpty(this.contentType) ||
 							!(this.contentType.StartsWith("image/") ||
 							this.contentType.StartsWith("audio/") ||
-							this.contentType.StartsWith("video/"))))
+							this.contentType.StartsWith("video/") ||
+							this.contentType == "application/octet-stream")))
 						{
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);

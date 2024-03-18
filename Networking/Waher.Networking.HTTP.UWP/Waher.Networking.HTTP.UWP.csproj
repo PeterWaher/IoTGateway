@@ -209,6 +209,7 @@
     <Compile Include="HttpRequestHeader.cs" />
     <Compile Include="HttpResource.cs" />
     <Compile Include="HttpResponse.cs" />
+    <Compile Include="HttpReverseProxyResource.cs" />
     <Compile Include="HttpScriptResource.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="HttpSynchronousResource.cs" />

@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the DELETE method is allowed.
 		/// </summary>
-		bool AllowsDELETE
-		{
-			get;
-		}
+		bool AllowsDELETE { get; }
 	}
 }

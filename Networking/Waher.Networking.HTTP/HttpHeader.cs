@@ -277,10 +277,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the message contains, apart from the header, a message body also.
 		/// </summary>
-		public abstract bool HasMessageBody
-		{
-			get;
-		}
+		public abstract bool HasMessageBody { get; }
 
 	}
 }

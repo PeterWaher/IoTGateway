@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the PUT method is allowed.
 		/// </summary>
-		bool AllowsPUT
-		{
-			get;
-		}
+		bool AllowsPUT { get; }
 	}
 }

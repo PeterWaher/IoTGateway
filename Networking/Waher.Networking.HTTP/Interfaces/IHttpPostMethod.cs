@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the POST method is allowed.
 		/// </summary>
-		bool AllowsPOST
-		{
-			get;
-		}
+		bool AllowsPOST { get; }
 	}
 }

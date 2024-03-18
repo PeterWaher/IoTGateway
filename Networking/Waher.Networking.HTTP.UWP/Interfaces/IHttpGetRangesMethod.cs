@@ -19,9 +19,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
-		bool AllowsGET
-		{
-			get;
-		}
+		bool AllowsGET { get; }
 	}
 }

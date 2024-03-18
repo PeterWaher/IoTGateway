@@ -133,26 +133,17 @@ namespace Waher.Networking.HTTP
 		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).
 		/// </summary>
-		public abstract bool Synchronous
-		{
-			get;
-		}
+		public abstract bool Synchronous { get; }
 
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public abstract bool HandlesSubPaths
-		{
-			get;
-		}
+		public abstract bool HandlesSubPaths { get; }
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public abstract bool UserSessions
-		{
-			get;
-		}
+		public abstract bool UserSessions { get; }
 
 		/// <summary>
 		/// Array of allowed methods.

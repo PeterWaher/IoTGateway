@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the OPTIONS method is allowed.
 		/// </summary>
-		bool AllowsOPTIONS
-		{
-			get;
-		}
+		bool AllowsOPTIONS { get; }
 	}
 }

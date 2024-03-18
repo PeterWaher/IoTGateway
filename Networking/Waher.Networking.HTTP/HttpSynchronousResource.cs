@@ -20,10 +20,6 @@
 		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).
 		/// </summary>
-		public override bool Synchronous
-		{
-			get { return true; }
-		}
-
+		public override bool Synchronous => true;
 	}
 }

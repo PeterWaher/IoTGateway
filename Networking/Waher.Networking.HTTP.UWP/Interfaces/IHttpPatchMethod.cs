@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the PATCH method is allowed.
 		/// </summary>
-		bool AllowsPATCH
-		{
-			get;
-		}
+		bool AllowsPATCH { get; }
 	}
 }

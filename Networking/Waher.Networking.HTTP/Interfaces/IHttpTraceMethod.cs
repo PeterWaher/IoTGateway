@@ -18,9 +18,6 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the TRACE method is allowed.
 		/// </summary>
-		bool AllowsTRACE
-		{
-			get;
-		}
+		bool AllowsTRACE { get; }
 	}
 }

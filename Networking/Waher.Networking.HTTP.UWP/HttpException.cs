@@ -109,6 +109,35 @@ namespace Waher.Networking.HTTP
 		{
 			switch (StatusCode)
 			{
+				// Information
+				case 100: return "Continue";
+				case 101: return "Switching Protocols";
+				case 102: return "Processing";
+				case 103: return "Early Hints";
+
+				// Successful responses
+				case 200: return "OK";
+				case 201: return "Created";
+				case 202: return "Accepted";
+				case 203: return "Non-Authoritative Information";
+				case 204: return "No Content";
+				case 205: return "Reset Content";
+				case 206: return "Partial Content";
+				case 207: return "Multi-Status";
+				case 208: return "Already Reported";
+				case 226: return "IM Used";
+
+				// Redirections
+				case 300:return "Multiple Choices";
+				case MovedPermanentlyException.Code: return MovedPermanentlyException.StatusMessage;
+				case FoundException.Code: return FoundException.StatusMessage;
+				case SeeOtherException.Code: return SeeOtherException.StatusMessage;
+				case NotModifiedException.Code: return NotModifiedException.StatusMessage;
+				case UseProxyException.Code: return UseProxyException.StatusMessage;
+				case 306:return "unused";
+				case TemporaryRedirectException.Code: return TemporaryRedirectException.StatusMessage;
+				case PermanentRedirectException.Code: return PermanentRedirectException.StatusMessage;
+
 				// Client errors
 				case BadRequestException.Code: return BadRequestException.StatusMessage;
 				case ConflictException.Code: return ConflictException.StatusMessage;
@@ -130,14 +159,6 @@ namespace Waher.Networking.HTTP
 				case UnprocessableEntityException.Code: return UnprocessableEntityException.StatusMessage;
 				case UnsupportedMediaTypeException.Code: return UnsupportedMediaTypeException.StatusMessage;
 				case UpgradeRequiredException.Code: return UpgradeRequiredException.StatusMessage;
-
-				// Redirections
-				case SeeOtherException.Code: return SeeOtherException.StatusMessage;
-				case TemporaryRedirectException.Code: return TemporaryRedirectException.StatusMessage;
-				case UseProxyException.Code: return UseProxyException.StatusMessage;
-				case FoundException.Code: return FoundException.StatusMessage;
-				case MovedPermanentlyException.Code: return MovedPermanentlyException.StatusMessage;
-				case NotModifiedException.Code: return NotModifiedException.StatusMessage;
 
 				// Server errors
 				case BadGatewayException.Code: return BadGatewayException.StatusMessage;

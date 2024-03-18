@@ -367,12 +367,13 @@ namespace Waher.Networking.XMPP.HTTPX
 				case UpgradeRequiredException.Code: throw new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType);
 
 				// Redirections
-				case FoundException.Code: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
 				case MovedPermanentlyException.Code: throw new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case NotModifiedException.Code: throw new NotModifiedException();
+				case FoundException.Code: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
 				case SeeOtherException.Code: throw new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case TemporaryRedirectException.Code: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case NotModifiedException.Code: throw new NotModifiedException();
 				case UseProxyException.Code: throw new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case TemporaryRedirectException.Code: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case PermanentRedirectException.Code: throw new PermanentRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
 
 				// Server Errors
 				case BadGatewayException.Code: throw new BadGatewayException(Data, ContentType);

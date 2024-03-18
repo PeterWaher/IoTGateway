@@ -2269,6 +2269,7 @@ The following functions return HTTP redirection responses back to he client:
 | `Found(Location)`             |  302 | Returns the Found redirection back to the client.              |
 | `MovedPermanently(Location)`  |  301 | Returns the Moved Permanently redirection back to the client.  |
 | `NotModified()`               |  304 | Returns the Not Modified message back to the client.           |
+| `PermanentRedirect(Location)` |  308 | Returns the Permanent Redirect redirection back to the client. |
 | `SeeOther(Location)`          |  303 | Returns the See Other redirection back to the client.          |
 | `TemporaryRedirect(Location)` |  307 | Returns the Temporary Redirect redirection back to the client. |
 | `UseProxy(Location)`          |  305 | Returns the Use Proxy redirection back to the client.          |

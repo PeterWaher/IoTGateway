@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Waher.Content;
 
 namespace Waher.Networking.HTTP.HeaderFields
@@ -53,7 +54,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 				}
 
 				if (this.valueByName.TryGetValue(CookieName, out string Result))
-					return Result;
+					return WebUtility.UrlDecode(Result);
 				else
 					return string.Empty;
 			}

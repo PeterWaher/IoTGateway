@@ -13,6 +13,7 @@ using Waher.Events.Console;
 using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Security;
+using System.Net.Http;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -254,52 +255,58 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public void Test_15_GET_Single_Closed_Range()
+		public async Task Test_15_GET_Single_Closed_Range()
 		{
 			server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
+
+			using HttpClient Client = new();
 			
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test15/Text.txt");
-			Request.AddRange(100, 119);
+			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test15/Text.txt");
+			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(100, 119);
 
-			using WebResponse Response = Request.GetResponse();
-			byte[] Data = new byte[Response.ContentLength];
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
 
-			using Stream f = Response.GetResponseStream();
-			Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("89012345678901234567", s);
 		}
 
 		[TestMethod]
-		public void Test_16_GET_Single_Open_Range1()
+		public async Task Test_16_GET_Single_Open_Range1()
 		{
 			server.Register(new HttpFolderResource("/Test16", "Data", false, false, true, false));
 
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test16/Text.txt");
-			Request.AddRange(980);
+			using HttpClient Client = new();
 
-			using WebResponse Response = Request.GetResponse();
-			byte[] Data = new byte[Response.ContentLength];
+			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test16/Text.txt");
+			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(980, null);
 
-			using Stream f = Response.GetResponseStream();
-			Assert.AreEqual(23, f.Read(Data, 0, (int)Response.ContentLength));
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("89012345678901234567890", s);
 		}
 
 		[TestMethod]
-		public void Test_17_GET_Single_Open_Range2()
+		public async Task Test_17_GET_Single_Open_Range2()
 		{
 			server.Register(new HttpFolderResource("/Test17", "Data", false, false, true, false));
 
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test17/Text.txt");
-			Request.AddRange(-20);
+			using HttpClient Client = new();
 
-			using WebResponse Response = Request.GetResponse();
-			byte[] Data = new byte[Response.ContentLength];
+			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test17/Text.txt");
+			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(null, 20);
 
-			using Stream f = Response.GetResponseStream();
-			Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("12345678901234567890", s);
 		}
@@ -309,16 +316,17 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
 
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test18/Text.txt");
-			Request.AddRange(100, 199);
-			Request.AddRange(-100);
+			using HttpClient Client = new();
 
-			using WebResponse Response = Request.GetResponse();
-			byte[] Data = new byte[500];
+			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test18/Text.txt");
+			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(100, 199);
+			Request.Headers.Range.Ranges.Add(new System.Net.Http.Headers.RangeItemHeaderValue(null, 100));
 
-			using Stream f = Response.GetResponseStream();
-			int NrRead = f.Read(Data, 0, 500);
-			string s = Encoding.UTF8.GetString(Data, 0, NrRead);
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			string s = Encoding.UTF8.GetString(Data);
 			string s2 = await Resources.ReadAllTextAsync("Data/MultiRangeResponse.txt");
 
 			int i = s.IndexOf("--");
@@ -329,69 +337,119 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public void Test_19_PUT_Range()
+		public async Task Test_19_PUT_Range()
 		{
 			server.Register(new HttpFolderResource("/Test19", "Data", true, false, true, false));
 
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test19/String2.txt");
-			Request.Method = "PUT";
-			Request.Headers.Add("Content-Range: bytes 20-39/40");
+			using HttpClient Client = new();
+
+			using HttpRequestMessage Request = new(HttpMethod.Put, "http://localhost:8081/Test19/String2.txt");
+
 			byte[] Data = new byte[20];
 			int i;
 
 			for (i = 0; i < 20; i++)
 				Data[i] = (byte)'1';
 
-			Stream f = Request.GetRequestStream();
-			f.Write(Data, 0, 20);
+			Request.Content = new ByteArrayContent(Data);
+			Request.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(20, 39, 40);
 
-			WebResponse Response = Request.GetResponse();
-			Response.Close();
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
 
 			for (i = 0; i < 20; i++)
 				Data[i] = (byte)'2';
 
-			Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/Test19/String2.txt");
-			Request.Method = "PUT";
-			Request.Headers.Add("Content-Range: bytes 0-19/40");
+			using HttpRequestMessage Request2 = new(HttpMethod.Put, "http://localhost:8081/Test19/String2.txt");
 
-			f = Request.GetRequestStream();
-			f.Write(Data, 0, 20);
+			Request2.Content = new ByteArrayContent(Data);
+			Request2.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(0, 19, 40);
 
-			Response = Request.GetResponse();
-			Response.Close();
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			Response2.EnsureSuccessStatusCode();
 
-			using CookieWebClient Client = new();
-			Data = Client.DownloadData("http://localhost:8081/Test19/String2.txt");
+			using HttpRequestMessage Request3 = new(HttpMethod.Get, "http://localhost:8081/Test19/String2.txt");
+
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			Response3.EnsureSuccessStatusCode();
+
+			Data = await Response3.Content.ReadAsByteArrayAsync();
+
 			string s = Encoding.ASCII.GetString(Data);
 
 			Assert.AreEqual("2222222222222222222211111111111111111111", s);
 		}
 
 		[TestMethod]
-		public void Test_20_HEAD()
+		public async Task Test_20_PATCH_Range()
 		{
-			server.Register("/test20.png", async (req, resp) =>
+			server.Register(new HttpFolderResource("/Test20", "Data", true, false, true, false));
+
+			using HttpClient Client = new();
+
+			using HttpRequestMessage Request = new(HttpMethod.Patch, "http://localhost:8081/Test20/String2.txt");
+
+			byte[] Data = new byte[20];
+			int i;
+
+			for (i = 0; i < 20; i++)
+				Data[i] = (byte)'1';
+
+			Request.Content = new ByteArrayContent(Data);
+			Request.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(20, 39, 40);
+
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			for (i = 0; i < 20; i++)
+				Data[i] = (byte)'2';
+
+			using HttpRequestMessage Request2 = new(HttpMethod.Patch, "http://localhost:8081/Test20/String2.txt");
+
+			Request2.Content = new ByteArrayContent(Data);
+			Request2.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(0, 19, 40);
+
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			Response2.EnsureSuccessStatusCode();
+
+			using HttpRequestMessage Request3 = new(HttpMethod.Get, "http://localhost:8081/Test20/String2.txt");
+
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			Response3.EnsureSuccessStatusCode();
+
+			Data = await Response3.Content.ReadAsByteArrayAsync();
+
+			string s = Encoding.ASCII.GetString(Data);
+
+			Assert.AreEqual("2222222222222222222211111111111111111111", s);
+		}
+
+		[TestMethod]
+		public async Task Test_21_HEAD()
+		{
+			server.Register("/test21.png", async (req, resp) =>
 			{
 				await resp.Return(new SKBitmap(320, 200));
 			});
 
-			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8081/test20.png");
-			Request.Method = "HEAD";
-			WebResponse Response = Request.GetResponse();
+			using HttpClient Client = new();
 
-			Assert.IsTrue(Response.ContentLength > 0);
+			using HttpRequestMessage Request = new(HttpMethod.Head, "http://localhost:8081/test21.png");
 
-			Stream f = Response.GetResponseStream();
-			byte[] Data = new byte[1];
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
 
-			Assert.AreEqual(0, f.Read(Data, 0, 1));
+			Assert.IsTrue(Response.Content.Headers.ContentLength > 0);
+
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+
+			Assert.AreEqual(0, Data.Length);
 		}
 
 		[TestMethod]
-		public void Test_21_Cookies()
+		public void Test_22_Cookies()
 		{
-			server.Register("/test21_1.txt", async (req, resp) =>
+			server.Register("/test22_1.txt", async (req, resp) =>
 			{
 				resp.SetCookie(new Cookie("word1", "hej", "localhost", "/"));
 				resp.SetCookie(new Cookie("word2", "på", "localhost", "/"));
@@ -400,44 +458,44 @@ namespace Waher.Networking.HTTP.Test
 				await resp.Return("hejsan");
 			});
 
-			server.Register("/test21_2.txt", async (req, resp) =>
+			server.Register("/test22_2.txt", async (req, resp) =>
 			{
 				await resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
 			});
 
 			using CookieWebClient Client = new();
-			byte[] Data = Client.DownloadData("http://localhost:8081/test21_1.txt");
+			byte[] Data = Client.DownloadData("http://localhost:8081/test22_1.txt");
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hejsan", s);
 
-			Data = Client.DownloadData("http://localhost:8081/test21_2.txt");
+			Data = Client.DownloadData("http://localhost:8081/test22_2.txt");
 			s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(WebException))]
-		public void Test_22_Conditional_GET_IfModifiedSince_1()
-		{
-			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
-
-			server.Register(new HttpFolderResource("/Test22", "Data", false, false, true, false));
-
-			using CookieWebClient Client = new();
-			Client.IfModifiedSince = LastModified.AddMinutes(1);
-			byte[] Data = Client.DownloadData("http://localhost:8081/Test22/BarnSwallowIsolated-300px.png");
-		}
-
-		[TestMethod]
-		public void Test_23_Conditional_GET_IfModifiedSince_2()
+		public void Test_23_Conditional_GET_IfModifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
 			server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new();
-			Client.IfModifiedSince = LastModified.AddMinutes(-1);
+			Client.IfModifiedSince = LastModified.AddMinutes(1);
 			byte[] Data = Client.DownloadData("http://localhost:8081/Test23/BarnSwallowIsolated-300px.png");
+		}
+
+		[TestMethod]
+		public void Test_24_Conditional_GET_IfModifiedSince_2()
+		{
+			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
+
+			server.Register(new HttpFolderResource("/Test24", "Data", false, false, true, false));
+
+			using CookieWebClient Client = new();
+			Client.IfModifiedSince = LastModified.AddMinutes(-1);
+			byte[] Data = Client.DownloadData("http://localhost:8081/Test24/BarnSwallowIsolated-300px.png");
 			SKBitmap Bmp = SKBitmap.Decode(Data);
 			Assert.AreEqual(300, Bmp.Width);
 			Assert.AreEqual(264, Bmp.Height);
@@ -445,21 +503,7 @@ namespace Waher.Networking.HTTP.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(WebException))]
-		public void Test_24_Conditional_PUT_IfUnmodifiedSince_1()
-		{
-			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
-
-			server.Register(new HttpFolderResource("/Test24", "Data", true, false, true, false));
-
-			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
-			string s1 = new('Ω', 100000);
-			Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
-			Client.UploadData("http://localhost:8081/Test24/Temp.txt", "PUT", Utf8.GetBytes(s1));
-		}
-
-		[TestMethod]
-		public void Test_25_Conditional_PUT_IfUnmodifiedSince_2()
+		public void Test_25_Conditional_PUT_IfUnmodifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
@@ -468,32 +512,46 @@ namespace Waher.Networking.HTTP.Test
 			using CookieWebClient Client = new();
 			Encoding Utf8 = new UTF8Encoding(true);
 			string s1 = new('Ω', 100000);
-			Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
+			Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
 			Client.UploadData("http://localhost:8081/Test25/Temp.txt", "PUT", Utf8.GetBytes(s1));
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
-		public void Test_26_NotAcceptable()
+		public void Test_26_Conditional_PUT_IfUnmodifiedSince_2()
 		{
-			server.Register(new HttpFolderResource("/Test26", "Data", false, false, true, false));
+			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
+
+			server.Register(new HttpFolderResource("/Test26", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Client.Accept = "text/x-test4";
-			byte[] Data = Client.DownloadData("http://localhost:8081/Test26/Text.txt");
+			Encoding Utf8 = new UTF8Encoding(true);
+			string s1 = new('Ω', 100000);
+			Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
+			Client.UploadData("http://localhost:8081/Test26/Temp.txt", "PUT", Utf8.GetBytes(s1));
 		}
 
 		[TestMethod]
-		public void Test_27_Content_Conversion()
+		[ExpectedException(typeof(WebException))]
+		public void Test_27_NotAcceptable()
 		{
-			HttpFolderResource Resource = new("/Test27", "Data", false, false, true, false);
+			server.Register(new HttpFolderResource("/Test27", "Data", false, false, true, false));
+
+			using CookieWebClient Client = new();
+			Client.Accept = "text/x-test4";
+			byte[] Data = Client.DownloadData("http://localhost:8081/Test27/Text.txt");
+		}
+
+		[TestMethod]
+		public void Test_28_Content_Conversion()
+		{
+			HttpFolderResource Resource = new("/Test28", "Data", false, false, true, false);
 			Resource.AllowTypeConversion("text/plain", "text/x-test1", "text/x-test2", "text/x-test3");
 
 			server.Register(Resource);
 
 			using CookieWebClient Client = new();
 			Client.Accept = "text/x-test3";
-			byte[] Data = Client.DownloadData("http://localhost:8081/Test27/Text.txt");
+			byte[] Data = Client.DownloadData("http://localhost:8081/Test28/Text.txt");
 			MemoryStream ms = new(Data);
 			StreamReader r = new(ms);
 			string s = r.ReadToEnd();

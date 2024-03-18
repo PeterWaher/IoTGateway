@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Waher.Content;
 
@@ -60,7 +61,7 @@ namespace Waher.Networking.HTTP
 		public Cookie(string Name, string Value, string Domain, string Path, DateTimeOffset? Expires, bool Secure, bool HttpOnly)
 		{
 			this.name = Name;
-			this.value = Value;
+			this.value = WebUtility.UrlEncode(Value);
 			this.domain = Domain;
 			this.path = Path;
 			this.expires = Expires;
@@ -96,7 +97,7 @@ namespace Waher.Networking.HTTP
 		public Cookie(string Name, string Value, string Domain, string Path, int MaxAgeSeconds, bool Secure, bool HttpOnly)
 		{
 			this.name = Name;
-			this.value = Value;
+			this.value = WebUtility.UrlEncode(Value);
 			this.domain = Domain;
 			this.path = Path;
 			this.maxAgeSeconds = MaxAgeSeconds;

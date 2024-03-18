@@ -42,7 +42,7 @@
 
 				for (i = 0; i < c; i++)
 				{
-					s = Parts[i];
+					s = Parts[i].Trim();
 					j = s.IndexOf('-');
 					if (j < 0)
 						return null;

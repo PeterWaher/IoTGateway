@@ -17,7 +17,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task TestInitialize()
 		{
 			this.coapClient = new CoapEndpoint(new int[] { 5783 }, new int[] { 5784 }, null, null,
-				false, false, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				false, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),
@@ -33,13 +33,10 @@ namespace Waher.Networking.CoAP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.lwm2mClient is null))
-			{
-				this.lwm2mClient.Dispose();
-				this.lwm2mClient = null;
-			}
+			this.lwm2mClient?.Dispose();
+			this.lwm2mClient = null;
 
-			if (!(this.coapClient is null))
+			if (this.coapClient is not null)
 			{
 				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
 
@@ -53,12 +50,12 @@ namespace Waher.Networking.CoAP.Test
 		[TestMethod]
 		public async Task LWM2M_Bootstrap_Test_01_BootstrapRequest_Explicit()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
-			ManualResetEvent Done3 = new ManualResetEvent(false);
-			ManualResetEvent Error3 = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
+			ManualResetEvent Done3 = new(false);
+			ManualResetEvent Error3 = new(false);
 
 			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
 			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
@@ -95,12 +92,12 @@ namespace Waher.Networking.CoAP.Test
 		[Ignore("Bootstrap URI not configured correctly by the Leshan demo server.")]
 		public async Task LWM2M_Bootstrap_Test_02_BootstrapRequest_LastServer()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
-			ManualResetEvent Done3 = new ManualResetEvent(false);
-			ManualResetEvent Error3 = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
+			ManualResetEvent Done3 = new(false);
+			ManualResetEvent Error3 = new(false);
 
 			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
 			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();

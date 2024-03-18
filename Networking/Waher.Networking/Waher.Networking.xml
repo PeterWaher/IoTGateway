@@ -986,6 +986,11 @@
             </summary>
             <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
         </member>
+        <member name="P:Waher.Networking.Sniffers.ConsoleErrorSniffer.CanDisposeOutput">
+            <summary>
+            If output can be disposed.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.Sniffers.BinaryPresentationMethod">
             <summary>
             How binary data is to be presented.
@@ -2222,8 +2227,10 @@
             Method is called after writing something to the text file.
             </summary>
         </member>
-        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.Dispose">
-            <inheritdoc/>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.DisposeOutput">
+            <summary>
+            Disposes of the current output.
+            </summary>
         </member>
         <member name="T:Waher.Networking.Sniffers.TextSnifferBase">
             <summary>
@@ -2300,6 +2307,16 @@
         </member>
         <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.WriteLine(System.String)">
             <inheritdoc/>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.TextWriterSniffer.CanDisposeOutput">
+            <summary>
+            If output can be disposed.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.DisposeOutput">
+            <summary>
+            Disposes of the current output.
+            </summary>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Dispose">
             <summary>
@@ -2426,8 +2443,10 @@
             <param name="FileName">Filename.</param>
             <returns>Binary content.</returns>
         </member>
-        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.Dispose">
-            <inheritdoc/>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.DisposeOutput">
+            <summary>
+            Disposes of the current output.
+            </summary>
         </member>
         <member name="T:Waher.Networking.Sniffers.XmlWriterSniffer">
             <summary>
@@ -2479,6 +2498,11 @@
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Exception(System.DateTime,System.String)">
             <inheritdoc/>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.DisposeOutput">
+            <summary>
+            Disposes of the current output.
+            </summary>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Dispose">
             <summary>

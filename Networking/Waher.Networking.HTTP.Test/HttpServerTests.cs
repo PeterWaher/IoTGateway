@@ -39,7 +39,7 @@ namespace Waher.Networking.HTTP.Test
 			Log.Register(sink);
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			server = new HttpServer(8081, 8088, Certificate, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			server = new HttpServer(8081, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{

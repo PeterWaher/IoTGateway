@@ -22,7 +22,7 @@ namespace Waher.Networking.CoAP.Test
 			this.server = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort }, 
 				this.users, "CoAP", false, true);
 			this.client = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort + 2 }, 
-				null, null, true, false, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				null, null, true, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 			this.clientCredentials = new PresharedKey("testid", new byte[] { 1, 2, 3, 4 });
 		}
 
@@ -109,7 +109,7 @@ namespace Waher.Networking.CoAP.Test
 
 		private static void AssertNotNull(object Obj)
 		{
-			Assert.IsTrue(!(Obj is null));
+			Assert.IsNotNull(Obj);
 		}
 
 		[TestMethod]

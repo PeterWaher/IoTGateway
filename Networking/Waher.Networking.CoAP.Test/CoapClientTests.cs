@@ -49,13 +49,10 @@ namespace Waher.Networking.CoAP.Test
 		[AssemblyCleanup]
 		public static void AssemblyCleanup()
 		{
-			if (!(filesProvider is null))
-			{
-				filesProvider.Dispose();
-				filesProvider = null;
-			}
+			filesProvider?.Dispose();
+			filesProvider = null;
 
-			if (!(consoleEventSink is null))
+			if (consoleEventSink is not null)
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;
@@ -67,13 +64,13 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 		}
 
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.client is null))
+			if (this.client is not null)
 			{
 				ulong[] Tokens = this.client.GetActiveTokens();
 				ushort[] MessageIDs = this.client.GetActiveMessageIDs();
@@ -93,8 +90,8 @@ namespace Waher.Networking.CoAP.Test
 
 		private async Task<object> Get(string Uri, IDtlsCredentials Credentials, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 			object Result = null;
 
 			await this.client.GET(Uri, true, Credentials, async (sender, e) =>
@@ -118,8 +115,8 @@ namespace Waher.Networking.CoAP.Test
 
 		private async Task<object> Observe(string Uri, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 			object Result = null;
 			ulong Token = 0;
 			int Count = 0;
@@ -163,15 +160,15 @@ namespace Waher.Networking.CoAP.Test
 
 		private async Task Post(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			await this.client.POST(Uri, true, Payload, BlockSize, null, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (!(Result is null))
+					if (Result is not null)
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -185,15 +182,15 @@ namespace Waher.Networking.CoAP.Test
 
 		private async Task Put(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			await this.client.PUT(Uri, true, Payload, BlockSize, null, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (!(Result is null))
+					if (Result is not null)
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -306,7 +303,7 @@ namespace Waher.Networking.CoAP.Test
 
 		private static void AssertNotNull(object Obj)
 		{
-			Assert.IsTrue(!(Obj is null));
+			Assert.IsTrue(Obj is not null);
 		}
 
 		[TestMethod]

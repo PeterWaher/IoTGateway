@@ -12,35 +12,35 @@ namespace Waher.Security.DTLS.Test
 		private DtlsEndpoint server;
 		private DtlsBridge toServer;
 		private DtlsBridge toClient;
-		private TextWriterSniffer sniffer;
+		private ConsoleOutSniffer sniffer;
 		private Users users;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.sniffer = new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal);
+			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine);
 			this.users = new Users(new User("testid", "01020304", "HEX"));
 
 			this.toServer = new DtlsBridge(null);
 			this.toClient = new DtlsBridge(null);
 
-			this.toServer.RemoteBridge = toClient;
-			this.toClient.RemoteBridge = toServer;
+			this.toServer.RemoteBridge = this.toClient;
+			this.toClient.RemoteBridge = this.toServer;
 
-			this.client = new DtlsEndpoint(DtlsMode.Client, toServer, this.sniffer);
-			this.server = new DtlsEndpoint(DtlsMode.Server, toClient, this.users);
+			this.client = new DtlsEndpoint(DtlsMode.Client, this.toServer, this.sniffer);
+			this.server = new DtlsEndpoint(DtlsMode.Server, this.toClient, this.users);
 		}
 
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.client is null))
+			if (this.client is not null)
 			{
 				this.client.Dispose();
 				this.client = null;
 			}
 
-			if (!(this.server is null))
+			if (this.server is not null)
 			{
 				this.server.Dispose();
 				this.server = null;
@@ -55,8 +55,8 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_01_Handshake()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.client.OnHandshakeSuccessful += (sender, e) => Done.Set();
 			this.client.OnHandshakeFailed += (sender, e) => Error.Set();
@@ -70,8 +70,8 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_02_ApplicationData()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.server.OnApplicationDataReceived += (sender, e) =>
 			{
@@ -96,10 +96,10 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_03_GracefulShutdown()
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 
 			this.Test_02_ApplicationData();
 

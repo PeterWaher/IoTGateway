@@ -55,7 +55,9 @@ namespace Waher.Networking.CoAP.Test
 
 		protected virtual void SetupClientServer()
 		{
-			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, 
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
+
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
 			this.clientCredentials = null;
 		}
@@ -157,7 +159,7 @@ namespace Waher.Networking.CoAP.Test
 
 			this.server.Register("/query", async (req, resp) =>
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new();
 				bool First = true;
 
 				foreach (CoapOption Option in req.Options)
@@ -276,17 +278,17 @@ namespace Waher.Networking.CoAP.Test
 		{
 			try
 			{
-				this.Cleanup(ref this.client);
+				Cleanup(ref this.client);
 			}
 			finally
 			{
-				this.Cleanup(ref this.server);
+				Cleanup(ref this.server);
 			}
 		}
 
-		private void Cleanup(ref CoapEndpoint Client)
+		private static void Cleanup(ref CoapEndpoint Client)
 		{
-			if (!(Client is null))
+			if (Client is not null)
 			{
 				ulong[] Tokens = Client.GetActiveTokens();
 				ushort[] MessageIDs = Client.GetActiveMessageIDs();
@@ -301,8 +303,8 @@ namespace Waher.Networking.CoAP.Test
 
 		protected async Task<object> Get(string Uri, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 			object Result = null;
 
 			await this.client.GET(Uri, true, this.clientCredentials, async (sender, e) =>
@@ -326,8 +328,8 @@ namespace Waher.Networking.CoAP.Test
 
 		protected async Task<object> Observe(string Uri, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 			object Result = null;
 			ulong Token = 0;
 			int Count = 0;
@@ -371,15 +373,15 @@ namespace Waher.Networking.CoAP.Test
 
 		protected async Task Post(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			await this.client.POST(Uri, true, Payload, BlockSize, this.clientCredentials, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (!(Result is null))
+					if (Result is not null)
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -393,15 +395,15 @@ namespace Waher.Networking.CoAP.Test
 
 		protected async Task Put(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			await this.client.PUT(Uri, true, Payload, BlockSize, this.clientCredentials, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (!(Result is null))
+					if (Result is not null)
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();
@@ -415,15 +417,15 @@ namespace Waher.Networking.CoAP.Test
 
 		protected async Task Delete(string Uri, params CoapOption[] Options)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			await this.client.DELETE(Uri, true, this.clientCredentials, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					object Result = await e.Message.DecodeAsync();
-					if (!(Result is null))
+					if (Result is not null)
 						Console.Out.WriteLine(Result.ToString());
 
 					Done.Set();

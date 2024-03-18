@@ -14,12 +14,12 @@ namespace Waher.Networking.XMPP.Test
 	public abstract class CommunicationTests
 	{
 		private static ConsoleEventSink sink = null;
-		protected ManualResetEvent connected1 = new ManualResetEvent(false);
-		protected ManualResetEvent error1 = new ManualResetEvent(false);
-		protected ManualResetEvent offline1 = new ManualResetEvent(false);
-		protected ManualResetEvent connected2 = new ManualResetEvent(false);
-		protected ManualResetEvent error2 = new ManualResetEvent(false);
-		protected ManualResetEvent offline2 = new ManualResetEvent(false);
+		protected ManualResetEvent connected1 = new(false);
+		protected ManualResetEvent error1 = new(false);
+		protected ManualResetEvent offline1 = new(false);
+		protected ManualResetEvent connected2 = new(false);
+		protected ManualResetEvent error2 = new(false);
+		protected ManualResetEvent offline2 = new(false);
 		protected XmppClient client1;
 		protected XmppClient client2;
 		protected Exception ex1 = null;
@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (!(sink is null))
+			if (sink is not null)
 			{
 				Log.Unregister(sink);
 				sink.Dispose();
@@ -68,10 +68,10 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
-            this.client1.OnConnectionError += Client_OnConnectionError1;
-			this.client1.OnError += Client_OnError1;
-			this.client1.OnStateChanged += Client_OnStateChanged1;
+            this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+            this.client1.OnConnectionError += this.Client_OnConnectionError1;
+			this.client1.OnError += this.Client_OnError1;
+			this.client1.OnStateChanged += this.Client_OnStateChanged1;
 
 			this.PrepareClient1(this.client1);
 
@@ -89,9 +89,9 @@ namespace Waher.Networking.XMPP.Test
 			};
 
             //this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
-            this.client2.OnConnectionError += Client_OnConnectionError2;
-			this.client2.OnError += Client_OnError2;
-			this.client2.OnStateChanged += Client_OnStateChanged2;
+            this.client2.OnConnectionError += this.Client_OnConnectionError2;
+			this.client2.OnError += this.Client_OnError2;
+			this.client2.OnStateChanged += this.Client_OnStateChanged2;
 			
             this.PrepareClient2(this.client2);
 			
@@ -215,17 +215,17 @@ namespace Waher.Networking.XMPP.Test
 
 		private void WaitConnected1(int Timeout)
 		{
-			this.AssertWaitConnected(this.Wait1(Timeout));
+			AssertWaitConnected(this.Wait1(Timeout));
 			Thread.Sleep(100);  // Wait for presence to be processed by server.
 		}
 
 		private void WaitConnected2(int Timeout)
 		{
-			this.AssertWaitConnected(this.Wait2(Timeout));
+			AssertWaitConnected(this.Wait2(Timeout));
 			Thread.Sleep(100);  // Wait for presence to be processed by server.
 		}
 
-		private void AssertWaitConnected(int Event)
+		private static void AssertWaitConnected(int Event)
 		{
 			switch (Event)
 			{
@@ -252,10 +252,10 @@ namespace Waher.Networking.XMPP.Test
 			this.client1?.Dispose();
 			this.client2?.Dispose();
 
-			if (!(this.ex1 is null))
+			if (this.ex1 is not null)
 				throw new TargetInvocationException(this.ex1);
 
-			if (!(this.ex2 is null))
+			if (this.ex2 is not null)
 				throw new TargetInvocationException(this.ex2);
 		}
 	}

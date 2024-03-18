@@ -14,9 +14,9 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppConnectionTests
 	{
 		protected static ConsoleEventSink sink = null;
-		protected AutoResetEvent connected = new AutoResetEvent(false);
-		protected AutoResetEvent error = new AutoResetEvent(false);
-		protected AutoResetEvent offline = new AutoResetEvent(false);
+		protected AutoResetEvent connected = new(false);
+		protected AutoResetEvent error = new(false);
+		protected AutoResetEvent offline = new(false);
 		protected XmppClient client;
 		protected Exception ex = null;
 		protected Type permittedExceptionType = null;
@@ -35,7 +35,7 @@ namespace Waher.Networking.XMPP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (!(sink is null))
+			if (sink is not null)
 			{
 				Log.Unregister(sink);
 				sink.Dispose();
@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
 			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.OnError += this.Client_OnError;
@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client?.Dispose();
 			this.client = null;
 
-			if (!(this.ex is null) && this.ex.GetType() != this.permittedExceptionType)
+			if (this.ex is not null && this.ex.GetType() != this.permittedExceptionType)
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(this.ex).Throw();
 		}
 
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.Test
 		[Ignore("Feature not supported on server.")]
 		public void Connection_Test_06_ChangePassword()
 		{
-			AutoResetEvent Changed = new AutoResetEvent(false);
+			AutoResetEvent Changed = new(false);
 
 			this.WaitConnected(10000);
 

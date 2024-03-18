@@ -15,7 +15,7 @@ namespace Waher.Networking.MQTT.Test
 		public void TestInitialize()
 		{
 			this.client = new MqttClient("mqtt.eclipse.org", this.Port, this.Encypted, "UnitTest", string.Empty,
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 		}
 
 		public abstract bool Encypted
@@ -38,8 +38,8 @@ namespace Waher.Networking.MQTT.Test
 		[TestMethod]
 		public void Test_01_Connect()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.client.OnStateChanged += (sender, State) =>
 			{
@@ -64,7 +64,7 @@ namespace Waher.Networking.MQTT.Test
 		[TestMethod]
 		public async Task Test_02_Subscribe()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			int Count = 0;
 
 			this.Test_01_Connect();
@@ -110,8 +110,8 @@ namespace Waher.Networking.MQTT.Test
 
 		private async Task Publish(MqttQualityOfService QoS)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.Test_01_Connect();
 
@@ -144,8 +144,8 @@ namespace Waher.Networking.MQTT.Test
 		[TestMethod]
 		public void Test_06_HeartBeats()
 		{
-			ManualResetEvent Ping = new ManualResetEvent(false);
-			ManualResetEvent PingResp = new ManualResetEvent(false);
+			ManualResetEvent Ping = new(false);
+			ManualResetEvent PingResp = new(false);
 
 			this.Test_01_Connect();
 

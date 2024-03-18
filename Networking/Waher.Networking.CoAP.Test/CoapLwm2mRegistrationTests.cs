@@ -19,7 +19,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.coapClient = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),
@@ -35,13 +35,10 @@ namespace Waher.Networking.CoAP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.lwm2mClient is null))
-			{
-				this.lwm2mClient.Dispose();
+				this.lwm2mClient?.Dispose();
 				this.lwm2mClient = null;
-			}
 
-			if (!(this.coapClient is null))
+			if (this.coapClient is not null)
 			{
 				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
 
@@ -55,8 +52,8 @@ namespace Waher.Networking.CoAP.Test
 		[TestMethod]
 		public void LWM2M_Registration_Test_01_Register()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
 			{
@@ -81,8 +78,8 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.LWM2M_Registration_Test_01_Register();
 
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
 			{
@@ -103,8 +100,8 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.LWM2M_Registration_Test_02_RegisterUpdate();
 
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.lwm2mClient.OnDeregistrationSuccessful += (sender, e) =>
 			{

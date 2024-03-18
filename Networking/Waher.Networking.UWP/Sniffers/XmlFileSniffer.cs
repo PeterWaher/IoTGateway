@@ -200,7 +200,7 @@ namespace Waher.Networking.Sniffers
 			string s = GetFileName(this.fileName, TP);
 			this.lastEvent = TP;
 
-			if (!(this.lastFileName is null) && this.lastFileName == s)
+			if (!(this.lastFileName is null) && this.lastFileName == s && this.file.BaseStream.CanWrite)
 				return;
 
 			if (!(this.file is null))

@@ -14,9 +14,9 @@ namespace Waher.Networking.XMPP.Test
 	{
 		protected XmppClient client1;
 		protected Exception ex1 = null;
-		protected ManualResetEvent connected1 = new ManualResetEvent(false);
-		protected ManualResetEvent error1 = new ManualResetEvent(false);
-		protected ManualResetEvent offline1 = new ManualResetEvent(false);
+		protected ManualResetEvent connected1 = new(false);
+		protected ManualResetEvent error1 = new(false);
+		protected ManualResetEvent offline1 = new(false);
 		private HttpFileUploadClient httpUpload = null;
 
 		[TestInitialize]
@@ -36,7 +36,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 			this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
@@ -88,10 +88,10 @@ namespace Waher.Networking.XMPP.Test
 
 		private void WaitConnected1(int Timeout)
 		{
-			this.AssertWaitConnected(this.Wait1(Timeout));
+			AssertWaitConnected(this.Wait1(Timeout));
 		}
 
-		private void AssertWaitConnected(int Event)
+		private static void AssertWaitConnected(int Event)
 		{
 			switch (Event)
 			{
@@ -116,18 +116,17 @@ namespace Waher.Networking.XMPP.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.client1 is null))
-				this.client1.Dispose();
+			this.client1?.Dispose();
 
-			if (!(this.ex1 is null))
+			if (this.ex1 is not null)
 				throw new TargetInvocationException(this.ex1);
 		}
 
 		[TestMethod]
 		public void FileUpload_Test_01_Discovery()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.httpUpload = new HttpFileUploadClient(this.client1);
 			this.httpUpload.Discover((sender, e) =>
@@ -151,12 +150,12 @@ namespace Waher.Networking.XMPP.Test
 
 			string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".bin";
 			string ContentType = "application/octet-stream";
-			Random Rnd = new Random();
+			Random Rnd = new();
 			byte[] Bin = new byte[1024];
 			Rnd.NextBytes(Bin);
 
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 			HttpFileUploadEventArgs e = null;
 
 			this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, (sender, e2) =>
@@ -177,7 +176,7 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("PUT URL:" + e.PutUrl);
 			Console.Out.WriteLine("PUT Headers:");
 
-			if (!(e.PutHeaders is null))
+			if (e.PutHeaders is not null)
 			{
 				foreach (KeyValuePair<string, string> Header in e.PutHeaders)
 					Console.Out.WriteLine(Header.Key + ": " + Header.Value);

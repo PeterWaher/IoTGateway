@@ -15,5 +15,10 @@ namespace Waher.Networking.Sniffers
 			: base(Console.Error, BinaryPresentationMethod)
 		{
 		}
+
+		/// <summary>
+		/// If output can be disposed.
+		/// </summary>
+		public override bool CanDisposeOutput => false;
 	}
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Events.Files
 {
@@ -77,7 +75,7 @@ namespace Waher.Events.Files
 			{
 				try
 				{
-					this.file.Dispose();
+					this.file?.Dispose();
 				}
 				catch (Exception)
 				{
@@ -85,9 +83,9 @@ namespace Waher.Events.Files
 				}
 
 				this.file = null;
+				this.output = null;
 			}
 
-			DateTime TP = DateTime.Now;
 			string s = XmlFileEventSink.GetFileName(this.fileName);
 
 			if (File.Exists(s))
@@ -126,18 +124,14 @@ namespace Waher.Events.Files
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
+		/// Disposes of the current output.
 		/// </summary>
-		public override void Dispose()
+		public override void DisposeOutput()
 		{
-			base.Dispose();
+			base.DisposeOutput();
 
-			if (!(this.file is null))
-			{
-				this.file.Flush();
-				this.file.Dispose();
-				this.file = null;
-			}
+			this.file?.Dispose();
+			this.file = null;
 		}
 	}
 }

@@ -125,6 +125,10 @@ namespace Waher.Networking.Sniffers
 						this.output.WriteEndElement();
 						this.output.Flush();
 					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 					finally
 					{
 						await this.AfterWrite();

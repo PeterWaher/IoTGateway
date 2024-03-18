@@ -52,6 +52,7 @@ namespace Waher.Events.Files
 		{
 			this.disposed = true;
 
+			this.DisposeOutput();
 			base.Dispose();
 		}
 
@@ -69,68 +70,84 @@ namespace Waher.Events.Files
 				this.BeforeWrite();
 				try
 				{
-					this.output.Write(Event.Timestamp.ToString("d"));
-					this.output.Write(", ");
-					this.output.Write(Event.Timestamp.ToString("T"));
-					this.output.Write('\t');
-					this.output.Write(Event.Type.ToString());
-					this.output.Write('\t');
-					this.output.Write(Event.Level.ToString());
-
-					if (!string.IsNullOrEmpty(Event.EventId))
+					if (!(this.output is null))
 					{
+						this.output.Write(Event.Timestamp.ToString("d"));
+						this.output.Write(", ");
+						this.output.Write(Event.Timestamp.ToString("T"));
 						this.output.Write('\t');
-						this.output.Write(Event.EventId);
-					}
-
-					if (!string.IsNullOrEmpty(Event.Object))
-					{
+						this.output.Write(Event.Type.ToString());
 						this.output.Write('\t');
-						this.output.Write(Event.Object);
-					}
+						this.output.Write(Event.Level.ToString());
 
-					if (!string.IsNullOrEmpty(Event.Actor))
-					{
-						this.output.Write('\t');
-						this.output.Write(Event.Actor);
-					}
-
-					this.output.WriteLine("\r\n");
-
-					if (!string.IsNullOrEmpty(Event.Module))
-					{
-						this.output.Write('\t');
-						this.output.Write(Event.Module);
-					}
-
-					if (!string.IsNullOrEmpty(Event.Facility))
-					{
-						this.output.Write('\t');
-						this.output.Write(Event.Facility);
-					}
-
-					if (!(Event.Tags is null) && Event.Tags.Length > 0)
-					{
-						this.output.WriteLine("\r\n");
-
-						foreach (KeyValuePair<string, object> Tag in Event.Tags)
+						if (!string.IsNullOrEmpty(Event.EventId))
 						{
 							this.output.Write('\t');
-							this.output.Write(Tag.Key);
-							this.output.Write('=');
-
-							if (!(Tag.Value is null))
-								this.output.Write(Tag.Value.ToString());
+							this.output.Write(Event.EventId);
 						}
-					}
 
-					this.output.WriteLine("\r\n");
-					this.output.WriteLine(Event.Message);
+						if (!string.IsNullOrEmpty(Event.Object))
+						{
+							this.output.Write('\t');
+							this.output.Write(Event.Object);
+						}
 
-					if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
-					{
+						if (!string.IsNullOrEmpty(Event.Actor))
+						{
+							this.output.Write('\t');
+							this.output.Write(Event.Actor);
+						}
+
 						this.output.WriteLine("\r\n");
-						this.output.WriteLine(Event.StackTrace);
+
+						if (!string.IsNullOrEmpty(Event.Module))
+						{
+							this.output.Write('\t');
+							this.output.Write(Event.Module);
+						}
+
+						if (!string.IsNullOrEmpty(Event.Facility))
+						{
+							this.output.Write('\t');
+							this.output.Write(Event.Facility);
+						}
+
+						if (!(Event.Tags is null) && Event.Tags.Length > 0)
+						{
+							this.output.WriteLine("\r\n");
+
+							foreach (KeyValuePair<string, object> Tag in Event.Tags)
+							{
+								this.output.Write('\t');
+								this.output.Write(Tag.Key);
+								this.output.Write('=');
+
+								if (!(Tag.Value is null))
+									this.output.Write(Tag.Value.ToString());
+							}
+						}
+
+						this.output.WriteLine("\r\n");
+						this.output.WriteLine(Event.Message);
+
+						if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
+						{
+							this.output.WriteLine("\r\n");
+							this.output.WriteLine(Event.StackTrace);
+						}
+
+						this.output.Flush();
+					}
+				}
+				catch (Exception)
+				{
+					try
+					{
+						this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
 					}
 				}
 				finally
@@ -140,6 +157,22 @@ namespace Waher.Events.Files
 			}
 
 			return Task.CompletedTask;
+		}
+			
+		/// <summary>
+		/// If output can be disposed.
+		/// </summary>
+		public virtual bool CanDisposeOutput => true;
+
+		/// <summary>
+		/// Disposes of the current output.
+		/// </summary>
+		public virtual void DisposeOutput()
+		{
+			if (this.CanDisposeOutput)
+				this.output?.Dispose();
+
+			this.output = null;
 		}
 	}
 }

@@ -14,12 +14,12 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppComponentTests
 	{
 		private static ConsoleEventSink sink = null;
-		protected AutoResetEvent clientConnected = new AutoResetEvent(false);
-		protected AutoResetEvent clientError = new AutoResetEvent(false);
-		protected AutoResetEvent clientOffline = new AutoResetEvent(false);
-		protected AutoResetEvent componentConnected = new AutoResetEvent(false);
-		protected AutoResetEvent componentError = new AutoResetEvent(false);
-		protected AutoResetEvent componentOffline = new AutoResetEvent(false);
+		protected AutoResetEvent clientConnected = new(false);
+		protected AutoResetEvent clientError = new(false);
+		protected AutoResetEvent clientOffline = new(false);
+		protected AutoResetEvent componentConnected = new(false);
+		protected AutoResetEvent componentError = new(false);
+		protected AutoResetEvent componentOffline = new(false);
 		protected XmppClient client;
 		protected XmppComponent component;
 		protected Exception clientEx = null;
@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (!(sink is null))
+			if (sink is not null)
 			{
 				Log.Unregister(sink);
 				sink.Dispose();
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.component.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
+			this.component.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
 			this.component.OnConnectionError += this.Component_OnConnectionError;
 			this.component.OnError += this.Component_OnError;
@@ -172,12 +172,12 @@ namespace Waher.Networking.XMPP.Test
 
 		private void WaitClientConnected(int Timeout)
 		{
-			this.AssertWaitConnected(this.WaitClient(Timeout));
+			AssertWaitConnected(this.WaitClient(Timeout));
 		}
 
 		private void WaitComponentConnected(int Timeout)
 		{
-			this.AssertWaitConnected(this.WaitComponent(Timeout));
+			AssertWaitConnected(this.WaitComponent(Timeout));
 		}
 
 		private void WaitConnected(int Timeout)
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitComponentConnected(Timeout);
 		}
 
-		private void AssertWaitConnected(int Event)
+		private static void AssertWaitConnected(int Event)
 		{
 			switch (Event)
 			{
@@ -210,10 +210,10 @@ namespace Waher.Networking.XMPP.Test
 			this.client?.Dispose();
 			this.component?.Dispose();
 
-			if (!(this.clientEx is null))
+			if (this.clientEx is not null)
 				throw new TargetInvocationException(this.clientEx);
 
-			if (!(this.componentEx is null))
+			if (this.componentEx is not null)
 				throw new TargetInvocationException(this.componentEx);
 		}
 

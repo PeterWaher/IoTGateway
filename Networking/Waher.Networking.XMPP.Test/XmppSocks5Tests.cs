@@ -20,8 +20,8 @@ namespace Waher.Networking.XMPP.Test
 		public void Socks5_Test_01_FindProxy()
 		{
 			this.ConnectClients();
-			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Proxy Proxy = new Socks5Proxy(this.client1);
+			ManualResetEvent Done = new(false);
+			Socks5Proxy Proxy = new(this.client1);
 			
 			Proxy.StartSearch((sender, e) =>
 			{
@@ -40,10 +40,10 @@ namespace Waher.Networking.XMPP.Test
 		public void Socks5_Test_02_ConnectSOCKS5()
 		{
 			this.ConnectClients();
-			ManualResetEvent Error = new ManualResetEvent(false);
-			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Client Client = new Socks5Client("waher.se", 1080, "socks5.waher.se",
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+			ManualResetEvent Error = new(false);
+			ManualResetEvent Done = new(false);
+			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
+				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
 			Client.OnStateChange += (sender, e) =>
 			{
@@ -69,9 +69,9 @@ namespace Waher.Networking.XMPP.Test
 		public void Socks5_Test_03_ConnectStream()
 		{
 			this.ConnectClients();
-			ManualResetEvent Error = new ManualResetEvent(false);
-			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Client Client = new Socks5Client("waher.se", 1080, "socks5.waher.se",
+			ManualResetEvent Error = new(false);
+			ManualResetEvent Done = new(false);
+			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -102,10 +102,10 @@ namespace Waher.Networking.XMPP.Test
 		public void Socks5_Test_04_ActivateStream()
 		{
 			this.ConnectClients();
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			Socks5Client Client1 = new Socks5Client("waher.se", 1080, "socks5.waher.se",
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done1 = new(false);
+			Socks5Client Client1 = new("waher.se", 1080, "socks5.waher.se",
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			Client1.OnStateChange += (sender, e) =>
 			{
@@ -128,10 +128,10 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			ManualResetEvent Error2 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			Socks5Client Client2 = new Socks5Client("waher.se", 1080, "socks5.waher.se",
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+			ManualResetEvent Error2 = new(false);
+			ManualResetEvent Done2 = new(false);
+			Socks5Client Client2 = new("waher.se", 1080, "socks5.waher.se",
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			Client2.OnStateChange += (sender, e) =>
 			{
@@ -157,8 +157,8 @@ namespace Waher.Networking.XMPP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Unable to connect.");
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Unable to connect.");
 
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			Done1.Reset();
 			Error1.Reset();
@@ -217,16 +217,16 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("Searching for SOCKS5 proxy.");
 			Console.Out.WriteLine();
 
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			Socks5Proxy Proxy1 = new Socks5Proxy(this.client1);
+			ManualResetEvent Done1 = new(false);
+			Socks5Proxy Proxy1 = new(this.client1);
 
 			Proxy1.StartSearch((sender, e) =>
 			{
 				Done1.Set();
 			});
 
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			Socks5Proxy Proxy2 = new Socks5Proxy(this.client2);
+			ManualResetEvent Done2 = new(false);
+			Socks5Proxy Proxy2 = new(this.client2);
 
 			Proxy2.StartSearch((sender, e) =>
 			{
@@ -242,10 +242,10 @@ namespace Waher.Networking.XMPP.Test
 			Done1.Reset();
 			Done2.Reset();
 
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
-			ManualResetEvent Closed1 = new ManualResetEvent(false);
-			ManualResetEvent Closed2 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Error2 = new(false);
+			ManualResetEvent Closed1 = new(false);
+			ManualResetEvent Closed2 = new(false);
 
 			Console.Out.WriteLine();
 			Console.Out.WriteLine("Start of session initiation.");

@@ -54,6 +54,7 @@ namespace Waher.Events.Files
 		{
 			this.disposed = true;
 
+			this.DisposeOutput();
 			base.Dispose();
 		}
 
@@ -72,59 +73,73 @@ namespace Waher.Events.Files
 				await this.BeforeWrite();
 				try
 				{
-					this.output.WriteStartElement(Event.Type.ToString());
-					this.output.WriteAttributeString("timestamp", Encode(Event.Timestamp));
-					this.output.WriteAttributeString("level", Event.Level.ToString());
-
-
-					if (!string.IsNullOrEmpty(Event.EventId))
-						this.output.WriteAttributeString("id", Event.EventId);
-
-					if (!string.IsNullOrEmpty(Event.Object))
-						this.output.WriteAttributeString("object", Event.Object);
-
-					if (!string.IsNullOrEmpty(Event.Actor))
-						this.output.WriteAttributeString("actor", Event.Actor);
-
-					if (!string.IsNullOrEmpty(Event.Module))
-						this.output.WriteAttributeString("module", Event.Module);
-
-					if (!string.IsNullOrEmpty(Event.Facility))
-						this.output.WriteAttributeString("facility", Event.Facility);
-
-					this.output.WriteStartElement("Message");
-
-					foreach (string Row in EventExtensions.GetRows(Event.Message))
-						this.output.WriteElementString("Row", Row);
-
-					this.output.WriteEndElement();
-
-					if (!(Event.Tags is null) && Event.Tags.Length > 0)
+					if (!(this.output is null))
 					{
-						foreach (KeyValuePair<string, object> Tag in Event.Tags)
-						{
-							this.output.WriteStartElement("Tag");
-							this.output.WriteAttributeString("key", Tag.Key);
+						this.output.WriteStartElement(Event.Type.ToString());
+						this.output.WriteAttributeString("timestamp", Encode(Event.Timestamp));
+						this.output.WriteAttributeString("level", Event.Level.ToString());
 
-							if (!(Tag.Value is null))
-								this.output.WriteAttributeString("value", Tag.Value.ToString());
 
-							this.output.WriteEndElement();
-						}
-					}
+						if (!string.IsNullOrEmpty(Event.EventId))
+							this.output.WriteAttributeString("id", Event.EventId);
 
-					if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
-					{
-						this.output.WriteStartElement("StackTrace");
+						if (!string.IsNullOrEmpty(Event.Object))
+							this.output.WriteAttributeString("object", Event.Object);
 
-						foreach (string Row in EventExtensions.GetRows(Event.StackTrace))
+						if (!string.IsNullOrEmpty(Event.Actor))
+							this.output.WriteAttributeString("actor", Event.Actor);
+
+						if (!string.IsNullOrEmpty(Event.Module))
+							this.output.WriteAttributeString("module", Event.Module);
+
+						if (!string.IsNullOrEmpty(Event.Facility))
+							this.output.WriteAttributeString("facility", Event.Facility);
+
+						this.output.WriteStartElement("Message");
+
+						foreach (string Row in EventExtensions.GetRows(Event.Message))
 							this.output.WriteElementString("Row", Row);
 
 						this.output.WriteEndElement();
-					}
 
-					this.output.WriteEndElement();
-					this.output.Flush();
+						if (!(Event.Tags is null) && Event.Tags.Length > 0)
+						{
+							foreach (KeyValuePair<string, object> Tag in Event.Tags)
+							{
+								this.output.WriteStartElement("Tag");
+								this.output.WriteAttributeString("key", Tag.Key);
+
+								if (!(Tag.Value is null))
+									this.output.WriteAttributeString("value", Tag.Value.ToString());
+
+								this.output.WriteEndElement();
+							}
+						}
+
+						if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
+						{
+							this.output.WriteStartElement("StackTrace");
+
+							foreach (string Row in EventExtensions.GetRows(Event.StackTrace))
+								this.output.WriteElementString("Row", Row);
+
+							this.output.WriteEndElement();
+						}
+
+						this.output.WriteEndElement();
+						this.output.Flush();
+					}
+				}
+				catch (Exception)
+				{
+					try
+					{
+						this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 				finally
 				{
@@ -159,6 +174,15 @@ namespace Waher.Events.Files
 				sb.Append("Z");
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Disposes of the current output.
+		/// </summary>
+		public virtual void DisposeOutput()
+		{
+			this.output?.Dispose();
+			this.output = null;
 		}
 
 	}

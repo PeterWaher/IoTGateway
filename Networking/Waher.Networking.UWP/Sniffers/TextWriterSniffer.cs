@@ -45,10 +45,27 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// If output can be disposed.
+		/// </summary>
+		public virtual bool CanDisposeOutput => true;
+
+		/// <summary>
+		/// Disposes of the current output.
+		/// </summary>
+		public virtual void DisposeOutput()
+		{
+			if (this.CanDisposeOutput)
+				this.output?.Dispose();
+
+			this.output = null;
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public virtual void Dispose()
 		{
+			this.DisposeOutput();
 			this.disposed = true;
 		}
 	}

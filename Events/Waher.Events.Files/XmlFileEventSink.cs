@@ -181,26 +181,30 @@ namespace Waher.Events.Files
 		protected override async Task BeforeWrite()
 		{
 			string s = GetFileName(this.fileName);
-			if (!(this.lastFileName is null) && this.lastFileName == s)
+			if (!(this.lastFileName is null) && this.lastFileName == s && !(this.file is null) && this.file.BaseStream.CanWrite)
 				return;
 
-			if (!(this.file is null))
+			try
+			{
+				this.output?.WriteEndElement();
+				this.output?.WriteEndDocument();
+				this.output?.Flush();
+				this.file?.Dispose();
+			}
+			catch (Exception)
 			{
 				try
 				{
-					this.output.WriteEndElement();
-					this.output.WriteEndDocument();
-					this.output.Flush();
-					this.file.Dispose();
+					this.DisposeOutput();
 				}
 				catch (Exception)
 				{
 					// Ignore
 				}
-
-				this.file = null;
-				this.output = null;
 			}
+
+			this.file = null;
+			this.output = null;
 
 			string s2 = s;
 
@@ -254,46 +258,14 @@ namespace Waher.Events.Files
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
+		/// Disposes of the current output.
 		/// </summary>
-		public override void Dispose()
+		public override void DisposeOutput()
 		{
-			base.Dispose();
+			base.DisposeOutput();
 
-			if (!(this.output is null))
-			{
-				try
-				{
-					this.output.WriteEndElement();
-					this.output.WriteEndDocument();
-					this.output.Flush();
-					this.output.Dispose();
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-				finally
-				{
-					this.output = null;
-				}
-			}
-
-			if (!(this.file is null))
-			{
-				try
-				{
-					this.file.Dispose();
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-				finally
-				{
-					this.file = null;
-				}
-			}
+			this.file?.Dispose();
+			this.file = null;
 		}
 	}
 }

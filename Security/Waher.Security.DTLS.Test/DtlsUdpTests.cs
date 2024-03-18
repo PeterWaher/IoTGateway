@@ -16,7 +16,7 @@ namespace Waher.Security.DTLS.Test
 		private UdpClient udpClient;
 		private DtlsOverUdp dtlsOverUdp;
 		private IPEndPoint remoteEndpoint;
-		private TextWriterSniffer sniffer;
+		private ConsoleOutSniffer sniffer;
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
@@ -28,7 +28,7 @@ namespace Waher.Security.DTLS.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.sniffer = new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal);
+			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine);
 
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("vs0.inf.ethz.ch")[0], 5684);
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("californium.eclipse.org")[0], 5684);
@@ -42,17 +42,11 @@ namespace Waher.Security.DTLS.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.dtlsOverUdp is null))
-			{
-				this.dtlsOverUdp.Dispose();
-				this.dtlsOverUdp = null;
-			}
+			this.dtlsOverUdp?.Dispose();
+			this.dtlsOverUdp = null;
 
-			if (!(this.udpClient is null))
-			{
-				this.udpClient.Dispose();
-				this.udpClient = null;
-			}
+			this.udpClient?.Dispose();
+			this.udpClient = null;
 
 			this.sniffer = null;
 		}
@@ -60,8 +54,8 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_01_Handshake()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
 
 			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) => Done.Set();
 			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) => Error.Set();

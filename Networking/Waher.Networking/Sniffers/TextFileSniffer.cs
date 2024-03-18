@@ -85,6 +85,7 @@ namespace Waher.Networking.Sniffers
 				}
 
 				this.file = null;
+				this.output = null;
 			}
 
 			DateTime TP = DateTime.Now;
@@ -129,17 +130,15 @@ namespace Waher.Networking.Sniffers
 			return Task.CompletedTask;
 		}
 
-		/// <inheritdoc/>
-		public override void Dispose()
+		/// <summary>
+		/// Disposes of the current output.
+		/// </summary>
+		public override void DisposeOutput()
 		{
-			base.Dispose();
+			base.DisposeOutput();
 
-			if (!(this.file is null))
-			{
-				this.file.Flush();
-				this.file.Dispose();
-				this.file = null;
-			}
+			this.file?.Dispose();
+			this.file = null;
 		}
 	}
 }

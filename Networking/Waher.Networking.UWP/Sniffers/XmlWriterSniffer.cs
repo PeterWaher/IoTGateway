@@ -125,9 +125,16 @@ namespace Waher.Networking.Sniffers
 						this.output.WriteEndElement();
 						this.output.Flush();
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
-						Log.Critical(ex);
+						try
+						{
+							this.DisposeOutput();
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
 					}
 					finally
 					{
@@ -225,9 +232,16 @@ namespace Waher.Networking.Sniffers
 						}
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					Log.Critical(ex);
+					try
+					{
+						this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 			}
 			finally
@@ -288,11 +302,21 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// Disposes of the current output.
+		/// </summary>
+		public virtual void DisposeOutput()
+		{
+			this.output?.Dispose();
+			this.output = null;
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public virtual void Dispose()
 		{
 			this.disposed = true;
+			this.DisposeOutput();
 			this.semaphore.Dispose();
 		}
 	}

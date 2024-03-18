@@ -85,6 +85,7 @@ namespace Waher.Networking.Sniffers
 				}
 
 				this.file = null;
+				this.output = null;
 			}
 
 			DateTime TP = DateTime.Now;

@@ -36,7 +36,7 @@ namespace Waher.Networking.Sniffers
 			await this.BeforeWrite();
 			try
 			{
-				this.output.WriteLine(s);
+				this.output?.WriteLine(s);
 			}
 			finally
 			{
@@ -65,6 +65,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Dispose()
 		{
+			this.disposed = true;
+
 			this.DisposeOutput();
 			this.disposed = true;
 		}

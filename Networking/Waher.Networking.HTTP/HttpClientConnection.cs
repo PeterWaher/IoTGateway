@@ -433,10 +433,15 @@ namespace Waher.Networking.HTTP
 		private async Task<bool> RequestReceived()
 		{
 #if WINDOWS_UWP
-			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, 
-				this.client.Client.Information.RemoteAddress.ToString() + ":" + this.client.Client.Information.RemotePort);
+			StreamSocket UnderlyingSocket = this.client.Client;
+			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream,
+				UnderlyingSocket.Information.RemoteAddress.ToString() + ":" + UnderlyingSocket.Information.RemotePort,
+				UnderlyingSocket.Information.LocalAddress.ToString() + ":" + UnderlyingSocket.Information.LocalPort);
 #else
-			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, this.client.Client.Client.RemoteEndPoint.ToString());
+			Socket UnderlyingSocket = this.client.Client.Client;
+			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, 
+				UnderlyingSocket.RemoteEndPoint.ToString(),
+				UnderlyingSocket.LocalEndPoint.ToString());
 #endif
 			Request.clientConnection = this;
 

@@ -291,6 +291,7 @@ namespace Waher.Networking.HTTP
 
 
 				HttpClientHandler Handler = WebGetter.GetClientHandler();
+				string s;
 
 				using (HttpClient HttpClient = new HttpClient(Handler, true)
 				{
@@ -389,6 +390,60 @@ namespace Waher.Networking.HTTP
 									break;
 							}
 						}
+
+						// Forwarded:			https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded
+						// X-Forwarded-Host:	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
+						// X-Forwarded-For		https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+						// X-Forwarded-Proto	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+						// Via					https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via
+
+						sb.Clear();
+
+						sb.Append("by=");
+						sb.Append(Request.LocalEndPoint);
+
+						sb.Append(";for=");
+						sb.Append(s = Request.RemoteEndPoint);
+
+						if (Request.Header.TryGetHeaderField("X-Forwarded-For", out HttpField ForwardedFor))
+							ProxyRequest.Headers.Add("X-Forwarded-For", s + ", " + ForwardedFor.Value);
+						else
+							ProxyRequest.Headers.Add("X-Forwarded-For", s);
+
+						sb.Append(";proto=http");
+						if (Request.Encrypted)
+						{
+							sb.Append('s');
+							ProxyRequest.Headers.Add("X-Forwarded-Proto", "https");
+						}
+						else
+							ProxyRequest.Headers.Add("X-Forwarded-Proto", "http");
+
+						if (!(Request.Header.Host is null))
+						{
+							sb.Append(";host=");
+							sb.Append(s = Request.Header.Host.Value);
+
+							ProxyRequest.Headers.Add("X-Forwarded-Host", s);
+							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
+
+							sb.Clear();
+
+							sb.Append("HTTP/");
+							sb.Append(CommonTypes.Encode(Request.Header.HttpVersion, 1));
+							sb.Append(' ');
+							sb.Append(s);
+
+							if (Request.Header.TryGetHeaderField("Via", out HttpField Via))
+							{
+								sb.Append(", ");
+								sb.Append(Via.Value);
+							}
+
+							ProxyRequest.Headers.Add("Via", sb.ToString());
+						}
+						else
+							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
 
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
 

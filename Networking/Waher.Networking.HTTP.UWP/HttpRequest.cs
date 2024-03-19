@@ -20,6 +20,7 @@ namespace Waher.Networking.HTTP
 		private Stream dataStream;
 		private readonly HttpServer server;
 		private readonly string remoteEndPoint;
+		private readonly string localEndPoint;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
@@ -36,12 +37,15 @@ namespace Waher.Networking.HTTP
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
 		/// <param name="RemoteEndPoint">Remote end-point.</param>
-		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint)
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint)
 		{
 			this.server = Server;
 			this.header = Header;
 			this.dataStream = Data;
 			this.remoteEndPoint = RemoteEndPoint;
+			this.localEndPoint = LocalEndPoint;
 
 			if (!(this.dataStream is null))
 				this.dataStream.Position = 0;
@@ -172,6 +176,11 @@ namespace Waher.Networking.HTTP
 		/// Remote end-point.
 		/// </summary>
 		public string RemoteEndPoint => this.remoteEndPoint;
+
+		/// <summary>
+		/// Local end-point.
+		/// </summary>
+		public string LocalEndPoint => this.localEndPoint;
 
 		/// <summary>
 		/// HTTP Response object, if one has been assigned to the request.

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
+using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.Networking.HTTP
 {
@@ -18,7 +20,7 @@ namespace Waher.Networking.HTTP
 		IHttpDeleteMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpTraceMethod
 	{
 		private readonly TimeSpan timeout;
-		private readonly Uri baseUri;
+		private readonly string baseUri;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -60,7 +62,7 @@ namespace Waher.Networking.HTTP
 			if (!string.IsNullOrEmpty(RemoteFolder))
 				sb.Append(RemoteFolder);
 
-			this.baseUri = new Uri(sb.ToString());
+			this.baseUri = sb.ToString();
 		}
 
 		/// <summary>
@@ -246,24 +248,47 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				Uri RemoteUri;
+				StringBuilder sb = new StringBuilder();
 
-				if (string.IsNullOrEmpty(Request.Header.QueryString))
+				sb.Append(this.baseUri);
+				sb.Append(Request.SubPath);
+
+				if (!string.IsNullOrEmpty(Request.Header.QueryString))
 				{
-					if (!Uri.TryCreate(this.baseUri, Request.SubPath, out RemoteUri))
+					sb.Append('?');
+					sb.Append(Request.Header.QueryString);
+				}
+
+				if (!Uri.TryCreate(sb.ToString(), UriKind.Absolute, out Uri RemoteUri))
+				{
+					await Response.SendResponse(new BadRequestException());
+					return;
+				}
+
+				byte[] Data;
+
+				if (Request.HasData)
+				{
+					int c = (int)Request.DataStream.Length;
+					Request.DataStream.Position = 0;
+
+					int i = 0;
+					int j;
+
+					Data = new byte[c];
+
+					while (i < c)
 					{
-						await Response.SendResponse(new BadRequestException());
-						return;
+						j = await Request.DataStream.ReadAsync(Data, i, c - i);
+						if (j <= 0)
+							throw new IOException("Unexpected end of stream.");
+
+						i += j;
 					}
 				}
 				else
-				{
-					if (!Uri.TryCreate(this.baseUri, Request.SubPath + "?" + Request.Header.QueryString, out RemoteUri))
-					{
-						await Response.SendResponse(new BadRequestException());
-						return;
-					}
-				}
+					Data = null;
+
 
 				HttpClientHandler Handler = WebGetter.GetClientHandler();
 
@@ -278,6 +303,9 @@ namespace Waher.Networking.HTTP
 						Method = new HttpMethod(Request.Header.Method)
 					})
 					{
+						if (!(Data is null))
+							ProxyRequest.Content = new ByteArrayContent(Data);
+
 						foreach (HttpField Field in Request.Header)
 						{
 							switch (Field.Key)
@@ -340,16 +368,39 @@ namespace Waher.Networking.HTTP
 									Handler.CookieContainer.Add(ProxyRequest.RequestUri, Cookie);
 									break;
 
+								case "Content-Encoding":
+								case "Content-Length":
+									// Igore; will be re-coded.
+									break;
+
+								case "Allow":
+								case "Content-Disposition":
+								case "Content-Language":
+								case "Content-Location":
+								case "Content-MD5":
+								case "Content-Range":
+								case "Content-Type":
+								case "Last-Modified":
+									ProxyRequest.Content?.Headers.Add(Field.Key, Field.Value);
+									break;
+
 								default:
 									ProxyRequest.Headers.Add(Field.Key, Field.Value);
 									break;
 							}
 						}
 
-						if (Request.HasData)
+						sb.Clear();
+
+						sb.Append("by=");
+						sb.Append(Request.LocalEndPoint);
+						sb.Append(";for=");
+						sb.Append(Request.RemoteEndPoint);
+
+						if (!(Request.Header.Host is null))
 						{
-							Request.DataStream.Position = 0;
-							ProxyRequest.Content = new StreamContent(Request.DataStream);
+							sb.Append(";host=");
+							sb.Append(Request.Header.Host.Value);
 						}
 
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
@@ -365,13 +416,26 @@ namespace Waher.Networking.HTTP
 
 						if (!(ProxyResponse.Content is null))
 						{
-							byte[] Bin = await ProxyResponse.Content.ReadAsByteArrayAsync();
-							string ContentType = ProxyResponse.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
+							foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Content.Headers)
+							{
+								switch (Header.Key)
+								{
+									case "Content-Length":
+									case "Content-Encoding":
+										break;
 
-							Response.ContentType = ContentType;
+									default:
+										foreach (string Value in Header.Value)
+											Response.SetHeader(Header.Key, Value);
+										break;
+								}
+							}
+
+							byte[] Bin = await ProxyResponse.Content.ReadAsByteArrayAsync();
+
 							Response.ContentLength = Bin.Length;
 
-							await Response.WriteRawAsync(Bin);
+							await Response.Write(Bin);
 						}
 
 						await Response.SendResponse();

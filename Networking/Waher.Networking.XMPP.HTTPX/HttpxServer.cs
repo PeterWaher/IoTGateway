@@ -185,7 +185,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									TemporaryStream File = new TemporaryStream();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
-										new HttpRequest(this.server, Header, File, e.From), e.E2eEncryption, e.E2eReference, File, 
+										new HttpRequest(this.server, Header, File, e.From, e.To), e.E2eEncryption, e.E2eReference, File, 
                                         MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));
 									return;
 
@@ -216,7 +216,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.server.VanityResources, HeaderFields.ToArray());
 			}
 
-			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From), e.E2eEncryption, e.E2eReference,
+			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To), e.E2eEncryption, e.E2eReference,
 				MaxChunkSize, PostResource, Ibb, Socks5);
 		}
 

@@ -656,5 +656,29 @@ namespace Waher.Networking.HTTP.Test
 
 			Assert.AreEqual("hej på dej", s);
 		}
+
+		[TestMethod]
+		public void Test_32_TemporaryRedirect()
+		{
+			server.Register("/New32/test.txt", (req, resp) => resp.Return("hej på dej"));
+			server.Register(new HttpRedirectionResource("/Old32", "/New32", true, false));
+
+			using CookieWebClient Client = new();
+			byte[] Data = Client.DownloadData("http://localhost:8081/Old32/test.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
+
+		[TestMethod]
+		public void Test_33_PermanentRedirect()
+		{
+			server.Register("/New33/test.txt", (req, resp) => resp.Return("hej på dej"));
+			server.Register(new HttpRedirectionResource("/Old33", "/New33", true, true));
+
+			using CookieWebClient Client = new();
+			byte[] Data = Client.DownloadData("http://localhost:8081/Old33/test.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
 	}
 }

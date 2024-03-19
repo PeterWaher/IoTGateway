@@ -150,6 +150,20 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Redirections" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="Redirection">
+								<xs:complexType>
+									<xs:attribute name="resource" type="xs:string" use="required"/>
+									<xs:attribute name="location" type="xs:string" use="required"/>
+									<xs:attribute name="includeSubPaths" type="xs:boolean" use="required"/>
+									<xs:attribute name="permanent" type="xs:boolean" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
 						<xs:attribute name="folder" type="xs:string" use="required"/>

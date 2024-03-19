@@ -937,6 +937,34 @@ namespace Waher.IoTGateway
 					}
 				}
 
+				XmlElement Redirections = Config.DocumentElement["Redirections"];
+				if (!(Redirections is null))
+				{
+					foreach (XmlNode N in Redirections.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "Redirection")
+						{
+							string Resource = XML.Attribute(E, "resource");
+							string Location = XML.Attribute(E, "location");
+							bool IncludeSubPaths = XML.Attribute(E, "includeSubPaths", false);
+							bool Permanent = XML.Attribute(E, "permanent", false);
+
+							try
+							{
+								webServer.Register(new HttpRedirectionResource(Resource, Location, IncludeSubPaths, Permanent));
+							}
+							catch (Exception ex)
+							{
+								Log.Error("Unable to register redirection: " + ex.Message,
+									new KeyValuePair<string, object>("Resource", Resource),
+									new KeyValuePair<string, object>("Location", Location),
+									new KeyValuePair<string, object>("IncludeSubPaths", IncludeSubPaths),
+									new KeyValuePair<string, object>("Permanent", Permanent));
+							}
+						}
+					}
+				}
+
 				await LoadScriptResources();
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);

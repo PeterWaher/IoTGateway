@@ -127,6 +127,7 @@
     <Compile Include="ContentEncodings\IContentEncoding.cs" />
     <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="HttpRedirectionResource.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />

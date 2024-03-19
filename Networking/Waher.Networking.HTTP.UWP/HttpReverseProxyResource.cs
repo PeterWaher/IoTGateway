@@ -400,6 +400,7 @@ namespace Waher.Networking.HTTP
 								case "Content-Length":
 								case "Transfer-Encoding":
 								case "Host":
+								case "Accept-Encoding":
 									// Igore; will be re-coded.
 									break;
 

@@ -21,6 +21,7 @@ namespace Waher.Networking.HTTP
 		private readonly TimeSpan timeout;
 		private readonly string baseUri;
 		private readonly bool useSession;
+		private readonly bool encryption;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -83,6 +84,7 @@ namespace Waher.Networking.HTTP
 				sb.Append(RemoteFolder);
 
 			this.baseUri = sb.ToString();
+			this.encryption = Encryption;
 		}
 
 		/// <summary>
@@ -94,6 +96,11 @@ namespace Waher.Networking.HTTP
 		/// If the resource handles sub-paths.
 		/// </summary>
 		public override bool HandlesSubPaths => true;
+
+		/// <summary>
+		/// If forwarding is encrypted.
+		/// </summary>
+		public bool Encrypted => this.encryption;
 
 		/// <summary>
 		/// If the GET method is allowed.

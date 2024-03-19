@@ -1578,6 +1578,28 @@ namespace Waher.Networking.HTTP
 			return ResourceName;
 		}
 
+		/// <summary>
+		/// Gets registered resources of a specific type.
+		/// </summary>
+		/// <typeparam name="T">Type of resource to get.</typeparam>
+		/// <returns>Registered resources of type <typeparamref name="T"/>.</returns>
+		public T[] GetRegisteredResources<T>()
+			where T : HttpResource
+		{
+			List<T> Result = new List<T>();
+
+			lock (this.resources)
+			{
+				foreach (HttpResource Resource in this.resources.Values)
+				{
+					if (Resource is T TypedResource)
+						Result.Add(TypedResource);
+				}
+			}
+
+			return Result.ToArray();
+		}
+
 		#endregion
 
 		#region Sessions

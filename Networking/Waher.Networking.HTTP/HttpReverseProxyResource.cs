@@ -391,6 +391,8 @@ namespace Waher.Networking.HTTP
 
 								case "Content-Encoding":
 								case "Content-Length":
+								case "Transfer-Encoding":
+								case "Host":
 									// Igore; will be re-coded.
 									break;
 
@@ -474,8 +476,17 @@ namespace Waher.Networking.HTTP
 
 						foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Headers)
 						{
-							foreach (string Value in Header.Value)
-								Response.SetHeader(Header.Key, Value);
+							switch (Header.Key)
+							{
+								case "Transfer-Encoding":
+								case "X-Content-Type-Options:":
+									break;
+
+								default:
+									foreach (string Value in Header.Value)
+										Response.SetHeader(Header.Key, Value);
+									break;
+							}
 						}
 
 						if (!(ProxyResponse.Content is null))

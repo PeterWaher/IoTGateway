@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
-using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.Networking.HTTP
 {
@@ -21,6 +20,7 @@ namespace Waher.Networking.HTTP
 	{
 		private readonly TimeSpan timeout;
 		private readonly string baseUri;
+		private readonly bool useSession;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -34,9 +34,29 @@ namespace Waher.Networking.HTTP
 		/// <param name="Timeout">Timeout threshold.</param>
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
 			string RemoteFolder, bool Encryption, TimeSpan Timeout)
+			: this(ResourceName, RemoteHost, Port, RemoteFolder, Encryption, Timeout, false)
+		{
+		}
+
+		/// <summary>
+		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
+		/// are returned asynchronously as they are received.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="RemoteHost">Host of remote web server.</param>
+		/// <param name="Port">Port number of remote web server.</param>
+		/// <param name="RemoteFolder">Optional remote folder where remote content is hosted.</param>
+		/// <param name="Encryption">If encryption (https) should be used.</param>
+		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="UseProxySession">If the proxy resource should add a session requirement
+		/// as well. This allows the proxy resource to forward user infomration to underlying
+		/// services, etc.. (Default=false)</param>
+		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
+			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession)
 			: base(ResourceName)
 		{
 			this.timeout = Timeout;
+			this.useSession = UseProxySession;
 
 			StringBuilder sb = new StringBuilder();
 			int DefaultPort;
@@ -68,7 +88,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions => false;
+		public override bool UserSessions => this.useSession;
 
 		/// <summary>
 		/// If the resource handles sub-paths.
@@ -445,6 +465,8 @@ namespace Waher.Networking.HTTP
 						else
 							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
 
+						this.BeforeForwardRequest?.Invoke(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response));
+
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
 
 						Response.StatusCode = (int)ProxyResponse.StatusCode;
@@ -477,8 +499,12 @@ namespace Waher.Networking.HTTP
 
 							Response.ContentLength = Bin.Length;
 
+							this.BeforeForwardResponse?.Invoke(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+
 							await Response.Write(Bin);
 						}
+						else
+							this.BeforeForwardResponse?.Invoke(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
 
 						await Response.SendResponse();
 					}
@@ -507,5 +533,15 @@ namespace Waher.Networking.HTTP
 				}
 			}
 		}
+
+		/// <summary>
+		/// Event raised before a request is forwarded
+		/// </summary>
+		public event ProxyRequestEventHandler BeforeForwardRequest;
+
+		/// <summary>
+		/// Event raised before a response is forwarded
+		/// </summary>
+		public event ProxyResponseEventHandler BeforeForwardResponse;
 	}
 }

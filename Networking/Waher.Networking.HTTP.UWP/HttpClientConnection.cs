@@ -13,7 +13,6 @@ using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Temporary;
 using Waher.Security;
-using Windows.Networking.Sockets;
 
 namespace Waher.Networking.HTTP
 {

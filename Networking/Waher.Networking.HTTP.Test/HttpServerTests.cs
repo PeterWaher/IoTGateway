@@ -562,10 +562,10 @@ namespace Waher.Networking.HTTP.Test
 		public void Test_29_ReverseProxy()
 		{
 			server.Register("/Remote/test29.txt", (req, resp) => resp.Return("hej på dej"));
-			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+			server.Register(new HttpReverseProxyResource("/Proxy29", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
 
 			using CookieWebClient Client = new();
-			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy/test29.txt");
+			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy29/test29.txt");
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hej på dej", s);
 		}
@@ -587,10 +587,10 @@ namespace Waher.Networking.HTTP.Test
 				await resp.Return(WebUtility.UrlDecode(A) + " " + WebUtility.UrlDecode(B) + " " +
 					WebUtility.UrlDecode(C));
 			});
-			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+			server.Register(new HttpReverseProxyResource("/Proxy30", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
 
 			using CookieWebClient Client = new();
-			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy/test30.txt?A=" +
+			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy30/test30.txt?A=" +
 				WebUtility.UrlEncode("hej") + "&B=" + WebUtility.UrlEncode("på") + "&C=" +
 				WebUtility.UrlEncode("dej"));
 			string s = Encoding.UTF8.GetString(Data);
@@ -620,10 +620,10 @@ namespace Waher.Networking.HTTP.Test
 
 				await resp.Return(A + " " + B + " " + C);
 			}, true, false, true);
-			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+			server.Register(new HttpReverseProxyResource("/Proxy31", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
 
 			using HttpClient Client = new();
-			using HttpRequestMessage Request = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetA")
+			using HttpRequestMessage Request = new(HttpMethod.Post, "http://localhost:8081/Proxy31/test31/SetA")
 			{
 				Content = new StringContent("hej")
 			};
@@ -631,7 +631,7 @@ namespace Waher.Networking.HTTP.Test
 			using HttpResponseMessage Response = await Client.SendAsync(Request);
 			Response.EnsureSuccessStatusCode();
 
-			using HttpRequestMessage Request2 = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetB")
+			using HttpRequestMessage Request2 = new(HttpMethod.Post, "http://localhost:8081/Proxy31/test31/SetB")
 			{
 				Content = new StringContent("på")
 			};
@@ -639,7 +639,7 @@ namespace Waher.Networking.HTTP.Test
 			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
 			Response2.EnsureSuccessStatusCode();
 
-			using HttpRequestMessage Request3 = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetC")
+			using HttpRequestMessage Request3 = new(HttpMethod.Post, "http://localhost:8081/Proxy31/test31/SetC")
 			{
 				Content = new StringContent("dej")
 			};
@@ -647,7 +647,7 @@ namespace Waher.Networking.HTTP.Test
 			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
 			Response3.EnsureSuccessStatusCode();
 
-			using HttpRequestMessage Request4 = new(HttpMethod.Get, "http://localhost:8081/Proxy/test31.txt");
+			using HttpRequestMessage Request4 = new(HttpMethod.Get, "http://localhost:8081/Proxy31/test31.txt");
 			using HttpResponseMessage Response4 = await Client.SendAsync(Request4);
 			Response4.EnsureSuccessStatusCode();
 

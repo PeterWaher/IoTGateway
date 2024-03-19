@@ -467,7 +467,10 @@ namespace Waher.Networking.HTTP
 						else
 							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
 
-						this.BeforeForwardRequest?.Invoke(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response));
+						ProxyResponseEventHandler h2;
+						ProxyRequestEventHandler h = this.BeforeForwardRequest;
+						if (!(h is null))
+							await h(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response));
 
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
 
@@ -510,12 +513,18 @@ namespace Waher.Networking.HTTP
 
 							Response.ContentLength = Bin.Length;
 
-							this.BeforeForwardResponse?.Invoke(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+							h2 = this.BeforeForwardResponse;
+							if (!(h2 is null))
+								await h2(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
 
 							await Response.Write(Bin);
 						}
 						else
-							this.BeforeForwardResponse?.Invoke(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+						{
+							h2 = this.BeforeForwardResponse;
+							if (!(h2 is null))
+								await h2(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+						}
 
 						await Response.SendResponse();
 					}

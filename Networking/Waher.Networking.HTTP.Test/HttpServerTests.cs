@@ -260,7 +260,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
 
 			using HttpClient Client = new();
-			
+
 			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test15/Text.txt");
 			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(100, 119);
 
@@ -268,7 +268,7 @@ namespace Waher.Networking.HTTP.Test
 			Response.EnsureSuccessStatusCode();
 
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
-			
+
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("89012345678901234567", s);
 		}
@@ -558,5 +558,103 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\r\nConverter 1 was here.\r\nConverter 2 was here.\r\nConverter 3 was here.", s);
 		}
 
+		[TestMethod]
+		public void Test_29_ReverseProxy()
+		{
+			server.Register("/Remote/test29.txt", (req, resp) => resp.Return("hej på dej"));
+			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+
+			using CookieWebClient Client = new();
+			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy/test29.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
+
+		[TestMethod]
+		public void Test_30_ReverseProxy_WithQuery()
+		{
+			server.Register("/Remote/test30.txt", async (req, resp) =>
+			{
+				if (!req.Header.TryGetQueryParameter("A", out string A))
+					throw new BadRequestException();
+
+				if (!req.Header.TryGetQueryParameter("B", out string B))
+					throw new BadRequestException();
+
+				if (!req.Header.TryGetQueryParameter("C", out string C))
+					throw new BadRequestException();
+
+				await resp.Return(WebUtility.UrlDecode(A) + " " + WebUtility.UrlDecode(B) + " " +
+					WebUtility.UrlDecode(C));
+			});
+			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+
+			using CookieWebClient Client = new();
+			byte[] Data = Client.DownloadData("http://localhost:8081/Proxy/test30.txt?A=" +
+				WebUtility.UrlEncode("hej") + "&B=" + WebUtility.UrlEncode("på") + "&C=" +
+				WebUtility.UrlEncode("dej"));
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
+
+		[TestMethod]
+		public async Task Test_31_ReverseProxy_Cookies()
+		{
+			server.Register("/Remote/test31/SetA", null, async (req, resp) =>
+			{
+				req.Session["A"] = await req.DecodeDataAsync();
+			}, true, false, true);
+			server.Register("/Remote/test31/SetB", null, async (req, resp) =>
+			{
+				req.Session["B"] = await req.DecodeDataAsync();
+			}, true, false, true);
+			server.Register("/Remote/test31/SetC", null, async (req, resp) =>
+			{
+				req.Session["C"] = await req.DecodeDataAsync();
+			}, true, false, true);
+			server.Register("/Remote/test31.txt", async (req, resp) =>
+			{
+				string A = req.Session["A"].ToString();
+				string B = req.Session["B"].ToString();
+				string C = req.Session["C"].ToString();
+
+				await resp.Return(A + " " + B + " " + C);
+			}, true, false, true);
+			server.Register(new HttpReverseProxyResource("/Proxy", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
+
+			using HttpClient Client = new();
+			using HttpRequestMessage Request = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetA")
+			{
+				Content = new StringContent("hej")
+			};
+
+			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+
+			using HttpRequestMessage Request2 = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetB")
+			{
+				Content = new StringContent("på")
+			};
+
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			Response2.EnsureSuccessStatusCode();
+
+			using HttpRequestMessage Request3 = new(HttpMethod.Post, "http://localhost:8081/Proxy/test31/SetC")
+			{
+				Content = new StringContent("dej")
+			};
+
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			Response3.EnsureSuccessStatusCode();
+
+			using HttpRequestMessage Request4 = new(HttpMethod.Get, "http://localhost:8081/Proxy/test31.txt");
+			using HttpResponseMessage Response4 = await Client.SendAsync(Request4);
+			Response4.EnsureSuccessStatusCode();
+
+			byte[] Data = await Response4.Content.ReadAsByteArrayAsync();
+			string s = Encoding.UTF8.GetString(Data);
+
+			Assert.AreEqual("hej på dej", s);
+		}
 	}
 }

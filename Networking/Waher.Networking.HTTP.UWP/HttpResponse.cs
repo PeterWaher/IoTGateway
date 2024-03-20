@@ -255,14 +255,32 @@ namespace Waher.Networking.HTTP
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.date = DTO;
 					else
-						throw new ArgumentException("Value does not conform to RFC 822.", nameof(Value));
+					{
+						Log.Error("Value does not conform to RFC 822: " + Value, this.httpRequest.Resource.ResourceName,
+							new KeyValuePair<string, object>("Header", FieldName),
+							new KeyValuePair<string, object>("Value", Value));
+
+						if (this.customHeaders is null)
+							this.customHeaders = new Dictionary<string, string>();
+
+						this.customHeaders[FieldName] = Value;
+					}
 					break;
 
 				case "expires":
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.expires = DTO;
 					else
-						throw new ArgumentException("Value does not conform to RFC 822.", nameof(Value));
+					{
+						Log.Error("Value does not conform to RFC 822: " + Value, this.httpRequest.Resource.ResourceName,
+							new KeyValuePair<string, object>("Header", FieldName),
+							new KeyValuePair<string, object>("Value", Value));
+
+						if (this.customHeaders is null)
+							this.customHeaders = new Dictionary<string, string>();
+
+						this.customHeaders[FieldName] = Value;
+					}
 					break;
 
 				case "server":

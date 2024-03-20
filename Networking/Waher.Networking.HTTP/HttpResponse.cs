@@ -254,6 +254,8 @@ namespace Waher.Networking.HTTP
 					DateTimeOffset DTO;
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.date = DTO;
+					else if (int.TryParse(Value, out int i))
+						this.date = DateTimeOffset.UtcNow.AddSeconds(i);
 					else
 					{
 						Log.Error("Value does not conform to RFC 822: " + Value, this.httpRequest.Resource.ResourceName,
@@ -270,6 +272,8 @@ namespace Waher.Networking.HTTP
 				case "expires":
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.expires = DTO;
+					else if (int.TryParse(Value, out int i))
+						this.date = DateTimeOffset.UtcNow.AddSeconds(i);
 					else
 					{
 						Log.Error("Value does not conform to RFC 822: " + Value, this.httpRequest.Resource.ResourceName,

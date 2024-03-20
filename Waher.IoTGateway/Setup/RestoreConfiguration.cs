@@ -164,7 +164,7 @@ namespace Waher.IoTGateway.Setup
 				!Request.Header.TryGetHeaderField("X-More", out F) ||
 				!CommonTypes.TryParse(F.Value, out bool More) ||
 				(Cookie = Request.Header.Cookie) is null ||
-				string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+				string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
 			{
 				throw new BadRequestException();
 			}
@@ -237,7 +237,7 @@ namespace Waher.IoTGateway.Setup
 				!Request.Header.TryGetHeaderField("X-TabID", out HttpField F) ||
 				string.IsNullOrEmpty(TabID = F.Value) ||
 				(Cookie = Request.Header.Cookie) is null ||
-				string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+				string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
 			{
 				throw new BadRequestException();
 			}

@@ -1,9 +1,12 @@
-﻿namespace Waher.Security.JWT
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Waher.Security.JWT
 {
 	/// <summary>
 	/// Represents a user in an external system.
 	/// </summary>
-	public class ExternalUser : IUser
+	public class ExternalUser : IUserWithClaims
 	{
 		/// <summary>
 		/// Represents a user in an external system.
@@ -42,5 +45,26 @@
 		/// <param name="Privilege">Privilege.</param>
 		/// <returns>If the user has the corresponding privilege.</returns>
 		public bool HasPrivilege(string Privilege) => false;
+
+		/// <summary>
+		/// Creates a set of claims identifying the user.
+		/// </summary>
+		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <returns>Set of claims.</returns>
+		public Task<IEnumerable<KeyValuePair<string, object>>> CreateClaims(bool Encrypted)
+		{
+			return Task.FromResult(this.Token.Claims);
+		}
+
+		/// <summary>
+		/// Creates a JWT Token referencing the user object.
+		/// </summary>
+		/// <param name="Factory">JWT Factory.</param>
+		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <returns>Token, if able to create a token, null otherwise.</returns>
+		public Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+		{
+			return Task.FromResult(this.Token.Token);
+		}
 	}
 }

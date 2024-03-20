@@ -244,7 +244,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								HttpFieldCookie Cookie = Request.Header.Cookie;
 								if (!(Cookie is null))
 								{
-									string HttpSessionID = Cookie["HttpSessionID"];
+									string HttpSessionID = Cookie[HttpResource.HttpSessionID];
 
 									if (!string.IsNullOrEmpty(HttpSessionID))
 										Request.Session = this.server.GetSession(HttpSessionID);

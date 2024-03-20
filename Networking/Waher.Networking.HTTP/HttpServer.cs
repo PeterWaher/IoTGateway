@@ -1667,14 +1667,14 @@ namespace Waher.Networking.HTTP
 			};
 		}
 
-		internal bool SetSession(string SessionId, Variables Variables)
+		internal Variables SetSession(string SessionId, Variables Variables)
 		{
-			if (this.sessions.ContainsKey(SessionId))
-				return false;
+			if (this.sessions.TryGetValue(SessionId, out Variables Variables2))
+				return Variables2;
 			else
 			{
 				this.sessions[SessionId] = Variables;
-				return true;
+				return Variables;
 			}
 		}
 

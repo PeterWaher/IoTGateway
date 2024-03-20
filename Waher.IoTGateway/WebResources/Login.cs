@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
+using Waher.Security.JWT;
 using Waher.Security.Users;
 using Waher.Things;
 
@@ -154,7 +156,7 @@ namespace Waher.IoTGateway.WebResources
 				throw new SeeOtherException(From);
 		}
 
-		private class InternalUser : IUser, IRequestOrigin
+		private class InternalUser : IUserWithClaims, IRequestOrigin
 		{
 			public string PasswordHash => string.Empty;
 			public string PasswordHashType => string.Empty;
@@ -168,6 +170,38 @@ namespace Waher.IoTGateway.WebResources
 			public Task<RequestOrigin> GetOrigin()
 			{
 				return Task.FromResult(new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null));
+			}
+
+			public Task<IEnumerable<KeyValuePair<string, object>>> CreateClaims(bool Encrypted)
+			{
+				int IssuedAt = (int)Math.Round(DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalSeconds);
+				int Expires = IssuedAt + 3600;
+
+				List<KeyValuePair<string, object>> Claims = new List<KeyValuePair<string, object>>()
+				{
+					new KeyValuePair<string, object>(JwtClaims.JwtId, Convert.ToBase64String(Gateway.NextBytes(32))),
+					new KeyValuePair<string, object>(JwtClaims.Subject, Environment.UserName),
+					new KeyValuePair<string, object>(JwtClaims.IssueTime, IssuedAt),
+					new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expires),
+					new KeyValuePair<string, object>(JwtClaims.Issuer, Environment.UserDomainName)
+				};
+
+				string OsName = Environment.OSVersion.ToString();
+				string OsVersion = Environment.OSVersion.Version.ToString();
+
+				if (OsName.EndsWith(OsVersion))
+					OsName = OsName.Substring(0, OsName.Length - OsVersion.Length).TrimEnd();
+
+				Claims.Add(new KeyValuePair<string, object>(JwtClaims.HardwareName, Environment.MachineName));
+				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareName, OsName));
+				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareVersion, OsVersion));
+				
+				return Task.FromResult<IEnumerable<KeyValuePair<string, object>>>(Claims);
+			}
+
+			public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+			{
+				return Factory.Create(await this.CreateClaims(Encrypted));
 			}
 		}
 

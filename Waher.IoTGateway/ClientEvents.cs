@@ -244,7 +244,7 @@ namespace Waher.IoTGateway
 			else
 			{
 				HttpFieldCookie Cookie = Request.Header.Cookie;
-				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
+				string HttpSessionID = Cookie is null ? string.Empty : Cookie[HttpResource.HttpSessionID];
 
 				TabQueue Queue2 = new TabQueue(TabID, HttpSessionID, Session)
 				{

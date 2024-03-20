@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
+using Waher.Networking.HTTP.HeaderFields;
+using Waher.Script;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
@@ -275,6 +278,41 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
+				if (this.useSession)
+				{
+					HttpFieldCookie Cookie = Request.Header.Cookie;
+					Variables Session = Request.Session;
+					string HttpProxySessionID;
+					string HttpSessionID;
+
+					if (Session is null)
+					{
+						if (Cookie is null || string.IsNullOrEmpty(HttpProxySessionID = Cookie[HttpResource.HttpProxySessionID]))
+						{
+							HttpProxySessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+							Response.SetCookie(new Cookie(HttpResource.HttpProxySessionID, HttpProxySessionID, null, "/", null, false, true));
+						}
+
+						Request.Session = Session = Server.GetSession(HttpProxySessionID);
+
+						HttpSessionID = Cookie[HttpResource.HttpSessionID];
+						if (!string.IsNullOrEmpty(HttpSessionID))
+							Session.ContextVariables = Server.GetSession(HttpSessionID);
+					}
+					else if (Request.tempSession)
+					{
+						HttpProxySessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+						Response.SetCookie(new Cookie(HttpResource.HttpProxySessionID, HttpProxySessionID, null, "/", null, false, true));
+
+						Session = Server.SetSession(HttpProxySessionID, Request.Session);
+						Request.tempSession = false;
+
+						HttpSessionID = Cookie[HttpResource.HttpSessionID];
+						if (!string.IsNullOrEmpty(HttpSessionID))
+							Session.ContextVariables = Server.GetSession(HttpSessionID);
+					}
+				}
+
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append(this.baseUri);

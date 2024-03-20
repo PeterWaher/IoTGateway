@@ -29,6 +29,16 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public abstract class HttpResource : IHttpOptionsMethod
 	{
+		/// <summary>
+		/// The Cookie Key for HTTP Session Identifiers: "HttpSessionID"
+		/// </summary>
+		public const string HttpSessionID = "HttpSessionID";
+
+		/// <summary>
+		/// The Cookie Key for HTTP Reverse Proxy Session Identifiers: "HttpProxySessionID"
+		/// </summary>
+		public const string HttpProxySessionID = "HttpProxySessionID";
+
 		private readonly List<HttpServer> servers = new List<HttpServer>();
 		private readonly string[] allowedMethods;
 		private readonly IHttpGetMethod get;
@@ -207,9 +217,19 @@ namespace Waher.Networking.HTTP
 		/// <returns>ETag value.</returns>
 		public string ComputeETag(byte[] Binary)
 		{
+			return ComputeETag(Binary, this.ETagSalt);
+		}
+
+		/// <summary>
+		/// Computes an ETag value for a resource.
+		/// </summary>
+		/// <param name="Binary">Binary representation of resource.</param>
+		/// <param name="Salt">Salt for ETag hash computation.</param>
+		/// <returns>ETag value.</returns>
+		public static string ComputeETag(byte[] Binary, string Salt)
+		{
 			string ETag = Hashes.ComputeSHA1HashString(Binary);
 
-			string Salt = this.ETagSalt;
 			if (!string.IsNullOrEmpty(Salt))
 				ETag = Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(ETag + Salt));
 
@@ -248,10 +268,10 @@ namespace Waher.Networking.HTTP
 
 				if (Request.Session is null)
 				{
-					if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+					if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
 					{
 						HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-						Response.SetCookie(new Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
+						Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
 					}
 
 					Request.Session = Server.GetSession(HttpSessionID);
@@ -259,7 +279,7 @@ namespace Waher.Networking.HTTP
 				else if (Request.tempSession)
 				{
 					HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-					Response.SetCookie(new Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
+					Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
 
 					Server.SetSession(HttpSessionID, Request.Session);
 					Request.tempSession = false;

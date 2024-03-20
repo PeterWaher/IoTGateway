@@ -1649,7 +1649,7 @@ namespace Waher.IoTGateway
 				certificate = null;
 
 			if (!Users.HashMethodLocked)
-				Users.Register(ComputeUserPasswordHash, "DIGEST-SHA3-256", LoginAuditor, true);
+				Users.Register(ComputeUserPasswordHash, "DIGEST-SHA3-256", LoginAuditor, domain, true);
 
 			await Privileges.LoadAll();
 			await Roles.LoadAll();

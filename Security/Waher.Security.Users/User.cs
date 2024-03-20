@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Security.JWT;
 using Waher.Things;
 
 namespace Waher.Security.Users
@@ -12,8 +17,10 @@ namespace Waher.Security.Users
 	[TypeName(TypeNameSerialization.None)]
 	[Index("UserName")]
 	[ArchivingTime]
-	public class User : IUser, IRequestOrigin
+	public class User : IUserWithClaims, IRequestOrigin
 	{
+		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
 		private readonly Dictionary<string, bool> privileges = new Dictionary<string, bool>();
 		private string objectId = null;
 		private string userName = string.Empty;
@@ -159,6 +166,101 @@ namespace Waher.Security.Users
 		public Task<RequestOrigin> GetOrigin()
 		{
 			return Task.FromResult(new RequestOrigin(this.userName, null, null, null));
+		}
+
+		/// <summary>
+		/// Creates a set of claims identifying the user.
+		/// </summary>
+		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <returns>Set of claims.</returns>
+		public async Task<IEnumerable<KeyValuePair<string, object>>> CreateClaims(bool Encrypted)
+		{
+			int IssuedAt = (int)Math.Round(DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalSeconds);
+			int Expires = IssuedAt + 3600;
+			byte[] RandomBytes = new byte[32];
+
+			lock (rnd)
+			{
+				rnd.GetBytes(RandomBytes);
+			}
+
+			List<KeyValuePair<string, object>> Claims = new List<KeyValuePair<string, object>>()
+			{
+				new KeyValuePair<string, object>(JwtClaims.JwtId, Convert.ToBase64String(RandomBytes)),
+				new KeyValuePair<string, object>(JwtClaims.Subject, this.userName),
+				new KeyValuePair<string, object>(JwtClaims.IssueTime, IssuedAt),
+				new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expires)
+			};
+
+			if (!string.IsNullOrEmpty(Users.Domain))
+				Claims.Add(new KeyValuePair<string, object>(JwtClaims.Issuer, Users.Domain));
+
+			if (Encrypted)
+			{
+				if (!(this.roleIds is null))
+				{
+					StringBuilder sb = null;
+
+					foreach (string RoleId in this.roleIds)
+						AppendValue(ref sb, "\"" + RoleId + "\"", ", ");
+
+					Claims.Add(new KeyValuePair<string, object>(JwtClaims.Roles, sb?.ToString()));
+
+					sb = null;
+
+					foreach (Role Role in await this.LoadRoles())
+					{
+						foreach (PrivilegePattern Privilege in Role.Privileges)
+						{
+							if (Privilege.Include)
+								AppendValue(ref sb, "+" + Privilege.Expression, Environment.NewLine);
+							else
+								AppendValue(ref sb, "-" + Privilege.Expression, Environment.NewLine);
+						}
+					}
+
+					Claims.Add(new KeyValuePair<string, object>(JwtClaims.Entitlements, sb?.ToString()));
+				}
+			}
+
+			return Claims;
+		}
+
+		/// <summary>
+		/// Appends a value to a <see cref="StringBuilder"/>.
+		/// </summary>
+		/// <param name="Output">Value will be appended here. If created, the <paramref name="Delimiter"/> will be appended first, otherwise
+		/// the <see cref="StringBuilder"/> will be created first.</param>
+		/// <param name="Value">Value to append.</param>
+		/// <param name="Delimiter">Delimiter, in case other values have been appended first.</param>
+		public static void AppendValue(ref StringBuilder Output, object Value, string Delimiter)
+		{
+			if (Value is null)
+				return;
+
+			if (!(Value is string s))
+				s = Value.ToString();
+
+			if (!string.IsNullOrEmpty(s))
+			{
+				if (Output is null)
+					Output = new StringBuilder();
+				else
+					Output.Append(Delimiter);
+
+				Output.Append(s);
+			}
+		}
+
+		/// <summary>
+		/// Creates a JWT Token referencing the user object.
+		/// </summary>
+		/// <param name="Factory">JWT Factory.</param>
+		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <returns>Token, if able to create a token, null otherwise.</returns>
+		public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+		{
+			return Factory.Create(await this.CreateClaims(Encrypted));
 		}
 	}
 }

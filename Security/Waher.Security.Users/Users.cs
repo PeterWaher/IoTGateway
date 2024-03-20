@@ -27,6 +27,7 @@ namespace Waher.Security.Users
 		private static readonly IUserSource source = new Users();
 		private static LoginAuditor loginAuditor = null;
 		private static HashComputationMethod hashMethod = null;
+		private static string domain = string.Empty;
 		private static string hashMethodTypeName = "Internal";
 		private static bool hashMethodLocked = false;
 
@@ -39,6 +40,11 @@ namespace Waher.Security.Users
 		/// Any Login Auditor registered, if any.
 		/// </summary>
 		public static LoginAuditor LoginAuditor => loginAuditor;
+
+		/// <summary>
+		/// Domain name, if provided.
+		/// </summary>
+		public static string Domain => domain;
 
 		/// <summary>
 		/// Tries to get a user with a given user name.
@@ -109,9 +115,24 @@ namespace Waher.Security.Users
 		/// <param name="Lock">If the registration should be locked.</param>
 		public static void Register(HashComputationMethod HashComputationMethod, string HashMethodTypeName, LoginAuditor LoginAuditor, bool Lock)
 		{
+			Register(HashComputationMethod, HashMethodTypeName, LoginAuditor, string.Empty, Lock);
+		}
+
+		/// <summary>
+		/// Registers a Hash Digest Computation Method.
+		/// </summary>
+		/// <param name="HashComputationMethod">Hash Digest Computation Method.</param>
+		/// <param name="HashMethodTypeName">Hash Digest Computation Method Type Name.</param>
+		/// <param name="LoginAuditor">Auditor of login attempts.</param>
+		/// <param name="Domain">Domain name</param>
+		/// <param name="Lock">If the registration should be locked.</param>
+		public static void Register(HashComputationMethod HashComputationMethod, string HashMethodTypeName, LoginAuditor LoginAuditor, 
+			string Domain, bool Lock)
+		{
 			if (hashMethodLocked)
 				throw new InvalidOperationException("Hash method already registered, and locked.");
 
+			domain = Domain;
 			loginAuditor = LoginAuditor;
 			hashMethod = HashComputationMethod;
 			hashMethodTypeName = HashMethodTypeName;

@@ -288,6 +288,30 @@
             Origin of request.
             </summary>
         </member>
+        <member name="M:Waher.Security.Users.User.CreateClaims(System.Boolean)">
+            <summary>
+            Creates a set of claims identifying the user.
+            </summary>
+            <param name="Encrypted">If communication is encrypted.</param>
+            <returns>Set of claims.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.User.AppendValue(System.Text.StringBuilder@,System.Object,System.String)">
+            <summary>
+            Appends a value to a <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="Output">Value will be appended here. If created, the <paramref name="Delimiter"/> will be appended first, otherwise
+            the <see cref="T:System.Text.StringBuilder"/> will be created first.</param>
+            <param name="Value">Value to append.</param>
+            <param name="Delimiter">Delimiter, in case other values have been appended first.</param>
+        </member>
+        <member name="M:Waher.Security.Users.User.CreateToken(Waher.Security.JWT.JwtFactory,System.Boolean)">
+            <summary>
+            Creates a JWT Token referencing the user object.
+            </summary>
+            <param name="Factory">JWT Factory.</param>
+            <param name="Encrypted">If communication is encrypted.</param>
+            <returns>Token, if able to create a token, null otherwise.</returns>
+        </member>
         <member name="T:Waher.Security.Users.UserMetaData">
             <summary>
             Contains a piece of meta-data information about a user.
@@ -331,6 +355,11 @@
             Any Login Auditor registered, if any.
             </summary>
         </member>
+        <member name="P:Waher.Security.Users.Users.Domain">
+            <summary>
+            Domain name, if provided.
+            </summary>
+        </member>
         <member name="M:Waher.Security.Users.Users.TryGetUser(System.String)">
             <summary>
             Tries to get a user with a given user name.
@@ -353,6 +382,16 @@
             <param name="HashComputationMethod">Hash Digest Computation Method.</param>
             <param name="HashMethodTypeName">Hash Digest Computation Method Type Name.</param>
             <param name="LoginAuditor">Auditor of login attempts.</param>
+            <param name="Lock">If the registration should be locked.</param>
+        </member>
+        <member name="M:Waher.Security.Users.Users.Register(Waher.Security.Users.HashComputationMethod,System.String,Waher.Security.LoginMonitor.LoginAuditor,System.String,System.Boolean)">
+            <summary>
+            Registers a Hash Digest Computation Method.
+            </summary>
+            <param name="HashComputationMethod">Hash Digest Computation Method.</param>
+            <param name="HashMethodTypeName">Hash Digest Computation Method Type Name.</param>
+            <param name="LoginAuditor">Auditor of login attempts.</param>
+            <param name="Domain">Domain name</param>
             <param name="Lock">If the registration should be locked.</param>
         </member>
         <member name="P:Waher.Security.Users.Users.HashMethodTypeName">

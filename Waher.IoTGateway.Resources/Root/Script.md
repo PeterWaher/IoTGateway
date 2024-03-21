@@ -2019,6 +2019,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `HtmlValueEncode(s)`                               | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
 | `LoadFile(FileName[,ContentType])`                 | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
 | `Post(Url,Data[,Accept/Headers,[Certificate]])`    | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
+| `PrettyJson(Obj)`                                  | JSON-encodes `Obj` as a pretty string, for display. | [Example][PrettyJsonExample] |
 | `Put(Url,Data[,Accept/Headers,[Certificate]])`     | Encodes data and PUTs it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PutExample] |
 | `QrEncode(Text,Level)`                             | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
 | `QrEncode(Text,Level[,Width[,Height]])`            | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
@@ -2050,6 +2051,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [HtmlValueEncodeExample]: Prompt.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
 [LoadFileExample]: Prompt.md?Expression=LoadFile(%22FileName%22)
 [PostExample]: Prompt.md?Expression=Post(%22URL%22,%22Data%22)
+[PrettyJsonExample]: Prompt.md?Expression=PrettyJson(Generalize(Obj))
 [PutExample]: Prompt.md?Expression=Put(%22URL%22,%22Data%22)
 [QrExample]: Prompt.md?Expression=QrEncode("Hello World","Q")
 [QrExample2]: Prompt.md?Expression=QrEncode("Hello World","Q",300)

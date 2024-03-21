@@ -273,7 +273,7 @@ namespace Waher.Networking.HTTP
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.expires = DTO;
 					else if (int.TryParse(Value, out int i))
-						this.date = DateTimeOffset.UtcNow.AddSeconds(i);
+						this.expires = DateTimeOffset.UtcNow.AddSeconds(i);
 					else
 					{
 						Log.Error("Value does not conform to RFC 822: " + Value, this.httpRequest.Resource.ResourceName,

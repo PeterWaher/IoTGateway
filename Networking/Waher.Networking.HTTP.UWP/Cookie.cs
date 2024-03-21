@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Waher.Content;
@@ -11,6 +12,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class Cookie
 	{
+		private Dictionary<string, string> otherProperties = null;
 		private DateTimeOffset? expires = null;
 		private readonly string name;
 		private readonly string value;
@@ -19,6 +21,14 @@ namespace Waher.Networking.HTTP
 		private readonly int? maxAgeSeconds = null;
 		private readonly bool secure = false;
 		private readonly bool httpOnly = false;
+
+		/// <summary>
+		/// Contains information about a cookie, as defined in RFC 6265.
+		/// https://tools.ietf.org/html/rfc6265
+		/// </summary>
+		private Cookie()
+		{
+		}
 
 		/// <summary>
 		/// Contains information about a cookie, as defined in RFC 6265.
@@ -105,6 +115,171 @@ namespace Waher.Networking.HTTP
 			this.httpOnly = HttpOnly;
 		}
 
+		/// <summary>
+		/// Any other properties registered on the cookie.
+		/// </summary>
+		public IEnumerable<KeyValuePair<string, string>> OtherProperties => (IEnumerable<KeyValuePair<string, string>>)this.otherProperties ?? new KeyValuePair<string, string>[0];
+
+		/// <summary>
+		/// Name of cookie
+		/// </summary>
+		public string Name => this.name;
+
+		/// <summary>
+		/// Value of cookie.
+		/// </summary>
+		public string Value => this.value;
+
+		/// <summary>
+		/// Domain of cookie.
+		/// </summary>
+		public string Domain => this.domain;
+
+		/// <summary>
+		/// Path of cookie.
+		/// </summary>
+		public string Path => this.path;
+
+		/// <summary>
+		/// When cookie expires.
+		/// </summary>
+		public DateTimeOffset? Expires => this.expires;
+
+		/// <summary>
+		/// Maximum age of cookie, in seconds.
+		/// </summary>
+		public int? MaxAgeSeconds => this.maxAgeSeconds;
+
+		/// <summary>
+		/// If cookie is secure.
+		/// </summary>
+		public bool Secure => this.secure;
+
+		/// <summary>
+		/// If cookie is for HTTP use only.
+		/// </summary>
+		public bool HttpOnly => this.httpOnly;
+
+		/// <summary>
+		/// Creates a Cookie object from a Set-Cookie header field value.
+		/// </summary>
+		/// <param name="SetCookieFieldValue">Set-Cookie header field value.</param>
+		/// <returns>Cookie object representation. If no cookie information available, null is returned.</returns>
+		public static Cookie FromSetCookie(string SetCookieFieldValue)
+		{
+			DateTimeOffset? Expires = null;
+			string Name = string.Empty;
+			string Value = string.Empty;
+			string Domain = null;
+			string Path = null;
+			string SameSite = null;
+			int? MaxAgeSeconds = null;
+			bool Secure = false;
+			bool HttpOnly = false;
+			bool Partitioned = false;
+			bool First = true;
+			int i;
+
+			foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(SetCookieFieldValue))
+			{
+				if (First)
+				{
+					Name = P.Key;
+					Value = P.Value;
+					First = false;
+				}
+				else
+				{
+					switch (P.Key.ToLower())
+					{
+						case "domain":
+							Domain = P.Value;
+							break;
+
+						case "expires":
+							if (CommonTypes.TryParseRfc822(P.Value, out DateTimeOffset DTO))
+								Expires = DTO;
+							else if (int.TryParse(P.Value, out i))
+								Expires = DateTimeOffset.UtcNow.AddSeconds(i);
+							break;
+
+						case "secure":
+							Secure = true;
+							break;
+
+						case "httponly":
+							HttpOnly = true;
+							break;
+
+						case "max-age":
+							if (int.TryParse(P.Value, out i))
+								MaxAgeSeconds = i;
+							break;
+
+						case "partitioned":
+							Partitioned = true;
+							break;
+
+						case "path":
+							Path = P.Value;
+							break;
+
+						case "samesite":
+							SameSite = P.Value;
+							break;
+					}
+				}
+			}
+
+			if (First)
+				return null;
+
+			Cookie Result;
+
+			if (MaxAgeSeconds.HasValue)
+				Result = new Cookie(Name, Value, Domain, Path, MaxAgeSeconds.Value, Secure, HttpOnly);
+			else
+				Result = new Cookie(Name, Value, Domain, Path, Expires, Secure, HttpOnly);
+
+			if (Partitioned)
+				Result.AddProperty("Partitioned", string.Empty);
+
+			if (!string.IsNullOrEmpty(SameSite))
+				Result.AddProperty("SameSite", SameSite);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Adds another property on the cookie.
+		/// </summary>
+		/// <param name="Name">Name of property.</param>
+		/// <param name="Value">Value of property.</param>
+		public void AddProperty(string Name, string Value)
+		{
+			if (this.otherProperties is null)
+				this.otherProperties = new Dictionary<string, string>();
+
+			this.otherProperties[Name] = Value;
+		}
+
+		/// <summary>
+		/// Tries to get another property value previously added using <see cref="AddProperty(string, string)"/>.
+		/// </summary>
+		/// <param name="Name">Name of property.</param>
+		/// <param name="Value">Value of property, if found, null otherwise..</param>
+		/// <returns>If the property was found.</returns>
+		public bool TryGetProperty(string Name, out string Value)
+		{
+			if (this.otherProperties is null)
+			{
+				Value = null;
+				return false;
+			}
+			else
+				return this.otherProperties.TryGetValue(Name, out Value);
+		}
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -144,7 +319,40 @@ namespace Waher.Networking.HTTP
 			if (this.httpOnly)
 				Output.Append("; HttpOnly");
 
+			if (!(this.otherProperties is null))
+			{
+				foreach (KeyValuePair<string, string> P in this.otherProperties)
+				{
+					Output.Append("; ");
+					Output.Append(P.Key);
+
+					if (!string.IsNullOrEmpty(P.Value))
+					{
+						Output.Append('=');
+						Output.Append(P.Value);
+					}
+				}
+			}
+
 			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Cookie"/> to a <see cref="System.Net.Cookie"/>
+		/// </summary>
+		/// <param name="Cookie">Cookie</param>
+		public static explicit operator System.Net.Cookie(Cookie Cookie)
+		{
+			return new System.Net.Cookie(Cookie.name, Cookie.value, Cookie.path, Cookie.domain);
+		}
+
+		/// <summary>
+		/// Converts a <see cref="System.Net.Cookie"/> to a <see cref="Cookie"/>
+		/// </summary>
+		/// <param name="Cookie">Cookie</param>
+		public static explicit operator Cookie(System.Net.Cookie Cookie)
+		{
+			return new Cookie(Cookie.Name, Cookie.Value, Cookie.Domain, Cookie.Path, Cookie.Expires, Cookie.Secure, Cookie.HttpOnly);
 		}
 	}
 }

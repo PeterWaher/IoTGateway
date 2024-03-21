@@ -35,9 +35,9 @@ namespace Waher.Networking.HTTP
 		public const string HttpSessionID = "HttpSessionID";
 
 		/// <summary>
-		/// The Cookie Key for HTTP Reverse Proxy Session Identifiers: "HttpProxySessionID"
+		/// Session variable name for the HttpSessionID cookie variable.
 		/// </summary>
-		public const string HttpProxySessionID = "HttpProxySessionID";
+		internal const string SpacePrefixedHttpSessionID = " " + HttpSessionID;
 
 		private readonly List<HttpServer> servers = new List<HttpServer>();
 		private readonly string[] allowedMethods;

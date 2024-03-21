@@ -278,40 +278,34 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
+				Variables Session = Request.Session;
+
 				if (this.useSession)
 				{
 					HttpFieldCookie Cookie = Request.Header.Cookie;
-					Variables Session = Request.Session;
-					string HttpProxySessionID;
 					string HttpSessionID;
 
 					if (Session is null)
 					{
-						if (Cookie is null || string.IsNullOrEmpty(HttpProxySessionID = Cookie[HttpResource.HttpProxySessionID]))
+						if (Cookie is null || string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
 						{
-							HttpProxySessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-							Response.SetCookie(new Cookie(HttpResource.HttpProxySessionID, HttpProxySessionID, null, "/", null, false, true));
+							HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+							Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
 						}
 
-						Request.Session = Session = Server.GetSession(HttpProxySessionID);
-
-						HttpSessionID = Cookie[HttpResource.HttpSessionID];
-						if (!string.IsNullOrEmpty(HttpSessionID))
-							Session.ContextVariables = Server.GetSession(HttpSessionID);
+						Request.Session = Session = Server.GetSession(HttpSessionID);
 					}
 					else if (Request.tempSession)
 					{
-						HttpProxySessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-						Response.SetCookie(new Cookie(HttpResource.HttpProxySessionID, HttpProxySessionID, null, "/", null, false, true));
+						HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+						Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
 
-						Session = Server.SetSession(HttpProxySessionID, Request.Session);
+						Session = Server.SetSession(HttpSessionID, Request.Session);
 						Request.tempSession = false;
-
-						HttpSessionID = Cookie[HttpResource.HttpSessionID];
-						if (!string.IsNullOrEmpty(HttpSessionID))
-							Session.ContextVariables = Server.GetSession(HttpSessionID);
 					}
 				}
+				else
+					Session = null;
 
 				StringBuilder sb = new StringBuilder();
 
@@ -390,48 +384,19 @@ namespace Waher.Networking.HTTP
 									break;
 
 								case "Cookie":
-									string Name = null;
-									string Value = null;
-									string Path = null;
-									string Domain = null;
-									bool First = true;
-
 									foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Field.Value))
 									{
-										if (First)
+										if (this.useSession && P.Key == HttpResource.HttpSessionID && !(Session is null))
 										{
-											Name = P.Key;
-											Value = P.Value;
-											First = false;
-										}
-										else
-										{
-											switch (P.Key.ToLower())
+											if (Session.TryGetVariable(HttpResource.SpacePrefixedHttpSessionID, out Variable v) &&
+												v.ValueObject is Cookie ProxyCookie)
 											{
-												case "path":
-													Path = P.Value;
-													break;
-
-												case "domain":
-													Domain = P.Value;
-													break;
+												Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(ProxyCookie.Name, ProxyCookie.Value));
 											}
 										}
+										else
+											Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(P.Key, P.Value));
 									}
-
-									if (First)
-										break;
-
-									System.Net.Cookie Cookie;
-
-									if (!string.IsNullOrEmpty(Domain))
-										Cookie = new System.Net.Cookie(Name, Value, Path ?? string.Empty, Domain);
-									else if (!string.IsNullOrEmpty(Path))
-										Cookie = new System.Net.Cookie(Name, Value, Path);
-									else
-										Cookie = new System.Net.Cookie(Name, Value);
-
-									Handler.CookieContainer.Add(ProxyRequest.RequestUri, Cookie);
 									break;
 
 								case "Content-Encoding":
@@ -528,7 +493,35 @@ namespace Waher.Networking.HTTP
 							switch (Header.Key)
 							{
 								case "Transfer-Encoding":
-								case "X-Content-Type-Options:":
+								case "X-Content-Type-Options":
+									break;
+
+								case "Set-Cookie":
+									if (!(Session is null))
+									{
+										foreach (string Value in Header.Value)
+										{
+											Cookie Cookie = Cookie.FromSetCookie(Value);
+											if (Cookie is null)
+												continue;
+
+											if (Cookie.Name == HttpResource.HttpSessionID)
+												Session[HttpResource.SpacePrefixedHttpSessionID] = Cookie;
+											else
+												Response.SetCookie(Cookie);
+										}
+									}
+									else
+									{
+										foreach (string Value in Header.Value)
+										{
+											Cookie Cookie = Cookie.FromSetCookie(Value);
+											if (Cookie is null)
+												continue;
+											
+											Response.SetCookie(Cookie);
+										}
+									}
 									break;
 
 								default:

@@ -502,6 +502,13 @@ namespace Waher.Content
 							sb.Clear();
 							State = 2;
 						}
+						else if (ch == ',' || ch == ';')
+						{
+							Key = sb.ToString().TrimEnd();
+							Result.Add(new KeyValuePair<string, string>(Key, string.Empty));
+							sb.Clear();
+							State = 0;
+						}
 						else
 							sb.Append(ch);
 						break;

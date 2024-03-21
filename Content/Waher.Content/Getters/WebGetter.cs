@@ -246,48 +246,8 @@ namespace Waher.Content.Getters
 							break;
 
 						case "Cookie":
-							string Name = null;
-							string Value = null;
-							string Path = null;
-							string Domain = null;
-							bool First = true;
-
 							foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Header.Value))
-							{
-								if (First)
-								{
-									Name = P.Key;
-									Value = P.Value;
-									First = false;
-								}
-								else
-								{
-									switch (P.Key.ToLower())
-									{
-										case "path":
-											Path = P.Value;
-											break;
-
-										case "domain":
-											Domain = P.Value;
-											break;
-									}
-								}
-							}
-
-							if (First)
-								break;
-
-							Cookie Cookie;
-
-							if (!string.IsNullOrEmpty(Domain))
-								Cookie = new Cookie(Name, Value, Path ?? string.Empty, Domain);
-							else if (!string.IsNullOrEmpty(Path))
-								Cookie = new Cookie(Name, Value, Path);
-							else
-								Cookie = new Cookie(Name, Value);
-
-							Handler.CookieContainer.Add(Request.RequestUri, Cookie);
+								Handler.CookieContainer.Add(Request.RequestUri, new Cookie(P.Key, P.Value));
 							break;
 
 						default:

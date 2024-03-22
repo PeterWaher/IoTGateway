@@ -25,7 +25,7 @@ namespace Waher.Content.Json.ValueTypes
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
 			DateTime TP = ((DateTimeOffset)Object).ToUniversalTime().DateTime;
-			int Seconds = (int)(TP - JSON.UnixEpoch).TotalSeconds;
+			long Seconds = (long)(TP - JSON.UnixEpoch).TotalSeconds;
 
 			Json.Append(Seconds.ToString());
 		}

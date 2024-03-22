@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Script;
 using Waher.Security.JWS;
 
 namespace Waher.Security.JWT
@@ -110,18 +111,15 @@ namespace Waher.Security.JWT
 								break;
 
 							case JwtClaims.ExpirationTime:
-								if (P.Value is int ExpInt)
-									this.expiration = JSON.UnixEpoch.AddSeconds(ExpInt);
+								this.expiration = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
 								break;
 
 							case JwtClaims.NotBeforeTime:
-								if (P.Value is int NbfInt)
-									this.notBefore = JSON.UnixEpoch.AddSeconds(NbfInt);
+								this.notBefore = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
 								break;
 
 							case JwtClaims.IssueTime:
-								if (P.Value is int IatInt)
-									this.issuedAt = JSON.UnixEpoch.AddSeconds(IatInt);
+								this.issuedAt = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
 								break;
 
 							case "expires":

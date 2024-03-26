@@ -132,5 +132,22 @@ namespace Waher.Things.Xmpp
 			return Result;
 		}
 
+		/// <summary>
+		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
+		/// </summary>
+		public override async Task DestroyAsync()
+		{
+			await base.DestroyAsync();
+
+			if (this.Parent is XmppBrokerNode BrokerNode)
+			{
+				XmppBroker Broker = await BrokerNode.GetBroker();
+				XmppClient Client = Broker.Client;
+				RosterItem Item = Client[this.BareJID];
+
+				if (!(Item is null))
+					Client.RemoveRosterItem(this.BareJID);
+			}
+		}
 	}
 }

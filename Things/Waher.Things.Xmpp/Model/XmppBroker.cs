@@ -77,7 +77,7 @@ namespace Waher.Things.Xmpp.Model
 
 			foreach (INode Node in await this.node.ChildNodes)
 			{
-				if (Node is XmppExtensionNode Extension && 
+				if (Node is XmppExtensionNode Extension &&
 					!Extension.IsRegisteredExtension(this.xmppClient))
 				{
 					await Extension.RegisterExtension(this.xmppClient);
@@ -154,13 +154,15 @@ namespace Waher.Things.Xmpp.Model
 				return;
 			}
 
-			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, false);
 
 			if (string.IsNullOrEmpty(this.node.AutoAcceptPattern))
 			{
 				e.Decline();
-				
-				await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+
+				if (!(RosterItem is null))
+					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+
 				return;
 			}
 
@@ -172,19 +174,27 @@ namespace Waher.Things.Xmpp.Model
 				if (M.Success && M.Index == 0 && M.Length == e.FromBareJID.Length)
 				{
 					e.Accept();
+
+					if (RosterItem is null)
+						RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+
 					await RosterItem.LogInformationAsync("Presence subscription received and accepted.");
 				}
 				else
 				{
 					e.Decline();
-					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+
+					if (!(RosterItem is null))
+						await RosterItem.LogInformationAsync("Presence subscription received and declined.");
 				}
 			}
 			catch (Exception ex)
 			{
 				e.Decline();
 
-				await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+				if (!(RosterItem is null))
+					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+
 				await this.node.LogErrorAsync("Unable to parse regular expression: " + ex.Message);
 			}
 		}
@@ -205,9 +215,13 @@ namespace Waher.Things.Xmpp.Model
 			if (this.node is null)
 				return;
 
-			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, false);
 
-			await RosterItem.LogInformationAsync("Presence unsubscribed by " + e.FromBareJID);
+			if (!(RosterItem is null))
+			{
+				await RosterItem.LogInformationAsync("Presence unsubscribed by " + e.FromBareJID);
+				await RosterItem.DestroyAsync();
+			}
 		}
 
 		private async Task XmppClient_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
@@ -215,9 +229,13 @@ namespace Waher.Things.Xmpp.Model
 			if (this.node is null)
 				return;
 
-			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, false);
 
-			await RosterItem.LogInformationAsync("Unsubscribed from " + e.FromBareJID);
+			if (!(RosterItem is null))
+			{
+				await RosterItem.LogInformationAsync("Unsubscribed from " + e.FromBareJID);
+				await RosterItem.DestroyAsync();
+			}
 		}
 
 		private Task XmppClient_OnPresence(object Sender, PresenceEventArgs e)
@@ -231,9 +249,9 @@ namespace Waher.Things.Xmpp.Model
 				return;
 
 			RosterItemNode Node = await this.node.GetRosterItem(Item.BareJid, true);
-			bool Changed = 
+			bool Changed =
 				Node.SubscriptionState != Item.State ||
-				Node.ContactName != Item.Name || 
+				Node.ContactName != Item.Name ||
 				Node.PendingSubscription != Item.PendingSubscription ||
 				!AreSame(Node.Groups, Item.Groups);
 

@@ -991,6 +991,8 @@ input[type="radio"] + label:before
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
     box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
 }
 
 input[type="radio"] + label:before:focus
@@ -1005,6 +1007,11 @@ input[type="radio"]:checked + label:before
     color: ¤ButtonColor¤;
     text-align: center;
     line-height: 0.75em;
+}
+
+input[type="range"]
+{
+	box-shadow:none;
 }
 
 .clickable 

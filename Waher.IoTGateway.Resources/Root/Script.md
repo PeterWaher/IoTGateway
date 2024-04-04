@@ -1822,32 +1822,32 @@ wildcard characters. You can also use regular expressions by encapsulating it be
 `/` characters, such as `/regex/`. You can search for sequences of keywords by 
 encapsulating them between apostrophes `'` or quotes `"`.
 
-| Summary                                                                         |||
-| Syntax             | Example                | Discription                         |
-|:-------------------|:-----------------------|:------------------------------------|
-| `keyword`          | `kilroy`               | Letters or digits, case-insensitive |
-| `+`                | `+kilroy`              | Required keyword                    |
-| `-`                | `-kilroy`              | Prohibited keyword                  |
-| `*`, `%`, `¤`, `#` | `kil*`, `%roy`, `k¤r#` | Wildcards                           |
-| `/regex/`          | `/(kil|fitz)roy/`      | Regular expression                  |
-| `'`, `"`           | `"kilroy was here"`    | Sequence of keywords                |
+| Summary                                                                                    |||
+| Syntax             | Example                           | Discription                         |
+|:-------------------|:----------------------------------|:------------------------------------|
+| `keyword`          | `kilroy`                          | Letters or digits, case-insensitive |
+| `+`                | `+kilroy`                         | Required keyword                    |
+| `-`                | `-kilroy`                         | Prohibited keyword                  |
+| `*`, `%`, `¤`, `#` | `kil*`, `%roy`, `k¤r#`            | Wildcards                           |
+| `/regex/`          | <code>/(kil&#124;fitz)roy/</code> | Regular expression                  |
+| `'`, `"`           | `"kilroy was here"`               | Sequence of keywords                |
 
 The syntax can be nested, so you can combine the different constructs.
 
-| Composite Examples                |
-|:----------------------------------|
-| `Kilroy was here.`                |
-| `+Kilroy was here.`               |
-| `+Kilroy was -not here.`          |
-| `+*roy was -not here.`            |
-| `+Kil* was -not here.`            |
-| `+K*y was -not here.`             |
-| `+/(Kil|Fitz)roy/ was -not here.` |
-| `+/Kil(roy|ling)/ was -not here.` |
-| `+/K.+y/ was -not here.`          |
-| `+'Kilroy was here'`              |
-| `'Kilroy was' here`               |
-| `Kilroy 'was here'`               |
+| Composite Examples                                ||
+|:--------------------------------------------------||
+| `Kilroy was here.`                                ||
+| `+Kilroy was here.`                               ||
+| `+Kilroy was -not here.`                          ||
+| `+*roy was -not here.`                            ||
+| `+Kil* was -not here.`                            ||
+| `+K*y was -not here.`                             ||
+| <code>+/(Kil&#124;Fitz)roy/ was -not here.</code> ||
+| <code>+/Kil(roy&#124;ling)/ was -not here.</code> ||
+| `+/K.+y/ was -not here.`                          ||
+| `+'Kilroy was here'`                              ||
+| `'Kilroy was' here`                               ||
+| `Kilroy 'was here'`                               ||
 
 **Note**: The words `was` and `here` are used as examples only, to highlight syntax. 
 They are typically considered *stop words*, and thus ignored in a real search.

@@ -519,7 +519,8 @@ namespace Waher.IoTGateway.WebResources
 				LocalFileName = LocalFileName,
 				FullFileName = FullFileName,
 				IsKey = IsKey,
-				Thread = Thread
+				Thread = Thread,
+				Rescheduled = false
 			});
 		}
 
@@ -528,6 +529,7 @@ namespace Waher.IoTGateway.WebResources
 			public string LocalFileName;
 			public string FullFileName;
 			public bool IsKey;
+			public bool Rescheduled;
 			public Dictionary<string, bool> Recipients = null;
 			public ProfilerThread Thread;
 		}
@@ -536,12 +538,17 @@ namespace Waher.IoTGateway.WebResources
 		{
 			BackupInfo BackupInfo = (BackupInfo)State;
 			bool Reschedule = false;
+			string Msg;
 
 			try
 			{
 				if (!File.Exists(BackupInfo.FullFileName))
 				{
-					Log.Warning("Backup file has been removed. Upload cancelled.", BackupInfo.LocalFileName);
+					Log.Warning(Msg = "Backup file has been removed. Upload cancelled.", BackupInfo.LocalFileName);
+
+					if (BackupInfo.Rescheduled)
+						await Gateway.SendNotification(Msg);
+
 					return;
 				}
 				else if (Gateway.XmppClient.State != XmppState.Connected)
@@ -664,7 +671,14 @@ namespace Waher.IoTGateway.WebResources
 				if (Reschedule)
 				{
 					BackupInfo.Thread?.NewState("Reschedule");
-					Gateway.ScheduleEvent(UploadBackupFile, DateTime.Now.AddMinutes(15), State);
+					BackupInfo.Rescheduled = true;
+
+					Gateway.ScheduleEvent(UploadBackupFile, DateTime.Now.AddMinutes(15), BackupInfo);
+				}
+				else if (BackupInfo.Rescheduled)
+				{
+					await Gateway.SendNotification("Backup file has been successfully been uploaded. The initial attempt to upload the backup file failed, but a sequent rescheduled upload succeeded.");
+					BackupInfo.Rescheduled = false;
 				}
 
 				BackupInfo.Thread = null;

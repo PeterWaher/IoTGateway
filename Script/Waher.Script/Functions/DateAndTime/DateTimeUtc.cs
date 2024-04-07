@@ -107,9 +107,9 @@ namespace Waher.Script.Functions.DateAndTime
 				else if (Obj is System.DateTimeOffset TPO)
 					return new DateTimeValue(TPO.ToUniversalTime().DateTime);
 				else if (Obj is long L)
-					return new DateTimeValue(new System.DateTime(L, DateTimeKind.Utc));
+					return new DateTimeValue(DateTime.FromInteger(L, DateTimeKind.Utc));
 				else if (Obj is double Dbl)
-					return new DateTimeValue(new System.DateTime((long)Dbl, DateTimeKind.Utc));
+					return new DateTimeValue(DateTime.FromInteger((long)Dbl, DateTimeKind.Utc));
 				else
 				{
 					string s = Obj?.ToString() ?? string.Empty;

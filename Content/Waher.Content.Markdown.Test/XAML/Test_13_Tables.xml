@@ -267,4 +267,27 @@
 			</StackPanel>
 		</Border>
 	</Grid>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">One-column table</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row 1</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row 2</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row 3</TextBlock>
+		</Border>
+	</Grid>
 </StackPanel>

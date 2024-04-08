@@ -295,6 +295,29 @@
 				</Cell>
 			</Row>
 		</Table>
+		<Table caption="" id="" columns="1">
+			<Column alignment="Left" />
+			<HeaderRow>
+				<HeaderCell>
+					<InlineText>One-column table</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<Row>
+				<Cell>
+					<InlineText>Row 1</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<InlineText>Row 2</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell>
+					<InlineText>Row 3</InlineText>
+				</Cell>
+			</Row>
+		</Table>
 	</elements>
 	<references />
 </parsedMakdown>

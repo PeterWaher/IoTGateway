@@ -22,6 +22,12 @@
 | e[1,1]  | e[1,2]  |
 | e[2,1]  | e[2,2]  |
 
+| One\-column table  |
+|:-----------------|
+| Row 1              |
+| Row 2              |
+| Row 3              |
+
 
 
 [^e11]:	| Info about cell   ||

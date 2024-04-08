@@ -16,6 +16,11 @@ Table with complex cells
 e₁,₁	e₁,₂
 e₂,₁	e₂,₂
 
+One-column table
+Row 1
+Row 2
+Row 3
+
 --------------------------------------------------------------------------------
 
 [e11] Info about cell

@@ -305,7 +305,7 @@ namespace Waher.Content.Markdown.Model
 					if (IsUnderline && HasUnderlineChars && UnderlineRow < 0 )
 						UnderlineRow = i;
 
-					if (j == 0)
+					if (j == 0 && !LeftPipe && !RightPipe)
 						return false;
 					else if (i == this.start)
 						Columns = j + 1;

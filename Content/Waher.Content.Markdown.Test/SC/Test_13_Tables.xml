@@ -234,3 +234,25 @@
 		</cell>
 	</row>
 </table>
+<table>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>One-column table</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Row 1</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Row 2</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Row 3</text>
+		</cell>
+	</row>
+</table>

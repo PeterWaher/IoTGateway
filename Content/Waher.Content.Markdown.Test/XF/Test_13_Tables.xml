@@ -379,4 +379,37 @@
 			</Frame>
 		</Grid>
 	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="-2" ColumnSpacing="-2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="0">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html" FontAttributes="Bold"><![CDATA[One-column table]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Row 1]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Row 2]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="3">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Row 3]]></Label>
+				</ContentView>
+			</Frame>
+		</Grid>
+	</ContentView>
 </StackLayout>

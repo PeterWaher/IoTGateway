@@ -42,7 +42,7 @@ namespace Waher.Content.Markdown.Web
 		/// <returns>Conversion result.</returns>
 		protected override Task<string> DoConversion(MarkdownDocument Doc)
 		{
-			return Doc.GenerateLaTeX();
+			return Doc.GenerateJavaScript();
 		}
 
 	}

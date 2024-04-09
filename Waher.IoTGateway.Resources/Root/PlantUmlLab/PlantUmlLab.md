@@ -3,8 +3,8 @@ Description: This page allows the user to work with PlantUML, and view the visua
 Author: Peter Waher
 Date: 2021-03-31
 Master: /Master.md
-Javascript: PlantUmlLab.js
-Javascript: /Events.js
+JavaScript: PlantUmlLab.js
+JavaScript: /Events.js
 CSS: PlantUmlLab.css
 UserVariable: User
 Privilege: Admin.Lab.PlantUml

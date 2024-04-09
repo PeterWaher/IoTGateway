@@ -4,8 +4,8 @@ Date: 2020-05-26
 Author: Peter Waher
 Copyright: /Copyright.md
 Master: /Master.md
-Javascript: RemoteEndpoint.js
-Javascript: /Events.js
+JavaScript: RemoteEndpoint.js
+JavaScript: /Events.js
 UserVariable: User
 Login: /Login.md
 Privilege: Admin.Communication.Endpoints

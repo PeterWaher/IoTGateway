@@ -2144,7 +2144,7 @@ namespace Waher.Persistence.MongoDB
 		//	* Created field
 		//	* Updated field
 		//	* RegEx fields
-		//	* Javascript fields
+		//	* JavaScript fields
 		//	* Binary fields (BLOBS)
 		//	* Image fields
 		//	* Collection indices.

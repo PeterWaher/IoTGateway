@@ -63,6 +63,33 @@
             HTML settings for automatically converted content.
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToJavaScriptConverter">
+            <summary>
+            Converts Markdown documents to JavaScript documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToJavaScriptConverter.#ctor">
+            <summary>
+            Converts Markdown documents to JavaScript documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToJavaScriptConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToJavaScriptConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToJavaScriptConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Web.MarkdownToLatexConverter">
             <summary>
             Converts Markdown documents to LaTeX documents.

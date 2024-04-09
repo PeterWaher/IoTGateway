@@ -1,4 +1,4 @@
-﻿using Waher.Content.Html.Javascript;
+﻿using Waher.Content.Html.JavaScript;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -7,18 +7,18 @@ using Waher.Script.Objects;
 namespace Waher.Content.Markdown.Functions
 {
 	/// <summary>
-	/// Encapsulates javascript content.
+	/// Encapsulates JavaScript content.
 	/// </summary>
-	public class JavascriptContent : FunctionOneScalarStringVariable
+	public class JavaScriptContent : FunctionOneScalarStringVariable
 	{
 		/// <summary>
-		/// Encapsulates javascript content.
+		/// Encapsulates JavaScript content.
 		/// </summary>
 		/// <param name="Argument">Argument.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public JavascriptContent(ScriptNode Argument, int Start, int Length, Expression Expression)
+		public JavaScriptContent(ScriptNode Argument, int Start, int Length, Expression Expression)
 			: base(Argument, Start, Length, Expression)
 		{
 		}
@@ -26,12 +26,12 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(JavascriptContent);
+		public override string FunctionName => nameof(JavaScriptContent);
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "Javascript" };
+		public override string[] DefaultArgumentNames => new string[] { "JavaScript" };
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -41,7 +41,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
-			return new ObjectValue(new JavascriptDocument(Argument));
+			return new ObjectValue(new JavaScriptDocument(Argument));
 		}
 	}
 }

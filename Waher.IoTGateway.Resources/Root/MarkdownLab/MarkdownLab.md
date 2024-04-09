@@ -3,8 +3,8 @@ Description: This page allows the user to work with Markdown, and view the visua
 Author: Peter Waher
 Date: 2021-05-29
 Master: /Master.md
-Javascript: MarkdownLab.js
-Javascript: /Events.js
+JavaScript: MarkdownLab.js
+JavaScript: /Events.js
 CSS: MarkdownLab.css
 UserVariable: User
 Privilege: Admin.Lab.Markdown

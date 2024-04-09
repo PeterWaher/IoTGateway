@@ -18,7 +18,7 @@ namespace Waher.Content.Markdown.Test
 			return DoTest(MarkdownFileName, JavaScriptFileName, true);
 		}
 
-		private static async Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavascript)
+		private static async Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavaScript)
 		{
 			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
 			string ExpectedJavaScript = await Resources.ReadAllTextAsync("JavaScript/" + JavaScriptFileName);
@@ -42,7 +42,7 @@ namespace Waher.Content.Markdown.Test
 
 			MarkdownHtmlTests.AssertEqual(ExpectedJavaScript, GeneratedJavaScript, "Generated JavaScript does not match expected JavaScript.");
 
-			if (ExecuteJavascript)
+			if (ExecuteJavaScript)
 			{
 				// Ref: https://github.com/cbaxter/JSTest.NET/wiki
 
@@ -70,11 +70,11 @@ namespace Waher.Content.Markdown.Test
 
 				int i = ExpectedHtml.IndexOf("<body>");
 				if (i > 0)
-					ExpectedHtml = ExpectedHtml.Substring(i + 6).TrimStart();
+					ExpectedHtml = ExpectedHtml[(i + 6)..].TrimStart();
 
 				i = ExpectedHtml.IndexOf("</body>");
 				if (i > 0)
-					ExpectedHtml = ExpectedHtml.Substring(0, i);
+					ExpectedHtml = ExpectedHtml[..i];
 
 				MarkdownHtmlTests.AssertEqual(ExpectedHtml, GeneratedHtml, "Generated HTML does not match expected HTML.");
 			}

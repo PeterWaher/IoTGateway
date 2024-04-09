@@ -3,8 +3,8 @@ Description: This page allows the user to work with GraphViz, and view the visua
 Author: Peter Waher
 Date: 2021-03-31
 Master: /Master.md
-Javascript: GraphVizLab.js
-Javascript: /Events.js
+JavaScript: GraphVizLab.js
+JavaScript: /Events.js
 CSS: GraphVizLab.css
 UserVariable: User
 Privilege: Admin.Lab.GraphViz

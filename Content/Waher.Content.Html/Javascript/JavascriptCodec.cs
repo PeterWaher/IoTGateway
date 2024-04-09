@@ -4,24 +4,24 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Html.Javascript
+namespace Waher.Content.Html.JavaScript
 {
 	/// <summary>
-	/// Javascript encoder/decoder.
+	/// JavaScript encoder/decoder.
 	/// </summary>
-	public class JavascriptCodec : IContentDecoder, IContentEncoder
+	public class JavaScriptCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Javascript encoder/decoder.
+		/// JavaScript encoder/decoder.
 		/// </summary>
-		public JavascriptCodec()
+		public JavaScriptCodec()
 		{
 		}
 
 		/// <summary>
-		/// Javascript content types.
+		/// JavaScript content types.
 		/// </summary>
-		public static readonly string[] JavascriptContentTypes = new string[]
+		public static readonly string[] JavaScriptContentTypes = new string[]
 		{
 			"application/javascript"
 		};
@@ -29,7 +29,7 @@ namespace Waher.Content.Html.Javascript
 		/// <summary>
 		/// Plain text file extensions.
 		/// </summary>
-		public static readonly string[] JavascriptFileExtensions = new string[]
+		public static readonly string[] JavaScriptFileExtensions = new string[]
 		{
 			"js"
 		};
@@ -37,12 +37,12 @@ namespace Waher.Content.Html.Javascript
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => JavascriptContentTypes;
+		public string[] ContentTypes => JavaScriptContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions => JavascriptFileExtensions;
+		public string[] FileExtensions => JavaScriptFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -52,7 +52,7 @@ namespace Waher.Content.Html.Javascript
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf(JavascriptContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(JavaScriptContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Barely;
 				return true;
@@ -76,8 +76,8 @@ namespace Waher.Content.Html.Javascript
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string Javascript = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(new JavascriptDocument(Javascript));
+			string JavaScript = CommonTypes.GetString(Data, Encoding);
+			return Task.FromResult<object>(new JavaScriptDocument(JavaScript));
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Waher.Content.Html.Javascript
 			switch (FileExtension.ToLower())
 			{
 				case "js":
-					ContentType = JavascriptContentTypes[0];
+					ContentType = JavaScriptContentTypes[0];
 					return true;
 
 				default:
@@ -111,7 +111,7 @@ namespace Waher.Content.Html.Javascript
 			switch (ContentType.ToLower())
 			{
 				case "application/javascript":
-					FileExtension = JavascriptFileExtensions[0];
+					FileExtension = JavaScriptFileExtensions[0];
 					return true;
 
 				default:
@@ -129,9 +129,9 @@ namespace Waher.Content.Html.Javascript
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is JavascriptDocument)
+			if (Object is JavaScriptDocument)
 			{
-				if (InternetContent.IsAccepted(JavascriptContentTypes, AcceptedContentTypes))
+				if (InternetContent.IsAccepted(JavaScriptContentTypes, AcceptedContentTypes))
 				{
 					Grade = Grade.Barely;
 					return true;
@@ -152,13 +152,13 @@ namespace Waher.Content.Html.Javascript
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (!InternetContent.IsAccepted(JavascriptContentTypes, out string ContentType, AcceptedContentTypes))
+			if (!InternetContent.IsAccepted(JavaScriptContentTypes, out string ContentType, AcceptedContentTypes))
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 
 			string s;
 
-			if (Object is JavascriptDocument JavascriptDoc)
-				s = JavascriptDoc.Javascript;
+			if (Object is JavaScriptDocument JavaScriptDoc)
+				s = JavaScriptDoc.JavaScript;
 			else
 				s = Object.ToString();
 

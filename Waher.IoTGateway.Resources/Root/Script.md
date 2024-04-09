@@ -3,7 +3,7 @@ Description: Script syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-26
 Author: Peter Waher
 Master: /Master.md
-Javascript: /Events.js
+JavaScript: /Events.js
 
 Script syntax reference
 =============================
@@ -2172,7 +2172,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `CssContent(s)`                    | Encodes a string as a CSS Content object for encoding, as results of web service calls. | [Example][CssContentExample] |
 | `FromMarkdown(Markdown)`           | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
 | `InitScriptFile(FileName)`         | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
-| `JavascriptContent(s)`             | Encodes a string as a Javascript Content object for encoding, as results of web service calls. | [Example][JavascriptContentExample] |
+| `JavaScriptContent(s)`             | Encodes a string as a JavaScript Content object for encoding, as results of web service calls. | [Example][JavaScriptContentExample] |
 | `LoadMarkdown(FileName[,Headers])` | Loads a markdown file and preprocesses it before returning it as a string. By default, Markdown headers are removed. If you wish Markdown headers to be included, set `Headers` to `true`. | [Example][LoadMarkdownExample] |
 | `MarkdownContent(s)`               | Encodes a string as a Markdown Content object for encoding, as results of web service calls. | [Example][MarkdownContentExample] |
 | `MarkdownEncode(s)`                | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
@@ -2193,7 +2193,7 @@ The following context-specific constants (read-only variables) are available in 
 | `EndPosition`   | The ending position of the script in the markdown document.           |
 
 [CssContentExample]: Prompt.md?Expression=CssContent(%22CSS content%22)
-[JavascriptContentExample]: Prompt.md?Expression=JavascriptContent(%22javascript content%22)
+[JavaScriptContentExample]: Prompt.md?Expression=JavaScriptContent(%22javascript content%22)
 [LoadMarkdownExample]: Prompt.md?Expression=LoadMarkdown(%22File.md%22)
 [MarkdownContentExample]: Prompt.md?Expression=MarkdownContent(%22*markdown content*%22)
 [MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_markdown%22)
@@ -2368,7 +2368,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `GetTabIDs(User)`                                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
 | `GetTabInformation(TabID)`                            | Gets information about a tab, the URI used, query parameters, session ID and session variables. If tab is not found, `null` is returned. |
 | `IncCounter(CounterName[,Amount])`                    | Increments a counter, given its name, and returns the incremented count. |
-| `PushEvent(..., Event, Data)`                         | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function), or a reference to a Tab ID. Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
+| `PushEvent(..., Event, Data)`                         | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function), or a reference to a Tab ID. Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a JavaScript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
 | `ReadSensorData(Sensor[,Types[,Fields[,From[,To]]]])` | Reads a sensor defined on the gateway. Authorization to read the sensor depends on the execution context. The response is an object of the type `{"Error":boolean,"Ok":boolean,"Fields":Dictionary<string,Field>,"Errors":ThingError} |
 | `ReloadPage(...)`                                     | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
 | `RemoveScriptResource(Resource)`                      | Removes a script resource added using the `ScriptResource` function. The function returns a Boolean value showing if such a resource was found and removed. |

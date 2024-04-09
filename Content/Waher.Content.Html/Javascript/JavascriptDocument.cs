@@ -1,24 +1,24 @@
-﻿namespace Waher.Content.Html.Javascript
+﻿namespace Waher.Content.Html.JavaScript
 {
 	/// <summary>
-	/// Encapsulates a Javascript Document
+	/// Encapsulates a JavaScript Document
 	/// </summary>
-	public class JavascriptDocument
+	public class JavaScriptDocument
 	{
-		private readonly string javascript;
+		private readonly string javaScript;
 
 		/// <summary>
-		/// Encapsulates a Javascript Document
+		/// Encapsulates a JavaScript Document
 		/// </summary>
-		/// <param name="Javascript">Javascript Text</param>
-		public JavascriptDocument(string Javascript)
+		/// <param name="JavaScript">JavaScript Text</param>
+		public JavaScriptDocument(string JavaScript)
 		{
-			this.javascript = Javascript;
+			this.javaScript = JavaScript;
 		}
 
 		/// <summary>
-		/// Javascript Text
+		/// JavaScript Text
 		/// </summary>
-		public string Javascript => this.javascript;
+		public string JavaScript => this.javaScript;
 	}
 }

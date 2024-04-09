@@ -3,7 +3,7 @@ Description: Markdown syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-11
 Author: Peter Waher
 Master: /Master.md
-Javascript: /Events.js
+JavaScript: /Events.js
 
 Markdown syntax reference
 =============================

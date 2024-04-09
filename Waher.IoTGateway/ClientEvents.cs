@@ -19,7 +19,7 @@ namespace Waher.IoTGateway
 {
 	/// <summary>
 	/// The ClientEvents class allows applications to push information asynchronously to web clients connected to the server.
-	/// It keeps track of all open web clients that have the Events.js Javascript file loaded. When Events.js is loaded, it
+	/// It keeps track of all open web clients that have the Events.js JavaScript file loaded. When Events.js is loaded, it
 	/// creates a unique Tab ID which it reports back to the ClientEvents resource. There, it is paired with the current resource
 	/// being displayed, including any query parameters. Any application can then use ClientEvents to push information, either
 	/// text strings or JSON objects, to any JavaScript function currently loaded by the client. Subsets of connected web clients
@@ -42,7 +42,7 @@ namespace Waher.IoTGateway
 	/// 
 	/// PushEvent() allows you to push information to a set of clients, identified by their Tab IDs. Events.js performs constant long-polling
 	/// of the server, to retrieve any events it might push to the client. Events include a Type and a Data element. The Type is translated into
-	/// a Javascript function name. Data is passed to the function, as a parameter. The Data parameter can be either a string, or a JSON object.
+	/// a JavaScript function name. Data is passed to the function, as a parameter. The Data parameter can be either a string, or a JSON object.
 	/// You can use the static JSON class available in the Waher.Content library to encode and decode JSON.
 	/// 
 	/// ReportAsynchronousResult() allows you to report asynchronously evaluated results back to clients.

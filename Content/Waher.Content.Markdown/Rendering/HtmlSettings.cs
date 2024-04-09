@@ -25,10 +25,10 @@
             set => this.hashtagClass = value;
         }
 
-        /// <summary>
-        /// Javascript to execute when hashtag mark element is clicked.
-        /// </summary>
-        public string HashtagClickScript
+		/// <summary>
+		/// JavaScript to execute when hashtag mark element is clicked.
+		/// </summary>
+		public string HashtagClickScript
         {
             get => this.hashtagClickScript;
             set => this.hashtagClickScript = value;

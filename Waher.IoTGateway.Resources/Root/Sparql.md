@@ -3,7 +3,7 @@ Description: SPARQL Endpoint evaluating federated SPARQL queries
 Date: 2023-07-01
 Author: Peter Waher
 Master: /Master.md
-Javascript: Sparql.js
+JavaScript: Sparql.js
 CSS: Sparql.css
 Parameter: query
 Parameter: default-graph-uri

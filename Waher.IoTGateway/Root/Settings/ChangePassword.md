@@ -3,7 +3,7 @@ Description: Allows a logged in user to change its password.
 Date: 2023-07-11
 Author: Peter Waher
 Master: /Master.md
-Javascript: /Settings/XMPP.js
+JavaScript: /Settings/XMPP.js
 UserVariable: User
 Login: /Login.md
 

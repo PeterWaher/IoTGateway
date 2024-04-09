@@ -3,7 +3,7 @@ Description: Allows editing of a role.
 Date: 2021-01-27
 Author: Peter Waher
 Master: /Master.md
-Javascript: /Controls/SimpleTree.js
+JavaScript: /Controls/SimpleTree.js
 JavaScript: /Settings/Next.js
 JavaScript: /Events.js
 CSS: /Controls/SimpleTree.cssx

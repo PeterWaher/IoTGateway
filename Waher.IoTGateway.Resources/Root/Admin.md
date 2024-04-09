@@ -5,7 +5,7 @@ Author: Peter Waher
 Copyright: /Copyright.md
 Master: /Master.md
 CSS: /Admin.cssx
-Javascript: /TargetBlank.js
+JavaScript: /TargetBlank.js
 JavaScript: /Sniffers/Sniffer.js
 UserVariable: User
 Login: /Login.md

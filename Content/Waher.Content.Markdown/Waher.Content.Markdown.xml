@@ -147,31 +147,31 @@
             <param name="FileName">File name</param>
             <returns>If script file needs to be executed.</returns>
         </member>
-        <member name="T:Waher.Content.Markdown.Functions.JavascriptContent">
+        <member name="T:Waher.Content.Markdown.Functions.JavaScriptContent">
             <summary>
-            Encapsulates javascript content.
+            Encapsulates JavaScript content.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Functions.JavascriptContent.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Content.Markdown.Functions.JavaScriptContent.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            Encapsulates javascript content.
+            Encapsulates JavaScript content.
             </summary>
             <param name="Argument">Argument.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Content.Markdown.Functions.JavascriptContent.FunctionName">
+        <member name="P:Waher.Content.Markdown.Functions.JavaScriptContent.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Functions.JavascriptContent.DefaultArgumentNames">
+        <member name="P:Waher.Content.Markdown.Functions.JavaScriptContent.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Functions.JavascriptContent.EvaluateScalar(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Functions.JavaScriptContent.EvaluateScalar(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -6383,7 +6383,7 @@
         </member>
         <member name="P:Waher.Content.Markdown.Rendering.HtmlSettings.HashtagClickScript">
             <summary>
-            Javascript to execute when hashtag mark element is clicked.
+            JavaScript to execute when hashtag mark element is clicked.
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.Rendering.HtmlSettings.XmlEntitiesOnly">

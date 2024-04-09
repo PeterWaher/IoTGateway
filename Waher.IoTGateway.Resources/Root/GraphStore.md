@@ -3,7 +3,7 @@ Description: Semantic Graph store
 Date: 2023-07-05
 Author: Peter Waher
 Master: /Master.md
-Javascript: GraphStore.js
+JavaScript: GraphStore.js
 Parameter: default
 Parameter: graph
 UserVariable: User

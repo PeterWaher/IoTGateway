@@ -1,11 +1,11 @@
-﻿function CreateInnerHTML(ElementId)
+﻿function CreateInnerHTML(ElementId, Args)
 {
 	var Element = document.getElementById(ElementId);
 	if (Element)
-		Element.innerHTML = CreateHTML();
+		Element.innerHTML = CreateHTML(Args);
 }
 
-function CreateHTML()
+function CreateHTML(Args)
 {
 	var Segments = [
 		"<h1",

@@ -1,11 +1,11 @@
-﻿function CreateInnerHTML(ElementId)
+﻿function CreateInnerHTML(ElementId, Args)
 {
 	var Element = document.getElementById(ElementId);
 	if (Element)
-		Element.innerHTML = CreateHTML();
+		Element.innerHTML = CreateHTML(Args);
 }
 
-function CreateHTML()
+function CreateHTML(Args)
 {
 	var Segments = [
 		"<div class=\"toc\">\r\n<div class=\"tocTitle\">Table of Contents</div><div class=\"tocBody\">\r\n<ol>\r\n<li><a href=\"#thisIsAnH1\">This is an H1</a><ol>\r\n<li><a href=\"#thisIsAnH2\">This is an H2</a></li></ol></li>\r\n<li><a href=\"#thisIsASecondH1\">This is a second H1</a><ol>\r\n<li><a href=\"#thisIsASecondH2\">This is a second H2</a><ol>\r\n<li><a href=\"#thisIsASecondH3\">This is a second H3</a><ol>\r\n<li><a href=\"#thisIsASecondH4\">This is a second H4</a><ol>\r\n<li><ol>\r\n<li><a href=\"#thisIsAnH6\">This is an H6</a></li></ol></li></ol></li></ol></li></ol></li></ol></li>\r\n<li><a href=\"#thisIsAThirdH1\">This is a third H1</a><ol>\r\n<li><a href=\"#thisIsAThirdH2\">This is a third H2</a><ol>\r\n<li><a href=\"#thisIsAThirdH3\">This is a third H3</a><ol>\r\n<li><a href=\"#thisIsAThirdH4\">This is a third H4</a></li></ol></li>\r\n<li><a href=\"#thisIsAnH3\">This is an H3</a></li></ol></li></ol></li></ol>\r\n</div>\r\n</div>\r\n",

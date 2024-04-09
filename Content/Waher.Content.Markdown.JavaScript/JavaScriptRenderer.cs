@@ -110,18 +110,18 @@ namespace Waher.Content.Markdown.JavaScript
 
 			this.Output.Append("function CreateInnerHTML");
 			this.Output.Append(Name);
-			this.Output.AppendLine("(ElementId)");
+			this.Output.AppendLine("(ElementId, Args)");
 			this.Output.AppendLine("{");
 			this.Output.AppendLine("\tvar Element = document.getElementById(ElementId);");
 			this.Output.AppendLine("\tif (Element)");
 			this.Output.Append("\t\tElement.innerHTML = CreateHTML");
 			this.Output.Append(Name);
-			this.Output.AppendLine("();");
+			this.Output.AppendLine("(Args);");
 			this.Output.AppendLine("}");
 			this.Output.AppendLine();
 			this.Output.Append("function CreateHTML");
 			this.Output.Append(Name);
-			this.Output.AppendLine("()");
+			this.Output.AppendLine("(Args)");
 			this.Output.AppendLine("{");
 			this.Output.Append("\tvar Segments = [");
 

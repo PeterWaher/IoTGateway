@@ -84,7 +84,7 @@ namespace Waher.Security.JWT
 			set
 			{
 				if (value < TimeSpan.Zero)
-					throw new ArgumentOutOfRangeException("Time margins must be non-negative.", nameof(TimeMargin));
+					throw new ArgumentOutOfRangeException("Time margins must be non-negative.", nameof(this.TimeMargin));
 
 				this.timeMargin = value;
 			}

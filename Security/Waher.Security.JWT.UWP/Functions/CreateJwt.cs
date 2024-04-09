@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -15,7 +14,7 @@ namespace Waher.Security.JWT.Functions
 	/// </summary>
 	public class CreateJwt : FunctionOneVariable
 	{
-		private static readonly JwtFactory factory = new JwtFactory();
+		private static JwtFactory factory = null;
 
 		/// <summary>
 		/// Creates a Java Web Token (JWT)
@@ -32,7 +31,21 @@ namespace Waher.Security.JWT.Functions
 		/// <summary>
 		/// Token factory used to create tokens.
 		/// </summary>
-		public static JwtFactory Factory => factory;
+		public static JwtFactory Factory
+		{
+			get
+			{
+				if (factory is null)
+				{
+					if (Types.TryGetModuleParameter("JWT", out object Value) && Value is JwtFactory Factory)
+						factory = Factory;
+					else
+						factory = new JwtFactory();
+				}
+				
+				return factory;
+			}
+		}
 
 		/// <summary>
 		/// Name of the function
@@ -86,7 +99,7 @@ namespace Waher.Security.JWT.Functions
 			else
 				Claims = await Database.Generalize(Obj);
 
-			return new StringValue(factory.Create(Claims));
+			return new StringValue(Factory.Create(Claims));
 		}
 	}
 }

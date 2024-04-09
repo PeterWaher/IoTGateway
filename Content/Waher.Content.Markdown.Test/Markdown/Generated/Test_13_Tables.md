@@ -28,6 +28,9 @@
 | Row 2              |
 | Row 3              |
 
+|:-----------|:---------:|-----------|
+| No  | headers  | table  |
+
 
 
 [^e11]:	| Info about cell   ||

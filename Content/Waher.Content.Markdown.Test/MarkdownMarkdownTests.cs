@@ -225,5 +225,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await DoTest("Test_32_TablesAndNotes.md");
 		}
+
+		[TestMethod]
+		public async Task Test_33_SingleNoHeaderTable()
+		{
+			await DoTest("Test_33_SingleNoHeaderTable.md");
+		}
 	}
 }

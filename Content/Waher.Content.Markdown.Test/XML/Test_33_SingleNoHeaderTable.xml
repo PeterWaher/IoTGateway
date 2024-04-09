@@ -1,0 +1,26 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_33_SingleNoHeaderTable" />
+		</tag>
+	</metaData>
+	<elements>
+		<Table caption="" id="" columns="3">
+			<Column alignment="Left" />
+			<Column alignment="Center" />
+			<Column alignment="Left" />
+			<Row>
+				<Cell>
+					<InlineText>No</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>headers</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>table</InlineText>
+				</Cell>
+			</Row>
+		</Table>
+	</elements>
+	<references />
+</parsedMakdown>

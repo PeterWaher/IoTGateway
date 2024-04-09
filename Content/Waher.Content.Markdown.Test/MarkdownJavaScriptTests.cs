@@ -18,7 +18,13 @@ namespace Waher.Content.Markdown.Test
 			return DoTest(MarkdownFileName, JavaScriptFileName, true);
 		}
 
-		private static async Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavaScript)
+		private static Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavaScript)
+		{
+			return DoTest(MarkdownFileName, JavaScriptFileName, ExecuteJavaScript, "<body>", "</body>");
+		}
+
+		private static async Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavaScript,
+			string HtmlStartTag, string HtmlEndTag)
 		{
 			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
 			string ExpectedJavaScript = await Resources.ReadAllTextAsync("JavaScript/" + JavaScriptFileName);
@@ -68,11 +74,11 @@ namespace Waher.Content.Markdown.Test
 				Console.Out.WriteLine();
 				Console.Out.WriteLine(GeneratedHtml);
 
-				int i = ExpectedHtml.IndexOf("<body>");
+				int i = ExpectedHtml.IndexOf(HtmlStartTag);
 				if (i > 0)
-					ExpectedHtml = ExpectedHtml[(i + 6)..].TrimStart();
+					ExpectedHtml = ExpectedHtml[(i + HtmlStartTag.Length)..].TrimStart();
 
-				i = ExpectedHtml.IndexOf("</body>");
+				i = ExpectedHtml.IndexOf(HtmlEndTag);
 				if (i > 0)
 					ExpectedHtml = ExpectedHtml[..i];
 
@@ -270,6 +276,12 @@ namespace Waher.Content.Markdown.Test
 		public async Task Test_32_TablesAndNotes()
 		{
 			await DoTest("Test_32_TablesAndNotes.md", "Test_32_TablesAndNotes.js");
+		}
+
+		[TestMethod]
+		public async Task Test_33_SingleNoHeaderTable()
+		{
+			await DoTest("Test_33_SingleNoHeaderTable.md", "Test_33_SingleNoHeaderTable.js", true, "<tbody>", "</tbody>");
 		}
 	}
 }

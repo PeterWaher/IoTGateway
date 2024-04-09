@@ -290,4 +290,23 @@
 			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Row 3</TextBlock>
 		</Border>
 	</Grid>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">No</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">headers</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">table</TextBlock>
+		</Border>
+	</Grid>
 </StackPanel>

@@ -318,6 +318,22 @@
 				</Cell>
 			</Row>
 		</Table>
+		<Table caption="" id="" columns="3">
+			<Column alignment="Left" />
+			<Column alignment="Center" />
+			<Column alignment="Left" />
+			<Row>
+				<Cell>
+					<InlineText>No</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>headers</InlineText>
+				</Cell>
+				<Cell>
+					<InlineText>table</InlineText>
+				</Cell>
+			</Row>
+		</Table>
 	</elements>
 	<references />
 </parsedMakdown>

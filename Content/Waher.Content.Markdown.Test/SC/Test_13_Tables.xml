@@ -256,3 +256,16 @@
 		</cell>
 	</row>
 </table>
+<table>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>No</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>headers</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>table</text>
+		</cell>
+	</row>
+</table>

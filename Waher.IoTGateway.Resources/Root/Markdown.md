@@ -2316,6 +2316,9 @@ as-is into the JavaScript. This allows you to populate the dynamic HTML using va
 do it. This also means, that the script syntax normally used for single-braces evaluation on the server, is not used in the JavaScript case. The
 inline script has access to `Args`, but as it runs in the browser, does not have access to server-side session-state variables.
 
+* If the Markdown only contains a header-less table (i.e. a table with zero header rows), the JavaScript rendered will only generate the table rows,
+not the surrounding `table`, `thead` and `tbody` elements, to facilitate dynamic addition of rows to a table.
+
 #### Generated JavaScript Example
 
 Consider the following Markdown page, saved as `Test.md`:

@@ -1245,60 +1245,78 @@ namespace Waher.Content.Markdown.JavaScript
 		{
 			MarkdownElement E;
 			int i, j, k;
+			bool OnlyRows = false;
 
-			this.AppendHtmlLine("<table>");
-
-			if (!string.IsNullOrEmpty(Element.Id))
+			if (Element.Headers.Length == 0 && !(this.Document?.Elements is null))
 			{
-				this.AppendHtml("<caption id=\"" + XML.HtmlAttributeEncode(Element.Id) + "\">");
-
-				if (string.IsNullOrEmpty(Element.Caption))
-					this.AppendHtml(XML.HtmlValueEncode(Element.Id));
-				else
-					this.AppendHtml(XML.HtmlValueEncode(Element.Caption));
-
-				this.AppendHtmlLine("</caption>");
+				OnlyRows = true;
+				foreach (MarkdownElement Child in this.Document.Elements)
+				{
+					if (Child != Element)
+					{
+						OnlyRows = false;
+						break;
+					}
+				}
 			}
 
-			this.AppendHtmlLine("<colgroup>");
-
-			foreach (TextAlignment Alignment in Element.Alignments)
-				this.AppendHtmlLine("<col style=\"text-align:" + Alignment.ToString().ToLower() + "\"/>");
-
-			this.AppendHtmlLine("</colgroup>");
-
-			this.AppendHtmlLine("<thead>");
-			foreach (MarkdownElement[] Row in Element.Headers)
+			if (!OnlyRows)
 			{
-				this.AppendHtmlLine("<tr>");
+				this.AppendHtmlLine("<table>");
 
-				for (i = 0; i < Element.Columns; i++)
+				if (!string.IsNullOrEmpty(Element.Id))
 				{
-					E = Row[i];
-					if (E is null)
-						continue;
+					this.AppendHtml("<caption id=\"" + XML.HtmlAttributeEncode(Element.Id) + "\">");
 
-					k = 1;
-					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
-						k++;
+					if (string.IsNullOrEmpty(Element.Caption))
+						this.AppendHtml(XML.HtmlValueEncode(Element.Id));
+					else
+						this.AppendHtml(XML.HtmlValueEncode(Element.Caption));
 
-					this.AppendHtml("<th style=\"text-align:" +
-						Element.Alignments[i].ToString().ToLower());
-
-					if (k > 1)
-						this.AppendHtml("\" colspan=\"" + k.ToString());
-
-					this.AppendHtml("\">");
-					await E.Render(this);
-					this.AppendHtmlLine("</th>");
+					this.AppendHtmlLine("</caption>");
 				}
 
-				this.AppendHtmlLine("</tr>");
-			}
-			this.AppendHtmlLine("</thead>");
+				this.AppendHtmlLine("<colgroup>");
 
-			this.AppendHtmlLine("<tbody>");
+				foreach (TextAlignment Alignment in Element.Alignments)
+					this.AppendHtmlLine("<col style=\"text-align:" + Alignment.ToString().ToLower() + "\"/>");
+
+				this.AppendHtmlLine("</colgroup>");
+
+				this.AppendHtmlLine("<thead>");
+				foreach (MarkdownElement[] Row in Element.Headers)
+				{
+					this.AppendHtmlLine("<tr>");
+
+					for (i = 0; i < Element.Columns; i++)
+					{
+						E = Row[i];
+						if (E is null)
+							continue;
+
+						k = 1;
+						j = i + 1;
+						while (j < Element.Columns && Row[j++] is null)
+							k++;
+
+						this.AppendHtml("<th style=\"text-align:" +
+							Element.Alignments[i].ToString().ToLower());
+
+						if (k > 1)
+							this.AppendHtml("\" colspan=\"" + k.ToString());
+
+						this.AppendHtml("\">");
+						await E.Render(this);
+						this.AppendHtmlLine("</th>");
+					}
+
+					this.AppendHtmlLine("</tr>");
+				}
+				this.AppendHtmlLine("</thead>");
+
+				this.AppendHtmlLine("<tbody>");
+			}
+
 			foreach (MarkdownElement[] Row in Element.Rows)
 			{
 				this.AppendHtmlLine("<tr>");
@@ -1327,9 +1345,12 @@ namespace Waher.Content.Markdown.JavaScript
 
 				this.AppendHtmlLine("</tr>");
 			}
-			this.AppendHtmlLine("</tbody>");
 
-			this.AppendHtmlLine("</table>");
+			if (!OnlyRows)
+			{
+				this.AppendHtmlLine("</tbody>");
+				this.AppendHtmlLine("</table>");
+			}
 		}
 
 		/// <summary>

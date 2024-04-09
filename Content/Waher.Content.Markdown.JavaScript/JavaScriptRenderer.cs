@@ -114,7 +114,7 @@ namespace Waher.Content.Markdown.JavaScript
 			this.Output.AppendLine("{");
 			this.Output.AppendLine("\tvar Element = document.getElementById(ElementId);");
 			this.Output.AppendLine("\tif (Element)");
-			this.Output.Append("\t\tElement.innerHTML = CreateHtml");
+			this.Output.Append("\t\tElement.innerHTML = CreateHTML");
 			this.Output.Append(Name);
 			this.Output.AppendLine("();");
 			this.Output.AppendLine("}");

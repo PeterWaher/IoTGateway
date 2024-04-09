@@ -50,7 +50,7 @@ namespace Waher.Content.Markdown.Test
 				Parsed.AppendBlock(new JsAssertLibrary());
 
 				string JsFileName = Path.ChangeExtension(Path.GetTempFileName(), ".js");
-				File.WriteAllText(JsFileName, GeneratedJavaScript);
+				await Resources.WriteAllTextAsync(JsFileName, GeneratedJavaScript, System.Text.Encoding.UTF8);
 				Parsed.AppendFile(JsFileName);
 
 				string JsonEncoded = Parsed.RunTest("return CreateHTML();");

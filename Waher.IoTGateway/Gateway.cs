@@ -4308,7 +4308,7 @@ namespace Waher.IoTGateway
 
 		private static async Task WebServer_CustomError(object Sender, CustomErrorEventArgs e)
 		{
-			Networking.HTTP.HeaderFields.HttpFieldAccept Accept = e.Request?.Header?.Accept;
+			HttpFieldAccept Accept = e.Request?.Header?.Accept;
 			if (Accept is null || Accept.Value == "*/*")
 				return;
 

@@ -285,7 +285,7 @@ namespace Waher.Networking.HTTP
 
 			if (this.domainOptions != HostDomainOptions.SameForAllDomains)
 			{
-				string Host = Header.Host?.Value;
+				string Host = Header?.Host?.Value;
 				string Folder;
 
 				if (Host is null)
@@ -326,7 +326,7 @@ namespace Waher.Networking.HTTP
 				if (i > 0 && 
 					File.Exists(s3 = s2.Substring(0, i)) &&
 					InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
-					(Header.Accept?.IsAcceptable(ContentType) ?? true))
+					(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 				{
 					if (!(Header is null))
 						Header.Accept = new HttpFieldAccept("Accept", ContentType);
@@ -344,7 +344,7 @@ namespace Waher.Networking.HTTP
 			if (i > 0 &&
 				File.Exists(s3 = s2.Substring(0, i)) &&
 				InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
-				(Header.Accept?.IsAcceptable(ContentType) ?? true))
+				(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 			{
 				if (!(Header is null))
 					Header.Accept = new HttpFieldAccept("Accept", ContentType);

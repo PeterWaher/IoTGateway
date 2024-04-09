@@ -255,7 +255,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Accept HTTP Field header. (RFC 2616, §14.1)
 		/// </summary>
-		public HttpFieldAccept Accept => this.accept;
+		public HttpFieldAccept Accept
+		{
+			get => this.accept;
+			internal set => this.accept = value;
+		}
 
 		/// <summary>
 		/// Accept-Charset HTTP Field header. (RFC 2616, §14.2)

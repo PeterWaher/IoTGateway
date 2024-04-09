@@ -2341,7 +2341,7 @@ It refers to a Markdown template called `TestTable.md`, in a JavaScript header. 
 extension `.js` is added to the filename, resulting in a reference to `TestTable.md.js` file. When the browser requests this file, the server
 recognizes that the file does not exist. Instead, it recognizes the `.js` extension, understands that it refers to the `Accept: application/javascript`
 header, and modifies the request to refer to `TestTable.md` with the corresponding `Accept` header set. The server then loads the Markdown,
-converts it to JavaScript, and returns Javascript that generates HTML from the following Markdown template:
+converts it to JavaScript, and returns JavaScript that generates HTML from the following Markdown template:
 
 ```
 | Table populated by JavaScript ||

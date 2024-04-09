@@ -2790,6 +2790,15 @@
           "Waher.Content.Xml": "2.2.5"
         }
       },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
+        }
+      },
       "Waher.Content.Markdown.Latex/3.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -5739,6 +5748,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content.Markdown": "3.0.0",
           "Waher.Content.Xml": "2.2.5"
+        }
+      },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
         }
       },
       "Waher.Content.Markdown.Latex/3.0.0": {
@@ -8728,6 +8746,15 @@
           "Waher.Content.Xml": "2.2.5"
         }
       },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
+        }
+      },
       "Waher.Content.Markdown.Latex/3.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -11686,6 +11713,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content.Markdown": "3.0.0",
           "Waher.Content.Xml": "2.2.5"
+        }
+      },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
         }
       },
       "Waher.Content.Markdown.Latex/3.0.0": {
@@ -14684,6 +14720,15 @@
           "Waher.Content.Xml": "2.2.5"
         }
       },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
+        }
+      },
       "Waher.Content.Markdown.Latex/3.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -17642,6 +17687,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content.Markdown": "3.0.0",
           "Waher.Content.Xml": "2.2.5"
+        }
+      },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
         }
       },
       "Waher.Content.Markdown.Latex/3.0.0": {
@@ -20638,6 +20692,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content.Markdown": "3.0.0",
           "Waher.Content.Xml": "2.2.5"
+        }
+      },
+      "Waher.Content.Markdown.JavaScript/3.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.8",
+          "Waher.Content.Markdown": "3.0.0"
         }
       },
       "Waher.Content.Markdown.Latex/3.0.0": {
@@ -30902,6 +30965,11 @@
       "path": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj",
       "msbuildProject": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj"
     },
+    "Waher.Content.Markdown.JavaScript/3.0.0": {
+      "type": "project",
+      "path": "../Waher.Content.Markdown.JavaScript/Waher.Content.Markdown.JavaScript.csproj",
+      "msbuildProject": "../Waher.Content.Markdown.JavaScript/Waher.Content.Markdown.JavaScript.csproj"
+    },
     "Waher.Content.Markdown.Latex/3.0.0": {
       "type": "project",
       "path": "../Waher.Content.Markdown.Latex/Waher.Content.Markdown.Latex.csproj",
@@ -31056,6 +31124,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Contracts\\Waher.Content.Markdown.Contracts.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Contracts\\Waher.Content.Markdown.Contracts.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.JavaScript\\Waher.Content.Markdown.JavaScript.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.JavaScript\\Waher.Content.Markdown.JavaScript.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Latex\\Waher.Content.Markdown.Latex.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.Latex\\Waher.Content.Markdown.Latex.csproj"

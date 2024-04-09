@@ -191,6 +191,7 @@
 			<Content fileName="MarkdownLab.js"/>
 			<Content fileName="MarkdownLab.md"/>
 			<Content fileName="MarkdownLabHtml.md"/>
+			<Content fileName="MarkdownLabJavaScript.md"/>
 			<Content fileName="MarkdownLabLaTeXArticle.md"/>
 			<Content fileName="MarkdownLabLaTeXBook.md"/>
 			<Content fileName="MarkdownLabLaTeXReport.md"/>

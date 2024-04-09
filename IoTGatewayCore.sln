@@ -438,6 +438,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss", "Conten
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss.Test", "Content\Waher.Content.Rss.Test\Waher.Content.Rss.Test.csproj", "{280FE262-2442-472D-8DF2-BCEDF56C9D84}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.JavaScript", "Content\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj", "{99EEED02-2343-4B43-9328-CBA9FE8B76AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -5140,6 +5142,30 @@ Global
 		{280FE262-2442-472D-8DF2-BCEDF56C9D84}.Release|x64.Build.0 = Release|Any CPU
 		{280FE262-2442-472D-8DF2-BCEDF56C9D84}.Release|x86.ActiveCfg = Release|Any CPU
 		{280FE262-2442-472D-8DF2-BCEDF56C9D84}.Release|x86.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|ARM.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|ARM.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|ARM.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|ARM64.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|x64.Build.0 = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5337,6 +5363,7 @@ Global
 		{5A3B77E5-DBE4-49DF-ACFE-EFE5AE905E58} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{EE7D1E1D-9B79-4089-8EAC-4F5E9DBA7206} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{280FE262-2442-472D-8DF2-BCEDF56C9D84} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{99EEED02-2343-4B43-9328-CBA9FE8B76AE} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

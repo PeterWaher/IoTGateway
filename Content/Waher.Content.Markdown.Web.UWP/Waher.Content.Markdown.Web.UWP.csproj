@@ -113,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarkdownToHtmlConverter.cs" />
+    <Compile Include="MarkdownToJavaScriptConverter.cs" />
     <Compile Include="MarkdownToLatexConverter.cs" />
     <Compile Include="MarkdownToSmartContractConverter.cs" />
     <Compile Include="MarkdownToTextConverter.cs" />
@@ -153,6 +154,10 @@
     <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj">
       <Project>{b9d1ef63-3216-45b2-a5d8-aa14b78575d6}</Project>
       <Name>Waher.Content.Markdown.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj">
+      <Project>{fb1afa4c-da4c-460f-8e99-7f13aa9468ae}</Project>
+      <Name>Waher.Content.Markdown.JavaScript</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj">
       <Project>{4e95c552-9fe8-4e5c-9a0d-811646eb5a87}</Project>

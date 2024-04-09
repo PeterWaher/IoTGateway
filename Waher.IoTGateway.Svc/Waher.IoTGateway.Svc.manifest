@@ -276,6 +276,8 @@
 	<Assembly fileName='Waher.Content.Markdown.pdb'/>
 	<Assembly fileName='Waher.Content.Markdown.GraphViz.dll'/>
 	<Assembly fileName='Waher.Content.Markdown.GraphViz.pdb'/>
+	<Assembly fileName='Waher.Content.Markdown.JavaScript.dll'/>
+	<Assembly fileName='Waher.Content.Markdown.JavaScript.pdb'/>
 	<Assembly fileName='Waher.Content.Markdown.Latex.dll'/>
 	<Assembly fileName='Waher.Content.Markdown.Latex.pdb'/>
 	<Assembly fileName='Waher.Content.Markdown.Layout2D.dll'/>

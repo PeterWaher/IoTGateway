@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Rss.Test", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Test", "Content\Waher.Content.Test\Waher.Content.Test.csproj", "{71859F40-5DFD-491F-B12F-2991B0142B21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Wpf", "Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj", "{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Wpf", "Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj", "{1AFAC8F2-BCB4-4CA6-9EF9-A15202B2769E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xamarin", "Content\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj", "{3A0E31ED-4C9D-464A-8C6A-FE90E4ADF7F7}"
 EndProject
@@ -54,6 +54,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Contracts", "Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj", "{1F66CF45-B3B2-42EF-BC4D-FE5A2901E72B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xml", "Content\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj", "{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.JavaScript", "Content\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj", "{2476A365-E51E-4B74-BF8C-1D8CAC44249B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -165,6 +167,10 @@ Global
 		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{692A9F3D-FF73-4DFF-8896-E9D4C9FEABA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2476A365-E51E-4B74-BF8C-1D8CAC44249B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2476A365-E51E-4B74-BF8C-1D8CAC44249B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2476A365-E51E-4B74-BF8C-1D8CAC44249B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2476A365-E51E-4B74-BF8C-1D8CAC44249B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

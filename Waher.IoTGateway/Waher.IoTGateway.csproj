@@ -316,6 +316,7 @@
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj" />

@@ -38,6 +38,7 @@
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj" />

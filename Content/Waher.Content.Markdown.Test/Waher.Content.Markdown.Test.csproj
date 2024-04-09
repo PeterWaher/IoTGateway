@@ -55,6 +55,38 @@
     <None Remove="HTML\Test_30_Incomplete.html" />
     <None Remove="HTML\Test_31_Justification2.html" />
     <None Remove="HTML\Test_32_TablesAndNotes.html" />
+    <None Remove="JavaScript\Test_01_Paragraphs.js" />
+    <None Remove="JavaScript\Test_02_Links.js" />
+    <None Remove="JavaScript\Test_03_TextFormatting.js" />
+    <None Remove="JavaScript\Test_04_Multimedia.js" />
+    <None Remove="JavaScript\Test_05_HTML.js" />
+    <None Remove="JavaScript\Test_06_CodeBlocks.js" />
+    <None Remove="JavaScript\Test_07_BlockQuotes.js" />
+    <None Remove="JavaScript\Test_08_Headers.js" />
+    <None Remove="JavaScript\Test_09_UnorderedLists.js" />
+    <None Remove="JavaScript\Test_10_LazyOrderedLists.js" />
+    <None Remove="JavaScript\Test_11_OrderedLists.js" />
+    <None Remove="JavaScript\Test_12_Typography.js" />
+    <None Remove="JavaScript\Test_13_Tables.js" />
+    <None Remove="JavaScript\Test_14_HorizontalRules.js" />
+    <None Remove="JavaScript\Test_15_DefinitionLists.js" />
+    <None Remove="JavaScript\Test_16_MetaData.js" />
+    <None Remove="JavaScript\Test_17_Footnotes.js" />
+    <None Remove="JavaScript\Test_18_Emojis.js" />
+    <None Remove="JavaScript\Test_19_Sections.js" />
+    <None Remove="JavaScript\Test_20_Script.js" />
+    <None Remove="JavaScript\Test_21_Httpx.js" />
+    <None Remove="JavaScript\Test_22_TaskLists.js" />
+    <None Remove="JavaScript\Test_23_Superscript.js" />
+    <None Remove="JavaScript\Test_24_Subscript.js" />
+    <None Remove="JavaScript\Test_25_HashTags.js" />
+    <None Remove="JavaScript\Test_26_Comments.js" />
+    <None Remove="JavaScript\Test_27_Contract.js" />
+    <None Remove="JavaScript\Test_28_Nesting.js" />
+    <None Remove="JavaScript\Test_29_Justification.js" />
+    <None Remove="JavaScript\Test_30_Incomplete.js" />
+    <None Remove="JavaScript\Test_31_Justification2.js" />
+    <None Remove="JavaScript\Test_32_TablesAndNotes.js" />
     <None Remove="Markdown\Diff\Diff\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Diff\Test_02_Paragraphs.md" />
     <None Remove="Markdown\Diff\Diff\Test_03_Bullets.md" />
@@ -385,6 +417,102 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="HTML\Test_24_Subscript.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_01_Paragraphs.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_02_Links.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_03_TextFormatting.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_04_Multimedia.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_05_HTML.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_06_CodeBlocks.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_07_BlockQuotes.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_08_Headers.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_09_UnorderedLists.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_10_LazyOrderedLists.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_11_OrderedLists.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_12_Typography.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_13_Tables.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_14_HorizontalRules.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_15_DefinitionLists.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_16_MetaData.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_17_Footnotes.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_18_Emojis.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_19_Sections.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_20_Script.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_21_Httpx.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_22_TaskLists.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_23_Superscript.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_24_Subscript.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_25_HashTags.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_26_Comments.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_27_Contract.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_28_Nesting.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_29_Justification.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_30_Incomplete.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_31_Justification2.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JavaScript\Test_32_TablesAndNotes.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Diff\Diff\Test_01_Simple.md">
@@ -1089,6 +1217,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JSTest.NET" Version="1.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.2.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.2.1" />
@@ -1102,6 +1231,7 @@
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Latex\Waher.Content.Markdown.Latex.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.csproj" />

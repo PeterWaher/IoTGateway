@@ -569,6 +569,7 @@
 							<File Id='Waher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Contracts.dll' Name='Waher.Content.Markdown.Contracts.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.GraphViz.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.JavaScript.dll' Name='Waher.Content.Markdown.JavaScript.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.JavaScript.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Latex.dll' Name='Waher.Content.Markdown.Latex.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Latex.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Layout2D.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
@@ -706,6 +707,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Contracts.dll' Name='Waher.Content.Markdown.Contracts.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.JavaScript.dll' Name='Waher.Content.Markdown.JavaScript.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Latex.dll' Name='Waher.Content.Markdown.Latex.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
@@ -841,6 +843,7 @@
 							<File Id='Waher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Contracts.pdb' Name='Waher.Content.Markdown.Contracts.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.GraphViz.pdb' Vital='yes'/>
+3							<File Id='Waher.Content.Markdown.JavaScript.pdb' Name='Waher.Content.Markdown.JavaScript.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.JavaScript.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Latex.pdb' Name='Waher.Content.Markdown.Latex.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Latex.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Layout2D.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
@@ -952,6 +955,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Contracts.pdb' Name='Waher.Content.Markdown.Contracts.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.JavaScript.pdb' Name='Waher.Content.Markdown.JavaScript.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Latex.pdb' Name='Waher.Content.Markdown.Latex.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>

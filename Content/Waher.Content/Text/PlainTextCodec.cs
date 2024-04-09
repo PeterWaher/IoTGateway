@@ -24,10 +24,7 @@ namespace Waher.Content.Text
 		public static readonly string[] PlainTextContentTypes = new string[]
 		{
 			"text/plain",
- 			"text/css",
 			"text/sgml",
-			"text/tab-separated-values",
-			"application/javascript",
 			"text/richtext"
 		};
 
@@ -38,10 +35,7 @@ namespace Waher.Content.Text
 		{
 			"txt",
 			"text",
-			"css",
 			"sgml",
-			"tsv",
-			"js",
 			"rtx"
 		};
 
@@ -110,20 +104,8 @@ namespace Waher.Content.Text
 					ContentType = "text/plain";
 					return true;
 
-				case "css":
-					ContentType = "text/css";
-					return true;
-
 				case "sgml":
 					ContentType = "text/sgml";
-					return true;
-
-				case "tsv":
-					ContentType = "text/tab-separated-values";
-					return true;
-
-				case "js":
-					ContentType = "application/javascript";
 					return true;
 
 				case "rtx":
@@ -150,20 +132,8 @@ namespace Waher.Content.Text
 					FileExtension = "txt";
 					return true;
 
-				case "text/css":
-					FileExtension = "css";
-					return true;
-
 				case "text/sgml":
 					FileExtension = "sgml";
-					return true;
-
-				case "text/tab-separated-values":
-					FileExtension = "tsv";
-					return true;
-
-				case "application/javascript":
-					FileExtension = "js";
 					return true;
 
 				case "text/richtext":

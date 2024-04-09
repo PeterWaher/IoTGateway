@@ -9,7 +9,7 @@ namespace Waher.Content.QR.Test.VersionTests
 {
 	public abstract class VersionTests
 	{
-		protected static readonly Random rnd = new Random();
+		protected static readonly Random rnd = new();
 		private QrEncoder encoder;
 
 		[TestInitialize]

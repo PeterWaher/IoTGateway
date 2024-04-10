@@ -74,5 +74,14 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
 		public delegate bool HandlerRoutine(CtrlTypes CtrlType);
 
+		// https://stackoverflow.com/questions/19487541/how-to-get-windows-user-name-from-sessionid
+
+		[DllImport("Wtsapi32.dll")]
+		internal static extern bool WTSQuerySessionInformation(IntPtr hServer, int sessionId, WtsInfoClass wtsInfoClass, out IntPtr ppBuffer, out int pBytesReturned);
+		
+		[DllImport("Wtsapi32.dll")]
+		internal static extern void WTSFreeMemory(IntPtr pointer);
+
+
 	}
 }

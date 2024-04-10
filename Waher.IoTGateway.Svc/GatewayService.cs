@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Threading;
 using Waher.Events;
+using Waher.IoTGateway.Svc.ServiceManagement;
+using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.Persistence;
 
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -209,49 +212,138 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		protected override void OnSessionChange(SessionChangeDescription changeDescription)
+		protected override void OnSessionChange(SessionChangeDescription ChangeDescription)
 		{
-			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+			int SessionId = ChangeDescription.SessionId;
+			List<KeyValuePair<string, object>> Tags = new()
 			{
-				new("SessionId", changeDescription.SessionId)
+				new("SessionId", SessionId)
 			};
 
-			switch (changeDescription.Reason)
+			AddWtsUserName(Tags, SessionId);
+			AddWtsName(Tags, "Initial Program", SessionId, WtsInfoClass.WTSInitialProgram);
+			AddWtsName(Tags, "Application Name", SessionId, WtsInfoClass.WTSApplicationName);
+			AddWtsName(Tags, "Working Directory", SessionId, WtsInfoClass.WTSWorkingDirectory);
+			AddWtsName(Tags, "OEM ID", SessionId, WtsInfoClass.WTSOEMId);
+			AddWtsName(Tags, "Station Name", SessionId, WtsInfoClass.WTSWinStationName);
+			AddWtsName(Tags, "Connect State", SessionId, WtsInfoClass.WTSConnectState);
+			AddWtsName(Tags, "Client Build Number", SessionId, WtsInfoClass.WTSClientBuildNumber);
+			AddWtsName(Tags, "Client Name", SessionId, WtsInfoClass.WTSClientName);
+			AddWtsName(Tags, "Client Directory", SessionId, WtsInfoClass.WTSClientDirectory);
+			AddWtsName(Tags, "Client Product ID", SessionId, WtsInfoClass.WTSClientProductId);
+			AddWtsName(Tags, "Client Hardware ID", SessionId, WtsInfoClass.WTSClientHardwareId);
+			AddWtsName(Tags, "Client Address", SessionId, WtsInfoClass.WTSClientAddress);
+			AddWtsName(Tags, "Client Display", SessionId, WtsInfoClass.WTSClientDisplay);
+			AddWtsName(Tags, "Client Protocol Type", SessionId, WtsInfoClass.WTSClientProtocolType);
+			AddWtsName(Tags, "Idle Time", SessionId, WtsInfoClass.WTSIdleTime);
+			AddWtsName(Tags, "Logon Time", SessionId, WtsInfoClass.WTSLogonTime);
+			AddWtsName(Tags, "Incoming Bytes", SessionId, WtsInfoClass.WTSIncomingBytes);
+			AddWtsName(Tags, "Outgoing Bytes", SessionId, WtsInfoClass.WTSOutgoingBytes);
+			AddWtsName(Tags, "Incoming Frames", SessionId, WtsInfoClass.WTSIncomingFrames);
+			AddWtsName(Tags, "Outgoing Frames", SessionId, WtsInfoClass.WTSOutgoingFrames);
+			AddWtsName(Tags, "Client Info", SessionId, WtsInfoClass.WTSClientInfo);
+			AddWtsName(Tags, "Session Info", SessionId, WtsInfoClass.WTSSessionInfo);
+
+			switch (ChangeDescription.Reason)
 			{
 				case SessionChangeReason.ConsoleConnect:
-					Log.Notice("User connected to machine via console interface.", Tags);
+					Log.Alert("User connected to machine via console interface.", Tags.ToArray());
 					break;
 
 				case SessionChangeReason.ConsoleDisconnect:
-					Log.Notice("User disconnected console interface.", Tags);
+					Log.Alert("User disconnected console interface.", Tags.ToArray());
 					break;
 				case SessionChangeReason.RemoteConnect:
-					Log.Notice("User connected remotely to machine.", Tags);
+					Log.Alert("User connected remotely to machine.", Tags.ToArray());
 					break;
 				case SessionChangeReason.RemoteDisconnect:
-					Log.Notice("User disconnected remote interface.", Tags);
+					Log.Alert("User disconnected remote interface.", Tags.ToArray());
 					break;
 				case SessionChangeReason.SessionLock:
-					Log.Notice("User session locked.", Tags);
+					Log.Alert("User session locked.", Tags.ToArray());
 					break;
 				case SessionChangeReason.SessionLogoff:
-					Log.Notice("User logged off.", Tags);
+					Log.Alert("User logged off.", Tags.ToArray());
 					break;
 				case SessionChangeReason.SessionLogon:
-					Log.Notice("User logged on.", Tags);
+					Log.Alert("User logged on.", Tags.ToArray());
 					break;
 				case SessionChangeReason.SessionRemoteControl:
-					Log.Notice("User remote control status of session has changed.", Tags);
+					Log.Alert("User remote control status of session has changed.", Tags.ToArray());
 					break;
 				case SessionChangeReason.SessionUnlock:
-					Log.Notice("User session unlocked.", Tags);
+					Log.Alert("User session unlocked.", Tags.ToArray());
 					break;
 
 				default:
-					Log.Notice("Session changed.",
-						new KeyValuePair<string, object>("SessionId", changeDescription.SessionId),
-						new KeyValuePair<string, object>("Reason", changeDescription.Reason.ToString()));
+					Tags.Add(new KeyValuePair<string, object>("Reason", ChangeDescription.Reason.ToString()));
+					Log.Alert("Session changed.", Tags.ToArray());
 					break;
+			}
+		}
+
+		private static void AddWtsUserName(List<KeyValuePair<string, object>> Tags, int SessionId)
+		{
+			string Value = GetUserName(SessionId);
+			if (!string.IsNullOrEmpty(Value))
+				Tags.Add(new KeyValuePair<string, object>("User Name", Value));
+		}
+
+		private static void AddWtsName(List<KeyValuePair<string, object>> Tags, string Key, int SessionId, WtsInfoClass InfoClass)
+		{
+			string Value = GetWtsName(SessionId, InfoClass);
+			if (!string.IsNullOrEmpty(Value))
+				Tags.Add(new KeyValuePair<string, object>(Key, Value));
+		}
+
+		private static string GetUserName(int SessionId)
+		{
+			try
+			{
+				string UserName = GetWtsName(SessionId, WtsInfoClass.WTSUserName);
+				if (string.IsNullOrEmpty(UserName))
+					return null;
+
+				string Domain = GetWtsName(SessionId, WtsInfoClass.WTSDomainName);
+				if (!string.IsNullOrEmpty(Domain))
+					UserName = Domain + "\\" + UserName;
+
+				return UserName;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return null;
+			}
+		}
+
+		private static string GetWtsName(int SessionId, WtsInfoClass InfoClass)
+		{
+			try
+			{
+				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int StrLen) && StrLen > 1)
+				{
+					try
+					{
+						string Name = Marshal.PtrToStringAnsi(Buffer);
+						Win32.WTSFreeMemory(Buffer);
+						Buffer = IntPtr.Zero;
+
+						return Name;
+					}
+					finally
+					{
+						if (Buffer != IntPtr.Zero)
+							Win32.WTSFreeMemory(Buffer);
+					}
+				}
+				else
+					return null;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return null;
 			}
 		}
 

@@ -7,6 +7,7 @@ namespace Waher.IoTGateway.Setup
 	{
 		private readonly static Dictionary<string, KeyValuePair<string, string>> clp = new Dictionary<string, KeyValuePair<string, string>>(StringComparer.CurrentCultureIgnoreCase)
 		{
+#error Enter list of featured servers here. Build events copy a Registration.cs file from the parent folder of the solution folder, to avoid placing keys in the repository.
 		};
 
 		/// <summary>

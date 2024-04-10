@@ -36,7 +36,18 @@ namespace Waher.Content.Text
 			"txt",
 			"text",
 			"sgml",
-			"rtx"
+			"rtx",
+			"log",
+			"ini",
+			"asc",
+			"me",
+			"readme",
+			"1st",
+			"license",
+			"faq",
+			"note",
+			"utf8",
+			"plain"
 		};
 
 		/// <summary>
@@ -101,6 +112,17 @@ namespace Waher.Content.Text
 			{
 				case "txt":
 				case "text":
+				case "log":
+				case "ini":
+				case "asc":
+				case "me":
+				case "readme":
+				case "1st":
+				case "license":
+				case "faq":
+				case "note":
+				case "utf8":
+				case "plain":
 					ContentType = "text/plain";
 					return true;
 

@@ -7707,7 +7707,7 @@ namespace Waher.Content.Emoji
 		/// <summary>
 		/// :keycap_star: *⃣ 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_keycap_star = new EmojiInfo("keycap_star", "002a-20e3.png", "", "*⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_keycap_star = new EmojiInfo("keycap_star", "002a-20e3.png", string.Empty, "*⃣", true, true, true, false);
 
 		/// <summary>
 		/// :zero: 0⃣ keycap 0
@@ -9047,92 +9047,92 @@ namespace Waher.Content.Emoji
 		/// <summary>
 		/// :man-man-boy: 👨‍👨‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_boy = new EmojiInfo("man-man-boy", "1f468-200d-1f468-200d-1f466.png", "", "👨‍👨‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_boy = new EmojiInfo("man-man-boy", "1f468-200d-1f468-200d-1f466.png", string.Empty, "👨‍👨‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :man-man-boy-boy: 👨‍👨‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_boy_boy = new EmojiInfo("man-man-boy-boy", "1f468-200d-1f468-200d-1f466-200d-1f466.png", "", "👨‍👨‍👦‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_boy_boy = new EmojiInfo("man-man-boy-boy", "1f468-200d-1f468-200d-1f466-200d-1f466.png", string.Empty, "👨‍👨‍👦‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :man-man-girl: 👨‍👨‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl = new EmojiInfo("man-man-girl", "1f468-200d-1f468-200d-1f467.png", "", "👨‍👨‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl = new EmojiInfo("man-man-girl", "1f468-200d-1f468-200d-1f467.png", string.Empty, "👨‍👨‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :man-man-girl-boy: 👨‍👨‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl_boy = new EmojiInfo("man-man-girl-boy", "1f468-200d-1f468-200d-1f467-200d-1f466.png", "", "👨‍👨‍👧‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl_boy = new EmojiInfo("man-man-girl-boy", "1f468-200d-1f468-200d-1f467-200d-1f466.png", string.Empty, "👨‍👨‍👧‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :man-man-girl-girl: 👨‍👨‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl_girl = new EmojiInfo("man-man-girl-girl", "1f468-200d-1f468-200d-1f467-200d-1f467.png", "", "👨‍👨‍👧‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl_girl = new EmojiInfo("man-man-girl-girl", "1f468-200d-1f468-200d-1f467-200d-1f467.png", string.Empty, "👨‍👨‍👧‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :man-woman-boy-boy: 👨‍👩‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_boy_boy = new EmojiInfo("man-woman-boy-boy", "1f468-200d-1f469-200d-1f466-200d-1f466.png", "", "👨‍👩‍👦‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_boy_boy = new EmojiInfo("man-woman-boy-boy", "1f468-200d-1f469-200d-1f466-200d-1f466.png", string.Empty, "👨‍👩‍👦‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :man-woman-girl: 👨‍👩‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl = new EmojiInfo("man-woman-girl", "1f468-200d-1f469-200d-1f467.png", "", "👨‍👩‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl = new EmojiInfo("man-woman-girl", "1f468-200d-1f469-200d-1f467.png", string.Empty, "👨‍👩‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :man-woman-girl-boy: 👨‍👩‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl_boy = new EmojiInfo("man-woman-girl-boy", "1f468-200d-1f469-200d-1f467-200d-1f466.png", "", "👨‍👩‍👧‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl_boy = new EmojiInfo("man-woman-girl-boy", "1f468-200d-1f469-200d-1f467-200d-1f466.png", string.Empty, "👨‍👩‍👧‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :man-woman-girl-girl: 👨‍👩‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl_girl = new EmojiInfo("man-woman-girl-girl", "1f468-200d-1f469-200d-1f467-200d-1f467.png", "", "👨‍👩‍👧‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl_girl = new EmojiInfo("man-woman-girl-girl", "1f468-200d-1f469-200d-1f467-200d-1f467.png", string.Empty, "👨‍👩‍👧‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :man-heart-man: 👨‍❤️‍👨 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_heart_man = new EmojiInfo("man-heart-man", "1f468-200d-2764-fe0f-200d-1f468.png", "", "👨‍❤️‍👨", true, true, true, false);
+		public static readonly EmojiInfo Emoji_man_heart_man = new EmojiInfo("man-heart-man", "1f468-200d-2764-fe0f-200d-1f468.png", string.Empty, "👨‍❤️‍👨", true, true, true, false);
 
 		/// <summary>
 		/// :man-kiss-man: 👨‍❤️‍💋‍👨 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_kiss_man = new EmojiInfo("man-kiss-man", "1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png", "", "👨‍❤️‍💋‍👨", true, true, true, false);
+		public static readonly EmojiInfo Emoji_man_kiss_man = new EmojiInfo("man-kiss-man", "1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png", string.Empty, "👨‍❤️‍💋‍👨", true, true, true, false);
 
 		/// <summary>
 		/// :woman-woman-boy: 👩‍👩‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_boy = new EmojiInfo("woman-woman-boy", "1f469-200d-1f469-200d-1f466.png", "", "👩‍👩‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_boy = new EmojiInfo("woman-woman-boy", "1f469-200d-1f469-200d-1f466.png", string.Empty, "👩‍👩‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :woman-woman-boy-boy: 👩‍👩‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_boy_boy = new EmojiInfo("woman-woman-boy-boy", "1f469-200d-1f469-200d-1f466-200d-1f466.png", "", "👩‍👩‍👦‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_boy_boy = new EmojiInfo("woman-woman-boy-boy", "1f469-200d-1f469-200d-1f466-200d-1f466.png", string.Empty, "👩‍👩‍👦‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :woman-woman-girl: 👩‍👩‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl = new EmojiInfo("woman-woman-girl", "1f469-200d-1f469-200d-1f467.png", "", "👩‍👩‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl = new EmojiInfo("woman-woman-girl", "1f469-200d-1f469-200d-1f467.png", string.Empty, "👩‍👩‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :woman-woman-girl-boy: 👩‍👩‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl_boy = new EmojiInfo("woman-woman-girl-boy", "1f469-200d-1f469-200d-1f467-200d-1f466.png", "", "👩‍👩‍👧‍👦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl_boy = new EmojiInfo("woman-woman-girl-boy", "1f469-200d-1f469-200d-1f467-200d-1f466.png", string.Empty, "👩‍👩‍👧‍👦", true, true, true, true);
 
 		/// <summary>
 		/// :woman-woman-girl-girl: 👩‍👩‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl_girl = new EmojiInfo("woman-woman-girl-girl", "1f469-200d-1f469-200d-1f467-200d-1f467.png", "", "👩‍👩‍👧‍👧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl_girl = new EmojiInfo("woman-woman-girl-girl", "1f469-200d-1f469-200d-1f467-200d-1f467.png", string.Empty, "👩‍👩‍👧‍👧", true, true, true, true);
 
 		/// <summary>
 		/// :woman-heart-woman: 👩‍❤️‍👩 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_heart_woman = new EmojiInfo("woman-heart-woman", "1f469-200d-2764-fe0f-200d-1f469.png", "", "👩‍❤️‍👩", true, true, true, false);
+		public static readonly EmojiInfo Emoji_woman_heart_woman = new EmojiInfo("woman-heart-woman", "1f469-200d-2764-fe0f-200d-1f469.png", string.Empty, "👩‍❤️‍👩", true, true, true, false);
 
 		/// <summary>
 		/// :woman-kiss-woman: 👩‍❤️‍💋‍👩 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_kiss_woman = new EmojiInfo("woman-kiss-woman", "1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png", "", "👩‍❤️‍💋‍👩", true, true, true, false);
+		public static readonly EmojiInfo Emoji_woman_kiss_woman = new EmojiInfo("woman-kiss-woman", "1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png", string.Empty, "👩‍❤️‍💋‍👩", true, true, true, false);
 	}
 
 	/// <summary>

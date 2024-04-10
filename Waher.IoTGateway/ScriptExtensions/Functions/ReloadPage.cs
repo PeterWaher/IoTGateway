@@ -67,7 +67,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			string[] TabIDs = GetTabIDs.GetTabs(Arguments, this);
 
 			if (TabIDs.Length > 0)
-				ClientEvents.PushEvent(TabIDs, "Reload", "");
+				ClientEvents.PushEvent(TabIDs, "Reload", string.Empty);
 
 			return new ObjectVector(TabIDs);
 		}

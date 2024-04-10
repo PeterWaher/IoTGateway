@@ -184,6 +184,13 @@ namespace Waher.Networking.XMPP.HTTPX
 								case "chunkedBase64":
 									TemporaryStream File = new TemporaryStream();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
+
+									if (Header is null)
+									{
+										Header = new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
+											this.server.VanityResources, HeaderFields.ToArray());
+									}
+
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
 										new HttpRequest(this.server, Header, File, e.From, e.To), e.E2eEncryption, e.E2eReference, File, 
                                         MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));

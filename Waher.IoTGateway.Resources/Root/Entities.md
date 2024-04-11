@@ -1,5 +1,5 @@
 ﻿Title: HTML Entities
-Description: List of HTML entities understood by IoT Gateway Markdown.
+Description: List of HTML entities understood by {{Waher.IoTGateway.Gateway.ApplicationName}} Markdown.
 Date: 2016-08-22
 Author: Peter Waher
 Master: /Master.md

@@ -1,5 +1,5 @@
 ﻿Title: Login
-Description: IoT Gateway login page.
+Description: {{Waher.IoTGateway.Gateway.ApplicationName}} login page.
 Date: 2016-12-25
 Author: Peter Waher
 Master: /Master.md

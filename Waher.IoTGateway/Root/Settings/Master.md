@@ -1,4 +1,4 @@
-Title: IoT Gateway Setup
+Title: {{Waher.IoTGateway.Gateway.ApplicationName}} Setup
 Description: Main menu during setup
 Date: 2018-06-02
 Author: Peter Waher

@@ -17,12 +17,13 @@ Login: /Login.md
 Network connectivity
 ===========================
 
-The IoT Gateway requires a connection to an XMPP network to work properly. The XMPP connection allows you to configure, monitor and administer your
-IoT Gateway in a secure manner, from anywhere where you have access to the same XMPP network, even if you reside behind a different firewall. 
-If the server has provisioning support, it will provide for additional security for any embedded devices. Enter the domain name of the XMPP server 
-you wish to use. Or click on any of the featured servers below. You can also use any of the free public servers listed at 
-[xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also set up your own XMPP server. 
-[xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use.
+The {{Waher.IoTGateway.Gateway.ApplicationName}} requires a connection to an XMPP network to work properly. The XMPP connection allows you to configure, 
+monitor and administer your {{Waher.IoTGateway.Gateway.ApplicationName}} in a secure manner, from anywhere where you have access to the same XMPP 
+network, even if you reside behind a different firewall. If the server has provisioning support, it will provide for additional security for any 
+embedded devices. Enter the domain name of the XMPP server you wish to use. Or click on any of the featured servers below. You can also use any of 
+the free public servers listed at [xmpp.net](https://xmpp.net/directory.php). If you're an expert user, you can also set up your own XMPP server. 
+[xmpp.org](https://xmpp.org/software/servers.html) publishes an abridged list of XMPP server software you can use. For full support, the
+[TAG Neuron(R)](https://lab.tagroot.io/Documentation/Index.md) is recommended.
 
 <form>
 <fieldset>
@@ -69,7 +70,7 @@ Featured servers:
 
 <p>
 <input type="checkbox" name="Sniffer" id="Sniffer" {{Config.Sniffer ? "checked" : ""}} />
-<label for="Sniffer" title="If XMPP communication is to be logged.">Log XMPP communication to the application data folder (`C:\ProgramData\IoT Gateway\XMPP`).</label>
+<label for="Sniffer" title="If XMPP communication is to be logged.">Log XMPP communication to the application data folder (`{{Waher.IoTGateway.Gateway.AppDataFolder}}XMPP`).</label>
 </p>
 
 <p>

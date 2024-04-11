@@ -1,5 +1,5 @@
-﻿Title: IoT Gateway
-Description: Administration page of the IoT Broker
+﻿Title: {{Waher.IoTGateway.Gateway.ApplicationName}}
+Description: Administration page of the {{Waher.IoTGateway.Gateway.ApplicationName}}
 Date: 2020-04-06
 Author: Peter Waher
 Copyright: /Copyright.md

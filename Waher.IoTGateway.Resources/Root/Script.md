@@ -1,5 +1,5 @@
 ﻿Title: Script
-Description: Script syntax reference, as understood by the IoT Gateway.
+Description: Script syntax reference, as understood by {{Waher.IoTGateway.Gateway.ApplicationName}}.
 Date: 2016-02-26
 Author: Peter Waher
 Master: /Master.md
@@ -8,9 +8,9 @@ JavaScript: /Events.js
 Script syntax reference
 =============================
 
-The **IoT Gateway** contains a powerful script parser and evaluation engine. The script engine is not ECMA-compliant. Instead, its focus
-is to provide an efficient and compact script language using mathemathical notation. Following is a brief overview of the syntax different 
-script elements. You can also use the [Script Prompt](Prompt.md) to experiment with script syntax.
+**{{Waher.IoTGateway.Gateway.ApplicationName}}** contains a powerful script parser and evaluation engine. The script engine is not ECMA-compliant. 
+Instead, its focus is to provide an efficient and compact script language using mathemathical notation. Following is a brief overview of the syntax 
+different script elements. You can also use the [Script Prompt](Prompt.md) to experiment with script syntax.
 
 ![Table of Contents](ToC)
 
@@ -1160,7 +1160,7 @@ pairs. Any tag name can be used, however, the Event log treats the following tag
 
 The script engine can be extended by modules that are run in the environment. The following subssections list such funcion extensions
 made available in different modules available by default on the gateway. This list does not include funcion extensions made available
-by applications that are not part of the **IoT Gateway**.
+by applications that are not part of **{{Waher.IoTGateway.Gateway.ApplicationName}}**.
 
 #### Color functions (Waher.Script.Graphs)
 

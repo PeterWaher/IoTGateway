@@ -1,5 +1,5 @@
 ﻿Title: Markdown
-Description: Markdown syntax reference, as understood by the IoT Gateway.
+Description: Markdown syntax reference, as understood by the {{AppName:=Waher.IoTGateway.Gateway.ApplicationName}}.
 Date: 2016-02-11
 Author: Peter Waher
 Master: /Master.md
@@ -8,12 +8,12 @@ JavaScript: /Events.js
 Markdown syntax reference
 =============================
 
-*Markdown* is a very simple, yet efficient format for editing text-based content. The **IoT Gateway** converts Markdown to HTML automatically when
-web browsers download it, making it a powerful tool for publishing online content. The syntax is inspired by the 
-[original markdown syntax](http://daringfireball.net/projects/markdown/syntax) as defined by John Gruber at Daring Fireball, but contains numerous other 
-additions and modifications. Some of these are introduced in the **IoT Gateway**, others are inspired by selected features used in
-[MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
-[Markdown Extra](https://michelf.ca/projects/php-markdown/extra/). Below, is a summary of the markdown syntax, as understood by the **IoT Gateway**.
+*Markdown* is a very simple, yet efficient format for editing text-based content. The **{{AppName}}** converts Markdown to HTML automatically 
+when web browsers download it, making it a powerful tool for publishing online content. The syntax is inspired by the 
+[original markdown syntax](http://daringfireball.net/projects/markdown/syntax) as defined by John Gruber at Daring Fireball, but contains 
+numerous other additions and modifications. Some of these are introduced in the **{{AppName}}**, others are inspired by selected features used 
+in [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and 
+[Markdown Extra](https://michelf.ca/projects/php-markdown/extra/). Below, is a summary of the markdown syntax, as understood by the **{{AppName}}**.
 
 **Note**: You can use the [Markdown Lab](MarkdownLab/MarkdownLab.md) to experiment with Markdown syntax.
 
@@ -230,7 +230,7 @@ in any other situation does not require escaping.
 
 There are numerous typographical enhancements added to the markdown parser. This makes it easier to generate beautiful text. Some of these additions are
 are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) addition to the original markdown, but numerous other character 
-sequences have been added to the **IoT Gateway** version of markdown, as shown in the following table:
+sequences have been added to the **{{AppName}}** version of markdown, as shown in the following table:
 
 | Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |
 |:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|
@@ -289,8 +289,9 @@ supported HTML entities, click [here](Entities.md).
 Block constructs
 -----------------------------
 
-Block constructs are larger constructs representing larger blocks in the document. They are all separated from each other using empty rows (or rows including
-only white space characters). The following subsections lists the different block constructs that are available in the **IoT Gateway** version of markdown.
+Block constructs are larger constructs representing larger blocks in the document. They are all separated from each other using empty rows 
+(or rows including only white space characters). The following subsections lists the different block constructs that are available in the 
+**{{AppName}}** version of markdown.
 
 ### Paragraphs
 
@@ -851,7 +852,7 @@ the code block.
 **Note 3**: You can embed code-blocks defined using back-ticks in code-blocks defined by back-ticks, if each embedded code-block uses
 fewer back-ticks compared to the parent block.
 
-The IoT Gateway provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in
+The {{AppName}} provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in 
 different ways. The following subsections illustrate such renderings.
 
 #### 2D Layout diagrams
@@ -1333,9 +1334,9 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
 
 #### GraphViz diagrams
 
-If [GraphViz](http://www.graphviz.org/) is installed on the same machine as the IoT Gateway, it can be used to render diagrams from code blocks. 
-There are six diagram types: **dot**, **neato**, **fdp**, **sfdp**, **twopi** and **circo**. Use the corresponding diagram type as language for the code block.
-The diagram type can be suffixed by a colon `:` and a title. The diagram will be rendered as an *SVG* image.
+If [GraphViz](http://www.graphviz.org/) is installed on the same machine as the {{AppName}}, it can be used to render diagrams from code blocks. 
+There are six diagram types: **dot**, **neato**, **fdp**, **sfdp**, **twopi** and **circo**. Use the corresponding diagram type as language for 
+the code block. The diagram type can be suffixed by a colon `:` and a title. The diagram will be rendered as an *SVG* image.
 
 Example of a **dot** GraphViz diagram:
 
@@ -1377,9 +1378,9 @@ digraph G {
 }
 ```
 
-**Note**: If after having installed [GraphViz](http://www.graphviz.org/), the above is not displayed as a graph, make sure to restart the IoT Gateway service
-(or the machine). GraphViz is detected during initialization of the service. Make sure that GraphViz is installed in the program data folder, preferrably
-in its default folder.
+**Note**: If after having installed [GraphViz](http://www.graphviz.org/), the above is not displayed as a graph, make sure to restart the 
+{{AppName}} service (or the machine). GraphViz is detected during initialization of the service. Make sure that GraphViz is installed in the 
+program data folder, preferrably in its default folder.
 
 **Note 2**: You can make the graph clickable by embedding [URL attributes](http://www.graphviz.org/doc/info/attrs.html#d:URL) on either nodes, edges
 or the entire graph.
@@ -1391,7 +1392,7 @@ For more information about the GraphViz syntax, see the [GraphViz documentation]
 #### UML with PlantUML
 
 If you have the [PlantUML.jar](http://plantuml.com/download) file stored in the program files folder, and have [Java](https://www.java.com) installed
-on the same machine as the IoT Gateway, they can be used to render UML diagrams from code blocks. The diagram will be rendered as an *SVG* image.
+on the same machine as the {{AppName}}, they can be used to render UML diagrams from code blocks. The diagram will be rendered as an *SVG* image.
 
 Example of a sequence **uml** PlantUML diagram:
 
@@ -1454,7 +1455,7 @@ WB is Waiting
 ```
 
 **Note**: If after having installed [PlantUML](http://plantuml.com/download) and [Java](https://www.java.com), the above is not displayed as a graph, 
-make sure to restart the IoT Gateway service (or the machine). PlantUML and Java are detected during initialization of the service. Make sure that 
+make sure to restart the {{AppName}} service (or the machine). PlantUML and Java are detected during initialization of the service. Make sure that 
 PlantUML is installed in the program data folder.
 
 **Note 2**: You can use the [PlantUML Lab](PlantUmlLab/PlantUmlLab.md) to experiment with PlantUML syntax.
@@ -2429,8 +2430,8 @@ It was written [%Date] by [%Author].
 Note: If a metadata record does not exist for a given key, but a variable exists with the given name, the corresponding variable value will be
 inserted instead.
 
-The following subsections list the different metadata keys that have special meaning to the **IoT Gateway** Markdown parser. You're not limited to these
-metadata keys, and can freely add your own.
+The following subsections list the different metadata keys that have special meaning to the **{{AppName}}** Markdown parser. You're not limited to 
+these metadata keys, and can freely add your own.
 
 ### AllowScriptTag
 

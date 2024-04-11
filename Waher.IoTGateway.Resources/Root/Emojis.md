@@ -1,5 +1,5 @@
 ﻿Title: Emojis
-Description: List of emojis supported by IoT Gateway Markdown.
+Description: List of emojis supported by {{Waher.IoTGateway.Gateway.ApplicationName}} Markdown.
 Date: 2016-02-05
 Author: Peter Waher
 Master: /Master.md

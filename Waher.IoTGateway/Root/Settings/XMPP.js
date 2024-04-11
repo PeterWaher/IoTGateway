@@ -5,6 +5,8 @@
     SetInputValue("BoshUrl", "");
 }
 
+var StatusCheckTimer = null;
+
 function ConnectToHost()
 {
     document.getElementById("XmppServerError").style.display = "none";
@@ -88,6 +90,8 @@ function ConnectToHost()
     document.getElementById("ConnectionStatus").style.display = 'block';
     document.getElementById("Success0").style.display = 'none';
 
+    StartStatusCheck();
+
     xhttp.open("POST", "/Settings/ConnectToHost", true);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("X-TabID", TabID);
@@ -107,6 +111,25 @@ function ConnectToHost()
         "storePassword": GetInputChecked("StorePassword"),
         "sniffer": GetInputChecked("Sniffer")
     }));
+}
+
+function ClearStatusCheck()
+{
+    if (StatusCheckTimer)
+    {
+        window.clearTimeout(StatusCheckTimer);
+        StatusCheckTimer = null;
+    }
+}
+
+function StartStatusCheck()
+{
+    ClearStatusCheck();
+    StatusCheckTimer = window.setTimeout(async function()
+    {
+        await ClearCacheAsync(null);
+        Reload(null);
+    }, 5000);
 }
 
 function RandomizePassword()
@@ -167,6 +190,8 @@ function SetInputValue(Id, Value)
 function ShowStatus(data)
 {
     var Div;
+
+    ClearStatusCheck();
 
     if (data.id)
     {

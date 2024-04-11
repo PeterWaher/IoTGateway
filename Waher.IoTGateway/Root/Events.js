@@ -51,13 +51,25 @@ function CheckEventsWS(TabID)
 
 	Uri += "//" + FindNeuronDomain() + "/ClientEventsWS";
 
-	var Socket = new WebSocket(Uri, ["ls"]);
-	var PingTimer = null;
-	var Closed = false;
+	console.log("Connecting to server for client events using Websocket.");
 
-	Socket.onopen = function ()
+	var EventSocket = new WebSocket(Uri, ["ls"]);
+	var PingTimer = null;
+
+	EventSocket.onopen = async function ()
 	{
-		Socket.send(JSON.stringify({
+		if (PageOutOfSync)
+		{
+			console.log("Websocket reopened. Reloading page to synchronize content.");
+
+			await ClearCacheAsync(null);
+			Reload(null);
+			return;
+		}
+
+		console.log("Websocket opened. Registring Tab for client events: " + TabID);
+
+		EventSocket.send(JSON.stringify({
 			"cmd": "Register",
 			"tabId": TabID,
 			"location": window.location.href
@@ -65,55 +77,67 @@ function CheckEventsWS(TabID)
 
 		PingTimer = window.setInterval(function ()
 		{
-			if (Socket)
+			if (EventSocket && EventSocket.readyState === WebSocket.OPEN)
 			{
-				if (Socket.readyState === Socket.OPEN)
-				{
-					Socket.send(JSON.stringify({
-						"cmd": "Ping"
-					}));
-				}
-				else
-				{
-					if (PingTimer)
-					{
-						window.clearInterval(PingTimer);
-						PingTimer = null;
-					}
+				console.log("Ping");
 
-					if (!Closed)
-					{
-						window.setTimeout(function ()
-						{
-							NeedsReload = true;
-							CheckEventsWS(TabID);
-						}, 5000);
-					}
+				EventSocket.send(JSON.stringify({
+					"cmd": "Ping"
+				}));
+			}
+			else
+			{
+				if (PingTimer)
+				{
+					window.clearInterval(PingTimer);
+					PingTimer = null;
+				}
+
+				if (EventCheckingEnabled)
+				{
+					PageOutOfSync = true;
+					CheckEventsWS(TabID);
 				}
 			}
 		}, 10000);
-
-		window.onbeforeunload = function ()
-		{
-			if (Socket && Socket.readyState === Socket.OPEN)
-			{
-				window.clearInterval(PingTimer);
-				PingTimer = null;
-
-				Socket.send(JSON.stringify({
-					"cmd": "Unregister"
-				}));
-
-				Socket.close(1000, "Page closed.");
-				Socket = null;
-			}
-
-			Closed = true;
-		};
 	};
 
-	Socket.onmessage = function (event)
+	window.onbeforeunload = function ()
 	{
+		console.log("Unloading page.");
+
+		EventCheckingEnabled = false;
+
+		if (PingTimer)
+		{
+			window.clearInterval(PingTimer);
+			PingTimer = null;
+		}
+
+		if (EventSocket && EventSocket.readyState === WebSocket.OPEN)
+		{
+			console.log("Unregistering Tab.");
+
+			EventSocket.send(JSON.stringify({
+				"cmd": "Unregister"
+			}));
+
+			EventSocket.close(1000, "Page closed.");
+			EventSocket = null;
+		}
+	};
+
+	EventSocket.onmessage = async function (event)
+	{
+		if (PageOutOfSync)
+		{
+			console.log("Reloading page to synchronize content.");
+
+			await ClearCacheAsync(null);
+			Reload(null);
+			return;
+		}
+
 		var Event;
 		var s = event.data;
 		if (s === "" || s === null)
@@ -132,19 +156,21 @@ function CheckEventsWS(TabID)
 		EvaluateEvent(Event);
 	};
 
-	Socket.onerror = function ()
+	EventSocket.onerror = function ()
 	{
+		console.log("Connection error.");
+
 		if (PingTimer)
 		{
 			window.clearInterval(PingTimer);
 			PingTimer = null;
 		}
 
-		if (!Closed)
+		if (EventCheckingEnabled)
 		{
 			window.setTimeout(function ()
 			{
-				NeedsReload = true;
+				PageOutOfSync = true;
 				CheckEventsWS(TabID);
 			}, 5000);
 		}
@@ -153,22 +179,23 @@ function CheckEventsWS(TabID)
 
 function CheckEventsXHTTP(TabID)
 {
-	var NeedsReload = false;
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function ()
+	xhttp.onreadystatechange = async function ()
 	{
 		if (xhttp.readyState === 4)
 		{
 			if (xhttp.status === 200)
 			{
-				if (NeedsReload)
+				if (PageOutOfSync)
 				{
-					window.location.reload(false);
+					console.log("Reloading page to synchronize content.");
+
+					await ClearCacheAsync(null);
+					Reload(null);
 					return;
 				}
 
 				var Events;
-				var Event;
 				var i, c;
 
 				try
@@ -199,6 +226,8 @@ function CheckEventsXHTTP(TabID)
 				{
 					if (EventCheckingEnabled)
 					{
+						console.log("Ping");
+
 						xhttp.open("POST", "/ClientEvents", true);
 						xhttp.setRequestHeader("Content-Type", "text/plain");
 						xhttp.setRequestHeader("X-TabID", TabID);
@@ -214,7 +243,9 @@ function CheckEventsXHTTP(TabID)
 				{
 					window.setTimeout(function ()
 					{
-						NeedsReload = true;
+						console.log("Reconnecting");
+
+						PageOutOfSync = true;
 						xhttp.open("POST", "/ClientEvents", true);
 						xhttp.setRequestHeader("Content-Type", "text/plain");
 						xhttp.setRequestHeader("X-TabID", TabID);
@@ -226,6 +257,8 @@ function CheckEventsXHTTP(TabID)
 	}
 
 	EventCheckingEnabled = true;
+
+	console.log("Connecting to server for client events using XML/HTTP-Request.");
 
 	xhttp.open("POST", "/ClientEvents", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
@@ -251,11 +284,14 @@ function EvaluateEvent(Event)
 
 function CloseEvents()
 {
+	console.log("Stopping event reception.");
 	EventCheckingEnabled = false;
 }
 
 function ShowError(xhttp)
 {
+	console.log("Error received: " + xhttp.responseText);
+
 	if (xhttp.responseText.length > 0)
 		window.alert(xhttp.responseText);
 }
@@ -272,6 +308,25 @@ function CreateGUID()
 
 function NOP(Data)
 {
+}
+
+async function ClearCacheAsync(Data)
+{
+	try
+	{
+		console.log("Clearing cache.");
+
+		var Keys = await caches.keys();
+		var Tasks = Keys.map(Key => caches.delete(Key));
+
+		await Promise.all(Tasks);
+
+		console.log("Cache has been cleared.");
+	}
+	catch (e)
+	{
+		console.log(e);
+	}
 }
 
 function Reload(Data)
@@ -435,6 +490,7 @@ var ContentQueue = null;
 var TabID;
 var ServerID = "";
 var EventCheckingEnabled = true;
+var PageOutOfSync = false;
 
 try
 {

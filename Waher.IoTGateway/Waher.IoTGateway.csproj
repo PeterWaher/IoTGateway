@@ -90,6 +90,7 @@
     <None Remove="Root\Sniffers\Sniffer.js" />
     <None Remove="Root\Sniffers\Sniffer.md" />
     <None Remove="Root\Sniffers\XMPP.md" />
+    <None Remove="Root\Starting.md" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
     <None Remove="Schema\ServiceConfiguration.xsd" />
     <None Remove="Schema\Theme.xsd" />
@@ -122,6 +123,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Controls\SimpleTree.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Starting.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\ExpandPrivilege.ws">

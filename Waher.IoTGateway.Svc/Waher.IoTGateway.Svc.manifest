@@ -769,6 +769,7 @@
 		<Content fileName='Sparql.css'/>
 		<Content fileName='Sparql.js'/>
 		<Content fileName='Sparql.md'/>
+		<Content fileName='Starting.md'/>
 		<Content fileName="TargetBlank.js"/>
 		<Folder name='Audio'>
 			<Content fileName='glass_ping-Go445-1207030150.mp3'/>

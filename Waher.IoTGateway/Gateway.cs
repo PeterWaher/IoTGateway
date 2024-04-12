@@ -679,6 +679,7 @@ namespace Waher.IoTGateway
 
 					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null)
 					{
+						ResourceOverride = "/Starting.md",
 						ResourceOverrideFilter = "(?<!Login)[.]md(\\?[.]*)?$",
 						LoginAuditor = loginAuditor
 					};
@@ -807,9 +808,6 @@ namespace Waher.IoTGateway
 
 				if (!(webServer is null))
 				{
-					webServer.ResourceOverride = null;
-					webServer.ResourceOverrideFilter = null;
-
 					if (!(SetupResources is null))
 					{
 						foreach (HttpResource Resource in SetupResources)
@@ -831,9 +829,10 @@ namespace Waher.IoTGateway
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
-					webServer.CustomError += WebServer_CustomError;
-
+					webServer.ResourceOverride = "/Starting.md";
 					webServer.LoginAuditor = loginAuditor;
+					
+					webServer.CustomError += WebServer_CustomError;
 
 					foreach (SystemConfiguration Configuration in configurations)
 					{
@@ -1197,6 +1196,12 @@ namespace Waher.IoTGateway
 				}
 				finally
 				{
+					if (!(webServer is null))
+					{
+						webServer.ResourceOverride = null;
+						webServer.ResourceOverrideFilter = null;
+					}
+
 					startingServer?.Release();
 					startingServer?.Dispose();
 					startingServer = null;

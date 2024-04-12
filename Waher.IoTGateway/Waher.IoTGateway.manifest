@@ -9,6 +9,7 @@
 		<Content fileName="ProposeContract.md"/>
 		<Content fileName="SignatureRequest.js"/>
 		<Content fileName="SignatureRequest.md"/>
+		<Content fileName="Starting.md"/>
 		<Folder name="Controls">
 			<Content fileName="SimpleTable.script"/>
 			<Content fileName="SimpleTree.cssx"/>

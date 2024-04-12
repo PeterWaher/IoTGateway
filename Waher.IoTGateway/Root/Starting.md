@@ -3,7 +3,6 @@ Description: The starting page will be displayed while {{AppName:=Waher.IoTGatew
 Date: 2024-04-12
 Author: Peter Waher
 Copyright: Copyright.md
-CSS: {{Theme.CSSX}}
 Cache-Control: max-age=0, no-cache, no-store
 Refresh: 2
 

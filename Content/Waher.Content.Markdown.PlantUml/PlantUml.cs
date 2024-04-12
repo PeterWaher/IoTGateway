@@ -134,6 +134,9 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <param name="Reschedule">If rescheduling should be done.</param>
 		public static void DeleteOldFiles(TimeSpan MaxAge, bool Reschedule)
 		{
+			if (string.IsNullOrEmpty(plantUmlFolder))
+				return;
+
 			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 

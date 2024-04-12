@@ -144,6 +144,9 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Reschedule">If rescheduling should be done.</param>
 		public static void DeleteOldFiles(TimeSpan MaxAge, bool Reschedule)
 		{
+			if (string.IsNullOrEmpty(graphVizFolder))
+				return;
+
 			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 

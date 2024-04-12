@@ -48,8 +48,11 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			Variables["GraphBgColor"] = currentDefinition.GraphBgColor;
-			Variables["GraphFgColor"] = currentDefinition.GraphFgColor;
+			if (!(Variables is null))
+			{
+				Variables["GraphBgColor"] = currentDefinition.GraphBgColor;
+				Variables["GraphFgColor"] = currentDefinition.GraphFgColor;
+			}
 
 			return new ObjectValue(currentDefinition);
 		}

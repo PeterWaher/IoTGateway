@@ -87,6 +87,9 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Reschedule">If rescheduling should be done.</param>
 		public static void DeleteOldFiles(TimeSpan MaxAge, bool Reschedule)
 		{
+			if (string.IsNullOrEmpty(layoutFolder))
+				return;
+
 			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 

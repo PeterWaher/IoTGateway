@@ -5159,8 +5159,11 @@ namespace Waher.Content.Markdown
 				this.master.syntaxHighlighting |= this.syntaxHighlighting;
 
 				if (this.master.metaData.ContainsKey("MASTER"))
-					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
-
+				{
+					throw new GenericException("Master documents are not allowed to be embedded in other master documents.",
+						EventType.Error, FileName, this.fileName);
+				}
+				
 				CopyMetaDataTags(this, this.master, true);
 
 				this.master.detail = this;

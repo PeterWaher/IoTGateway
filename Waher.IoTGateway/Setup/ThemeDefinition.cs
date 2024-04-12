@@ -331,7 +331,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Width">Desired width</param>
 		/// <param name="Height">Desired height</param>
-		/// <returns>Image</returns>
+		/// <returns>Image, or null if none found.</returns>
 		public ThemeImage GetBackgroundImage(int Width, int Height)
 		{
 			return this.GetImage(this.backgroundImages, Width, Height);
@@ -342,7 +342,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Width">Desired width</param>
 		/// <param name="Height">Desired height</param>
-		/// <returns>Image</returns>
+		/// <returns>Image, or null if none found.</returns>
 		public ThemeImage GetBannerImage(int Width, int Height)
 		{
 			return this.GetImage(this.bannerImages, Width, Height);
@@ -368,9 +368,6 @@ namespace Waher.IoTGateway.Setup
 					BestSqrError = SqrError;
 				}
 			}
-
-			if (Best is null)
-				throw new InvalidOperationException("No such images defined in theme.");
 
 			return Best;
 		}

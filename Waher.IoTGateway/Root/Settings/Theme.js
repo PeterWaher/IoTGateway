@@ -1,4 +1,6 @@
-﻿function SetTheme(ThemeId)
+﻿var StatusCheckTimer = null;
+
+function SetTheme(ThemeId)
 {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function ()
@@ -10,14 +12,37 @@
         }
     };
 
+    StartStatusCheck();
+
     xhttp.open("POST", "/Settings/SetTheme", true);
     xhttp.setRequestHeader("Content-Type", "text/plain");
     xhttp.setRequestHeader("X-TabID", TabID);
     xhttp.send(ThemeId);
 }
 
+function ClearStatusCheck()
+{
+    if (StatusCheckTimer)
+    {
+        window.clearTimeout(StatusCheckTimer);
+        StatusCheckTimer = null;
+    }
+}
+
+function StartStatusCheck()
+{
+    ClearStatusCheck();
+    StatusCheckTimer = window.setTimeout(async function ()
+    {
+        await ClearCacheAsync(null);
+        Reload(null);
+    }, 3000);
+}
+
 function ThemeOk(Data)
 {
+    ClearStatusCheck();
+
     var ThemeId = Data.themeId;
     var Themes = document.getElementById("themes");
     var Loop = Themes.firstChild;

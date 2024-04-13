@@ -746,6 +746,8 @@ namespace Waher.IoTGateway
 							NeedsCleanup = true;
 						}
 
+						DateTime StartConfig = DateTime.Now;
+
 						try
 						{
 							await Configuration.ConfigureSystem();
@@ -800,6 +802,9 @@ namespace Waher.IoTGateway
 
 							break;
 						}
+
+						if (DateTime.Now.Subtract(StartConfig).TotalSeconds > 2)
+							await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 					}
 				}
 				while (ReloadConfigurations);
@@ -834,7 +839,7 @@ namespace Waher.IoTGateway
 
 					webServer.ResourceOverride = "/Starting.md";
 					webServer.LoginAuditor = loginAuditor;
-					
+
 					webServer.CustomError += WebServer_CustomError;
 
 					foreach (SystemConfiguration Configuration in configurations)
@@ -984,7 +989,7 @@ namespace Waher.IoTGateway
 
 							try
 							{
-								webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted, 
+								webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
 									TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
 							}
 							catch (Exception ex)

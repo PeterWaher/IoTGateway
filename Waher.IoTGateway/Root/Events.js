@@ -351,7 +351,7 @@ function SetReloadTimer()
 	{
 		await ClearCacheAsync();
 		Reload(null);
-	}, 2000);
+	}, 3000);
 }
 
 function OpenUrl(Url)

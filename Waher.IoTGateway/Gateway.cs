@@ -22,6 +22,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Markdown.PlantUml;
+using Waher.Content.Markdown.Rendering;
 using Waher.Content.Markdown.Web;
 using Waher.Content.Markdown.Web.WebScript;
 using Waher.Content.SystemFiles;
@@ -40,6 +41,8 @@ using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.ContentEncodings;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -60,6 +63,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.ServiceRegistration;
 using Waher.Runtime.Settings;
+using Waher.Runtime.Threading;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -74,12 +78,6 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
-using Waher.Runtime.Threading;
-using Waher.Content.Markdown.Functions;
-using Waher.Content.Markdown.Rendering;
-using Waher.Networking.HTTP.ContentEncodings;
-using System.Runtime.CompilerServices;
-using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.IoTGateway
 {
@@ -684,6 +682,7 @@ namespace Waher.IoTGateway
 						LoginAuditor = loginAuditor
 					};
 
+					webServer.Register("/Starting.md", StartingMd);
 					webServer.CustomError += WebServer_CustomError;
 
 					SetupResources = new LinkedList<HttpResource>();
@@ -837,6 +836,7 @@ namespace Waher.IoTGateway
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
+					webServer.Register("/Starting.md", StartingMd);
 					webServer.ResourceOverride = "/Starting.md";
 					webServer.LoginAuditor = loginAuditor;
 
@@ -1250,6 +1250,15 @@ namespace Waher.IoTGateway
 			Link.Append(WebUtility.UrlEncode(e.Text));
 
 			e.Url = Link.ToString();
+		}
+
+		private static async Task StartingMd(HttpRequest Request, HttpResponse Response)
+		{
+			if (string.IsNullOrEmpty(webServer?.ResourceOverride))
+				throw new TemporaryRedirectException("/");
+
+			string Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+			await Response.Return(new MarkdownContent(Markdown));
 		}
 
 		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)
@@ -3444,7 +3453,7 @@ namespace Waher.IoTGateway
 		/// <param name="Graph">Graph to send.</param>
 		public static Task SendNotification(Graph Graph)
 		{
-			return SendNotification(ToMarkdown.GraphToMarkdown(Graph));
+			return SendNotification(Content.Markdown.Functions.ToMarkdown.GraphToMarkdown(Graph));
 		}
 
 		/// <summary>
@@ -3453,7 +3462,7 @@ namespace Waher.IoTGateway
 		/// <param name="Pixels">Pixels to send.</param>
 		public static Task SendNotification(PixelInformation Pixels)
 		{
-			return SendNotification(ToMarkdown.PixelsToMarkdown(Pixels));
+			return SendNotification(Content.Markdown.Functions.ToMarkdown.PixelsToMarkdown(Pixels));
 		}
 
 		/// <summary>
@@ -4816,7 +4825,7 @@ namespace Waher.IoTGateway
 				XSL.Validate(Path.GetFileName(ConfigurationFileName), Doc, ServiceConfigurationRoot, ServiceConfigurationNamespace,
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.ServiceConfiguration.xsd", typeof(Gateway).Assembly));
 
-				bool ExecuteInitScript = await InitScriptFile.NeedsExecution(ConfigurationFileName);
+				bool ExecuteInitScript = await Content.Markdown.Functions.InitScriptFile.NeedsExecution(ConfigurationFileName);
 
 				if (OnlyIfChanged && !ExecuteInitScript)
 					return false;

@@ -235,7 +235,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			try
 			{
-				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
+				if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
 

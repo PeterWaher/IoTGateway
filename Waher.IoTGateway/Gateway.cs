@@ -808,6 +808,9 @@ namespace Waher.IoTGateway
 
 				if (!(webServer is null))
 				{
+					webServer.ResourceOverride = "/Starting.md";
+					await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+
 					if (!(SetupResources is null))
 					{
 						foreach (HttpResource Resource in SetupResources)
@@ -4685,7 +4688,7 @@ namespace Waher.IoTGateway
 		/// <returns>If a script resource with the given resource name was found and removed.</returns>
 		private static async Task<bool> RemoveScriptResource(string ResourceName, bool ConsiderNonexistantRemoved)
 		{
-			if (!webServer.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath))
+			if (!webServer.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath))
 				return false;
 
 			if (!string.IsNullOrEmpty(SubPath))

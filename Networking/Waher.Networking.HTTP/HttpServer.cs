@@ -1533,9 +1533,22 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(string ResourceName, out HttpResource Resource, out string SubPath)
 		{
+			return this.TryGetResource(ResourceName, true, out Resource, out SubPath);
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="ResourceName">Full resource name.</param>
+		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(string ResourceName, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
+		{
 			int i;
 
-			if (!string.IsNullOrEmpty(this.resourceOverride))
+			if (PermitResourceOverride && !string.IsNullOrEmpty(this.resourceOverride))
 			{
 				if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
 					ResourceName = this.resourceOverride;
@@ -1947,7 +1960,7 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath) &&
+			if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
 				using (MemoryStream ms = new MemoryStream())
@@ -2000,7 +2013,7 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath) &&
+			if (this.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath) &&
 				Resource is HttpFolderResource Folder)
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);

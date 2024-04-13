@@ -22,6 +22,7 @@ function ConfigComplete(Command)
     };
 
     CloseEvents();
+    SetReloadTimer();
 
     xhttp.open("POST", "/Settings/" + Command, true);
     xhttp.setRequestHeader("Connection", "close");

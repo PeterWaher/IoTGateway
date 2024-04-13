@@ -331,7 +331,27 @@ async function ClearCacheAsync(Data)
 
 function Reload(Data)
 {
+	ClearReloadTimer();
 	window.location.reload(false);
+}
+
+function ClearReloadTimer()
+{
+	if (ReloadTimer)
+	{
+		window.clearTimeout(ReloadTimer);
+		ReloadTimer = null;
+	}
+}
+
+function SetReloadTimer()
+{
+	ClearReloadTimer();
+	ReloadTimer = window.setTimeout(async function ()
+	{
+		await ClearCacheAsync();
+		Reload(null);
+	}, 2000);
 }
 
 function OpenUrl(Url)
@@ -491,6 +511,7 @@ var TabID;
 var ServerID = "";
 var EventCheckingEnabled = true;
 var PageOutOfSync = false;
+var ReloadTimer = null;
 
 try
 {

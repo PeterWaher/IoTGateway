@@ -13,6 +13,9 @@ using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#endif
 
 namespace Waher.Networking.HTTP
 {

@@ -114,6 +114,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\AnonymousAuthentication.cs" />
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
     <Compile Include="Authentication\MutualTlsAuthentication.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="ContentEncodings\IContentEncoding.cs" />
     <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="Exceptions\Redirections\PermanentRedirectException.cs" />
     <Compile Include="HttpRedirectionResource.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="Interfaces\IHttpTraceMethod.cs" />
     <Compile Include="PostedInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxyResponseEventArgs.cs" />
     <Compile Include="ScriptExtensions\Functions\ClientErrors\BadRequest.cs" />
     <Compile Include="ScriptExtensions\Functions\ClientErrors\Conflict.cs" />
     <Compile Include="ScriptExtensions\Functions\ClientErrors\FailedDependency.cs" />
@@ -249,6 +252,7 @@
     <Compile Include="ScriptExtensions\Functions\Redirections\Found.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\MovedPermanently.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\NotModified.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\PermanentRedirect.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\SeeOther.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\TemporaryRedirect.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\UseProxy.cs" />

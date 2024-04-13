@@ -116,6 +116,7 @@
     <Compile Include="Functions\AuthenticateJwt.cs" />
     <Compile Include="Functions\CreateJwt.cs" />
     <Compile Include="Functions\ValidateJwt.cs" />
+    <Compile Include="IUserWithClaims.cs" />
     <Compile Include="JwtAuthentication.cs" />
     <Compile Include="JwtClaims.cs" />
     <Compile Include="JwtCodec.cs" />

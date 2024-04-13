@@ -39,12 +39,10 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultHttpPort = 80;
 
-#if !WINDOWS_UWP          // SSL/TLS server-side certificates not implemented in UWP...
 		/// <summary>
 		/// Default HTTPS port (443).
 		/// </summary>
 		public const int DefaultHttpsPort = 443;
-#endif
 
 		/// <summary>
 		/// Default Connection backlog (10).

@@ -1258,7 +1258,14 @@ namespace Waher.IoTGateway
 				throw new TemporaryRedirectException("/");
 
 			string Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
-			await Response.Return(new MarkdownContent(Markdown));
+			Variables v = Request.Session ?? new Variables();
+			MarkdownSettings Settings = new MarkdownSettings(emoji1_24x24, true, v);
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
+			string Html = await Doc.GenerateHTML();
+
+			Response.ContentType = "text/html; charset=utf-8";
+			await Response.Write(System.Text.Encoding.UTF8.GetBytes(Html));
+			await Response.SendResponse();
 		}
 
 		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)

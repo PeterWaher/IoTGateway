@@ -2504,6 +2504,7 @@ IoT Broker or the Neuron^TM.
 |---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------|
 | `ExchangeRate(From,To)`                                 | Gets the current exchange rate between two currencies. Requires a currency converter to be configured for the system. | `ExchangeRate("USD","EUR")` |
 | `GetServiceProvidersForBuyingEDaler(Country,Currency)`  | Gets available service providers that can be used to buy eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForBuyingEDaler("US","USD")` |
+| `GetServiceProvidersForPayments(Country,Currency)`      | Gets available service providers that can be used to pay for services in a given country, given its country code, and a currency. | `GetServiceProvidersForPayments("US","USD")` |
 | `GetServiceProvidersForPeerReview(MetaData)`            | Gets available service providers that can be used for peer reviews of identity applications. Meta-data about the person is provided in the `MetaData` argument, which is assumed to be an object ex-nihilo. | `GetServiceProvidersForPeerReview({"COUNTRY":"SE","CITY":"Stockholm"})` |
 | `GetServiceProvidersForSellingEDaler(Country,Currency)` | Gets available service providers that can be used to sell eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForSellingEDaler("US","USD")` |
 

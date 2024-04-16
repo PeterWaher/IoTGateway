@@ -2526,6 +2526,7 @@ about the script functions referenced in this section is available in the [Neuro
 | Function                         | Description                                           |
 |----------------------------------|-------------------------------------------------------|
 | `BuyEDalerService(Definition)`   | Creates a script-based service for buying eDaler(R).  |
+| `PaymentService(Definition)`     | Creates a script-based service for payments.          |
 | `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
 
 #### OpenAI Extensions (available in TAG.XmppOpenAIBridge.package)

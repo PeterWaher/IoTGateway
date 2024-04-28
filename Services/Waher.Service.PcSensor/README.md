@@ -32,12 +32,6 @@ As the application is available through XMPP, it also publishes a chat interface
 
 ![Sniff](../../Images/Waher.Service.PcSensor.3.png)
 
-## Binary executable
-
-You can test the application by downloading a [binary executable](../../Executables/Waher.Service.PcSensor.zip). If you don't have an XMPP client
-you can use to chat with the sensor, or if the one you use does not support the XMPP IoT XEPs, you can also download the
-[WPF client](https://waher.se/Downloads/IoTClientSetup.exe) available in the solution.
-
 ## Categories XML
 
 After the first readout, a file called **categories.xml** is created. It includes all performance counter categories found. By default, no categories

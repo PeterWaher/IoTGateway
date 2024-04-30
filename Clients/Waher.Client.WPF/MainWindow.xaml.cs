@@ -213,7 +213,7 @@ namespace Waher.Client.WPF
 				this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (!(Value is null) && Value is string s && Enum.TryParse<WindowState>(s, out WindowState WindowState))
+				if (!(Value is null) && Value is string s && Enum.TryParse(s, out WindowState WindowState))
 					this.WindowState = WindowState;
 
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);

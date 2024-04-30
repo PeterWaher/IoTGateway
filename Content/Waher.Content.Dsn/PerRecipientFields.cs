@@ -118,7 +118,7 @@ namespace Waher.Content.Dsn
 						return false;
 
 				case "ACTION":
-					if (Enum.TryParse<Action>(Value.ToLower(), out Action Action))
+					if (Enum.TryParse(Value.ToLower(), out Action Action))
 					{
 						this.action = Action;
 						return true;

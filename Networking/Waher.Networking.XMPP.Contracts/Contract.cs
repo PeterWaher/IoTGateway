@@ -396,7 +396,7 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "visibility":
-						if (Enum.TryParse<ContractVisibility>(Attr.Value, out ContractVisibility Visibility))
+						if (Enum.TryParse(Attr.Value, out ContractVisibility Visibility))
 						{
 							Result.visibility = Visibility;
 							HasVisibility = true;
@@ -828,7 +828,7 @@ namespace Waher.Networking.XMPP.Contracts
 									break;
 
 								case "state":
-									if (Enum.TryParse<ContractState>(Attr.Value, out ContractState ContractState))
+									if (Enum.TryParse(Attr.Value, out ContractState ContractState))
 										Result.state = ContractState;
 									break;
 

@@ -30,15 +30,13 @@ namespace Waher.Client.WPF.Controls
 			this.node = Node;
 			this.sniffer = null;
 
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public void Dispose()
 		{
-			if (!(this.node is null))
-				this.node.RemoveSniffer(this.sniffer);
-
-			this.Node?.ViewClosed();
+			this.node?.RemoveSniffer(this.sniffer);
+			this.node?.ViewClosed();
 		}
 
 		public TreeNode Node => this.node;
@@ -201,7 +199,7 @@ namespace Waher.Client.WPF.Controls
 				if (E is null)
 					continue;
 
-				if (!Enum.TryParse<SniffItemType>(E.LocalName, out SniffItemType Type))
+				if (!Enum.TryParse(E.LocalName, out SniffItemType Type))
 					continue;
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);

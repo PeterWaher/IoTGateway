@@ -204,7 +204,7 @@ namespace Waher.IoTGateway.Svc
 								break;
 							}
 
-							if (!Enum.TryParse<ServiceStartType>(args[i], out StartType))
+							if (!Enum.TryParse(args[i], out StartType))
 							{
 								Error = true;
 								break;

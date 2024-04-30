@@ -264,7 +264,7 @@ namespace Waher.Networking.XMPP.Contracts
 										break;
 
 									case "state":
-										if (Enum.TryParse<IdentityState>(Attr.Value, out IdentityState IdentityState))
+										if (Enum.TryParse(Attr.Value, out IdentityState IdentityState))
 											Result.state = IdentityState;
 										break;
 

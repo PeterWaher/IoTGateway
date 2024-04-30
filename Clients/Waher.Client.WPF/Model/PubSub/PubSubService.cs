@@ -184,7 +184,7 @@ namespace Waher.Client.WPF.Model.PubSub
 									{
 										if (Identity.Category == "pubsub")
 										{
-											if (!Enum.TryParse<NodeType>(Identity.Type, out NodeType))
+											if (!Enum.TryParse(Identity.Type, out NodeType))
 												NodeType = NodeType.leaf;
 
 											if (!string.IsNullOrEmpty(Identity.Name))
@@ -244,7 +244,7 @@ namespace Waher.Client.WPF.Model.PubSub
 							string NodeName = Form["Node"].ValueString;
 							string Title = Form["pubsub#title"]?.ValueString ?? string.Empty;
 
-							if (!Enum.TryParse<NodeType>(Form["pubsub#node_type"]?.ValueString ?? string.Empty, out NodeType Type))
+							if (!Enum.TryParse(Form["pubsub#node_type"]?.ValueString ?? string.Empty, out NodeType Type))
 								Type = NodeType.leaf;
 
 							Mouse.OverrideCursor = Cursors.Wait;

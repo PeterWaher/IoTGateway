@@ -68,7 +68,7 @@ namespace Waher.Security.ACME
 				switch (P.Key)
 				{
 					case "status":
-						if (!Enum.TryParse<AcmeOrderStatus>(P.Value as string, out this.status))
+						if (!Enum.TryParse(P.Value as string, out this.status))
 							throw new ArgumentException("Invalid ACME order status: " + P.Value.ToString(), "status");
 						break;
 

@@ -505,7 +505,7 @@ namespace Waher.Networking.XMPP.PEP
 							break;
 
 						default:
-							if (Enum.TryParse<UserGeneralActivities>(E2.LocalName, out UserGeneralActivities GeneralActivity))
+							if (Enum.TryParse(E2.LocalName, out UserGeneralActivities GeneralActivity))
 								Result.generalActivity = GeneralActivity;
 							else if (Result.generalActivity.HasValue)
 								break;
@@ -516,7 +516,7 @@ namespace Waher.Networking.XMPP.PEP
 							{
 								if (N2 is XmlElement E3)
 								{
-									if (Enum.TryParse<UserSpecificActivities>(E3.LocalName, out UserSpecificActivities SpecificActivity))
+									if (Enum.TryParse(E3.LocalName, out UserSpecificActivities SpecificActivity))
 										Result.specificActivity = SpecificActivity;
 									else if (!Result.specificActivity.HasValue)
 										Result.specificActivity = UserSpecificActivities.other;

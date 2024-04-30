@@ -194,7 +194,7 @@ namespace Waher.Networking.DNS
 			IPEndPoint Destination = null;
 			int Timeout = 5000;     // Local timeout
 
-			if (Enum.TryParse<TYPE>(TYPE.ToString(), out TYPE T))
+			if (Enum.TryParse(TYPE.ToString(), out TYPE T))
 				ExpectedType = T;
 			else
 				ExpectedType = null;
@@ -476,10 +476,9 @@ namespace Waher.Networking.DNS
 					Answer = CheckTtl(ref Ttl, Message?.Answer),
 					Authority = CheckTtl(ref Ttl, Message?.Authority),
 					Additional = CheckTtl(ref Ttl, Message?.Additional),
-					Raw = Message?.Binary
+					Raw = Message?.Binary,
+					Expires = DateTime.Now.AddSeconds(Ttl)
 				};
-
-				Response.Expires = DateTime.Now.AddSeconds(Ttl);
 
 				if (Save && Database.HasProvider)
 				{

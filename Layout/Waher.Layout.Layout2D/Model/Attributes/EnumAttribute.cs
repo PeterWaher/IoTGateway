@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <returns>If the value could be parsed.</returns>
 		public override bool TryParse(string StringValue, out TEnum Value)
 		{
-			return Enum.TryParse<TEnum>(StringValue, out Value);
+			return Enum.TryParse(StringValue, out Value);
 		}
 
 		/// <summary>

@@ -557,7 +557,7 @@ namespace Waher.Client.WPF.Controls
 				if (E is null)
 					continue;
 
-				if (!Enum.TryParse<ChatItemType>(E.LocalName, out ChatItemType Type))
+				if (!Enum.TryParse(E.LocalName, out ChatItemType Type))
 					continue;
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);

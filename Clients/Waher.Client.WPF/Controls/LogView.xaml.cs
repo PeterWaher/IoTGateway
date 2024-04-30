@@ -274,7 +274,7 @@ namespace Waher.Client.WPF.Controls
 				if (E is null)
 					continue;
 
-				if (!Enum.TryParse<EventType>(E.LocalName, out EventType Type))
+				if (!Enum.TryParse(E.LocalName, out EventType Type))
 					continue;
 
 				DateTime Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);

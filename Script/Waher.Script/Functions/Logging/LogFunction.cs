@@ -125,7 +125,7 @@ namespace Waher.Script.Functions.Logging
 
 						case "LEVEL":
 							if (P.Value.AssociatedObjectValue is EventLevel L ||
-								Enum.TryParse<EventLevel>(P.Value.AssociatedObjectValue?.ToString() ?? string.Empty, out L))
+								Enum.TryParse(P.Value.AssociatedObjectValue?.ToString() ?? string.Empty, out L))
 							{
 								Level = L;
 							}

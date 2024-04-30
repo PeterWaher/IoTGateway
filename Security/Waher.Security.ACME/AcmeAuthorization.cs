@@ -62,7 +62,7 @@ namespace Waher.Security.ACME
 				switch (P.Key)
 				{
 					case "status":
-						if (!Enum.TryParse<AcmeAuthorizationStatus>(P.Value as string, out this.status))
+						if (!Enum.TryParse(P.Value as string, out this.status))
 							throw new ArgumentException("Invalid ACME authorization status: " + P.Value.ToString(), "status");
 						break;
 

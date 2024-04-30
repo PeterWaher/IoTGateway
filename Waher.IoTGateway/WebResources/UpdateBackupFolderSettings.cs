@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -156,10 +157,10 @@ namespace Waher.IoTGateway.WebResources
 				}
 			}
 
-			Export.ExportFolder = ExportFolder;
-			Export.ExportKeyFolder = KeyFolder;
-			Export.BackupHosts = BackupHosts;
-			Export.KeyHosts = KeyHosts;
+			await Export.SetExportFolderAsync(ExportFolder);
+			await Export.SetExportKeyFolderAsync(KeyFolder);
+			await Export.SetBackupHostsAsync(BackupHosts);
+			await Export.SetKeyHostsAsync(KeyHosts);
 
 			Response.StatusCode = 200;
 			Response.StatusMessage = "OK";

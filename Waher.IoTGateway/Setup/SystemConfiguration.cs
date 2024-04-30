@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -162,9 +164,9 @@ namespace Waher.IoTGateway.Setup
 		protected virtual async Task ConfigComplete(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, new string[] { this.ConfigPrivilege });
-			
+
 			await this.MakeCompleted();
-			
+
 			Response.StatusCode = 200;
 		}
 
@@ -208,10 +210,114 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public virtual Task<bool> SimplifiedConfiguration()
 		{
 			return Task.FromResult(false);
+		}
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public abstract Task<bool> EnvironmentConfiguration();
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// contains an error.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError(null, EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value is missing.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableMissingError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Value missing.", EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// is not a valid Boolean value.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableInvalidBooleanError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Invalid Boolean Value.", EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// is not a valid integer value.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableInvalidIntegerError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Invalid integer Value.", EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// is not a valid time value.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableInvalidTimeError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Invalid time Value.", EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// is not a valid date value.
+		/// </summary>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableInvalidDateError(string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Invalid date Value.", EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// is not within a valid range.
+		/// </summary>
+		/// <param name="Min">Minimum value.</param>
+		/// <param name="Max">Maximum value.</param>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentVariableInvalidRangeError(int Min, int Max, string EnvironmentVariable, object Value)
+		{
+			this.LogEnvironmentError("Value not in valid range. Must be between " + Min.ToString() + " and " + Max.ToString() + ".",
+				EnvironmentVariable, Value);
+		}
+
+		/// <summary>
+		/// Logs an error to the event log, telling the operator an environment variable value
+		/// contains an error.
+		/// </summary>
+		/// <param name="Message">Message to log.</param>
+		/// <param name="EnvironmentVariable">Name of environment variable.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		public void LogEnvironmentError(string Message, string EnvironmentVariable, object Value)
+		{
+			if (string.IsNullOrEmpty(Message))
+				Message = "Environment Variable contains an invalid value.";
+			else
+				Message = "Environment Variable contains an invalid value: " + Message;
+
+			Log.Error(Message, EnvironmentVariable, string.Empty, "ConfigError",
+				new KeyValuePair<string, object>("EnvironmentVariable", EnvironmentVariable),
+				new KeyValuePair<string, object>("Value", Value));
 		}
 	}
 }

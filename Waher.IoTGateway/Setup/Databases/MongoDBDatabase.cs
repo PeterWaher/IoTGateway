@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
@@ -71,7 +70,7 @@ namespace Waher.IoTGateway.Setup.Databases
 					Types.SetProperty(MongoClientSettings, "Credential", MongoCredential);
 				}
 
-				IDatabaseProvider MongoDBProvider = Types.CreateObject("Waher.Persistence.MongoDB.MongoDBProvider", MongoClientSettings, 
+				IDatabaseProvider MongoDBProvider = Types.CreateObject("Waher.Persistence.MongoDB.MongoDBProvider", MongoClientSettings,
 					MongoDBSettings.Database, MongoDBSettings.DefaultCollection) as IDatabaseProvider;
 
 				Database.Register(MongoDBProvider, true);
@@ -111,56 +110,178 @@ namespace Waher.IoTGateway.Setup.Databases
 				throw new BadRequestException();
 			}
 
-			int? PortNumber;
+			(string Message, string _, string _) = await this.Test(HostName, DatabaseName, DefaultCollection, UserName, Password,
+				PortNumberString, Save, MongoDBSettings);
 
-			if (string.IsNullOrEmpty(PortNumberString))
-				PortNumber = null;
-			else if (!int.TryParse(PortNumberString, out int i) || i <= 0 || i > 65535)
-				throw new BadRequestException("Invalid Port Number.");
-			else
-				PortNumber = i;
+			if (!string.IsNullOrEmpty(Message))
+				throw new BadRequestException(Message);
+		}
 
+		/// <summary>
+		/// Environment variable name for MongoDB Host Name.
+		/// </summary>
+		public const string MONGO_DB_HOST = nameof(MONGO_DB_HOST);
 
-			object MongoClientSettings = Types.CreateObject("MongoDB.Driver.MongoClientSettings");
-			Types.SetProperty(MongoClientSettings, "ApplicationName", Gateway.ApplicationName);
-			Types.SetProperty(MongoClientSettings, "ConnectTimeout", TimeSpan.FromSeconds(5));
+		/// <summary>
+		/// Environment variable name for MongoDB Database Name.
+		/// </summary>
+		public const string MONGO_DB_NAME = nameof(MONGO_DB_NAME);
 
-			if (!string.IsNullOrEmpty(HostName))
+		/// <summary>
+		/// Environment variable name for MongoDB default collection.
+		/// </summary>
+		public const string MONGO_DB_DEFAULT = nameof(MONGO_DB_DEFAULT);
+
+		/// <summary>
+		/// Environment variable name for MongoDB User Name.
+		/// </summary>
+		public const string MONGO_DB_USER = nameof(MONGO_DB_USER);
+
+		/// <summary>
+		/// Environment variable name for MongoDB Password.
+		/// </summary>
+		public const string MONGO_DB_PASSWORD = nameof(MONGO_DB_PASSWORD);
+
+		/// <summary>
+		/// Environment variable name for MongoDB Port number.
+		/// </summary>
+		public const string MONGO_DB_PORT = nameof(MONGO_DB_PORT);
+
+		private async Task<(string, string, string)> Test(string HostName, string DatabaseName, string DefaultCollection, string UserName, string Password,
+			string PortNumberString, bool Save, MongoDBSettings Settings)
+		{
+			try
 			{
-				object MongoServerAddress;
+				int? PortNumber;
 
-				if (PortNumber.HasValue)
-					MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName, PortNumber.Value);
+				if (string.IsNullOrEmpty(PortNumberString))
+					PortNumber = null;
+				else if (!int.TryParse(PortNumberString, out int i) || i <= 0 || i > 65535)
+					return ("Invalid Port Number.", MONGO_DB_PORT, PortNumberString);
 				else
-					MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName);
+					PortNumber = i;
 
-				Types.SetProperty(MongoClientSettings, "Server", MongoServerAddress);
+				object MongoClientSettings = Types.CreateObject("MongoDB.Driver.MongoClientSettings");
+				Types.SetProperty(MongoClientSettings, "ApplicationName", Gateway.ApplicationName);
+				Types.SetProperty(MongoClientSettings, "ConnectTimeout", TimeSpan.FromSeconds(5));
+
+				if (!string.IsNullOrEmpty(HostName))
+				{
+					try
+					{
+						object MongoServerAddress;
+
+						if (PortNumber.HasValue)
+							MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName, PortNumber.Value);
+						else
+							MongoServerAddress = Types.CreateObject("MongoDB.Driver.MongoServerAddress", HostName);
+
+						Types.SetProperty(MongoClientSettings, "Server", MongoServerAddress);
+					}
+					catch (Exception ex)
+					{
+						return (ex.Message, MONGO_DB_HOST, HostName);
+					}
+				}
+
+				if (!string.IsNullOrEmpty(Settings.UserName))
+				{
+					try
+					{
+						object MongoCredential = Types.CallStatic("MongoDB.Driver.MongoCredential", "CreateCredential",
+							DatabaseName, UserName, Password);
+
+						Types.SetProperty(MongoClientSettings, "Credential", MongoCredential);
+					}
+					catch (Exception ex)
+					{
+						return (ex.Message, MONGO_DB_USER, UserName);
+					}
+				}
+
+				object Client = Types.CreateObject("MongoDB.Driver.MongoClient", MongoClientSettings);
+
+				Task Task = Types.Call(Client, "StartSessionAsync") as Task;
+				await Task;
+
+				Types.Call(Client, "GetDatabase", DatabaseName);
+
+				if (Save)
+				{
+					Settings.Host = HostName;
+					Settings.Port = PortNumber;
+					Settings.UserName = UserName;
+					Settings.Password = Password;
+					Settings.Database = DatabaseName;
+					Settings.DefaultCollection = DefaultCollection;
+				}
 			}
-
-			if (!string.IsNullOrEmpty(MongoDBSettings.UserName))
+			catch (Exception ex)
 			{
-				object MongoCredential = Types.CallStatic("MongoDB.Driver.MongoCredential", "CreateCredential", 
-					DatabaseName, UserName, Password);
-
-				Types.SetProperty(MongoClientSettings, "Credential", MongoCredential);
+				return (ex.Message, MONGO_DB_HOST, HostName);
 			}
 
-			object Client = Types.CreateObject("MongoDB.Driver.MongoClient", MongoClientSettings);
+			return (null, null, null);
+		}
 
-			Task Task = Types.Call(Client, "StartSessionAsync") as Task;
-			await Task;
+		/// <summary>
+		/// Tests database connection parameters available via environment variables.
+		/// </summary>
+		/// <param name="Configuration">Configuration object.</param>
+		/// <param name="Settings">Plugin settings parameters.</param>
+		/// <returns>If environment configuration is correct.</returns>
+		public async Task<bool> TestEnvironmentVariables(DatabaseConfiguration Configuration, object Settings)
+		{
+			if (!(Settings is MongoDBSettings MongoDBSettings))
+				return false;
 
-			Types.Call(Client, "GetDatabase", DatabaseName);
+			string Host = Environment.GetEnvironmentVariable(MONGO_DB_HOST);
+			string Name = Environment.GetEnvironmentVariable(MONGO_DB_NAME);
+			string Default = Environment.GetEnvironmentVariable(MONGO_DB_DEFAULT);
+			string User = Environment.GetEnvironmentVariable(MONGO_DB_USER);
+			string Password = Environment.GetEnvironmentVariable(MONGO_DB_PASSWORD);
+			string Port = Environment.GetEnvironmentVariable(MONGO_DB_PORT);
 
-			if (Save)
+			if (string.IsNullOrEmpty(Host) &&
+				string.IsNullOrEmpty(Name) &&
+				string.IsNullOrEmpty(Default) &&
+				string.IsNullOrEmpty(User) &&
+				string.IsNullOrEmpty(Password) &&
+				string.IsNullOrEmpty(Port))
 			{
-				MongoDBSettings.Host = HostName;
-				MongoDBSettings.Port = PortNumber;
-				MongoDBSettings.UserName = UserName;
-				MongoDBSettings.Password = Password;
-				MongoDBSettings.Database = DatabaseName;
-				MongoDBSettings.DefaultCollection = DefaultCollection;
+				return false;
 			}
+
+			if (string.IsNullOrEmpty(Host))
+			{
+				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_HOST, Host);
+				return false;
+			}
+
+			if (string.IsNullOrEmpty(Name))
+			{
+				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_NAME, Name);
+				return false;
+			}
+
+			if (string.IsNullOrEmpty(Default))
+				Default = "Default";
+
+			if (string.IsNullOrEmpty(User))
+			{
+				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_USER, User);
+				return false;
+			}
+
+			(string Message, string Parameter, string Value) = await this.Test(Host, Name, Default, User, Password, Port, true, MongoDBSettings);
+
+			if (!string.IsNullOrEmpty(Message))
+			{
+				Configuration.LogEnvironmentError(Message, Parameter, Value);
+				return false;
+			}
+
+			return true;
 		}
 
 	}

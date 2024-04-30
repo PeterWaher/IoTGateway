@@ -66,9 +66,9 @@ namespace Waher.IoTGateway.WebResources
 			string Dir;
 
 			if (FileName.EndsWith(".key", StringComparison.CurrentCultureIgnoreCase))
-				Dir = Export.FullKeyExportFolder;
+				Dir = await Export.GetFullKeyExportFolderAsync();
 			else
-				Dir = Export.FullExportFolder;
+				Dir = await Export.GetFullExportFolderAsync();
 
 			if (!Directory.Exists(Dir))
 				throw new NotFoundException("Folder not found: " + Dir);

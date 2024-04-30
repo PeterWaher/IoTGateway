@@ -24,47 +24,41 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Full path to export folder.
 		/// </summary>
-		public static string FullExportFolder
+		public static async Task<string> GetFullExportFolderAsync()
 		{
-			get
-			{
-				string Path = ExportFolder;
+			string Path = await GetExportFolderAsync();
 
-				if (string.IsNullOrEmpty(Path))
-					Path = System.IO.Path.Combine(Gateway.AppDataFolder, "Backup");
+			if (string.IsNullOrEmpty(Path))
+				Path = System.IO.Path.Combine(Gateway.AppDataFolder, "Backup");
 
-				return Path;
-			}
+			return Path;
 		}
 
 		/// <summary>
 		/// Full path to key folder.
 		/// </summary>
-		public static string FullKeyExportFolder
+		public static async Task<string> GetFullKeyExportFolderAsync()
 		{
-			get
-			{
-				string Path = ExportKeyFolder;
+			string Path = await GetExportKeyFolderAsync();
 
-				if (string.IsNullOrEmpty(Path))
-					Path = System.IO.Path.Combine(Gateway.AppDataFolder, "Backup");
+			if (string.IsNullOrEmpty(Path))
+				Path = System.IO.Path.Combine(Gateway.AppDataFolder, "Backup");
 
-				return Path;
-			}
+			return Path;
 		}
 
 		/// <summary>
 		/// Gets information about exported files.
 		/// </summary>
 		/// <returns>File information array</returns>
-		public static FileInformation[] GetExportFiles()
+		public static async Task<FileInformation[]> GetExportFilesAsync()
 		{
 			SortedDictionary<DateTime, FileInformation> Sorted = new SortedDictionary<DateTime, FileInformation>(new ReverseDateTimeOrder());
-			string Path = FullExportFolder;
+			string Path = await GetFullExportFolderAsync();
 			if (Directory.Exists(Path))
 				GetFiles(Path, Sorted);
 
-			string Path2 = FullKeyExportFolder;
+			string Path2 = await GetFullKeyExportFolderAsync();
 			if (Path != Path2 && Directory.Exists(Path2))
 				GetFiles(Path2, Sorted);
 
@@ -154,33 +148,35 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Export folder.
 		/// </summary>
-		public static string ExportFolder
+		public static async Task<string> GetExportFolderAsync()
 		{
-			get
-			{
-				if (exportFolderValue is null)
-					exportFolderValue = RuntimeSettings.Get("ExportFolder", string.Empty);
+			if (exportFolderValue is null)
+				exportFolderValue = await RuntimeSettings.GetAsync("ExportFolder", string.Empty);
 
-				return exportFolderValue;
-			}
+			return exportFolderValue;
+		}
 
-			set
+		/// <summary>
+		/// Export folder.
+		/// </summary>
+		/// <param name="Value">New value.</param>
+		public static async Task SetExportFolderAsync(string Value)
+		{
+			if (exportFolderValue != Value)
 			{
-				if (exportFolderValue != value)
+				exportFolderValue = Value;
+				await RuntimeSettings.SetAsync("ExportFolder", exportFolderValue);
+
+				if (!(BackupConfiguration.Instance is null))
+					await BackupConfiguration.Instance.UpdateExportFolder(await GetFullExportFolderAsync());
+
+				try
 				{
-					exportFolderValue = value;
-					RuntimeSettings.Set("ExportFolder", exportFolderValue);
-
-					BackupConfiguration.Instance?.UpdateExportFolder(FullExportFolder);
-
-					try
-					{
-						OnExportFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
+					OnExportFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 				}
 			}
 		}
@@ -195,33 +191,34 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Key folder
 		/// </summary>
-		public static string ExportKeyFolder
+		public static async Task<string> GetExportKeyFolderAsync()
 		{
-			get
-			{
-				if (exportKeyFolderValue is null)
-					exportKeyFolderValue = RuntimeSettings.Get("ExportKeyFolder", string.Empty);
+			if (exportKeyFolderValue is null)
+				exportKeyFolderValue = await RuntimeSettings.GetAsync("ExportKeyFolder", string.Empty);
 
-				return exportKeyFolderValue;
-			}
+			return exportKeyFolderValue;
+		}
 
-			set
+		/// <summary>
+		/// Key folder
+		/// </summary>
+		/// <param name="Value">New value.</param>
+		public static async Task SetExportKeyFolderAsync(string Value)
+		{
+			if (exportKeyFolderValue != Value)
 			{
-				if (exportKeyFolderValue != value)
+				exportKeyFolderValue = Value;
+				await RuntimeSettings.SetAsync("ExportKeyFolder", exportKeyFolderValue);
+
+				BackupConfiguration.Instance?.UpdateExportKeyFolder(await GetFullKeyExportFolderAsync());
+
+				try
 				{
-					exportKeyFolderValue = value;
-					RuntimeSettings.Set("ExportKeyFolder", exportKeyFolderValue);
-
-					BackupConfiguration.Instance?.UpdateExportKeyFolder(FullKeyExportFolder);
-
-					try
-					{
-						OnExportKeyFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
+					OnExportKeyFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 				}
 			}
 		}
@@ -382,27 +379,19 @@ namespace Waher.IoTGateway
 		private static string exportType = null;
 
 		/// <summary>
-		/// If automatic backups is activated
+		/// If automatic backups are activated
 		/// </summary>
-		public static bool AutomaticBackups
+		public static async Task SetAutomaticBackupsAsync(bool Value)
 		{
-			get
+			if (automaticBackups != Value)
 			{
-				return GetAutomaticBackupsAsync().Result;
-			}
-
-			set
-			{
-				if (automaticBackups != value)
-				{
-					automaticBackups = value;
-					RuntimeSettings.Set("AutomaticBackups", automaticBackups.Value);
-				}
+				automaticBackups = Value;
+				await RuntimeSettings.SetAsync("AutomaticBackups", automaticBackups.Value);
 			}
 		}
 
 		/// <summary>
-		/// If automatic backups is activated
+		/// If automatic backups are activated
 		/// </summary>
 		public static async Task<bool> GetAutomaticBackupsAsync()
 		{
@@ -417,20 +406,13 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// For how many days backups are kept.
 		/// </summary>
-		public static long BackupKeepDays
+		/// <param name="Value">Number of days.</param>
+		public static async Task SetKeepDaysAsync(long Value)
 		{
-			get
+			if (backupKeepDays != Value)
 			{
-				return GetKeepDaysAsync().Result;
-			}
-
-			set
-			{
-				if (backupKeepDays != value)
-				{
-					backupKeepDays = value;
-					RuntimeSettings.Set("BackupKeepDays", backupKeepDays.Value);
-				}
+				backupKeepDays = Value;
+				await RuntimeSettings.SetAsync("BackupKeepDays", backupKeepDays.Value);
 			}
 		}
 
@@ -450,20 +432,13 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// For how many months the monthly backups are kept.
 		/// </summary>
-		public static long BackupKeepMonths
+		/// <param name="Value">Number of months.</param>
+		public static async Task SetKeepMonthsAsync(long Value)
 		{
-			get
+			if (backupKeepMonths != Value)
 			{
-				return GetKeepMonthsAsync().Result;
-			}
-
-			set
-			{
-				if (backupKeepMonths != value)
-				{
-					backupKeepMonths = value;
-					RuntimeSettings.Set("BackupKeepMonths", backupKeepMonths.Value);
-				}
+				backupKeepMonths = Value;
+				await RuntimeSettings.SetAsync("BackupKeepMonths", backupKeepMonths.Value);
 			}
 		}
 
@@ -483,20 +458,13 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// For how many years the yearly backups are kept.
 		/// </summary>
-		public static long BackupKeepYears
+		/// <param name="Value">Number of years.</param>
+		public static async Task SetKeepYearsAsync(long Value)
 		{
-			get
+			if (backupKeepYears != Value)
 			{
-				return GetKeepYearsAsync().Result;
-			}
-
-			set
-			{
-				if (backupKeepYears != value)
-				{
-					backupKeepYears = value;
-					RuntimeSettings.Set("BackupKeepYears", backupKeepYears.Value);
-				}
+				backupKeepYears = Value;
+				await RuntimeSettings.SetAsync("BackupKeepYears", backupKeepYears.Value);
 			}
 		}
 
@@ -516,20 +484,13 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Time of day to start performing backups.
 		/// </summary>
-		public static TimeSpan BackupTime
+		/// <param name="Value">Time of day.</param>
+		public static async Task SetBackupTimeAsync(TimeSpan Value)
 		{
-			get
+			if (backupTime != Value)
 			{
-				return GetBackupTimeAsync().Result;
-			}
-
-			set
-			{
-				if (backupTime != value)
-				{
-					backupTime = value;
-					RuntimeSettings.Set("BackupTime", backupTime.Value);
-				}
+				backupTime = Value;
+				await RuntimeSettings.SetAsync("BackupTime", backupTime.Value);
 			}
 		}
 
@@ -547,23 +508,6 @@ namespace Waher.IoTGateway
 		private static TimeSpan? backupTime = null;
 
 		/// <summary>
-		/// Timestamp of last backup.
-		/// </summary>
-		public static DateTime LastBackup
-		{
-			get
-			{
-				return GetLastBackupAsync().Result;
-			}
-
-			set
-			{
-				if (lastBackup != value)
-					SetLastBackupAsync(value).Wait();
-			}
-		}
-
-		/// <summary>
 		/// Get Timestamp of last backup.
 		/// </summary>
 		public static async Task<DateTime> GetLastBackupAsync()
@@ -579,8 +523,11 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static async Task SetLastBackupAsync(DateTime Value)
 		{
-			lastBackup = Value;
-			await RuntimeSettings.SetAsync("LastBackup", Value);
+			if (lastBackup != Value)
+			{
+				lastBackup = Value;
+				await RuntimeSettings.SetAsync("LastBackup", Value);
+			}
 		}
 
 		private static DateTime? lastBackup = null;
@@ -650,23 +597,24 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Secondary backup hosts.
 		/// </summary>
-		public static string[] BackupHosts
+		public static async Task<string[]> GetBackupHostsAsync()
 		{
-			get
-			{
-				if (backupHosts is null)
-					backupHosts = StringToArray(RuntimeSettings.Get("BackupHosts", string.Empty));
+			if (backupHosts is null)
+				backupHosts = StringToArray(await RuntimeSettings.GetAsync("BackupHosts", string.Empty));
 
-				return backupHosts;
-			}
+			return backupHosts;
+		}
 
-			set
+		/// <summary>
+		/// Secondary backup hosts.
+		/// </summary>
+		/// <param name="Value">New value.</param>
+		public static async Task SetBackupHostsAsync(string[] Value)
+		{
+			if (backupHosts != Value)
 			{
-				if (backupHosts != value)
-				{
-					backupHosts = value;
-					RuntimeSettings.Set("BackupHosts", ArrayToString(backupHosts));
-				}
+				backupHosts = Value;
+				await RuntimeSettings.SetAsync("BackupHosts", ArrayToString(backupHosts));
 			}
 		}
 
@@ -675,23 +623,24 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Secondary key hosts.
 		/// </summary>
-		public static string[] KeyHosts
+		public static async Task<string[]> GetKeyHostsAsync()
 		{
-			get
-			{
-				if (keyHosts is null)
-					keyHosts = StringToArray(RuntimeSettings.Get("KeyHosts", string.Empty));
+			if (keyHosts is null)
+				keyHosts = StringToArray(await RuntimeSettings.GetAsync("KeyHosts", string.Empty));
 
-				return keyHosts;
-			}
+			return keyHosts;
+		}
 
-			set
+		/// <summary>
+		/// Secondary key hosts.
+		/// </summary>
+		/// <param name="Value">New value.</param>
+		public static async Task SetKeyHostsAsync(string[] Value)
+		{
+			if (keyHosts != Value)
 			{
-				if (keyHosts != value)
-				{
-					keyHosts = value;
-					RuntimeSettings.Set("KeyHosts", ArrayToString(keyHosts));
-				}
+				keyHosts = Value;
+				await RuntimeSettings.SetAsync("KeyHosts", ArrayToString(keyHosts));
 			}
 		}
 

@@ -25,28 +25,28 @@ in the database. Click the **Next** button below to continue.
 If you enable automatic backups, the system will automaticly backup your data every day at a given time.  
 
 <p>
-<input name="AutomaticBackups" id="AutomaticBackups" type="checkbox" style="max-width:10em" {{(Export:=Waher.IoTGateway.Export).AutomaticBackups ? "checked" : ""}}/>
+<input name="AutomaticBackups" id="AutomaticBackups" type="checkbox" style="max-width:10em" {{(Export:=Waher.IoTGateway.Export).GetAutomaticBackupsAsync() ? "checked" : ""}}/>
 <label for="AutomaticBackups">Enable Automatic backups.</label>
 </p>
 
 <p>
 <label for="BackupTime">Backup time:</label>  
-<input name="BackupTime" id="BackupTime" type="time" value="{{Export.BackupTime}}" style="max-width:10em"/>
+<input name="BackupTime" id="BackupTime" type="time" value="{{Export.GetBackupTimeAsync()}}" style="max-width:10em"/>
 </p>
 
 <p>
 <label for="KeepDays">Keep daily backups:</label>  
-<input name="KeepDays" id="KeepDays" type="number" min="1" value="{{Export.BackupKeepDays}}" style="max-width:10em"/> days
+<input name="KeepDays" id="KeepDays" type="number" min="1" value="{{Export.GetKeepDaysAsync()}}" style="max-width:10em"/> days
 </p>
 
 <p>
 <label for="KeepMonths">Keep monthly backups:</label>  
-<input name="KeepMonths" id="KeepMonths" type="number" min="1" value="{{Export.BackupKeepMonths}}" style="max-width:10em"/> months
+<input name="KeepMonths" id="KeepMonths" type="number" min="1" value="{{Export.GetKeepMonthsAsync()}}" style="max-width:10em"/> months
 </p>
 
 <p>
 <label for="KeepYears">Keep yearly backups:</label>  
-<input name="KeepYears" id="KeepYears" type="number" min="1" value="{{Export.BackupKeepYears}}" style="max-width:10em"/> years
+<input name="KeepYears" id="KeepYears" type="number" min="1" value="{{Export.GetKeepYearsAsync()}}" style="max-width:10em"/> years
 </p>
 
 <p>
@@ -66,37 +66,37 @@ You can redirect any exported files to another folder if you want, on the local 
 Currently, backup files are stored in this folder:
 
 ```
-{{Export.FullExportFolder}}
+{{Export.GetFullExportFolderAsync()}}
 ```
 
 Keys are stored in this folder:
 
 ```
-{{Export.FullKeyExportFolder}}
+{{Export.GetFullKeyExportFolderAsync()}}
 ```
 
 You can update these folders if you want below. By leaving the fields blank, the default backup folder is used. 
 
 <label for="ExportFolder">Backup Folder:</label>  
-<input id="ExportFolder" name="ExportFolder" type="text" value="{{Export.ExportFolder}}"/>
+<input id="ExportFolder" name="ExportFolder" type="text" value="{{Export.GetExportFolderAsync()}}"/>
 
 If you want encryption keys to be stored in a separate folder, you can provide an additional folder for these. 
 If no key folder is provided, the keys will be placed in the same folder as the corresponding backup file.
 
 <label for="KeyFolder">Key Folder:</label>  
-<input id="KeyFolder" name="KeyFolder" type="text" value="{{Export.ExportKeyFolder}}"/>
+<input id="KeyFolder" name="KeyFolder" type="text" value="{{Export.GetExportKeyFolderAsync()}}"/>
 
 You can choose to store backup files and key files at secondary backup hosts for extra backup and resilience.
 Secondary hosts must be TAG Neurons^TM. You provide their domain names below (separate hosts using comma).
 
 <p>
 <label for="BackupHosts">Secondary Backup Host\(s):</label>  
-<input id="BackupHosts" name="BackupHosts" type="text" value="{{Export.BackupHosts}}"/>
+<input id="BackupHosts" name="BackupHosts" type="text" value="{{Export.GetBackupHostsAsync()}}"/>
 </p>
 
 <p>
 <label for="KeyHosts">Secondary Key Host\(s):</label>  
-<input id="KeyHosts" name="KeyHosts" type="text" value="{{Export.KeyHosts}}"/>
+<input id="KeyHosts" name="KeyHosts" type="text" value="{{Export.GetKeyHostsAsync()}}"/>
 </p>
 
 <p>
@@ -192,7 +192,7 @@ Available backup files
 
 | File | Size | Created |    |
 |:-----|:----:|:-------:|:--:|
-{{Files:=Export.GetExportFiles();foreach File in Files do
+{{Files:=Export.GetExportFilesAsync();foreach File in Files do
 	]]| <a href="/((File.IsKey ? "Key" : "Export"))/((UrlEncode(File.Name).Replace(")","%29");))" target="_blank">((File.Name.Replace(")","\\)").Replace("_","\\_");))</a> | ((File.SizeStr)) | ((File.Created)) | <button class='negButtonSm' onclick='DeleteExport("((File.Name.Replace('"','\\"');))")'>Delete</button> |
 [[;}}
 

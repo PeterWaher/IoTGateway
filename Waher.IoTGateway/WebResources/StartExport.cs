@@ -95,7 +95,7 @@ namespace Waher.IoTGateway.WebResources
 				if (!RequestObj.TryGetValue("exportOnly", out Obj) || !(Obj is bool ExportOnly))
 					throw new BadRequestException("Missing: exportOnly");
 
-				ExportInfo ExportInfo = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
+				ExportInfo ExportInfo = await GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
 				Task T;
 
 				lock (synchObject)
@@ -166,10 +166,10 @@ namespace Waher.IoTGateway.WebResources
 			public IExportFormat Exporter;
 		}
 
-		internal static ExportInfo GetExporter(string TypeOfFile, bool OnlySelectedCollections, Array SelectedCollections)
+		internal static async Task<ExportInfo> GetExporter(string TypeOfFile, bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			ExportInfo Result = new ExportInfo();
-			string BasePath = Export.FullExportFolder;
+			string BasePath = await Export.GetFullExportFolderAsync();
 
 			if (!Directory.Exists(BasePath))
 				Directory.CreateDirectory(BasePath);
@@ -223,7 +223,7 @@ namespace Waher.IoTGateway.WebResources
 					gz = new GZipStream(cs, CompressionLevel.Optimal, false);
 					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, gz, fs, cs, 32, OnlySelectedCollections, SelectedCollections);
 
-					string BasePath2 = Export.FullKeyExportFolder;
+					string BasePath2 = await Export.GetFullKeyExportFolderAsync();
 
 					if (!Directory.Exists(BasePath2))
 						Directory.CreateDirectory(BasePath2);
@@ -559,15 +559,19 @@ namespace Waher.IoTGateway.WebResources
 					{
 						BackupInfo.Recipients = new Dictionary<string, bool>();
 
-						if (BackupInfo.IsKey && !(Export.KeyHosts is null))
+						string[] Hosts = await Export.GetKeyHostsAsync();
+
+						if (BackupInfo.IsKey && !(Hosts is null))
 						{
-							foreach (string Host in Export.KeyHosts)
+							foreach (string Host in Hosts)
 								BackupInfo.Recipients[Host] = false;
 						}
 
-						if (!BackupInfo.IsKey && !(Export.BackupHosts is null))
+						Hosts = await Export.GetBackupHostsAsync();
+
+						if (!BackupInfo.IsKey && !(Hosts is null))
 						{
-							foreach (string Host in Export.BackupHosts)
+							foreach (string Host in Hosts)
 								BackupInfo.Recipients[Host] = false;
 						}
 					}

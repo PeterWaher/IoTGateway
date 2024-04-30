@@ -579,7 +579,7 @@ namespace Waher.IoTGateway
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();
 				Dictionary<string, SystemConfiguration> SystemConfigurations = new Dictionary<string, SystemConfiguration>();
 				bool Configured = true;
-				bool? Simplify = null;
+				bool Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
 
 				foreach (Type SystemConfigurationType in Types.GetTypesImplementingInterface(typeof(ISystemConfiguration)))
 				{
@@ -600,12 +600,9 @@ namespace Waher.IoTGateway
 						SystemConfigurations[s] = SystemConfiguration;
 						SystemConfigurationTypes.Remove(s);
 
-						if (!SystemConfiguration.Complete && Configured)
+						if (!SystemConfiguration.Complete)
 						{
-							if (!Simplify.HasValue)
-								Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
-
-							if (Simplify.Value && await SystemConfiguration.SimplifiedConfiguration())
+							if (await SystemConfiguration.EnvironmentConfiguration())
 							{
 								await SystemConfiguration.MakeCompleted();
 								await Database.Update(SystemConfiguration);
@@ -614,9 +611,22 @@ namespace Waher.IoTGateway
 									NewConfigurations = new LinkedList<SystemConfiguration>();
 
 								NewConfigurations.AddLast(SystemConfiguration);
+								continue;
 							}
-							else
-								Configured = false;
+
+							if (Simplify && await SystemConfiguration.SimplifiedConfiguration())
+							{
+								await SystemConfiguration.MakeCompleted();
+								await Database.Update(SystemConfiguration);
+
+								if (NewConfigurations is null)
+									NewConfigurations = new LinkedList<SystemConfiguration>();
+
+								NewConfigurations.AddLast(SystemConfiguration);
+								continue;
+							}
+
+							Configured = false;
 						}
 					}
 				}
@@ -633,24 +643,31 @@ namespace Waher.IoTGateway
 
 						SystemConfigurations[P.Key] = SystemConfiguration;
 
-						if (Configured)
+						if (await SystemConfiguration.EnvironmentConfiguration())
 						{
-							if (!Simplify.HasValue)
-								Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
+							await SystemConfiguration.MakeCompleted();
+							await Database.Update(SystemConfiguration);
 
-							if (Simplify.Value && await SystemConfiguration.SimplifiedConfiguration())
-							{
-								await SystemConfiguration.MakeCompleted();
-								await Database.Update(SystemConfiguration);
+							if (NewConfigurations is null)
+								NewConfigurations = new LinkedList<SystemConfiguration>();
 
-								if (NewConfigurations is null)
-									NewConfigurations = new LinkedList<SystemConfiguration>();
-
-								NewConfigurations.AddLast(SystemConfiguration);
-							}
-							else
-								Configured = false;
+							NewConfigurations.AddLast(SystemConfiguration);
+							continue;
 						}
+
+						if (Simplify && await SystemConfiguration.SimplifiedConfiguration())
+						{
+							await SystemConfiguration.MakeCompleted();
+							await Database.Update(SystemConfiguration);
+
+							if (NewConfigurations is null)
+								NewConfigurations = new LinkedList<SystemConfiguration>();
+
+							NewConfigurations.AddLast(SystemConfiguration);
+							continue;
+						}
+
+						Configured = false;
 					}
 					catch (Exception ex)
 					{
@@ -3315,7 +3332,7 @@ namespace Waher.IoTGateway
 
 			await Export.SetLastBackupAsync(Now);
 
-			StartExport.ExportInfo ExportInfo = StartExport.GetExporter("Encrypted", false, new string[0]);
+			StartExport.ExportInfo ExportInfo = await StartExport.GetExporter("Encrypted", false, new string[0]);
 
 			ExportFormat.UpdateClientsFileUpdated(ExportInfo.LocalBackupFileName, -1, Now);
 
@@ -3329,8 +3346,8 @@ namespace Waher.IoTGateway
 			long KeepDays = await Export.GetKeepDaysAsync();
 			long KeepMonths = await Export.GetKeepMonthsAsync();
 			long KeepYears = await Export.GetKeepYearsAsync();
-			string ExportFolder = Export.FullExportFolder;
-			string KeyFolder = Export.FullKeyExportFolder;
+			string ExportFolder = await Export.GetFullExportFolderAsync();
+			string KeyFolder = await Export.GetFullKeyExportFolderAsync();
 
 			DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now);
 			if (ExportFolder != KeyFolder)
@@ -3946,7 +3963,12 @@ namespace Waher.IoTGateway
 			{
 				if (!Configuration.Complete)
 				{
-					if (await Configuration.SimplifiedConfiguration())
+					bool Updated = await Configuration.EnvironmentConfiguration();
+
+					if (!Configuration.Complete && await Configuration.SimplifiedConfiguration())
+						Updated = true;
+
+					if (Updated)
 					{
 						await Configuration.MakeCompleted();
 						await Database.Update(Configuration);

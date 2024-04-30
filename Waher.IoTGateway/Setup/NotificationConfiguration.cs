@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
+using Waher.Networking.XMPP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -187,9 +188,39 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// JIDs of operators of gateway.
+		/// </summary>
+		public const string GATEWAY_NOTIFICATION_JIDS = nameof(GATEWAY_NOTIFICATION_JIDS);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override Task<bool> EnvironmentConfiguration()
+		{
+			CaseInsensitiveString Value = Environment.GetEnvironmentVariable(GATEWAY_NOTIFICATION_JIDS);
+			if (CaseInsensitiveString.IsNullOrEmpty(Value))
+				return Task.FromResult(false);
+
+			CaseInsensitiveString[] Jids = Value.Split(',');
+			foreach (CaseInsensitiveString Jid in Jids)
+			{
+				if (!XmppClient.BareJidRegEx.IsMatch(Jid))
+				{
+					this.LogEnvironmentError("Invalid JID.", GATEWAY_NOTIFICATION_JIDS, Jid);
+					return Task.FromResult(false);
+				}
+			}
+
+			this.addresses = Jids;
+
 			return Task.FromResult(true);
 		}
 

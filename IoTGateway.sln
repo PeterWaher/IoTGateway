@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		ConfigurationSteps.md = ConfigurationSteps.md
 		LICENSE.md = LICENSE.md
 		LICENSE.txt = LICENSE.txt
 		Waher.IoTGateway.Resources\Root\Markdown.md = Waher.IoTGateway.Resources\Root\Markdown.md
@@ -569,7 +570,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xml"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.HTTP.Brotli", "Networking\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj", "{E510F5C6-EA1B-4CCB-AE8D-F58C7ACE4F4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.JavaScript", "Content\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj", "{FB1AFA4C-DA4C-460F-8E99-7F13AA9468AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.JavaScript", "Content\Waher.Content.Markdown.JavaScript\Waher.Content.Markdown.JavaScript.csproj", "{FB1AFA4C-DA4C-460F-8E99-7F13AA9468AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

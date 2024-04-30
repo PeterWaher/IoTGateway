@@ -107,6 +107,25 @@ namespace Waher.IoTGateway.Setup
 
 					Task _2 = ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
 				}
+
+				while (Gateway.XmppClient.State == XmppState.Connected)
+				{
+					(string Jid, string Name, string[] Groups) = this.PopToAdd();
+					if (!string.IsNullOrEmpty(Jid))
+					{
+						Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
+						continue;
+					}
+
+					Jid = this.PopToSubscribe();
+					if (!string.IsNullOrEmpty(Jid))
+					{
+						Gateway.XmppClient.RequestPresenceSubscription(Jid);
+						continue;
+					}
+
+					break;
+				}
 			}
 		}
 
@@ -114,6 +133,12 @@ namespace Waher.IoTGateway.Setup
 		{
 			if (e.FromBareJID.ToLower() == Gateway.XmppClient.BareJID.ToLower())
 				return;
+
+			if (this.AcceptSubscriptionRequest(e.FromBareJID))
+			{
+				e.Accept();
+				return;
+			}
 
 			StringBuilder Markdown = new StringBuilder();
 
@@ -612,7 +637,7 @@ namespace Waher.IoTGateway.Setup
 				Log.Informational("Declining presence subscription request.", SubscriptionRequest.FromBareJID);
 
 				this.RosterItemRemoved(JID);
-			
+
 				await Response.Write("1");
 			}
 		}
@@ -620,11 +645,246 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
 			return Task.FromResult(true);
 		}
 
+		/// <summary>
+		/// Optional Comma-separated list of Bare JIDs to add to the roster.
+		/// </summary>
+		public const string GATEWAY_ROSTER_ADD = nameof(GATEWAY_ROSTER_ADD);
+
+		/// <summary>
+		/// Optional Comma-separated list of Bare JIDs to send presence subscription requests to.
+		/// </summary>
+		public const string GATEWAY_ROSTER_SUBSCRIBE = nameof(GATEWAY_ROSTER_SUBSCRIBE);
+
+		/// <summary>
+		/// Optional Comma-separated list of Bare JIDs to accept presence subscription requests from.
+		/// </summary>
+		public const string GATEWAY_ROSTER_ACCEPT = nameof(GATEWAY_ROSTER_ACCEPT);
+
+		/// <summary>
+		/// Optional Comma-separated list of groups to define.
+		/// </summary>
+		public const string GATEWAY_ROSTER_GROUPS = nameof(GATEWAY_ROSTER_GROUPS);
+
+		/// <summary>
+		/// Optional Comma-separated list of Bare JIDs in the roster to add to the group `[group]`.
+		/// </summary>
+		public const string GATEWAY_ROSTER_GRP_ = nameof(GATEWAY_ROSTER_GRP_);
+
+		/// <summary>
+		/// Optional human-readable name of a JID in the roster.
+		/// </summary>
+		public const string GATEWAY_ROSTER_NAME_ = nameof(GATEWAY_ROSTER_NAME_);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override Task<bool> EnvironmentConfiguration()
+		{
+			Dictionary<string, string> ToAdd = GetDictionaryElementWithNames(GATEWAY_ROSTER_ADD);
+			if (!this.ValidateJids(ToAdd.Keys, GATEWAY_ROSTER_ADD))
+				return Task.FromResult(false);
+
+			Dictionary<string, bool> ToSubscribe = GetDictionaryElements(GATEWAY_ROSTER_SUBSCRIBE);
+			if (!this.ValidateJids(ToSubscribe.Keys, GATEWAY_ROSTER_SUBSCRIBE))
+				return Task.FromResult(false);
+
+			Dictionary<string, bool> ToAccept = GetDictionaryElements(GATEWAY_ROSTER_ACCEPT);
+			if (!this.ValidateJids(ToAccept.Keys, GATEWAY_ROSTER_ACCEPT))
+				return Task.FromResult(false);
+
+			string[] GroupNames = GetElements(GATEWAY_ROSTER_GROUPS);
+
+			if (ToAdd is null && ToSubscribe is null && ToAccept is null && GroupNames is null)
+				return Task.FromResult(true);
+
+			Dictionary<string, SortedDictionary<string, bool>> GroupsByJid =
+				new Dictionary<string, SortedDictionary<string, bool>>(StringComparer.InvariantCultureIgnoreCase);
+
+			foreach (string Group in GroupNames)
+			{
+				string Name = GATEWAY_ROSTER_GRP_ + Group;
+				string[] Jids = GetElements(Name);
+				if (Jids is null)
+				{
+					this.LogEnvironmentVariableMissingError(Name, string.Empty);
+					return Task.FromResult(false);
+				}
+
+				if (!this.ValidateJids(Jids, GATEWAY_ROSTER_GROUPS))
+					return Task.FromResult(false);
+
+				foreach (string Jid in Jids)
+				{
+					if (!GroupsByJid.TryGetValue(Jid, out SortedDictionary<string, bool> Groups))
+					{
+						Groups = new SortedDictionary<string, bool>();
+						GroupsByJid[Jid] = Groups;
+					}
+
+					Groups[Group] = true;
+				}
+			}
+
+			this.toAdd = ToAdd;
+			this.toSubscribe = ToSubscribe;
+			this.toAccept = ToAccept;
+			this.groupsByJid = GroupsByJid;
+
+			this.AddHandlers();
+
+			return Task.FromResult(true);
+		}
+
+		private Dictionary<string, string> toAdd = null;
+		private Dictionary<string, bool> toSubscribe = null;
+		private Dictionary<string, bool> toAccept = null;
+		private Dictionary<string, SortedDictionary<string, bool>> groupsByJid = null;
+
+		private bool ValidateJids(IEnumerable<string> Jids, string ParameterName)
+		{
+			foreach (string Jid in Jids)
+			{
+				if (!XmppClient.BareJidRegEx.IsMatch(Jid))
+				{
+					this.LogEnvironmentError("Not a valid Bare JID.", ParameterName, Jid);
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private (string, string, string[]) PopToAdd()
+		{
+			Dictionary<string, string> ToAdd = this.toAdd;
+			if (ToAdd is null)
+				return (null, null, null);
+
+			string Jid = null;
+			string Name = null;
+
+			lock (ToAdd)
+			{
+				foreach (KeyValuePair<string, string> P in this.toAdd)
+				{
+					Jid = P.Key;
+					Name = P.Value;
+					this.toAdd.Remove(Jid);
+					break;
+				}
+			}
+
+			if (Jid is null)
+			{
+				this.toAdd = null;
+				return (null, null, null);
+			}
+
+			Dictionary<string, SortedDictionary<string, bool>> GroupsByJid = this.groupsByJid;
+			if (GroupsByJid is null)
+				return (Jid, Name, null);
+
+			string[] Groups;
+
+			lock (GroupsByJid)
+			{
+				if (!GroupsByJid.TryGetValue(Jid, out SortedDictionary<string, bool> GroupsOrdered))
+					return (Jid, Name, null);
+
+				GroupsByJid.Remove(Jid);
+				if (GroupsByJid.Count == 0)
+					this.groupsByJid = null;
+
+				Groups = new string[GroupsOrdered.Count];
+				GroupsOrdered.Keys.CopyTo(Groups, 0);
+			}
+
+			return (Jid, Name, Groups);
+		}
+
+		private string PopToSubscribe()
+		{
+			Dictionary<string, bool> ToSubscribe = this.toSubscribe;
+			if (ToSubscribe is null)
+				return null;
+
+			lock (ToSubscribe)
+			{
+				foreach (string Jid in this.toSubscribe.Keys)
+				{
+					this.toSubscribe.Remove(Jid);
+					return Jid;
+				}
+			}
+
+			this.toSubscribe = null;
+			return null;
+		}
+
+		private bool AcceptSubscriptionRequest(string Jid)
+		{
+			Dictionary<string, bool> ToAccept = this.toAccept;
+			if (ToAccept is null)
+				return false;
+
+			lock (ToAccept)
+			{
+				if (!ToAccept.ContainsKey(Jid))
+					return false;
+
+				ToAccept.Remove(Jid);
+				if (ToAccept.Count == 0)
+					this.toAccept = null;
+			}
+
+			return true;
+		}
+
+		private static string[] GetElements(string VariableName)
+		{
+			string Value = Environment.GetEnvironmentVariable(VariableName);
+			if (string.IsNullOrEmpty(Value))
+				return null;
+			else
+				return Value.Split(',');
+		}
+
+		private static Dictionary<string, bool> GetDictionaryElements(string VariableName)
+		{
+			string[] Elements = GetElements(VariableName);
+			if (Elements is null)
+				return null;
+
+			Dictionary<string, bool> Result = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+
+			foreach (string Element in Elements)
+				Result[Element] = true;
+
+			return Result;
+		}
+
+		private static Dictionary<string, string> GetDictionaryElementWithNames(string VariableName)
+		{
+			string[] Elements = GetElements(VariableName);
+			if (Elements is null)
+				return null;
+
+			Dictionary<string, string> Result = new Dictionary<string, string>();
+
+			foreach (string Element in Elements)
+			{
+				string Name = Environment.GetEnvironmentVariable(GATEWAY_ROSTER_NAME_ + Element);
+				Result[Element] = Name ?? string.Empty;
+			}
+
+			return Result;
+		}
 	}
 }

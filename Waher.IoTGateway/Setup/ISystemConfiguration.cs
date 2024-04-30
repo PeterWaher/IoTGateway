@@ -90,6 +90,7 @@ namespace Waher.IoTGateway.Setup
 		/// Waits for the user to provide configuration.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
+		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
 		Task<bool> SetupConfiguration(HttpServer WebServer);
 
 		/// <summary>
@@ -97,5 +98,18 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
 		Task CleanupAfterConfiguration(HttpServer WebServer);
+
+		/// <summary>
+		/// Simplified configuration by configuring simple default values.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		Task<bool> SimplifiedConfiguration();
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		Task<bool> EnvironmentConfiguration();
+
 	}
 }

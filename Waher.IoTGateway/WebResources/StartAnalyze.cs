@@ -82,7 +82,7 @@ namespace Waher.IoTGateway.WebResources
 				await Response.Write("Analysis is underway.");
 			}
 
-			string BasePath = Export.FullExportFolder;
+			string BasePath = await Export.GetFullExportFolderAsync();
 			if (!Directory.Exists(BasePath))
 				Directory.CreateDirectory(BasePath);
 

@@ -102,11 +102,11 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			Export.AutomaticBackups = AutomaticBackups;
-			Export.BackupTime = BackupTime;
-			Export.BackupKeepDays = KeepDays;
-			Export.BackupKeepMonths = KeepMonths;
-			Export.BackupKeepYears = KeepYears;
+			await Export.SetAutomaticBackupsAsync(AutomaticBackups);
+			await Export.SetBackupTimeAsync(BackupTime);
+			await Export.SetKeepDaysAsync(KeepDays);
+			await Export.SetKeepMonthsAsync(KeepMonths);
+			await Export.SetKeepYearsAsync(KeepYears);
 
 			Response.StatusCode = 200;
 			Response.StatusMessage = "OK";

@@ -45,5 +45,13 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// <param name="Settings">Settings object for the plugin.</param>
 		/// <exception cref="Exception">Exception, in case parameters are not correct.</exception>
 		Task Test(Dictionary<string, object> Form, bool Save, object Settings);
+
+		/// <summary>
+		/// Tests database connection parameters available via environment variables.
+		/// </summary>
+		/// <param name="Configuration">Configuration object.</param>
+		/// <param name="Settings">Plugin settings parameters.</param>
+		/// <returns>If environment configuration is correct.</returns>
+		Task<bool> TestEnvironmentVariables(DatabaseConfiguration Configuration, object Settings);
 	}
 }

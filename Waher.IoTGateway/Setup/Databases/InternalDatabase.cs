@@ -66,5 +66,16 @@ namespace Waher.IoTGateway.Setup.Databases
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Tests database connection parameters available via environment variables.
+		/// </summary>
+		/// <param name="Configuration">Configuration object.</param>
+		/// <param name="Settings">Plugin settings parameters.</param>
+		/// <returns>If environment configuration is correct.</returns>
+		public Task<bool> TestEnvironmentVariables(DatabaseConfiguration Configuration, object Settings)
+		{
+			return Task.FromResult(true);
+		}
+
 	}
 }

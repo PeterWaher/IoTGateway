@@ -9,6 +9,7 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Content.Markdown;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.Networking.HTTP;
@@ -877,7 +878,7 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("country", out Obj) || !(Obj is string Country) ||
 				!Parameters.TryGetValue("nationality", out Obj) || !(Obj is string Nationality) ||
 				!Parameters.TryGetValue("gender", out Obj) || !(Obj is string Gender) ||
-				!Parameters.TryGetValue("birthDate", out Obj) || !(Obj is string BirthDateStr) || 
+				!Parameters.TryGetValue("birthDate", out Obj) || !(Obj is string BirthDateStr) ||
 				!Parameters.TryGetValue("orgName", out Obj) || !(Obj is string OrgName) ||
 				!Parameters.TryGetValue("orgDepartment", out Obj) || !(Obj is string OrgDepartment) ||
 				!Parameters.TryGetValue("orgRole", out Obj) || !(Obj is string OrgRole) ||
@@ -974,6 +975,7 @@ namespace Waher.IoTGateway.Setup
 			this.country = Country;
 			this.nationality = Nationality;
 			this.gender = Gender;
+			this.orgName = OrgName;
 			this.orgDepartment = OrgDepartment;
 			this.orgRole = OrgRole;
 			this.orgNumber = OrgNr;
@@ -990,8 +992,14 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
+			await this.ApplyId(Password, TabID, ProtectWithPassword, null);
+		}
+
+		private async Task ApplyId(string Password, string TabID, bool ProtectWithPassword, TaskCompletionSource<bool> Response)
+		{
 			await Gateway.ContractsClient.GenerateNewKeys();
-			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, new object[] { Password, TabID, ProtectWithPassword });
+			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, 
+				new object[] { Password, TabID, ProtectWithPassword, Response });
 		}
 
 		private async Task ApplyResponse(object Sender, LegalIdentityEventArgs e)
@@ -1000,6 +1008,7 @@ namespace Waher.IoTGateway.Setup
 			string Password = (string)P[0];
 			string TabID = (string)P[1];
 			bool ProtectWithPassword = (bool)P[2];
+			TaskCompletionSource<bool> Response = (TaskCompletionSource<bool>)P[3];
 
 			if (e.Ok)
 			{
@@ -1015,7 +1024,7 @@ namespace Waher.IoTGateway.Setup
 							ById[H.Key] = H;
 					}
 
-					ById[e.Identity.Id] = new AlternativeField(e.Identity.Id, this.CalcPasswordhash(e.Identity, Password));
+					ById[e.Identity.Id] = new AlternativeField(e.Identity.Id, this.CalcPasswordHash(e.Identity, Password));
 
 					AlternativeField[] Hashes = new AlternativeField[ById.Count];
 					ById.Values.CopyTo(Hashes, 0);
@@ -1026,15 +1035,23 @@ namespace Waher.IoTGateway.Setup
 				this.Step = 1;
 				await Database.Update(this);
 
-				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 
 				await this.UpdateClients(e.Identity);
+
+				Response?.TrySetResult(true);
 			}
 			else
-				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationError", e.ErrorText);
+			{
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationError", e.ErrorText);
+
+				Response?.TrySetResult(false);
+			}
 		}
 
-		private string CalcPasswordhash(LegalIdentity ID, string Password)
+		private string CalcPasswordHash(LegalIdentity ID, string Password)
 		{
 			StringBuilder sb = new StringBuilder();
 			SortedDictionary<string, string> Sorted = new SortedDictionary<string, string>();
@@ -1287,7 +1304,7 @@ namespace Waher.IoTGateway.Setup
 
 			foreach (LegalIdentity ID in approvedIdentities)
 			{
-				string H = this.CalcPasswordhash(ID, Password);
+				string H = this.CalcPasswordHash(ID, Password);
 
 				foreach (AlternativeField F in this.passwordHashes)
 				{
@@ -1504,10 +1521,259 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
 			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// If a legal identity is to be used by the gateway.If used, the folllowing optional variables can be used to provide information 
+		/// going into the application.
+		/// </summary>
+		public const string GATEWAY_ID_USE = nameof(GATEWAY_ID_USE);
+
+		/// <summary>
+		/// First name of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_FIRST = nameof(GATEWAY_ID_FIRST);
+
+		/// <summary>
+		/// Middle name of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_MIDDLE = nameof(GATEWAY_ID_MIDDLE);
+
+		/// <summary>
+		/// Last name of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_LAST = nameof(GATEWAY_ID_LAST);
+
+		/// <summary>
+		/// Personal number of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_PNR = nameof(GATEWAY_ID_PNR);
+
+		/// <summary>
+		/// Address (line 1) of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ADDR = nameof(GATEWAY_ID_ADDR);
+
+		/// <summary>
+		/// Address(line 2) of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ADDR2 = nameof(GATEWAY_ID_ADDR2);
+
+		/// <summary>
+		/// Postal code of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ZIP = nameof(GATEWAY_ID_ZIP);
+
+		/// <summary>
+		/// Area of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_AREA = nameof(GATEWAY_ID_AREA);
+
+		/// <summary>
+		/// City of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_CITY = nameof(GATEWAY_ID_CITY);
+
+		/// <summary>
+		/// Region of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_REGION = nameof(GATEWAY_ID_REGION);
+
+		/// <summary>
+		/// Country of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_COUNTRY = nameof(GATEWAY_ID_COUNTRY);
+
+		/// <summary>
+		/// Nationality of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_NATIONALITY = nameof(GATEWAY_ID_NATIONALITY);
+
+		/// <summary>
+		/// Gender of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_GENDER = nameof(GATEWAY_ID_GENDER);
+
+		/// <summary>
+		/// Birth Date of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_BDATE = nameof(GATEWAY_ID_BDATE);
+
+		/// <summary>
+		/// Organization name of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGNAME = nameof(GATEWAY_ID_ORGNAME);
+
+		/// <summary>
+		/// Organization department of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGDEPT = nameof(GATEWAY_ID_ORGDEPT);
+
+		/// <summary>
+		/// Organization role of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGROLE = nameof(GATEWAY_ID_ORGROLE);
+
+		/// <summary>
+		/// Organization number of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGNR = nameof(GATEWAY_ID_ORGNR);
+
+		/// <summary>
+		/// Organization address (line 1) of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGADDR = nameof(GATEWAY_ID_ORGADDR);
+
+		/// <summary>
+		/// Organization address(line 2) of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGADDR2 = nameof(GATEWAY_ID_ORGADDR2);
+
+		/// <summary>
+		/// Organization postal code of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGZIP = nameof(GATEWAY_ID_ORGZIP);
+
+		/// <summary>
+		/// Organization area of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGAREA = nameof(GATEWAY_ID_ORGAREA);
+
+		/// <summary>
+		/// Organization city of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGCITY = nameof(GATEWAY_ID_ORGCITY);
+
+		/// <summary>
+		/// Organization region of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGREGION = nameof(GATEWAY_ID_ORGREGION);
+
+		/// <summary>
+		/// Organization country of legal identity.
+		/// </summary>
+		public const string GATEWAY_ID_ORGCOUNTRY = nameof(GATEWAY_ID_ORGCOUNTRY);
+
+		/// <summary>
+		/// Comma-separated list of alternative fields to send in identity application.
+		/// </summary>
+		public const string GATEWAY_ID_ALT = nameof(GATEWAY_ID_ALT);
+
+		/// <summary>
+		/// Value for alternative field `field` to send in the identity application.
+		/// </summary>
+		public const string GATEWAY_ID_ALT_ = nameof(GATEWAY_ID_ALT_);
+
+		/// <summary>
+		/// Protect legal identity with this password.
+		/// </summary>
+		public const string GATEWAY_ID_PASSWORD = nameof(GATEWAY_ID_PASSWORD);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_ID_USE);
+
+			if (string.IsNullOrEmpty(Value))
+				return false;
+			else if (CommonTypes.TryParse(Value, out bool b))
+			{
+				this.useLegalIdentity = b;
+				if (!b)
+					return true;
+			}
+			else
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ID_USE, Value);
+				return false;
+			}
+
+			this.firstName = Environment.GetEnvironmentVariable(GATEWAY_ID_FIRST) ?? string.Empty;
+			this.middleName = Environment.GetEnvironmentVariable(GATEWAY_ID_MIDDLE) ?? string.Empty;
+			this.lastName = Environment.GetEnvironmentVariable(GATEWAY_ID_LAST) ?? string.Empty;
+			this.personalNumber = Environment.GetEnvironmentVariable(GATEWAY_ID_PNR) ?? string.Empty;
+			this.address = Environment.GetEnvironmentVariable(GATEWAY_ID_ADDR) ?? string.Empty;
+			this.address2 = Environment.GetEnvironmentVariable(GATEWAY_ID_ADDR2) ?? string.Empty;
+			this.postalCode = Environment.GetEnvironmentVariable(GATEWAY_ID_ZIP) ?? string.Empty;
+			this.area = Environment.GetEnvironmentVariable(GATEWAY_ID_AREA) ?? string.Empty;
+			this.city = Environment.GetEnvironmentVariable(GATEWAY_ID_CITY) ?? string.Empty;
+			this.region = Environment.GetEnvironmentVariable(GATEWAY_ID_REGION) ?? string.Empty;
+			this.country = Environment.GetEnvironmentVariable(GATEWAY_ID_COUNTRY) ?? string.Empty;
+			this.nationality = Environment.GetEnvironmentVariable(GATEWAY_ID_NATIONALITY) ?? string.Empty;
+			this.gender = Environment.GetEnvironmentVariable(GATEWAY_ID_GENDER) ?? string.Empty;
+			this.orgName = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGNAME) ?? string.Empty;
+			this.orgDepartment = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGDEPT) ?? string.Empty;
+			this.orgRole = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGROLE) ?? string.Empty;
+			this.orgNumber = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGNR) ?? string.Empty;
+			this.orgAddress = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGADDR) ?? string.Empty;
+			this.orgAddress2 = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGADDR2) ?? string.Empty;
+			this.orgPostalCode = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGZIP) ?? string.Empty;
+			this.orgArea = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGAREA) ?? string.Empty;
+			this.orgCity = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGCITY) ?? string.Empty;
+			this.orgRegion = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGREGION) ?? string.Empty;
+			this.orgCountry = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGCOUNTRY) ?? string.Empty;
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_ID_BDATE) ?? string.Empty;
+			if (string.IsNullOrEmpty(Value))
+				this.birthDate = null;
+			else if (XML.TryParse(Value, out DateTime TP) && TP.TimeOfDay == TimeSpan.Zero)
+				this.birthDate = TP.Date;
+			else
+			{
+				this.LogEnvironmentVariableInvalidDateError(GATEWAY_ID_BDATE, Value);
+				return false;
+			}
+
+			List<AlternativeField> Fields = new List<AlternativeField>();
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_ID_ALT);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				string[] Parts = Value.Split(',');
+
+				foreach (string Part in Parts)
+				{
+					string Name = GATEWAY_ID_ALT_ + Part;
+
+					Value = Environment.GetEnvironmentVariable(Name);
+					if (string.IsNullOrEmpty(Value))
+					{
+						this.LogEnvironmentVariableMissingError(Name, Value);
+						return false;
+					}
+
+					Fields.Add(new AlternativeField(Part, Value));
+				}
+			}
+
+			this.altFields = Fields.ToArray();
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_ID_PASSWORD);
+
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+			try
+			{
+				Task _ = Task.Delay(30000).ContinueWith(Prev => Result?.TrySetException(new TimeoutException()));
+
+				await this.ApplyId(Value, null, !string.IsNullOrEmpty(Value), Result);
+
+				if (await Result.Task)
+					return true;
+				else
+					return false;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
 		}
 
 	}

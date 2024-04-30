@@ -267,5 +267,31 @@ namespace Waher.IoTGateway.Setup
 			return themeDefinitions.TryGetValue(ThemeId, out Definition);
 		}
 
+		/// <summary>
+		/// ID of theme to use.
+		/// </summary>
+		public const string GATEWAY_THEME_ID = nameof(GATEWAY_THEME_ID);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_THEME_ID);
+			if (string.IsNullOrEmpty(Value))
+				return Task.FromResult(false);
+
+			if (!themeDefinitions.ContainsKey(Value))
+			{
+				this.LogEnvironmentError("Theme not found.", GATEWAY_THEME_ID, Value);
+				return Task.FromResult(false);
+			}
+
+			this.themeId = Value;
+
+			return Task.FromResult(true);
+		}
+
 	}
 }

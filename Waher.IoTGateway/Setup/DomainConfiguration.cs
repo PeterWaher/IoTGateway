@@ -486,7 +486,7 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
-			this.Test(TabID);
+			Task _ = Task.Run(async () => await this.Test(TabID, false));
 		}
 
 		private Task TestDomainName(HttpRequest Request, HttpResponse Response)
@@ -496,16 +496,19 @@ namespace Waher.IoTGateway.Setup
 			return Response.Write(this.token);
 		}
 
-		private async void Test(string TabID)
+		private async Task<bool> Test(string TabID, bool EnvironmentSetup)
 		{
 			try
 			{
 				if (!string.IsNullOrEmpty(this.domain))
 				{
-					if (!await this.Test(TabID, this.domain))
+					if (!await this.Test(TabID, EnvironmentSetup, this.domain))
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", this.domain, false, "User");
-						return;
+						if (string.IsNullOrEmpty(TabID))
+							this.LogEnvironmentError("Domain name not valid.", GATEWAY_DOMAIN_NAME, this.domain);
+						else
+							await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", this.domain, false, "User");
+						return false;
 					}
 				}
 
@@ -513,10 +516,13 @@ namespace Waher.IoTGateway.Setup
 				{
 					foreach (string AltDomainName in this.alternativeDomains)
 					{
-						if (!await this.Test(TabID, AltDomainName))
+						if (!await this.Test(TabID, EnvironmentSetup, AltDomainName))
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", AltDomainName, false, "User");
-							return;
+							if (string.IsNullOrEmpty(TabID))
+								this.LogEnvironmentError("Alternative domain name not valid.", GATEWAY_DOMAIN_ALT, AltDomainName);
+							else
+								await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", AltDomainName, false, "User");
+							return false;
 						}
 					}
 				}
@@ -527,27 +533,51 @@ namespace Waher.IoTGateway.Setup
 				this.Updated = DateTime.Now;
 				await Database.Update(this);
 
-				await ClientEvents.PushEvent(new string[] { TabID }, "NamesOK", string.Empty, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "NamesOK", string.Empty, false, "User");
+
+				return true;
 			}
 			catch (Exception ex)
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
+				if (string.IsNullOrEmpty(TabID))
+					Log.Critical(ex);
+				else
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
+
+				return false;
 			}
 		}
 
-		internal async Task<bool> CheckDynamicIp()
+		internal Task<bool> CheckDynamicIp()
+		{
+			return this.CheckDynamicIp(null, false);
+		}
+
+		internal Task<bool> CheckDynamicIp(bool EnvironmentSetup)
+		{
+			return this.CheckDynamicIp(null, EnvironmentSetup);
+		}
+
+		private async Task<bool> CheckDynamicIp(string TabID, bool EnvironmentSetup)
 		{
 			try
 			{
 				if (!this.useDomainName || !this.dynamicDns)
 					return true;
 
-				await this.CheckDynamicIp(null, this.domain);
+				bool Result = true;
+
+				if (!await this.CheckDynamicIp(TabID, this.domain, EnvironmentSetup))
+					Result = false;
 
 				foreach (string AlternativeDomain in this.alternativeDomains)
-					await this.CheckDynamicIp(null, AlternativeDomain);
+				{
+					if (!await this.CheckDynamicIp(TabID, AlternativeDomain, EnvironmentSetup))
+						Result = false;
+				}
 
-				return true;
+				return Result;
 			}
 			catch (Exception ex)
 			{
@@ -556,16 +586,19 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		internal async Task<bool> CheckDynamicIp(string TabID, string DomainName)
+		internal async Task<bool> CheckDynamicIp(string TabID, string DomainName, bool EnvironmentSetup)
 		{
-			string Msg = await this.CheckDynamicIp(DomainName, async (_, Status) =>
+			string Msg = await this.CheckDynamicIp(DomainName, EnvironmentSetup, async (_, Status) =>
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
 			});
 
 			if (!string.IsNullOrEmpty(Msg))
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+
 				return false;
 			}
 
@@ -576,9 +609,10 @@ namespace Waher.IoTGateway.Setup
 		/// Checks if Dynamic IP configuration is correct
 		/// </summary>
 		/// <param name="DomainName">Domain Name</param>
+		/// <param name="EnvironmentSetup">If check is done as part of environment variable configuration.</param>
 		/// <param name="Status">Status callback method.</param>
 		/// <returns>null if successful, error message if failed.</returns>
-		public async Task<string> CheckDynamicIp(string DomainName, EventHandlerAsync<string> Status)
+		public async Task<string> CheckDynamicIp(string DomainName, bool EnvironmentSetup, EventHandlerAsync<string> Status)
 		{
 			if (!this.dynamicDns)
 				return null;
@@ -592,7 +626,12 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				return "Unable to parse script checking current IP Address: " + ex.Message;
+				string Msg = "Unable to parse script checking current IP Address: " + ex.Message;
+
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(Msg, GATEWAY_DYNDNS_CHECK, this.checkIpScript);
+
+				return Msg;
 			}
 
 			try
@@ -601,7 +640,12 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				return "Unable to parse script updating the dynamic DNS server: " + ex.Message;
+				string Msg = "Unable to parse script updating the dynamic DNS server: " + ex.Message;
+
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(Msg, GATEWAY_DYNDNS_UPDATE, this.updateIpScript);
+
+				return Msg;
 			}
 
 			await Status.Invoke(this, "Checking current IP Address.");
@@ -615,11 +659,23 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				return "Unable to get current IP Address: " + ex.Message;
+				string Msg = "Unable to get current IP Address: " + ex.Message;
+
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(Msg, GATEWAY_DYNDNS_CHECK, this.checkIpScript);
+
+				return Msg;
 			}
 
 			if (!(Result is string CurrentIP) || !IPAddress.TryParse(CurrentIP, out IPAddress _))
-				return "Unable to get current IP Address. Unexpected response.";
+			{
+				string Msg = "Unable to get current IP Address. Unexpected response.";
+
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(Msg, GATEWAY_DYNDNS_CHECK, this.checkIpScript);
+
+				return Msg;
+			}
 
 			await Status.Invoke(this, "Current IP Address: " + CurrentIP);
 
@@ -644,23 +700,31 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					return "Unable to register new dynamic IP Address: " + ex.Message;
+					string Msg = "Unable to register new dynamic IP Address: " + ex.Message;
+
+					if (EnvironmentSetup)
+						this.LogEnvironmentError(Msg, GATEWAY_DYNDNS_UPDATE, this.updateIpScript);
+
+					return Msg;
 				}
 			}
 
 			return null;
 		}
 
-		private async Task<bool> Test(string TabID, string DomainName)
+		private async Task<bool> Test(string TabID, bool EnvironmentSetup, string DomainName)
 		{
-			string Msg = await this.Test(DomainName, async (_, Status) =>
+			string Msg = await this.Test(DomainName, EnvironmentSetup, async (_, Status) =>
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
 			});
 
 			if (!string.IsNullOrEmpty(Msg))
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+
 				return false;
 			}
 
@@ -671,13 +735,14 @@ namespace Waher.IoTGateway.Setup
 		/// Checks if the domain points to the server.
 		/// </summary>
 		/// <param name="DomainName">Domain Name</param>
+		/// <param name="EnvironmentSetup">If test is part of an environment setup.</param>
 		/// <param name="Status">Status callback method.</param>
 		/// <returns>null if successful, error message if failed.</returns>
-		public async Task<string> Test(string DomainName, EventHandlerAsync<string> Status)
+		public async Task<string> Test(string DomainName, bool EnvironmentSetup, EventHandlerAsync<string> Status)
 		{
 			await Status.Invoke(this, "Testing " + DomainName + "...");
 
-			string Msg = await this.CheckDynamicIp(DomainName, Status);
+			string Msg = await this.CheckDynamicIp(DomainName, EnvironmentSetup, Status);
 			if (!string.IsNullOrEmpty(Msg))
 				return Msg;
 
@@ -808,7 +873,7 @@ namespace Waher.IoTGateway.Setup
 				{
 					try
 					{
-						await this.CreateCertificate(TabID);
+						await this.CreateCertificate(TabID, false);
 					}
 					catch (Exception ex)
 					{
@@ -831,7 +896,7 @@ namespace Waher.IoTGateway.Setup
 			if (this.IsDomainRegistered(Name))
 				return "Domain already registered.";
 
-			string Msg = await this.Test(Name, Status);
+			string Msg = await this.Test(Name, false, Status);
 			if (!string.IsNullOrEmpty(Msg))
 				return Msg;
 
@@ -855,7 +920,7 @@ namespace Waher.IoTGateway.Setup
 				this.alternativeDomains = NewArray;
 			}
 
-			Msg = await this.CreateCertificate(Status, (_, __) => Task.CompletedTask);
+			Msg = await this.CreateCertificate(false, Status, (_, __) => Task.CompletedTask);
 			if (!string.IsNullOrEmpty(Msg))
 			{
 				this.domain = DomainBak;
@@ -933,7 +998,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (this.useDomainName)
 			{
-				string Msg = await this.CreateCertificate(Status, (_, __) => Task.CompletedTask);
+				string Msg = await this.CreateCertificate(false, Status, (_, __) => Task.CompletedTask);
 				if (!string.IsNullOrEmpty(Msg))
 				{
 					this.domain = DomainBak;
@@ -974,14 +1039,14 @@ namespace Waher.IoTGateway.Setup
 
 		internal Task<bool> CreateCertificate()
 		{
-			return this.CreateCertificate((string)null);
+			return this.CreateCertificate(null, false);
 		}
 
-		internal async Task<bool> CreateCertificate(string TabID)
+		private async Task<bool> CreateCertificate(string TabID, bool EnvironmentSetup)
 		{
 			try
 			{
-				string Msg = await this.CreateCertificate(
+				string Msg = await this.CreateCertificate(EnvironmentSetup,
 					async (_, Status) =>
 					{
 						if (!string.IsNullOrEmpty(TabID))
@@ -989,7 +1054,8 @@ namespace Waher.IoTGateway.Setup
 					},
 					async (_, URL) =>
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
 					});
 
 				if (string.IsNullOrEmpty(Msg))
@@ -1012,11 +1078,15 @@ namespace Waher.IoTGateway.Setup
 				if (!string.IsNullOrEmpty(TabID))
 					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", ex.Message, false, "User");
 
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(ex.Message, GATEWAY_ENCRYPTION, this.useEncryption);
+
 				return false;
 			}
 		}
 
-		internal async Task<string> CreateCertificate(EventHandlerAsync<string> Status, EventHandlerAsync<string> TermsOfService)
+		internal async Task<string> CreateCertificate(bool EnvironmentSetup, EventHandlerAsync<string> Status,
+			EventHandlerAsync<string> TermsOfService)
 		{
 			try
 			{
@@ -1078,7 +1148,14 @@ namespace Waher.IoTGateway.Setup
 						this.urlToS = URL;
 
 						if (!this.acceptToS)
-							return "You need to accept the terms of service.";
+						{
+							string Msg = "You need to accept the terms of service.";
+
+							if (EnvironmentSetup)
+								this.LogEnvironmentError(Msg, GATEWAY_ACME_ACCEPT_TOS, this.acceptToS);
+
+							return Msg;
+						}
 					}
 
 					if (!(AcmeDirectory.Website is null))
@@ -1203,7 +1280,7 @@ namespace Waher.IoTGateway.Setup
 
 								await Status.Invoke(this, "Acknowleding challenge.");
 
-								string Msg = await this.CheckDynamicIp(Authorization.Value, Status);
+								string Msg = await this.CheckDynamicIp(Authorization.Value, EnvironmentSetup, Status);
 								if (string.IsNullOrEmpty(Msg))
 								{
 									Challenge = await HttpChallenge.AcknowledgeChallenge();
@@ -1217,7 +1294,14 @@ namespace Waher.IoTGateway.Setup
 						}
 
 						if (!Acknowledged)
-							return "No automated method found to respond to any of the authorization challenges.";
+						{
+							string Msg = "No automated method found to respond to any of the authorization challenges.";
+
+							if (EnvironmentSetup)
+								this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+							return Msg;
+						}
 
 						AcmeAuthorization Authorization2 = Authorization;
 
@@ -1332,7 +1416,14 @@ namespace Waher.IoTGateway.Setup
 							try
 							{
 								if (Files.Length == 0)
-									return "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.";
+								{
+									string Msg = "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.";
+
+									if (EnvironmentSetup)
+										this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+									return Msg;
+								}
 								else
 								{
 									foreach (string OpenSslFile in Files)
@@ -1410,7 +1501,13 @@ namespace Waher.IoTGateway.Setup
 									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
-										return "Unable to convert to PFX using OpenSSL.";
+										
+										string Msg = "Unable to convert to PFX using OpenSSL.";
+
+										if (EnvironmentSetup)
+											this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+										return Msg;
 									}
 								}
 							}
@@ -1452,7 +1549,13 @@ namespace Waher.IoTGateway.Setup
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				return "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message);
+
+				string Msg = "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message);
+
+				if (EnvironmentSetup)
+					this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+				return Msg;
 			}
 			finally
 			{
@@ -1492,7 +1595,7 @@ namespace Waher.IoTGateway.Setup
 			List<AlternativeField> LocalizedNames = new List<AlternativeField>();
 			int Index = 1;
 
-			while (Parameters.TryGetValue("nameLanguage" + Index.ToString(), out Obj) && 
+			while (Parameters.TryGetValue("nameLanguage" + Index.ToString(), out Obj) &&
 				Obj is string NameLanguage &&
 				Parameters.TryGetValue("nameLocalized" + Index.ToString(), out Obj) &&
 				Obj is string NameLocalized)
@@ -1563,10 +1666,401 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
 			return Task.FromResult(true);
 		}
+
+		/// <summary>
+		/// If the gateway uses a domain name.
+		/// </summary>
+		public const string GATEWAY_DOMAIN_USE = nameof(GATEWAY_DOMAIN_USE);
+
+		/// <summary>
+		/// Main Domain Name of the gateway, if defined. If not provided, the gateway will not use a domain name.
+		/// </summary>
+		public const string GATEWAY_DOMAIN_NAME = nameof(GATEWAY_DOMAIN_NAME);
+
+		// If a Domain Name is configured(<see cref="GATEWAY_DOMAIN"/> variable), the following variables define its operation:
+
+		/// <summary>
+		/// Comma-separated list of alternative domain names for the gateway, if defined.
+		/// </summary>
+		public const string GATEWAY_DOMAIN_ALT = nameof(GATEWAY_DOMAIN_ALT);
+
+		/// <summary>
+		/// true or 1 if gateway should use a Dynamic DNS-service, false or 0 if IP-address of Gateway is static.
+		/// </summary>
+		public const string GATEWAY_DYNDNS = nameof(GATEWAY_DYNDNS);
+
+		/// <summary>
+		/// true or 1 if gateway should use X.509-based encryption (for example TLS over HTTP, HTTPS), false or 0 if encryption is disabled.
+		/// </summary>
+		public const string GATEWAY_ENCRYPTION = nameof(GATEWAY_ENCRYPTION);
+
+		/// <summary>
+		/// true or 1 if gateway should use a custom Certificate Authority (must support ACME), false or 0 if [Let's Encrypt](https://letsencrypt.org/) should be used to generate certificates for the gateway.
+		/// </summary>
+		public const string GATEWAY_CA_CUSTOM = nameof(GATEWAY_CA_CUSTOM);
+
+		/// <summary>
+		/// E-mail address for contact person associated with generated certificates.
+		/// </summary>
+		public const string GATEWAY_ACME_EMAIL = nameof(GATEWAY_ACME_EMAIL);
+
+		/// <summary>
+		/// If Certificate Authority Terms of Services are accepted.
+		/// </summary>
+		public const string GATEWAY_ACME_ACCEPT_TOS = nameof(GATEWAY_ACME_ACCEPT_TOS);
+
+		/// <summary>
+		/// Default Human-readable name for gateway.
+		/// </summary>
+		public const string GATEWAY_HR_NAME = nameof(GATEWAY_HR_NAME);
+
+		/// <summary>
+		/// Language code (ISO-639-1) of <see cref="GATEWAY_HR_NAME"/>.
+		/// </summary>
+		public const string GATEWAY_HR_NAME_LANG = nameof(GATEWAY_HR_NAME_LANG);
+
+		/// <summary>
+		/// Default Human-readable description of gateway.
+		/// </summary>
+		public const string GATEWAY_HR_DESC = nameof(GATEWAY_HR_DESC);
+
+		/// <summary>
+		/// Language code (ISO-639-1) of <see cref="GATEWAY_HR_DESC"/>.
+		/// </summary>
+		public const string GATEWAY_HR_DESC_LANG = nameof(GATEWAY_HR_DESC_LANG);
+
+		/// <summary>
+		/// Comma-separated list of Language Codes (ISO-639-1) for available localizations of the human-readable name for the gateway.
+		/// </summary>
+		public const string GATEWAY_HR_NAME_LOC = nameof(GATEWAY_HR_NAME_LOC);
+
+		/// <summary>
+		/// Localized Human-readable name for the gateway, where "lang" is replaced by any of the ISO-639-1 language codes available in <see cref="GATEWAY_HR_NAME_LOC"/>.
+		/// </summary>
+		public const string GATEWAY_HR_NAME_ = nameof(GATEWAY_HR_NAME_);
+
+		/// <summary>
+		/// Comma-separated list of Language Codes (ISO-639-1) for available localizations of the human-readable description of the gateway.
+		/// </summary>
+		public const string GATEWAY_HR_DESC_LOC = nameof(GATEWAY_HR_DESC_LOC);
+
+		/// <summary>
+		/// Localized Human-readable description of the gateway, where "lang" is replaced by any of the ISO-639-1 language codes available in <see cref="GATEWAY_HR_DESC_LOC"/>.
+		/// </summary>
+		public const string GATEWAY_HR_DESC_ = nameof(GATEWAY_HR_DESC_);
+
+		// If Dynamic DNS is configured (<see cref="GATEWAY_DYNDNS"/> variable), the following variables define its operation:
+
+		/// <summary>
+		/// Name of template to use for reporting IP address changes to the Dynamic DNS-service.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_TEMPLATE = nameof(GATEWAY_DYNDNS_TEMPLATE);
+
+		/// <summary>
+		/// Script to use to check the current public IP address of the gateway.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_CHECK = nameof(GATEWAY_DYNDNS_CHECK);
+
+		/// <summary>
+		/// Script to use to update the current public IP address of the gateway in the Dynamic DNS service.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_UPDATE = nameof(GATEWAY_DYNDNS_UPDATE);
+
+		/// <summary>
+		/// Account of the gateway in the Dynamic DNS service.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_ACCOUNT = nameof(GATEWAY_DYNDNS_ACCOUNT);
+
+		/// <summary>
+		/// Password of the Dynamic DNS service account.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_PASSWORD = nameof(GATEWAY_DYNDNS_PASSWORD);
+
+		/// <summary>
+		/// Interval (in seconds) for checking if the IP address has changed.
+		/// </summary>
+		public const string GATEWAY_DYNDNS_INTERVAL = nameof(GATEWAY_DYNDNS_INTERVAL);
+
+		// If a Custom Certificate Authority is configured(<see cref="GATEWAY_CA_CUSTOM"/> variable), the following variables define its operation:
+
+		/// <summary>
+		/// URL to the custom ACME directory to use to generate certificates for the gateway if a custom CA has been selected.
+		/// </summary>
+		public const string GATEWAY_ACME_DIRECTORY = nameof(GATEWAY_ACME_DIRECTORY);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_DOMAIN_USE);
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			if (!CommonTypes.TryParse(Value, out bool b))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_DOMAIN_USE, Value);
+				return false;
+			}
+
+			this.UseDomainName = b;
+
+			if (!b)
+			{
+				this.Domain = string.Empty;
+				this.DynamicDns = false;
+				this.UseEncryption = false;
+				this.CustomCA = false;
+				this.ContactEMail = string.Empty;
+				this.AcceptToS = false;
+			}
+			else
+			{
+				Value = Environment.GetEnvironmentVariable(GATEWAY_DOMAIN_NAME);
+				if (string.IsNullOrEmpty(Value))
+				{
+					this.LogEnvironmentVariableMissingError(GATEWAY_DOMAIN_NAME, Value);
+					return false;
+				}
+				else if (Value.ToLower() == "localhost")
+				{
+					this.LogEnvironmentError("localhost is not a valid domain name.", GATEWAY_DOMAIN_NAME, Value);
+					return false;
+				}
+
+				this.Domain = Value;
+
+				Value = Environment.GetEnvironmentVariable(GATEWAY_DOMAIN_ALT);
+				if (string.IsNullOrEmpty(Value))
+					this.AlternativeDomains = null;
+				else
+				{
+					string[] Parts = Value.Split(',');
+
+					foreach (string Part in Parts)
+					{
+						if (Part.ToLower() == "localhost")
+						{
+							this.LogEnvironmentError("localhost is not a valid alternative domain name.", GATEWAY_DOMAIN_ALT, Value);
+							return false;
+						}
+					}
+
+					this.AlternativeDomains = Parts;
+				}
+
+				Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS);
+				if (string.IsNullOrEmpty(Value))
+					this.DynamicDns = false;
+				else if (CommonTypes.TryParse(Value, out b))
+				{
+					this.DynamicDns = b;
+					if (b)
+					{
+						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_TEMPLATE);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_TEMPLATE, Value);
+							return false;
+						}
+						else
+							this.DynDnsTemplate = Value;
+
+						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_CHECK);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_CHECK, Value);
+							return false;
+						}
+						else
+							this.CheckIpScript = Value;
+
+						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_UPDATE);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_UPDATE, Value);
+							return false;
+						}
+						else
+							this.UpdateIpScript = Value;
+
+						this.DynDnsAccount = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_ACCOUNT);
+						this.DynDnsPassword = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_PASSWORD);
+
+						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_INTERVAL);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_INTERVAL, Value);
+							return false;
+						}
+						else if (int.TryParse(Value, out int i) && i >= 60 && i <= 86400)
+							this.DynDnsInterval = i;
+						else
+						{
+							this.LogEnvironmentVariableInvalidRangeError(60, 86400, GATEWAY_DYNDNS_INTERVAL, Value);
+							return false;
+						}
+					}
+				}
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_DYNDNS, Value);
+					return false;
+				}
+
+				Value = Environment.GetEnvironmentVariable(GATEWAY_ENCRYPTION);
+				if (string.IsNullOrEmpty(Value))
+				{
+					this.LogEnvironmentVariableMissingError(GATEWAY_ENCRYPTION, Value);
+					return false;
+				}
+				else if (CommonTypes.TryParse(Value, out b))
+				{
+					this.UseEncryption = b;
+
+					if (b)
+					{
+						Value = Environment.GetEnvironmentVariable(GATEWAY_CA_CUSTOM);
+						if (string.IsNullOrEmpty(Value))
+							this.CustomCA = false;
+						else if (CommonTypes.TryParse(Value, out b))
+						{
+							this.CustomCA = b;
+
+							if (b)
+							{
+								Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_DIRECTORY);
+								if (string.IsNullOrEmpty(Value))
+								{
+									this.LogEnvironmentVariableMissingError(GATEWAY_ACME_DIRECTORY, Value);
+									return false;
+								}
+
+								this.AcmeDirectory = Value;
+							}
+						}
+						else
+						{
+							this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_CA_CUSTOM, Value);
+							return false;
+						}
+
+						Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_EMAIL);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_ACME_EMAIL, Value);
+							return false;
+						}
+						else
+							this.ContactEMail = Value;
+
+						Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_ACCEPT_TOS);
+						if (string.IsNullOrEmpty(Value))
+						{
+							this.LogEnvironmentVariableMissingError(GATEWAY_ACME_ACCEPT_TOS, Value);
+							return false;
+						}
+						else if (CommonTypes.TryParse(Value, out b))
+							this.AcceptToS = b;
+						else
+						{
+							this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ACME_ACCEPT_TOS, Value);
+							return false;
+						}
+					}
+				}
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ENCRYPTION, Value);
+					return false;
+				}
+			}
+
+			AlternativeField LocalizedString = this.GetLocalizedEnvironmentVariable(GATEWAY_HR_NAME, GATEWAY_HR_NAME_LANG);
+			if (LocalizedString is null)
+				return false;
+
+			this.HumanReadableName = LocalizedString.Value;
+			this.HumanReadableNameLanguage = LocalizedString.Key;
+
+			LocalizedString = this.GetLocalizedEnvironmentVariable(GATEWAY_HR_DESC, GATEWAY_HR_DESC_LANG);
+			if (LocalizedString is null)
+				return false;
+
+			this.HumanReadableDescription = LocalizedString.Value;
+			this.HumanReadableDescriptionLanguage = LocalizedString.Key;
+
+			this.localizedNames = this.GetLocalizedEnvironmentVariables(GATEWAY_HR_NAME_LOC, GATEWAY_HR_NAME_);
+			if (this.localizedNames is null)
+				return false;
+
+			this.localizedDescriptions = this.GetLocalizedEnvironmentVariables(GATEWAY_HR_DESC_LOC, GATEWAY_HR_DESC_);
+			if (this.localizedDescriptions is null)
+				return false;
+
+			if (!await this.Test(null, true))                                                           // Tests domain names.
+				return false;
+
+			if (this.dynamicDns && !await this.CheckDynamicIp(true))                                    // Tests dynamic DNS settings.
+				return false;
+
+			if (this.useEncryption && this.useDomainName && !await this.CreateCertificate(null, true))  // Creates certificate.
+				return false;
+
+			return true;
+		}
+
+		private AlternativeField GetLocalizedEnvironmentVariable(string VariableName, string LanguageVariableName)
+		{
+			string Value = Environment.GetEnvironmentVariable(VariableName);
+			if (string.IsNullOrEmpty(Value))
+			{
+				this.LogEnvironmentVariableMissingError(VariableName, Value);
+				return null;
+			}
+
+			string Language = Environment.GetEnvironmentVariable(LanguageVariableName);
+			if (string.IsNullOrEmpty(Language))
+			{
+				this.LogEnvironmentVariableMissingError(LanguageVariableName, Language);
+				return null;
+			}
+
+			return new AlternativeField(Value, Language);
+		}
+
+		private AlternativeField[] GetLocalizedEnvironmentVariables(string CollectionVariableName, string VariableName)
+		{
+			List<AlternativeField> Result = new List<AlternativeField>();
+
+			string Value = Environment.GetEnvironmentVariable(CollectionVariableName);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				string[] Languages = Value.Split(',');
+				string Name;
+
+				foreach (string Language in Languages)
+				{
+					Name = VariableName + Language;
+					Value = Environment.GetEnvironmentVariable(Name);
+					if (string.IsNullOrEmpty(Value))
+					{
+						this.LogEnvironmentVariableMissingError(Name, Value);
+						return null;
+					}
+
+					Result.Add(new AlternativeField(Language, Value));
+				}
+			}
+
+			return Result.ToArray();
+		}
+
 	}
 }

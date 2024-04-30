@@ -226,5 +226,35 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 		}
 
+		/// <summary>
+		/// Environment variable name for personal data consent configuration.
+		/// </summary>
+		public const string GATEWAY_PII_CONSENT = nameof(GATEWAY_PII_CONSENT);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_PII_CONSENT);
+			if (string.IsNullOrEmpty(Value))
+				return Task.FromResult(false);
+
+			if (!CommonTypes.TryParse(Value, out bool PersonalDataConsent))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_PII_CONSENT, Value);
+				return Task.FromResult(false);
+			}
+
+			if (PersonalDataConsent)
+			{
+				this.consented = true;
+				this.consentedTimestamp = DateTime.Now;
+			}
+
+			return Task.FromResult(true);
+		}
+
 	}
 }

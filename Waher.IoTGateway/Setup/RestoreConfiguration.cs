@@ -204,14 +204,22 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 		}
 
+		internal static string[] GetTabIDs(string TabID)
+		{
+			if (string.IsNullOrEmpty(TabID))
+				return ClientEvents.GetTabIDs();
+			else
+				return new string[] { TabID };
+		}
+
 		private static void CollectionFound(string TabID, string CollectionName)
 		{
-			ClientEvents.PushEvent(new string[] { TabID }, "CollectionFound", CollectionName, false);
+			ClientEvents.PushEvent(GetTabIDs(TabID), "CollectionFound", CollectionName, false);
 		}
 
 		private static void ShowStatus(string TabID, string Id, string Message)
 		{
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", JSON.Encode(new Dictionary<string, object>()
+			ClientEvents.PushEvent(GetTabIDs(TabID), "ShowStatus", JSON.Encode(new Dictionary<string, object>()
 			{
 				{ "id", Id },
 				{ "message", Message },
@@ -220,7 +228,7 @@ namespace Waher.IoTGateway.Setup
 
 		private static void ShowStatus(string TabID, string Message)
 		{
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Message, false);
+			ClientEvents.PushEvent(GetTabIDs(TabID), "ShowStatus", Message, false);
 		}
 
 		private async Task Restore(HttpRequest Request, HttpResponse Response)
@@ -257,8 +265,8 @@ namespace Waher.IoTGateway.Setup
 			BackupFile = GetAndRemoveFile(HttpSessionID, this.backupFilePerSession);
 			KeyFile = GetAndRemoveFile(HttpSessionID, this.keyFilePerSession);
 
-			this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(),
-				Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts);
+			Task _ = Task.Run(async () => await this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(),
+				Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts));
 
 			Response.StatusCode = 200;
 		}
@@ -300,7 +308,7 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private async void Restore(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string BackupFileName, bool Overwrite,
+		private async Task Restore(FileStream BackupFile, FileStream KeyFile, string TabID, string BackupFileName, bool Overwrite,
 			bool OnlySelectedCollections, Array SelectedCollections, Array SelectedParts)
 		{
 			ICryptoTransform AesTransform1 = null;
@@ -436,7 +444,7 @@ namespace Waher.IoTGateway.Setup
 					Result.Append("Click on the Next button to continue.");
 				}
 
-				await ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
+				await ClientEvents.PushEvent(GetTabIDs(TabID), "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
 				{
 					{ "ok", true },
 					{ "message", Result.ToString() }
@@ -447,7 +455,7 @@ namespace Waher.IoTGateway.Setup
 				Log.Critical(ex);
 				ShowStatus(TabID, "Failure: " + ex.Message);
 
-				await ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
+				await ClientEvents.PushEvent(GetTabIDs(TabID), "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
 				{
 					{ "ok", false },
 					{ "message", ex.Message }
@@ -464,7 +472,7 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID,
+		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(FileStream BackupFile, FileStream KeyFile, string TabID,
 			string Extension, ValidateBackupFile Import, bool Overwrite, bool OnlySelectedCollections, Array SelectedCollections,
 			Array SelectedParts)
 		{
@@ -1455,7 +1463,7 @@ namespace Waher.IoTGateway.Setup
 
 							ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Database") >= 0 || SelectedParts.Length == 0;
 
-							if(!ImportPart)
+							if (!ImportPart)
 								ShowStatus(TabID, "Skipping database section.");
 							else if (Overwrite)
 								ShowStatus(TabID, "Restoring database section.");
@@ -1958,7 +1966,7 @@ namespace Waher.IoTGateway.Setup
 			if (i > 0)
 				s = s.Substring(0, i);
 
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", JSON.Encode(new Dictionary<string, object>()
+			ClientEvents.PushEvent(GetTabIDs(TabID), "ShowStatus", JSON.Encode(new Dictionary<string, object>()
 			{
 				{ "html", s },
 			}, false), true);
@@ -1976,10 +1984,133 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
 			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Environment variable name containing a Boolean value if a Restore should be made or not.
+		/// </summary>
+		public const string GATEWAY_RESTORE = nameof(GATEWAY_RESTORE);
+
+		/// <summary>
+		/// Environment variable name containing file name of backup file to restore.
+		/// </summary>
+		public const string GATEWAY_RESTORE_BAKFILE = nameof(GATEWAY_RESTORE_BAKFILE);
+
+		/// <summary>
+		/// Environment variable name containing file name of key file corresponding to the backup file, if available.
+		/// </summary>
+		public const string GATEWAY_RESTORE_KEYFILE = nameof(GATEWAY_RESTORE_KEYFILE);
+
+		/// <summary>
+		/// Environment variable name specifying if restore should overwrite existing information.
+		/// </summary>
+		public const string GATEWAY_RESTORE_OVERWRITE = nameof(GATEWAY_RESTORE_OVERWRITE);
+
+		/// <summary>
+		/// Environment variable name specifying a set of collections to restore.
+		/// </summary>
+		public const string GATEWAY_RESTORE_COLLECTIONS = nameof(GATEWAY_RESTORE_COLLECTIONS);
+
+		/// <summary>
+		/// Environment variable name specifying a set of parts to restore.
+		/// </summary>
+		public const string GATEWAY_RESTORE_PARTS = nameof(GATEWAY_RESTORE_PARTS);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_RESTORE);
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			if (!CommonTypes.TryParse(Value, out bool Restore))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_RESTORE, Value);
+				return false;
+			}
+
+			if (!Restore)
+				return true;
+
+			string BakFileName = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_BAKFILE);
+			string KeyFileName = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_KEYFILE);
+			string OverWriteStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_OVERWRITE);
+			string CollectionsStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_COLLECTIONS);
+			string PartsStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_PARTS);
+			string[] Collections;
+			string[] Parts;
+
+			if (string.IsNullOrEmpty(BakFileName))
+			{
+				this.LogEnvironmentVariableMissingError(GATEWAY_RESTORE_BAKFILE, BakFileName);
+				return false;
+			}
+
+			if (string.IsNullOrEmpty(OverWriteStr) || !CommonTypes.TryParse(OverWriteStr, out bool OverWrite))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_RESTORE_OVERWRITE, OverWriteStr);
+				return false;
+			}
+
+			if (string.IsNullOrEmpty(CollectionsStr))
+				Collections = new string[0];
+			else
+				Collections = CollectionsStr.Split(',');
+
+			if (string.IsNullOrEmpty(PartsStr))
+				Parts = new string[0];
+			else
+				Parts = PartsStr.Split(',');
+
+			FileStream BakFile = null;
+			FileStream KeyFile = null;
+
+			try
+			{
+				try
+				{
+					BakFile = File.OpenRead(BakFileName);
+				}
+				catch (Exception ex)
+				{
+					this.LogEnvironmentError(ex.Message, GATEWAY_RESTORE_BAKFILE, BakFileName);
+					return false;
+				}
+
+				if (!string.IsNullOrEmpty(KeyFileName))
+				{
+					try
+					{
+						KeyFile = File.OpenRead(KeyFileName);
+					}
+					catch (Exception ex)
+					{
+						this.LogEnvironmentError(ex.Message, GATEWAY_RESTORE_KEYFILE, KeyFileName);
+						return false;
+					}
+				}
+
+				await this.Restore(BakFile, KeyFile, string.Empty, BakFileName, OverWrite, Collections.Length > 0, Collections, Parts);
+			}
+			catch (Exception ex)
+			{
+				this.LogEnvironmentError(ex.Message, GATEWAY_RESTORE_BAKFILE, BakFileName);
+				return false;
+			}
+			finally
+			{
+				BakFile?.Dispose();
+				KeyFile?.Dispose();
+			}
+
+			return true;
 		}
 
 	}

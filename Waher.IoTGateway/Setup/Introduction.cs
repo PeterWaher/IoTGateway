@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Language;
 
@@ -93,6 +95,33 @@ namespace Waher.IoTGateway.Setup
 			await this.MakeCompleted();
 
 			await Response.SendResponse();
+		}
+
+		/// <summary>
+		/// Environment variable name for simple setup configuration.
+		/// </summary>
+		public const string GATEWAY_SIMPLE_SETUP = nameof(GATEWAY_SIMPLE_SETUP);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_SIMPLE_SETUP);
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			if (!CommonTypes.TryParse(Value, out bool SimpleSetup))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_SIMPLE_SETUP, Value);
+				return false;
+			}
+			
+			if (SimpleSetup)
+				await Gateway.SimplifiedConfiguration();
+			
+			return true;
 		}
 
 	}

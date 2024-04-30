@@ -13,6 +13,7 @@ using Waher.Runtime.Language;
 using Waher.IoTGateway.Setup.Databases;
 using Waher.IoTGateway.Setup.Databases.Sniffing;
 using Waher.Content.Json;
+using Waher.Events;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -297,7 +298,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Simplified configuration by configuring simple default values.
 		/// </summary>
-		/// <returns>If the configuration was changed.</returns>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
 			InternalDatabase Plugin = new InternalDatabase();
@@ -308,6 +309,67 @@ namespace Waher.IoTGateway.Setup
 			this.Step = 1;
 
 			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Environment variable name for selection of database provider.
+		/// </summary>
+		public const string GATEWAY_DB_PROVIDER = nameof(GATEWAY_DB_PROVIDER);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string ProviderType = Environment.GetEnvironmentVariable(GATEWAY_DB_PROVIDER);
+			if (string.IsNullOrEmpty(ProviderType))
+				return false;
+
+			Type T = Types.GetType(ProviderType);
+			if (T is null)
+			{
+				this.LogEnvironmentError("Database plugin not found.", GATEWAY_DB_PROVIDER, ProviderType);
+				return false;
+			}
+
+			IDatabasePlugin Plugin;
+
+			try
+			{
+				Plugin = (IDatabasePlugin)Types.Instantiate(true, T);
+			}
+			catch (Exception ex)
+			{
+				this.LogEnvironmentError(ex.Message, GATEWAY_DB_PROVIDER, ProviderType);
+				return false;
+			}
+
+			if (Plugin is null)
+			{
+				this.LogEnvironmentError("Unable to instantiate database plugin.", GATEWAY_DB_PROVIDER, ProviderType);
+				return false;
+			}
+
+			DatabaseSettings Settings = Plugin.CreateNewSettings();
+
+			try
+			{
+				if (!await Plugin.TestEnvironmentVariables(this, Settings))
+					return false;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
+
+			this.databasePlugin = Plugin;
+			this.databasePluginName = ProviderType;
+			this.databasePluginSettings = Settings;
+			this.Step = 1;
+
+			return true;
 		}
 
 	}

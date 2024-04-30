@@ -21,6 +21,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Things](#things)
 * [Utilities](#utilities)
 * [Web Services](#webServices)
+* [Environment Variables](#environmentVariables)
 
 License
 ----------------------
@@ -533,3 +534,30 @@ The folder also contains the following unit test projects:
 | Project                             | Type     | Project description |
 |-------------------------------------|----------|---------------------|
 | **Waher.Webservice.Tesseract.Test** | .NET 6.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
+
+Environment Variables
+------------------------
+
+During intial configuration and setup of the **IoT Gateway**, and any hosted services, a sequence of configuration steps have to be processed.
+The operator of the Gateway, and hosted services, can choose to enter the information manually in each step via the web interface, or provide
+the information via *environment variables*, allowing for the automation of the configuration and setup procedure.
+
+### Web setup
+
+The default method of configuring the **IoT Gateway** is via the web interface. The first time the gateway is run, the web interface is overridden
+to display the configuration steps required to be completed. The user can choose a *simplified* or a *detailed* configuration. The *detailed*
+configuration shows each step in the configuration process, while the *simplified* only shows required steps, while the others receive a *default*
+configuration. As soon as all steps have been completed, the setup override is removed, and the gateway starts operating in a configured state.
+
+### Automated setup
+
+The setup procedure can be automated, by providing the values required for the setup in *Environment Variables*. This permits the operator
+to automate the configuration, and to create containers with preprogrammed configurations. Available Environment Variables depends on the
+amount of services hosted by the gateway. This repository contains a list of Environment Variables that can be used to automate the setup,
+in the [Configuration Steps](ConfigurationSteps.md) article.
+
+### Mixed setup
+
+An operator can choose to partially pre-configure the gateway using only a subset of available *Environment Variables* necessary for a complete
+configuration. During initial start of the gateway, the configuraiton steps with these preconfigured values will be skipped, as they will be seen
+as completed. Only the configuration steps without preconfigured values will be shown.

@@ -20,8 +20,7 @@ using Waher.Persistence.Attributes;
 using Waher.Security;
 using Waher.Security.Users;
 using Waher.Runtime.Language;
-using Waher.Script.Statistics.Functions;
-using Waher.Script.Functions.Vectors;
+using Waher.IoTGateway.ScriptExtensions.Functions;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -89,6 +88,7 @@ namespace Waher.IoTGateway.Setup
 		private bool pep = false;
 		private bool mail = false;
 
+		private TaskCompletionSource<bool> testConnection = null;
 		private XmppClient client = null;
 		private bool createAccount = false;
 
@@ -501,7 +501,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Parameters.TryGetValue("sniffer", out Obj) || !(Obj is bool Sniffer))
 				throw new BadRequestException();
 
-			if (!Parameters.TryGetValue("transport", out Obj) || !(Obj is string s2) || !Enum.TryParse<XmppTransportMethod>(s2, out XmppTransportMethod Method))
+			if (!Parameters.TryGetValue("transport", out Obj) || !(Obj is string s2) || !Enum.TryParse(s2, out XmppTransportMethod Method))
 				throw new BadRequestException();
 
 			if (!Parameters.TryGetValue("account", out Obj) || !(Obj is string Account))
@@ -549,41 +549,7 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
 
-			byte[] Proposal;
-			double[] H;
-			double MinH;
-
-			do
-			{
-				Proposal = Gateway.NextBytes(32);
-				H = Histogram.Compute(Proposal, 12, 0, 256);
-				MinH = Min.CalcMin(H, null);
-			}
-			while (MinH == 0);
-
-			/////////////////////////////////////////////////////////////////////
-			//
-			// This condition approximately removes 1 in 2 generated passwords, 
-			// reducing the strength from 256 bits to 255 bits.
-			//
-			// In a test of 100'000 randomly generated passwords, 42'973 passed
-			// (~43%), 57027 failed (~57%).
-			//
-			// Sample script:
-			//
-			//     NrPass:=0;
-			//     NrFail:=0;
-			//     foreach x in 1..100000 do
-			//     (
-			//         Bin:=Base64Decode(Base64Encode(Gateway.NextBytes(32)));
-			//         H:=Histogram([foreach x in Bin : x],0,256,12);
-			//         if (Min(H[1])>0) then NrPass++ else NrFail++
-			//     );
-			//     {"NrPass":NrPass,"NrFail":NrFail}
-			//
-			/////////////////////////////////////////////////////////////////////
-
-			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));
+			return Response.Write(RandomPassword.CreateRandomPassword());
 		}
 
 		/// <summary>
@@ -666,7 +632,7 @@ namespace Waher.IoTGateway.Setup
 				return;
 
 			if (!Client.TryGetTag("TabID", out object Obj) || !(Obj is string TabID))
-				return;
+				TabID = null;
 
 			try
 			{
@@ -679,18 +645,22 @@ namespace Waher.IoTGateway.Setup
 						Client.SetTag("EncyptionSuccessful", true);
 						if (this.Step == 0)
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK0", "Connection established.", false, "User");
+							if (!string.IsNullOrEmpty(TabID))
+							{
+								await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK0", "Connection established.", false, "User");
 
-							this.client.Dispose();
-							this.client = null;
+								this.client.Dispose();
+								this.client = null;
 
-							this.Step = 1;
-							this.Updated = DateTime.Now;
-							await Database.Update(this);
-							return;
+								this.Step = 1;
+								this.Updated = DateTime.Now;
+								await Database.Update(this);
+
+								return;
+							}
 						}
-						else
-							Msg = "Authenticating user.";
+
+						Msg = "Authenticating user.";
 						break;
 
 					case XmppState.Binding:
@@ -729,7 +699,8 @@ namespace Waher.IoTGateway.Setup
 
 						if (this.createAccount && !string.IsNullOrEmpty(this.accountHumanReadableName))
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false, "User");
+							if (!string.IsNullOrEmpty(TabID))
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Setting vCard.", false, "User");
 
 							StringBuilder Xml = new StringBuilder();
 
@@ -745,7 +716,9 @@ namespace Waher.IoTGateway.Setup
 							await Client.IqSetAsync(this.client.BareJID, Xml.ToString());
 						}
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false, "User");
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server features.", false, "User");
+
 						ServiceDiscoveryEventArgs e = await Client.ServiceDiscoveryAsync(null, string.Empty, string.Empty);
 
 						if (e.Ok)
@@ -767,12 +740,16 @@ namespace Waher.IoTGateway.Setup
 							this.mail = false;
 						}
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false, "User");
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking account features.", false, "User");
+
 						e = await Client.ServiceDiscoveryAsync(null, Client.BareJID, string.Empty);
 
 						this.pep = e.Ok && this.ContainsIdentity("pep", "pubsub", e);
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false, "User");
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking server components.", false, "User");
+
 						ServiceItemsDiscoveryEventArgs e2 = await Client.ServiceItemsDiscoveryAsync(null, string.Empty, string.Empty);
 
 						this.thingRegistry = string.Empty;
@@ -787,7 +764,8 @@ namespace Waher.IoTGateway.Setup
 						{
 							foreach (Item Item in e2.Items)
 							{
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking component features for " + Item.JID, false, "User");
+								if (!string.IsNullOrEmpty(TabID))
+									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking component features for " + Item.JID, false, "User");
 
 								e = await Client.ServiceDiscoveryAsync(null, Item.JID, string.Empty);
 
@@ -833,7 +811,8 @@ namespace Waher.IoTGateway.Setup
 							{ "software", this.software }
 						};
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
 
 						this.client.Dispose();
 						this.client = null;
@@ -841,6 +820,8 @@ namespace Waher.IoTGateway.Setup
 						this.Step = 2;
 						this.Updated = DateTime.Now;
 						await Database.Update(this);
+
+						this.testConnection?.TrySetResult(true);
 						return;
 
 					case XmppState.Connecting:
@@ -855,8 +836,11 @@ namespace Waher.IoTGateway.Setup
 						{
 							this.customBinding = true;
 
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to connect properly. Looking for alternative ways to connect.", false, "User");
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowCustomProperties", "{\"visible\":true}", true, "User");
+							if (!string.IsNullOrEmpty(TabID))
+							{
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Unable to connect properly. Looking for alternative ways to connect.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowCustomProperties", "{\"visible\":true}", true, "User");
+							}
 
 							using (HttpClient HttpClient = new HttpClient(new HttpClientHandler()
 							{
@@ -920,7 +904,8 @@ namespace Waher.IoTGateway.Setup
 											this.wsUrl = WsUrl;
 											this.transportMethod = XmppTransportMethod.WS;
 
-											await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true, "User");
+											if (!string.IsNullOrEmpty(TabID))
+												await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true, "User");
 
 											this.Connect(TabID);
 
@@ -931,7 +916,8 @@ namespace Waher.IoTGateway.Setup
 											this.boshUrl = BoshUrl;
 											this.transportMethod = XmppTransportMethod.BOSH;
 
-											await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true, "User");
+											if (!string.IsNullOrEmpty(TabID))
+												await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true, "User");
 
 											this.Connect(TabID);
 
@@ -955,21 +941,28 @@ namespace Waher.IoTGateway.Setup
 
 							if (Client.TryGetTag("StartedAuthentication", out Obj) && Obj is bool b && b)
 							{
-								if (this.createAccount)
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowFail2", Msg, false, "User");
-								else
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", Msg, false, "User");
+								if (!string.IsNullOrEmpty(TabID))
+								{
+									if (this.createAccount)
+										await ClientEvents.PushEvent(new string[] { TabID }, "ShowFail2", Msg, false, "User");
+									else
+										await ClientEvents.PushEvent(new string[] { TabID }, "ShowFail1", Msg, false, "User");
+								}
 								return;
 							}
 						}
 
 						if (Error)
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionError", Msg, false, "User");
+							if (string.IsNullOrEmpty(TabID))
+								this.LogEnvironmentError(Msg, GATEWAY_XMPP_HOST, this.host);
+							else
+								await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionError", Msg, false, "User");
 
 							this.client.Dispose();
 							this.client = null;
 
+							this.testConnection?.TrySetResult(false);
 							return;
 						}
 						break;
@@ -1012,12 +1005,15 @@ namespace Waher.IoTGateway.Setup
 						break;
 				}
 
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Msg, false, "User");
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Msg, false, "User");
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
+
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
 			}
 		}
 
@@ -1028,7 +1024,7 @@ namespace Waher.IoTGateway.Setup
 
 			User User = await Users.GetUser(this.account, true);
 
-			User.PasswordHash = Convert.ToBase64String(Users.ComputeHash(this.account, 
+			User.PasswordHash = Convert.ToBase64String(Users.ComputeHash(this.account,
 				string.IsNullOrEmpty(this.password0) ? this.password : this.password0));
 
 			if (User.RoleIds.Length == 0)
@@ -1094,5 +1090,295 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		private static string[] featuredServers = null;
+
+		/// <summary>
+		/// XMPP broker to connect to. (If `C2S` binding has been selected).
+		/// </summary>
+		public const string GATEWAY_XMPP_HOST = nameof(GATEWAY_XMPP_HOST);
+
+		/// <summary>
+		/// XMPP transport method(a.k.a.binding). Can be `C2S` (default if variable not available), `BOSH` (Bidirectional HTTP) or 
+		/// `WS` (Web-socket).
+		/// </summary>
+		public const string GATEWAY_XMPP_TRANSPORT = nameof(GATEWAY_XMPP_TRANSPORT);
+
+		/// <summary>
+		/// Optional Port number to use when connecting to host. (If `C2S` binding has been selected.) If not provided, the default port number 
+		/// will be used.
+		/// </summary>
+		public const string GATEWAY_XMPP_PORT = nameof(GATEWAY_XMPP_PORT);
+
+		/// <summary>
+		/// URL to use when connecting to host. (If `BOSH` binding has been selected).
+		/// </summary>
+		public const string GATEWAY_XMPP_BOSHURL = nameof(GATEWAY_XMPP_BOSHURL);
+
+		/// <summary>
+		/// URL to use when connecting to host. (If `WS` binding has been selected).
+		/// </summary>
+		public const string GATEWAY_XMPP_WSURL = nameof(GATEWAY_XMPP_WSURL);
+
+		/// <summary>
+		/// If an account is to be created.
+		/// </summary>
+		public const string GATEWAY_XMPP_CREATE = nameof(GATEWAY_XMPP_CREATE);
+
+		/// <summary>
+		/// API-Key to use when creating account, if host is not one of the featured hosts.
+		/// </summary>
+		public const string GATEWAY_XMPP_CREATE_KEY = nameof(GATEWAY_XMPP_CREATE_KEY);
+
+		/// <summary>
+		/// API-Key secret to use when creating account, if host is not one of the featured hosts.
+		/// </summary>
+		public const string GATEWAY_XMPP_CREATE_SECRET = nameof(GATEWAY_XMPP_CREATE_SECRET);
+
+		/// <summary>
+		/// Name of account.
+		/// </summary>
+		public const string GATEWAY_XMPP_ACCOUNT = nameof(GATEWAY_XMPP_ACCOUNT);
+
+		/// <summary>
+		/// Password of account. If creating an account, this variable is optional. If not available, a secure password will be generated.
+		/// </summary>
+		public const string GATEWAY_XMPP_PASSWORD = nameof(GATEWAY_XMPP_PASSWORD);
+
+		/// <summary>
+		/// Optional Human-readable name of account.
+		/// </summary>
+		public const string GATEWAY_XMPP_ACCOUNT_NAME = nameof(GATEWAY_XMPP_ACCOUNT_NAME);
+
+		/// <summary>
+		/// Optional. `true` or `1` if gateway should log communication to program data folder, `false` or `0` if communication should not be 
+		/// logged (default).
+		/// </summary>
+		public const string GATEWAY_XMPP_LOG = nameof(GATEWAY_XMPP_LOG);
+
+		/// <summary>
+		/// Optional. `true` or `1` if gateway should trust server certificate, even if it does not validate, `false` or `0` if server should 
+		/// be distrusted(default).
+		/// </summary>
+		public const string GATEWAY_XMPP_TRUST = nameof(GATEWAY_XMPP_TRUST);
+
+		/// <summary>
+		/// Optional. `true` or `1` if gateway should be allowed to use obsolete and insecure authentication mechanisms, `false` or `0` if only 
+		/// secure mechanisms should be allowed(default).
+		/// </summary>
+		public const string GATEWAY_XMPP_OBS_AUTH = nameof(GATEWAY_XMPP_OBS_AUTH);
+
+		/// <summary>
+		/// Optional. `true` or `1` if gateway should store password as-is in the database, `false` or `0` if only the password hash should be 
+		/// stored(default).
+		/// </summary>
+		public const string GATEWAY_XMPP_CLEAR_PWD = nameof(GATEWAY_XMPP_CLEAR_PWD);
+
+		/// <summary>
+		/// Environment configuration by configuring values available in environment variables.
+		/// </summary>
+		/// <returns>If the configuration was changed, and can be considered completed.</returns>
+		public override async Task<bool> EnvironmentConfiguration()
+		{
+			string Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_HOST);
+			bool b;
+
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			this.host = Value;
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_TRANSPORT);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				if (!Enum.TryParse(Value, out XmppTransportMethod Method))
+				{
+					this.LogEnvironmentError("Invalid transport method.", GATEWAY_XMPP_TRANSPORT, Value);
+					return false;
+				}
+
+				this.transportMethod = Method;
+			}
+
+			switch (this.transportMethod)
+			{
+				case XmppTransportMethod.C2S:
+					Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_PORT);
+					if (!string.IsNullOrEmpty(Value))
+					{
+						if (!int.TryParse(Value, out int i) || i <= 0 || i > 65535)
+						{
+							this.LogEnvironmentVariableInvalidRangeError(1, 65535, GATEWAY_XMPP_PORT, Value);
+							return false;
+						}
+
+						this.port = i;
+						this.customBinding = false;
+					}
+					break;
+
+				case XmppTransportMethod.BOSH:
+					Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_BOSHURL);
+					if (string.IsNullOrEmpty(Value))
+					{
+						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_BOSHURL, Value);
+						return false;
+					}
+
+					this.boshUrl = Value;
+					this.customBinding = true;
+					break;
+
+				case XmppTransportMethod.WS:
+					Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_WSURL);
+					if (string.IsNullOrEmpty(Value))
+					{
+						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_WSURL, Value);
+						return false;
+					}
+
+					this.wsUrl = Value;
+					this.customBinding = true;
+					break;
+
+				default:
+					this.LogEnvironmentError("Unhandled binding method.", GATEWAY_XMPP_TRANSPORT, this.transportMethod);
+					return false;
+			}
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CREATE);
+			if (string.IsNullOrEmpty(Value))
+				this.createAccount = false;
+			else if (!CommonTypes.TryParse(Value, out b))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_CREATE, Value);
+				return false;
+			}
+			else
+				this.createAccount = b;
+
+			if (this.createAccount)
+			{
+				Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CREATE_KEY);
+				if (string.IsNullOrEmpty(Value))
+				{
+					if (!clp.ContainsKey(this.host))
+					{
+						this.LogEnvironmentError("Host is not a featured broker. If an account is to be created, an API Key must be provided.",
+							GATEWAY_XMPP_CREATE_KEY, Value);
+						return false;
+					}
+				}
+				else
+				{
+					string Value2 = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CREATE_SECRET);
+					if (string.IsNullOrEmpty(Value2))
+					{
+						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_CREATE_SECRET, Value2);
+						return false;
+					}
+
+					clp[this.host] = new KeyValuePair<string, string>(Value, Value2);
+				}
+			}
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT);
+			if (string.IsNullOrEmpty(Value))
+			{
+				this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_ACCOUNT, Value);
+				return false;
+			}
+			else
+				this.account = Value;
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_PASSWORD);
+			if (string.IsNullOrEmpty(Value))
+			{
+				if (this.createAccount)
+					this.password = RandomPassword.CreateRandomPassword();
+				else
+				{
+					this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_PASSWORD, Value);
+					return false;
+				}
+			}
+			else
+				this.password = Value;
+
+			this.password0 = this.password;
+			this.passwordType = string.Empty;
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT_NAME);
+			if (!string.IsNullOrEmpty(Value))
+				this.accountHumanReadableName = Value;
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_LOG);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				if (CommonTypes.TryParse(Value, out b))
+					this.sniffer = b;
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_LOG, Value);
+					return false;
+				}
+			}
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_TRUST);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				if (CommonTypes.TryParse(Value, out b))
+					this.trustServer = b;
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_TRUST, Value);
+					return false;
+				}
+			}
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_OBS_AUTH);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				if (CommonTypes.TryParse(Value, out b))
+					this.allowInsecureMechanisms = b;
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_OBS_AUTH, Value);
+					return false;
+				}
+			}
+
+			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CLEAR_PWD);
+			if (!string.IsNullOrEmpty(Value))
+			{
+				if (CommonTypes.TryParse(Value, out b))
+					this.storePasswordInsteadOfHash = b;
+				else
+				{
+					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_CLEAR_PWD, Value);
+					return false;
+				}
+			}
+
+			this.testConnection = new TaskCompletionSource<bool>();
+			try
+			{
+				Task _ = Task.Delay(30000).ContinueWith(Prev => this.testConnection?.TrySetException(new TimeoutException()));
+
+				this.Connect(null);
+
+				if (await this.testConnection.Task)
+					return true;
+				else
+					return false;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
+			finally
+			{
+				this.testConnection = null;
+			}
+		}
 	}
 }

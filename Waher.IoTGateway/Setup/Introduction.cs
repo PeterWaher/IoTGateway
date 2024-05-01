@@ -108,16 +108,9 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_SIMPLE_SETUP);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_SIMPLE_SETUP, false, out bool SimpleSetup))
 				return false;
 
-			if (!CommonTypes.TryParse(Value, out bool SimpleSetup))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_SIMPLE_SETUP, Value);
-				return false;
-			}
-			
 			if (SimpleSetup)
 				await Gateway.SimplifiedConfiguration();
 			

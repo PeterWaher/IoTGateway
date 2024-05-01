@@ -1178,16 +1178,10 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_HOST);
-			bool b;
-
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_HOST, false, out this.host))
 				return false;
 
-			this.host = Value;
-
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_TRANSPORT);
-			if (!string.IsNullOrEmpty(Value))
+			if (this.TryGetEnvironmentVariable(GATEWAY_XMPP_TRANSPORT, false, out string Value))
 			{
 				if (!Enum.TryParse(Value, out XmppTransportMethod Method))
 				{
@@ -1216,26 +1210,16 @@ namespace Waher.IoTGateway.Setup
 					break;
 
 				case XmppTransportMethod.BOSH:
-					Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_BOSHURL);
-					if (string.IsNullOrEmpty(Value))
-					{
-						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_BOSHURL, Value);
+					if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_BOSHURL, true, out this.boshUrl))
 						return false;
-					}
 
-					this.boshUrl = Value;
 					this.customBinding = true;
 					break;
 
 				case XmppTransportMethod.WS:
-					Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_WSURL);
-					if (string.IsNullOrEmpty(Value))
-					{
-						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_WSURL, Value);
+					if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_WSURL, true, out this.wsUrl))
 						return false;
-					}
 
-					this.wsUrl = Value;
 					this.customBinding = true;
 					break;
 
@@ -1244,16 +1228,8 @@ namespace Waher.IoTGateway.Setup
 					return false;
 			}
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CREATE);
-			if (string.IsNullOrEmpty(Value))
-				this.createAccount = false;
-			else if (!CommonTypes.TryParse(Value, out b))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_CREATE, Value);
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_CREATE, out this.createAccount, false))
 				return false;
-			}
-			else
-				this.createAccount = b;
 
 			if (this.createAccount)
 			{
@@ -1269,28 +1245,17 @@ namespace Waher.IoTGateway.Setup
 				}
 				else
 				{
-					string Value2 = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CREATE_SECRET);
-					if (string.IsNullOrEmpty(Value2))
-					{
-						this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_CREATE_SECRET, Value2);
+					if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_CREATE_SECRET, true, out string Value2))
 						return false;
-					}
 
 					clp[this.host] = new KeyValuePair<string, string>(Value, Value2);
 				}
 			}
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT);
-			if (string.IsNullOrEmpty(Value))
-			{
-				this.LogEnvironmentVariableMissingError(GATEWAY_XMPP_ACCOUNT, Value);
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT, true, out this.account))
 				return false;
-			}
-			else
-				this.account = Value;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_PASSWORD);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_PASSWORD, false, out this.password))
 			{
 				if (this.createAccount)
 					this.password = RandomPassword.CreateRandomPassword();
@@ -1300,63 +1265,24 @@ namespace Waher.IoTGateway.Setup
 					return false;
 				}
 			}
-			else
-				this.password = Value;
 
 			this.password0 = this.password;
 			this.passwordType = string.Empty;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT_NAME);
-			if (!string.IsNullOrEmpty(Value))
+			if (this.TryGetEnvironmentVariable(GATEWAY_XMPP_ACCOUNT_NAME, false, out Value))
 				this.accountHumanReadableName = Value;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_LOG);
-			if (!string.IsNullOrEmpty(Value))
-			{
-				if (CommonTypes.TryParse(Value, out b))
-					this.sniffer = b;
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_LOG, Value);
-					return false;
-				}
-			}
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_LOG, out this.sniffer, false))
+				return false;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_TRUST);
-			if (!string.IsNullOrEmpty(Value))
-			{
-				if (CommonTypes.TryParse(Value, out b))
-					this.trustServer = b;
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_TRUST, Value);
-					return false;
-				}
-			}
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_TRUST, out this.trustServer, false))
+				return false;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_OBS_AUTH);
-			if (!string.IsNullOrEmpty(Value))
-			{
-				if (CommonTypes.TryParse(Value, out b))
-					this.allowInsecureMechanisms = b;
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_OBS_AUTH, Value);
-					return false;
-				}
-			}
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_OBS_AUTH, out this.allowInsecureMechanisms, false))
+				return false;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_XMPP_CLEAR_PWD);
-			if (!string.IsNullOrEmpty(Value))
-			{
-				if (CommonTypes.TryParse(Value, out b))
-					this.storePasswordInsteadOfHash = b;
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_XMPP_CLEAR_PWD, Value);
-					return false;
-				}
-			}
+			if (!this.TryGetEnvironmentVariable(GATEWAY_XMPP_CLEAR_PWD, out this.storePasswordInsteadOfHash, false))
+				return false;
 
 			this.testConnection = new TaskCompletionSource<bool>();
 			try

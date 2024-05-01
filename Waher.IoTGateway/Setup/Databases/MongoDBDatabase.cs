@@ -235,43 +235,19 @@ namespace Waher.IoTGateway.Setup.Databases
 			if (!(Settings is MongoDBSettings MongoDBSettings))
 				return false;
 
-			string Host = Environment.GetEnvironmentVariable(MONGO_DB_HOST);
-			string Name = Environment.GetEnvironmentVariable(MONGO_DB_NAME);
-			string Default = Environment.GetEnvironmentVariable(MONGO_DB_DEFAULT);
-			string User = Environment.GetEnvironmentVariable(MONGO_DB_USER);
-			string Password = Environment.GetEnvironmentVariable(MONGO_DB_PASSWORD);
-			string Port = Environment.GetEnvironmentVariable(MONGO_DB_PORT);
+			if (!Configuration.TryGetEnvironmentVariable(MONGO_DB_HOST, false, out string Host))
+				return false;
 
-			if (string.IsNullOrEmpty(Host) &&
-				string.IsNullOrEmpty(Name) &&
-				string.IsNullOrEmpty(Default) &&
-				string.IsNullOrEmpty(User) &&
-				string.IsNullOrEmpty(Password) &&
-				string.IsNullOrEmpty(Port))
+			if (!Configuration.TryGetEnvironmentVariable(MONGO_DB_NAME, true, out string Name) ||
+				!Configuration.TryGetEnvironmentVariable(MONGO_DB_USER, true, out string User) ||
+				!Configuration.TryGetEnvironmentVariable(MONGO_DB_PASSWORD, true, out string Password) ||
+				!Configuration.TryGetEnvironmentVariable(MONGO_DB_PORT, true, out string Port))
 			{
 				return false;
 			}
 
-			if (string.IsNullOrEmpty(Host))
-			{
-				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_HOST, Host);
-				return false;
-			}
-
-			if (string.IsNullOrEmpty(Name))
-			{
-				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_NAME, Name);
-				return false;
-			}
-
-			if (string.IsNullOrEmpty(Default))
+			if (!Configuration.TryGetEnvironmentVariable(MONGO_DB_DEFAULT, false, out string Default))
 				Default = "Default";
-
-			if (string.IsNullOrEmpty(User))
-			{
-				Configuration.LogEnvironmentVariableMissingError(MONGO_DB_USER, User);
-				return false;
-			}
 
 			(string Message, string Parameter, string Value) = await this.Test(Host, Name, Default, User, Password, Port, true, MongoDBSettings);
 

@@ -1501,7 +1501,7 @@ namespace Waher.IoTGateway.Setup
 									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
-										
+
 										string Msg = "Unable to convert to PFX using OpenSSL.";
 
 										if (EnvironmentSetup)
@@ -1799,19 +1799,10 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_DOMAIN_USE);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_DOMAIN_USE, false, out this.useDomainName))
 				return false;
 
-			if (!CommonTypes.TryParse(Value, out bool b))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_DOMAIN_USE, Value);
-				return false;
-			}
-
-			this.UseDomainName = b;
-
-			if (!b)
+			if (!this.useDomainName)
 			{
 				this.Domain = string.Empty;
 				this.DynamicDns = false;
@@ -1822,13 +1813,10 @@ namespace Waher.IoTGateway.Setup
 			}
 			else
 			{
-				Value = Environment.GetEnvironmentVariable(GATEWAY_DOMAIN_NAME);
-				if (string.IsNullOrEmpty(Value))
-				{
-					this.LogEnvironmentVariableMissingError(GATEWAY_DOMAIN_NAME, Value);
-					return false;
-				}
-				else if (Value.ToLower() == "localhost")
+				if (!this.TryGetEnvironmentVariable(GATEWAY_DOMAIN_NAME, true, out string Value))
+					return true;
+
+				if (Value.ToLower() == "localhost")
 				{
 					this.LogEnvironmentError("localhost is not a valid domain name.", GATEWAY_DOMAIN_NAME, Value);
 					return false;
@@ -1855,130 +1843,52 @@ namespace Waher.IoTGateway.Setup
 					this.AlternativeDomains = Parts;
 				}
 
-				Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS);
-				if (string.IsNullOrEmpty(Value))
-					this.DynamicDns = false;
-				else if (CommonTypes.TryParse(Value, out b))
+				if (!this.TryGetEnvironmentVariable(GATEWAY_DYNDNS, out this.dynamicDns, false))
+					return false;
+
+				if (this.dynamicDns)
 				{
-					this.DynamicDns = b;
-					if (b)
+					if (!this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_TEMPLATE, true, out Value))
+						return false;
+
+					this.DynDnsTemplate = Value;
+
+					if (!this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_CHECK, true, out Value))
+						return false;
+
+					this.CheckIpScript = Value;
+
+					if (!this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_UPDATE, true, out Value))
+						return false;
+
+					this.UpdateIpScript = Value;
+
+					this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_ACCOUNT, false, out this.dynDnsAccount);
+					this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_PASSWORD, false, out this.dynDnsPassword);
+
+					if (!this.TryGetEnvironmentVariable(GATEWAY_DYNDNS_UPDATE, 60, 86400, true, ref this.dynDnsInterval))
+						return false;
+				}
+
+				if (!this.TryGetEnvironmentVariable(GATEWAY_ENCRYPTION, true, out this.useEncryption))
+					return false;
+
+				if (this.useEncryption)
+				{
+					if (!this.TryGetEnvironmentVariable(GATEWAY_CA_CUSTOM, out this.customCA, false))
+						return false;
+
+					if (this.customCA)
 					{
-						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_TEMPLATE);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_TEMPLATE, Value);
+						if (!this.TryGetEnvironmentVariable(GATEWAY_ACME_DIRECTORY, true, out this.acmeDirectory))
 							return false;
-						}
-						else
-							this.DynDnsTemplate = Value;
-
-						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_CHECK);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_CHECK, Value);
-							return false;
-						}
-						else
-							this.CheckIpScript = Value;
-
-						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_UPDATE);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_UPDATE, Value);
-							return false;
-						}
-						else
-							this.UpdateIpScript = Value;
-
-						this.DynDnsAccount = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_ACCOUNT);
-						this.DynDnsPassword = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_PASSWORD);
-
-						Value = Environment.GetEnvironmentVariable(GATEWAY_DYNDNS_INTERVAL);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_DYNDNS_INTERVAL, Value);
-							return false;
-						}
-						else if (int.TryParse(Value, out int i) && i >= 60 && i <= 86400)
-							this.DynDnsInterval = i;
-						else
-						{
-							this.LogEnvironmentVariableInvalidRangeError(60, 86400, GATEWAY_DYNDNS_INTERVAL, Value);
-							return false;
-						}
 					}
-				}
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_DYNDNS, Value);
-					return false;
-				}
 
-				Value = Environment.GetEnvironmentVariable(GATEWAY_ENCRYPTION);
-				if (string.IsNullOrEmpty(Value))
-				{
-					this.LogEnvironmentVariableMissingError(GATEWAY_ENCRYPTION, Value);
-					return false;
-				}
-				else if (CommonTypes.TryParse(Value, out b))
-				{
-					this.UseEncryption = b;
+					if (!this.TryGetEnvironmentVariable(GATEWAY_ACME_EMAIL, true, out this.contactEMail))
+						return false;
 
-					if (b)
-					{
-						Value = Environment.GetEnvironmentVariable(GATEWAY_CA_CUSTOM);
-						if (string.IsNullOrEmpty(Value))
-							this.CustomCA = false;
-						else if (CommonTypes.TryParse(Value, out b))
-						{
-							this.CustomCA = b;
-
-							if (b)
-							{
-								Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_DIRECTORY);
-								if (string.IsNullOrEmpty(Value))
-								{
-									this.LogEnvironmentVariableMissingError(GATEWAY_ACME_DIRECTORY, Value);
-									return false;
-								}
-
-								this.AcmeDirectory = Value;
-							}
-						}
-						else
-						{
-							this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_CA_CUSTOM, Value);
-							return false;
-						}
-
-						Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_EMAIL);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_ACME_EMAIL, Value);
-							return false;
-						}
-						else
-							this.ContactEMail = Value;
-
-						Value = Environment.GetEnvironmentVariable(GATEWAY_ACME_ACCEPT_TOS);
-						if (string.IsNullOrEmpty(Value))
-						{
-							this.LogEnvironmentVariableMissingError(GATEWAY_ACME_ACCEPT_TOS, Value);
-							return false;
-						}
-						else if (CommonTypes.TryParse(Value, out b))
-							this.AcceptToS = b;
-						else
-						{
-							this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ACME_ACCEPT_TOS, Value);
-							return false;
-						}
-					}
-				}
-				else
-				{
-					this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ENCRYPTION, Value);
-					return false;
+					if (!this.TryGetEnvironmentVariable(GATEWAY_ACME_ACCEPT_TOS, true, out this.acceptToS))
+						return false;
 				}
 			}
 
@@ -2018,17 +1928,9 @@ namespace Waher.IoTGateway.Setup
 
 		private AlternativeField GetLocalizedEnvironmentVariable(string VariableName, string LanguageVariableName)
 		{
-			string Value = Environment.GetEnvironmentVariable(VariableName);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(VariableName, true, out string Value) ||
+				!this.TryGetEnvironmentVariable(LanguageVariableName, true, out string Language))
 			{
-				this.LogEnvironmentVariableMissingError(VariableName, Value);
-				return null;
-			}
-
-			string Language = Environment.GetEnvironmentVariable(LanguageVariableName);
-			if (string.IsNullOrEmpty(Language))
-			{
-				this.LogEnvironmentVariableMissingError(LanguageVariableName, Language);
 				return null;
 			}
 
@@ -2048,12 +1950,9 @@ namespace Waher.IoTGateway.Setup
 				foreach (string Language in Languages)
 				{
 					Name = VariableName + Language;
-					Value = Environment.GetEnvironmentVariable(Name);
-					if (string.IsNullOrEmpty(Value))
-					{
-						this.LogEnvironmentVariableMissingError(Name, Value);
+
+					if (!this.TryGetEnvironmentVariable(Name, true, out Value))
 						return null;
-					}
 
 					Result.Add(new AlternativeField(Language, Value));
 				}

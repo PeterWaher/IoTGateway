@@ -189,15 +189,8 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_BACKUP);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_BACKUP, false, out bool Backup))
 				return false;
-
-			if (!CommonTypes.TryParse(Value, out bool Backup))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_BACKUP, Value);
-				return false;
-			}
 
 			if (!Backup)
 				return true;
@@ -252,8 +245,7 @@ namespace Waher.IoTGateway.Setup
 				await Export.SetKeepYearsAsync(i);
 			}
 
-			s = Environment.GetEnvironmentVariable(GATEWAY_BACKUP_FOLDER);
-			if (!string.IsNullOrEmpty(s))
+			if (this.TryGetEnvironmentVariable(GATEWAY_BACKUP_FOLDER, false, out s))
 			{
 				try
 				{

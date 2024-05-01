@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
@@ -297,8 +299,21 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Value">Value of environment variable.</param>
 		public void LogEnvironmentVariableInvalidRangeError(int Min, int Max, string EnvironmentVariable, object Value)
 		{
-			this.LogEnvironmentError("Value not in valid range. Must be between " + Min.ToString() + " and " + Max.ToString() + ".",
-				EnvironmentVariable, Value);
+			if (Max == int.MaxValue)
+			{
+				this.LogEnvironmentError("Value not in valid range. Must be at least " + Min.ToString() + ".",
+					EnvironmentVariable, Value);
+			}
+			else if (Min == int.MinValue)
+			{
+				this.LogEnvironmentError("Value not in valid range. Must be at most " + Max.ToString() + ".",
+					EnvironmentVariable, Value);
+			}
+			else
+			{
+				this.LogEnvironmentError("Value not in valid range. Must be between " + Min.ToString() + " and " + Max.ToString() + ".",
+					EnvironmentVariable, Value);
+			}
 		}
 
 		/// <summary>
@@ -319,5 +334,174 @@ namespace Waher.IoTGateway.Setup
 				new KeyValuePair<string, object>("EnvironmentVariable", EnvironmentVariable),
 				new KeyValuePair<string, object>("Value", Value));
 		}
+
+		/// <summary>
+		/// Tries to get a string-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found as was non-empty.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, bool Required, out string Value)
+		{
+			Value = Environment.GetEnvironmentVariable(VariableName) ?? string.Empty;
+			if (!string.IsNullOrEmpty(Value))
+				return true;
+
+			if (Required)
+				this.LogEnvironmentVariableMissingError(VariableName, Value);
+
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to get a Boolean-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, bool Required, out bool Value)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, Required, out string s))
+			{
+				Value = default;
+				return false;
+			}
+
+			if (!CommonTypes.TryParse(s, out Value))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(VariableName, s);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to get a Boolean-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Default">Default value, in case parameter is not defined.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, out bool Value, bool Default)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, false, out string s))
+			{
+				Value = Default;
+				return true;
+			}
+
+			if (!CommonTypes.TryParse(s, out Value))
+			{
+				this.LogEnvironmentVariableInvalidBooleanError(VariableName, s);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to get a integer-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, bool Required, out int Value)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, Required, out string s))
+			{
+				Value = default;
+				return false;
+			}
+
+			if (!int.TryParse(s, out Value))
+			{
+				this.LogEnvironmentVariableInvalidIntegerError(VariableName, s);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to get a integer-valued environment variable within a range.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Min">Minimum value.</param>
+		/// <param name="Max">Maximum value.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, int Min, int Max, bool Required, ref int Value)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, Required, out int i))
+				return false;
+
+			if (i < Min || i > Max)
+			{
+				this.LogEnvironmentVariableInvalidRangeError(Min, Max, VariableName, i);
+				return false;
+			}
+
+			Value = i;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to get a time-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, bool Required, out TimeSpan? Value)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, Required, out string s))
+			{
+				Value = default;
+				return false;
+			}
+
+			if (!TimeSpan.TryParse(s, out TimeSpan TS) || TS < TimeSpan.Zero || TS.TotalHours >= 24)
+			{
+				this.LogEnvironmentVariableInvalidTimeError(VariableName, s);
+				Value = default;
+				return false;
+			}
+
+			Value = TS;
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to get a date-valued environment variable.
+		/// </summary>
+		/// <param name="VariableName">Variable name.</param>
+		/// <param name="Required">If variable is required.</param>
+		/// <param name="Value">Value of environment variable.</param>
+		/// <returns>If environment variable was found and valid.</returns>
+		public bool TryGetEnvironmentVariable(string VariableName, bool Required, out DateTime? Value)
+		{
+			if (!this.TryGetEnvironmentVariable(VariableName, Required, out string s))
+			{
+				Value = default;
+				return false;
+			}
+
+			if (!XML.TryParse(s, out DateTime TP) || TP.TimeOfDay != TimeSpan.Zero)
+			{
+				this.LogEnvironmentVariableInvalidDateError(VariableName, s);
+				Value = default;
+				return false;
+			}
+
+			Value = TP;
+			return true;
+		}
+
 	}
 }

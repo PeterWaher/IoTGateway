@@ -998,7 +998,7 @@ namespace Waher.IoTGateway.Setup
 		private async Task ApplyId(string Password, string TabID, bool ProtectWithPassword, TaskCompletionSource<bool> Response)
 		{
 			await Gateway.ContractsClient.GenerateNewKeys();
-			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, 
+			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse,
 				new object[] { Password, TabID, ProtectWithPassword, Response });
 		}
 
@@ -1679,21 +1679,11 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_ID_USE);
+			if (!this.TryGetEnvironmentVariable(GATEWAY_ID_USE, false, out this.useLegalIdentity))
+				return false;
 
-			if (string.IsNullOrEmpty(Value))
-				return false;
-			else if (CommonTypes.TryParse(Value, out bool b))
-			{
-				this.useLegalIdentity = b;
-				if (!b)
-					return true;
-			}
-			else
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_ID_USE, Value);
-				return false;
-			}
+			if (!this.useLegalIdentity)
+				return true;
 
 			this.firstName = Environment.GetEnvironmentVariable(GATEWAY_ID_FIRST) ?? string.Empty;
 			this.middleName = Environment.GetEnvironmentVariable(GATEWAY_ID_MIDDLE) ?? string.Empty;
@@ -1720,21 +1710,12 @@ namespace Waher.IoTGateway.Setup
 			this.orgRegion = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGREGION) ?? string.Empty;
 			this.orgCountry = Environment.GetEnvironmentVariable(GATEWAY_ID_ORGCOUNTRY) ?? string.Empty;
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_ID_BDATE) ?? string.Empty;
-			if (string.IsNullOrEmpty(Value))
-				this.birthDate = null;
-			else if (XML.TryParse(Value, out DateTime TP) && TP.TimeOfDay == TimeSpan.Zero)
-				this.birthDate = TP.Date;
-			else
-			{
-				this.LogEnvironmentVariableInvalidDateError(GATEWAY_ID_BDATE, Value);
+			if (!this.TryGetEnvironmentVariable(GATEWAY_ID_BDATE, false, out this.birthDate))
 				return false;
-			}
 
 			List<AlternativeField> Fields = new List<AlternativeField>();
 
-			Value = Environment.GetEnvironmentVariable(GATEWAY_ID_ALT);
-			if (!string.IsNullOrEmpty(Value))
+			if (this.TryGetEnvironmentVariable(GATEWAY_ID_ALT,false,out string Value))
 			{
 				string[] Parts = Value.Split(',');
 
@@ -1742,12 +1723,8 @@ namespace Waher.IoTGateway.Setup
 				{
 					string Name = GATEWAY_ID_ALT_ + Part;
 
-					Value = Environment.GetEnvironmentVariable(Name);
-					if (string.IsNullOrEmpty(Value))
-					{
-						this.LogEnvironmentVariableMissingError(Name, Value);
+					if (!this.TryGetEnvironmentVariable(Name, true, out Value))
 						return false;
-					}
 
 					Fields.Add(new AlternativeField(Part, Value));
 				}

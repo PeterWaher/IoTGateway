@@ -21,6 +21,7 @@ Overview
 |      300 | IoT Gateway   | XMPP        | XmppConfiguration            |
 |      320 | IoT Gateway   | XMPP        | LegalIdentityConfiguration   |
 |      350 | Neuro-Ledger  | Ledger      | LedgerConfiguration          |
+|      380 | IoT Broker    | XMPP        | PeerReviewConfiguration      |
 |      400 | IoT Gateway   | XMPP        | RosterConfiguration          |
 |      450 | IoT Broker    | Mail        | RelayConfiguration           |
 |      460 | IoT Broker    | Push        | PushConfiguration            |
@@ -118,6 +119,7 @@ Restore Configuration
 
 **Note**: The list of parts can be extended by modules hosted on the gateway.
 
+
 Backup Configuration
 ------------------------
 
@@ -140,6 +142,22 @@ Backup Configuration
 | `GATEWAY_KEY_FOLDER`          | Optional variable determining the folder key files are to be stored, if different from the default key folder.                                                        |
 | `GATEWAY_BACKUP_HOSTS`        | A comma-separated list of secondary backup hosts for redundant storage of backup files.                                                                               |
 | `GATEWAY_KEY_HOSTS`           | A comma-separated list of secondary key hosts for redundant storage of key files.                                                                                     |
+
+
+Internet Gateway Configuration
+---------------------------------
+
+| Configuration step                                                                                      ||
+|:------------|:-------------------------------------------------------------------------------------------|
+| Priority    | 190                                                                                        |
+| Module      | IoT Broker                                                                                 |
+| Category    | Internet                                                                                   |
+| Class       | `Waher.Service.IoTBroker.Setup.InternetGatewayConfiguration`                               |
+| Description | Configures if the broker should register itself in available Internet Gateways in the LAN. |
+
+| Environment Variable          | Description                                                                                                                                                      |
+|:------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `BROKER_INET_GATEWAY_REG`     | `true` or `1` if the broker should register itself in any Internet Gateway it finds in the Local Area Network, `false` or `0` if no registration should be made. |
 
 
 Domain Configuration
@@ -198,6 +216,22 @@ If a Custom Certificate Authority is configured (`GATEWAY_CA_CUSTOM` variable), 
 | Environment Variable          | Description                                                                                                        |
 |:------------------------------|:-------------------------------------------------------------------------------------------------------------------|
 | `GATEWAY_ACME_DIRECTORY`      | URL to the custom ACME directory to use to generate certificates for the gateway if a custom CA has been selected. |
+
+
+DNS Configuration
+-------------------
+
+| Configuration step                                                                                   ||
+|:------------|:----------------------------------------------------------------------------------------|
+| Priority    | 250                                                                                     |
+| Module      | IoT Broker                                                                              |
+| Category    | Internet                                                                                |
+| Class       | `Waher.Service.IoTBroker.Setup.DnsConfiguration`                                        |
+| Description | Tests the DNS to see if necessary records are available. No configuration is performed. |
+
+**Note**: No configuration is performed in this step. The configuration step allows the installer to review necessary DNS settings.
+When configuring the system using environment variables, the test will also be performed. Any errors will be logged to the event log,
+but configuration will not fail.
 
 
 XMPP Configuration
@@ -274,6 +308,55 @@ Legal Identity Configuration
 | `GATEWAY_ID_PASSWORD`         | Protect legal identity with this password.                                                                                                                  |
 
 
+Neuro-Ledger Configuration
+------------------------------
+
+| Configuration step                                                 ||
+|:------------|:------------------------------------------------------|
+| Priority    | 350                                                   |
+| Module      | Neuro-Ledger                                          |
+| Category    | Ledger                                                |
+| Class       | `Waher.Service.NeuroLedger.Setup.LedgerConfiguration` |
+| Description | Configures collection parameter for the Neuro-Ledger. |
+
+| Environment Variable          | Description                                                                        |
+|:------------------------------|:-----------------------------------------------------------------------------------|
+| `NEURO_LEDGER_COLLECTION`     | Collection time in seconds. If not provided, the default value will be used.       |
+| `NEURO_LEDGER_MAXSIZE`        | Maximum size of blocks, in bytes. If not provided, the default value will be used. |
+
+
+Peer Review Configuration
+----------------------------
+
+| Configuration step                                                                                   ||
+|:------------|:----------------------------------------------------------------------------------------|
+| Priority    | 380                                                                                     |
+| Module      | IoT Broker                                                                              |
+| Category    | XMPP                                                                                    |
+| Class       | `Waher.Service.IoTBroker.Setup.PeerReviewConfiguration`                                 |
+| Description | Configures requirements for peer-review of legal identities on the broker.              |
+
+| Environment Variable        | Description                                                                                                                                                     |
+|:----------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `BROKER_REVIEW_USE`         | If peer review is allowed on the broker (`true` or `1`), or not (`false` or `0`). If enabled, the following variables control what parameters must be included: |
+| `BROKER_REVIEW_NRPEERS`     | Number of peers required to review and approve a legal identity application before it can be approved.                                                          |
+| `BROKER_REVIEW_NRPHOTOS`    | Number of photos required in a legal identity application for a peer review to be accepted.                                                                     |
+| `BROKER_REVIEW_FIRST`       | If first-name is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                            |
+| `BROKER_REVIEW_MIDDLE`      | If middle-name is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                           |
+| `BROKER_REVIEW_LAST`        | If last-name is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                             |
+| `BROKER_REVIEW_PNR`         | If personal number is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                       |
+| `BROKER_REVIEW_COUNTRY`     | If country is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                               |
+| `BROKER_REVIEW_REGION`      | If region is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                                |
+| `BROKER_REVIEW_CITY`        | If city is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                                  |
+| `BROKER_REVIEW_AREA`        | If area is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                                  |
+| `BROKER_REVIEW_ZIP`         | If postal code is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                           |
+| `BROKER_REVIEW_ADDR`        | If address is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                               |
+| `BROKER_REVIEW_ISO3166`     | If country codes must comply with ISO 3166 in a peer review (`true` or `1`), or not (`false` or `0`).                                                           |
+| `BROKER_REVIEW_NATIONALITY` | If nationality is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                           |
+| `BROKER_REVIEW_GENDER`      | If gender is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                                |
+| `BROKER_REVIEW_BDATE`       | If birth date is required in a peer review (`true` or `1`), or not (`false` or `0`).                                                                            |
+
+
 Roster Configuration
 -----------------------
 
@@ -293,6 +376,52 @@ Roster Configuration
 | `GATEWAY_ROSTER_GROUPS`       | Optional Comma-separated list of groups to define.                                        |
 | `GATEWAY_ROSTER_GRP_[group]`  | Optional Comma-separated list of Bare JIDs in the roster to add to the group `[group]`.   |
 | `GATEWAY_ROSTER_NAME_[jid]`   | Optional human-readable name of a JID in the roster.                                      |
+
+
+Mail Relay Configuration
+----------------------------
+
+| Configuration step                                              ||
+|:------------|:---------------------------------------------------|
+| Priority    | 450                                                |
+| Module      | Broker                                             |
+| Category    | Mail                                               |
+| Class       | `Waher.Service.IoTBroker.Setup.RelayConfiguration` |
+| Description | Configures e-mail Relay settings for the broker.   |
+
+| Environment Variable   | Description                                                                                                                                      |
+|:-----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `BROKER_RELAY_USE`     | If an SMTP relay server is to be used (`true` or `1`), or if the broker should connect to the recipient mail exchange directly (`false` or `0`). |
+| `BROKER_RELAY_DOMAINS` | Optional Comma-separated list of domain names for which the broker can act as an SMTP relay.                                                     |
+| `BROKER_RELAY_SENDER`  | Default sender of mail messages from broker.                                                                                                     |
+
+If you choose to use a relay server to send e-mail (`NEURO_RELAY_USE` is `true`or `1`), the following variables configure the connection to the
+relay server:
+
+| Environment Variable    | Description                                                         |
+|:------------------------|:--------------------------------------------------------------------|
+| `BROKER_RELAY_HOST`     | Host (or domain) or the SMTP Relay server.                          |
+| `BROKER_RELAY_PORT`     | Port number to use when connecting relay server.                    |
+| `BROKER_RELAY_USER`     | User account in the relay server.                                   |
+| `BROKER_RELAY_PASSWORD` | Password of account when authenticating access to the relay server. |
+
+
+Push Notification Configuration
+----------------------------------
+
+| Configuration step                                                         ||
+|:------------|:--------------------------------------------------------------|
+| Priority    | 460                                                           |
+| Module      | Broker                                                        |
+| Category    | Push                                                          |
+| Class       | `Waher.Service.IoTBroker.Setup.PushNotificationConfiguration` |
+| Description | Configures Push-Notification settings for the broker.         |
+
+| Environment Variable        | Description                                                                                                                       |
+|:----------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| `BROKER_FIREBASE_USE`       | If Firebase should be used to push notifications to clients when they are not connected (`true` or `1`), or not (`false` or `0`). |
+| `BROKER_FIREBASE_SERVICEID` | Firebase Service ID, identifying the service in Firebase.                                                                         |
+| `BROKER_FIREBASE_SERVERKEY` | Server Key, authenticating access of the service in Firebase.                                                                     |
 
 
 Theme Configuration

@@ -2026,38 +2026,23 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override async Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_RESTORE);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_RESTORE, false, out bool Restore))
 				return false;
-
-			if (!CommonTypes.TryParse(Value, out bool Restore))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_RESTORE, Value);
-				return false;
-			}
 
 			if (!Restore)
 				return true;
 
-			string BakFileName = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_BAKFILE);
+			if (!this.TryGetEnvironmentVariable(GATEWAY_RESTORE_BAKFILE, true, out string BakFileName) ||
+				!this.TryGetEnvironmentVariable(GATEWAY_RESTORE_OVERWRITE, true, out bool OverWrite))
+			{
+				return false;
+			}
+
 			string KeyFileName = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_KEYFILE);
-			string OverWriteStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_OVERWRITE);
 			string CollectionsStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_COLLECTIONS);
 			string PartsStr = Environment.GetEnvironmentVariable(GATEWAY_RESTORE_PARTS);
 			string[] Collections;
 			string[] Parts;
-
-			if (string.IsNullOrEmpty(BakFileName))
-			{
-				this.LogEnvironmentVariableMissingError(GATEWAY_RESTORE_BAKFILE, BakFileName);
-				return false;
-			}
-
-			if (string.IsNullOrEmpty(OverWriteStr) || !CommonTypes.TryParse(OverWriteStr, out bool OverWrite))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_RESTORE_OVERWRITE, OverWriteStr);
-				return false;
-			}
 
 			if (string.IsNullOrEmpty(CollectionsStr))
 				Collections = new string[0];

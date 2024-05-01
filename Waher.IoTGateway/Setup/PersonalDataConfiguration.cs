@@ -237,22 +237,10 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> EnvironmentConfiguration()
 		{
-			string Value = Environment.GetEnvironmentVariable(GATEWAY_PII_CONSENT);
-			if (string.IsNullOrEmpty(Value))
+			if (!this.TryGetEnvironmentVariable(GATEWAY_PII_CONSENT, false, out this.consented) || !this.consented)
 				return Task.FromResult(false);
 
-			if (!CommonTypes.TryParse(Value, out bool PersonalDataConsent))
-			{
-				this.LogEnvironmentVariableInvalidBooleanError(GATEWAY_PII_CONSENT, Value);
-				return Task.FromResult(false);
-			}
-
-			if (PersonalDataConsent)
-			{
-				this.consented = true;
-				this.consentedTimestamp = DateTime.Now;
-			}
-
+			this.consentedTimestamp = DateTime.Now;
 			return Task.FromResult(true);
 		}
 

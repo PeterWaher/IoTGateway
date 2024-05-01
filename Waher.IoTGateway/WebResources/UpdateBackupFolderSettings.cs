@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources

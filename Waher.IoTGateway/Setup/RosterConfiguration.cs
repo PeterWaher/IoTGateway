@@ -111,22 +111,78 @@ namespace Waher.IoTGateway.Setup
 				while (Gateway.XmppClient.State == XmppState.Connected)
 				{
 					(string Jid, string Name, string[] Groups) = this.PopToAdd();
+					RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
+					
 					if (!string.IsNullOrEmpty(Jid))
 					{
-						Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
+						if (Item is null)
+							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
+						else if (NeedsUpdate(Item, Name, Groups))
+							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Union(Item.Groups, Groups)));
 						continue;
 					}
 
 					Jid = this.PopToSubscribe();
 					if (!string.IsNullOrEmpty(Jid))
 					{
-						Gateway.XmppClient.RequestPresenceSubscription(Jid);
+						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+							Gateway.XmppClient.RequestPresenceSubscription(Jid);
 						continue;
 					}
 
 					break;
 				}
 			}
+		}
+
+		private static bool NeedsUpdate(RosterItem Item, string Name, string[] Groups)
+		{
+			if (Item.Name != Name)
+				return true;
+
+			if (Groups is null)
+				return false;
+
+			Dictionary<string, bool> Found = new Dictionary<string, bool>();
+
+			if (!(Item.Groups is null))
+			{
+				foreach (string Group in Item.Groups)
+					Found[Group] = true;
+			}
+
+			if (!(Groups is null))
+			{
+				foreach (string Group in Groups)
+				{
+					if (!Found.ContainsKey(Group))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		private static string[] Union(string[] A1, string[] A2)
+		{
+			SortedDictionary<string, bool> Entries = new SortedDictionary<string, bool>();
+
+			if (!(A1 is null))
+			{
+				foreach (string s in A1)
+					Entries[s] = true;
+			}
+
+			if (!(A2 is null))
+			{
+				foreach (string s in A2)
+					Entries[s] = true;
+			}
+
+			string[] Result = new string[Entries.Count];
+			Entries.Keys.CopyTo(Result, 0);
+
+			return Result;
 		}
 
 		private async Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)

@@ -91,12 +91,12 @@ Secondary hosts must be TAG Neurons^TM. You provide their domain names below (se
 
 <p>
 <label for="BackupHosts">Secondary Backup Host\(s):</label>  
-<input id="BackupHosts" name="BackupHosts" type="text" value="{{Export.GetBackupHostsAsync()}}"/>
+<input id="BackupHosts" name="BackupHosts" type="text" value="{{concat(Export.GetBackupHostsAsync(),',')}}"/>
 </p>
 
 <p>
 <label for="KeyHosts">Secondary Key Host\(s):</label>  
-<input id="KeyHosts" name="KeyHosts" type="text" value="{{Export.GetKeyHostsAsync()}}"/>
+<input id="KeyHosts" name="KeyHosts" type="text" value="{{concat(Export.GetKeyHostsAsync(),',')}}"/>
 </p>
 
 <p>

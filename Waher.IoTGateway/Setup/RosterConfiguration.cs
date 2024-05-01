@@ -111,22 +111,27 @@ namespace Waher.IoTGateway.Setup
 				while (Gateway.XmppClient.State == XmppState.Connected)
 				{
 					(string Jid, string Name, string[] Groups) = this.PopToAdd();
-					RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
 					
 					if (!string.IsNullOrEmpty(Jid))
 					{
+						RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
+						
 						if (Item is null)
 							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
 						else if (NeedsUpdate(Item, Name, Groups))
 							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Union(Item.Groups, Groups)));
+						
 						continue;
 					}
 
 					Jid = this.PopToSubscribe();
 					if (!string.IsNullOrEmpty(Jid))
 					{
+						RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
+
 						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
 							Gateway.XmppClient.RequestPresenceSubscription(Jid);
+						
 						continue;
 					}
 

@@ -1793,7 +1793,7 @@ namespace Waher.Networking.XMPP.PubSub
 				return true;
 			}
 			else
-				return Enum.TryParse<AffiliationStatus>(s, out Affiliation);
+				return Enum.TryParse(s, out Affiliation);
 		}
 
 		#endregion

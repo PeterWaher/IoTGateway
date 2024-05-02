@@ -271,7 +271,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 										if (E2.HasAttribute("bgColor") && ConcentratorClient.TryParse(E2.GetAttribute("bgColor"), out Color))
 											BgColor = Color;
 
-										if (E2.HasAttribute("alignment") && Enum.TryParse<ColumnAlignment>(E2.GetAttribute("alignment"), out ColumnAlignment ColumnAlignment2))
+										if (E2.HasAttribute("alignment") && Enum.TryParse(E2.GetAttribute("alignment"), out ColumnAlignment ColumnAlignment2))
 											ColumnAlignment = ColumnAlignment2;
 
 										if (E2.HasAttribute("nrDecimals") && byte.TryParse(E2.GetAttribute("nrDecimals"), out byte b))

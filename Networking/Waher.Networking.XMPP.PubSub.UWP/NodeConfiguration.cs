@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.PubSub
 				switch (F.Var)
 				{
 					case "pubsub#access_model":
-						if (Enum.TryParse<NodeAccessModel>(F.ValueString, out NodeAccessModel AccessModel))
+						if (Enum.TryParse(F.ValueString, out NodeAccessModel AccessModel))
 							this.accessModel = AccessModel;
 						break;
 
@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.PubSub
 						break;
 
 					case "pubsub#publish_model":
-						if (Enum.TryParse<PublisherModel>(F.ValueString, out PublisherModel PublisherModel))
+						if (Enum.TryParse(F.ValueString, out PublisherModel PublisherModel))
 							this.publisherModel = PublisherModel;
 						break;
 
@@ -191,7 +191,7 @@ namespace Waher.Networking.XMPP.PubSub
 						break;
 
 					case "pubsub#send_last_published_item":
-						if (Enum.TryParse<SendLastPublishedItem>(F.ValueString, out SendLastPublishedItem SendLastPublishedItem))
+						if (Enum.TryParse(F.ValueString, out SendLastPublishedItem SendLastPublishedItem))
 							this.sendLastPublishedItem = SendLastPublishedItem;
 						break;
 
@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.PubSub
 						break;
 
 					case "pubsub#notification_type":
-						if (Enum.TryParse<NotificationType>(F.ValueString, out NotificationType NotificationType))
+						if (Enum.TryParse(F.ValueString, out NotificationType NotificationType))
 							this.notificationType = NotificationType;
 						break;
 

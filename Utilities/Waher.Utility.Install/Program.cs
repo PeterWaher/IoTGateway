@@ -256,8 +256,8 @@ namespace Waher.Utility.Install
 				Types.Initialize(typeof(Program).Assembly,
 					typeof(JSON).Assembly);
 
-				Semaphore GatewayRunning = null;
-				Semaphore StartingServer = null;
+				Mutex GatewayRunning = null;
+				Mutex StartingServer = null;
 				bool GatewayRunningLocked = false;
 				bool StartingServerLocked = false;
 
@@ -268,13 +268,13 @@ namespace Waher.Utility.Install
 						if (Verbose)
 							Console.Out.WriteLine("Making sure server is closed...");
 
-						GatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
+						GatewayRunning = new Mutex(false, "Waher.IoTGateway.Running" + Suffix);
 						if (!GatewayRunning.WaitOne(Timeout.Value))
 							throw new Exception("The IoT Gateway did not stop within the given time period.");
 
 						GatewayRunningLocked = true;
 
-						StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
+						StartingServer = new Mutex(false, "Waher.IoTGateway.Starting" + Suffix);
 						if (!StartingServer.WaitOne(Timeout.Value))
 							throw new Exception("The IoT Gateway is starting in another process, and is unable to stop within the given time period.");
 
@@ -314,7 +314,7 @@ namespace Waher.Utility.Install
 					if (GatewayRunning is not null)
 					{
 						if (GatewayRunningLocked)
-							GatewayRunning.Release();
+							GatewayRunning.ReleaseMutex();
 
 						GatewayRunning.Dispose();
 						GatewayRunning = null;
@@ -323,7 +323,7 @@ namespace Waher.Utility.Install
 					if (StartingServer is not null)
 					{
 						if (StartingServerLocked)
-							StartingServer.Release();
+							StartingServer.ReleaseMutex();
 
 						StartingServer.Dispose();
 						StartingServer = null;

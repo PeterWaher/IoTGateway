@@ -471,12 +471,12 @@ namespace Waher.IoTGateway.Installers
 
 							do
 							{
-								using (Semaphore RunningServer = new Semaphore(1, 1, "Waher.IoTGateway.Running"))
+								using (Mutex RunningServer = new Mutex(false, "Waher.IoTGateway.Running"))
 								{
 									Stopped = RunningServer.WaitOne(1000);
 
 									if (Stopped)
-										RunningServer.Release();
+										RunningServer.ReleaseMutex();
 								}
 							}
 							while (!Stopped && (DateTime.Now - Started).TotalSeconds < 30);
@@ -684,12 +684,12 @@ namespace Waher.IoTGateway.Installers
 
 				do
 				{
-					using (Semaphore RunningServer = new Semaphore(1, 1, "Waher.IoTGateway.Running"))
+					using (Mutex RunningServer = new Mutex(false, "Waher.IoTGateway.Running"))
 					{
 						Running = !RunningServer.WaitOne(1000);
 
 						if (!Running)
-							RunningServer.Release();
+							RunningServer.ReleaseMutex();
 					}
 
 					if (!Running)
@@ -705,11 +705,11 @@ namespace Waher.IoTGateway.Installers
 
 				Session.Log("Waiting for service startup procedure to complete.");
 
-				using (Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting"))
+				using (Mutex StartingServer = new Mutex(false, "Waher.IoTGateway.Starting"))
 				{
 					if (StartingServer.WaitOne(120000))
 					{
-						StartingServer.Release();
+						StartingServer.ReleaseMutex();
 						Session.Log("All modules started.");
 					}
 					else

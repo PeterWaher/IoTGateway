@@ -54,9 +54,9 @@ namespace Waher.Events.Console
 				StringBuilder sb = new StringBuilder();
 				ConsoleColor FgBak = System.Console.ForegroundColor;
 				ConsoleColor BgBak = System.Console.BackgroundColor;
-				int Width;
+				int Width = 80;
 				StringBuilder Output = new StringBuilder();
-				bool WriteLine = false;
+				bool WriteLine = true;
 				int i;
 
 				if (this.consoleWidthWorks)
@@ -64,21 +64,20 @@ namespace Waher.Events.Console
 					try
 					{
 						Width = System.Console.WindowWidth;
+						WriteLine = Width > 0;
 
-						if (System.Console.CursorLeft > 1)
-							System.Console.Out.WriteLine();
+						if (WriteLine)
+						{
+							if (System.Console.CursorLeft > 1)
+								System.Console.Out.WriteLine();
+						}
+						else
+							Width = 80;
 					}
 					catch (Exception)
 					{
-						Width = 80;
-						WriteLine = true;
 						this.consoleWidthWorks = false;
 					}
-				}
-				else
-				{
-					Width = 80;
-					WriteLine = true;
 				}
 
 				try
@@ -249,23 +248,29 @@ namespace Waher.Events.Console
 		private void AddTag(StringBuilder Output, int Width, string Key, object Value, bool First, bool WriteLine)
 		{
 			string ValueStr = Value is null ? string.Empty : Value.ToString();
-			int i = Output.ToString().Length % Width;
 
-			if (i + Key.Length + 1 + ValueStr.Length + (First ? 0 : 2) > Width)
+			if (Width > 0)
 			{
-				if (WriteLine)
-				{
-					Output.AppendLine();
-					Output.Append("  ");
-				}
-				else
-					Output.Append(new string(' ', Width - i + 3));
+				int i = Output.ToString().Length % Width;
 
-				First = true;
+				if (i + Key.Length + 1 + ValueStr.Length + (First ? 0 : 2) > Width)
+				{
+					if (WriteLine)
+					{
+						Output.AppendLine();
+						Output.Append("  ");
+					}
+					else
+						Output.Append(new string(' ', Width - i + 3));
+
+					First = true;
+				}
 			}
 
 			if (!First)
 				Output.Append(", ");
+			else if (Width <= 0)
+				Output.Append(' ');
 
 			Output.Append(Key);
 			Output.Append('=');

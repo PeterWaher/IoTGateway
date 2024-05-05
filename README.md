@@ -96,6 +96,23 @@ and other stores.
 The examples described in this book are available in a separate repository:
 [MIoT](https://github.com/PeterWaher/MIoT)
 
+Solution Files
+------------------
+
+The repository contains multiple solution files. Since the repo contains many different pojects, different solution files different subsets
+of projects, making it easier to work with different aspects of the gateway, or on different platforms.
+
+| Solution File | Description |
+|:--------------|:------------|
+| `IoTGateway.sln`     | Main repository. Contains references to all gateway projects, for most platforms. |
+| `IoTGatewayCore.sln` | Solution file that contains core repositories only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
+| `Content.sln`        | Contains Content-related repositories, and their dependecies.                     |
+| `Layout.sln`         | Contains Layout-related repositories, and their dependecies.                      |
+| `Persistence.sln`    | Contains Persistence-related repositories, and their dependecies.                 |
+| `Runtime.sln`        | Contains Runtime-related repositories, and their dependecies.                     |
+| `Script.sln`         | Contains Script-related repositories, and their dependecies.                      |
+
+
 IoT Gateway
 ----------------------
 
@@ -561,3 +578,51 @@ in the [Configuration Steps](ConfigurationSteps.md) article.
 An operator can choose to partially pre-configure the gateway using only a subset of available *Environment Variables* necessary for a complete
 configuration. During initial start of the gateway, the configuraiton steps with these preconfigured values will be skipped, as they will be seen
 as completed. Only the configuration steps without preconfigured values will be shown.
+
+Compiling solution
+---------------------
+
+You need to setup the build environment properly before you can compile the projects in this repository. The following subsections describe the configurations that need to be made:
+
+### Instances
+
+The IoT Gateway can be executed in multiple instances. The default instance uses the empty *instance name*. Each other instance, has a given instance name that is assigned to the executable via a command-line argument.  When building the IoT Gateway, it is assumed the instance name is `Dev`. This allows you to have a default installed version of the Gateway (or multiple installed instances), while your development version is running as a separate instance named `Dev` in parallel.
+
+### Project Folders
+
+Build events and script available in solutions assume the projects reside certain folders. On a Windows machine, the IoT Gateway repository is assumed to be cloned into the `C:\My Projects\IoTGateway` folder. On a MAC, that folder is assumed to be `/My Projects/IoT Gateway`.
+
+#### Virtual root folders on MAC computers
+
+To create a root folder on a MAC you need to create a virtual folder that appears in the root folder, due to restrictions in the operating system. To create the `/My Projects` folder, follow these steps:
+
+1. Open the Terminal app.
+2. Type `sudo nano /etc/synthetic.conf` and press Enter. You may need to enter your administrator password.
+3. In the nano text editor, enter:
+	
+		My Projects	/Users/yourusername/My Projects
+	
+	There should be a space between `My` and `Projects`, but a TAB character between `My Projects` and `/Users...`. Also, replace the `yourusername` with the name of your user name.
+
+4. Press Control + O to write the file, then Enter to confirm, and Control + X to exit nano.
+5. Reboot your Mac.
+
+After rebooting, you should see the virtual folder `/My Projects` in the root directory. 
+
+### Windows
+
+To compile projects on Windows, use Visual Studio 2022 (or later). The IoT Gateway separates executable and compiled code (which is later installed in any of the computer's Program Files folder(s)), and application data, which the application can read and write. The latter is stored in the corresponding `ProgramData` folder. The default installation of IoT Gateway, stores data in `C:\ProgramData\IoT Gateway`. A non-default instance, stores its application data in `C:\ProgramData\IoT Gateway INST`, where `INST` is replaced by the instance name. So before you can compile, you need to make sure the folder `C:\ProgramData\IoT Gateway Dev` exists, and that the user performing the build has access to this folder.
+
+### MAC
+
+To compile projects on MAC, use VS Code for MAC. The IoT Gateway separates executable and compiled code (which is later installed in a computer's `/Applications` folder), and application data, which the application can read and write. The latter is stored in the corresponding `/usr/local/share` folder. The default installation of IoT Gateway, stores data in `/usr/local/share/IoT Gateway`. A non-default instance, stores its application data in `/user/local/share/IoT Gateway INST`, where `INST` is replaced by the instance name. So before you can compile, you need to make sure the folder `/usr/local/share/IoT Gateway Dev` exists, and that the user performing the build has access to this folder.
+
+Terminal script to create and configure folder:
+
+	sudo mkdir -p "/usr/local/share/IoT Gateway Dev"
+	sudo chown yourusername "/usr/local/share/IoT Gateway Dev"
+	sudo chmod 755 "/usr/local/share/IoT Gateway Dev"
+
+### Running IoT Gateway
+
+You have to have the correct .NET Core framework installed on your machine to run the gateway: [Download .NET 6](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0). 

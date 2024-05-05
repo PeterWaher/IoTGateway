@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -362,6 +363,9 @@ namespace Waher.Utility.Install
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
@@ -709,6 +713,9 @@ namespace Waher.Utility.Install
 		private static string GetFolderPath(SpecialFolder SpecialFolder, string Name)
 		{
 			string s = Environment.GetFolderPath(SpecialFolder);
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				s = s.Replace("/usr/share", "/usr/local/share");
+
 			string Result = Path.Combine(s, Name);
 
 			if (Directory.Exists(Result))
@@ -738,7 +745,10 @@ namespace Waher.Utility.Install
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
-				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
@@ -1230,7 +1240,10 @@ namespace Waher.Utility.Install
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
-				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
@@ -1310,6 +1323,8 @@ namespace Waher.Utility.Install
 
 						SpecialFolder SpecialFolder = Enum.Parse<SpecialFolder>(SpecialFolderName);
 						ExternalFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder), FolderName);
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+							ExternalFolder = ExternalFolder.Replace("/usr/share", "/usr/local/share");
 
 						if (!Directory.Exists(ExternalFolder))
 						{
@@ -1585,6 +1600,9 @@ namespace Waher.Utility.Install
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 

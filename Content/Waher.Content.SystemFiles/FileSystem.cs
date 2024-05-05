@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Waher.Content.SystemFiles
 {
@@ -126,6 +127,9 @@ namespace Waher.Content.SystemFiles
 			foreach (Environment.SpecialFolder Folder in Folders)
 			{
 				string Path = Environment.GetFolderPath(Folder, Environment.SpecialFolderOption.None);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					Path = Path.Replace("/usr/share", "/usr/local/share");
+
 				if (!string.IsNullOrEmpty(Path))
 				{
 					// In 64-bit operating systems, the 32-bit folder can be returned anyway, if the process is running in 32 bit.

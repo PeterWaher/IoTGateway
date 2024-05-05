@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
@@ -219,6 +221,8 @@ namespace Waher.Content.Markdown.GraphViz
 			try
 			{
 				Folder = Environment.GetFolderPath(SpecialFolder);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					Folder = Folder.Replace("/usr/share", "/usr/local/share");
 			}
 			catch (Exception)
 			{

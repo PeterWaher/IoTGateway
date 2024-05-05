@@ -259,6 +259,9 @@ namespace Waher.IoTGateway
 				loopbackIntefaceAvailable = LoopbackIntefaceAvailable;
 
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
+
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					appDataFolder += Path.DirectorySeparatorChar;
 

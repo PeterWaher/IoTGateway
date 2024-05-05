@@ -401,9 +401,17 @@
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if not exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(SolutionDir)\..\Registration.cs.bak&quot;&#xD;&#xA;if exist &quot;$(SolutionDir)\..\Registration.cs&quot; copy &quot;$(SolutionDir)\..\Registration.cs&quot; &quot;$(ProjectDir)Setup&quot;&#xD;&#xA;" />
-  </Target>
+    <Exec Command="if not exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs&quot; copy &quot;$(ProjectDir)\..\..\Registration.cs&quot; &quot;$(ProjectDir)Setup&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="if [ ! -f &quot;$(ProjectDir)/../../Registration.cs.bak&quot; ]; then cp &quot;$(ProjectDir)Setup/Registration.cs&quot; &quot;$(ProjectDir)/../../Registration.cs.bak&quot;; fi" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="if [ -f &quot;$(ProjectDir)/../../Registration.cs&quot; ]; then cp &quot;$(ProjectDir)/../../Registration.cs&quot; &quot;$(ProjectDir)Setup/&quot;; fi" Condition="'$(OS)'=='Unix'" />
+ </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; copy &quot;$(SolutionDir)\..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;&#xD;&#xA;if exist &quot;$(SolutionDir)\..\Registration.cs.bak&quot; del &quot;$(SolutionDir)\..\Registration.cs.bak&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" />
+    <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; del &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="if [ -f &quot;$(ProjectDir)/../../Registration.cs.bak&quot; ]; then cp &quot;$(ProjectDir)/../../Registration.cs.bak&quot; &quot;$(ProjectDir)Setup/Registration.cs&quot;; fi" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="if [ -f &quot;$(ProjectDir)/../../Registration.cs.bak&quot; ]; then rm &quot;$(ProjectDir)/../../Registration.cs.bak&quot;; fi" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="ditto &quot;$(OutDir)Root&quot; &quot;/usr/local/share/IoT Gateway Dev/Root&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 </Project>

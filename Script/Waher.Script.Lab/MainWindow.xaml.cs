@@ -65,6 +65,8 @@ namespace Waher.Script.Lab
 				TypesLoader.Initialize(Folder);
 
 				appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScriptLab");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
 
 				databaseProvider = await FilesProvider.CreateAsync(Path.Combine(appDataFolder, "Data"), "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
 				await databaseProvider.RepairIfInproperShutdown(string.Empty);

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.IO;
-using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Xml;
 using Waher.Content.Xml;
 using static System.Environment;
@@ -185,10 +184,13 @@ namespace Waher.Utility.GenManifest
 					int MaxLen = 0;
 					int Len;
 
-					foreach (Environment.SpecialFolder SpecialFolder in Enum.GetValues(typeof(Environment.SpecialFolder)))
+					foreach (SpecialFolder SpecialFolder in Enum.GetValues(typeof(SpecialFolder)))
 					{
 						string Folder = Environment.GetFolderPath(SpecialFolder);
 						string Name = SpecialFolder.ToString();
+
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+							Folder = Folder.Replace("/usr/share", "/usr/local/share");
 
 						Len = Name.Length;
 						if (Len > MaxLen)

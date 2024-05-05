@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.FullTextSearch</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.FullTextSearch.Functions.AddFtsProperties">
+            <summary>
+            Adds collection properties to the corresponding index for full-text-searching.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.AddFtsProperties.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Adds collection properties to the corresponding index for full-text-searching.
+            </summary>
+            <param name="Collection">Name of database collection.</param>
+            <param name="Properties">Properties of objects in collection to index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.AddFtsProperties.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.AddFtsProperties.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.AddFtsProperties.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.AddFtsProperties.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.AddFtsProperties.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.AddFtsProperties.GetPropertyDefinitions(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Gets property definitions.
+            </summary>
+            <param name="Argument">Argument provided in function.</param>
+            <param name="Node">Node evaluating method.</param>
+            <returns>Array of property definitions.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.FtsCollection">
+            <summary>
+            Matches a Full-Text-Search Index with a Database Collection.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Matches a Full-Text-Search Index with a Database Collection.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="DatabaseCollection">Name of Database index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.FtsFile">
+            <summary>
+            Indexes a specific file.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFile.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Indexes a specific file.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="FileName">Folder to index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFile.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFile.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFile.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFile.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFile.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.FtsFolder">
+            <summary>
+            Indexes files in a folder.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Indexes files in a folder.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="Folder">Folder to index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Indexes files in a folder.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="Folder">Folder to index.</param>
+            <param name="Recursive">If search should be recursive through sub folders.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Indexes files in a folder.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="Folder">Folder to index.</param>
+            <param name="Recursive">If search should be recursive through sub folders.</param>
+            <param name="SubFoldersToExclude">Sub-folders to exclude from index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFolder.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFolder.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsFolder.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.GetFtsCollections">
+            <summary>
+            Gets collections indexed for full-text-search.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsCollections.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets collections indexed for full-text-search.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsCollections.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets collections indexed for full-text-search.
+            </summary>
+            <param name="IndexCollection">Name of index collection.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsCollections.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsCollections.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsCollections.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsCollections.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsCollections.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.GetFtsProperties">
+            <summary>
+            Gets properties indexed for full-text-search.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsProperties.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets properties indexed for full-text-search.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsProperties.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets properties indexed for full-text-search.
+            </summary>
+            <param name="Collection">Name of database collection.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsProperties.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsProperties.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.GetFtsProperties.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsProperties.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.GetFtsProperties.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.ReindexFts">
+            <summary>
+            Reindexes the full-text-search index defined by `Index`.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.ReindexFts.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Reindexes the full-text-search index defined by `Index`.
+            </summary>
+            <param name="IndexCollection">Name of index collection.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.ReindexFts.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.ReindexFts.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.ReindexFts.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.ReindexFts.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.ReindexFts.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties">
+            <summary>
+            Removes collection properties from the corresponding index for full-text-searching.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Removes collection properties from the corresponding index for full-text-searching.
+            </summary>
+            <param name="Collection">Name of database collection.</param>
+            <param name="Properties">Properties of objects in collection to index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.RemoveFtsProperties.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.FullTextSearch.Functions.Search">
+            <summary>
+            Full-Text-search
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Order">Sort order.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Order">Sort order.</param>
+            <param name="PaginationStrategy">Pagination Strategy</param>
+            <param name="Type">Type of object to search for.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.#ctor">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.Prepare(System.String)">
+            <summary>
+            Parses a property definition.
+            </summary>
+            <param name="Definition">Property definition</param>
+            <returns>Parsed definition.</returns>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.Evaluate(System.Object)">
+            <summary>
+            Evaluates the parsed definition, on an object instance.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.#ctor">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.Prepare(System.String)">
+            <summary>
+            Parses a property definition.
+            </summary>
+            <param name="Definition">Property definition</param>
+            <returns>Parsed definition.</returns>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.Evaluate(System.Object)">
+            <summary>
+            Evaluates the parsed definition, on an object instance.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value.</returns>
+        </member>
+    </members>
+</doc>

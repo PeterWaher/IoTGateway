@@ -1,0 +1,3384 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Graphs</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Graphs.Canvas2D.CanvasGraph">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.#ctor">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.#ctor(System.Int32,System.Int32,System.Nullable{SkiaSharp.SKColor},System.Nullable{SkiaSharp.SKColor})">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+            <param name="Width">Width, in puxels.</param>
+            <param name="Height">Height, in puxels.</param>
+            <param name="BackgroundColor">Background color.</param>
+            <param name="DefaultColor">Default color.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.BgColor">
+            <summary>
+            Background color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.DefaultColor">
+            <summary>
+            Default color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.Width">
+            <summary>
+            Width, in puxels.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.Height">
+            <summary>
+            Height, in puxels.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ImportGraphAsync(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.LineTo(System.Double,System.Double)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.MoveTo(System.Double,System.Double)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Line(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Draws a line between two points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.PenWidth(System.Double)">
+            <summary>
+            Sets the current pen width.
+            </summary>
+            <param name="Width">New pen width</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Color(SkiaSharp.SKColor)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New pen color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Color(System.Object)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New pen color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Rectangle(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Draws a rectangle defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.FillRectangle(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Fills a rectangle defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Plot(System.Double,System.Double)">
+            <summary>
+            Plots a pixel at a given coordinate.
+            </summary>
+            <param name="x">X-coordinate.</param>
+            <param name="y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Ellipse(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Draws a ellipse defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.FillEllipse(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Fills a ellipse defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Clear">
+            <summary>
+            Clears the canvas with the current brush.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation">
+            <summary>
+            Abstract base class for canvas operations.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <summary>
+            Performs a drawing operation.
+            </summary>
+            <param name="Canvas">Current canvas.</param>
+            <param name="State">Current state.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+            <param name="Variables">Set of variables.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.CanvasState">
+            <summary>
+            Current drawing state in a canvas graph.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.FgColor">
+            <summary>
+            Foreground color
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Width">
+            <summary>
+            Pen width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.BgColor">
+            <summary>
+            Background color
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.X">
+            <summary>
+            Current X-coordinate.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Y">
+            <summary>
+            Current Y-coordinate.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Pen">
+            <summary>
+            Current pen
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Brush">
+            <summary>
+            Current brush
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Clear">
+            <summary>
+            Clears the canvas with the current brush.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Clear.#ctor">
+            <summary>
+            Clears the canvas with the current brush.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Clear.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Clear.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Clear.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Ellipse">
+            <summary>
+            Draws an ellipse
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Ellipse.#ctor">
+            <summary>
+            Draws an ellipse
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Ellipse.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws an ellipse
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Ellipse.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Ellipse.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Ellipse.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse">
+            <summary>
+            Fills an ellipse
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse.#ctor">
+            <summary>
+            Fills an ellipse
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Fills an ellipse
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillEllipse.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle">
+            <summary>
+            Fills a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.#ctor">
+            <summary>
+            Fills a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Fills a rectangle
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Line">
+            <summary>
+            Draws a line
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.#ctor">
+            <summary>
+            Draws a line
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws a line
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.LineTo">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.#ctor">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.#ctor(System.Single,System.Single)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.MoveTo">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.#ctor">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.#ctor(System.Single,System.Single)">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.#ctor">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.#ctor(SkiaSharp.SKColor)">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+            <param name="Parameter">Parameter.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.Parameter">
+            <summary>
+            Parameter
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.#ctor">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.#ctor(System.Single,System.Single)">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.#ctor">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.#ctor(System.Single)">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+            <param name="Parameter">Parameter.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.Parameter">
+            <summary>
+            Parameter
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.PenColor">
+            <summary>
+            Sets the current pen color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.#ctor">
+            <summary>
+            Sets the current pen color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.#ctor(SkiaSharp.SKColor)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.PenWidth">
+            <summary>
+            Sets the current pen width.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.#ctor">
+            <summary>
+            Sets the current pen width.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.#ctor(System.Single)">
+            <summary>
+            Sets the current pen width.
+            </summary>
+            <param name="Width">New pen width</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Plot">
+            <summary>
+            Plots a pixel at a given coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Plot.#ctor">
+            <summary>
+            Plots a pixel at a given coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Plot.#ctor(System.Single,System.Single)">
+            <summary>
+            Plots a pixel at a given coordinate.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Plot.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Plot.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Plot.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Rectangle">
+            <summary>
+            Draws a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.#ctor">
+            <summary>
+            Draws a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws a rectangle
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.#ctor">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.X2">
+            <summary>
+            X2-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Y2">
+            <summary>
+            Y2-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Width">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Height">
+            <summary>
+            Height
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters">
+            <summary>
+            Abstract base class for operations lacking parameters.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters.#ctor">
+            <summary>
+            Abstract base class for operations lacking parameters.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.ZeroParameters.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.DrawingArea">
+            <summary>
+            Contains information about the current drawing area.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Contains information about the current drawing area.
+            </summary>
+            <param name="MinX">Smallest value of X.</param>
+            <param name="MaxX">Largest value of X.</param>
+            <param name="MinY">Smallest value of Y.</param>
+            <param name="MaxY">Largest value of Y.</param>
+            <param name="OffsetX">X-offset of drawing area, relative to the canvas origin.</param>
+            <param name="OffsetY">Y-offset of drawing area, relative to the canvas origin.</param>
+            <param name="Width">Width of drawing area.</param>
+            <param name="Height">Height of drawing area.</param>
+            <param name="OrigoX">X-coordinate of the origo.</param>
+            <param name="OrigoY">Y-coordinate of the origo.</param>
+            <param name="Elementwise">If graph was generated using element-wise addition operations.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.MinX">
+            <summary>
+            Smallest value of X.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.MaxX">
+            <summary>
+            Largest value of X.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.MinY">
+            <summary>
+            Smallest value of Y.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.MaxY">
+            <summary>
+            Largest value of Y.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.OffsetX">
+            <summary>
+            X-offset of drawing area, relative to the canvas origin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.OffsetY">
+            <summary>
+            Y-offset of drawing area, relative to the canvas origin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.Width">
+            <summary>
+            Width of drawing area.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.Height">
+            <summary>
+            Height of drawing area.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.OrigoX">
+            <summary>
+            X-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.OrigoY">
+            <summary>
+            Y-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.Elementwise">
+            <summary>
+            If graph was generated using element-wise addition operations.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.XLabelPositions">
+            <summary>
+            Optional fixed X-Label positions.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.YLabelPositions">
+            <summary>
+            Optional fixed Y-Label positions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales two vectors of equal size to points in a rectangular area.
+            </summary>
+            <param name="VectorX">X-vector.</param>
+            <param name="VectorY">Y-vector.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.ScaleX(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.ScaleY(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.DescaleX(System.Double)">
+            <summary>
+            Descales a scaled value along the X-axis.
+            </summary>
+            <param name="Value">Scaled value.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.DrawingArea.DescaleY(System.Double)">
+            <summary>
+            Descales a scaled value along the Y-axis.
+            </summary>
+            <param name="Value">Scaled value.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Canvas.Canvas">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Color">Default color of graph.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Color">Default color of graph.</param>
+            <param name="BgColor">Background color.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Canvas.Canvas.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Canvas.Canvas.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.Alpha">
+            <summary>
+            Sets the Alpha channel of a color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sets the Alpha channel of a color.
+            </summary>
+            <param name="Color">Color.</param>
+            <param name="Alpha">Alpha channel value.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Alpha.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Alpha.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">Color argument.</param>
+            <param name="Argument2">Alpha argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.Blend">
+            <summary>
+            Blends colors `c1` and `c2` together using a blending factor 0&lt;=`p`&lt;=1. Any or both of `c1` and `c2` can be an image.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Blends colors `c1` and `c2` together using a blending factor 0&lt;=`p`&lt;=1. Any or both of `c1` and `c2` can be an image.
+            </summary>
+            <param name="c1">First color, or image.</param>
+            <param name="c2">Second color, or image.</param>
+            <param name="p">Blending factor in [0,1].</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Blend.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Blend.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(SkiaSharp.SKColor,SkiaSharp.SKColor,System.Double)">
+            <summary>
+            Blends two colors using a blending factor.
+            </summary>
+            <param name="c1">Color 1.</param>
+            <param name="c2">Color 2.</param>
+            <param name="p">Blending factor (0=<paramref name="c1"/>, 1=<paramref name="c2"/>).</param>
+            <returns>Blended color.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(Waher.Script.Graphs.PixelInformation,SkiaSharp.SKColor,System.Double)">
+            <summary>
+            Blends an image with a fixed color using a blending factor.
+            </summary>
+            <param name="Pixels">Image pixels</param>
+            <param name="Color">Color</param>
+            <param name="p">Blending factor (0=<paramref name="Pixels"/>, 1=<paramref name="Color"/>).</param>
+            <returns>Blended image.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(Waher.Script.Graphs.PixelInformation,Waher.Script.Graphs.PixelInformation,System.Double)">
+            <summary>
+            Blends two images of the same size using a blending factor.
+            </summary>
+            <param name="Image1">Image 1</param>
+            <param name="Image2">Image 2</param>
+            <param name="p">Blending factor (0=<paramref name="Image1"/>, 1=<paramref name="Image2"/>).</param>
+            <returns>Blended image.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.Color">
+            <summary>
+            Returns a color value from a string.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Color.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value from a string.
+            </summary>
+            <param name="Name">Name of color.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Color.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.Color.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Color.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Color.TryParse(System.String,SkiaSharp.SKColor@)">
+            <summary>
+            Tries to parse a string containing a color name.
+            </summary>
+            <param name="s">String value.</param>
+            <param name="Color">Color, if found.</param>
+            <returns>If the string was successfully parsed.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.ColorGradient">
+            <summary>
+            Returns a color from a color gradient defined by a vector of colors and an interpolation constant 0&lt;=`p`&lt;=1.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.ColorGradient.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color from a color gradient defined by a vector of colors and an interpolation constant 0&lt;=`p`&lt;=1.
+            </summary>
+            <param name="Colors">Second color, or image.</param>
+            <param name="p">Blending factor in [0,1].</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.ColorGradient.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.ColorGradient.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.ColorGradient.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.GrayScale">
+            <summary>
+            Converts a color into grayscale.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts a color into grayscale.
+            </summary>
+            <param name="Color">Color to convert.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.GrayScale.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.GrayScale.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.ToGrayScale(SkiaSharp.SKColor)">
+            <summary>
+            Converts a color to grayscale.
+            </summary>
+            <param name="Color">Color</param>
+            <returns>Grayscale.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.HSL">
+            <summary>
+            Returns a color value using HSL coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSL.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using HSL coordinates.
+            </summary>
+            <param name="H">Hue</param>
+            <param name="S">Saturation</param>
+            <param name="L">Light</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSL.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSL.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSL.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.HSLA">
+            <summary>
+            Returns a color value using HSL coordinates, and an alpha component.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSLA.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using HSL coordinates, and an alpha component.
+            </summary>
+            <param name="H">Hue</param>
+            <param name="S">Saturation</param>
+            <param name="L">Light</param>
+            <param name="A">Alpha</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSLA.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSLA.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSLA.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.HSV">
+            <summary>
+            Returns a color value using HSV coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSV.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using HSV coordinates.
+            </summary>
+            <param name="H">Hue</param>
+            <param name="S">Saturation</param>
+            <param name="V">Value</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSV.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSV.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSV.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.HSVA">
+            <summary>
+            Returns a color value using HSV coordinates, and an alpha component.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSVA.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using HSV coordinates, and an alpha component.
+            </summary>
+            <param name="H">Hue</param>
+            <param name="S">Saturation</param>
+            <param name="V">Value</param>
+            <param name="A">Alpha</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSVA.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.HSVA.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.HSVA.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.RGB">
+            <summary>
+            Returns a color value using RGB coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.RGB.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using RGB coordinates.
+            </summary>
+            <param name="R">Red</param>
+            <param name="G">Green</param>
+            <param name="B">Blue</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.RGB.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.RGB.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.RGB.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.RGBA">
+            <summary>
+            Returns a color value using RGB coordinates, and an alpha component.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.RGBA.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color value using RGB coordinates, and an alpha component.
+            </summary>
+            <param name="R">Red</param>
+            <param name="G">Green</param>
+            <param name="B">Blue</param>
+            <param name="A">Alpha</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.RGBA.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.RGBA.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.RGBA.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.HorizontalBarPainter">
+            <summary>
+            Plots a two-dimensional horizontal-bar chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.HorizontalBarPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.HorizontalBars">
+            <summary>
+            Plots a two-dimensional horizontal-bar chart.
+            </summary>
+            <example>
+            x:=0..20;y:=sin(x);y2:=2*sin(x);HorizontalBars("x"+x,y,rgba(255,0,0,128))+HorizontalBars("x"+x,y2,rgba(0,0,255,128));
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.HorizontalBars.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional horizontal-bar chart.
+            </summary>
+            <param name="Labels">Labels.</param>
+            <param name="Values">Values.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.HorizontalBars.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional horizontal-bar chart.
+            </summary>
+            <param name="Labels">Labels.</param>
+            <param name="Values">Values.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.HorizontalBars.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.HorizontalBars.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.HorizontalBars.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DArea">
+            <summary>
+            Plots a two-dimensional stacked area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            
+            Syntax:
+            Plot2DArea(x,y[,AreaColor])
+            </summary>
+            <example>
+            x:=-10..10;y:=sin(x);y2:=2*sin(x);plot2darea(x,y,rgba(255,0,0,64))+plot2darea(x,y2,rgba(0,0,255,64))+plot2dline(x,y)+plot2dline(x,y2,"Blue")
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional stacked area chart.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional stacked area chart.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Area Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DArea.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DArea.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DArea.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DArea.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DAreaPainter">
+            <summary>
+            Plots a two-dimensional stacked area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurve">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+            <example>
+            x:=-10..10;
+            y:=sin(x);
+            plot2dcurve(x,y);
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Size">Size</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.CreateSpline(SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.CreateSpline(SkiaSharp.SKPath,SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurve.GetCubicBezierCoefficients(System.Double[],System.Double[]@,System.Double[]@)">
+            <summary>
+            Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
+            </summary>
+            <param name="V">One set of coordinates.</param>
+            <param name="A">Corresponding coefficients for first control points.</param>
+            <param name="B">Corresponding coefficients for second control points.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea">
+            <summary>
+            Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            
+            Syntax:
+            Plot2DCurveArea(x,y[,AreaColor])
+            </summary>
+            <example>
+            x:=-10..10;y:=sin(x);y2:=2*sin(x);plot2dcurvearea(x,y,rgba(255,0,0,64))+plot2dcurvearea(x,y2,rgba(0,0,255,64))+plot2dcurve(x,y)+plot2dcurve(x,y2,"Blue")+scatter2d(x,y,"Red",5)+scatter2d(x,y2,"Blue",5)
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Area Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurveArea.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurveAreaPainter">
+            <summary>
+            Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurveAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.CreateSpline(SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.CreateSpline(SkiaSharp.SKPath,SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.GetCubicBezierCoefficients(System.Double[],System.Double[]@,System.Double[]@)">
+            <summary>
+            Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
+            </summary>
+            <param name="V">One set of coordinates.</param>
+            <param name="A">Corresponding coefficients for first control points.</param>
+            <param name="B">Corresponding coefficients for second control points.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine">
+            <summary>
+            Plots a two-dimensional horizontal line.
+            </summary>
+            <example>
+            x:=-10..10;
+            y:=sin(x);
+            plot2dhline(x,y,0,"Red",5)+scatter2d(x,y,"Blue",5)+plot2dline(x,y,"Blue",1);
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional horizontal line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional horizontal line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional horizontal line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Mode">Mode: Negative: Value begins at last point, zero: change occurs between points, Positive: Value begins at new point.</param>
+            <param name="Color">Color</param>
+            <param name="Size">Size</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLine.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLinePainter">
+            <summary>
+            Plots a two-dimensional horizontal line graph.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DHorizontalLinePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea">
+            <summary>
+            Plots a two-dimensional layered area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            
+            Syntax:
+            Plot2DLayeredArea(x,y[,AreaColor])
+            </summary>
+            <example>
+            x:=-10..10;y:=sin(x);y2:=2*sin(x/2);plot2dlayeredarea(x,y,rgba(255,0,0,64))+plot2dlayeredarea(x,y2,rgba(0,0,255,64))+plot2dline(x,y)+plot2dline(x,y2,"Blue")
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional layered area chart.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional layered area chart.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Area Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredAreaPainter">
+            <summary>
+            Plots a two-dimensional layered area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea">
+            <summary>
+            Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            
+            Syntax:
+            Plot2DLayeredCurveArea(x,y[,AreaColor])
+            </summary>
+            <example>
+            x:=-10..10;y:=sin(x);y2:=2*sin(x/2);plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+plot2dlayeredcurvearea(x,y2,rgba(0,0,255,64))+plot2dcurve(x,y)+plot2dcurve(x,y2,"Blue")+scatter2d(x,y,"Red",5)+scatter2d(x,y2,"Blue",5)
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Area Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveAreaPainter">
+            <summary>
+            Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLine">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <example>
+            x:=-10..10;
+            y:=sin(x);
+            plot2dline(x,y);
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLine.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Size">Size</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLine.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Plot2DLine.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLine.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter">
+            <summary>
+            Plots a two-dimensional line graph.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Polygon2D">
+            <summary>
+            Plots a two-dimensional polygon.
+            </summary>
+            <example>
+            t:=0..9;
+            x:=sin(t*pi/5);
+            y:=cos(t*pi/5);
+            polygon2d(x,y)
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Polygon2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional polygon.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Polygon2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional polygon.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Polygon2D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Polygon2D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Polygon2D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Polygon2DPainter">
+            <summary>
+            Plots a two-dimensional polygon.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Polygon2DPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Scatter2D">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+            <example>
+            x:=-10..10;
+            y:=sin(x);
+            scatter2d(x,y);
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Color">Color</param>
+            <param name="Size">Size</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Scatter2D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.Scatter2D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Scatter2DPainter">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2DPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter">
+            <summary>
+            Painters for single-color graphs
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter.UsesDefaultColor(System.Object[])">
+            <summary>
+            If graph uses default color
+            </summary>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter.TrySetDefaultColor(SkiaSharp.SKColor,System.Object[])">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.VerticalBars">
+            <summary>
+            Plots a two-dimensional vertical-bar chart.
+            </summary>
+            <example>
+            x:=0..20;y:=sin(x);y2:=2*sin(x);VerticalBars("x"+x,y,rgba(255,0,0,128))+VerticalBars("x"+x,y2,rgba(0,0,255,128));
+            </example>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.VerticalBars.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional vertical-bar chart.
+            </summary>
+            <param name="Labels">Labels.</param>
+            <param name="Values">Values.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.VerticalBars.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a two-dimensional vertical-bar chart.
+            </summary>
+            <param name="Labels">Labels.</param>
+            <param name="Values">Values.</param>
+            <param name="Color">Color</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.VerticalBars.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Plots.VerticalBars.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.VerticalBars.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.VerticalBarsPainter">
+            <summary>
+            Plots a two-dimensional vertical-bar chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.VerticalBarsPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.SameScale">
+            <summary>
+            Makes a graph use the same scale for all axes.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a graph use the same scale for all axes.
+            </summary>
+            <param name="Graph">Graph.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.SameScale.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.SameScale.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.LabelType">
+            <summary>
+             Type of labels
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.Double">
+            <summary>
+            Double-valued label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeYear">
+            <summary>
+            Year DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeQuarter">
+            <summary>
+            Quarter DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeMonth">
+            <summary>
+            Month DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeWeek">
+            <summary>
+            Week DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeDate">
+            <summary>
+            Date DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeShortTime">
+            <summary>
+            Short Time DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.DateTimeLongTime">
+            <summary>
+            Short Time DateTime label.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.PhysicalQuantity">
+            <summary>
+            Physical quantity labels.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.LabelType.String">
+            <summary>
+            String label.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.Graph">
+            <summary>
+            Base class for graphs.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.GraphNamespace">
+            <summary>
+            http://waher.se/Schema/Graph.xsd
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.GraphLocalName">
+            <summary>
+            Graph
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.DefaultColor">
+            <summary>
+            Default color: Red
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.#ctor">
+            <summary>
+            Base class for graphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.SameScale">
+            <summary>
+            If the same scale should be used for all axes.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.AssociatedObjectValue">
+            <summary>
+            Associated object value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.AssociatedSemiGroup">
+            <summary>
+            Associated Semi-Group.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetSettings(Waher.Script.Variables)">
+            <summary>
+            Gets default graph settings for drawing the graph.
+            </summary>
+            <param name="Variables">Current set of variables, where graph settings might be available.</param>
+            <returns>Graph settings.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetSettings(Waher.Script.Variables,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Gets default graph settings for drawing the graph.
+            </summary>
+            <param name="Variables">Current set of variables, where graph settings might be available.</param>
+            <param name="DefaultWidth">Default width.</param>
+            <param name="DefaultHeight">Default height.</param>
+            <returns>Graph settings.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
+            <param name="Settings">Settings used to create the graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
+            <param name="Settings">Settings used to create the graph.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Graphs.GraphSettings)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.RecommendedBitmapSize">
+            <summary>
+            The recommended bitmap size of the graph, if such is available, or null if not.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double})">
+            <summary>
+            Scales two vectors of equal size to points in a rectangular area.
+            </summary>
+            <param name="VectorX">X-vector.</param>
+            <param name="VectorY">Y-vector.</param>
+            <param name="MinX">Smallest X-value.</param>
+            <param name="MaxX">Largest X-value.</param>
+            <param name="MinY">Smallest Y-value.</param>
+            <param name="MaxY">Largest Y-value.</param>
+            <param name="OffsetX">X-offset to area.</param>
+            <param name="OffsetY">Y-offset to area.</param>
+            <param name="Width">Width of area.</param>
+            <param name="Height">Height of area.</param>
+            <param name="XLabelPositions">Optional fixed X-label positions.</param>
+            <param name="YLabelPositions">Optional fixed Y-label positions.</param>
+            <returns>Sequence of points.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to area.</param>
+            <param name="Size">Size of area.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
+            <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(System.Double[],System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to area.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(System.DateTime[],System.DateTime,System.DateTime,System.Double,System.Double)">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to area.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.referenceTimestamp">
+            <summary>
+            Reference time stamp when converting <see cref="T:System.DateTime"/> to <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IElement[],System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Offset">Offset to area.</param>
+            <param name="Size">Size of area.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
+            <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Objects.PhysicalQuantity[],System.Double,System.Double,Waher.Script.Units.Unit,System.Double,System.Double)">
+            <summary>
+            Scales a vector to fit a given area.
+            </summary>
+            <param name="Vector">Vector.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Unit">Unit.</param>
+            <param name="Offset">Offset to area.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Descale(System.Double,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double)">
+            <summary>
+            Descales a scaled value.
+            </summary>
+            <param name="Value">Scaled value.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Drawing offset.</param>
+            <param name="Size">Size of drawing area.</param>
+            <returns>Descaled value.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToPen(System.Object,System.Object)">
+            <summary>
+            Converts an object to a pen value.
+            </summary>
+            <param name="Object">Object</param>
+            <param name="Size">Optional size.</param>
+            <returns>Pen object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.TryConvertToColor(System.Object,SkiaSharp.SKColor@)">
+            <summary>
+            Tries to convert an object to a color.
+            </summary>
+            <param name="Object">Object to convert.</param>
+            <param name="Color">Resulting color, if possible to convert.</param>
+            <returns>Of <paramref name="Object"/> could be converted to a color.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToColor(System.Object)">
+            <summary>
+            Converts an object to a color.
+            </summary>
+            <param name="Object">Object.</param>
+            <returns>Color value.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToColorHSL(System.Double,System.Double,System.Double)">
+            <summary>
+            Creates a Color from its HSL representation.
+            
+            RGB conversion done according to:
+            https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+            </summary>
+            <param name="H">Hue H ∈ [0°, 360°).</param>
+            <param name="S">Saturation S ∈ [0, 1].</param>
+            <param name="L">Lightness L ∈ [0, 1].</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToColorHSL(System.Double,System.Double,System.Double,System.Byte)">
+            <summary>
+            Creates a Color from its HSL representation.
+            
+            RGB conversion done according to:
+            https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+            </summary>
+            <param name="H">Hue H ∈ [0°, 360°).</param>
+            <param name="S">Saturation S ∈ [0, 1].</param>
+            <param name="L">Lightness L ∈ [0, 1].</param>
+            <param name="A">Alpha A ∈ [0, 255].</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToColorHSV(System.Double,System.Double,System.Double)">
+            <summary>
+            Creates a Color from its HSV representation.
+            
+            RGB conversion done according to:
+            https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
+            </summary>
+            <param name="H">Hue H ∈ [0°, 360°).</param>
+            <param name="S">Saturation S ∈ [0, 1].</param>
+            <param name="V">Value V ∈ [0, 1].</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToColorHSV(System.Double,System.Double,System.Double,System.Byte)">
+            <summary>
+            Creates a Color from its HSV representation.
+            
+            RGB conversion done according to:
+            https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
+            </summary>
+            <param name="H">Hue H ∈ [0°, 360°).</param>
+            <param name="S">Saturation S ∈ [0, 1].</param>
+            <param name="V">Value V ∈ [0, 1].</param>
+            <param name="A">Alpha A ∈ [0, 255].</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetLabels(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Elements.IElement@,System.Collections.Generic.IEnumerable{Waher.Script.Abstraction.Elements.IVector},System.Int32,Waher.Script.Graphs.LabelType@)">
+            <summary>
+            Gets label values for a series vector.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Series">Series to draw.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <param name="LabelType">Type of labels produced.</param>
+            <returns>Vector of labels.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetLabels(System.Double,System.Double,System.Int32)">
+            <summary>
+            Gets label values for a series vector.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <returns>Vector of labels.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetStepSize(System.Double,System.Double,System.Int32)">
+            <summary>
+            Gets a human readable step size for an interval, given its limits and desired number of steps.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <returns>Recommended step size.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetStepFraction(System.Double,System.Double,System.Int32,System.Int32@,System.Int32@,System.Int32@)">
+            <summary>
+            Gets a human readable step size for an interval, given its limits and desired number of steps.
+            The step size is given as a fraction and an exponent of power 10.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <param name="Numerator">Numerator of fraction.</param>
+            <param name="Denominator">Denominator of fraction.</param>
+            <param name="Exponent">Power of 10 exponent.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetLabels(System.DateTime,System.DateTime,System.Int32,Waher.Script.Graphs.LabelType@)">
+            <summary>
+            Gets label values for a series vector.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <param name="LabelType">Type of labels produced.</param>
+            <returns>Vector of labels.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetLabels(Waher.Script.Objects.PhysicalQuantity,Waher.Script.Objects.PhysicalQuantity,System.Int32)">
+            <summary>
+            Gets label values for a series vector.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <returns>Vector of labels.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.LabelString(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Graphs.LabelType)">
+            <summary>
+            Converts a label to a string.
+            </summary>
+            <param name="Label">Label</param>
+            <param name="LabelType">Type of label.</param>
+            <returns>String-representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.LabelStrings(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Graphs.LabelType)">
+            <summary>
+            Converts a vector of labels to a string array.
+            </summary>
+            <param name="Labels">Labels</param>
+            <param name="LabelType">Type of label.</param>
+            <returns>String-representation of elements.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetIso8601WeekOfYear(System.DateTime)">
+            <summary>
+            Gets the week number of a date, according to ISO-8601.
+            
+            https://blogs.msdn.microsoft.com/shawnste/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net/
+            </summary>
+            <param name="Time">Time</param>
+            <returns>Week number, according to ISO-8601.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToXml">
+            <summary>
+            Exports the graph to XML.
+            </summary>
+            <returns>XML string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToXml(System.Text.StringBuilder)">
+            <summary>
+            Exports the graph to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToXml(System.Xml.XmlWriter)">
+            <summary>
+            Exports the graph to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ImportGraph(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ImportGraphAsync(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Parse(System.String,Waher.Script.Variables)">
+            <summary>
+            Parses an element expression string.
+            </summary>
+            <param name="s">Expression</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Parsed element.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ParseAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Parses an element expression string.
+            </summary>
+            <param name="s">Expression</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Parsed element.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToObjectArray(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Gets an array of objects corresponding to the elements of a vector.
+            </summary>
+            <param name="v">Vector.</param>
+            <returns>Array of objects.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Graph2D">
+            <summary>
+            Handles two-dimensional graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.#ctor">
+            <summary>
+            Base class for two-dimensional graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.#ctor(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Graphs.IPainter2D,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
+            <summary>
+            Base class for two-dimensional graphs.
+            </summary>
+            <param name="X">X-axis</param>
+            <param name="Y">Y-axis</param>
+            <param name="Painter">Painter of graph.</param>
+            <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
+            <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
+            <param name="Node">Node creating the graph.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.X">
+            <summary>
+            X-axis series.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.Y">
+            <summary>
+            Y-axis series.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.Parameters">
+            <summary>
+            Parameters.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.MinX">
+            <summary>
+            Smallest X-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.MaxX">
+            <summary>
+            Largest X-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.MinY">
+            <summary>
+            Smallest Y-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.MaxY">
+            <summary>
+            Largest Y-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.Elementwise">
+            <summary>
+            If graph was generated using element-wise addition operations.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.Title">
+            <summary>
+            Title for graph.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.LabelX">
+            <summary>
+            Label for x-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.LabelY">
+            <summary>
+            Label for y-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.ShowXAxis">
+            <summary>
+            If the X-axis is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.ShowYAxis">
+            <summary>
+            If the Y-axis is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.ShowGrid">
+            <summary>
+            If the grid is to be displayed.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement,System.Boolean)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <param name="ElementWise">If element-wise addition is to be performed.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State object(s) that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(System.Double)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Objects.VectorSpaces.DoubleVector)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Objects.VectorSpaces.DateTimeVector)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlStringTimeSpans(Waher.Script.Objects.VectorSpaces.ObjectVector)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ImportGraphAsync(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.GraphBitmap">
+            <summary>
+            Handles bitmap-based graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor">
+            <summary>
+            Handles bitmap-based graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor(Waher.Script.Graphs.PixelInformation)">
+            <summary>
+            Handles bitmap-based graphs.
+            </summary>
+            <param name="Pixels">Pixels</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State object(s) that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphBitmap.RecommendedBitmapSize">
+            <summary>
+            The recommended bitmap size of the graph, if such is available.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.ImportGraphAsync(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphBitmap.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.GraphSettings">
+            <summary>
+            Graph settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphSettings.#ctor">
+            <summary>
+            Graph settings.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.Width">
+            <summary>
+            Width of graph, in pixels. (Default=640 pixels.)
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.Height">
+            <summary>
+            Height of graph, in pixels. (Default=480 pixels.)
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.BackgroundColor">
+            <summary>
+            Background color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.AxisColor">
+            <summary>
+            Axis color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.AxisWidth">
+            <summary>
+            Axis width.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.GridColor">
+            <summary>
+            Grid color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.GridWidth">
+            <summary>
+            Grid width.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.MarginTop">
+            <summary>
+            Top margin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.MarginBottom">
+            <summary>
+            Bottom margin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.MarginLeft">
+            <summary>
+            Left margin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.MarginRight">
+            <summary>
+            Right margin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.MarginLabel">
+            <summary>
+            Label margin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.FontName">
+            <summary>
+            Font name.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.LabelFontSize">
+            <summary>
+            Label font size
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.ApproxNrLabelsX">
+            <summary>
+            Approximate number of labels along the X-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphSettings.ApproxNrLabelsY">
+            <summary>
+            Approximate number of labels along the Y-axis.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.IPainter">
+            <summary>
+            Interface for graph drawing functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter.UsesDefaultColor(System.Object[])">
+            <summary>
+            If graph uses default color
+            </summary>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter.TrySetDefaultColor(SkiaSharp.SKColor,System.Object[])">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.IPainter2D">
+            <summary>
+            Interface for 2D graph drawing functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter2D.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Output.ColorOutput">
+            <summary>
+            Converts values of type <see cref="T:SkiaSharp.SKColor"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Output.ColorOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Output.ColorOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformation">
+            <summary>
+            Contains pixel information
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information
+            </summary>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Binary">
+            <summary>
+            Binary representation of pixels
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Width">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Height">
+            <summary>
+            Height
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.FromImage(SkiaSharp.SKImage)">
+            <summary>
+            Gets the pixel information from an <see cref="T:SkiaSharp.SKImage"/>.
+            </summary>
+            <param name="Image">Image</param>
+            <returns>Pixel information</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.FromRaw(SkiaSharp.SKColorType,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Gets the pixel information object from raw pixel data.
+            </summary>
+            <param name="ColorType">How pixels are represented</param>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+            <param name="BytesPerRow">Number of bytes per row</param>
+            <returns>Pixel information</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.EncodeAsPng">
+            <summary>
+            Encodes the pixels into a binary PNG image.
+            </summary>
+            <returns>PNG encoded image.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformationPng">
+            <summary>
+            Contains pixel information in PNG format
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information in PNG format
+            </summary>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.EncodeAsPng">
+            <summary>
+            Encodes the pixels into a binary PNG image.
+            </summary>
+            <returns>PNG encoded image.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformationRaw">
+            <summary>
+            Contains pixel information in a raw unencoded format.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.#ctor(SkiaSharp.SKColorType,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information in a raw unencoded format.
+            </summary>
+            <param name="ColorType">How pixels are represented</param>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+            <param name="BytesPerRow">Number of bytes per row</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformationRaw.ColorType">
+            <summary>
+            How pixels are represented
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformationRaw.BytesPerRow">
+            <summary>
+            Number of bytes per row
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.SetOfGraphs">
+            <summary>
+            Set containing all graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.SetOfGraphs.#ctor">
+            <summary>
+            Set containing all graphs.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.SetOfGraphs.Instance">
+            <summary>
+            Instance of the set of all graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.SetOfGraphs.Contains(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Checks if the set contains an element.
+            </summary>
+            <param name="Element">Element.</param>
+            <returns>If the element is contained in the set.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.SetOfGraphs.Equals(System.Object)">
+            <summary>
+            Compares the element to another.
+            </summary>
+            <param name="obj">Other element to compare against.</param>
+            <returns>If elements are equal.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.SetOfGraphs.GetHashCode">
+            <summary>
+            Calculates a hash code of the element.
+            </summary>
+            <returns>Hash code.</returns>
+        </member>
+    </members>
+</doc>

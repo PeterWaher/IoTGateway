@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Counters</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Counters.CounterModule">
+            <summary>
+            Module controling the life-cycle of counters.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Counters.CounterModule.Running">
+            <summary>
+            If the module is running or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.CounterModule.Start">
+            <summary>
+            Starts the module.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.CounterModule.Stop">
+            <summary>
+            Stops the module.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Counters.CounterObjects.RuntimeCounter">
+            <summary>
+            Contains a runtime counter.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.CounterObjects.RuntimeCounter.#ctor">
+            <summary>
+            Contains a runtime counter.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Counters.CounterObjects.RuntimeCounter.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Counters.CounterObjects.RuntimeCounter.Key">
+            <summary>
+            Counter Key
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Counters.CounterObjects.RuntimeCounter.Counter">
+            <summary>
+            Counter
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Counters.RuntimeCounters">
+            <summary>
+            Static class managing persistent counters.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.FlushAsync">
+            <summary>
+            Flushes all cached counters to the database.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.IncrementCounter(Waher.Persistence.CaseInsensitiveString)">
+            <summary>
+            Increments a counter.
+            </summary>
+            <param name="Key">Counter key.</param>
+            <returns>Current count.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.IncrementCounter(Waher.Persistence.CaseInsensitiveString,System.Int64)">
+            <summary>
+            Increments a counter.
+            </summary>
+            <param name="Key">Counter key.</param>
+            <param name="Delta">Amount to increment.</param>
+            <returns>Current count.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.DecrementCounter(Waher.Persistence.CaseInsensitiveString)">
+            <summary>
+            Decrements a counter.
+            </summary>
+            <param name="Key">Counter key.</param>
+            <returns>Current count.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.DecrementCounter(Waher.Persistence.CaseInsensitiveString,System.Int64)">
+            <summary>
+            Decrements a counter.
+            </summary>
+            <param name="Key">Counter key.</param>
+            <param name="Delta">Amount to decrement.</param>
+            <returns>Current count.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Counters.RuntimeCounters.GetCount(Waher.Persistence.CaseInsensitiveString)">
+            <summary>
+            Gets the current count of a counter.
+            </summary>
+            <param name="Key">Counter key.</param>
+            <returns>Current count.</returns>
+        </member>
+    </members>
+</doc>

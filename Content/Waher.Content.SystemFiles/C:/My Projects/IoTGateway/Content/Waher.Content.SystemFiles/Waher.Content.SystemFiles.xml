@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.SystemFiles</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.SystemFiles.FileSystem">
+            <summary>
+            Static class helping modules to find files installed on the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindFiles(System.Environment.SpecialFolder[],System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Finds files in a set of folders, and optionally, their subfolders. This method only finds files in folders
+            the application as access rights to.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="IncludeSubfolders">If subfolders are to be included.</param>
+            <param name="BreakOnFirst">If the search should break when it finds the first file.</param>
+            <returns>Files matching the pattern found in the corresponding folders.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindFiles(System.String[],System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Finds files in a set of folders, and optionally, their subfolders. This method only finds files in folders
+            the application as access rights to.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="IncludeSubfolders">If subfolders are to be included.</param>
+            <param name="BreakOnFirst">If the search should break when it finds the first file.</param>
+            <returns>Files matching the pattern found in the corresponding folders.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindFiles(System.String[],System.String,System.Boolean,System.Int32)">
+            <summary>
+            Finds files in a set of folders, and optionally, their subfolders. This method only finds files in folders
+            the application as access rights to.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="IncludeSubfolders">If subfolders are to be included.</param>
+            <param name="MaxCount">Maximum number of files to return.</param>
+            <returns>Files matching the pattern found in the corresponding folders.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindFiles(System.String[],System.String,System.Int32,System.Int32)">
+            <summary>
+            Finds files in a set of folders, and optionally, their subfolders. This method only finds files in folders
+            the application as access rights to.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="SubfolderDepth">Maximum folder depth to search.</param>
+            <param name="MaxCount">Maximum number of files to return.</param>
+            <returns>Files matching the pattern found in the corresponding folders.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.GetFolders(System.Environment.SpecialFolder[],System.String[])">
+            <summary>
+            Gets the physical locations of special folders.
+            </summary>
+            <param name="Folders">Special folders.</param>
+            <param name="AppendWith">Append result with this array of folders.</param>
+            <returns>Physical locations. Only the physical locations of defined special folders are returned.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindLatestFile(System.Environment.SpecialFolder[],System.String,System.Boolean)">
+            <summary>
+            Finds the latest file matching a search pattern, by searching in a set of folders, and optionally, their subfolders. 
+            This method only finds files in folders the application as access rights to. If no file is found, the empty string
+            is returned.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="IncludeSubfolders">If subfolders are to be included.</param>
+            <returns>Latest file if found, empty string if not.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindLatestFile(System.String[],System.String,System.Boolean)">
+            <summary>
+            Finds the latest file matching a search pattern, by searching in a set of folders, and optionally, their subfolders. 
+            This method only finds files in folders the application as access rights to. If no file is found, the empty string
+            is returned.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="IncludeSubfolders">If subfolders are to be included.</param>
+            <returns>Latest file if found, empty string if not.</returns>
+        </member>
+        <member name="M:Waher.Content.SystemFiles.FileSystem.FindLatestFile(System.String[],System.String,System.Int32)">
+            <summary>
+            Finds the latest file matching a search pattern, by searching in a set of folders, and optionally, their subfolders. 
+            This method only finds files in folders the application as access rights to. If no file is found, the empty string
+            is returned.
+            </summary>
+            <param name="Folders">Folders to search in.</param>
+            <param name="Pattern">Pattern to search for.</param>
+            <param name="SubfolderDepth">Maximum folder depth to search.</param>
+            <returns>Latest file if found, empty string if not.</returns>
+        </member>
+    </members>
+</doc>

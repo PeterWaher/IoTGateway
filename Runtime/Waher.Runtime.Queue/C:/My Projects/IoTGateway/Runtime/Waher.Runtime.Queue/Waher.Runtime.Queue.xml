@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Queue</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Queue.AsyncQueue`1">
+            <summary>
+            Asynchronous First-in-First-out (FIFO) Queue, for use when transporting items 
+            of type <typeparamref name="T"/> between tasks.
+            </summary>
+            <typeparam name="T">Items of this class is managed by the queue.</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.#ctor">
+            <summary>
+            Asynchronous Queue, for use when transporting items of class 
+            <typeparamref name="T"/> between tasks.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Queue.AsyncQueue`1.CountItems">
+            <summary>
+            Number of items in queue.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Queue.AsyncQueue`1.CountSubscribers">
+            <summary>
+            Number of subscribers waiting for items.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.Add(`0)">
+            <summary>
+            Adds an item to the queue.
+            </summary>
+            <param name="Item">Item to add.</param>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.Wait">
+            <summary>
+            Waits indefinitely (or until queue is disposed) for an item to be available.
+            If Queue is disposed, a null item will be returned to the subscriber.
+            </summary>
+            <returns>Item to process, or null if queue is disposed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.TryPeekItem(`0@)">
+            <summary>
+            Tries to get a queued item, if found. If not, the method returns
+            immediately with a null item.
+            </summary>
+            <param name="Item">Item, if found, null otherwise.</param>
+            <returns>If an item was found, and returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.TryGetItem(`0@)">
+            <summary>
+            Tries to get a queued item, if found. If not, the method returns
+            immediately with a null item.
+            </summary>
+            <param name="Item">Item, if found, null otherwise.</param>
+            <returns>If an item was found, and returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Queue.AsyncQueue`1.Terminate">
+            <summary>
+            Terminates the queue, allowing subscribers to get queued items, but
+            disallows new items to be added. When all items have been processed,
+            queue is disposed, and the returning Task will be completed.
+            </summary>
+        </member>
+        <member name="E:Waher.Runtime.Queue.AsyncQueue`1.Disposed">
+            <summary>
+            Event raised when queue has been disposed.
+            </summary>
+        </member>
+    </members>
+</doc>

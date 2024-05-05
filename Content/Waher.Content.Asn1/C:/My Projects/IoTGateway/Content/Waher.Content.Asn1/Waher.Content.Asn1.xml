@@ -1,0 +1,3118 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Asn1</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Asn1.Array`1">
+            <summary>
+            Generic array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(Waher.Content.Asn1.Array{`0})~`0[]">
+            <summary>
+            Implicit type converter to a typed array.
+            </summary>
+            <param name="A">Object instance</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(Waher.Content.Asn1.Array{`0})~System.Array">
+            <summary>
+            Implicit type converter to an untyped array.
+            </summary>
+            <param name="A">Object instance</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.op_Implicit(`0[])~Waher.Content.Asn1.Array{`0}">
+            <summary>
+            Implicit type converter to a typed array.
+            </summary>
+            <param name="A">Array</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.#ctor(System.Int32)">
+            <summary>
+            Generic array.
+            </summary>
+            <param name="Length">Length of array.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.#ctor(`0[])">
+            <summary>
+            Generic array.
+            </summary>
+            <param name="Elements">Elements</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Rank">
+            <summary>
+            Gets the rank (number of dimensions) of the System.Array. For example, a one-dimensional
+            array returns 1, a two-dimensional array returns 2, and so on.
+            </summary>
+            <returns>
+            The rank (number of dimensions) of the System.Array.
+            </returns>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Length">
+            <summary>
+            Gets a 32-bit integer that represents the total number of elements in all the
+            dimensions of the System.Array.
+            </summary>
+            <returns>
+            A 32-bit integer that represents the total number of elements in all the dimensions
+            of the System.Array; zero if there are no elements in the array.
+            </returns>
+            <exception cref="T:System.OverflowException">
+            The array is multidimensional and contains more than System.Int32.MaxValue elements.
+            </exception>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Elements">
+            <summary>
+            Internal array of elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Array`1.Item(System.Int32)">
+            <summary>
+            Gets or sets elements of the array.
+            </summary>
+            <param name="Index">Zero-based index into the array.</param>
+            <returns>Element of array.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.Clone">
+            <summary>
+            Creates a shallow copy of the System.Array.
+            </summary>
+            <returns>
+            A shallow copy of the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.CopyTo(Waher.Content.Asn1.Array{`0},System.Int32)">
+            <summary>
+            Copies all the elements of the current one-dimensional array to the specified
+            one-dimensional array starting at the specified destination array index. The
+            index is specified as a 32-bit integer.
+            </summary>
+            <param name="array">
+            The one-dimensional array that is the destination of the elements copied from
+            the current array.
+            </param>
+            <param name="index">
+            A 32-bit integer that represents the index in array at which copying begins.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            array is null.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            index is less than the lower bound of array.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            array is multidimensional.-or-The number of elements in the source array is greater
+            than the available number of elements from index to the end of the destination
+            array.
+            </exception>
+            <exception cref="T:System.ArrayTypeMismatchException">
+            The type of the source System.Array cannot be cast automatically to the type
+            of the destination array.
+            </exception>
+            <exception cref="T:System.RankException">
+            The source array is multidimensional.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            At least one element in the source System.Array cannot be cast to the type of
+            destination array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an System.Collections.IEnumerator for the System.Array.
+            </summary>
+            <returns>
+            An System.Collections.IEnumerator for the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetEnumerator">
+            <summary>
+            Returns an System.Collections.IEnumerator for the System.Array.
+            </summary>
+            <returns>
+            An System.Collections.IEnumerator for the System.Array.
+            </returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetLength(System.Int32)">
+            <summary>
+            Gets a 32-bit integer that represents the number of elements in the specified
+            dimension of the System.Array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the System.Array whose length needs to be determined.
+            </param>
+            <returns>
+            A 32-bit integer that represents the number of elements in the specified dimension.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetLowerBound(System.Int32)">
+            <summary>
+            Gets the index of the first element of the specified dimension in the array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the array whose starting index needs to be determined.
+            </param>
+            <returns>
+            The index of the first element of the specified dimension in the array.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetUpperBound(System.Int32)">
+            <summary>
+            Gets the index of the last element of the specified dimension in the array.
+            </summary>
+            <param name="dimension">
+            A zero-based dimension of the array whose upper bound needs to be determined.
+            </param>
+            <returns>
+            The index of the last element of the specified dimension in the array, or -1
+            if the specified dimension is empty.
+            </returns>
+            <exception cref="T:System.IndexOutOfRangeException">
+            dimension is less than zero.-or-dimension is equal to or greater than System.Array.Rank.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetValue(System.Int32)">
+            <summary>
+            Gets the value at the specified position in the one-dimensional System.Array.
+            The index is specified as a 32-bit integer.
+            </summary>
+            <param name="index">
+            A 32-bit integer that represents the position of the System.Array element to
+            get.
+            </param>
+            <returns>
+            The value at the specified position in the one-dimensional System.Array.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            The current System.Array does not have exactly one dimension.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            index is outside the range of valid indexes for the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.GetValue(System.Int32[])">
+            <summary>
+            Gets the value at the specified position in the multidimensional System.Array.
+            The indexes are specified as an array of 32-bit integers.
+            </summary>
+            <param name="indices">
+            A one-dimensional array of 32-bit integers that represent the indexes specifying
+            the position of the System.Array element to get.
+            </param>
+            <returns>
+            The value at the specified position in the multidimensional System.Array.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            indices is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The number of dimensions in the current System.Array is not equal to the number
+            of elements in indices.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            Any element in indices is outside the range of valid indexes for the corresponding
+            dimension of the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.Initialize">
+            <summary>
+            Initializes every element of the value-type System.Array by calling the default
+            constructor of the value type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.SetValue(System.Object,System.Int32[])">
+            <summary>
+            Sets a value to the element at the specified position in the multidimensional
+            System.Array. The indexes are specified as an array of 32-bit integers.
+            </summary>
+            <param name="value">
+            The new value for the specified element.
+            </param>
+            <param name="indices">
+            A one-dimensional array of 32-bit integers that represent the indexes specifying
+            the position of the element to set.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            indices is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The number of dimensions in the current System.Array is not equal to the number
+            of elements in indices.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            value cannot be cast to the element type of the current System.Array.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            Any element in indices is outside the range of valid indexes for the corresponding
+            dimension of the current System.Array.
+            </exception>
+        </member>
+        <member name="M:Waher.Content.Asn1.Array`1.SetValue(System.Object,System.Int32)">
+            <summary>
+            Sets a value to the element at the specified position in the one-dimensional
+            System.Array. The index is specified as a 32-bit integer.
+            </summary>
+            <param name="value">
+            The new value for the specified element.
+            </param>
+            <param name="index">
+            A 32-bit integer that represents the position of the System.Array element to
+            set.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            The current System.Array does not have exactly one dimension.
+            </exception>
+            <exception cref="T:System.InvalidCastException">
+            value cannot be cast to the element type of the current System.Array.
+            </exception>
+            <exception cref="T:System.IndexOutOfRangeException">
+            index is outside the range of valid indexes for the current System.Array.
+            </exception>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderBer">
+            <summary>
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.#ctor(System.IO.Stream)">
+            <summary>
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeIdentifier(System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderBer.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderCer">
+            <summary>
+            Constrained Encoding Rules (CER), as defined in X.690
+            (Subset of BER)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderCer.#ctor(System.IO.Stream)">
+            <summary>
+            Constrained Encoding Rules (CER), as defined in X.690
+            (Subset of BER)
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1DecoderDer">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
+            (Subset of BER)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1DecoderDer.#ctor(System.IO.Stream)">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
+            (Subset of BER)
+            </summary>
+            <param name="Input">Input stream.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Asn1Document">
+            <summary>
+            Represents an ASN.1 document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.CreateAsync(System.String,System.String,System.String[])">
+            <summary>
+            Represents an ASN.1 document.
+            </summary>
+            <param name="Text">ASN.1 text to parse.</param>
+            <param name="Location">Location of file.</param>
+            <param name="ImportFolders">Import Folders.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.Root">
+            <summary>
+            ASN.1 Root node
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.Text">
+            <summary>
+            ASN.1 text
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.Location">
+            <summary>
+            Location of document.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Asn1Document.ImportFolders">
+            <summary>
+            Import folders.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.FromFile(System.String,System.String[])">
+            <summary>
+            Read from file.
+            </summary>
+            <param name="FileName">Filename.</param>
+            <param name="ImportFolders">Import folders.</param>
+            <returns>ASN.1 document</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(Waher.Content.Asn1.CSharpExportSettings)">
+            <summary>
+            Exports ASN.1 schemas to C#
+            </summary>
+            <param name="Settings">C# export settings.</param>
+            <returns>C# code</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Asn1Document.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportSettings)">
+            <summary>
+            Exports ASN.1 schemas to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="Settings">C# export settings.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.BER">
+            <summary>
+            Implements static methods for Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeIdentifier(System.IO.Stream,System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.BER.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.CSharpExportSettings">
+            <summary>
+            C# export settings
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.CSharpExportSettings.Codecs">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.CSharpExportSettings.BaseNamespace">
+            <summary>
+            Base Namespace
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String)">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+            <param name="BaseNamespace">Base namespace of generated code.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.#ctor(System.String,Waher.Content.Asn1.EncodingSchemes)">
+            <summary>
+            What encoders and decoders to include in the generation of C# code.
+            </summary>
+            <param name="BaseNamespace">Base namespace of generated code.</param>
+            <param name="Codecs">Encoding schemes to support.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.Namespace(System.String)">
+            <summary>
+            Namespace for a given identifier.
+            </summary>
+            <param name="Identifier">Identifier.</param>
+            <returns>Namespace</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.ContainsCode(System.String)">
+            <summary>
+            If C# code is available for a given identifier.
+            </summary>
+            <param name="Identifier">Identifier.</param>
+            <returns>If C# code exists.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.AddCode(System.String,System.String,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Adds C# code for a given identifier.
+            </summary>
+            <param name="Identifier">Identifier.</param>
+            <param name="Code">C# Code</param>
+            <param name="Document">Document</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.GetCode(System.String)">
+            <summary>
+            Gets C# code for a given identifier.
+            </summary>
+            <param name="Identifier">Identifier.</param>
+            <returns>C# code</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportSettings.GetDocument(System.String)">
+            <summary>
+            Gets C# code for a given identifier.
+            </summary>
+            <param name="Identifier">Identifier.</param>
+            <returns>ASN.1 document.</returns>
+        </member>
+        <member name="P:Waher.Content.Asn1.CSharpExportSettings.Modules">
+            <summary>
+            Modules exported.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.CSharpExportState">
+            <summary>
+            C# export state
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.CSharpExportState.Settings">
+            <summary>
+            C# export settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportState.#ctor(Waher.Content.Asn1.CSharpExportSettings)">
+            <summary>
+            C# export state
+            </summary>
+            <param name="Settings">Export settings.</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportState.ClosePending(System.Text.StringBuilder)">
+            <summary>
+            Close pending actions
+            </summary>
+            <param name="Output">C# Output</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.CSharpExportState.ClosePendingValues(System.Text.StringBuilder)">
+            <summary>
+            Close pending value actions
+            </summary>
+            <param name="Output">C# Output</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.EncodingSchemes">
+            <summary>
+            Available ASN.1 encoding schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.BER">
+            <summary>
+            Basic Encoding Rules (BER), as defined in X.690
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.CER">
+            <summary>
+            Canonical Encoding Rules (CER), as defined in X.690
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.DER">
+            <summary>
+            Distinguished Encoding Rules (DER), as defined in X.690
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.All">
+            <summary>
+            All supported encoding schemes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.EncodingSchemes.None">
+            <summary>
+            None of the supported encoding schemes.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Exceptions.Asn1Exception">
+            <summary>
+            Base class from ASN.1 exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Exceptions.Asn1Exception.#ctor(System.String)">
+            <summary>
+            Base class from ASN.1 exceptions.
+            </summary>
+            <param name="Message">Exception message.</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Exceptions.Asn1SyntaxException">
+            <summary>
+            ASN.1 syntax exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            ASN.1 syntax exceptions.
+            </summary>
+            <param name="Message">Exception message.</param>
+            <param name="Text">ASN.1 text</param>
+            <param name="Position">Position where exception was raised.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.Text">
+            <summary>
+            ASN.1 text
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Exceptions.Asn1SyntaxException.Position">
+            <summary>
+            Position into text where exception was raised.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.IAsn1Decoder">
+            <summary>
+            Interface for ASN.1 decoders
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeIdentifier(System.Boolean@,Waher.Content.Asn1.TagClass@)">
+            <summary>
+            Decodes an identifier from the stream.
+            </summary>
+            <param name="Constructed">If the identifier is constructed (true) or primitive (false)</param>
+            <param name="Class">Class of tag.</param>
+            <returns>TAG</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeLength(System.IO.Stream)">
+            <summary>
+            Decodes the length of a contents section.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Length of contents (if definite), or -1 (if indefinite, and determined by an end-of-contents section).</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBOOLEAN(System.IO.Stream)">
+            <summary>
+            Decodes a BOOLEAN value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BOOLEAN value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeINTEGER(System.IO.Stream)">
+            <summary>
+            Decodes an INTEGER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>INTEGER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeEnum``1(System.IO.Stream)">
+            <summary>
+            Decodes an enumerated value.
+            </summary>
+            <typeparam name="T">Enumeration type.</typeparam>
+            <param name="Input">Input stream.</param>
+            <returns>Enumeration value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeREAL(System.IO.Stream)">
+            <summary>
+            Decodes a REAL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>REAL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBitString(System.IO.Stream,System.Int32@)">
+            <summary>
+            Decodes a BIT STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <param name="NrUnusedBits">Number of unused bits.</param>
+            <returns>BIT STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeOctetString(System.IO.Stream)">
+            <summary>
+            Decodes a OCTET STRING value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OCTET STRING value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeNull(System.IO.Stream)">
+            <summary>
+            Decodes a NULL value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NULL value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes an OBJECT IDENTIFIER value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>OBJECT IDENTIFIER value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeRelativeObjectId(System.IO.Stream)">
+            <summary>
+            Decodes a RELATIVE-OID value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>RELATIVE-OID value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeBmpString(System.IO.Stream)">
+            <summary>
+            Decodes a BmpString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>BmpString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeIa5String(System.IO.Stream)">
+            <summary>
+            Decodes a IA5String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>IA5String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeVisibleString(System.IO.Stream)">
+            <summary>
+            Decodes a VisibleString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>VisibleString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeUtf8String(System.IO.Stream)">
+            <summary>
+            Decodes a Utf8String value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>Utf8String value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeUniversalString(System.IO.Stream)">
+            <summary>
+            Decodes a UniversalString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>UniversalString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodePrintableString(System.IO.Stream)">
+            <summary>
+            Decodes a PrintableString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>PrintableString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeNumericString(System.IO.Stream)">
+            <summary>
+            Decodes a NumericString value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>NumericString value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeTime(System.IO.Stream)">
+            <summary>
+            Decodes a TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDate(System.IO.Stream)">
+            <summary>
+            Decodes a DATE value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeTimeOfDay(System.IO.Stream)">
+            <summary>
+            Decodes a TIME-OF-DAY value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>TIME-OF-DAY value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDateTime(System.IO.Stream)">
+            <summary>
+            Decodes a DATE-TIME value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DATE-TIME value</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.IAsn1Decoder.DecodeDuration(System.IO.Stream)">
+            <summary>
+            Decodes a DURATION value.
+            </summary>
+            <param name="Input">Input stream.</param>
+            <returns>DURATION value</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Choice">
+            <summary>
+            Represents a ASN.1 CHOICE construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents a ASN.1 CHOICE construct.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Choice.ConstructedType">
+            <summary>
+            If the type is a constructed type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Choice.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1ComplexType">
+            <summary>
+            Abstract base class for complex types.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1ComplexType.#ctor(System.String,System.Boolean)">
+            <summary>
+            Abstract base class for complex types.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1ComplexType.Name">
+            <summary>
+            Optional field or type name.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1ComplexType.TypeDefinition">
+            <summary>
+            If construct is part of a type definition.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Tags">
+            <summary>
+            How ASN.1 tags are managed.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Automatic">
+            <summary>
+            Automatically
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Implicit">
+            <summary>
+            Implicitly
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.Asn1Tags.Explicit">
+            <summary>
+            Explicitly
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Definitions">
+            <summary>
+            Represents a collection of ASN.1 definitions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.#ctor(System.String,Waher.Content.Asn1.Model.Values.Asn1Oid,System.Nullable{Waher.Content.Asn1.Model.Asn1Tags},System.Boolean,Waher.Content.Asn1.Model.Asn1Module,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents a collection of ASN.1 definitions.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Oid">Optional Object ID</param>
+            <param name="Tags">How tags are handled.</param>
+            <param name="Abstract">If abstract syntax is used.</param>
+            <param name="Body">Definition body.</param>
+            <param name="Document">ASN.1 document</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Oid">
+            <summary>
+            Optional Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Tags">
+            <summary>
+            How tags are handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Abstract">
+            <summary>
+            If abstract syntax is used.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Body">
+            <summary>
+            Definition body.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Definitions.Document">
+            <summary>
+            ASN.1 document of which the definition is part.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Definitions.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Enumeration">
+            <summary>
+            ENUMERATED
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            ENUMERATED
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Enumeration.ConstructedType">
+            <summary>
+            If the type is a constructed type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Enumeration.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Extension">
+            <summary>
+            Extensions follow.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Extension.#ctor">
+            <summary>
+            Extensions follow.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Field">
+            <summary>
+            Represents an ASN.1 named field.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1FieldDefinition">
+            <summary>
+            Represents an ASN.1 field definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.#ctor(System.String,System.Nullable{System.Int32},Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Represents an ASN.1 field definition.
+            </summary>
+            <param name="FieldName">Field name.</param>
+            <param name="Tag">Tag</param>
+            <param name="Type">Type.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Name">
+            <summary>
+            Field Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldDefinition.Tag">
+            <summary>
+            Tag
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1FieldValueDefinition">
+            <summary>
+            Represents an ASN.1 field value definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Type,Waher.Content.Asn1.Model.Asn1Value,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents an ASN.1 field value definition.
+            </summary>
+            <param name="FieldName">Field name.</param>
+            <param name="Type">Type</param>
+            <param name="Value">Value</param>
+            <param name="Document">ASN.1 Document in where the value is defined.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Name">
+            <summary>
+            Field Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Value">
+            <summary>
+            Type definition
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.Document">
+            <summary>
+            ASN.1 Document in where the value is defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1FieldValueDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Import">
+            <summary>
+            Represents one import instruction.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Import.#ctor(System.String[],System.String,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents one import instruction.
+            </summary>
+            <param name="Identifiers">Identifiers to import.</param>
+            <param name="Module">Module reference.</param>
+            <param name="Document">ASN.1 Document</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Import.Identifiers">
+            <summary>
+            Identifiers to import.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Import.Module">
+            <summary>
+            Module reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Import.LoadDocument">
+            <summary>
+            Loads the ASN.1 document to import.
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">If the import file is not found.</exception>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1List">
+            <summary>
+            Abstract base class for list constructs.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1List.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Abstract base class for list constructs.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1List.Nodes">
+            <summary>
+            Nodes
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Module">
+            <summary>
+            Represents an ASN.1 module.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Module.#ctor(Waher.Content.Asn1.Model.Asn1Import[],System.String[],Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents an ASN.1 module.
+            </summary>
+            <param name="Imports">Optional Import instructions.</param>
+            <param name="Exports">Optional Export instructions.</param>
+            <param name="Items">Items in module.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Imports">
+            <summary>
+            Optional Import instructions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Exports">
+            <summary>
+            Optional Export instructions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Module.Items">
+            <summary>
+            Items in module.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Module.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.CSharpExportPass">
+            <summary>
+            Defines different C# export passes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Preprocess">
+            <summary>
+            Preprocessing
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Variables">
+            <summary>
+            Preprocessing
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Implicit">
+            <summary>
+            Implicit definitions
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.Model.CSharpExportPass.Explicit">
+            <summary>
+            Explicit definitions
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Node">
+            <summary>
+            Base class for all ASN.1 nodes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Node.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Restriction">
+            <summary>
+            Abstract base class for ASN.1 restrictions.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Sequence">
+            <summary>
+            Represents a ASN.1 SEQUENCE construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents a ASN.1 SEQUENCE construct.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Sequence.ConstructedType">
+            <summary>
+            If the type is a constructed type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Sequence.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1SequenceOf">
+            <summary>
+            Represents a ASN.1 SEQUENCE OF construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Represents a ASN.1 SEQUENCE OF construct.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Size">Optional SIZE</param>
+            <param name="ElementType">Element type.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.Size">
+            <summary>
+            Optional SIZE
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SequenceOf.ElementType">
+            <summary>
+            Element Type
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SequenceOf.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Set">
+            <summary>
+            Represents a ASN.1 SET construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.#ctor(System.String,System.Boolean,Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents a ASN.1 SET construct.
+            </summary>
+            <param name="Name">Optional field or type name.</param>
+            <param name="TypeDef">If construct is part of a type definition.</param>
+            <param name="Nodes">Nodes</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Set.ConstructedType">
+            <summary>
+            If the type is a constructed type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Set.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1SetOf">
+            <summary>
+            Represents a ASN.1 SET OF construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1SetOf.#ctor(Waher.Content.Asn1.Model.Asn1Values,System.String)">
+            <summary>
+            Represents a ASN.1 SET OF construct.
+            </summary>
+            <param name="Size">SIZE</param>
+            <param name="TypeName">Type name</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SetOf.Size">
+            <summary>
+            SIZE
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1SetOf.TypeName">
+            <summary>
+            Type name.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Type">
+            <summary>
+            Abstract base class for ASN.1 types.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Type.#ctor">
+            <summary>
+            Abstract base class for ASN.1 types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Implicit">
+            <summary>
+            Implicit type definition
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Restriction">
+            <summary>
+            Any restrictions placed on the type.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Optional">
+            <summary>
+            If the type is optional
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Unique">
+            <summary>
+            If values must be unique.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Present">
+            <summary>
+            If the type must be present
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Absent">
+            <summary>
+            If the type must be absent
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.Default">
+            <summary>
+            Default value for type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.NamedOptions">
+            <summary>
+            Any named options.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Type.ConstructedType">
+            <summary>
+            If the type is a constructed type.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Type.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1TypeDefinition">
+            <summary>
+            Represents an ASN.1 Type definition.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.#ctor(System.String,System.Nullable{System.Int32},Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Represents an ASN.1 Type definition.
+            </summary>
+            <param name="TypeName">Type name.</param>
+            <param name="Tag">Tag</param>
+            <param name="Definition">Definition</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.Name">
+            <summary>
+            Type Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.Tag">
+            <summary>
+            Tag
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1TypeDefinition.Definition">
+            <summary>
+            Type definition
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1TypeDefinition.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Value">
+            <summary>
+            Abstract base class for values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Value.#ctor">
+            <summary>
+            Abstract base class for values.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Asn1Value.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Asn1Values">
+            <summary>
+            Abstract base class for sets of values
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Asn1Values.#ctor">
+            <summary>
+            Abstract base class for sets of values
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.INamedNode">
+            <summary>
+            Named ASN.1 node.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.INamedNode.Name">
+            <summary>
+            Name of node.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.Asn1Macro">
+            <summary>
+            ASN.1 Macro
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.#ctor(System.String,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.UserDefinedItem,Waher.Content.Asn1.Model.Macro.SupportingSyntax[],Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            ASN.1 Macro
+            </summary>
+            <param name="Name">Name of macro.</param>
+            <param name="TypeNotation">Type Notation</param>
+            <param name="ValueNotation">Value Notation</param>
+            <param name="SupportingSyntax">Supporting Syntax</param>
+            <param name="Document">Document defining macro.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.Name">
+            <summary>
+            Name of macro.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.TypeNotation">
+            <summary>
+            Type notation
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.ValueNotation">
+            <summary>
+            Value notation
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.SupportingSyntax">
+            <summary>
+            Supporting syntax
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.Asn1Macro.Document">
+            <summary>
+            ASN.1 document defining macro.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ParseValue(Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Parses a value from the portion of the document at the current position, 
+            according to the instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <returns>Parsed ASN.1 value node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ParseType(Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Parses a type from the portion of the document at the current position, 
+            according to the instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <returns>Parsed ASN.1 type node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.Asn1Macro.GetValueType">
+            <summary>
+            Gets the ASN.1 type corresponding to the value.
+            </summary>
+            <returns>ASN.1 type.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.SupportingSyntax">
+            <summary>
+            Supporting syntax in a macro
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.#ctor(System.String,Waher.Content.Asn1.Model.Macro.UserDefinedItem)">
+            <summary>
+            Type notation declaration
+            </summary>
+            <param name="Name">Name</param>
+            <param name="Notation">Notation</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Notation">
+            <summary>
+            Notation
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedItem">
+            <summary>
+            Abstract base class for user-defined parts in macros
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedItem.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral">
+            <summary>
+            String literal
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.#ctor(System.String)">
+            <summary>
+            String literal
+            </summary>
+            <param name="Value">Literal value.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.Value">
+            <summary>
+            String literal
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOption">
+            <summary>
+            One option of many
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOption.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem[])">
+            <summary>
+            One option of many
+            </summary>
+            <param name="Items">Items comprising option</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedOption.Items">
+            <summary>
+            Items comprising option
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOption.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOptions">
+            <summary>
+            Set of options
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.#ctor(Waher.Content.Asn1.Model.Macro.UserDefinedItem[])">
+            <summary>
+            Set of options
+            </summary>
+            <param name="Options">Options</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.Options">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedOptions.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedPart">
+            <summary>
+            Un-typed user-defined part.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.#ctor(System.String)">
+            <summary>
+            Un-typed user-defined part.
+            </summary>
+            <param name="Identifier">Identifier</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedPart.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart">
+            <summary>
+            Typed user-defined part.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.#ctor(System.String,System.String,Waher.Content.Asn1.Model.Asn1Type)">
+            <summary>
+            Typed user-defined part.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Name">Name</param>
+            <param name="Type">Type</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the
+            instructions available in the macro.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro being executed.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1And">
+            <summary>
+            Both restrictions apply
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1And.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Both restrictions apply
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator">
+            <summary>
+            Abstract base class of binary restriction operators
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Abstract base class of binary restriction operators
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.Left">
+            <summary>
+            Left restriction
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1BinaryRestrictionOperator.Right">
+            <summary>
+            Right restriction
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Containing">
+            <summary>
+            CONTAINING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Containing.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            CONTAINING
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1EncodedBy">
+            <summary>
+            ENCODED BY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1EncodedBy.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            ENCODED BY
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1From">
+            <summary>
+            FROM()
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1From.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            FROM()
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1InSet">
+            <summary>
+            Restricted to elements in set.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1InSet.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Restricted to elements in set.
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Or">
+            <summary>
+            Either restriction applies
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Or.#ctor(Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Model.Asn1Restriction)">
+            <summary>
+            Either restriction applies
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern">
+            <summary>
+            PATTERN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Pattern.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            PATTERN
+            </summary>
+            <param name="RegularExpression">Regular Expression</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1SetRestriction.Set">
+            <summary>
+            Set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1Size">
+            <summary>
+            SIZE()
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1Size.#ctor(Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            SIZE()
+            </summary>
+            <param name="Set">Set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction">
+            <summary>
+            Abstract base class for value-based restrictions
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Abstract base class for set-based restrictions
+            </summary>
+            <param name="Value">Item</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Restrictions.Asn1ValueRestriction.Value">
+            <summary>
+            Item
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Restrictions.Asn1WithComponents">
+            <summary>
+            WITH COMPONENTS
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Restrictions.Asn1WithComponents.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            WITH COMPONENTS
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1All">
+            <summary>
+            All elements (in current context).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1All.#ctor">
+            <summary>
+            All elements (in current context).
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator">
+            <summary>
+            Abstract base class of binary set operators
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Abstract base class of binary set operators
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.Left">
+            <summary>
+            Left set
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1BinarySetOperator.Right">
+            <summary>
+            Right set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Element">
+            <summary>
+            Set of one element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Element.#ctor(Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Set of one element.
+            </summary>
+            <param name="Element">Element</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Element.Element">
+            <summary>
+            Element
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Exclusion">
+            <summary>
+            Exclusion of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Exclusion.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Exclusion of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Intersection">
+            <summary>
+            Intersection of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Intersection.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Intersection of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Interval">
+            <summary>
+            Interval of elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Interval.#ctor(Waher.Content.Asn1.Model.Asn1Value,Waher.Content.Asn1.Model.Asn1Value)">
+            <summary>
+            Interval of elements.
+            </summary>
+            <param name="From">From</param>
+            <param name="To">To</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Interval.From">
+            <summary>
+            From
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Sets.Asn1Interval.To">
+            <summary>
+            To
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Sets.Asn1Union">
+            <summary>
+            Union of sets.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Sets.Asn1Union.#ctor(Waher.Content.Asn1.Model.Asn1Values,Waher.Content.Asn1.Model.Asn1Values)">
+            <summary>
+            Union of sets.
+            </summary>
+            <param name="Left">Left set</param>
+            <param name="Right">Right set</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Any">
+            <summary>
+            ANY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Any.#ctor">
+            <summary>
+            ANY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Any.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Any.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1BitString">
+            <summary>
+            BIT STRING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BitString.#ctor">
+            <summary>
+            BIT STRING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BitString.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1BmpString">
+            <summary>
+            BmpString (utf-16-be encoded string)
+            Basic Multilingual Plane of ISO/IEC/ITU 10646-1
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1BmpString.#ctor">
+            <summary>
+            BmpString (utf-16-be encoded string)
+            Basic Multilingual Plane of ISO/IEC/ITU 10646-1
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Boolean">
+            <summary>
+            BOOLEAN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.#ctor">
+            <summary>
+            BOOLEAN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Boolean.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Character">
+            <summary>
+            CHARACTER
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Character.#ctor">
+            <summary>
+            CHARACTER
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Character.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Date">
+            <summary>
+            DATE
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Date.#ctor">
+            <summary>
+            DATE
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Date.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1DateTime">
+            <summary>
+            DATE-TIME
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1DateTime.#ctor">
+            <summary>
+            DATE-TIME
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1DateTime.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Duration">
+            <summary>
+            DURATION
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Duration.#ctor">
+            <summary>
+            DURATION
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Duration.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime">
+            <summary>
+            GeneralizedTime
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.#ctor">
+            <summary>
+            GeneralizedTime
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralizedTime.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GeneralString">
+            <summary>
+            GeneralString
+            all registered graphic and character sets plus SPACE and DELETE
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GeneralString.#ctor">
+            <summary>
+            GeneralString
+            all registered graphic and character sets plus SPACE and DELETE
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1GraphicString">
+            <summary>
+            GraphicString
+            all registered G sets and SPACE
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1GraphicString.#ctor">
+            <summary>
+            GraphicString
+            all registered G sets and SPACE
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Ia5String">
+            <summary>
+            IA5String
+            International ASCII characters (International Alphabet 5)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Ia5String.#ctor">
+            <summary>
+            IA5String
+            International ASCII characters (International Alphabet 5)
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Integer">
+            <summary>
+            INTEGER
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.#ctor">
+            <summary>
+            INTEGER
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Integer.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Iso646String">
+            <summary>
+            Iso646String
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Iso646String.#ctor">
+            <summary>
+            Iso646String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Null">
+            <summary>
+            NULL
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.#ctor">
+            <summary>
+            NULL
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Null.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1NumericString">
+            <summary>
+            NumericString
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1NumericString.#ctor">
+            <summary>
+            NumericString
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier">
+            <summary>
+            OBJECT IDENTIFIER, or RELATIVE-OID
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.#ctor(System.Boolean)">
+            <summary>
+            OBJECT IDENTIFIER, or RELATIVE-OID
+            </summary>
+            <param name="Relative">If it is a relative object ID.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.Relative">
+            <summary>
+            If it is a relative object ID.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1ObjectIdentifier.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1OctetString">
+            <summary>
+            OCTET STRING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1OctetString.#ctor">
+            <summary>
+            OCTET STRING
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1OctetString.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1PrintableString">
+            <summary>
+            PrintableString
+            a-z, A-Z, ' () +,-.?:/= and SPACE
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1PrintableString.#ctor">
+            <summary>
+            PrintableString
+            a-z, A-Z, ' () +,-.?:/= and SPACE
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Real">
+            <summary>
+            REAL
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.#ctor">
+            <summary>
+            REAL
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Real.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1StringType">
+            <summary>
+            Abstract base class for string types
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.#ctor">
+            <summary>
+            Abstract base class for string types
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1StringType.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1T61String">
+            <summary>
+            T61String
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1T61String.#ctor">
+            <summary>
+            T61String
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TeletexString">
+            <summary>
+            TeletexString
+            CCITT and T.101 character sets
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TeletexString.#ctor">
+            <summary>
+            TeletexString
+            CCITT and T.101 character sets
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay">
+            <summary>
+            TIME-OF-DAY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.#ctor">
+            <summary>
+            TIME-OF-DAY
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TimeOfDay.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1TypeReference">
+            <summary>
+            Represents an ASN.1 type reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.#ctor(System.String,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents an ASN.1 type reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Document">ASN.1 Document containing the reference</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Document">
+            <summary>
+            ASN.1 Document in where the value is defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1TypeReference.Parse(Waher.Content.Asn1.Asn1Document,Waher.Content.Asn1.Model.Macro.Asn1Macro)">
+            <summary>
+            Parses the portion of the document at the current position, according to the type.
+            </summary>
+            <param name="Document">ASN.1 document being parsed.</param>
+            <param name="Macro">Macro performing parsing.</param>
+            <returns>Parsed ASN.1 node.</returns>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1UniversalString">
+            <summary>
+            UniversalString
+            ISO10646 character set
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UniversalString.#ctor">
+            <summary>
+            UniversalString
+            ISO10646 character set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1UtcTime">
+            <summary>
+            UTCTime
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UtcTime.#ctor">
+            <summary>
+            UTCTime
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1UtcTime.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1Utf8String">
+            <summary>
+            UTF8String
+            any character from a recognized alphabet (including ASCII control characters)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1Utf8String.#ctor">
+            <summary>
+            UTF8String
+            any character from a recognized alphabet (including ASCII control characters)
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1VideotexString">
+            <summary>
+            VideotexString
+            CCITT's T.100 and T.101 character sets 
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VideotexString.#ctor">
+            <summary>
+            VideotexString
+            CCITT's T.100 and T.101 character sets 
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Types.Asn1VisibleString">
+            <summary>
+            VisibleString
+            International ASCII printing character sets 
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Types.Asn1VisibleString.#ctor">
+            <summary>
+            VisibleString
+            International ASCII printing character sets 
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Array">
+            <summary>
+            Array of values
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Array.#ctor(Waher.Content.Asn1.Model.Asn1Value[])">
+            <summary>
+            Array of values
+            </summary>
+            <param name="Values">Values</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Array.Values">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Array.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Array.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1BooleanValue">
+            <summary>
+            Boolean value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.#ctor(System.Boolean)">
+            <summary>
+            Boolean value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1BooleanValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue">
+            <summary>
+            Floating-point value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.#ctor(System.Double)">
+            <summary>
+            Floating-point value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1FloatingPointValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1IntegerValue">
+            <summary>
+            Integer value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.#ctor(System.Int64)">
+            <summary>
+            Integer value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1IntegerValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Max">
+            <summary>
+            MAX
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Max.#ctor">
+            <summary>
+            MAX
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Min">
+            <summary>
+            MIN
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Min.#ctor">
+            <summary>
+            MIN
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1NamedValue">
+            <summary>
+            Represents a named value.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1NamedValue.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Value,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents a named value.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Value">Optional Value</param>
+            <param name="Document">ASN.1 Document containing the reference</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1NamedValue.Value">
+            <summary>
+            Optional Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1NamedValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1Oid">
+            <summary>
+            Represents an ASN.1 Object ID
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Oid.#ctor(Waher.Content.Asn1.Model.Asn1Node[])">
+            <summary>
+            Represents an ASN.1 Object ID
+            </summary>
+            <param name="Values">OID values.</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Oid.Values">
+            <summary>
+            OID values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1Oid.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1Oid.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference">
+            <summary>
+            Represents a restricted ASN.1 value reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference.#ctor(System.String,Waher.Content.Asn1.Model.Asn1Restriction,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Restriction">Restriction</param>
+            <param name="Document">ASN.1 Document containing the reference</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1RestrictedValueReference.Restriction">
+            <summary>
+            Restriction
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1StringValue">
+            <summary>
+            String value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.#ctor(System.String)">
+            <summary>
+            String value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1StringValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1StringValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1StringValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue">
+            <summary>
+            Unsigned Integer value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.#ctor(System.UInt64)">
+            <summary>
+            Integer value
+            </summary>
+            <param name="Value">Value</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.Value">
+            <summary>
+            Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1UnsignedIntegerValue.CSharpType">
+            <summary>
+            Corresponding C# type.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Asn1.Model.Values.Asn1ValueReference">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.#ctor(System.String,Waher.Content.Asn1.Asn1Document)">
+            <summary>
+            Represents an ASN.1 value reference.
+            </summary>
+            <param name="Identifier">Identifier</param>
+            <param name="Document">ASN.1 Document containing the reference</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.Model.Values.Asn1ValueReference.Identifier">
+            <summary>
+            Identifier
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.Model.Values.Asn1ValueReference.ExportCSharp(System.Text.StringBuilder,Waher.Content.Asn1.CSharpExportState,System.Int32,Waher.Content.Asn1.Model.CSharpExportPass)">
+            <summary>
+            Exports to C#
+            </summary>
+            <param name="Output">C# Output.</param>
+            <param name="State">C# export state.</param>
+            <param name="Indent">Indentation</param>
+            <param name="Pass">Export pass</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.ObjectId">
+            <summary>
+            ASN.1 Object identifier
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(System.UInt32[])">
+            <summary>
+            ASN.1 Object identifier
+            </summary>
+            <param name="Segments">Segments</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.#ctor(Waher.Content.Asn1.ObjectId,System.UInt32[])">
+            <summary>
+            ASN.1 Object identifier
+            </summary>
+            <param name="Id">First part of object identifier.</param>
+            <param name="Segments">Segments</param>
+        </member>
+        <member name="P:Waher.Content.Asn1.ObjectId.Segments">
+            <summary>
+            Segments of Object Identifier
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(Waher.Content.Asn1.ObjectId)~System.UInt32[]">
+            <summary>
+            Implicit converter to an integer array
+            </summary>
+            <param name="Id">Identity</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(System.UInt32[])~Waher.Content.Asn1.ObjectId">
+            <summary>
+            Implicit converter from an integer array
+            </summary>
+            <param name="Segments">Segments</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(System.Int32[])~Waher.Content.Asn1.ObjectId">
+            <summary>
+            Implicit converter from an integer array
+            </summary>
+            <param name="Segments">Segments</param>
+        </member>
+        <member name="M:Waher.Content.Asn1.ObjectId.op_Implicit(System.Int64[])~Waher.Content.Asn1.ObjectId">
+            <summary>
+            Implicit converter from an integer array
+            </summary>
+            <param name="Segments">Segments</param>
+        </member>
+        <member name="T:Waher.Content.Asn1.TagClass">
+            <summary>
+            TAG class
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Universal">
+            <summary>
+            Universal
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Application">
+            <summary>
+            Application
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.ContextSpecific">
+            <summary>
+            Context-specific
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Asn1.TagClass.Private">
+            <summary>
+            Private
+            </summary>
+        </member>
+    </members>
+</doc>

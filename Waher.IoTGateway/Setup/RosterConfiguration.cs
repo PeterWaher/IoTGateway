@@ -749,15 +749,15 @@ namespace Waher.IoTGateway.Setup
 		public override Task<bool> EnvironmentConfiguration()
 		{
 			Dictionary<string, string> ToAdd = GetDictionaryElementWithNames(GATEWAY_ROSTER_ADD);
-			if (!this.ValidateJids(ToAdd.Keys, GATEWAY_ROSTER_ADD))
+			if (!(ToAdd is null) && !this.ValidateJids(ToAdd.Keys, GATEWAY_ROSTER_ADD))
 				return Task.FromResult(false);
 
 			Dictionary<string, bool> ToSubscribe = GetDictionaryElements(GATEWAY_ROSTER_SUBSCRIBE);
-			if (!this.ValidateJids(ToSubscribe.Keys, GATEWAY_ROSTER_SUBSCRIBE))
+			if (!(ToSubscribe is null) && !this.ValidateJids(ToSubscribe.Keys, GATEWAY_ROSTER_SUBSCRIBE))
 				return Task.FromResult(false);
 
 			Dictionary<string, bool> ToAccept = GetDictionaryElements(GATEWAY_ROSTER_ACCEPT);
-			if (!this.ValidateJids(ToAccept.Keys, GATEWAY_ROSTER_ACCEPT))
+			if (!(ToAccept is null) && !this.ValidateJids(ToAccept.Keys, GATEWAY_ROSTER_ACCEPT))
 				return Task.FromResult(false);
 
 			string[] GroupNames = GetElements(GATEWAY_ROSTER_GROUPS);

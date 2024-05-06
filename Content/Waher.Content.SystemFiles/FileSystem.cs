@@ -84,6 +84,9 @@ namespace Waher.Content.SystemFiles
 				if (Processed.ContainsKey(Folder))
 					continue;
 
+				if (!Directory.Exists(Folder))
+					continue;
+					
 				Processed[Folder] = true;
 
 				try

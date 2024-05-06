@@ -192,6 +192,11 @@
             Persists objects into binary files.
             </summary>
         </member>
+        <member name="F:Waher.Persistence.Files.FilesProvider.FILES_DB_SALT">
+            <summary>
+            Name of environment variable containing salt for internal database encryption.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.#ctor(System.String,System.String,System.Int32,System.Int32,System.Int32,System.Text.Encoding,System.Int32,Waher.Persistence.Files.CustomKeyHandler)">
             <summary>
             Persists objects into binary files.

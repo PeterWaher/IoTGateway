@@ -623,6 +623,36 @@ Terminal script to create and configure folder:
 	sudo chown yourusername "/usr/local/share/IoT Gateway Dev"
 	sudo chmod 755 "/usr/local/share/IoT Gateway Dev"
 
+You also need to create an environment variable named `FILES_DB_SALT`. Since the MAC computer does not provide access to cryptographic resources, database encryption requires a salt that needs to be unique for each machine. The value can be anything, but cannot change, as it would render existing information unreadable.
+
+To set an environment variable in mac OS, you can follow this procedure:
+
+1.	Open the Terminal app.
+2.	Edit the shell configuration file, such as ~/.bash_profile for Bash or ~/.zshrc for Zsh (the default shell in newer macOS versions), using a text editor like nano or vim:
+
+		nano ~/.bash_profile
+
+	or
+
+		nano ~/.zshrc
+
+3.	Add the export command to the end of the file:
+
+		export FILES_DB_SALT="value"
+
+	You need to replace the `value` with a random string you keep unique for the machine.
+
+4.	Save the file and exit the editor.
+5.	To apply the changes immediately, source the file:
+
+		source ~/.bash_profile
+
+	or
+
+		source ~/.zshrc
+
+	(You can also reboot the computer.)
+
 ### Running IoT Gateway
 
 You have to have the correct .NET Core framework installed on your machine to run the gateway: [Download .NET 6](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0). 

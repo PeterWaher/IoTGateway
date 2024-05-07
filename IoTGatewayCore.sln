@@ -433,6 +433,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xama
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Xml", "Content\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj", "{D9FEBDE8-B473-4657-9E65-F9AE54396700}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Threading.Sync", "Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj", "{685B2185-AF97-40EC-8F00-DC44063FE6DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -5138,6 +5140,30 @@ Global
 		{D9FEBDE8-B473-4657-9E65-F9AE54396700}.Release|x64.Build.0 = Release|Any CPU
 		{D9FEBDE8-B473-4657-9E65-F9AE54396700}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9FEBDE8-B473-4657-9E65-F9AE54396700}.Release|x86.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|ARM.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|x64.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Debug|x86.Build.0 = Debug|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|ARM.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|ARM.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|ARM64.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|x64.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|x64.Build.0 = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|x86.ActiveCfg = Release|Any CPU
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5333,6 +5359,7 @@ Global
 		{01019325-95D1-4060-AF82-D5D6EFB82F3A} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{1C26DACC-BBBC-4A6E-880B-001434501705} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{D9FEBDE8-B473-4657-9E65-F9AE54396700} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{685B2185-AF97-40EC-8F00-DC44063FE6DB} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

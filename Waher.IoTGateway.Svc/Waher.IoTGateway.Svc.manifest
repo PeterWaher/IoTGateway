@@ -423,6 +423,8 @@
 	<Assembly fileName='Waher.Runtime.Text.pdb'/>
 	<Assembly fileName='Waher.Runtime.Threading.dll'/>
 	<Assembly fileName='Waher.Runtime.Threading.pdb'/>
+	<Assembly fileName='Waher.Runtime.Threading.Sync.dll'/>
+	<Assembly fileName='Waher.Runtime.Threading.Sync.pdb'/>
 	<Assembly fileName='Waher.Runtime.Timing.dll'/>
 	<Assembly fileName='Waher.Runtime.Timing.pdb'/>
 	<Assembly fileName='Waher.Runtime.Transactions.dll'/>

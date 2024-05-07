@@ -376,6 +376,7 @@ language localization, runtime settings, timing and scheduling.
 | **Waher.Runtime.Text**                | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Text/)                | The [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project provides classes working with text and text documents, particularly find differences between texts, or sequences of symbols, or mapping strings to a harmonized set of strings (or tokens). |
 | **Waher.Runtime.Temporary**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Temporary/)           | The [Waher.Runtime.Temporary](Runtime/Waher.Runtime.Temporary) project contains classes simplifying working with temporary in-memory and file streams. |
 | **Waher.Runtime.Threading**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Threading/)           | The [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project provides classes for usage in multi-threaded asynchronous environments providing multiple-read/single-write capabilities. |
+| **Waher.Runtime.Threading.Sync**       | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Threading.Sync/)     | The [Waher.Runtime.Threading.Sync](Runtime/Waher.Runtime.Threading.Sync) project provides classes for executing tasks that need to be synchronized from the same thread, asynchronously, in an asynchronous environment. Includes an asynchronous Mutex class. |
 | **Waher.Runtime.Timing**              | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Timing/)              | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
 | **Waher.Runtime.Transactions**        | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Transactions/)        | The [Waher.Runtime.Transactions](Runtime/Waher.Runtime.Transactions) project defines an architecture for processing transactions to help protect the integrity of data in asynchronous or distributed environments. |
 
@@ -615,6 +616,10 @@ To compile projects on Windows, use Visual Studio 2022 (or later). The IoT Gatew
 
 ### MAC
 
+The following sections list the preparations that need to be performed before you can compile and run the IoT Gateway on a MAC:
+
+#### Application data folder
+
 To compile projects on MAC, use VS Code for MAC. The IoT Gateway separates executable and compiled code (which is later installed in a computer's `/Applications` folder), and application data, which the application can read and write. The latter is stored in the corresponding `/usr/local/share` folder. The default installation of IoT Gateway, stores data in `/usr/local/share/IoT Gateway`. A non-default instance, stores its application data in `/user/local/share/IoT Gateway INST`, where `INST` is replaced by the instance name. So before you can compile, you need to make sure the folder `/usr/local/share/IoT Gateway Dev` exists, and that the user performing the build has access to this folder.
 
 Terminal script to create and configure folder:
@@ -622,6 +627,8 @@ Terminal script to create and configure folder:
 	sudo mkdir -p "/usr/local/share/IoT Gateway Dev"
 	sudo chown yourusername "/usr/local/share/IoT Gateway Dev"
 	sudo chmod 755 "/usr/local/share/IoT Gateway Dev"
+
+#### Database enryption
 
 You also need to create an environment variable named `FILES_DB_SALT`. Since the MAC computer does not provide access to cryptographic resources, database encryption requires a salt that needs to be unique for each machine. The value can be anything, but cannot change, as it would render existing information unreadable.
 

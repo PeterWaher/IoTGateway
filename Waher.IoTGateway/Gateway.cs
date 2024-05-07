@@ -64,6 +64,7 @@ using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.ServiceRegistration;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Threading;
+using Waher.Runtime.Threading.Sync;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -166,8 +167,8 @@ namespace Waher.IoTGateway
 		private static LoginAuditor loginAuditor = null;
 		private static Scheduler scheduler = null;
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private static Mutex gatewayRunning = null;
-		private static Mutex startingServer = null;
+		private static AsyncMutex gatewayRunning = null;
+		private static AsyncMutex startingServer = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
@@ -236,14 +237,14 @@ namespace Waher.IoTGateway
 			instance = InstanceName;
 
 			string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
-			gatewayRunning = new Mutex(false, "Waher.IoTGateway.Running" + Suffix);
-			if (!gatewayRunning.WaitOne(1000))
+			gatewayRunning = new AsyncMutex(false, "Waher.IoTGateway.Running" + Suffix);
+			if (!await gatewayRunning.WaitOne(1000))
 				return false; // Is running in another process.
 
-			startingServer = new Mutex(false, "Waher.IoTGateway.Starting" + Suffix);
-			if (!startingServer.WaitOne(1000))
+			startingServer = new AsyncMutex(false, "Waher.IoTGateway.Starting" + Suffix);
+			if (!await startingServer.WaitOne(1000))
 			{
-				gatewayRunning.ReleaseMutex();
+				await gatewayRunning.ReleaseMutex();
 				gatewayRunning.Dispose();
 				gatewayRunning = null;
 
@@ -753,7 +754,7 @@ namespace Waher.IoTGateway
 
 							Configuration.SetStaticInstance(Configuration);
 
-							startingServer?.ReleaseMutex();
+							await startingServer?.ReleaseMutex();
 							startingServer?.Dispose();
 							startingServer = null;
 
@@ -1230,7 +1231,7 @@ namespace Waher.IoTGateway
 						webServer.ResourceOverrideFilter = null;
 					}
 
-					startingServer?.ReleaseMutex();
+					await startingServer?.ReleaseMutex();
 					startingServer?.Dispose();
 					startingServer = null;
 
@@ -1242,11 +1243,11 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 
-				startingServer?.ReleaseMutex();
+				await startingServer?.ReleaseMutex();
 				startingServer?.Dispose();
 				startingServer = null;
 
-				gatewayRunning?.ReleaseMutex();
+				await gatewayRunning?.ReleaseMutex();
 				gatewayRunning?.Dispose();
 				gatewayRunning = null;
 
@@ -2004,13 +2005,19 @@ namespace Waher.IoTGateway
 				if (StopInternalProvider)
 					await internalProvider.Stop();
 
-				startingServer?.ReleaseMutex();
-				startingServer?.Dispose();
-				startingServer = null;
+				if (!(startingServer is null))
+				{
+					await startingServer.ReleaseMutex();
+					startingServer.Dispose();
+					startingServer = null;
+				}
 
-				gatewayRunning?.ReleaseMutex();
-				gatewayRunning?.Dispose();
-				gatewayRunning = null;
+				if (!(gatewayRunning is null))
+				{
+					await gatewayRunning.ReleaseMutex();
+					gatewayRunning.Dispose();
+					gatewayRunning = null;
+				}
 
 				if (!(configurations is null))
 				{

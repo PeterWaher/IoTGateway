@@ -1,29 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library that provides classes for usage in multi-threaded asynchronous environments providing multiple-read/single-write capabilities. Support for async entry into read and/or write states, allowing for complex lock management in asynchronous methods, where different sections of the code are executed by different working threads.</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</Copyright>
+    <Description>Class library that provides classes for executing tasks that need to be synchronized from the same thread, asynchronously, in an asynchronous environment. Includes an asynchronous Mutex class.</Description>
+    <Copyright>Copyright © Waher Data AB 2024. All rights reserved.</Copyright>
     <PackageLicenseUrl />
-    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Threading</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Threading.Sync</PackageProjectUrl>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>threading runtime multiple read single write access</PackageTags>
+    <PackageTags>threading runtime thread affinity synchronization asynchronous mutex</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
-    <FileVersion>1.2.1</FileVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <Version>1.2.1</Version>
+    <Version>1.0.0</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.3\Waher.Runtime.Threading.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard2.0\Waher.Runtime.Threading.Sync.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
@@ -37,6 +37,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
-    <ProjectReference Include="..\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
   </ItemGroup>
 </Project>

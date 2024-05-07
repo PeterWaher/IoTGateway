@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.QR\Waher.Content.QR.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Content.QR.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

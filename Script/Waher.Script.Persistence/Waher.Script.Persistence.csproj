@@ -28,8 +28,8 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Persistence\Waher.Script.Persistence.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Persistence.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj" />

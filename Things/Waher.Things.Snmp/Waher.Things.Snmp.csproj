@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Things.Snmp.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -21,12 +21,8 @@
     <Version>3.0.0</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Content.Markdown.Consolidation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

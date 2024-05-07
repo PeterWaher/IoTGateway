@@ -23,8 +23,8 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.DNS\Waher.Networking.DNS.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.DNS.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

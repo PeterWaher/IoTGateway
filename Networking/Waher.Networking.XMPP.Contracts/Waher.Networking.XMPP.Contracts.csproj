@@ -24,11 +24,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -26,8 +26,8 @@ https://waher.se/Script.md#paletteGenerationFunctionsWaherScriptFractals</Descri
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile></DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Fractals.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

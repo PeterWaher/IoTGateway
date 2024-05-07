@@ -24,8 +24,8 @@ https://waher.se/Script.md#cryptographyRelatedFunctionsWaherScriptCryptography</
     <Version>2.1.3</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Cryptography.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -23,12 +23,8 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.WebSocket.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.WebSocket.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.WebSocket.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

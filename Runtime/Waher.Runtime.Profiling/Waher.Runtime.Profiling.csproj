@@ -21,8 +21,8 @@
     <Version>1.0.8</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C$(ProjectDir)\Waher.Runtime.Profiling.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

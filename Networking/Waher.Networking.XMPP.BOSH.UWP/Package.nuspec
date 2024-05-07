@@ -37,7 +37,7 @@ XEP-0206: XMPP Over BOSH
     <file src="bin\Release\Waher.Networking.XMPP.BOSH.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\Release\Waher.Networking.XMPP.BOSH.UWP.XML" target="ref\uap10.0" />
+    <file src="Waher.Networking.XMPP.BOSH.UWP.XML" target="ref\uap10.0" />
 
     <!-- Resource files go together with the reference library. -->
     <file src="bin\Release\Waher.Networking.XMPP.BOSH.UWP.pri" target="ref\uap10.0" />

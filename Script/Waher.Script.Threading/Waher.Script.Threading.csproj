@@ -23,8 +23,8 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptTh
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Threading\Waher.Script.Threading.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Threading.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

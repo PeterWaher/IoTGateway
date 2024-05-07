@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.CallStack\Waher.Security.CallStack.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Security.CallStack.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

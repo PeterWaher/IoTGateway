@@ -23,12 +23,8 @@ Script Syntax: https://waher.se/Script.md#networkingRelatedFunctionsWaherScriptN
     <Version>2.0.3</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Networking\Waher.Script.Networking.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Networking\Waher.Script.Networking.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Networking.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Mail.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

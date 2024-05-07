@@ -20,7 +20,9 @@ https://waher.se/Markdown.md</Description>
     <AssemblyVersion>3.0.1</AssemblyVersion>
     <FileVersion>3.0.1</FileVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Xamarin\Waher.Content.Markdown.Xamarin.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Content.Markdown.Xamarin.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

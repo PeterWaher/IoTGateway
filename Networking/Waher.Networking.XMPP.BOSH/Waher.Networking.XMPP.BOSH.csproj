@@ -27,12 +27,8 @@ XEP-0206: XMPP Over BOSH
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.BOSH.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.3\Waher.Networking.XMPP.BOSH.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.BOSH.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

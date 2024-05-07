@@ -55,7 +55,7 @@
     <DebugType>pdbonly</DebugType>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\Release\Waher.Networking.WHOIS.UWP.XML</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.WHOIS.UWP.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <PlatformTarget>ARM</PlatformTarget>

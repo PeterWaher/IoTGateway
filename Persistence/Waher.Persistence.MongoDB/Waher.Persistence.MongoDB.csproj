@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.xml</DocumentationFile>
+    <DocumentationFile>C$(ProjectDir)\Waher.Persistence.MongoDB.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

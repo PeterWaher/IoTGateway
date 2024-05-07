@@ -22,8 +22,8 @@
     <Version>1.0.2</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Runtime.Counters.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

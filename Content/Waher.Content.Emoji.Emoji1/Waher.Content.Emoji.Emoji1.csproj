@@ -24,8 +24,8 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Content.Emoji.Emoji1.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Graphics\Emoji1\**" />

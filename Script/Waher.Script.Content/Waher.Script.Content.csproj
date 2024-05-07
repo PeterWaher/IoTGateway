@@ -25,8 +25,8 @@ Script Syntax: https://waher.se/Script.md#contentRelatedFunctionsWaherScriptCont
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Script.Content.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Content.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

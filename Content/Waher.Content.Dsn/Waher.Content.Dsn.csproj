@@ -23,8 +23,8 @@
     <Version>2.0.1</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Dsn\Waher.Content.Dsn.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Content.Dsn.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

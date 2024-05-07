@@ -20,8 +20,8 @@
     <NeutralLanguage>English</NeutralLanguage>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Runtime.Temporary.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

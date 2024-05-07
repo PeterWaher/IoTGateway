@@ -21,12 +21,8 @@
     <Version>1.1.0</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.Users\Waher.Security.Users.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.Users\Waher.Security.Users.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Security.Users.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -28,10 +28,7 @@ https://waher.se/Script.md#3dGraphFunctionsWaherScriptGraphs3d</Description>
     <Version>2.1.3</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.3\Waher.Script.Graphs3D.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Script.Graphs3D.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Functions\Transforms\**" />

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.xml</DocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>2.0.2</Version>
     <Authors>Peter Waher</Authors>
@@ -22,6 +21,10 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptFu
     <FileVersion>2.0.2</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Script.FullTextSearch.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

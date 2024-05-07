@@ -23,8 +23,8 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Avatar.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

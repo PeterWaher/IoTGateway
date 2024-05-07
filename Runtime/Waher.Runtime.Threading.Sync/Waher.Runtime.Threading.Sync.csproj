@@ -23,7 +23,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Waher.Runtime.Threading.Sync.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Runtime.Threading.Sync.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

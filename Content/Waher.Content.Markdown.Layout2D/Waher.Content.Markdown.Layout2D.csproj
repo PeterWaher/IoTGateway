@@ -21,12 +21,8 @@
     <Version>3.0.1</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.xml</DocumentationFile>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Content.Markdown.Layout2D.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

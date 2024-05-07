@@ -21,8 +21,8 @@
     <FileVersion>2.0.0</FileVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.Push\Waher.Networking.XMPP.Push.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Push.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

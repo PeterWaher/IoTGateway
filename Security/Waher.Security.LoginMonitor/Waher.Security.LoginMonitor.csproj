@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Security.LoginMonitor.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

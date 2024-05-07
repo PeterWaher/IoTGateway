@@ -41,7 +41,7 @@ Edwards448 (Goldilocks)</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.3\Waher.Security.EllipticCurves.xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)\Waher.Security.EllipticCurves.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

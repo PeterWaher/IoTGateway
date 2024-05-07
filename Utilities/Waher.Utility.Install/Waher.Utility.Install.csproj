@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -24,8 +24,10 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <StartupObject>Waher.Utility.Install.Program</StartupObject>
+    <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Schema\ModuleManifest.xsd" />
@@ -54,6 +56,7 @@
     <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
   </Target>
 </Project>

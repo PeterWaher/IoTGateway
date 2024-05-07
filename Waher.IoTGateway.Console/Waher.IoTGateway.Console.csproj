@@ -20,7 +20,7 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway.Console\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

@@ -16,15 +16,16 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
     <StartupObject>Waher.Utility.AnalyzeClock.Program</StartupObject>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj" />

@@ -754,9 +754,12 @@ namespace Waher.IoTGateway
 
 							Configuration.SetStaticInstance(Configuration);
 
-							await startingServer?.ReleaseMutex();
-							startingServer?.Dispose();
-							startingServer = null;
+							if (!(startingServer is null))
+							{
+								await startingServer.ReleaseMutex();
+								startingServer.Dispose();
+								startingServer = null;
+							}
 
 							await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
@@ -1231,9 +1234,12 @@ namespace Waher.IoTGateway
 						webServer.ResourceOverrideFilter = null;
 					}
 
-					await startingServer?.ReleaseMutex();
-					startingServer?.Dispose();
-					startingServer = null;
+					if (!(startingServer is null))
+					{
+						await startingServer.ReleaseMutex();
+						startingServer.Dispose();
+						startingServer = null;
+					}
 
 					if (xmppClient.State != XmppState.Connected)
 						xmppClient.Connect();
@@ -1243,13 +1249,19 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 
-				await startingServer?.ReleaseMutex();
-				startingServer?.Dispose();
-				startingServer = null;
+				if (!(startingServer is null))
+				{
+					await startingServer.ReleaseMutex();
+					startingServer.Dispose();
+					startingServer = null;
+				}
 
-				await gatewayRunning?.ReleaseMutex();
-				gatewayRunning?.Dispose();
-				gatewayRunning = null;
+				if (!(gatewayRunning is null))
+				{
+					await gatewayRunning.ReleaseMutex();
+					gatewayRunning.Dispose();
+					gatewayRunning = null;
+				}
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}

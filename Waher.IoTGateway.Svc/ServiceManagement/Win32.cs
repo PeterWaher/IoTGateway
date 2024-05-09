@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
-using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
 namespace Waher.IoTGateway.Svc.ServiceManagement
 {

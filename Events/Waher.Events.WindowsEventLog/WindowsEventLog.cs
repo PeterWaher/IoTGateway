@@ -37,12 +37,19 @@ namespace Waher.Events.WindowsEventLog
 		public WindowsEventLog(string Source, string MachineName)
 			: base("Windows Event Log")
 		{
-			this.eventLog = Win32.RegisterEventSourceW(MachineName, Source);
-			if (this.eventLog == IntPtr.Zero)
+			try
 			{
-				this.eventLog = Win32.RegisterEventSourceW(MachineName, "Application");
+				this.eventLog = Win32.RegisterEventSourceW(MachineName, Source);
 				if (this.eventLog == IntPtr.Zero)
-					throw new Win32Exception(Marshal.GetLastWin32Error());
+				{
+					this.eventLog = Win32.RegisterEventSourceW(MachineName, "Application");
+					if (this.eventLog == IntPtr.Zero)
+						throw new Win32Exception(Marshal.GetLastWin32Error());
+				}
+			}
+			catch (DllNotFoundException ex)
+			{
+				throw new PlatformNotSupportedException("Win32 APIs not found.", ex);
 			}
 		}
 

@@ -272,7 +272,15 @@ namespace Waher.IoTGateway.Svc
 					return -1;
 				}
 
-				Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName));
+				switch (Environment.OSVersion.Platform)
+				{
+					case PlatformID.Win32S:
+					case PlatformID.Win32Windows:
+					case PlatformID.Win32NT:
+					case PlatformID.WinCE:
+						Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName));
+						break;
+				}
 
 				if (Install && Uninstall)
 				{
@@ -418,31 +426,43 @@ namespace Waher.IoTGateway.Svc
 
 				ManualResetEvent Done = new(false);
 				Gateway.OnTerminate += (sender, e) => Done.Set();
-				Console.CancelKeyPress += (sender, e) => Gateway.Terminate();
-
-				try
+				Console.CancelKeyPress += (sender, e) =>
 				{
-					Win32.SetConsoleCtrlHandler((ControlType) =>
-					{
-						switch (ControlType)
+					e.Cancel = true;
+					Gateway.Terminate();
+				};
+
+				switch (Environment.OSVersion.Platform)
+				{
+					case PlatformID.Win32S:
+					case PlatformID.Win32Windows:
+					case PlatformID.Win32NT:
+					case PlatformID.WinCE:
+						try
 						{
-							case CtrlTypes.CTRL_BREAK_EVENT:
-							case CtrlTypes.CTRL_CLOSE_EVENT:
-							case CtrlTypes.CTRL_C_EVENT:
-							case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-								Gateway.Terminate();
-								break;
+							Win32.SetConsoleCtrlHandler((ControlType) =>
+							{
+								switch (ControlType)
+								{
+									case CtrlTypes.CTRL_BREAK_EVENT:
+									case CtrlTypes.CTRL_CLOSE_EVENT:
+									case CtrlTypes.CTRL_C_EVENT:
+									case CtrlTypes.CTRL_SHUTDOWN_EVENT:
+										Gateway.Terminate();
+										break;
 
-							case CtrlTypes.CTRL_LOGOFF_EVENT:
-								break;
+									case CtrlTypes.CTRL_LOGOFF_EVENT:
+										break;
+								}
+
+								return true;
+							}, true);
 						}
-
-						return true;
-					}, true);
-				}
-				catch (Exception)
-				{
-					Log.Error("Unable to register CTRL-C control handler.");
+						catch (Exception)
+						{
+							Log.Error("Unable to register CTRL-C control handler.");
+						}
+						break;
 				}
 
 				while (!Done.WaitOne(1000))

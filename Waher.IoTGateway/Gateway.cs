@@ -79,6 +79,7 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.IoTGateway
 {
@@ -535,6 +536,64 @@ namespace Waher.IoTGateway
 									}
 								}
 								break;
+
+							case "LoginAuditor":
+								List<LoginInterval> LoginIntervals = new List<LoginInterval>();
+								Duration LastInterval = Duration.Zero;
+								bool LastMaxInterval = false;
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2.LocalName == "Interval")
+									{
+										if (LastMaxInterval)
+										{
+											Log.Error("Only the last login auditor interval can be the empty 'eternal' interval.",
+												GatewayConfigLocalFileName);
+											break;
+										}
+
+										XmlElement E2 = (XmlElement)N2;
+										int NrAttempts = XML.Attribute(E2, "nrAttempts", 0);
+										if (NrAttempts <= 0)
+										{
+											Log.Error("Number of attempts must be positive when defining an interval for the LoginAuditor",
+												GatewayConfigLocalFileName);
+											continue;
+										}
+
+										if (!E2.HasAttribute("interval"))
+										{
+											LoginIntervals.Add(new LoginInterval(NrAttempts, TimeSpan.MaxValue));
+											LastMaxInterval = true;
+										}
+										else
+										{
+											Duration Interval = XML.Attribute(E2, "interval", Duration.Zero);
+											if (Interval <= Duration.Zero)
+											{
+												Log.Error("Login Auditor intervals must be positive", GatewayConfigLocalFileName);
+												continue;
+											}
+
+											if (Interval <= LastInterval)
+											{
+												Log.Error("Login Auditor intervals must be specified in an increasing order.",
+													GatewayConfigLocalFileName);
+												continue;
+											}
+
+											LoginIntervals.Add(new LoginInterval(NrAttempts, Interval));
+											LastInterval = Interval;
+										}
+									}
+								}
+
+								if (LoginIntervals.Count == 0)
+									Log.Error("Login Auditor intervals not specified.", GatewayConfigLocalFileName);
+								else
+									loginAuditor = new LoginAuditor("Login Auditor", LoginIntervals.ToArray());
+								break;
 						}
 					}
 				}
@@ -562,11 +621,15 @@ namespace Waher.IoTGateway
 					Log.Event(Event);
 				}
 
-				loginAuditor = new LoginAuditor("Login Auditor",
-					new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
-					new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
-					new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
-					new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
+				if (loginAuditor is null)
+				{
+					loginAuditor = new LoginAuditor("Login Auditor",
+						new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
+						new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
+						new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
+						new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
+				}
+
 				Log.Register(loginAuditor);
 
 				// Protecting Markdown resources:

@@ -302,7 +302,7 @@ namespace Waher.Security.LoginMonitor
 				return DateTime.MaxValue;
 			}
 
-			DateTime Next = EP.Timestamps[i - 1].Add(this.intervals[i - 1].Interval);
+			DateTime Next = this.intervals[i - 1].AddIntervalTo(EP.Timestamps[i - 1]);
 			if (Next <= DateTime.Now)
 				return null;
 			else

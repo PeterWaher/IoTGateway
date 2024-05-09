@@ -62,7 +62,7 @@ Database Configuration
 
 Configuration of the specific provider depends on the type of provider selected, as follows:
 
-### Internal Database
+### Local Internal Encrypted Object Database
 
 | Environment Variable   | Description                                         |
 |:-----------------------|:----------------------------------------------------|

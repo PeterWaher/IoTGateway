@@ -2224,7 +2224,7 @@ namespace Waher.IoTGateway
 		public static bool Configuring => configuring;
 
 		/// <summary>
-		/// Internal Database provider.
+		/// Local Internal Encrypted Object Database provider.
 		/// </summary>
 		public static IDatabaseProvider InternalDatabase => internalProvider;
 

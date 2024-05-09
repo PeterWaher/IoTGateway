@@ -25,7 +25,7 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// <returns>Displayable name.</returns>
 		public string Name(Language Language)
 		{
-			return "Internal Database";
+			return "Local Internal Encrypted Object Database";
 		}
 
 		/// <summary>

@@ -51,10 +51,8 @@ foreach PluginType in Waher.Runtime.Inventory.Types.GetTypesImplementingInterfac
 </div>
 
 <p id="Fail" class="error" style="display:none">Unable to connect to database. Check settings and try again.</p>
-<p id="Ok" class="message" style="display:none">
-Database connection successful. Press the Next button to save settings and continue.
-<span id="Restart" class="error" style="display:none">You will need to restart the service or computer before the changes come into effect.</span>
-</p>
+<p id="Ok" class="message" style="display:none">Database connection successful. Press the Next button to save settings and continue.</p>
+<p id="Restart" class="error" style="display:none">You will need to restart the service or computer before the changes come into effect.</p>
 
 <p>
 <button id="TestButton" type='button' onclick='TestSettings(false)' style='display:{{HasSettings?"inline":"none"}}'>Test</button>

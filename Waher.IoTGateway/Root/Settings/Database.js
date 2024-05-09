@@ -15,7 +15,7 @@
                     document.getElementById("TestButton").style.display = Response.hasSettings ? "inline" : "none";
                     document.getElementById("NextButton").style.display = Response.isDone ? "inline" : "none";
                     document.getElementById("Ok").style.display = Response.isDone ? "inline" : "none";
-                    document.getElementById("Restart").style.display = Response.isDone && Response.restart ? "inline" : "none";
+                    document.getElementById("Restart").style.display = Response.isDone && Response.restart ? "block" : "none";
                 }
                 catch (e)
                 {
@@ -49,7 +49,7 @@ function TestSettings(Save)
                 document.getElementById("NextButton").style.display = "inline";
                 document.getElementById("Ok").style.display = "inline";
                 document.getElementById("Fail").style.display = "none";
-                document.getElementById("Restart").style.display = xhttp.responseText === "2" ? "inline" : "none";
+                document.getElementById("Restart").style.display = xhttp.responseText === "2" ? "block" : "none";
 
                 if (Save)
                     Next();

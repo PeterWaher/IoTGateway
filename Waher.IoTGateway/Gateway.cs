@@ -2519,12 +2519,38 @@ namespace Waher.IoTGateway
 #if !MONO
 			try
 			{
+				string FileName;
+				string Arguments;
+
+				switch (Environment.OSVersion.Platform)
+				{
+					case PlatformID.Win32S:
+        			case PlatformID.Win32Windows:
+        			case PlatformID.Win32NT:
+        			case PlatformID.WinCE:
+						FileName = "netstat.exe";
+						Arguments = "-a -n -o";
+						break;
+
+					case PlatformID.Unix:
+					case PlatformID.MacOSX:
+						FileName = "netstat";
+						Arguments = "-anv -p tcp";
+						break;
+
+					default:
+						if (DoLog)
+							Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+
+						return;
+				}
+
 				using (Process Proc = new Process())
 				{
 					ProcessStartInfo StartInfo = new ProcessStartInfo()
 					{
-						FileName = "netstat.exe",
-						Arguments = "-a -n -o",
+						FileName = FileName,
+						Arguments = Arguments,
 						WindowStyle = ProcessWindowStyle.Hidden,
 						UseShellExecute = false,
 						RedirectStandardInput = true,
@@ -2534,6 +2560,9 @@ namespace Waher.IoTGateway
 
 					Proc.StartInfo = StartInfo;
 					Proc.Start();
+					Proc.WaitForExit(5000);
+					if (!Proc.HasExited)
+						return;
 
 					string Output = Proc.StandardOutput.ReadToEnd();
 					if (DoLog)
@@ -2553,29 +2582,71 @@ namespace Waher.IoTGateway
 					{
 						string[] Tokens = Regex.Split(Row, @"\s+");
 
-						if (Tokens.Length < 6)
-							continue;
-
-						if (Tokens[1] != "TCP")
-							continue;
-
-						if (Tokens[2] != RemoteEndpoint)
-							continue;
-
-						if (Tokens[4] != "ESTABLISHED")
-							continue;
-
-						if (!int.TryParse(Tokens[5], out int PID))
-							continue;
-
-						Process P = Process.GetProcessById(PID);
-						int CurrentSession = WTSGetActiveConsoleSessionId();
-
-						if (P.SessionId == CurrentSession)
+						switch (Environment.OSVersion.Platform)
 						{
-							LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-							Login.DoLogin(Request, From);
-							break;
+							case PlatformID.Win32S:
+							case PlatformID.Win32Windows:
+							case PlatformID.Win32NT:
+							case PlatformID.WinCE:
+								if (Tokens.Length < 6)
+									break;
+
+								if (Tokens[1] != "TCP")
+									break;
+
+								if (!SameEndpoint(Tokens[2], RemoteEndpoint))
+									break;
+
+								if (Tokens[4] != "ESTABLISHED")
+									break;
+
+								if (!int.TryParse(Tokens[5], out int PID))
+									break;
+
+								Process P = Process.GetProcessById(PID);
+								int CurrentSession = WTSGetActiveConsoleSessionId();
+
+								if (P.SessionId == CurrentSession)
+								{
+									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									Login.DoLogin(Request, From);
+									return;
+								}
+								break;
+
+							case PlatformID.Unix:
+							case PlatformID.MacOSX:
+								if (Tokens.Length < 9)
+									break;
+
+								if (Tokens[0] != "tcp4" && Tokens[0] != "tcp6")
+									break;
+
+								if (!SameEndpoint(Tokens[4], RemoteEndpoint))
+									break;
+
+								if (Tokens[5] != "ESTABLISHED")
+									break;
+
+								if (!int.TryParse(Tokens[8], out PID))
+									break;
+
+								P = Process.GetProcessById(PID);
+								CurrentSession = Process.GetCurrentProcess().SessionId;
+
+								if (P.SessionId == CurrentSession)
+								{
+									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									Login.DoLogin(Request, From);
+									return;
+								}
+								break;
+
+							default:
+								if (DoLog)
+									Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+
+								return;
 						}
 					}
 				}
@@ -2595,6 +2666,47 @@ namespace Waher.IoTGateway
 				return;
 			}
 #endif
+		}
+
+		private static bool SameEndpoint(string EP1, string EP2)
+		{
+			if (string.Compare(EP1, EP2, true) == 0)
+				return true;
+
+			switch (Environment.OSVersion.Platform)
+			{
+				case PlatformID.Unix:
+				case PlatformID.MacOSX:
+					int i = EP1.LastIndexOf('.');
+					if (i < 0)
+						break;
+
+					if (!int.TryParse(EP1.Substring(i + 1), out int Port1))
+						break;
+
+					if (!IPAddress.TryParse(EP1.Substring(0, i), out IPAddress Addr1))
+						break;
+
+					i = EP2.LastIndexOf(':');
+					if (i < 0)
+						break;
+
+					if (!int.TryParse(EP2.Substring(i + 1), out int Port2) || Port1 != Port2)
+						break;
+
+					if (!IPAddress.TryParse(EP2.Substring(0, i), out IPAddress Addr2))
+						break;
+
+					string s1 = Addr1.ToString();
+					string s2 = Addr2.ToString();
+
+					if (string.Compare(s1, s2, true) == 0)
+						return true;
+
+					break;
+			}
+
+			return false;
 		}
 
 		private static readonly IPAddress ipv6Local = IPAddress.Parse("[::1]");

@@ -456,7 +456,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="DataSource">Data Source.</param>
 		/// <returns>If the data source was unregistered (true), or if the data source was not found (false).</returns>
-		public bool UNregister(IDataSource DataSource)
+		public bool Unregister(IDataSource DataSource)
 		{
 			return this.Unregister(DataSource, true);
 		}

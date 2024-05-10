@@ -32,14 +32,62 @@ span.ItemImage img
 	max-height:1em;
 }
 
+li.Selectable:before
+{
+	cursor:pointer;
+	content: '\229e';
+	color:transparent;
+	margin: 0 1em;
+}
+
+li.Selectable
+{
+	cursor:pointer;
+}
+
 li.Leaf:before
 {
 	cursor:default;
-	content: '';
+	content: '\229e';
+	color:transparent;
 	margin: 0 1em;
 }
 
 li.Leaf
 {
 	cursor:default;
+}
+
+.SimpleTreeListViewContainer
+{
+	display:flex;
+}
+
+.SimpleTreeView
+{
+	width:25%;
+	height:70vh;
+	overflow:scroll;
+	padding:1em;	
+	background-color:¤BackgroundColor¤;
+	border: solid 1px ¤Alpha(TextColor,64)¤;
+	border-radius:0.3em;
+}
+
+.SimpleTreeView > ul.SimpleTree
+{
+	padding-inline-start:0.5em;
+}
+
+
+.SimpleListView
+{
+	width:75%;
+	height:70vh;
+	overflow:scroll;
+	margin-left:1em;
+	padding:1em;	
+	background-color:¤BackgroundColor¤;
+	border: solid 1px ¤Alpha(TextColor,64)¤;
+	border-radius:0.3em;
 }

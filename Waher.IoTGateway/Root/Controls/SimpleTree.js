@@ -1,7 +1,8 @@
-﻿function ExpandNode(Event, Node)
+﻿function SelectNode(Event, Node)
 {
 	Event.stopPropagation();
 
+	var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
@@ -12,6 +13,54 @@
 				try
 				{
 					var Response = JSON.parse(xhttp.responseText);
+
+					if (ListView && Response.list) 
+					{
+						document.getElementById(ListView).innerHTML = Response.list;
+						Response = Response.items;
+					}
+				}
+				catch (e) 
+				{
+					console.log(e);
+					console.log(xhttp.responseText);
+				}
+			}
+			else
+				window.alert(xhttp.responseText);
+		}
+	};
+
+	xhttp.open("POST", Node.getAttribute("data-select"), true);
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.setRequestHeader("Accept", "application/json");
+	xhttp.send(JSON.stringify({
+		"id": Node.getAttribute("data-id")
+	}));
+}
+
+function ExpandNode(Event, Node)
+{
+	Event.stopPropagation();
+
+	var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState === 4)
+		{
+			if (xhttp.status === 200)
+			{
+				try
+				{
+					var Response = JSON.parse(xhttp.responseText);
+
+					if (ListView && Response.list && Response.items)
+					{
+						document.getElementById(ListView).innerHTML = Response.list;
+						Response = Response.items;
+					}
+
 					var i, c = Response.length;
 
 					if (!(Response instanceof Array))
@@ -83,11 +132,20 @@
 							Li.innerHTML = Rec.html;
 							Li.setAttribute("data-id", Rec.id);
 
+							if (ListView)
+								Li.setAttribute("data-listview", ListView);
+
 							if (Rec.expand)
 							{
 								Li.className = "Expandable";
 								Li.setAttribute("data-expand", Rec.expand);
 								Li.setAttribute("onclick", "ExpandNode(event,this)");
+							}
+							else if (Rec.select) 
+							{
+								Li.className = "Selectable";
+								Li.setAttribute("data-select", Rec.select);
+								Li.setAttribute("onclick", "SelectNode(event,this)");
 							}
 							else
 							{

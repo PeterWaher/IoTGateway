@@ -33,8 +33,25 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
-			DataForm Parameters = new DataForm(Client, FormType.Form, e.To, e.From);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
+
+			return await GetEditableForm(Client, Language, e.From, e.To, EditableObject, Title);
+		}
+
+		/// <summary>
+		/// Gets a data form containing editable parameters from an object.
+		/// </summary>
+		/// <param name="Client">Client</param>
+		/// <param name="Language">Language to use for localized strings.</param>
+		/// <param name="From">From addres</param>
+		/// <param name="To">To addres</param>
+		/// <param name="EditableObject">Object whose parameters will be edited.</param>
+		/// <param name="Title">Title of form.</param>
+		/// <returns>Data form containing editable parameters.</returns>
+		public static async Task<DataForm> GetEditableForm(XmppClient Client, Language Language, string From, string To, object EditableObject, string Title)
+		{
+			Type T = EditableObject.GetType();
+			DataForm Parameters = new DataForm(Client, FormType.Form, To, From);
 
 			if (EditableObject is IEditableObject Editable)
 				await Editable.PopulateForm(Parameters, Language);

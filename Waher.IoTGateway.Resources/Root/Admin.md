@@ -59,16 +59,16 @@ MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");
 MenuItem("Database","/Settings/Database.md","Admin.Data.Database");
 SnifferItem("Database Sniffer","/Sniffers/Database.md",["Admin.Data.Database","Admin.Communication.Sniffer"]);
 MenuItem("Events","/Sniffers/EventLog.md","Admin.Data.Events");
+MenuItem("Graph Store","/GraphStore.md","Admin.Graphs.Get");
 MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
+MenuItem("SPARQL","/Sparql.md","Admin.Graphs.Query");
 MenuFooter();
 
 MenuHeader("Lab");
-MenuItem("Graph Store","/GraphStore.md","Admin.Graphs.Get");
 MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);
 MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);
 MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);
 MenuItem("Script","/Prompt.md","Admin.Lab.Script");
-MenuItem("SPARQL","/Sparql.md","Admin.Graphs.Query");
 MenuFooter();
 
 MenuHeader("Legal");

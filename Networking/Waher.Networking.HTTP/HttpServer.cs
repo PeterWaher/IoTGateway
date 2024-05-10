@@ -66,6 +66,7 @@ namespace Waher.Networking.HTTP
 #else
 		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 		private X509Certificate serverCertificate;
+		private Dictionary<int, KeyValuePair<ClientCertificates, bool>> portSpecificMTlsSettings;
 		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
 		private bool trustClientCertificates = false;
 		private bool clientCertificateSettingsLocked = false;
@@ -448,7 +449,7 @@ namespace Waher.Networking.HTTP
 									{
 										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, false);
+										Task T = this.ListenForIncomingConnections(Listener, false, ClientCertificates.NotUsed, false);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 									}
@@ -549,9 +550,11 @@ namespace Waher.Networking.HTTP
 								{
 									try
 									{
+										this.GetMTlsSettings(HttpsPort, out ClientCertificates ClientCertificates, out bool TrustCertificates);
+
 										Listener = new TcpListener(DesiredEndpoint);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, true);
+										Task T = this.ListenForIncomingConnections(Listener, true, ClientCertificates, TrustCertificates);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
 									}
@@ -826,23 +829,57 @@ namespace Waher.Networking.HTTP
 		/// <param name="LockSettings">If client certificate settings should be locked.</param>
 		public void ConfigureMutualTls(ClientCertificates ClientCertificates, bool TrustClientCertificates, bool LockSettings)
 		{
+			this.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, null, LockSettings);
+		}
+	
+		/// <summary>
+		/// Configures Mutual-TLS capabilities of the server. Affects all connections, all resources.
+		/// </summary>
+		/// <param name="ClientCertificates">If client certificates are not used, optional or required.</param>
+		/// <param name="TrustClientCertificates">If client certificates should be trusted, even if they do not validate.</param>
+		/// <param name="LockSettings">If client certificate settings should be locked.</param>
+		public void ConfigureMutualTls(ClientCertificates ClientCertificates, bool TrustClientCertificates,
+			Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificSettings, bool LockSettings)
+		{
 			if (this.clientCertificateSettingsLocked)
 				throw new InvalidOperationException("Mutual TLS settings locked.");
 
 			this.clientCertificates = ClientCertificates;
 			this.trustClientCertificates = TrustClientCertificates;
+			this.portSpecificMTlsSettings = PortSpecificSettings;
 			this.clientCertificateSettingsLocked = LockSettings;
 		}
 
 		/// <summary>
-		/// If client certificates are not used, optional or required.
+		/// If client certificates are not used by default, optional or required.
 		/// </summary>
 		public ClientCertificates ClientCertificates => this.clientCertificates;
 
 		/// <summary>
-		/// If client certificates should be trusted, even if they do not validate.
+		/// If client certificates should be trusted by default, even if they do not validate.
 		/// </summary>
 		public bool TrustClientCertificates => this.trustClientCertificates;
+
+		/// <summary>
+		/// Gets mTLS settings for a given port number.
+		/// </summary>
+		/// <param name="Port">Port number.</param>
+		/// <param name="ClientCertificates">How to configure mTLS for the corresponding port number.</param>
+		/// <param name="TrustClientCertificates">If client certificates are to be trusted by default.</param>
+		public void GetMTlsSettings(int Port, out ClientCertificates ClientCertificates, out bool TrustClientCertificates)
+		{
+			if (!(this.portSpecificMTlsSettings is null) && this.portSpecificMTlsSettings.TryGetValue(Port,
+				out KeyValuePair<ClientCertificates, bool> P))
+			{
+				ClientCertificates = P.Key;
+				TrustClientCertificates = P.Value;
+			}
+			else
+			{
+				ClientCertificates = this.clientCertificates;
+				TrustClientCertificates = this.trustClientCertificates;
+			}
+		}
 #endif
 
 		#endregion
@@ -881,7 +918,8 @@ namespace Waher.Networking.HTTP
 			}
 		}
 #else
-		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls)
+		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls, ClientCertificates ClientCertificates,
+			bool TrustCertificates)
 		{
 			try
 			{
@@ -924,7 +962,7 @@ namespace Waher.Networking.HTTP
 
 							if (Tls)
 							{
-								Task T = this.SwitchToTls(BinaryTcpClient);
+								Task _ = this.SwitchToTls(BinaryTcpClient, ClientCertificates, TrustCertificates);
 							}
 							else
 							{
@@ -982,7 +1020,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task SwitchToTls(BinaryTcpClient Client)
+		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates)
 		{
 			string RemoteIpEndpoint;
 			EndPoint EP = Client.Client.Client.RemoteEndPoint;
@@ -999,7 +1037,7 @@ namespace Waher.Networking.HTTP
 					this.Information("Switching to TLS.");
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-						this.clientCertificates, null, this.trustClientCertificates);
+						ClientCertificates, null, TrustClientCertificates);
 
 					if (this.HasSniffers)
 					{

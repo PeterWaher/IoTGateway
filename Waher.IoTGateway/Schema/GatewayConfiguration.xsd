@@ -36,14 +36,34 @@
 						<xs:documentation>Any settings affect all domains.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-						<xs:attribute name="clientCertificates" type="ClientCertificates" use="required">
+						<xs:sequence>
+							<xs:element name="Port" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="PortNumber">
+											<xs:attribute name="clientCertificates" type="ClientCertificates" use="optional" default="NotUsed">
+												<xs:annotation>
+													<xs:documentation>Port specific override, if client certificates are requested during TLS handshake.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="trustCertificates" type="xs:boolean" use="optional" default="true">
+												<xs:annotation>
+													<xs:documentation>Port specific override, if certificates should be trusted, even if they don't validate.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="clientCertificates" type="ClientCertificates" use="optional" default="NotUsed">
 							<xs:annotation>
-								<xs:documentation>If client certificates are requested during TLS handshake.</xs:documentation>
+								<xs:documentation>If client certificates are requested during TLS handshake, by default.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						<xs:attribute name="trustCertificates" type="xs:boolean" use="optional" default="true">
 							<xs:annotation>
-								<xs:documentation>If certificates should be trusted, even if they don't validate.</xs:documentation>
+								<xs:documentation>If certificates should be trusted, even if they don't validate, by default.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 					</xs:complexType>

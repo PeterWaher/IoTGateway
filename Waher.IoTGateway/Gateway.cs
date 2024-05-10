@@ -357,6 +357,7 @@ namespace Waher.IoTGateway
 				IDatabaseProvider DatabaseProvider = null;
 				ClientCertificates ClientCertificates = ClientCertificates.NotUsed;
 				bool TrustClientCertificates = false;
+				Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificMTlsSettings = null;
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -378,6 +379,21 @@ namespace Waher.IoTGateway
 							case "MutualTls":
 								ClientCertificates = XML.Attribute(E, "clientCertificates", ClientCertificates.NotUsed);
 								TrustClientCertificates = XML.Attribute(E, "trustCertificates", false);
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2.LocalName == "Port" && int.TryParse(N2.InnerText, out int PortNumber))
+									{
+										XmlElement E2 = (XmlElement)N2;
+										ClientCertificates ClientCertificatesPort = XML.Attribute(E2, "clientCertificates", ClientCertificates);
+										bool TrustClientCertificatesPort = XML.Attribute(E2, "trustCertificates", TrustClientCertificates);
+
+										if (PortSpecificMTlsSettings is null)
+											PortSpecificMTlsSettings = new Dictionary<int, KeyValuePair<ClientCertificates, bool>>();
+
+										PortSpecificMTlsSettings[PortNumber] = new KeyValuePair<ClientCertificates, bool>(ClientCertificatesPort, TrustClientCertificatesPort);
+									}
+								}
 								break;
 
 							case "ContentEncodings":
@@ -951,7 +967,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, true);
+				webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, PortSpecificMTlsSettings, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);

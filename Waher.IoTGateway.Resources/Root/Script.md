@@ -2017,6 +2017,8 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Head(Url[,Accept/Headers[,Certificate]])`         | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][HeadExample] |
 | `HtmlAttributeEncode(s)`                           | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
 | `HtmlValueEncode(s)`                               | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
+| `JsonDecode(Data)`                                 | Decodes a JSON string. | [Example][JsonDecodeExample] |
+| `JsonEncode(Data)`                                 | Encodes data into a JSON string. | [Example][JsonEncodeExample] |
 | `LoadFile(FileName[,ContentType])`                 | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
 | `Post(Url,Data[,Accept/Headers,[Certificate]])`    | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
 | `PrettyJson(Obj)`                                  | JSON-encodes `Obj` as a pretty string, for display. | [Example][PrettyJsonExample] |
@@ -2049,6 +2051,8 @@ The following functions are available in the `Waher.Script.Content` library.
 [HeadExample]: Prompt.md?Expression=Head(%22URL%22)
 [HtmlAttributeEncodeExample]: Prompt.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
 [HtmlValueEncodeExample]: Prompt.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
+[JsonDecodeExample]: Prompt.md?Expression=JsonDecode("{'a':1,'b':2}")
+[JsonEncodeExample]: Prompt.md?Expression=JsonEncode({'a':1,'b':2})
 [LoadFileExample]: Prompt.md?Expression=LoadFile(%22FileName%22)
 [PostExample]: Prompt.md?Expression=Post(%22URL%22,%22Data%22)
 [PrettyJsonExample]: Prompt.md?Expression=PrettyJson(Generalize(Obj))

@@ -99,7 +99,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private readonly string from;
 		private readonly string to;
 		private readonly bool containsPostBackFields = false;
-		private readonly bool hasPages = false;
+		private bool hasPages = false;
 		private bool hasMedia = false;
 
 		/// <summary>
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.DataForms
 			if (this.header is null)
 				this.header = new Field[0];
 
-			if (this.hasPages = (!(Pages is null)))
+			if (this.hasPages = (!(Pages is null) && Pages.Count > 0))
 				this.pages = Pages.ToArray();
 			else if (this.fields.Length > 0)
 				this.pages = new Page[] { new Page(this, this.title, this.fields) };
@@ -785,7 +785,11 @@ namespace Waher.Networking.XMPP.DataForms
 		public Page[] Pages
 		{
 			get => this.pages;
-			set => this.pages = value;
+			set
+			{
+				this.pages = value;
+				this.hasPages = !(this.pages is null) && this.pages.Length > 0;
+			}
 		}
 
 		/// <summary>

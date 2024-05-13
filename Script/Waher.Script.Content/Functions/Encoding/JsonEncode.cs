@@ -1,8 +1,6 @@
-using System;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -11,7 +9,7 @@ namespace Waher.Script.Content.Functions.Encoding
     /// <summary>
     /// JsonEncode(Data)
     /// </summary>
-    public class JsonEncode : FunctionOneScalarVariable
+    public class JsonEncode : FunctionOneVariable
     {
         /// <summary>
         /// JsonEncode(Data)
@@ -36,7 +34,7 @@ namespace Waher.Script.Content.Functions.Encoding
         /// <param name="Argument">Function argument.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+        public override IElement Evaluate(IElement Argument, Variables Variables)
         {
             return new StringValue(JSON.Encode(Argument.AssociatedObjectValue, false));
         }
@@ -47,9 +45,9 @@ namespace Waher.Script.Content.Functions.Encoding
         /// <param name="Argument">Function argument.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
-        public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+        public override Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
         {
-            return Task.FromResult(this.EvaluateScalar(Argument, Variables));
+            return Task.FromResult(this.Evaluate(Argument, Variables));
         }
 
     }

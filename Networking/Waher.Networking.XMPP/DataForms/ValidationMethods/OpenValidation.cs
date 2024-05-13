@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.DataForms.ValidationMethods

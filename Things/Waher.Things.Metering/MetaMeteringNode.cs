@@ -304,6 +304,7 @@ namespace Waher.Things.Metering
 		[Header(82, "Latitude:", 10)]
 		[ToolTip(83, "Latitude of device.")]
 		[DefaultValueNull]
+		[Range(-90, 90)]
 		public double? Latitude
 		{
 			get => this.latitude;
@@ -317,6 +318,7 @@ namespace Waher.Things.Metering
 		[Header(84, "Longitude:", 20)]
 		[ToolTip(85, "Longitude of device.")]
 		[DefaultValueNull]
+		[Range(-180, 180)]
 		public double? Longitude
 		{
 			get => this.longitude;

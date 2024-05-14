@@ -41,9 +41,11 @@
 
 function ExpandNode(Event, Node)
 {
-	Event.stopPropagation();
+	if (Event)
+		Event.stopPropagation();
 
 	var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
+	var IdAsDataId = Node.getAttribute("id") === Node.getAttribute("data-id");
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
@@ -132,6 +134,9 @@ function ExpandNode(Event, Node)
 							Li.innerHTML = Rec.html;
 							Li.setAttribute("data-id", Rec.id);
 
+							if (IdAsDataId)
+								Li.setAttribute("id", Rec.id);
+
 							if (ListView)
 								Li.setAttribute("data-listview", ListView);
 
@@ -192,7 +197,9 @@ function ExpandNode(Event, Node)
 
 function CollapseNode(Event, Node)
 {
-	Event.stopPropagation();
+	if (Event)
+		Event.stopPropagation();
+
 	Node.className = "Expandable";
 	Node.setAttribute("onclick", "ExpandNode(event,this)");
 

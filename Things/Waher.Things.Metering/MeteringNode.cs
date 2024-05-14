@@ -304,6 +304,15 @@ namespace Waher.Things.Metering
 						this.RaiseUpdate();
 					}
 					break;
+
+				case MessageType.Information:
+					if (this.state < NodeState.Information)
+					{
+						this.state = NodeState.Information;
+						await Database.Update(this);
+						this.RaiseUpdate();
+					}
+					break;
 			}
 
 			switch (Type)

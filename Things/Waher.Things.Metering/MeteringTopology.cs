@@ -171,6 +171,26 @@ namespace Waher.Things.Metering
 				return Node;
 		}
 
+		internal static MeteringNode RegisterNewNodeId(MeteringNode Node, string OldId)
+		{
+			if (Node.SourceId != SourceID || !string.IsNullOrEmpty(Node.Partition))
+				return Node;
+
+			lock (nodes)
+			{
+				if (!nodes.TryGetValue(OldId, out MeteringNode Node2) || Node2 != Node)
+					return Node;
+
+				if (nodes.TryGetValue(Node.NodeId, out Node2))
+					return Node2;
+
+				nodes.Remove(OldId);
+				nodes[Node.NodeId] = Node;
+
+				return Node;
+			}
+		}
+
 		internal static void UnregisterNode(MeteringNode Node)
 		{
 			if (Node.SourceId == SourceID && string.IsNullOrEmpty(Node.Partition))

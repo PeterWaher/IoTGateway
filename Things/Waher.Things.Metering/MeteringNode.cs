@@ -1127,7 +1127,11 @@ namespace Waher.Things.Metering
 				Timestamp = DateTime.Now
 			});
 
-			this.oldId = this.nodeId;
+			if (this.oldId != this.nodeId)
+			{
+				MeteringTopology.RegisterNewNodeId(this, this.oldId);
+				this.oldId = this.nodeId;
+			}
 		}
 
 		/// <summary>

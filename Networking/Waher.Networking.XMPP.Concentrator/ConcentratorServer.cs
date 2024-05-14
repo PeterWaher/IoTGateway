@@ -1674,7 +1674,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					string NewNodeId = Form["NodeId"]?.ValueString;
 					string NewSourceId = Form["SourceId"]?.ValueString;
 					string NewPartition = Form["Partition"]?.ValueString;
-					Parameters.SetEditableFormResult Result = null;
+					SetEditableFormResult Result = null;
 
 					if (!string.IsNullOrEmpty(NewNodeId))
 					{
@@ -1689,11 +1689,11 @@ namespace Waher.Networking.XMPP.Concentrator
 							NewPartition != OldPartition) &&
 							!(await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) is null))
 						{
-							Result = new Parameters.SetEditableFormResult()
+							Result = new SetEditableFormResult()
 							{
 								Errors = new KeyValuePair<string, string>[]
 								{
-										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+									new KeyValuePair<string, string>("NodeId", "Identity already exists.")
 								}
 							};
 						}
@@ -1721,9 +1721,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						e.IqResult(Xml.ToString());
 
-						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-						Result.Tags.Add(new KeyValuePair<string, object>("Source", Node.SourceId));
-						Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node.Partition));
+						Result.AddTag("Full", e.From);
+						Result.AddTag("Source", Node.SourceId);
+						Result.AddTag("Partition", Node.Partition);
 
 						Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
@@ -1902,7 +1902,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					string NewNodeId = Form["NodeId"]?.ValueString;
 					string NewSourceId = Form["SourceId"]?.ValueString;
 					string NewPartition = Form["Partition"]?.ValueString;
-					Parameters.SetEditableFormResult Result = null;
+					SetEditableFormResult Result = null;
 
 					if (!string.IsNullOrEmpty(NewNodeId))
 					{
@@ -1917,7 +1917,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							NewPartition != OldPartition) &&
 							!(await P.Item1.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) is null))
 						{
-							Result = new Parameters.SetEditableFormResult()
+							Result = new SetEditableFormResult()
 							{
 								Errors = new KeyValuePair<string, string>[]
 								{
@@ -1957,9 +1957,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						break;
 					}
 
-					Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-					Result.Tags.Add(new KeyValuePair<string, object>("Source", P.Item2.SourceId));
-					Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Item2.Partition));
+					Result.AddTag("Full", e.From);
+					Result.AddTag("Source", P.Item2.SourceId);
+					Result.AddTag("Partition", P.Item2.Partition);
 
 					Log.Informational("Node edited.", P.Item2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
 
@@ -2212,7 +2212,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
+			SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
 
 			if (Result.Errors is null)
 			{
@@ -2236,10 +2236,10 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				e.IqResult(Xml.ToString());
 
-				Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-				Result.Tags.Add(new KeyValuePair<string, object>("Parent", Node.NodeId));
-				Result.Tags.Add(new KeyValuePair<string, object>("Source", PresumptiveChild.SourceId));
-				Result.Tags.Add(new KeyValuePair<string, object>("Partition", PresumptiveChild.Partition));
+				Result.AddTag("Full", e.From);
+				Result.AddTag("Parent", Node.NodeId);
+				Result.AddTag("Source", PresumptiveChild.SourceId);
+				Result.AddTag("Partition", PresumptiveChild.Partition);
 
 				Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
 
@@ -2739,7 +2739,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Command = Command.Copy();
 
-						Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+						SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
 						if (!(Result.Errors is null))
 						{
@@ -2821,7 +2821,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Command = Command.Copy();
 
-					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+					SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
 					if (!(Result.Errors is null))
 					{
@@ -3688,7 +3688,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Command = Command.Copy();
 
-				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+				SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
 				if (!(Result.Errors is null))
 				{
@@ -3841,7 +3841,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Command = Command.Copy();
 
-			Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+			SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
 
 			if (!(Result.Errors is null))
 			{

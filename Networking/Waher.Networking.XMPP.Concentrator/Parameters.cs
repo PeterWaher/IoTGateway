@@ -622,39 +622,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Result of a set properties operation.
-		/// </summary>
-		public class SetEditableFormResult
-		{
-			/// <summary>
-			/// If any errors were encountered.
-			/// </summary>
-			public KeyValuePair<string, string>[] Errors;
-
-			/// <summary>
-			/// Actual property values set.
-			/// </summary>
-			public List<KeyValuePair<string, object>> Tags;
-
-			/// <summary>
-			/// Adds an error to the list of errors.
-			/// </summary>
-			/// <param name="Key">Key</param>
-			/// <param name="Value">Value</param>
-			public void AddError(string Key, string Value)
-			{
-				if (this.Errors is null)
-					this.Errors = new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(Key, Value) };
-				else
-				{
-					int c = this.Errors.Length;
-					Array.Resize(ref this.Errors, c + 1);
-					this.Errors[c] = new KeyValuePair<string, string>(Key, Value);
-				}
-			}
-		}
-
-		/// <summary>
 		/// Sets parameters from a data form in an object.
 		/// </summary>
 		/// <param name="e">IQ Event Arguments describing the request.</param>
@@ -1040,17 +1007,17 @@ namespace Waher.Networking.XMPP.Concentrator
 								if (!(Rec.PInfo is null))
 								{
 									Rec.PInfo.SetValue(EditableObject, Rec.Value);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.PInfo.Name, Rec.Value));
+									Result.AddTag(Rec.PInfo.Name, Rec.Value);
 								}
 								else if (!(Rec.FInfo is null))
 								{
 									Rec.FInfo.SetValue(EditableObject, Rec.Value);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.FInfo.Name, Rec.Value));
+									Result.AddTag(Rec.FInfo.Name, Rec.Value);
 								}
 								else
 								{
 									await Rec.CustomFormProperties.SetCustomProperty(Rec.Field);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.Field.Var, Rec.Value));
+									Result.AddTag(Rec.Field.Var, Rec.Value);
 								}
 							}
 							catch (Exception ex)

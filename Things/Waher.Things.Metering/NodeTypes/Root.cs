@@ -46,5 +46,25 @@ namespace Waher.Things.Metering.NodeTypes
 		{
 			return Task.FromResult(false);
 		}
-	}
+
+		/// <summary>
+		/// If the node can be edited by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be edited by the caller.</returns>
+		public override Task<bool> CanEditAsync(RequestOrigin Caller)
+		{
+			return Task.FromResult(false);
+		}
+
+		/// <summary>
+		/// If the node can be destroyed to by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be destroyed to by the caller.</returns>
+		public override Task<bool> CanDestroyAsync(RequestOrigin Caller)
+        {
+            return Task.FromResult(false);
+        }
+    }
 }

@@ -1,198 +1,166 @@
-﻿function SelectNode(Event, Node)
+﻿async function SelectNode(Event, Node)
 {
-	Event.stopPropagation();
-
-	var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function ()
+	try
 	{
-		if (xhttp.readyState === 4)
+		if (Event)
+			Event.stopPropagation();
+
+		var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
+		var Response = await CallServer(Node.getAttribute("data-select"), {
+			"id": Node.getAttribute("data-id")
+		});
+		
+		if (ListView && Response.list) 
 		{
-			if (xhttp.status === 200)
-			{
-				try
-				{
-					var Response = JSON.parse(xhttp.responseText);
-
-					if (ListView && Response.list) 
-					{
-						document.getElementById(ListView).innerHTML = Response.list;
-						Response = Response.items;
-					}
-				}
-				catch (e) 
-				{
-					console.log(e);
-					console.log(xhttp.responseText);
-				}
-			}
-			else
-				window.alert(xhttp.responseText);
+			document.getElementById(ListView).innerHTML = Response.list;
+			Response = Response.items;
 		}
-	};
-
-	xhttp.open("POST", Node.getAttribute("data-select"), true);
-	xhttp.setRequestHeader("Content-Type", "application/json");
-	xhttp.setRequestHeader("Accept", "application/json");
-	xhttp.send(JSON.stringify({
-		"id": Node.getAttribute("data-id")
-	}));
+	}
+	catch (e) 
+	{
+		console.log(e);
+		console.log(xhttp.responseText);
+	}
 }
 
-function ExpandNode(Event, Node)
+async function ExpandNode(Event, Node)
 {
-	if (Event)
-		Event.stopPropagation();
-
-	var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
-	var IdAsDataId = Node.getAttribute("id") === Node.getAttribute("data-id");
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function ()
+	try
 	{
-		if (xhttp.readyState === 4)
+		if (Event)
+			Event.stopPropagation();
+
+		var ListView = Node.hasAttribute("data-listview") ? Node.getAttribute("data-listview") : null;
+		var IdAsDataId = Node.getAttribute("id") === Node.getAttribute("data-id");
+
+		var Response = await CallServer(Node.getAttribute("data-expand"), {
+			"id": Node.getAttribute("data-id")
+		});
+
+		if (ListView && Response.list && Response.items)
 		{
-			if (xhttp.status === 200)
+			document.getElementById(ListView).innerHTML = Response.list;
+			Response = Response.items;
+		}
+
+		var i, c = Response.length;
+
+		if (!(Response instanceof Array))
+		{
+			window.alert("Expected response to be a JSON array.");
+			return;
+		}
+
+		Node.className = "Collapsable";
+		Node.setAttribute("onclick", "CollapseNode(event,this)");
+
+		var Loop = Node.firstChild;
+		while (Loop)
+		{
+			if (Loop.tagName == "SPAN")
 			{
-				try
-				{
-					var Response = JSON.parse(xhttp.responseText);
-
-					if (ListView && Response.list && Response.items)
-					{
-						document.getElementById(ListView).innerHTML = Response.list;
-						Response = Response.items;
-					}
-
-					var i, c = Response.length;
-
-					if (!(Response instanceof Array))
-					{
-						window.alert("Expected response to be a JSON array.");
-						return;
-					}
-
-					Node.className = "Collapsable";
-					Node.setAttribute("onclick", "CollapseNode(event,this)");
-
-					var Loop = Node.firstChild;
-					while (Loop)
-					{
-						if (Loop.tagName == "SPAN")
-						{
-							Loop.innerHTML = Node.getAttribute("data-expandedimg");
-							break;
-						}
-						else
-							Loop = Loop.nextSibling;
-					}
-
-					if (Response[0] instanceof Array)
-					{
-						var Table = document.createElement("TABLE");
-						Node.appendChild(Table);
-						Table.setAttribute("onclick", "NoOperation(event,this)");
-
-						var THead = document.createElement("THEAD");
-						Table.appendChild(THead);
-
-						var TBody = document.createElement("TBODY");
-						Table.appendChild(TBody);
-
-						var j, d;
-
-						for (i = 0; i < c; i++)
-						{
-							var Rec = Response[i];
-							var Tr = document.createElement("TR");
-
-							if (i === 0)
-								THead.appendChild(Tr);
-							else
-								TBody.appendChild(Tr);
-
-							d = Rec.length;
-							for (j = 0; j < d; j++)
-							{
-								var Td = document.createElement(i === 0 ? "TH" : "TD");
-								Tr.appendChild(Td);
-
-								Td.innerHTML = Rec[j];
-							}
-						}
-					}
-					else
-					{
-						var Ul = document.createElement("UL");
-						Ul.className = "SimpleTree";
-						Node.appendChild(Ul);
-
-						for (i = 0; i < c; i++)
-						{
-							var Rec = Response[i];
-							var Li = document.createElement("LI");
-
-							Li.innerHTML = Rec.html;
-							Li.setAttribute("data-id", Rec.id);
-
-							if (IdAsDataId)
-								Li.setAttribute("id", Rec.id);
-
-							if (ListView)
-								Li.setAttribute("data-listview", ListView);
-
-							if (Rec.expand)
-							{
-								Li.className = "Expandable";
-								Li.setAttribute("data-expand", Rec.expand);
-								Li.setAttribute("onclick", "ExpandNode(event,this)");
-							}
-							else if (Rec.select) 
-							{
-								Li.className = "Selectable";
-								Li.setAttribute("data-select", Rec.select);
-								Li.setAttribute("onclick", "SelectNode(event,this)");
-							}
-							else
-							{
-								Li.className = "Leaf";
-								Li.setAttribute("onclick", "NoOperation(event,this)");
-							}
-
-							if (Rec.expandedImg)
-								Li.setAttribute("data-expandedimg", Rec.expandedImg);
-
-							if (Rec.collapsedImg)
-							{
-								Li.setAttribute("data-collapsedimg", Rec.collapsedImg);
-
-								var Span = document.createElement("SPAN");
-								Span.className = "ItemImage";
-								Span.innerHTML = Rec.collapsedImg;
-
-								Li.insertBefore(Span, Li.firstChild);
-							}
-
-							Ul.appendChild(Li);
-						}
-					}
-				}
-				catch (e)
-				{
-					console.log(e);
-					console.log(xhttp.responseText);
-				}
+				Loop.innerHTML = Node.getAttribute("data-expandedimg");
+				break;
 			}
 			else
-				window.alert(xhttp.responseText);
+				Loop = Loop.nextSibling;
 		}
-	};
 
-	xhttp.open("POST", Node.getAttribute("data-expand"), true);
-	xhttp.setRequestHeader("Content-Type", "application/json");
-	xhttp.setRequestHeader("Accept", "application/json");
-	xhttp.send(JSON.stringify({
-		"id": Node.getAttribute("data-id")
-	}));
+		if (Response[0] instanceof Array)
+		{
+			var Table = document.createElement("TABLE");
+			Node.appendChild(Table);
+			Table.setAttribute("onclick", "NoOperation(event,this)");
+
+			var THead = document.createElement("THEAD");
+			Table.appendChild(THead);
+
+			var TBody = document.createElement("TBODY");
+			Table.appendChild(TBody);
+
+			var j, d;
+
+			for (i = 0; i < c; i++)
+			{
+				var Rec = Response[i];
+				var Tr = document.createElement("TR");
+
+				if (i === 0)
+					THead.appendChild(Tr);
+				else
+					TBody.appendChild(Tr);
+
+				d = Rec.length;
+				for (j = 0; j < d; j++)
+				{
+					var Td = document.createElement(i === 0 ? "TH" : "TD");
+					Tr.appendChild(Td);
+
+					Td.innerHTML = Rec[j];
+				}
+			}
+		}
+		else
+		{
+			var Ul = document.createElement("UL");
+			Ul.className = "SimpleTree";
+			Node.appendChild(Ul);
+
+			for (i = 0; i < c; i++)
+			{
+				var Rec = Response[i];
+				var Li = document.createElement("LI");
+
+				Li.innerHTML = Rec.html;
+				Li.setAttribute("data-id", Rec.id);
+
+				if (IdAsDataId)
+					Li.setAttribute("id", Rec.id);
+
+				if (ListView)
+					Li.setAttribute("data-listview", ListView);
+
+				if (Rec.expand)
+				{
+					Li.className = "Expandable";
+					Li.setAttribute("data-expand", Rec.expand);
+					Li.setAttribute("onclick", "ExpandNode(event,this)");
+				}
+				else if (Rec.select) 
+				{
+					Li.className = "Selectable";
+					Li.setAttribute("data-select", Rec.select);
+					Li.setAttribute("onclick", "SelectNode(event,this)");
+				}
+				else
+				{
+					Li.className = "Leaf";
+					Li.setAttribute("onclick", "NoOperation(event,this)");
+				}
+
+				if (Rec.expandedImg)
+					Li.setAttribute("data-expandedimg", Rec.expandedImg);
+
+				if (Rec.collapsedImg)
+				{
+					Li.setAttribute("data-collapsedimg", Rec.collapsedImg);
+
+					var Span = document.createElement("SPAN");
+					Span.className = "ItemImage";
+					Span.innerHTML = Rec.collapsedImg;
+
+					Li.insertBefore(Span, Li.firstChild);
+				}
+
+				Ul.appendChild(Li);
+			}
+		}
+	}
+	catch (e)
+	{
+		console.log(e);
+		console.log(xhttp.responseText);
+	}
 }
 
 function CollapseNode(Event, Node)

@@ -635,6 +635,23 @@ namespace Waher.Networking.XMPP.Concentrator
 			/// Actual property values set.
 			/// </summary>
 			public List<KeyValuePair<string, object>> Tags;
+
+			/// <summary>
+			/// Adds an error to the list of errors.
+			/// </summary>
+			/// <param name="Key">Key</param>
+			/// <param name="Value">Value</param>
+			public void AddError(string Key, string Value)
+			{
+				if (this.Errors is null)
+					this.Errors = new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(Key, Value) };
+				else
+				{
+					int c = this.Errors.Length;
+					Array.Resize(ref this.Errors, c + 1);
+					this.Errors[c] = new KeyValuePair<string, string>(Key, Value);
+				}
+			}
 		}
 
 		/// <summary>
@@ -650,11 +667,24 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
+			return await SetEditableForm(Language, EditableObject, Form, OnlySetChanged);
+		}
 
+		/// <summary>
+		/// Sets parameters from a data form in an object.
+		/// </summary>
+		/// <param name="Language">User language.</param>
+		/// <param name="EditableObject">Object whose parameters will be set.</param>
+		/// <param name="Form">Data Form.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public static async Task<SetEditableFormResult> SetEditableForm(Language Language, object EditableObject, DataForm Form, bool OnlySetChanged)
+		{
 			if (EditableObject is IEditableObject Editable)
 				return await Editable.SetParameters(Form, Language, OnlySetChanged);
 			else
 			{
+				Type T = EditableObject.GetType();
 				List<KeyValuePair<string, string>> Errors = null;
 				PropertyInfo PropertyInfo;
 				FieldInfo FieldInfo;

@@ -2217,12 +2217,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Result.Errors is null)
 			{
 				if (!(await Rec.Source.GetNodeAsync(PresumptiveChild) is null))
-				{
-					Result.Errors = new KeyValuePair<string, string>[]
-					{
-						new KeyValuePair<string, string>("NodeId", "Identity already exists.")
-					};
-				}
+					Result.AddError("NodeId", "Identity already exists.");
 			}
 
 			if (Result.Errors is null)

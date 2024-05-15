@@ -12,6 +12,7 @@ using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Things.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -330,6 +331,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						DataType DataType;
 
+						s = null;
+
 						if (PropertyType == typeof(string))
 							DataType = StringDataType.Instance;
 						else if (PropertyType == typeof(sbyte))
@@ -374,13 +377,31 @@ namespace Waher.Networking.XMPP.Concentrator
 								DataType = DateDataType.Instance;
 							else
 								DataType = DateTimeDataType.Instance;
+
+							if (PropertyValue is DateTime TP)
+								s = XML.Encode(TP, DateOnly);
 						}
 						else if (PropertyType == typeof(decimal))
+						{
 							DataType = DecimalDataType.Instance;
+
+							if (PropertyValue is decimal d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(double))
+						{
 							DataType = DoubleDataType.Instance;
+
+							if (PropertyValue is double d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(float))
+						{
 							DataType = DoubleDataType.Instance;    // Use xs:double anyway
+
+							if (PropertyValue is float d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(TimeSpan))
 							DataType = TimeDataType.Instance;
 						else if (PropertyType == typeof(Uri))
@@ -398,7 +419,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
-						s = PropertyValue?.ToString();
+						if (s is null)
+							s = PropertyValue?.ToString();
+							
 						if (Nullable && s is null)
 							s = string.Empty;
 

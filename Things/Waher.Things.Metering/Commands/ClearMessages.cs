@@ -4,6 +4,8 @@ using Waher.Runtime.Language;
 using Waher.Things.Queries;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using System.Collections.Generic;
+using Waher.Events;
 
 namespace Waher.Things.Metering.Commands
 {
@@ -67,7 +69,17 @@ namespace Waher.Things.Metering.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			await Database.FindDelete<MeteringMessage>(new FilterFieldEqualTo("NodeId", this.node.NodeId));
+			IEnumerable<MeteringMessage> Messages = await Database.FindDelete<MeteringMessage>(
+				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
+			int Count = 0;
+
+			foreach (MeteringMessage Message in Messages)
+				Count++;
+
+			if (Count == 0)
+				Log.Informational("No messages found to clear.", this.node.NodeId);
+			else
+				Log.Informational("Number of messages cleared: " + Count.ToString(), this.node.NodeId);
 
 			if (this.node.State != NodeState.None)
 				this.node.State = NodeState.None;

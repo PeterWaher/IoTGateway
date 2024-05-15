@@ -14,7 +14,7 @@ namespace Waher.Things.Metering.Commands
 	{
 		private readonly MeteringNode node;
 		private MessageType messageType = MessageType.Information;
-		private string messaageBody = string.Empty;
+		private string messageBody = string.Empty;
 
 		/// <summary>
 		/// Logs a message on a node.
@@ -47,8 +47,8 @@ namespace Waher.Things.Metering.Commands
 		[Required]
 		public string MessageBody
 		{
-			get => this.messaageBody;
-			set => this.messaageBody = value;
+			get => this.messageBody;
+			set => this.messageBody = value;
 		}
 
 		/// <summary>
@@ -95,7 +95,7 @@ namespace Waher.Things.Metering.Commands
 		/// </summary>
 		public Task ExecuteCommandAsync()
 		{
-			return this.node.LogMessageAsync(this.messageType, this.messaageBody);
+			return this.node.LogMessageAsync(this.messageType, this.messageBody);
 		}
 
 		/// <summary>

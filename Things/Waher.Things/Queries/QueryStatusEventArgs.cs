@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.Queries
+﻿namespace Waher.Things.Queries
 {
 	/// <summary>
 	/// Event arguments for query title events.

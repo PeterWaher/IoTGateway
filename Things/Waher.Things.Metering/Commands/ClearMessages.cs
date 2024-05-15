@@ -82,7 +82,11 @@ namespace Waher.Things.Metering.Commands
 				Log.Informational("Number of messages cleared: " + Count.ToString(), this.node.NodeId);
 
 			if (this.node.State != NodeState.None)
+			{
 				this.node.State = NodeState.None;
+				await Database.Update(this.node);
+				this.node.RaiseUpdate();
+			}
 
 			await this.node.NodeStateChanged();
 		}

@@ -379,7 +379,12 @@ namespace Waher.Networking.XMPP.Concentrator
 								DataType = DateTimeDataType.Instance;
 
 							if (PropertyValue is DateTime TP)
-								s = XML.Encode(TP, DateOnly);
+							{
+								if (TP == DateTime.MinValue || TP == DateTime.MaxValue)
+									s = string.Empty;
+								else
+									s = XML.Encode(TP, DateOnly);
+							}
 						}
 						else if (PropertyType == typeof(decimal))
 						{

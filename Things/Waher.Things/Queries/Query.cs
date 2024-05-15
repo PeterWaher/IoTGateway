@@ -71,6 +71,7 @@ namespace Waher.Things.Queries
 		private readonly string commandId;
 		private readonly string queryId;
 		private readonly object state;
+		private bool isStarted = false;
 		private bool isAborted = false;
 		private bool isDone = false;
 		private int seqNr = 0;
@@ -118,6 +119,11 @@ namespace Waher.Things.Queries
 		public INode NodeReference => this.nodeReference;
 
 		/// <summary>
+		/// If the query has been started.
+		/// </summary>
+		public bool IsStarted => this.isStarted;
+
+		/// <summary>
 		/// If the query is aborted.
 		/// </summary>
 		public bool IsAborted => this.isAborted;
@@ -146,18 +152,30 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public virtual async Task Abort()
 		{
-			await this.Raise(this.OnAborted, new QueryEventArgs(this));
-			this.isAborted = true;
+			if (!this.isAborted)
+			{
+				this.isAborted = true;
+				await this.Raise(this.OnAborted, new QueryEventArgs(this), false);
+			}
 		}
 
 		internal Task Abort(QueryEventArgs e)
 		{
-			return this.Raise(this.OnAborted, e);
+			if (!this.isAborted)
+			{
+				this.isAborted = true;
+				return this.Raise(this.OnAborted, e, false);
+			}
+			else
+				return Task.CompletedTask;
 		}
 
-		private async Task Raise(QueryEventHandler Callback, QueryEventArgs e)
+		private async Task Raise(QueryEventHandler Callback, QueryEventArgs e, bool CheckTerminated)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
+			if (CheckTerminated && (this.isAborted || this.isDone))
+				return;
+
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -180,12 +198,22 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public Task Start()
 		{
-			return this.Raise(this.OnStarted, new QueryEventArgs(this));
+			if (this.isStarted)
+				return Task.CompletedTask;
+
+			this.isStarted = true;
+			return this.Raise(this.OnStarted, new QueryEventArgs(this), false);
 		}
 
 		internal Task Start(QueryEventArgs e)
 		{
-			return this.Raise(this.OnStarted, e);
+			if (!this.isStarted)
+			{
+				this.isStarted = true;
+				return this.Raise(this.OnStarted, e, false);
+			}
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -198,13 +226,22 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public async Task Done()
 		{
-			await this.Raise(this.OnDone, new QueryEventArgs(this));
-			this.isDone = true;
+			if (!this.isDone)
+			{
+				this.isDone = true;
+				await this.Raise(this.OnDone, new QueryEventArgs(this), false);
+			}
 		}
 
 		internal Task Done(QueryEventArgs e)
 		{
-			return this.Raise(this.OnDone, e);
+			if (!this.isDone)
+			{
+				this.isDone = true;
+				return this.Raise(this.OnDone, e, false);
+			}
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -481,12 +518,12 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public Task EndSection()
 		{
-			return this.Raise(this.OnEndSection, new QueryEventArgs(this));
+			return this.Raise(this.OnEndSection, new QueryEventArgs(this), true);
 		}
 
 		internal Task EndSection(QueryEventArgs e)
 		{
-			return this.Raise(this.OnEndSection, e);
+			return this.Raise(this.OnEndSection, e, true);
 		}
 
 		/// <summary>

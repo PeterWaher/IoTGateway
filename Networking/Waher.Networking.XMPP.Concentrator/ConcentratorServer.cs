@@ -2832,15 +2832,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node);
 
-					lock (this.synchObject)
-					{
-						if (this.queries.ContainsKey(QueryId))
-							Query = null;
-						else
-							this.queries[QueryId] = Query;
-					}
-
-					if (Query is null)
+					if (!this.RegisterQuery(Query))
 					{
 						DisposeObject(Command);
 						e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
@@ -2886,6 +2878,41 @@ namespace Waher.Networking.XMPP.Concentrator
 						DisposeObject(Command);
 					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Register a query object.
+		/// </summary>
+		/// <param name="Query">Query object.</param>
+		/// <returns>If the query object could be registered.</returns>
+		public bool RegisterQuery(Query Query)
+		{
+			lock (this.synchObject)
+			{
+				if (this.queries.ContainsKey(Query.QueryID))
+					return false;
+				else
+				{
+					this.queries[Query.QueryID] = Query;
+					return true;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Unregister a query object.
+		/// </summary>
+		/// <param name="Query">Query object.</param>
+		/// <returns>If the query object could be unregistered.</returns>
+		public bool UnregisterQuery(Query Query)
+		{
+			lock (this.synchObject)
+			{
+				if (this.queries.TryGetValue(Query.QueryID, out Query Query2) && Query2 == Query)
+					return this.queries.Remove(Query.QueryID);
+				else
+					return false;
 			}
 		}
 
@@ -3329,6 +3356,11 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private Task Query_OnDone(object Sender, QueryEventArgs e)
 		{
+			lock (this.synchObject)
+			{
+				this.queries.Remove(e.Query.QueryID);
+			}
+
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
@@ -3365,6 +3397,11 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private Task Query_OnAborted(object Sender, QueryEventArgs e)
 		{
+			lock (this.synchObject)
+			{
+				this.queries.Remove(e.Query.QueryID);
+			}
+
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];

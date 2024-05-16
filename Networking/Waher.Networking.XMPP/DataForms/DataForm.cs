@@ -1318,10 +1318,20 @@ namespace Waher.Networking.XMPP.DataForms
 			else
 			{
 				int c = this.pages.Length;
-				Array.Resize(ref this.pages, c + 1);
-				this.pages[c] = Page;
-				this.hasPages = true;
+
+				if (c == 1 && string.IsNullOrEmpty(this.pages[0].Label) &&
+					(this.pages[0].Elements is null || this.pages[0].Elements.Length == 0))
+				{
+					this.pages[0] = Page;
+				}
+				else
+				{
+					Array.Resize(ref this.pages, c + 1);
+					this.pages[c] = Page;
+				}
 			}
+
+			this.hasPages = true;
 		}
 
 		/// <summary>

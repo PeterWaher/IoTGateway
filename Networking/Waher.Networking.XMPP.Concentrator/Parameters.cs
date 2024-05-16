@@ -55,7 +55,26 @@ namespace Waher.Networking.XMPP.Concentrator
 			DataForm Parameters = new DataForm(Client, FormType.Form, To, From);
 
 			if (EditableObject is IEditableObject Editable)
+			{
 				await Editable.PopulateForm(Parameters, Language);
+
+				if (!(Parameters.Pages is null))
+				{
+					List<Page> Pages = new List<Page>();
+					bool Changed = false;
+
+					foreach (Page Page in Parameters.Pages)
+					{
+						if (!(Page.Elements is null) && Page.Elements.Length > 0)
+							Pages.Add(Page);
+						else
+							Changed = true;
+					}
+
+					if (Changed)
+						Parameters.Pages = Pages.ToArray();
+				}				
+			}
 			else
 			{
 				Namespace Namespace = null;
@@ -426,7 +445,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (s is null)
 							s = PropertyValue?.ToString();
-							
+
 						if (Nullable && s is null)
 							s = string.Empty;
 

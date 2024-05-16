@@ -13,14 +13,14 @@ using Waher.Things.Attributes;
 namespace Waher.Things.Script.Parameters
 {
     /// <summary>
-    /// Represents a 32-bit integer-valued script parameter.
+    /// Represents a 16-bit integer-valued script parameter.
     /// </summary>
-    public class ScriptInt32ParameterNode : ScriptParameterNode
+    public class ScriptInt16ParameterNode : ScriptParameterNode
     {
         /// <summary>
-        /// Represents a 32-bit integer-valued script parameter.
+        /// Represents a 16-bit integer-valued script parameter.
         /// </summary>
-        public ScriptInt32ParameterNode()
+        public ScriptInt16ParameterNode()
             : base()
         {
         }
@@ -31,7 +31,7 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(29, "Default value:")]
         [ToolTip(30, "Default value presented to user.")]
-        public int? DefaultValue { get; set; }
+        public short? DefaultValue { get; set; }
 
         /// <summary>
         /// Optional minimum value allowed.
@@ -39,7 +39,7 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(44, "Minimum Value:")]
         [ToolTip(45, "The smallest value allowed.")]
-        public int? Min { get; set; }
+        public short? Min { get; set; }
 
         /// <summary>
         /// Optional maximum value allowed.
@@ -47,7 +47,7 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(46, "Maximum Value:")]
         [ToolTip(47, "The largest value allowed.")]
-        public int? Max { get; set; }
+        public short? Max { get; set; }
 
         /// <summary>
         /// Gets the type name of the node.
@@ -56,7 +56,7 @@ namespace Waher.Things.Script.Parameters
         /// <returns>Localized type node.</returns>
         public override Task<string> GetTypeNameAsync(Language Language)
         {
-            return Language.GetStringAsync(typeof(ScriptNode), 48, "32-bit integer-valued parameter");
+            return Language.GetStringAsync(typeof(ScriptNode), 51, "16-bit integer-valued parameter");
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Waher.Things.Script.Parameters
                 Validation = new BasicValidation();
 
             TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue?.ToString() ?? string.Empty }, null, this.Description, IntDataType.Instance,
+                new string[] { this.DefaultValue?.ToString() ?? string.Empty }, null, this.Description, ShortDataType.Instance,
                 Validation, string.Empty, false, false, false);
 
             Parameters.Add(Field);
@@ -109,7 +109,7 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
-                if (int.TryParse(s, out int Parsed))
+                if (short.TryParse(s, out short Parsed))
                     Values[this.ParameterName] = Parsed;
                 else
                     Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));

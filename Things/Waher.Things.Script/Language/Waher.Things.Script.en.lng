@@ -51,9 +51,9 @@
 			<String id="47">The largest value allowed.</String>
 			<String id="48">32-bit integer-valued parameter</String>
 			<String id="49">Invalid value.</String>
-			<String id="50"></String>
-			<String id="51"></String>
-			<String id="52"></String>
+			<String id="50">64-bit integer-valued parameter</String>
+			<String id="51">16-bit integer-valued parameter</String>
+			<String id="52">8-bit integer-valued parameter</String>
 			<String id="53"></String>
 			<String id="54"></String>
 			<String id="55"></String>

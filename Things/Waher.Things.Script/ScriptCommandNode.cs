@@ -158,9 +158,9 @@ namespace Waher.Things.Script
         /// <summary>
         /// Gets a node command based on the script command.
         /// </summary>
-        /// <param name="Node">Script node.</param>
+        /// <param name="Node">Node on which command is executed.</param>
         /// <returns>Command object.</returns>
-        public async Task<ICommand> GetCommand(ScriptNode Node)
+        public async Task<ICommand> GetCommand(VirtualNode Node)
         {
             List<ScriptParameterNode> Parameters = new List<ScriptParameterNode>();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -119,5 +120,33 @@ namespace Waher.Things.Script
 			}
 		}
 
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		internal async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			INode Node = await MeteringTopology.GetNode(this.ScriptNodeId)
+				?? throw new Exception("Node not found: " + this.ScriptNodeId);
+			
+			List<ICommand> Commands = new List<ICommand>();
+			Commands.AddRange(await base.Commands);
+
+			if (Node.HasChildren)
+			{
+				IEnumerable<INode> Children = await Node.ChildNodes;
+				if (!(Children is null))
+				{
+					foreach (INode Child in Children)
+					{
+						if (Child is ScriptCommandNode CommandNode)
+							Commands.Add(await CommandNode.GetCommand(this));
+					}
+				}
+			}
+
+			return Commands.ToArray();
+		}
 	}
 }

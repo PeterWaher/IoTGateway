@@ -178,7 +178,7 @@ namespace Waher.Things.Script
 		/// </summary>
 		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
 
-		private async Task<IEnumerable<ICommand>> GetCommands()
+		internal async Task<IEnumerable<ICommand>> GetCommands()
 		{
 			List<ICommand> Commands = new List<ICommand>();
 			Commands.AddRange(await base.Commands);

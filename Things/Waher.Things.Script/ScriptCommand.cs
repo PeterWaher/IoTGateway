@@ -5,6 +5,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things.Queries;
+using Waher.Things.Virtual;
 
 namespace Waher.Things.Script
 {
@@ -15,7 +16,7 @@ namespace Waher.Things.Script
     {
         private readonly Variables values;
         private readonly ScriptParameterNode[] parameters;
-        private readonly ScriptNode node;
+        private readonly VirtualNode node;
         private readonly ScriptCommandNode commandNode;
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace Waher.Things.Script
         /// </summary>
         /// <param name="Node">Script node publishing the command.</param>
         /// <param name="Parameters">Command parameter definitions.
-        public ScriptCommand(ScriptNode Node, ScriptCommandNode CommandNode, ScriptParameterNode[] Parameters)
+        public ScriptCommand(VirtualNode Node, ScriptCommandNode CommandNode, ScriptParameterNode[] Parameters)
         {
             this.node = Node;
             this.commandNode = CommandNode;

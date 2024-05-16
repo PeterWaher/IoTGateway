@@ -89,7 +89,7 @@ namespace Waher.Things.Script
         [Page(2, "Script", 100)]
         [Header(9, "Command script:")]
         [ToolTip(10, "Script that gets evaluated when then command is executed.")]
-        [Text(TextPosition.AfterField, 11, "Script that is evaluated when command is executed. Use the \"this\" variable to refer to this node.")]
+        [Text(TextPosition.AfterField, 28, "Script that is evaluated when command is executed. Use the \"this\" variable to refer to this node.")]
         [ContentType("application/x-webscript")]
         [Required]
         public string[] CommandScript

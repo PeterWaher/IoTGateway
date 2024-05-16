@@ -36,6 +36,7 @@ namespace Waher.Things.Script
 		[ToolTip(4, "Script that returns sensor-data fields.")]
 		[Text(TextPosition.AfterField, 5, "Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the \"this\" variable to refer to this node.")]
 		[ContentType("application/x-webscript")]
+		[Required]
 		public string[] SensorScript
 		{
 			get => this.sensorScript;
@@ -63,7 +64,7 @@ namespace Waher.Things.Script
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is ScriptNode || Child is ScriptReferenceNode);
+			return Task.FromResult(Child is ScriptNode || Child is ScriptReferenceNode || Child is ScriptCommandNode);
 		}
 
 		/// <summary>
@@ -170,6 +171,32 @@ namespace Waher.Things.Script
 			}
 			else if (!(Obj is null))
 				throw new Exception("Expected script to return sensor data fields. Received object of type: " + Obj.GetType().FullName);
+		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Commands = new List<ICommand>();
+			Commands.AddRange(await base.Commands);
+
+			if (this.HasChildren)
+			{
+				IEnumerable<INode> Children = await this.ChildNodes;
+				if (!(Children is null))
+				{
+					foreach (INode Child in Children)
+					{
+						if (Child is ScriptCommandNode CommandNode)
+							Commands.Add(await CommandNode.GetCommand(this));
+					}
+				}
+			}
+
+			return Commands.ToArray();
 		}
 	}
 }

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -19,17 +18,14 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Language\Waher.Things.Script.en.lng" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="Language\Waher.Things.Script.en.lng">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
@@ -40,7 +36,6 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
@@ -48,6 +43,6 @@
     <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Waher.Things.Virtual\Waher.Things.Virtual.csproj" />
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
   </ItemGroup>
-
 </Project>

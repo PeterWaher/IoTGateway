@@ -28,6 +28,7 @@ namespace Waher.Things.Script
 		[Page(2, "Script", 100)]
 		[Header(6, "Script Node:")]
 		[ToolTip(7, "ID of template node that defines how the node operates.")]
+		[Required]
 		public string ScriptNodeId { get; set; }
 
 		/// <summary>

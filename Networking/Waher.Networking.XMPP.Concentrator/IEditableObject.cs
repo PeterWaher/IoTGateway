@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Runtime.Language;
-using static Waher.Networking.XMPP.Concentrator.Parameters;
 
 namespace Waher.Networking.XMPP.Concentrator
 {

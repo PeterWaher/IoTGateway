@@ -148,7 +148,7 @@ namespace Waher.Things.Script
             SetEditableFormResult Result = new SetEditableFormResult();
 
             foreach (ScriptParameterNode Parameter in this.parameters)
-                await Parameter.SetParameters(Parameters, Language, OnlySetChanged, Result);
+                await Parameter.SetParameter(Parameters, Language, OnlySetChanged, this.values, Result);
 
             return Result;
         }

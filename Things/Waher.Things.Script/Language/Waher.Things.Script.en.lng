@@ -30,17 +30,27 @@
 			<String id="26">Failure Message:</String>
 			<String id="27">Optional failure message. If defined, it will be presented to users after the failed execution of the command.</String>
 			<String id="28">Script that is evaluated when command is executed. Use the &quot;this&quot; variable to refer to this node.</String>
-			<String id="29"></String>
-			<String id="30"></String>
-			<String id="31"></String>
-			<String id="32"></String>
-			<String id="33"></String>
-			<String id="34"></String>
-			<String id="35"></String>
-			<String id="36"></String>
-			<String id="37"></String>
-			<String id="38"></String>
-			<String id="39"></String>
+			<String id="29">Default value:</String>
+			<String id="30">Default value presented to user.</String>
+			<String id="31">Pattern:</String>
+			<String id="32">Regular expression used for validating user input.</String>
+			<String id="33">Description:</String>
+			<String id="34">Description of parameter.</String>
+			<String id="35">String-valued parameter</String>
+			<String id="36">Page:</String>
+			<String id="37">Title of page on which parameter will appear.</String>
+			<String id="38">Label:</String>
+			<String id="39">Label shown with parmaeter when it is presented.</String>
+			<String id="40">Required</String>
+			<String id="41">If parameter is a required parameter.</String>
+			<String id="42">Required parameter.</String>
+			<String id="43">Value does not match expected pattern.</String>
+			<String id="44"></String>
+			<String id="45"></String>
+			<String id="46"></String>
+			<String id="47"></String>
+			<String id="48"></String>
+			<String id="49"></String>
 		</Namespace>
 	</Language>
 </Translation>

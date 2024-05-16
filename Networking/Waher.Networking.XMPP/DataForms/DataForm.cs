@@ -1266,5 +1266,84 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 		}
 
+		/// <summary>
+		/// Tries to get a page from the form, given its title.
+		/// </summary>
+		/// <param name="Title">Page title (label).</param>
+		/// <param name="Page">Page, if found.</param>
+		/// <returns>If a page was found with the given title.</returns>
+		public bool TryGetPage(string Title, out Page Page)
+		{
+			Page = null;
+
+			if (this.pages is null)
+				return false;
+
+			foreach (Page P in this.pages)
+			{
+				if (P.Label == Title)
+				{
+					Page = P;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets a page on the form. If one does not exist with the current title, a new page is created with the corresponding title.
+		/// </summary>
+		/// <param name="Title">Title of page.</param>
+		/// <returns>Page object.</returns>
+		public Page GetPage(string Title)
+		{
+			if (this.TryGetPage(Title, out Page Page))
+				return Page;
+
+			Page = new Page(this, Title);
+			this.Add(Page);
+
+			return Page;
+		}
+
+		/// <summary>
+		/// Adds a page to the form.
+		/// </summary>
+		/// <param name="Page">Page object.</param>
+		public void Add(Page Page)
+		{
+			if (this.pages is null)
+				this.Pages = new Page[] { Page };
+			else
+			{
+				int c = this.pages.Length;
+				Array.Resize(ref this.pages, c + 1);
+				this.pages[c] = Page;
+				this.hasPages = true;
+			}
+		}
+
+		/// <summary>
+		/// Adds a field to the form.
+		/// </summary>
+		/// <param name="Field">Field object.</param>
+		public void Add(Field Field)
+		{
+			if (this.fields is null)
+				this.fields = new Field[] { Field };
+			else
+			{
+				int c = this.fields.Length;
+				Array.Resize(ref this.fields, c + 1);
+				this.fields[c] = Field;
+			}
+
+			if (Field is MediaField)
+				this.hasMedia = true;
+
+			this.fieldsByVar[Field.Var] = Field;
+		}
+
 	}
 }

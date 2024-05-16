@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Runtime.Language;
+using Waher.Script;
 using Waher.Things.Attributes;
 using Waher.Things.Virtual;
 
@@ -12,8 +13,6 @@ namespace Waher.Things.Script
     /// </summary>
     public abstract class ScriptParameterNode : VirtualNode
     {
-        private string parameterName;
-
         /// <summary>
         /// Represents a parameter on a command.
         /// </summary>
@@ -25,14 +24,45 @@ namespace Waher.Things.Script
         /// Parameter name.
         /// </summary>
         [Page(2, "Script", 100)]
+        [Header(36, "Page:")]
+        [ToolTip(37, "Title of page on which parameter will appear.")]
+        [Required]
+        public string Page { get; set; }
+
+        /// <summary>
+        /// Parameter name.
+        /// </summary>
+        [Page(2, "Script", 100)]
         [Header(12, "Parameter Name:")]
         [ToolTip(13, "Parameter value can be referenced in script as a variable using this parameter name.")]
         [Required]
-        public string ParameterName
-        {
-            get => this.parameterName;
-            set => this.parameterName = value;
-        }
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// Parameter label.
+        /// </summary>
+        [Page(2, "Script", 100)]
+        [Header(38, "Label:")]
+        [ToolTip(39, "Label shown with parmaeter when it is presented.")]
+        [Required]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Parameter description.
+        /// </summary>
+        [Page(2, "Script", 100)]
+        [Header(33, "Description:")]
+        [ToolTip(34, "Description of parameter.")]
+        [Required]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// If parameter is required.
+        /// </summary>
+        [Page(2, "Script", 100)]
+        [Header(40, "Required")]
+        [ToolTip(41, "If parameter is a required parameter.")]
+        public bool Required { get; set; }
 
         /// <summary>
         /// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
@@ -68,9 +98,11 @@ namespace Waher.Things.Script
         /// <param name="Parameters">Data form with parameter values.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+        /// <param name="Values">Collection of parameter values.</param>
         /// <param name="Result">Result set to return to caller.</param>
         /// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-        public abstract Task SetParameters(DataForm Parameters, Language Language, bool OnlySetChanged, SetEditableFormResult Result);
+        public abstract Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
+            SetEditableFormResult Result);
 
     }
 }

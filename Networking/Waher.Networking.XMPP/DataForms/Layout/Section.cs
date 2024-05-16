@@ -143,6 +143,24 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 			this.dynamicElements.Add(Element);
 		}
 
+		/// <summary>
+		/// Adds a reference to a field.
+		/// </summary>
+		/// <param name="Field">Field</param>
+		public void Add(Field Field)
+		{
+			this.Add(new FieldReference(this.Form, Field.Var));
+		}
+
+		/// <summary>
+		/// Adds a text element.
+		/// </summary>
+		/// <param name="Text">Text to add.</param>
+		public void Add(string Text)
+		{
+			this.Add(new TextElement(this.Form, Text));
+		}
+
 		internal override bool RemoveExcluded()
 		{
 			if (this.dynamicElements is null)

@@ -1,10 +1,8 @@
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -65,9 +63,20 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Value">Value for parameter.</param>
         public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
-            JidSingleField Field = new JidSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, null, new BasicValidation(), 
-                string.Empty, false, false, false);
+            Field Field;
+
+            if (this.RestrictToOptions)
+            {
+                Field = new ListSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, null, new BasicValidation(),
+                    string.Empty, false, false, false);
+            }
+            else
+            {
+                Field = new JidSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, null, new BasicValidation(),
+                    string.Empty, false, false, false);
+            }
 
             Parameters.Add(Field);
 

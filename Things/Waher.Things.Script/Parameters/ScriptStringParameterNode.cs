@@ -79,15 +79,25 @@ namespace Waher.Things.Script.Parameters
         public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation;
+            Field Field;
 
             if (string.IsNullOrEmpty(this.Pattern))
                 Validation = new OpenValidation();
             else
                 Validation = new RegexValidation(this.Pattern);
 
-            TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, StringDataType.Instance,
-                Validation, string.Empty, false, false, false);
+            if (this.RestrictToOptions)
+            {
+                Field = new ListSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, StringDataType.Instance,
+                    Validation, string.Empty, false, false, false);
+            }
+            else
+            {
+                Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, StringDataType.Instance,
+                    Validation, string.Empty, false, false, false);
+            }
 
             Parameters.Add(Field);
 

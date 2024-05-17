@@ -51,9 +51,20 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Value">Value for parameter.</param>
         public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
-            TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, AnyUriDataType.Instance,
-                new BasicValidation(), string.Empty, false, false, false);
+            Field Field;
+
+            if (this.RestrictToOptions)
+            {
+                Field = new ListSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, AnyUriDataType.Instance,
+                    new BasicValidation(), string.Empty, false, false, false);
+            }
+            else
+            {
+                Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, AnyUriDataType.Instance,
+                    new BasicValidation(), string.Empty, false, false, false);
+            }
 
             Parameters.Add(Field);
 

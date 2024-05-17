@@ -102,13 +102,23 @@ namespace Waher.Things.Script.Parameters
         public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation = new BasicValidation();
+            Field Field;
 
             if (this.MinCount.HasValue || this.MaxCount.HasValue)
                 Validation = new ListRangeValidation(Validation, this.MinCount ?? 0, this.MaxCount ?? ushort.MaxValue);
 
-            TextMultiField Field = new TextMultiField(Parameters, this.ParameterName, this.Label, this.Required,
-                this.DefaultValue, await this.GetOptions(), this.Description, StringDataType.Instance, Validation, string.Empty, 
-                false, false, false, this.GetContentType());
+            if (this.RestrictToOptions)
+            {
+                Field = new ListMultiField(Parameters, this.ParameterName, this.Label, this.Required,
+                    this.DefaultValue, await this.GetOptions(), this.Description, StringDataType.Instance, Validation, string.Empty,
+                    false, false, false);
+            }
+            else
+            {
+                Field = new TextMultiField(Parameters, this.ParameterName, this.Label, this.Required,
+                    this.DefaultValue, await this.GetOptions(), this.Description, StringDataType.Instance, Validation, string.Empty,
+                    false, false, false, this.GetContentType());
+            }
 
             Parameters.Add(Field);
 

@@ -69,6 +69,7 @@ namespace Waher.Things.Script.Parameters
         public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation;
+            Field Field;
 
             if (this.Min.HasValue || this.Max.HasValue)
             {
@@ -79,9 +80,18 @@ namespace Waher.Things.Script.Parameters
             else
                 Validation = new BasicValidation();
 
-            TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue.HasValue ? CommonTypes.Encode(this.DefaultValue.Value) : string.Empty },
-                await this.GetOptions(), this.Description, DoubleDataType.Instance, Validation, string.Empty, false, false, false);
+            if (this.RestrictToOptions)
+            {
+                Field = new ListSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue.HasValue ? CommonTypes.Encode(this.DefaultValue.Value) : string.Empty },
+                    await this.GetOptions(), this.Description, DoubleDataType.Instance, Validation, string.Empty, false, false, false);
+            }
+            else
+            {
+                Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                    new string[] { this.DefaultValue.HasValue ? CommonTypes.Encode(this.DefaultValue.Value) : string.Empty },
+                    await this.GetOptions(), this.Description, DoubleDataType.Instance, Validation, string.Empty, false, false, false);
+            }
 
             Parameters.Add(Field);
 

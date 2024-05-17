@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Things.Attributes;
 
 namespace Waher.Things.Script.Parameters
 {
@@ -14,6 +15,14 @@ namespace Waher.Things.Script.Parameters
         public ScriptParameterNodeWithOptions()
         {
         }
+
+        /// <summary>
+        /// Optional minimum value allowed.
+        /// </summary>
+        [Page(2, "Script", 100)]
+        [Header(88, "Restrict to options.")]
+        [ToolTip(89, "If only values defined in options are valid values.")]
+        public bool RestrictToOptions { get; set; }
 
         /// <summary>
         /// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).

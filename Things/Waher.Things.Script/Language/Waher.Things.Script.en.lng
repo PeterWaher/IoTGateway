@@ -89,8 +89,18 @@
 			<String id="85">Value of parameter option.</String>
 			<String id="86">Label shown when option is presented.</String>
 			<String id="87">Selectable option</String>
-			<String id="88"></String>
-			<String id="89"></String>
+			<String id="88">Restrict to options.</String>
+			<String id="89">If only values defined in options are valid values.</String>
+			<String id="90"></String>
+			<String id="91"></String>
+			<String id="92"></String>
+			<String id="93"></String>
+			<String id="94"></String>
+			<String id="95"></String>
+			<String id="96"></String>
+			<String id="97"></String>
+			<String id="98"></String>
+			<String id="99"></String>
 		</Namespace>
 	</Language>
 </Translation>

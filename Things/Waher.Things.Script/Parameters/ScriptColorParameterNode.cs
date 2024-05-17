@@ -97,7 +97,15 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
-                if (this.AlphaChannel && ColorAlphaDataType.TryParse(s, out ColorReference Parsed))
+
+                if (string.IsNullOrEmpty(s))
+                {
+                    if (this.Required)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
+
+                    Values[this.ParameterName] = null;
+                }
+                else if (this.AlphaChannel && ColorAlphaDataType.TryParse(s, out ColorReference Parsed))
                     Values[this.ParameterName] = Parsed;
                 else if (!this.AlphaChannel && ColorDataType.TryParse(s, out Parsed))
                     Values[this.ParameterName] = Parsed;

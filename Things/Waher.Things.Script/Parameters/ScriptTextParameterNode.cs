@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Waher.Content.Xml;
+using Waher.Content;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -15,16 +15,38 @@ using Waher.Things.Attributes;
 namespace Waher.Things.Script.Parameters
 {
     /// <summary>
-    /// Represents a Date-valued script parameter.
+    /// Represents a text-valued script parameter.
     /// </summary>
-    public class ScriptDateParameterNode : ScriptParameterNode
+    public class ScriptTextParameterNode : ScriptParameterNode
     {
+        private string contentType;
+
         /// <summary>
-        /// Represents a Date-valued script parameter.
+        /// Represents a text-valued script parameter.
         /// </summary>
-        public ScriptDateParameterNode()
+        public ScriptTextParameterNode()
             : base()
         {
+        }
+
+        [Page(2, "Script", 100)]
+        [Header(63, "Content-Type:")]
+        [ToolTip(64, "Content-Type of text.")]
+        [Required]
+        public string ContentType
+        {
+            get => this.contentType;
+            set
+            {
+                if (!string.IsNullOrEmpty(value) && (
+                    !InternetContent.IsAccepted(value, InternetContent.CanDecodeContentTypes) ||
+                    !InternetContent.IsAccepted(value, InternetContent.CanEncodeContentTypes)))
+                {
+                    throw new NotSupportedException("Content-Type not supported.");
+                }
+
+                this.contentType = value;
+            }
         }
 
         /// <summary>
@@ -33,26 +55,33 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(29, "Default value:")]
         [ToolTip(30, "Default value presented to user.")]
-        [DateOnly]
-        public DateTime? DefaultValue { get; set; }
+        [DynamicContentType("GetContentType")]
+        public string[] DefaultValue { get; set; }
 
         /// <summary>
-        /// Optional minimum value allowed.
+        /// Minimum amount of JIDs expected.
         /// </summary>
         [Page(2, "Script", 100)]
-        [Header(44, "Minimum Value:")]
-        [ToolTip(45, "The smallest value allowed.")]
-        [DateOnly]
-        public DateTime? Min { get; set; }
+        [Header(68, "Minimum Count:")]
+        [ToolTip(69, "The smallest amount of items accepted.")]
+        public ushort? MinCount { get; set; }
 
         /// <summary>
-        /// Optional maximum value allowed.
+        /// Maximum amount of JIDs expected.
         /// </summary>
         [Page(2, "Script", 100)]
-        [Header(46, "Maximum Value:")]
-        [ToolTip(47, "The largest value allowed.")]
-        [DateOnly]
-        public DateTime? Max { get; set; }
+        [Header(70, "Maximum Count:")]
+        [ToolTip(71, "The largest amount of items accepted.")]
+        public ushort? MaxCount { get; set; }
+
+        /// <summary>
+        /// Gets the Content-Type of the text value of the parameter.
+        /// </summary>
+        /// <returns>Internet Content-Type.</returns>
+        public string GetContentType()
+        {
+            return string.IsNullOrEmpty(this.contentType) ? "text/plain" : this.contentType;
+        }
 
         /// <summary>
         /// Gets the type name of the node.
@@ -61,7 +90,7 @@ namespace Waher.Things.Script.Parameters
         /// <returns>Localized type node.</returns>
         public override Task<string> GetTypeNameAsync(Language Language)
         {
-            return Language.GetStringAsync(typeof(ScriptNode), 54, "Date and Time-valued parameter");
+            return Language.GetStringAsync(typeof(ScriptNode), 65, "Text-valued parameter");
         }
 
         /// <summary>
@@ -72,20 +101,14 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Value">Value for parameter.</param>
         public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
-            ValidationMethod Validation;
+            ValidationMethod Validation = new BasicValidation();
 
-            if (this.Min.HasValue || this.Max.HasValue)
-            {
-                Validation = new RangeValidation(
-                    this.Min.HasValue ? XML.Encode(this.Min.Value, true) : null,
-                    this.Max.HasValue ? XML.Encode(this.Max.Value, true) : null);
-            }
-            else
-                Validation = new BasicValidation();
+            if (this.MinCount.HasValue || this.MaxCount.HasValue)
+                Validation = new ListRangeValidation(Validation, this.MinCount ?? 0, this.MaxCount ?? ushort.MaxValue);
 
-            TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue.HasValue ? XML.Encode(this.DefaultValue.Value, true) : string.Empty }, null, this.Description,
-                DateDataType.Instance, Validation, string.Empty, false, false, false);
+            TextMultiField Field = new TextMultiField(Parameters, this.ParameterName, this.Label, this.Required,
+                this.DefaultValue, null, this.Description, StringDataType.Instance, Validation, string.Empty, 
+                false, false, false, this.GetContentType());
 
             Parameters.Add(Field);
 
@@ -117,24 +140,24 @@ namespace Waher.Things.Script.Parameters
             }
             else
             {
-                string s = Field.ValueString;
+                string[] s = Field.ValueStrings;
 
-                if (string.IsNullOrEmpty(s))
+                if (s is null || s.Length == 0)
                 {
                     if (this.Required)
                         Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
 
                     Values[this.ParameterName] = null;
                 }
-                else if (XML.TryParse(s, out DateTime Parsed))
-                {
-                    Values[this.ParameterName] = Parsed.Date;
-
-                    if (Parsed.TimeOfDay != TimeSpan.Zero)
-                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 55, "Only date acceptable."));
-                }
                 else
-                    Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));
+                {
+                    Values[this.ParameterName] = s;
+
+                    if (this.MinCount.HasValue && s.Length < this.MinCount.Value)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 72, "Too few rows."));
+                    else if (this.MaxCount.HasValue && s.Length > this.MaxCount.Value)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 73, "Too many rows."));
+                }
             }
         }
 

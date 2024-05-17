@@ -86,10 +86,21 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
-                Values[this.ParameterName] = s;
 
-                if (!Uri.TryCreate(s, UriKind.Absolute, out Uri _))
-                    Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));
+                if (string.IsNullOrEmpty(s))
+                {
+                    if (this.Required)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
+
+                    Values[this.ParameterName] = null;
+                }
+                else
+                {
+                    Values[this.ParameterName] = s;
+
+                    if (!Uri.TryCreate(s, UriKind.Absolute, out Uri _))
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));
+                }
             }
         }
 

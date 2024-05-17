@@ -64,13 +64,33 @@
 			<String id="60">Color-valued parameter</String>
 			<String id="61">Alpha channel</String>
 			<String id="62">If alpha channel is enabled.</String>
-			<String id="63"></String>
-			<String id="64"></String>
-			<String id="65"></String>
-			<String id="66"></String>
-			<String id="67"></String>
-			<String id="68"></String>
-			<String id="69"></String>
+			<String id="63">Content-Type:</String>
+			<String id="64">Content-Type of text.</String>
+			<String id="65">Text-valued parameter</String>
+			<String id="66">JID-valued parameter</String>
+			<String id="67">Multiple JIDs-valued parameter</String>
+			<String id="68">Minimum Count:</String>
+			<String id="69">The smallest amount of items accepted.</String>
+			<String id="70">Maximum Count:</String>
+			<String id="71">The largest amount of items accepted.</String>
+			<String id="72">Too few rows.</String>
+			<String id="73">Too many rows.</String>
+			<String id="74">Fixed parameter</String>
+			<String id="75">Value:</String>
+			<String id="76">Value presented to user.</String>
+			<String id="77">URL:</String>
+			<String id="78">URL to media.</String>
+			<String id="79">Content-Type of media.</String>
+			<String id="80">Width:</String>
+			<String id="81">Width of media.</String>
+			<String id="82">Height:</String>
+			<String id="83">Height of media.</String>
+			<String id="84">Media parameter</String>
+			<String id="85"></String>
+			<String id="86"></String>
+			<String id="87"></String>
+			<String id="88"></String>
+			<String id="89"></String>
 		</Namespace>
 	</Language>
 </Translation>

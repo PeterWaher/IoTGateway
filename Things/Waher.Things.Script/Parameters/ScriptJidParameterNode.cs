@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Waher.Content.Xml;
+using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -15,14 +15,16 @@ using Waher.Things.Attributes;
 namespace Waher.Things.Script.Parameters
 {
     /// <summary>
-    /// Represents a Date-valued script parameter.
+    /// Represents a JID-valued script parameter.
     /// </summary>
-    public class ScriptDateParameterNode : ScriptParameterNode
+    public class ScriptJidParameterNode : ScriptParameterNode
     {
+        private string defaultValue;
+
         /// <summary>
-        /// Represents a Date-valued script parameter.
+        /// Represents a JID-valued script parameter.
         /// </summary>
-        public ScriptDateParameterNode()
+        public ScriptJidParameterNode()
             : base()
         {
         }
@@ -33,26 +35,17 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(29, "Default value:")]
         [ToolTip(30, "Default value presented to user.")]
-        [DateOnly]
-        public DateTime? DefaultValue { get; set; }
+        public string DefaultValue
+        {
+            get => this.defaultValue;
+            set
+            {
+                if (!string.IsNullOrEmpty(value) && !XmppClient.BareJidRegEx.IsMatch(value))
+                    throw new NotSupportedException("Invalid JID.");
 
-        /// <summary>
-        /// Optional minimum value allowed.
-        /// </summary>
-        [Page(2, "Script", 100)]
-        [Header(44, "Minimum Value:")]
-        [ToolTip(45, "The smallest value allowed.")]
-        [DateOnly]
-        public DateTime? Min { get; set; }
-
-        /// <summary>
-        /// Optional maximum value allowed.
-        /// </summary>
-        [Page(2, "Script", 100)]
-        [Header(46, "Maximum Value:")]
-        [ToolTip(47, "The largest value allowed.")]
-        [DateOnly]
-        public DateTime? Max { get; set; }
+                this.defaultValue = value;
+            }
+        }
 
         /// <summary>
         /// Gets the type name of the node.
@@ -61,7 +54,7 @@ namespace Waher.Things.Script.Parameters
         /// <returns>Localized type node.</returns>
         public override Task<string> GetTypeNameAsync(Language Language)
         {
-            return Language.GetStringAsync(typeof(ScriptNode), 54, "Date and Time-valued parameter");
+            return Language.GetStringAsync(typeof(ScriptNode), 66, "JID-valued parameter");
         }
 
         /// <summary>
@@ -72,20 +65,8 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Value">Value for parameter.</param>
         public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
-            ValidationMethod Validation;
-
-            if (this.Min.HasValue || this.Max.HasValue)
-            {
-                Validation = new RangeValidation(
-                    this.Min.HasValue ? XML.Encode(this.Min.Value, true) : null,
-                    this.Max.HasValue ? XML.Encode(this.Max.Value, true) : null);
-            }
-            else
-                Validation = new BasicValidation();
-
-            TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue.HasValue ? XML.Encode(this.DefaultValue.Value, true) : string.Empty }, null, this.Description,
-                DateDataType.Instance, Validation, string.Empty, false, false, false);
+            JidSingleField Field = new JidSingleField(Parameters, this.ParameterName, this.Label, this.Required,
+                new string[] { this.DefaultValue }, null, this.Description, null, new BasicValidation(), string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
@@ -118,6 +99,7 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
+                Values[this.ParameterName] = s;
 
                 if (string.IsNullOrEmpty(s))
                 {
@@ -126,15 +108,8 @@ namespace Waher.Things.Script.Parameters
 
                     Values[this.ParameterName] = null;
                 }
-                else if (XML.TryParse(s, out DateTime Parsed))
-                {
-                    Values[this.ParameterName] = Parsed.Date;
-
-                    if (Parsed.TimeOfDay != TimeSpan.Zero)
-                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 55, "Only date acceptable."));
-                }
-                else
-                    Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));
+                else if (!XmppClient.BareJidRegEx.IsMatch(s))
+                    Result.AddError(this.ParameterName, "Invalid JID.");
             }
         }
 

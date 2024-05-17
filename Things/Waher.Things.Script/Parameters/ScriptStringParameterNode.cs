@@ -120,14 +120,25 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
-                Values[this.ParameterName] = s;
 
-                if (!(this.parsed is null))
+                if (string.IsNullOrEmpty(s))
                 {
-                    Match M = this.parsed.Match(s);
+                    if (this.Required)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
 
-                    if (!M.Success || M.Index > 0 || M.Length != s.Length)
-                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 43, "Value does not match expected pattern."));
+                    Values[this.ParameterName] = null;
+                }
+                else
+                {
+                    Values[this.ParameterName] = s;
+
+                    if (!(this.parsed is null))
+                    {
+                        Match M = this.parsed.Match(s);
+
+                        if (!M.Success || M.Index > 0 || M.Length != s.Length)
+                            Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 43, "Value does not match expected pattern."));
+                    }
                 }
             }
         }

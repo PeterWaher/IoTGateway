@@ -110,7 +110,15 @@ namespace Waher.Things.Script.Parameters
             else
             {
                 string s = Field.ValueString;
-                if (TimeSpan.TryParse(s, out TimeSpan Parsed))
+
+                if (string.IsNullOrEmpty(s))
+                {
+                    if (this.Required)
+                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
+
+                    Values[this.ParameterName] = null;
+                }
+                else if (TimeSpan.TryParse(s, out TimeSpan Parsed))
                     Values[this.ParameterName] = Parsed;
                 else
                     Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 49, "Invalid value."));

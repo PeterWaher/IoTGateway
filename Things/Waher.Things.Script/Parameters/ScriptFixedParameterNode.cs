@@ -13,26 +13,26 @@ using Waher.Things.Attributes;
 namespace Waher.Things.Script.Parameters
 {
     /// <summary>
-    /// Represents a password-valued script parameter.
+    /// Represents a fixed-valued script parameter.
     /// </summary>
-    public class ScriptPasswordParameterNode : ScriptParameterNode
+    public class ScriptFixedParameterNode : ScriptParameterNode
     {
         /// <summary>
-        /// Represents a password-valued script parameter.
+        /// Represents a fixed-valued script parameter.
         /// </summary>
-        public ScriptPasswordParameterNode()
+        public ScriptFixedParameterNode()
             : base()
         {
         }
 
         /// <summary>
-        /// Default parameter value.
+        /// Parameter value.
         /// </summary>
         [Page(2, "Script", 100)]
-        [Header(29, "Default value:")]
-        [ToolTip(30, "Default value presented to user.")]
-        [Masked]
-        public string DefaultValue { get; set; }
+        [Header(75, "Value:")]
+        [ToolTip(76, "Value presented to user.")]
+        [ContentType("text/plain")]
+        public string[] Value { get; set; }
 
         /// <summary>
         /// Gets the type name of the node.
@@ -41,7 +41,7 @@ namespace Waher.Things.Script.Parameters
         /// <returns>Localized type node.</returns>
         public override Task<string> GetTypeNameAsync(Language Language)
         {
-            return Language.GetStringAsync(typeof(ScriptNode), 58, "Password-valued parameter");
+            return Language.GetStringAsync(typeof(ScriptNode), 74, "Fixed parameter");
         }
 
         /// <summary>
@@ -52,9 +52,8 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Value">Value for parameter.</param>
         public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
-            TextPrivateField Field = new TextPrivateField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, null, this.Description, StringDataType.Instance,
-                new BasicValidation(), string.Empty, false, false, false);
+            FixedField Field = new FixedField(Parameters, this.ParameterName, this.Label, this.Required,
+                this.Value, null, this.Description, null, null, string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
@@ -73,31 +72,11 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Values">Collection of parameter values.</param>
         /// <param name="Result">Result set to return to caller.</param>
         /// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-        public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
+        public override Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
             SetEditableFormResult Result)
         {
-            Field Field = Parameters[this.ParameterName];
-            if (Field is null)
-            {
-                if (this.Required)
-                    Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
-
-                Values[this.ParameterName] = null;
-            }
-            else
-            {
-                string s = Field.ValueString;
-
-                if (string.IsNullOrEmpty(s))
-                {
-                    if (this.Required)
-                        Result.AddError(this.ParameterName, await Language.GetStringAsync(typeof(ScriptNode), 42, "Required parameter."));
-
-                    Values[this.ParameterName] = null;
-                }
-                else 
-                    Values[this.ParameterName] = s;
-            }
+            Values[this.ParameterName] = this.Value;
+            return Task.CompletedTask;
         }
 
     }

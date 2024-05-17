@@ -43,7 +43,7 @@ namespace Waher.Things.Script
         /// </summary>
         [Page(2, "Script", 100)]
         [Header(38, "Label:")]
-        [ToolTip(39, "Label shown with parmaeter when it is presented.")]
+        [ToolTip(39, "Label shown with parameter when it is presented.")]
         [Required]
         public string Label { get; set; }
 

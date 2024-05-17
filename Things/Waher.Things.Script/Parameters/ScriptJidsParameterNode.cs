@@ -18,7 +18,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a multiple JIDs-valued script parameter.
     /// </summary>
-    public class ScriptJidsParameterNode : ScriptParameterNode
+    public class ScriptJidsParameterNode : ScriptParameterNodeWithOptions
     {
         /// <summary>
         /// Represents a multiple JIDs-valued script parameter.
@@ -68,7 +68,7 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation = new BasicValidation();
 
@@ -76,14 +76,13 @@ namespace Waher.Things.Script.Parameters
                 Validation = new ListRangeValidation(Validation, this.MinCount ?? 0, this.MaxCount ?? ushort.MaxValue);
 
             JidMultiField Field = new JidMultiField(Parameters, this.ParameterName, this.Label, this.Required,
-                this.DefaultValue, null, this.Description, StringDataType.Instance, Validation, string.Empty, false, false, false);
+                this.DefaultValue, await this.GetOptions(), this.Description, StringDataType.Instance, Validation, string.Empty, 
+                false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

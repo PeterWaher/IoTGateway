@@ -15,7 +15,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents an URI-valued script parameter.
     /// </summary>
-    public class ScriptUriParameterNode : ScriptParameterNode
+    public class ScriptUriParameterNode : ScriptParameterNodeWithOptions
     {
         /// <summary>
         /// Represents an URI-valued script parameter.
@@ -49,18 +49,16 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, null, this.Description, AnyUriDataType.Instance,
+                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, AnyUriDataType.Instance,
                 new BasicValidation(), string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a JID-valued script parameter.
     /// </summary>
-    public class ScriptJidParameterNode : ScriptParameterNode
+    public class ScriptJidParameterNode : ScriptParameterNodeWithOptions
     {
         private string defaultValue;
 
@@ -63,17 +63,16 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             JidSingleField Field = new JidSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, null, this.Description, null, new BasicValidation(), string.Empty, false, false, false);
+                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, null, new BasicValidation(), 
+                string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

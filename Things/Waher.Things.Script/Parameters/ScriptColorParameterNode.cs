@@ -16,7 +16,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a color-valued script parameter.
     /// </summary>
-    public class ScriptColorParameterNode : ScriptParameterNode
+    public class ScriptColorParameterNode : ScriptParameterNodeWithOptions
     {
         /// <summary>
         /// Represents a color-valued script parameter.
@@ -58,20 +58,18 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             DataType DataType = this.AlphaChannel ? (DataType)ColorAlphaDataType.Instance : (DataType)ColorDataType.Instance;
 
             TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, null, this.Description, DataType, new BasicValidation(), string.Empty, 
-                false, false, false);
+                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, DataType, new BasicValidation(), 
+                string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

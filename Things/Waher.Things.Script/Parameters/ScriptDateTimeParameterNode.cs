@@ -17,7 +17,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a Date and Time-valued script parameter.
     /// </summary>
-    public class ScriptDateTimeParameterNode : ScriptParameterNode
+    public class ScriptDateTimeParameterNode : ScriptParameterNodeWithOptions
     {
         /// <summary>
         /// Represents a Date and Time-valued script parameter.
@@ -67,7 +67,7 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation;
 
@@ -81,15 +81,13 @@ namespace Waher.Things.Script.Parameters
                 Validation = new BasicValidation();
 
             TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue.HasValue ? XML.Encode(this.DefaultValue.Value) : string.Empty }, null, this.Description, 
-                DateTimeDataType.Instance, Validation, string.Empty, false, false, false);
+                new string[] { this.DefaultValue.HasValue ? XML.Encode(this.DefaultValue.Value) : string.Empty },
+                await this.GetOptions(), this.Description, DateTimeDataType.Instance, Validation, string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -40,7 +40,7 @@
 			<String id="36">Page:</String>
 			<String id="37">Title of page on which parameter will appear.</String>
 			<String id="38">Label:</String>
-			<String id="39">Label shown with parmaeter when it is presented.</String>
+			<String id="39">Label shown with parameter when it is presented.</String>
 			<String id="40">Required</String>
 			<String id="41">If parameter is a required parameter.</String>
 			<String id="42">Required parameter.</String>
@@ -86,9 +86,9 @@
 			<String id="82">Height:</String>
 			<String id="83">Height of media.</String>
 			<String id="84">Media parameter</String>
-			<String id="85"></String>
-			<String id="86"></String>
-			<String id="87"></String>
+			<String id="85">Value of parameter option.</String>
+			<String id="86">Label shown when option is presented.</String>
+			<String id="87">Selectable option</String>
 			<String id="88"></String>
 			<String id="89"></String>
 		</Namespace>

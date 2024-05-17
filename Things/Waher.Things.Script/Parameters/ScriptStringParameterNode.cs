@@ -15,7 +15,7 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a string-valued script parameter.
     /// </summary>
-    public class ScriptStringParameterNode : ScriptParameterNode
+    public class ScriptStringParameterNode : ScriptParameterNodeWithOptions
     {
         private string pattern = string.Empty;
         private Regex parsed = null;
@@ -76,7 +76,7 @@ namespace Waher.Things.Script.Parameters
         /// <param name="Parameters">Data form to host all editable parameters.</param>
         /// <param name="Language">Current language.</param>
         /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
+        public override async Task PopulateForm(DataForm Parameters, Language Language, object Value)
         {
             ValidationMethod Validation;
 
@@ -86,15 +86,13 @@ namespace Waher.Things.Script.Parameters
                 Validation = new RegexValidation(this.Pattern);
 
             TextSingleField Field = new TextSingleField(Parameters, this.ParameterName, this.Label, this.Required,
-                new string[] { this.DefaultValue }, null, this.Description, StringDataType.Instance,
+                new string[] { this.DefaultValue }, await this.GetOptions(), this.Description, StringDataType.Instance,
                 Validation, string.Empty, false, false, false);
 
             Parameters.Add(Field);
 
             Page Page = Parameters.GetPage(this.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

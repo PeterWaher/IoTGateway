@@ -54,13 +54,23 @@
 			<String id="50">64-bit integer-valued parameter</String>
 			<String id="51">16-bit integer-valued parameter</String>
 			<String id="52">8-bit integer-valued parameter</String>
-			<String id="53"></String>
-			<String id="54"></String>
-			<String id="55"></String>
-			<String id="56"></String>
-			<String id="57"></String>
-			<String id="58"></String>
-			<String id="59"></String>
+			<String id="53">Boolean-valued parameter</String>
+			<String id="54">Date and Time-valued parameter</String>
+			<String id="55">Only date acceptable.</String>
+			<String id="56">Time-valued parameter</String>
+			<String id="57">URI-valued parameter</String>
+			<String id="58">Password-valued parameter</String>
+			<String id="59">Double-precision floating-point parameter</String>
+			<String id="60">Color-valued parameter</String>
+			<String id="61">Alpha channel</String>
+			<String id="62">If alpha channel is enabled.</String>
+			<String id="63"></String>
+			<String id="64"></String>
+			<String id="65"></String>
+			<String id="66"></String>
+			<String id="67"></String>
+			<String id="68"></String>
+			<String id="69"></String>
 		</Namespace>
 	</Language>
 </Translation>

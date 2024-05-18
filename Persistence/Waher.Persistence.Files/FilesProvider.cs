@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if NETSTANDARD2_0
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+#endif
+using System;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.IO;
@@ -15,7 +18,6 @@ using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Waher.Persistence.Files
 {
@@ -89,10 +91,10 @@ namespace Waher.Persistence.Files
 		private int nrFiles = 0;
 		private int bulkCount = 0;
 		private string salt = null;
-		private bool rsaFailure = false;
 		private readonly bool encrypted;
 		private readonly CustomKeyHandler customKeyMethod;
 #if NETSTANDARD2_0
+		private bool rsaFailure = false;
 		private readonly bool compiled;
 		private bool deleteObsoleteKeys = true;
 #endif

@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if NETSTANDARD2_0
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+#endif
+using System;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.IO;
@@ -56,6 +59,11 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable, IDatabaseProvider, ISerializerContext
 	{
+		/// <summary>
+		/// Name of environment variable containing salt for internal database encryption.
+		/// </summary>
+		public const string FILES_DB_SALT = nameof(FILES_DB_SALT);
+
 #if NETSTANDARD2_0
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 #endif
@@ -82,9 +90,11 @@ namespace Waher.Persistence.Files
 		private readonly int timeoutMilliseconds;
 		private int nrFiles = 0;
 		private int bulkCount = 0;
+		private string salt = null;
 		private readonly bool encrypted;
 		private readonly CustomKeyHandler customKeyMethod;
 #if NETSTANDARD2_0
+		private bool rsaFailure = false;
 		private readonly bool compiled;
 		private bool deleteObsoleteKeys = true;
 #endif
@@ -831,6 +841,8 @@ namespace Waher.Persistence.Files
 				}
 #if NETSTANDARD2_0
 			}
+			else if (this.rsaFailure)
+				return this.GetKeysUsingSalt(FileName, FileExists);
 			else
 			{
 				RSACryptoServiceProvider rsa = null;
@@ -858,6 +870,11 @@ namespace Waher.Persistence.Files
 						KeyGenMode |= 1;
 					else if (rsa.KeySize == 768)
 						KeyGenMode |= 2;
+				}
+				catch (PlatformNotSupportedException)
+				{
+					this.rsaFailure = true;
+					return this.GetKeysUsingSalt(FileName, FileExists);
 				}
 				catch (CryptographicException ex)
 				{
@@ -971,6 +988,28 @@ namespace Waher.Persistence.Files
 			}
 #endif
 			return new KeyValuePair<byte[], byte[]>(Key, IV);
+		}
+
+		private KeyValuePair<byte[], byte[]> GetKeysUsingSalt(string FileName, bool FileExists)
+		{
+			if (string.IsNullOrEmpty(this.salt))
+			{
+				this.salt = Environment.GetEnvironmentVariable(FILES_DB_SALT);
+				if (string.IsNullOrEmpty(this.salt))
+					throw new CryptographicException("Missing salt in environment variable FILES_DB_SALT.");
+			}
+
+			using (SHA512 H = SHA512.Create())
+			{
+				byte[] Bin = H.ComputeHash(Encoding.UTF8.GetBytes(this.salt + "|" + FileName));
+				byte[] Key = new byte[32];
+				byte[] IV = new byte[32];
+
+				Array.Copy(Bin, 0, Key, 0, 32);
+				Array.Copy(Bin, 32, IV, 0, 32);
+
+				return new KeyValuePair<byte[], byte[]>(Key, IV);
+			}
 		}
 
 		#endregion

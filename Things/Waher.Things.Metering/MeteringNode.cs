@@ -144,19 +144,13 @@ namespace Waher.Things.Metering
 		/// Optional ID of source containing node.
 		/// </summary>
 		[IgnoreMember]
-		public string SourceId
-		{
-			get { return MeteringTopology.SourceID; }
-		}
+		public string SourceId => MeteringTopology.SourceID;
 
 		/// <summary>
 		/// Optional partition in which the Node ID is unique.
 		/// </summary>
 		[IgnoreMember]
-		public string Partition
-		{
-			get { return string.Empty; }
-		}
+		public string Partition => string.Empty;
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -602,43 +596,25 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// If the children of the node have an intrinsic order (true), or if the order is not important (false).
 		/// </summary>
-		public virtual bool ChildrenOrdered
-		{
-			get { return false; }
-		}
+		public virtual bool ChildrenOrdered => false;
 
 		/// <summary>
 		/// If the node can be read.
 		/// </summary>
 		[IgnoreMember]
-		public virtual bool IsReadable
-		{
-			get
-			{
-				return this is ISensor;
-			}
-		}
+		public virtual bool IsReadable => this is ISensor;
 
 		/// <summary>
 		/// If the node can be controlled.
 		/// </summary>
 		[IgnoreMember]
-		public virtual bool IsControllable
-		{
-			get
-			{
-				return this is IActuator;
-			}
-		}
+		public virtual bool IsControllable => this is IActuator;
 
 		/// <summary>
 		/// If the node has registered commands or not.
 		/// </summary>
 		[IgnoreMember]
-		public virtual bool HasCommands
-		{
-			get { return true; }
-		}
+		public virtual bool HasCommands => true;
 
 		/// <summary>
 		/// Parent Node, or null if a root node.

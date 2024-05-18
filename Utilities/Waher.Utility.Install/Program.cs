@@ -40,6 +40,11 @@ namespace Waher.Utility.Install
 	/// -k KEY               Encryption key used for the package file. Secret used in
 	///                      encryption is based on the local package file name and the
 	///                      KEY parameter, if provided. You cannot rename a package file.
+	/// -dk DOCKER_FILE      If provided together with one or more manifest files, a Docker
+	///                      file will be generated. the -d switch specifies a folder within
+	///                      the Docker image where content files will be copied. The -s
+	///                      switch specifies a full path of the server executable within
+	///                      the Docker image.
 	/// -v                   Verbose mode.
 	/// -i                   Install. This is the default. Switch not required.
 	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
@@ -79,6 +84,7 @@ namespace Waher.Utility.Install
 				string ProgramDataFolder = null;
 				string ServerApplication = null;
 				string PackageFile = null;
+				string DockerFile = null;
 				string Key = string.Empty;
 				string Suffix = string.Empty;
 				int i = 0;
@@ -153,6 +159,16 @@ namespace Waher.Utility.Install
 							}
 							else
 								throw new Exception("Only one key per package allowed.");
+							break;
+
+						case "-dk":
+							if (i >= c)
+								throw new Exception("Missing Docker file name.");
+
+							if (!string.IsNullOrEmpty(DockerFile))
+								throw new Exception("A Docker file name has already been specified.");
+
+							DockerFile = args[i++];
 							break;
 
 						case "-n":
@@ -230,6 +246,11 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
 					Console.Out.WriteLine("                     encryption is based on the local package file name and the");
 					Console.Out.WriteLine("                     KEY parameter, if provided. You cannot rename a package file.");
+					Console.Out.WriteLine("-dk DOCKER_FILE      If provided together with one or more manifest files, a Docker");
+					Console.Out.WriteLine("                     file will be generated. the -d switch specifies a folder within");
+					Console.Out.WriteLine("                     the Docker image where content files will be copied. The -s");
+					Console.Out.WriteLine("                     switch specifies a full path of the server executable within");
+					Console.Out.WriteLine("                     the Docker image.");
 					Console.Out.WriteLine("-v                   Verbose mode.");
 					Console.Out.WriteLine("-i                   Install. This the default. Switch not required.");
 					Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
@@ -256,78 +277,97 @@ namespace Waher.Utility.Install
 				Types.Initialize(typeof(Program).Assembly,
 					typeof(JSON).Assembly);
 
-				Mutex GatewayRunning = null;
-				Mutex StartingServer = null;
-				bool GatewayRunningLocked = false;
-				bool StartingServerLocked = false;
-
-				try
+				if (string.IsNullOrEmpty(DockerFile))
 				{
-					if (Timeout.HasValue && !ContentOnly)
+					Mutex GatewayRunning = null;
+					Mutex StartingServer = null;
+					bool GatewayRunningLocked = false;
+					bool StartingServerLocked = false;
+
+					try
 					{
-						if (Verbose)
-							Console.Out.WriteLine("Making sure server is closed...");
-
-						GatewayRunning = new Mutex(false, "Waher.IoTGateway.Running" + Suffix);
-						if (!GatewayRunning.WaitOne(Timeout.Value))
-							throw new Exception("The IoT Gateway did not stop within the given time period.");
-
-						GatewayRunningLocked = true;
-
-						StartingServer = new Mutex(false, "Waher.IoTGateway.Starting" + Suffix);
-						if (!StartingServer.WaitOne(Timeout.Value))
-							throw new Exception("The IoT Gateway is starting in another process, and is unable to stop within the given time period.");
-
-						StartingServerLocked = true;
-
-						if (Verbose)
-							Console.Out.WriteLine("Server is closed. Proceeding...");
-					}
-
-					if (Packages.First is not null)
-					{
-						if (ManifestFiles.Count == 0)
+						if (Timeout.HasValue && !ContentOnly)
 						{
-							if (UninstallService)
-								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
-							else
-								InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly, true);
+							if (Verbose)
+								Console.Out.WriteLine("Making sure server is closed...");
+
+							GatewayRunning = new Mutex(false, "Waher.IoTGateway.Running" + Suffix);
+							if (!GatewayRunning.WaitOne(Timeout.Value))
+								throw new Exception("The IoT Gateway did not stop within the given time period.");
+
+							GatewayRunningLocked = true;
+
+							StartingServer = new Mutex(false, "Waher.IoTGateway.Starting" + Suffix);
+							if (!StartingServer.WaitOne(Timeout.Value))
+								throw new Exception("The IoT Gateway is starting in another process, and is unable to stop within the given time period.");
+
+							StartingServerLocked = true;
+
+							if (Verbose)
+								Console.Out.WriteLine("Server is closed. Proceeding...");
 						}
-						else if (Packages.Count == 1)
-							GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
-						else
-							throw new Exception("Only one package file name can be referenced, when generating a package.");
-					}
-					else
-					{
-						foreach (string ManifestFile in ManifestFiles)
+
+						if (Packages.First is not null)
 						{
-							if (UninstallService)
-								Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
+							if (ManifestFiles.Count == 0)
+							{
+								if (UninstallService)
+									UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
+								else
+									InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly, true);
+							}
+							else if (Packages.Count == 1)
+								GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
 							else
-								Install(ManifestFile, ServerApplication, ProgramDataFolder, ContentOnly);
+								throw new Exception("Only one package file name can be referenced, when generating a package.");
+						}
+						else
+						{
+							foreach (string ManifestFile in ManifestFiles)
+							{
+								if (UninstallService)
+									Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
+								else
+									Install(ManifestFile, ServerApplication, ProgramDataFolder, ContentOnly);
+							}
+						}
+					}
+					finally
+					{
+						if (GatewayRunning is not null)
+						{
+							if (GatewayRunningLocked)
+								GatewayRunning.ReleaseMutex();
+
+							GatewayRunning.Dispose();
+							GatewayRunning = null;
+						}
+
+						if (StartingServer is not null)
+						{
+							if (StartingServerLocked)
+								StartingServer.ReleaseMutex();
+
+							StartingServer.Dispose();
+							StartingServer = null;
 						}
 					}
 				}
-				finally
+				else
 				{
-					if (GatewayRunning is not null)
-					{
-						if (GatewayRunningLocked)
-							GatewayRunning.ReleaseMutex();
+					if (UninstallService)
+						throw new Exception("Uninstallation not supported when creating Docker files.");
 
-						GatewayRunning.Dispose();
-						GatewayRunning = null;
-					}
+					if (Packages.First is not null)
+						throw new Exception("Docker files are generated from manifest files, not package files.");
 
-					if (StartingServer is not null)
-					{
-						if (StartingServerLocked)
-							StartingServer.ReleaseMutex();
 
-						StartingServer.Dispose();
-						StartingServer = null;
-					}
+					using StreamWriter DockerOutput = File.CreateText(DockerFile);
+
+					foreach (string ManifestFile in ManifestFiles)
+						GenerateDockerInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly);
+
+					DockerOutput.Flush();
 				}
 
 				return 0;
@@ -1171,6 +1211,11 @@ namespace Waher.Utility.Install
 
 		private static (string, string) GetFileName(XmlElement E, string ReferenceFolder)
 		{
+			return GetFileName(E, ReferenceFolder, true);
+		}
+
+		private static (string, string) GetFileName(XmlElement E, string ReferenceFolder, bool CheckFileExists)
+		{
 			string FileName = XML.Attribute(E, "fileName");
 			string AbsFileName = Path.Combine(ReferenceFolder, FileName);
 			if (File.Exists(AbsFileName))
@@ -1178,14 +1223,27 @@ namespace Waher.Utility.Install
 
 			string AltFolder = XML.Attribute(E, "altFolder");
 			if (string.IsNullOrEmpty(AltFolder))
+			{
+				if (!CheckFileExists)
+					return (FileName, Path.GetFullPath(AbsFileName));
+
 				throw new FileNotFoundException("File not found: " + AbsFileName);
+			}
 
 			AltFolder = Path.Combine(ReferenceFolder, AltFolder);
 			if (!Directory.Exists(AltFolder))
-				throw new Exception("Folder not found: " + AltFolder);
+			{
+				if (!CheckFileExists)
+					return (FileName, Path.GetFullPath(AbsFileName));
 
-			AbsFileName = Path.Combine(AltFolder, FileName);
-			if (File.Exists(AbsFileName))
+				throw new Exception("Folder not found: " + AltFolder);
+			}
+
+			string AbsFileName2 = Path.Combine(AltFolder, FileName);
+			if (File.Exists(AbsFileName2))
+				return (FileName, Path.GetFullPath(AbsFileName2));
+
+			if (!CheckFileExists)
 				return (FileName, Path.GetFullPath(AbsFileName));
 
 			throw new FileNotFoundException("File not found: " + AbsFileName);
@@ -1803,6 +1861,149 @@ namespace Waher.Utility.Install
 				AesTransform?.Dispose();
 				Aes?.Dispose();
 				fs?.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Generates Docker Instructions from information available in a manifest file.
+		/// </summary>
+		/// <param name="ManifestFile">File name of manifest file.</param>
+		/// <param name="DockerOutput">Docker output</param>
+		/// <param name="ProgramDataFolder">Data folder inside Docker container.</param>
+		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
+		/// <param name="ContentOnly">If only content files should be copied.</param>
+		public static void GenerateDockerInstructions(string ManifestFile, StreamWriter DockerOutput, 
+			string ProgramDataFolder, string ServerApplication, bool ContentOnly)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+			if (string.IsNullOrEmpty(ManifestFile))
+				throw new Exception("Missing manifest file.");
+
+			if (string.IsNullOrEmpty(ProgramDataFolder))
+				throw new Exception("Program Data folder for Docker image not specified.");
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
+			Log.Informational("Loading manifest file.");
+
+			XmlDocument Manifest = new()
+			{
+				PreserveWhitespace = true
+			};
+			Manifest.Load(ManifestFile);
+
+			Log.Informational("Validating manifest file.");
+
+			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
+			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
+
+			XmlElement Module = Manifest["Module"];
+			string SourceFolder = Path.GetDirectoryName(ManifestFile);
+			string AppFolder = Path.GetDirectoryName(ServerApplication);
+			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
+
+			CopyFile(ManifestFile, DestManifestFileName, DockerOutput);
+
+			Log.Informational("Source folder: " + SourceFolder);
+			Log.Informational("App folder: " + AppFolder);
+
+			foreach (XmlNode N in Module.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Assembly")
+				{
+					if (!ContentOnly)
+					{
+						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder, false);
+
+						CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerOutput);
+						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+						{
+							string PdbFileName = FileName[0..^4] + ".pdb";
+							if (File.Exists(PdbFileName))
+								CopyFile(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), DockerOutput);
+						}
+					}
+				}
+			}
+
+			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module, DockerOutput);
+		}
+
+		private static void CopyFile(string SourceFileName, string DestFileName, StreamWriter DockerOutput)
+		{
+			DockerOutput.Write("COPY \"");
+			DockerOutput.Write(SourceFileName);
+			DockerOutput.Write("\" \"");
+			DockerOutput.Write(DestFileName.Replace(Path.DirectorySeparatorChar, '/'));
+			DockerOutput.WriteLine("\"");
+		}
+
+		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent, StreamWriter DockerOutput)
+		{
+			foreach (XmlNode N in Parent.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "Content":
+							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder, false);
+
+							Log.Informational("Content file: " + FileName);
+
+							CopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerOutput);
+							CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerOutput);
+							break;
+
+						case "Folder":
+							string Name = XML.Attribute(E, "name");
+
+							string SourceFolder2 = Path.Combine(SourceFolder, Name);
+							string AppFolder2 = Path.Combine(AppFolder, Name);
+							string DataFolder2 = Path.Combine(DataFolder, Name);
+
+							Log.Informational("Folder: " + Name,
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("App", AppFolder2),
+								new KeyValuePair<string, object>("Data", DataFolder2));
+
+							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E, DockerOutput);
+							break;
+
+						case "File":
+							//(FileName, SourceFileName) = GetFileName(E, SourceFolder, false);
+							//
+							//Log.Informational("External program file: " + FileName);
+							//
+							//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+							//{
+							//	Log.Informational("Creating folder " + AppFolder + ".");
+							//	Directory.CreateDirectory(AppFolder);
+							//}
+							//
+							//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+							break;
+
+						case "External":
+							//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+							//Name = XML.Attribute(E, "name");
+							//
+							//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+							//AppFolder2 = SourceFolder2;
+							//DataFolder2 = Path.Combine(DataFolder, Name);
+							//
+							//Log.Informational("External Folder: " + Name,
+							//	new KeyValuePair<string, object>("Source", SourceFolder2),
+							//	new KeyValuePair<string, object>("App", AppFolder2),
+							//	new KeyValuePair<string, object>("Data", DataFolder2),
+							//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
+							//
+							//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
+							break;
+					}
+				}
 			}
 		}
 

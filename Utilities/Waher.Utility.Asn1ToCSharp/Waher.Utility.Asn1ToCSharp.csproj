@@ -41,7 +41,10 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;&#xD;&#xA;" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="mkdir -p &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 
 </Project>

@@ -1,6 +1,8 @@
 ﻿ul.SimpleTree
 {
 	list-style: none;
+	width:100%;
+	white-space:nowrap;
 }
 
 li.Expandable:before
@@ -65,7 +67,7 @@ li.Leaf
 
 .SimpleTreeView
 {
-	width:25%;
+	min-width:25%;
 	height:70vh;
 	overflow:scroll;
 	padding:1em;	

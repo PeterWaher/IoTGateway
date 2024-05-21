@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -19,24 +18,20 @@
     <FileVersion>1.0.0</FileVersion>
     <NeutralLanguage>English</NeutralLanguage>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Runtime.Temporary.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
-
 </Project>

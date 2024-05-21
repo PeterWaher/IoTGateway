@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -20,20 +19,17 @@
     <FileVersion>1.0.8</FileVersion>
     <Version>1.0.8</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C$(ProjectDir)\Waher.Runtime.Profiling.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
 </Project>

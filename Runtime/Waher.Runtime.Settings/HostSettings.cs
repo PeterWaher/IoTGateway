@@ -21,6 +21,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a string-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -32,6 +33,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a string-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -56,6 +58,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a string-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -67,6 +70,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a string-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -110,6 +114,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a long-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -121,6 +126,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a long-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -133,6 +139,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a long-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -144,6 +151,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a long-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -187,6 +195,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a bool-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -198,6 +207,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a bool-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -210,6 +220,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a bool-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -221,6 +232,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a bool-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -264,6 +276,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a DateTime-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -275,6 +288,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a DateTime-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -287,6 +301,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a DateTime-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -298,6 +313,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a DateTime-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -341,6 +357,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a TimeSpan-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -352,6 +369,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a TimeSpan-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -364,6 +382,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a TimeSpan-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -375,6 +394,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a TimeSpan-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -418,6 +438,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a double-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -429,6 +450,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a double-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -441,6 +463,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a double-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -452,6 +475,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a double-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -495,6 +519,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a Enum-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -506,6 +531,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a Enum-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -518,6 +544,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a Enum-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -529,6 +556,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a Enum-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -572,6 +600,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a object-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -583,6 +612,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets a object-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="DefaultValue">Default value, if not found.</param>
         /// <returns>Setting value.</returns>
@@ -595,6 +625,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a object-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -606,6 +637,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Sets a object-valued setting.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <param name="Value">New value.</param>
         /// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
@@ -755,6 +787,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Deletes a runtime setting
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Key name.</param>
         /// <returns>If a setting was found with the given name and deleted.</returns>
         public static async Task<bool> DeleteAsync(string Host, string Key)
@@ -803,6 +836,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
         /// <returns>Matching settings found.</returns>
         public static Dictionary<string, object> GetWhereKeyLikeRegEx(string Host, string KeyPattern)
@@ -813,6 +847,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
         /// <returns>Matching settings found.</returns>
         public static Task<Dictionary<string, object>> GetWhereKeyLikeRegExAsync(string Host, string KeyPattern)
@@ -823,24 +858,26 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Gets available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Return settings whose keys match this wildcard expression.</param>
         /// <param name="Wildcard">What wildcard has been used.</param>
         /// <returns>Matching settings found.</returns>
         public static Dictionary<string, object> GetWhereKeyLike(string Host, string Key, string Wildcard)
         {
-            return GetWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host), 
+            return GetWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host),
                 new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
         }
 
         /// <summary>
         /// Gets available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Return settings whose keys match this wildcard expression.</param>
         /// <param name="Wildcard">What wildcard has been used.</param>
         /// <returns>Matching settings found.</returns>
         public static Task<Dictionary<string, object>> GetWhereKeyLikeAsync(string Host, string Key, string Wildcard)
         {
-            return GetWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host), 
+            return GetWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host),
                 new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
         }
 
@@ -876,6 +913,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Deletes available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
         /// <returns>Number of settings deleted.</returns>
         public static int DeleteWhereKeyLikeRegEx(string Host, string KeyPattern)
@@ -886,6 +924,7 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Deletes available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
         /// <returns>Number of settings deleted.</returns>
         public static Task<int> DeleteWhereKeyLikeRegExAsync(string Host, string KeyPattern)
@@ -896,24 +935,26 @@ namespace Waher.Runtime.Settings
         /// <summary>
         /// Deletes available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Delete settings whose keys match this wildcard expression.</param>
         /// <param name="Wildcard">What wildcard has been used.</param>
         /// <returns>Number of settings deleted.</returns>
         public static int DeleteWhereKeyLike(string Host, string Key, string Wildcard)
         {
-            return DeleteWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host), 
+            return DeleteWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host),
                 new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
         }
 
         /// <summary>
         /// Deletes available settings, matching a search filter.
         /// </summary>
+		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Delete settings whose keys match this wildcard expression.</param>
         /// <param name="Wildcard">What wildcard has been used.</param>
         /// <returns>Number of settings deleted.</returns>
         public static Task<int> DeleteWhereKeyLikeAsync(string Host, string Key, string Wildcard)
         {
-            return DeleteWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host), 
+            return DeleteWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host),
                 new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
         }
 

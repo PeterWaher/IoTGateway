@@ -795,9 +795,6 @@ namespace Waher.Utility.Install
 		private static string GetFolderPath(SpecialFolder SpecialFolder, string Name)
 		{
 			string s = Environment.GetFolderPath(SpecialFolder);
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(s))
-				s = s.Replace("/usr/share", "/usr/local/share");
-
 			string Result = Path.Combine(s, Name);
 
 			if (Directory.Exists(Result))

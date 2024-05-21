@@ -293,8 +293,6 @@ namespace Waher.WebService.Tesseract
 			try
 			{
 				Folder = Environment.GetFolderPath(SpecialFolder);
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(Folder))
-					Folder = Folder.Replace("/usr/share", "/usr/local/share");
 			}
 			catch (Exception)
 			{

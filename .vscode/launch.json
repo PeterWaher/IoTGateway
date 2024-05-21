@@ -17,7 +17,9 @@
                 "-d",
                 "/usr/local/share/IoTGateway",
                 "-dk",
-                "/My Projects/IoTGateway/Waher.IoTGateway.Svc/Bin/Debug/net6.0/osx-arm64/Waher.IoTGateway.Svc.docker"
+                "/My Projects/IoTGateway/Waher.IoTGateway.Svc/Bin/Debug/net6.0/osx-arm64/Waher.IoTGateway.Svc.docker",
+                "-x",
+                "NetCoreWin"
             ],
             "cwd": "${workspaceFolder}/Utilities/Waher.Utility.Install/bin/Debug/net6.0/osx-arm64/",
             "stopAtEntry": false,

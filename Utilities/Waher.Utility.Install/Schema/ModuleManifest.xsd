@@ -31,6 +31,11 @@
         <xs:documentation>If the file can be retrieved from an alternative folder.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
+    <xs:attribute name="category" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Optional category that can be used to group files.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="Assembly">
@@ -48,7 +53,11 @@
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="File">
-        <xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer"/>
+        <xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer">
+          <xs:annotation>
+            <xs:documentation>When the file should be copied.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -68,8 +77,17 @@
       <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" use="required"/>
-  </xs:complexType>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Local name of folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="category" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Optional category that can be used to group files.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+ </xs:complexType>
 
   <xs:complexType name="External">
     <xs:annotation>
@@ -79,8 +97,16 @@
       <xs:element name="File" type="ExternalFile" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="Folder" type="ExternalFolder" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="folder" type="SpecialFolder" use="required"/>
-    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="folder" type="SpecialFolder" use="required">
+      <xs:annotation>
+        <xs:documentation>Reference to operating system special folder, that will act as parent folder for application files.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Local name of external folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:simpleType name="SpecialFolder">
@@ -340,7 +366,16 @@
       <xs:element name="File" type="ExternalFile" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="Folder" type="ExternalFolder" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="category" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Optional category that can be used to group files.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
 </xs:schema>

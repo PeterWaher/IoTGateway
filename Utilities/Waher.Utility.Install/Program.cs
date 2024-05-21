@@ -40,6 +40,8 @@ namespace Waher.Utility.Install
 	/// -k KEY               Encryption key used for the package file. Secret used in
 	///                      encryption is based on the local package file name and the
 	///                      KEY parameter, if provided. You cannot rename a package file.
+	/// -x CATEGORY          If working with manifest files, excludes a category from
+	///                      processing. Categories are case-insensitive.
 	/// -dk DOCKER_FILE      If provided together with one or more manifest files, a Docker
 	///                      file will be generated. the -d switch specifies a folder within
 	///                      the Docker image where content files will be copied. The -s
@@ -79,6 +81,7 @@ namespace Waher.Utility.Install
 		{
 			try
 			{
+				Dictionary<string, bool> ExcludeCategories = new(StringComparer.InvariantCultureIgnoreCase);
 				LinkedList<KeyValuePair<string, string>> Packages = new();
 				List<string> ManifestFiles = new();
 				string ProgramDataFolder = null;
@@ -197,6 +200,13 @@ namespace Waher.Utility.Install
 								Timeout = j;
 							break;
 
+						case "-x":
+							if (i >= c)
+								throw new Exception("Missing category.");
+
+							ExcludeCategories[args[i++]] = true;
+							break;
+
 						case "-co":
 							ContentOnly = true;
 							break;
@@ -246,6 +256,8 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
 					Console.Out.WriteLine("                     encryption is based on the local package file name and the");
 					Console.Out.WriteLine("                     KEY parameter, if provided. You cannot rename a package file.");
+					Console.Out.WriteLine("-x CATEGORY          If working with manifest files, excludes a category from");
+					Console.Out.WriteLine("                     processing. Categories are case-insensitive.");
 					Console.Out.WriteLine("-dk DOCKER_FILE      If provided together with one or more manifest files, a Docker");
 					Console.Out.WriteLine("                     file will be generated. the -d switch specifies a folder within");
 					Console.Out.WriteLine("                     the Docker image where content files will be copied. The -s");
@@ -317,7 +329,10 @@ namespace Waher.Utility.Install
 									InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly, true);
 							}
 							else if (Packages.Count == 1)
-								GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
+							{
+								GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value,
+									ExcludeCategories);
+							}
 							else
 								throw new Exception("Only one package file name can be referenced, when generating a package.");
 						}
@@ -326,9 +341,9 @@ namespace Waher.Utility.Install
 							foreach (string ManifestFile in ManifestFiles)
 							{
 								if (UninstallService)
-									Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
+									Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly, ExcludeCategories);
 								else
-									Install(ManifestFile, ServerApplication, ProgramDataFolder, ContentOnly);
+									Install(ManifestFile, ServerApplication, ProgramDataFolder, ContentOnly, ExcludeCategories);
 							}
 						}
 					}
@@ -365,7 +380,10 @@ namespace Waher.Utility.Install
 					using StreamWriter DockerOutput = File.CreateText(DockerFile);
 
 					foreach (string ManifestFile in ManifestFiles)
-						GenerateDockerInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly);
+					{
+						GenerateDockerInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly,
+							ExcludeCategories);
+					}
 
 					DockerOutput.Flush();
 				}
@@ -393,7 +411,21 @@ namespace Waher.Utility.Install
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
 
-		public static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
+		public static bool InExcludedCategory(XmlElement E, Dictionary<string, bool> ExcludeCategories)
+		{
+			if (ExcludeCategories is null)
+				return false;
+
+			if (!E.HasAttribute("category"))
+				return false;
+
+			string Category = E.GetAttribute("category");
+
+			return ExcludeCategories.ContainsKey(Category);
+		}
+
+		public static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly,
+			Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -480,7 +512,13 @@ namespace Waher.Utility.Install
 
 			foreach (XmlNode N in Module.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "Assembly")
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				if (E.LocalName == "Assembly")
 				{
 					if (!ContentOnly)
 					{
@@ -562,7 +600,7 @@ namespace Waher.Utility.Install
 				}
 			}
 
-			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module);
+			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module, ExcludeCategories);
 
 			if (!ContentOnly)
 			{
@@ -668,84 +706,88 @@ namespace Waher.Utility.Install
 			Always = 4
 		}
 
-		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent)
+		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent,
+			Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
-				if (N is XmlElement E)
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				switch (E.LocalName)
 				{
-					switch (E.LocalName)
-					{
-						case "Content":
-							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-							CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
+					case "Content":
+						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
+						CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
-							Log.Informational("Content file: " + FileName);
+						Log.Informational("Content file: " + FileName);
 
-							if (!string.IsNullOrEmpty(DataFolder) && !Directory.Exists(DataFolder))
-							{
-								Log.Informational("Creating folder " + DataFolder + ".");
-								Directory.CreateDirectory(DataFolder);
-							}
+						if (!string.IsNullOrEmpty(DataFolder) && !Directory.Exists(DataFolder))
+						{
+							Log.Informational("Creating folder " + DataFolder + ".");
+							Directory.CreateDirectory(DataFolder);
+						}
 
-							if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
-							{
-								Log.Informational("Creating folder " + AppFolder + ".");
-								Directory.CreateDirectory(AppFolder);
-							}
+						if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+						{
+							Log.Informational("Creating folder " + AppFolder + ".");
+							Directory.CreateDirectory(AppFolder);
+						}
 
-							CopyFileIfNewer(SourceFileName,
-								Path.Combine(DataFolder, FileName),
-								Path.Combine(AppFolder, FileName),
-								CopyOptions == CopyOptions.IfNewer);
-							break;
+						CopyFileIfNewer(SourceFileName,
+							Path.Combine(DataFolder, FileName),
+							Path.Combine(AppFolder, FileName),
+							CopyOptions == CopyOptions.IfNewer);
+						break;
 
-						case "Folder":
-							string Name = XML.Attribute(E, "name");
+					case "Folder":
+						string Name = XML.Attribute(E, "name");
 
-							string SourceFolder2 = Path.Combine(SourceFolder, Name);
-							string AppFolder2 = Path.Combine(AppFolder, Name);
-							string DataFolder2 = Path.Combine(DataFolder, Name);
+						string SourceFolder2 = Path.Combine(SourceFolder, Name);
+						string AppFolder2 = Path.Combine(AppFolder, Name);
+						string DataFolder2 = Path.Combine(DataFolder, Name);
 
-							Log.Informational("Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("App", AppFolder2),
-								new KeyValuePair<string, object>("Data", DataFolder2));
+						Log.Informational("Folder: " + Name,
+							new KeyValuePair<string, object>("Source", SourceFolder2),
+							new KeyValuePair<string, object>("App", AppFolder2),
+							new KeyValuePair<string, object>("Data", DataFolder2));
 
-							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
-							break;
+						CopyContent(SourceFolder2, AppFolder2, DataFolder2, E, ExcludeCategories);
+						break;
 
-						case "File":
-							//(FileName, SourceFileName) = GetFileName(E, SourceFolder);
-							//
-							//Log.Informational("External program file: " + FileName);
-							//
-							//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
-							//{
-							//	Log.Informational("Creating folder " + AppFolder + ".");
-							//	Directory.CreateDirectory(AppFolder);
-							//}
-							//
-							//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
-							break;
+					case "File":
+						//(FileName, SourceFileName) = GetFileName(E, SourceFolder);
+						//
+						//Log.Informational("External program file: " + FileName);
+						//
+						//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+						//{
+						//	Log.Informational("Creating folder " + AppFolder + ".");
+						//	Directory.CreateDirectory(AppFolder);
+						//}
+						//
+						//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+						break;
 
-						case "External":
-							//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
-							//Name = XML.Attribute(E, "name");
-							//
-							//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
-							//AppFolder2 = SourceFolder2;
-							//DataFolder2 = Path.Combine(DataFolder, Name);
-							//
-							//Log.Informational("External Folder: " + Name,
-							//	new KeyValuePair<string, object>("Source", SourceFolder2),
-							//	new KeyValuePair<string, object>("App", AppFolder2),
-							//	new KeyValuePair<string, object>("Data", DataFolder2),
-							//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
-							//
-							//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
-							break;
-					}
+					case "External":
+						//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+						//Name = XML.Attribute(E, "name");
+						//
+						//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+						//AppFolder2 = SourceFolder2;
+						//DataFolder2 = Path.Combine(DataFolder, Name);
+						//
+						//Log.Informational("External Folder: " + Name,
+						//	new KeyValuePair<string, object>("Source", SourceFolder2),
+						//	new KeyValuePair<string, object>("App", AppFolder2),
+						//	new KeyValuePair<string, object>("Data", DataFolder2),
+						//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
+						//
+						//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
+						break;
 				}
 			}
 		}
@@ -773,7 +815,8 @@ namespace Waher.Utility.Install
 			return Result;
 		}
 
-		public static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly)
+		public static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly,
+			Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers
 
@@ -855,7 +898,13 @@ namespace Waher.Utility.Install
 
 			foreach (XmlNode N in Module.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "Assembly")
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				if (E.LocalName == "Assembly")
 				{
 					if (!ContentOnly)
 					{
@@ -941,7 +990,7 @@ namespace Waher.Utility.Install
 			return true;
 		}
 
-		public static void GeneratePackage(string[] ManifestFiles, string PackageFile, string Key)
+		public static void GeneratePackage(string[] ManifestFiles, string PackageFile, string Key, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1014,7 +1063,13 @@ namespace Waher.Utility.Install
 
 					foreach (XmlNode N in Module.ChildNodes)
 					{
-						if (N is XmlElement E && E.LocalName == "Assembly")
+						if (N is not XmlElement E)
+							continue;
+
+						if (InExcludedCategory(E, ExcludeCategories))
+							continue;
+
+						if (E.LocalName == "Assembly")
 						{
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
@@ -1036,7 +1091,7 @@ namespace Waher.Utility.Install
 						}
 					}
 
-					CopyContent(SourceFolder, Compressed, string.Empty, Module);
+					CopyContent(SourceFolder, Compressed, string.Empty, Module, ExcludeCategories);
 				}
 
 				Compressed.WriteByte(0);
@@ -1148,63 +1203,67 @@ namespace Waher.Utility.Install
 			return (byte)i;
 		}
 
-		private static void CopyContent(string SourceFolder, Stream Output, string RelativeFolder, XmlElement Parent)
+		private static void CopyContent(string SourceFolder, Stream Output, string RelativeFolder, XmlElement Parent,
+			Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
-				if (N is XmlElement E)
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				switch (E.LocalName)
 				{
-					switch (E.LocalName)
-					{
-						case "Content":
-							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-							CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
+					case "Content":
+						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
+						CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
-							Log.Informational("Content file: " + FileName);
+						Log.Informational("Content file: " + FileName);
 
-							string RelativePath = Path.Combine(RelativeFolder, FileName);
-							CopyFile((byte)CopyOptions, SourceFileName, RelativePath, Output);
-							break;
+						string RelativePath = Path.Combine(RelativeFolder, FileName);
+						CopyFile((byte)CopyOptions, SourceFileName, RelativePath, Output);
+						break;
 
-						case "Folder":
-							string Name = XML.Attribute(E, "name");
+					case "Folder":
+						string Name = XML.Attribute(E, "name");
 
-							string SourceFolder2 = Path.Combine(SourceFolder, Name);
-							string RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
+						string SourceFolder2 = Path.Combine(SourceFolder, Name);
+						string RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
 
-							Log.Informational("Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("Relative", RelativeFolder2));
+						Log.Informational("Folder: " + Name,
+							new KeyValuePair<string, object>("Source", SourceFolder2),
+							new KeyValuePair<string, object>("Relative", RelativeFolder2));
 
-							CopyContent(SourceFolder2, Output, RelativeFolder2, E);
-							break;
+						CopyContent(SourceFolder2, Output, RelativeFolder2, E, ExcludeCategories);
+						break;
 
-						case "File":
-							(FileName, SourceFileName) = GetFileName(E, SourceFolder);
+					case "File":
+						(FileName, SourceFileName) = GetFileName(E, SourceFolder);
 
-							Log.Informational("External program file: " + FileName);
+						Log.Informational("External program file: " + FileName);
 
-							RelativePath = Path.Combine(RelativeFolder, FileName);
-							CopyFile(5, SourceFileName, RelativePath, Output);
-							break;
+						RelativePath = Path.Combine(RelativeFolder, FileName);
+						CopyFile(5, SourceFileName, RelativePath, Output);
+						break;
 
-						case "External":
-							SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
-							Name = XML.Attribute(E, "name");
+					case "External":
+						SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+						Name = XML.Attribute(E, "name");
 
-							Output.WriteByte(6);
-							WriteBin(Encoding.UTF8.GetBytes(SpecialFolder.ToString()), Output);
-							WriteBin(Encoding.UTF8.GetBytes(Name), Output);
+						Output.WriteByte(6);
+						WriteBin(Encoding.UTF8.GetBytes(SpecialFolder.ToString()), Output);
+						WriteBin(Encoding.UTF8.GetBytes(Name), Output);
 
-							SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+						SourceFolder2 = GetFolderPath(SpecialFolder, Name);
 
-							Log.Informational("External Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
+						Log.Informational("External Folder: " + Name,
+							new KeyValuePair<string, object>("Source", SourceFolder2),
+							new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
 
-							CopyContent(SourceFolder2, Output, string.Empty, E);
-							break;
-					}
+						CopyContent(SourceFolder2, Output, string.Empty, E, ExcludeCategories);
+						break;
 				}
 			}
 		}
@@ -1256,7 +1315,8 @@ namespace Waher.Utility.Install
 				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		public static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, 
+			bool ContentOnly, bool ServerExists)
 		{
 			if (string.IsNullOrEmpty(PackageFile))
 				throw new Exception("Missing package file.");
@@ -1266,7 +1326,8 @@ namespace Waher.Utility.Install
 			InstallPackage(PackageFile, fs, Key, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication, 
+			string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
 			string LocalName = Path.GetFileName(FileName);
 			SHAKE256 H = new(384);
@@ -1289,7 +1350,8 @@ namespace Waher.Utility.Install
 			InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(Stream Decrypted, string ServerApplication, string ProgramDataFolder, bool ContentOnly, bool ServerExists)
+		public static void InstallPackage(Stream Decrypted, string ServerApplication, string ProgramDataFolder, 
+			bool ContentOnly, bool ServerExists)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1872,8 +1934,9 @@ namespace Waher.Utility.Install
 		/// <param name="ProgramDataFolder">Data folder inside Docker container.</param>
 		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
+		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
 		public static void GenerateDockerInstructions(string ManifestFile, StreamWriter DockerOutput, 
-			string ProgramDataFolder, string ServerApplication, bool ContentOnly)
+			string ProgramDataFolder, string ServerApplication, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1911,7 +1974,13 @@ namespace Waher.Utility.Install
 
 			foreach (XmlNode N in Module.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "Assembly")
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				if (E.LocalName == "Assembly")
 				{
 					if (!ContentOnly)
 					{
@@ -1928,7 +1997,7 @@ namespace Waher.Utility.Install
 				}
 			}
 
-			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module, DockerOutput);
+			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module, DockerOutput, ExcludeCategories);
 		}
 
 		private static void CopyFile(string SourceFileName, string DestFileName, StreamWriter DockerOutput)
@@ -1940,69 +2009,73 @@ namespace Waher.Utility.Install
 			DockerOutput.WriteLine("\"");
 		}
 
-		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent, StreamWriter DockerOutput)
+		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent, 
+			StreamWriter DockerOutput, Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
-				if (N is XmlElement E)
+				if (N is not XmlElement E)
+					continue;
+
+				if (InExcludedCategory(E, ExcludeCategories))
+					continue;
+
+				switch (E.LocalName)
 				{
-					switch (E.LocalName)
-					{
-						case "Content":
-							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder, false);
+					case "Content":
+						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder, false);
 
-							Log.Informational("Content file: " + FileName);
+						Log.Informational("Content file: " + FileName);
 
-							CopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerOutput);
-							CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerOutput);
-							break;
+						CopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerOutput);
+						CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerOutput);
+						break;
 
-						case "Folder":
-							string Name = XML.Attribute(E, "name");
+					case "Folder":
+						string Name = XML.Attribute(E, "name");
 
-							string SourceFolder2 = Path.Combine(SourceFolder, Name);
-							string AppFolder2 = Path.Combine(AppFolder, Name);
-							string DataFolder2 = Path.Combine(DataFolder, Name);
+						string SourceFolder2 = Path.Combine(SourceFolder, Name);
+						string AppFolder2 = Path.Combine(AppFolder, Name);
+						string DataFolder2 = Path.Combine(DataFolder, Name);
 
-							Log.Informational("Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("App", AppFolder2),
-								new KeyValuePair<string, object>("Data", DataFolder2));
+						Log.Informational("Folder: " + Name,
+							new KeyValuePair<string, object>("Source", SourceFolder2),
+							new KeyValuePair<string, object>("App", AppFolder2),
+							new KeyValuePair<string, object>("Data", DataFolder2));
 
-							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E, DockerOutput);
-							break;
+						CopyContent(SourceFolder2, AppFolder2, DataFolder2, E, DockerOutput, ExcludeCategories);
+						break;
 
-						case "File":
-							//(FileName, SourceFileName) = GetFileName(E, SourceFolder, false);
-							//
-							//Log.Informational("External program file: " + FileName);
-							//
-							//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
-							//{
-							//	Log.Informational("Creating folder " + AppFolder + ".");
-							//	Directory.CreateDirectory(AppFolder);
-							//}
-							//
-							//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
-							break;
+					case "File":
+						//(FileName, SourceFileName) = GetFileName(E, SourceFolder, false);
+						//
+						//Log.Informational("External program file: " + FileName);
+						//
+						//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+						//{
+						//	Log.Informational("Creating folder " + AppFolder + ".");
+						//	Directory.CreateDirectory(AppFolder);
+						//}
+						//
+						//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+						break;
 
-						case "External":
-							//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
-							//Name = XML.Attribute(E, "name");
-							//
-							//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
-							//AppFolder2 = SourceFolder2;
-							//DataFolder2 = Path.Combine(DataFolder, Name);
-							//
-							//Log.Informational("External Folder: " + Name,
-							//	new KeyValuePair<string, object>("Source", SourceFolder2),
-							//	new KeyValuePair<string, object>("App", AppFolder2),
-							//	new KeyValuePair<string, object>("Data", DataFolder2),
-							//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
-							//
-							//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
-							break;
-					}
+					case "External":
+						//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+						//Name = XML.Attribute(E, "name");
+						//
+						//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+						//AppFolder2 = SourceFolder2;
+						//DataFolder2 = Path.Combine(DataFolder, Name);
+						//
+						//Log.Informational("External Folder: " + Name,
+						//	new KeyValuePair<string, object>("Source", SourceFolder2),
+						//	new KeyValuePair<string, object>("App", AppFolder2),
+						//	new KeyValuePair<string, object>("Data", DataFolder2),
+						//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
+						//
+						//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
+						break;
 				}
 			}
 		}

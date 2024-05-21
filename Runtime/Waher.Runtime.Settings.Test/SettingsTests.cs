@@ -97,7 +97,7 @@ namespace Waher.Runtime.Settings.Test
 		[TestMethod]
 		public async Task Test_08_Object()
 		{
-			TestObject Obj = new TestObject()
+			TestObject Obj = new()
 			{
 				S = "Hello",
 				D = 3.1415927,

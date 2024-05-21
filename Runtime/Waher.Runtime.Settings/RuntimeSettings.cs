@@ -750,12 +750,10 @@ namespace Waher.Runtime.Settings
 		{
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
-				bool Found = false;
-
 				foreach (Setting Setting in await Database.FindDelete<Setting>(new FilterFieldEqualTo("Key", Key)))
-					Found = true;
+					return true;
 
-				return Found;
+				return false;
 			}
 		}
 

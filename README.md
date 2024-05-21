@@ -620,9 +620,17 @@ The following sections list the preparations that need to be performed before yo
 
 #### Application data folder
 
-To compile projects on MAC, use VS Code for MAC. The IoT Gateway separates executable and compiled code (which is later installed in a computer's `/Applications` folder), and application data, which the application can read and write. The latter is stored in the corresponding `/usr/local/share` folder. The default installation of IoT Gateway, stores data in `/usr/local/share/IoT Gateway`. A non-default instance, stores its application data in `/user/local/share/IoT Gateway INST`, where `INST` is replaced by the instance name. So before you can compile, you need to make sure the folder `/usr/local/share/IoT Gateway Dev` exists, and that the user performing the build has access to this folder.
+To compile projects on MAC, use VS Code for MAC. The IoT Gateway separates executable and compiled code (which is later installed in a computer's `/Applications` folder), and application data, which the application can read and write. The latter is stored in the corresponding `/usr/share` folder. The default installation of IoT Gateway, stores data in `/usr/share/IoT Gateway`. A non-default instance, stores its application data in `/usr/share/IoT Gateway INST`, where `INST` is replaced by the instance name. So before you can compile, you need to make sure the folder `/usr/share/IoT Gateway Dev` exists, and that the user performing the build has access to this folder.
+
+**Note**: You might not be permitted to create a folder under `/usr/share` for security reasons, even if using `sudo`. In such cases, you can create a folder under `/usr/local/share` instead. This folder will be valid for development purposes. Once the gateway is placed in an installation package, the package tool will be able to create the proper share folder for you.
 
 Terminal script to create and configure folder:
+
+	sudo mkdir -p "/usr/share/IoT Gateway Dev"
+	sudo chown yourusername "/usr/share/IoT Gateway Dev"
+	sudo chmod 755 "/usr/share/IoT Gateway Dev"
+
+In case you are not permitted to execute the above script, you can create a development folder instead:
 
 	sudo mkdir -p "/usr/local/share/IoT Gateway Dev"
 	sudo chown yourusername "/usr/local/share/IoT Gateway Dev"

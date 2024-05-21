@@ -88,15 +88,27 @@ namespace Waher.IoTGateway.Installers
 			get
 			{
 				string Result = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-					Result = Result.Replace("/usr/share", "/usr/local/share");
 
 				if (!Result.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					Result += Path.DirectorySeparatorChar;
 
 				Result += "IoT Gateway" + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(Result))
-					Directory.CreateDirectory(Result);
+				{
+					try
+					{
+						Directory.CreateDirectory(Result);
+					}
+					catch (Exception ex)
+					{
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+						{
+							Result = Result.Replace("/usr/share", "/usr/local/share");
+							Directory.CreateDirectory(Result);
+						}
+						else
+							ExceptionDispatchInfo.Capture(ex).Throw();
+					}
 
 				return Result;
 			}
@@ -823,7 +835,7 @@ namespace Waher.IoTGateway.Installers
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
 
 				Session.Log("Using default program data folder: " + ProgramDataFolder);
@@ -1157,7 +1169,7 @@ namespace Waher.IoTGateway.Installers
 		private static string GetFolderPath(SpecialFolder SpecialFolder, string Name)
 		{
 			string s = Environment.GetFolderPath(SpecialFolder);
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(s))
 				s = s.Replace("/usr/share", "/usr/local/share");
 
 			string Result = Path.Combine(s, Name);
@@ -1192,7 +1204,7 @@ namespace Waher.IoTGateway.Installers
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
 
 				Session.Log("Using default program data folder: " + ProgramDataFolder);

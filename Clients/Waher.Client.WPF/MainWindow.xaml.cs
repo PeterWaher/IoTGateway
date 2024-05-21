@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading;
@@ -124,15 +125,28 @@ namespace Waher.Client.WPF
 				typeof(Security.EllipticCurves.PrimeFieldCurve).Assembly);
 
 			appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
 			if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 				appDataFolder += Path.DirectorySeparatorChar;
 
 			appDataFolder += "IoT Client" + Path.DirectorySeparatorChar;
 
 			if (!Directory.Exists(appDataFolder))
-				Directory.CreateDirectory(appDataFolder);
+			{
+				try
+				{
+					Directory.CreateDirectory(appDataFolder);
+				}
+				catch (Exception)
+				{
+					if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					{
+						appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
+						Directory.CreateDirectory(appDataFolder);
+					}
+					else
+						ExceptionDispatchInfo.Capture(ex).Throw();
+				}
+			}
 
 			Task T = Task.Run(() =>
 			{

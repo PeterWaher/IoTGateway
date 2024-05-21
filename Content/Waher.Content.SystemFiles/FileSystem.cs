@@ -130,7 +130,7 @@ namespace Waher.Content.SystemFiles
 			foreach (Environment.SpecialFolder Folder in Folders)
 			{
 				string Path = Environment.GetFolderPath(Folder, Environment.SpecialFolderOption.None);
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(Path))
 					Path = Path.Replace("/usr/share", "/usr/local/share");
 
 				if (!string.IsNullOrEmpty(Path))

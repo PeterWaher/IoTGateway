@@ -189,7 +189,7 @@ namespace Waher.Utility.GenManifest
 						string Folder = Environment.GetFolderPath(SpecialFolder);
 						string Name = SpecialFolder.ToString();
 
-						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(Folder))
 							Folder = Folder.Replace("/usr/share", "/usr/local/share");
 
 						Len = Name.Length;

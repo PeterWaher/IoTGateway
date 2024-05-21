@@ -10,7 +10,7 @@
 
 Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptStatistics</Description>
     <Copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Statistics</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -18,7 +18,7 @@ Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptS
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.1.1</AssemblyVersion>
     <FileVersion>2.1.1</FileVersion>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <Version>2.1.1</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Statistics\</UpgradeBackupLocation>
@@ -35,11 +35,11 @@ Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptS
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
 </Project>

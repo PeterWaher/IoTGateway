@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -11,7 +11,7 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Graphs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -19,7 +19,7 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
     <AssemblyVersion>2.1.6</AssemblyVersion>
     <FileVersion>2.1.6</FileVersion>
     <NeutralLanguage>English</NeutralLanguage>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <Version>2.1.6</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Graphs\</UpgradeBackupLocation>
@@ -40,11 +40,11 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
 </Project>

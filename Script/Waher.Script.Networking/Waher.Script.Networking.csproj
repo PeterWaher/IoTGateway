@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -22,27 +21,23 @@ Script Syntax: https://waher.se/Script.md#networkingRelatedFunctionsWaherScriptN
     <FileVersion>2.0.3</FileVersion>
     <Version>2.0.3</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Script.Networking.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.WHOIS\Waher.Networking.WHOIS.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
-
 </Project>

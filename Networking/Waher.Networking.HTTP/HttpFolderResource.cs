@@ -45,6 +45,7 @@ namespace Waher.Networking.HTTP
 		private readonly Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
 		private readonly Dictionary<string, bool> definedDomains = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Dictionary<string, string> folders = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+		private LinkedList<KeyValuePair<string, string>> defaultResponseHeaders = null;
 		private Dictionary<string, bool> allowTypeConversionFrom = null;
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 		private readonly HostDomainOptions domainOptions;
@@ -145,6 +146,19 @@ namespace Waher.Networking.HTTP
 			{
 				return protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected;
 			}
+		}
+
+		/// <summary>
+		/// Adds a default HTTP Response header that will be returned in responses for resources in the folder.
+		/// </summary>
+		/// <param name="Key">Header key.</param>
+		/// <param name="Value">Header value.</param>
+		public void AddDefaultResponseHeader(string Key, string Value)
+		{
+			if (this.defaultResponseHeaders is null)
+				this.defaultResponseHeaders = new LinkedList<KeyValuePair<string, string>>();
+
+			this.defaultResponseHeaders.AddLast(new KeyValuePair<string, string>(Key, Value));
 		}
 
 		/// <summary>
@@ -430,7 +444,8 @@ namespace Waher.Networking.HTTP
 				if (Response.ResponseSent)
 					return;
 
-				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
+				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, 
+					Response, Request, this.defaultResponseHeaders);
 			}
 			else
 				await this.RaiseFileNotFound(FullPath, Request, Response);
@@ -481,7 +496,7 @@ namespace Waher.Networking.HTTP
 		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
 			HttpResponse Response)
 		{
-			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null, null);
 		}
 
 		/// <summary>
@@ -496,11 +511,11 @@ namespace Waher.Networking.HTTP
 		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
 			HttpResponse Response, HttpRequest Request)
 		{
-			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request, null);
 		}
 
 		private static async Task SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
-			DateTime LastModified, HttpResponse Response, HttpRequest Request)
+			DateTime LastModified, HttpResponse Response, HttpRequest Request, LinkedList<KeyValuePair<string, string>> DefaultResponseHeaders)
 		{
 			ReadProgress Progress = new ReadProgress()
 			{
@@ -514,6 +529,12 @@ namespace Waher.Networking.HTTP
 			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
 			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
 			Progress.Buffer = new byte[Progress.BlockSize];
+
+			if (!(DefaultResponseHeaders is null))
+			{
+				foreach (KeyValuePair<string, string> P in DefaultResponseHeaders)
+					Response.SetHeader(P.Key, P.Value);
+			}
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;

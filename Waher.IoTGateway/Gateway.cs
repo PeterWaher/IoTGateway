@@ -1009,6 +1009,21 @@ namespace Waher.IoTGateway
 
 				root.AllowTypeConversion();
 
+				XmlElement DefaultHttpResponseHeaders = Config.DocumentElement["DefaultHttpResponseHeaders"];
+				if (!(DefaultHttpResponseHeaders is null))
+				{
+					foreach (XmlNode N in DefaultHttpResponseHeaders.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "DefaultHttpResponseHeader")
+						{
+							string HeaderKey = XML.Attribute(E, "key");
+							string HeaderValue = XML.Attribute(E, "value");
+
+							root.AddDefaultResponseHeader(HeaderKey, HeaderValue);
+						}
+					}
+				}
+
 				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
 				if (!(FileFolders is null))
 				{
@@ -1019,7 +1034,19 @@ namespace Waher.IoTGateway
 							string WebFolder = XML.Attribute(E, "webFolder");
 							string FolderPath = XML.Attribute(E, "folderPath");
 
-							webServer.Register(new HttpFolderResource(WebFolder, FolderPath, false, false, true, true, HostDomainOptions.SameForAllDomains));
+							HttpFolderResource FileFolder = new HttpFolderResource(WebFolder, FolderPath, false, false, true, true, HostDomainOptions.SameForAllDomains);
+							webServer.Register(FileFolder);
+
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "DefaultHttpResponseHeader")
+								{
+									string HeaderKey = XML.Attribute(E2, "key");
+									string HeaderValue = XML.Attribute(E2, "value");
+
+									FileFolder.AddDefaultResponseHeader(HeaderKey, HeaderValue);
+								}
+							}
 						}
 					}
 				}

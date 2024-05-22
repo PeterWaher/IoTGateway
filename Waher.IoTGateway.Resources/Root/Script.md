@@ -2365,6 +2365,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `DecCounter(CounterName[,Amount])`                    | Decrements a counter, given its name, and returns the decremented count. |
 | `FullJID(JID)`                                        | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
 | `GetCounter(CounterName)`                             | Gets the current count of a counter, given its name. |
+| `GetDomainSetting(Host,Key,DefaultValue)`             | Gets a domain setting. If the Host (which can be a string or implement `Waher.Content.IHostReference`, such as an HTTP Request object for instance) is an alternative domain, it will be treated as a host setting, otherwise a runtime setting. |
 | `GetNode(NodeId[,SourceId[,Partition[,JID]]])`        | Gets the node object of a node in the gateway (if not providing a `JID`), or a provisional reference node to a node hosted by a remote gateway identified by `JID`. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) Authorization to view the node is required, and depends on the execution context. |
 | `GetSources()`                                        | Gets available sources of things. |
 | `GetTabIDs([Page[,QueryFilter]])`                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
@@ -2378,6 +2379,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `ReloadPage(...)`                                     | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
 | `RemoveScriptResource(Resource)`                      | Removes a script resource added using the `ScriptResource` function. The function returns a Boolean value showing if such a resource was found and removed. |
 | `ScriptResource(Resource,Expression)`                 | Defines a script resource on the web server hosted by the gateway. Script resources are persisted, and will be available after the gateway is restarted, until they are removed by calling `RemoveScriptResource`. If a non-script resource already exists with the given name, the new resource is not added. The function returns a Boolean value showing if the script resource was added or not. |
+| `SetDomainSetting(Host,Key,Value)`                    | Sets a domain setting. If the Host (which can be a string or implement `Waher.Content.IHostReference`, such as an HTTP Request object for instance) is an alternative domain, it will be treated as a host setting, otherwise a runtime setting. |
 
 The following predefined variables are available in web pages hosted by the IoT Gateway:
 

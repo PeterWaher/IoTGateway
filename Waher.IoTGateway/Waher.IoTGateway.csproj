@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -8,9 +8,9 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M DNS</PackageTags>
@@ -98,15 +98,15 @@
     <None Remove="Waher.IoTGateway.manifest" />
     <None Include="..\Images\Icon.ico">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -406,7 +406,7 @@
     <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs&quot; copy &quot;$(ProjectDir)\..\..\Registration.cs&quot; &quot;$(ProjectDir)Setup&quot;" Condition="'$(OS)'=='Windows_NT'" />
     <Exec Command="if [ ! -f &quot;$(ProjectDir)/../../Registration.cs.bak&quot; ]; then cp &quot;$(ProjectDir)Setup/Registration.cs&quot; &quot;$(ProjectDir)/../../Registration.cs.bak&quot;; fi" Condition="'$(OS)'=='Unix'" />
     <Exec Command="if [ -f &quot;$(ProjectDir)/../../Registration.cs&quot; ]; then cp &quot;$(ProjectDir)/../../Registration.cs&quot; &quot;$(ProjectDir)Setup/&quot;; fi" Condition="'$(OS)'=='Unix'" />
- </Target>
+  </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; &quot;$(ProjectDir)Setup\Registration.cs&quot;" Condition="'$(OS)'=='Windows_NT'" />
     <Exec Command="if exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; del &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot;" Condition="'$(OS)'=='Windows_NT'" />

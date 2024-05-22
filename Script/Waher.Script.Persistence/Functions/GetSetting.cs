@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Runtime.Settings;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.Functions
@@ -82,7 +82,7 @@ namespace Waher.Script.Persistence.Functions
 		{
 			int i = 0;
 			int c = Arguments.Length;
-			string Host = c < 3 ? null : GetHost(Arguments[i++].AssociatedObjectValue);
+			string Host = c < 3 ? null : GetHost(Arguments[i++].AssociatedObjectValue, this);
 			string Name = Arguments[i++].AssociatedObjectValue?.ToString();
 			object DefaultValue = Arguments[i].AssociatedObjectValue;
 			object Result;
@@ -95,14 +95,22 @@ namespace Waher.Script.Persistence.Functions
 			return Expression.Encapsulate(Result);
 		}
 
-		internal static string GetHost(object Value)
+		/// <summary>
+		/// Gets the host name from a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Node">Script node executing code.</param>
+		/// <returns>Host name.</returns>
+		public static string GetHost(object Value, ScriptNode Node)
 		{
 			if (Value is IHostReference Ref)
 				return Ref.Host;
 			else if (Value is string s)
 				return s;
+			else if (Value is null)
+				return null;
 			else
-				return Value?.ToString();
+				throw new ScriptRuntimeException("Expected a host reference, or null.", Node);
 		}
 	}
 }

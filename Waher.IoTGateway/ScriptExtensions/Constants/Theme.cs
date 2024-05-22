@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using SkiaSharp;
+using Waher.Content;
 using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Markdown.PlantUml;
+using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.IoTGateway.Setup;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -44,13 +46,22 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			if (!(Variables is null))
+			ThemeDefinition Def = currentDefinition;
+
+			if (Variables.TryGetVariable("Request", out Variable v) && v.ValueObject is IHostReference HostRef)
 			{
-				Variables["GraphBgColor"] = currentDefinition.GraphBgColor;
-				Variables["GraphFgColor"] = currentDefinition.GraphFgColor;
+				string Host = GetDomainSetting.IsAlternativeDomain(HostRef.Host);
+				if (!string.IsNullOrEmpty(Host))
+					Def = GetTheme(Host);
 			}
 
-			return new ObjectValue(currentDefinition);
+			if (!(Variables is null))
+			{
+				Variables["GraphBgColor"] = Def.GraphBgColor;
+				Variables["GraphFgColor"] = Def.GraphFgColor;
+			}
+
+			return new ObjectValue(Def);
 		}
 
 		/// <summary>

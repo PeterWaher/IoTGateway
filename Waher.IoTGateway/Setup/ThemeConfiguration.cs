@@ -100,6 +100,8 @@ namespace Waher.IoTGateway.Setup
 			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out ThemeDefinition Def))
 				Theme.CurrentTheme = Def;
 
+			// TODO: GraphViz, PlantUml, LayoutXml for alternative domains.
+
 			return Task.CompletedTask;
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using SkiaSharp;
 using Waher.Content.Markdown.GraphViz;
@@ -17,6 +18,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 	/// </summary>
 	public class Theme : IConstant
 	{
+		private static readonly Dictionary<string, ThemeDefinition> definitionsPerDomain = new Dictionary<string, ThemeDefinition>(StringComparer.InvariantCultureIgnoreCase);
 		private static ThemeDefinition currentDefinition = null;
 
 		/// <summary>
@@ -29,18 +31,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName
-		{
-			get { return "Theme"; }
-		}
+		public string ConstantName => nameof(Theme);
 
-		/// <summary>
+		/// <	summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
 		/// </summary>
-		public string[] Aliases
-		{
-			get { return null; }
-		}
+		public string[] Aliases => null;
 
 		/// <summary>
 		/// Gets the constant value element.
@@ -83,6 +79,35 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 					PlantUml.DeleteOldFiles(TimeSpan.Zero, false);
 					XmlLayout.DeleteOldFiles(TimeSpan.Zero, false);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the theme for a given domain.
+		/// </summary>
+		/// <param name="Domain">Domain</param>
+		/// <returns>Theme definition.</returns>
+		public static ThemeDefinition GetTheme(string Domain)
+		{
+			lock (definitionsPerDomain)
+			{
+				if (definitionsPerDomain.TryGetValue(Domain, out ThemeDefinition Result))
+					return Result;
+			}
+
+			return CurrentTheme;
+		}
+
+		/// <summary>
+		/// Sets the theme for a given domain.
+		/// </summary>
+		/// <param name="Domain">Domain</param>
+		/// <param name="Theme">Theme</param>
+		internal static void SetTheme(string Domain, ThemeDefinition Theme)
+		{
+			lock (definitionsPerDomain)
+			{
+				definitionsPerDomain[Domain] = Theme;
 			}
 		}
 

@@ -8,10 +8,12 @@ using Waher.Content;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.IoTGateway.ScriptExtensions.Constants;
+using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
+using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -25,6 +27,7 @@ namespace Waher.IoTGateway.Setup
 		private HttpResource setTheme = null;
 
 		private string themeId = string.Empty;
+		private Dictionary<string, object> themeIdByAlternativeHost;
 
 		/// <summary>
 		/// Theme Configuration
@@ -47,6 +50,26 @@ namespace Waher.IoTGateway.Setup
 		{
 			get => this.themeId;
 			set => this.themeId = value;
+		}
+
+		/// <summary>
+		/// Gets the Theme ID that corresponds to a host.
+		/// </summary>
+		/// <param name="HostReference">Host reference.</param>
+		/// <returns>Theme ID corresponding to host.</returns>
+		public string GetThemeId(IHostReference HostReference)
+		{
+			string Host = GetDomainSetting.IsAlternativeDomain(HostReference.Host);
+			if (string.IsNullOrEmpty(Host))
+				return this.themeId;
+
+			lock (themeDefinitions)
+			{
+				if (themeDefinitions.TryGetValue(Host, out ThemeDefinition Def))
+					return Def.Id;
+				else
+					return this.themeId;
+			}
 		}
 
 		/// <summary>
@@ -172,6 +195,16 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
+			this.themeIdByAlternativeHost = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+			foreach (KeyValuePair<string, object> P in await HostSettings.GetHostValuesAsync("ThemeId"))
+				this.themeIdByAlternativeHost[P.Key] = P.Value;
+
+			foreach (KeyValuePair<string, object> P in this.themeIdByAlternativeHost)
+			{
+				if (P.Value is string ThemeId && themeDefinitions.TryGetValue(ThemeId, out Def))
+					Theme.SetTheme(P.Key, Def);
+			}
+
 			this.setTheme = WebServer.Register("/Settings/SetTheme", null, this.SetTheme, true, false, true);
 		}
 
@@ -206,40 +239,45 @@ namespace Waher.IoTGateway.Setup
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
-			if (themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
-				Theme.CurrentTheme = Def;
-			else
+			if (!themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
 				throw new NotFoundException("Theme not found: " + ThemeId);
 
-			this.UpdateTheme(Def, TabID);
-		
-			Response.StatusCode = 200;
-		}
-
-		private async void UpdateTheme(ThemeDefinition Def, string TabID)
-		{
-			try
+			string Host = GetDomainSetting.IsAlternativeDomain(Request.Host);
+			if (string.IsNullOrEmpty(Host))
 			{
+				Theme.CurrentTheme = Def;
+
 				this.themeId = Def.Id;
 
 				if (this.Step <= 0)
 					this.Step = 1;
-
-				this.Updated = DateTime.Now;
-				await Database.Update(this);
-
-				Gateway.HttpServer.ETagSalt = this.Updated.Ticks.ToString();
-
-				await ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
-					{
-						new KeyValuePair<string, object>("themeId", Def.Id),
-						new KeyValuePair<string, object>("cssUrl", Def.CSSX),
-					}, false), true, "User");
 			}
-			catch (Exception ex)
+			else
 			{
-				Log.Critical(ex);
+				lock (this.themeIdByAlternativeHost)
+				{
+					this.themeIdByAlternativeHost[Host] = Def;
+				}
+
+				await HostSettings.SetAsync(Host.ToLower(), "ThemeId", Def.Id);
+
+				Theme.SetTheme(Host, Def);
+
+				// TODO: GraphViz, PlantUml, LayoutXml colors.
 			}
+
+			this.Updated = DateTime.Now;
+			await Database.Update(this);
+
+			Gateway.HttpServer.ETagSalt = this.Updated.Ticks.ToString();
+
+			await ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("themeId", Def.Id),
+				new KeyValuePair<string, object>("cssUrl", Def.CSSX),
+			}, false), true, "User");
+
+			Response.StatusCode = 200;
 		}
 
 		/// <summary>

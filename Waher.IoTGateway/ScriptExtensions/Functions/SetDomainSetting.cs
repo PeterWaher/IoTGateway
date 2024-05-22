@@ -66,12 +66,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
         /// <returns>Function result.</returns>
         public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
         {
-            string Host = GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this);
+            string Host = GetDomainSetting.IsAlternativeDomain(GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this));
             string Name = Arguments[1].AssociatedObjectValue?.ToString();
             object Value = Arguments[2].AssociatedObjectValue;
             bool Result;
 
-            if (GetDomainSetting.IsAlternativeDomain(Host))
+            if (!string.IsNullOrEmpty(Host))
                 Result = await HostSettings.SetAsync(Host, Name, Value);
             else
                 Result = await RuntimeSettings.SetAsync(Name, Value);

@@ -66,12 +66,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
         /// <returns>Function result.</returns>
         public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
         {
-            string Host = GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this);
+            string Host = IsAlternativeDomain(GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this));
             string Name = Arguments[1].AssociatedObjectValue?.ToString();
             object DefaultValue = Arguments[2].AssociatedObjectValue;
             object Result;
 
-            if (IsAlternativeDomain(Host))
+            if (!string.IsNullOrEmpty(Host))
                 Result = await HostSettings.GetAsync(Host, Name, DefaultValue);
             else
                 Result = await RuntimeSettings.GetAsync(Name, DefaultValue);
@@ -79,13 +79,19 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
             return Expression.Encapsulate(Result);
         }
 
-        internal static bool IsAlternativeDomain(string Host)
+        internal static string IsAlternativeDomain(string Host)
         {
+            if (string.IsNullOrEmpty(Host))
+                return null;
+
             int i = Host.LastIndexOf(':');
             if (i > 0)
                 Host = Host.Substring(0, i);
 
-            return !string.IsNullOrEmpty(Host) && Gateway.IsDomain(Host, true) && !Gateway.IsDomain(Host, false);
+            if (Gateway.IsDomain(Host, true) && !Gateway.IsDomain(Host, false))
+                return Host;
+            else
+                return null;
         }
     }
 }

@@ -23,8 +23,13 @@ A theme defines a general look and feel for web pages. Select the theme you like
 <legend>Selected Theme</legend>
 
 <div id="themes" class="themes">
-{{ConfigClass:=Waher.IoTGateway.Setup.ThemeConfiguration;Config:=ConfigClass.Instance;foreach ThemeDefinition in ConfigClass.GetDefinitions() do ]]
-<div data-theme-id="((ThemeDefinition.Id))" class="theme((Config.ThemeId=ThemeDefinition.Id?"Selected"))" onclick="SetTheme('((ThemeDefinition.Id))')">
+{{
+ConfigClass:=Waher.IoTGateway.Setup.ThemeConfiguration;
+Config:=ConfigClass.Instance;
+SelectedThemeId:=Config.GetThemeId(Request);
+
+foreach ThemeDefinition in ConfigClass.GetDefinitions() do ]]
+<div data-theme-id="((ThemeDefinition.Id))" class="theme((SelectedThemeId=ThemeDefinition.Id?"Selected"))" onclick="SetTheme('((ThemeDefinition.Id))')">
 <img class="themeImage" alt="((HtmlAttributeEncode(ThemeDefinition.Title);))" width="((Thumbnail:=ThemeDefinition.Thumbnail;Thumbnail.Width))" height="((Thumbnail.Height))" src="((HtmlAttributeEncode(Thumbnail.Resource);))"/>
 <div class="themeTitle">
 

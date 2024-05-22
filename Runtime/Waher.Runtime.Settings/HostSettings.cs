@@ -812,51 +812,59 @@ namespace Waher.Runtime.Settings
         /// Gets available settings, matching a search filter.
         /// </summary>
         /// <param name="Filter">Search filter.</param>
+        /// <param name="HostAsKey">If the host parameter should be the key in the resultig dictionary (true) or 
+        /// the key parameter (false).</param>
         /// <returns>Matching settings found.</returns>
-        public static Dictionary<string, object> GetWhere(Filter Filter)
+        public static Dictionary<string, object> GetWhere(Filter Filter, bool HostAsKey)
         {
-            return GetWhereAsync(Filter).Result;
+            return GetWhereAsync(Filter, HostAsKey).Result;
         }
 
         /// <summary>
         /// Gets available settings, matching a search filter.
         /// </summary>
         /// <param name="Filter">Search filter.</param>
+        /// <param name="HostAsKey">If the host parameter should be the key in the resultig dictionary (true) or 
+        /// the key parameter (false).</param>
         /// <returns>Matching settings found.</returns>
-        public static async Task<Dictionary<string, object>> GetWhereAsync(Filter Filter)
+        public static async Task<Dictionary<string, object>> GetWhereAsync(Filter Filter, bool HostAsKey)
         {
             Dictionary<string, object> Result = new Dictionary<string, object>();
 
             foreach (HostSetting Setting in await Database.Find<HostSetting>(Filter))
-                Result[Setting.Key] = Setting.GetValueObject();
+                Result[HostAsKey ? Setting.Host : Setting.Key] = Setting.GetValueObject();
 
             return Result;
         }
 
         /// <summary>
-        /// Gets available settings, matching a search filter.
+        /// Gets available settings, matching a search filter, indexed by key.
         /// </summary>
 		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
         /// <returns>Matching settings found.</returns>
         public static Dictionary<string, object> GetWhereKeyLikeRegEx(string Host, string KeyPattern)
         {
-            return GetWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host), new FilterFieldLikeRegEx("Key", KeyPattern)));
+            return GetWhere(new FilterAnd(
+                new FilterFieldEqualTo("Host", Host), 
+                new FilterFieldLikeRegEx("Key", KeyPattern)), false);
         }
 
         /// <summary>
-        /// Gets available settings, matching a search filter.
+        /// Gets available settings, matching a search filter, indexed by key.
         /// </summary>
 		/// <param name="Host">Name of host.</param>
         /// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
         /// <returns>Matching settings found.</returns>
         public static Task<Dictionary<string, object>> GetWhereKeyLikeRegExAsync(string Host, string KeyPattern)
         {
-            return GetWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host), new FilterFieldLikeRegEx("Key", KeyPattern)));
+            return GetWhereAsync(new FilterAnd(
+                new FilterFieldEqualTo("Host", Host), 
+                new FilterFieldLikeRegEx("Key", KeyPattern)), false);
         }
 
         /// <summary>
-        /// Gets available settings, matching a search filter.
+        /// Gets available settings, matching a search filter, indexed by key.
         /// </summary>
 		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Return settings whose keys match this wildcard expression.</param>
@@ -864,12 +872,13 @@ namespace Waher.Runtime.Settings
         /// <returns>Matching settings found.</returns>
         public static Dictionary<string, object> GetWhereKeyLike(string Host, string Key, string Wildcard)
         {
-            return GetWhere(new FilterAnd(new FilterFieldEqualTo("Host", Host),
-                new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
+            return GetWhere(new FilterAnd(
+                new FilterFieldEqualTo("Host", Host),
+                new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))), false);
         }
 
         /// <summary>
-        /// Gets available settings, matching a search filter.
+        /// Gets available settings, matching a search filter, indexed by key.
         /// </summary>
 		/// <param name="Host">Name of host.</param>
         /// <param name="Key">Return settings whose keys match this wildcard expression.</param>
@@ -877,8 +886,27 @@ namespace Waher.Runtime.Settings
         /// <returns>Matching settings found.</returns>
         public static Task<Dictionary<string, object>> GetWhereKeyLikeAsync(string Host, string Key, string Wildcard)
         {
-            return GetWhereAsync(new FilterAnd(new FilterFieldEqualTo("Host", Host),
-                new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))));
+            return GetWhereAsync(new FilterAnd(
+                new FilterFieldEqualTo("Host", Host),
+                new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard))), false);
+        }
+
+        /// <summary>
+        /// Gets available settings for a given key, indexed by host.
+        /// </summary>
+        /// <returns>Host settings found.</returns>
+        public static Dictionary<string, object> GetHostValues(string Key)
+        {
+            return GetWhere(new FilterFieldEqualTo("Key", Key), true);
+        }
+
+        /// <summary>
+        /// Gets available settings for a given key, indexed by host.
+        /// </summary>
+        /// <returns>Host settings found.</returns>
+        public static Task<Dictionary<string, object>> GetHostValuesAsync(string Key)
+        {
+            return GetWhereAsync(new FilterFieldEqualTo("Key", Key), true);
         }
 
         #endregion

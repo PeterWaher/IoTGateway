@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -9,9 +8,9 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Provides encoding and decoding of Delivery Status Notification (DSN) messages and message reports, as defined in RFC 3462 and 3464.</Description>
     <Copyright>Copyright © Waher Data AB 2019-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Dsn</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Delivery Status Notification DSN Multipart Report</PackageTags>
@@ -22,25 +21,21 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <Version>2.0.1</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Content.Dsn.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
 </Project>

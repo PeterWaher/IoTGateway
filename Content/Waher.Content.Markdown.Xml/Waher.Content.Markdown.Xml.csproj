@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -24,16 +23,13 @@ https://waher.se/Markdown.md</Description>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Content.Markdown.Xml.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -20,20 +19,17 @@
     <FileVersion>2.0.0</FileVersion>
     <Version>2.0.0</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Content.SystemFiles.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
 </Project>

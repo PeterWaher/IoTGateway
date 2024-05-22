@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -11,7 +11,7 @@
 For a description of the Markdown flavour supported by the parser, see:
 https://waher.se/Markdown.md</Description>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -19,7 +19,7 @@ https://waher.se/Markdown.md</Description>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>3.0.1</AssemblyVersion>
     <FileVersion>3.0.1</FileVersion>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <Version>3.0.1</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
@@ -47,11 +47,11 @@ https://waher.se/Markdown.md</Description>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
 </Project>

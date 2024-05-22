@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using SkiaSharp;
 using Waher.Content;
-using Waher.Content.Markdown.GraphViz;
-using Waher.Content.Markdown.Layout2D;
-using Waher.Content.Markdown.PlantUml;
-using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.IoTGateway.Setup;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -51,7 +47,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 
 			if (Variables.TryGetVariable("Request", out Variable v) && v.ValueObject is IHostReference HostRef)
 			{
-				string Host = GetDomainSetting.IsAlternativeDomain(HostRef.Host);
+				string Host = DomainSettings.IsAlternativeDomain(HostRef.Host);
 				if (!string.IsNullOrEmpty(Host))
 					Def = GetTheme(Host);
 			}
@@ -78,7 +74,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 				Variables.TryGetVariable("Request", out Variable v) && 
 				v.ValueObject is IHostReference HostRef)
 			{
-				string Host = GetDomainSetting.IsAlternativeDomain(HostRef.Host);
+				string Host = DomainSettings.IsAlternativeDomain(HostRef.Host);
 				if (!string.IsNullOrEmpty(Host))
 					Def = GetTheme(Host);
 			}

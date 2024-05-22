@@ -66,7 +66,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
         /// <returns>Function result.</returns>
         public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
         {
-            string Host = GetDomainSetting.IsAlternativeDomain(GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this));
+            string Host = DomainSettings.IsAlternativeDomain(GetSetting.GetHost(Arguments[0].AssociatedObjectValue, this));
             string Name = Arguments[1].AssociatedObjectValue?.ToString();
             object Value = Arguments[2].AssociatedObjectValue;
             bool Result;

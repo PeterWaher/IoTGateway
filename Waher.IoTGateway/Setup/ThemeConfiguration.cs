@@ -8,7 +8,6 @@ using Waher.Content;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.IoTGateway.ScriptExtensions.Constants;
-using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -59,7 +58,7 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>Theme ID corresponding to host.</returns>
 		public string GetThemeId(IHostReference HostReference)
 		{
-			string Host = GetDomainSetting.IsAlternativeDomain(HostReference.Host);
+			string Host = DomainSettings.IsAlternativeDomain(HostReference.Host);
 			if (string.IsNullOrEmpty(Host))
 				return this.themeId;
 
@@ -244,7 +243,7 @@ namespace Waher.IoTGateway.Setup
 			if (!themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
 				throw new NotFoundException("Theme not found: " + ThemeId);
 
-			string Host = GetDomainSetting.IsAlternativeDomain(Request.Host);
+			string Host = DomainSettings.IsAlternativeDomain(Request.Host);
 			if (string.IsNullOrEmpty(Host))
 			{
 				Theme.CurrentTheme = Def;

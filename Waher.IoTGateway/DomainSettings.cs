@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Settings;
@@ -493,6 +494,78 @@ namespace Waher.IoTGateway
                 return await HostSettings.SetAsync(Host, Key, Value);
             else
                 return await RuntimeSettings.SetAsync(Key, Value);
+        }
+
+        #endregion
+
+        #region Getting file-based settings
+
+        /// <summary>
+        /// Gets the contents of a configurable domain-sensitive file.
+        /// </summary>
+        /// <param name="HostRef">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Setting value.</returns>
+        public static Task<string> GetFileSettingAsync(IHostReference HostRef, string FileName)
+        {
+            return GetFileSettingAsync(HostRef.Host, FileName);
+        }
+
+        /// <summary>
+        /// Gets the contents of a configurable domain-sensitive file.
+        /// </summary>
+        /// <param name="Host">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Setting value.</returns>
+        public static async Task<string> GetFileSettingAsync(string Host, string FileName)
+        {
+            Host = IsAlternativeDomain(Host);
+
+            string Content;
+
+            if (!string.IsNullOrEmpty(Host))
+                Content = await HostSettings.GetAsync(Host, FileName, string.Empty);
+            else
+                Content = await RuntimeSettings.GetAsync(FileName, string.Empty);
+
+            if (!string.IsNullOrEmpty(Content))
+                return Content;
+
+            return await Resources.ReadAllTextAsync(FileName);
+        }
+
+        /// <summary>
+        /// Gets the timestamp of contents of a configurable domain-sensitive file.
+        /// </summary>
+        /// <param name="HostRef">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Timestamp of Setting value.</returns>
+        public static Task<DateTime> GetFileSettingTimestampAsync(IHostReference HostRef, string FileName)
+        {
+            return GetFileSettingTimestampAsync(HostRef.Host, FileName);
+        }
+
+        /// <summary>
+        /// Gets the timestamp of contents of a configurable domain-sensitive file.
+        /// </summary>
+        /// <param name="Host">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Timestamp of Setting value.</returns>
+        public static async Task<DateTime> GetFileSettingTimestampAsync(string Host, string FileName)
+        {
+            Host = IsAlternativeDomain(Host);
+
+            DateTime Timestamp;
+
+            if (!string.IsNullOrEmpty(Host))
+                Timestamp = await HostSettings.GetAsync(Host, FileName, DateTime.MinValue);
+            else
+                Timestamp = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
+
+            if (Timestamp == DateTime.MinValue)
+                return File.GetLastWriteTime(FileName);
+            else
+                return Timestamp;
         }
 
         #endregion

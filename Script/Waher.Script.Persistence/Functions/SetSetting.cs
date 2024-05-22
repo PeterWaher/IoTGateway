@@ -1,20 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Runtime.Settings;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
-	/// Sets a runtime setting with name `Name` to the value `Value`.
+	/// Sets a runtime setting with name `Name` to the value `Value`. If `Host` is provided, the corresponding runtime host setting is set.
 	/// </summary>
-	public class SetSetting : FunctionTwoScalarVariables
+	public class SetSetting : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Sets a runtime setting with name `Name` to the value `Value`.
+		/// Sets a runtime setting with name `Name` to the value `Value`. If `Host` is provided, the corresponding runtime host setting is set.
 		/// </summary>
 		/// <param name="Name">Name of runtime setting parameter.</param>
 		/// <param name="Value">Default value, if setting not found.</param>
@@ -22,7 +20,21 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public SetSetting(ScriptNode Name, ScriptNode Value, int Start, int Length, Expression Expression)
-			: base(Name, Value, Start, Length, Expression)
+			: base(new ScriptNode[] { Name, Value }, argumentTypes2Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Sets a runtime setting with name `Name` to the value `Value`. If `Host` is provided, the corresponding runtime host setting is set.
+		/// </summary>
+		/// <param name="Host">Name of host.</param>
+		/// <param name="Name">Name of runtime setting parameter.</param>
+		/// <param name="Value">Default value, if setting not found.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public SetSetting(ScriptNode Host, ScriptNode Name, ScriptNode Value, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Host, Name, Value }, argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -43,60 +55,35 @@ namespace Waher.Script.Persistence.Functions
 		public override bool IsAsynchronous => true;
 
 		/// <summary>
-		/// Evaluates the function on two scalar arguments.
+		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
+			return this.EvaluateAsync(Arguments, Variables).Result;
 		}
 
 		/// <summary>
-		/// Evaluates the function on a scalar argument.
+		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override async Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string Name = Argument1.AssociatedObjectValue?.ToString();
-			if (string.IsNullOrEmpty(Name))
-				throw new ScriptRuntimeException("Name cannot be empty.", this);
+			int i = 0;
+			int c = Arguments.Length;
+			string Host = c < 3 ? null : Arguments[i++].AssociatedObjectValue?.ToString();
+			string Name = Arguments[i++].AssociatedObjectValue?.ToString();
+			object Value = Arguments[i].AssociatedObjectValue;
+			bool Result;
 
-			bool Result = await RuntimeSettings.SetAsync(Name, Argument2.AssociatedObjectValue);
-
-			return new BooleanValue(Result);
-		}
-
-		/// <summary>
-		/// Evaluates the function on two scalar arguments.
-		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
-		{
-			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
-		}
-
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override async Task<IElement> EvaluateScalarAsync(string Argument1, string Argument2, Variables Variables)
-		{
-			if (string.IsNullOrEmpty(Argument1))
-				throw new ScriptRuntimeException("Name cannot be empty.", this);
-
-			bool Result = await RuntimeSettings.SetAsync(Argument1, Argument2);
+			if (string.IsNullOrEmpty(Host))
+				Result = await RuntimeSettings.SetAsync(Name, Value);
+			else
+				Result = await HostSettings.SetAsync(Host, Name, Value);
 
 			return new BooleanValue(Result);
 		}

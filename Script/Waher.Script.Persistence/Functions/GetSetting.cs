@@ -1,20 +1,21 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Runtime.Settings;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
-	/// Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned.
+	/// Gets a runtime setting with name `Name`. If `Host` is provided, the function first tries to get the corresponding runtime 
+	/// host setting, and if one is not found, the corresponding runtime setting. If one is not found, the `DefaultValue` value is 
+	/// returned.
 	/// </summary>
-	public class GetSetting : FunctionTwoScalarVariables
+	public class GetSetting : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned.
+		/// Gets a runtime setting with name `Name`. If `Host` is provided, the function first tries to get the corresponding runtime 
+		/// host setting, and if one is not found, the corresponding runtime setting. If one is not found, the `DefaultValue` value is 
+		/// returned.
 		/// </summary>
 		/// <param name="Name">Name of runtime setting parameter.</param>
 		/// <param name="DefaultValue">Default value, if setting not found.</param>
@@ -22,7 +23,23 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public GetSetting(ScriptNode Name, ScriptNode DefaultValue, int Start, int Length, Expression Expression)
-			: base(Name, DefaultValue, Start, Length, Expression)
+			: base(new ScriptNode[] { Name, DefaultValue }, argumentTypes2Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Gets a runtime setting with name `Name`. If `Host` is provided, the function first tries to get the corresponding runtime 
+		/// host setting, and if one is not found, the corresponding runtime setting. If one is not found, the `DefaultValue` value is 
+		/// returned.
+		/// </summary>
+		/// <param name="Host">Name of host.</param>
+		/// <param name="Name">Name of runtime setting parameter.</param>
+		/// <param name="DefaultValue">Default value, if setting not found.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public GetSetting(ScriptNode Host, ScriptNode Name, ScriptNode DefaultValue, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Host, Name, DefaultValue }, argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -43,62 +60,37 @@ namespace Waher.Script.Persistence.Functions
 		public override bool IsAsynchronous => true;
 
 		/// <summary>
-		/// Evaluates the function on two scalar arguments.
+		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
+			return this.EvaluateAsync(Arguments, Variables).Result;
 		}
 
 		/// <summary>
-		/// Evaluates the function on a scalar argument.
+		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override async Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string Name = Argument1.AssociatedObjectValue?.ToString();
-			if (string.IsNullOrEmpty(Name))
-				throw new ScriptRuntimeException("Name cannot be empty.", this);
+			int i = 0;
+			int c = Arguments.Length;
+			string Host = c < 3 ? null : Arguments[i++].AssociatedObjectValue?.ToString();
+			string Name = Arguments[i++].AssociatedObjectValue?.ToString();
+			object DefaultValue = Arguments[i].AssociatedObjectValue;
+			object Result;
 
-			object Result = await RuntimeSettings.GetAsync(Name, Argument2.AssociatedObjectValue);
+			if (string.IsNullOrEmpty(Host))
+				Result = await RuntimeSettings.GetAsync(Name, DefaultValue);
+			else
+				Result = await HostSettings.GetAsync(Host, Name, DefaultValue);
 
 			return Expression.Encapsulate(Result);
-		}
-
-		/// <summary>
-		/// Evaluates the function on two scalar arguments.
-		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
-		{
-			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
-		}
-
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override async Task<IElement> EvaluateScalarAsync(string Argument1, string Argument2, Variables Variables)
-		{
-			if (string.IsNullOrEmpty(Argument1))
-				throw new ScriptRuntimeException("Name cannot be empty.", this);
-
-			string Result = await RuntimeSettings.GetAsync(Argument1, Argument2);
-
-			return new StringValue(Result);
 		}
 	}
 }

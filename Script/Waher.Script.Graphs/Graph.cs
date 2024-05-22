@@ -87,6 +87,16 @@ namespace Waher.Script.Graphs
 		public const string GraphLocalName = "Graph";
 
 		/// <summary>
+		/// Variable name for graph background color.
+		/// </summary>
+		public const string GraphBgColorVariableName = "GraphBgColor";
+
+		/// <summary>
+		/// Variable name for graph foreground color.
+		/// </summary>
+		public const string GraphFgColorVariableName = "GraphFgColor";
+
+		/// <summary>
 		/// Default color: Red
 		/// </summary>
 		public static readonly SKColor DefaultColor = SKColors.Red;
@@ -113,24 +123,12 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get
-			{
-				return this;
-			}
-		}
+		public override object AssociatedObjectValue => this;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get
-			{
-				return SetOfGraphs.Instance;
-			}
-		}
+		public override ISemiGroup AssociatedSemiGroup => SetOfGraphs.Instance;
 
 		/// <summary>
 		/// Tries to add an element to the current element, from the left, element-wise.
@@ -217,13 +215,13 @@ namespace Waher.Script.Graphs
 
 			int i = 0;
 
-			if (Variables.TryGetVariable("GraphBgColor", out v) && TryConvertToColor(v.ValueObject, out SKColor Color))
+			if (Variables.TryGetVariable(GraphBgColorVariableName, out v) && TryConvertToColor(v.ValueObject, out SKColor Color))
 			{
 				Settings.BackgroundColor = Color;
 				i++;
 			}
 
-			if (Variables.TryGetVariable("GraphFgColor", out v) && TryConvertToColor(v.ValueObject, out Color))
+			if (Variables.TryGetVariable(GraphFgColorVariableName, out v) && TryConvertToColor(v.ValueObject, out Color))
 			{
 				Settings.AxisColor = Color;
 				i++;
@@ -313,10 +311,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// The recommended bitmap size of the graph, if such is available, or null if not.
 		/// </summary>
-		public virtual Tuple<int, int> RecommendedBitmapSize
-		{
-			get { return null; }
-		}
+		public virtual Tuple<int, int> RecommendedBitmapSize => null;
 
 		/// <summary>
 		/// Scales two vectors of equal size to points in a rectangular area.
@@ -734,6 +729,26 @@ namespace Waher.Script.Graphs
 		public static SKColor ToColorHSV(double H, double S, double V, byte A)
 		{
 			return SKColor.FromHsv((float)H, (float)(S * 100), (float)(V * 100), A);
+		}
+
+		/// <summary>
+		/// Converts a color to an RGB(A) style string.
+		/// </summary>
+		/// <param name="Color">Color</param>
+		/// <returns>Color style value.</returns>
+		public static string ToRGBAStyle(SKColor Color)
+		{
+			StringBuilder Result = new StringBuilder();
+
+			Result.Append('#');
+			Result.Append(Color.Red.ToString("x2"));
+			Result.Append(Color.Green.ToString("x2"));
+			Result.Append(Color.Blue.ToString("x2"));
+
+			if (Color.Alpha != 255)
+				Result.Append(Color.Alpha.ToString("x2"));
+
+			return Result.ToString();
 		}
 
 		/// <summary>

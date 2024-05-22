@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using SkiaSharp;
 using Waher.Script;
+using Waher.Script.Graphs;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -30,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				{
 					SKColor Color = (SKColor)PI.GetValue(null);
 					stringToColor[PI.Name] = Color;
-					rgbaToName[ToRGBA(Color)] = PI.Name;
+					rgbaToName[Graph.ToRGBAStyle(Color)] = PI.Name;
 				}
 			}
 
@@ -40,24 +41,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				{
 					SKColor Color = (SKColor)FI.GetValue(null);
 					stringToColor[FI.Name] = Color;
-					rgbaToName[ToRGBA(Color)] = FI.Name;
+					rgbaToName[Graph.ToRGBAStyle(Color)] = FI.Name;
 				}
 			}
-		}
-
-		private static string ToRGBA(SKColor Color)
-		{
-			StringBuilder Result = new StringBuilder();
-
-			Result.Append('#');
-			Result.Append(Color.Red.ToString("x2"));
-			Result.Append(Color.Green.ToString("x2"));
-			Result.Append(Color.Blue.ToString("x2"));
-
-			if (Color.Alpha != 255)
-				Result.Append(Color.Alpha.ToString("x2"));
-
-			return Result.ToString();
 		}
 
 		/// <summary>
@@ -143,7 +129,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <returns>String representation.</returns>
 		public override string ToString(SKColor Value)
 		{
-			string s = ToRGBA(Value);
+			string s = Graph.ToRGBAStyle(Value);
 
 			if (rgbaToName.TryGetValue(s, out string s2))
 				return s2;

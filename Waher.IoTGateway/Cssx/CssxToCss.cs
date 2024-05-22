@@ -79,7 +79,7 @@ namespace Waher.IoTGateway.Cssx
 				Session.Push();
 				Pushed = true;
 
-				ThemeDefinition Def = Theme.CurrentTheme;
+				ThemeDefinition Def = Theme.GetCurrentTheme(Session);
 				Def?.Prepare(Session);
 
 				StringBuilder Result = new StringBuilder();

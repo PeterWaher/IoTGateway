@@ -37,8 +37,6 @@ namespace Waher.Content.Markdown.PlantUml
 		private static string javaPath = null;
 		private static string plantUmlFolder = null;
 		private static string contentRootFolder = null;
-		private static string defaultBgColor = null;
-		private static string defaultFgColor = null;
 		private static IMarkdownAsynchronousOutput asyncHtmlOutput = null;
 
 		/// <summary>
@@ -626,24 +624,6 @@ namespace Waher.Content.Markdown.PlantUml
 			{
 				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
 			}
-		}
-
-		/// <summary>
-		/// Default Background color
-		/// </summary>
-		public static string DefaultBgColor
-		{
-			get => defaultBgColor;
-			set => defaultBgColor = value;
-		}
-
-		/// <summary>
-		/// Default Foreground color
-		/// </summary>
-		public static string DefaultFgColor
-		{
-			get => defaultFgColor;
-			set => defaultFgColor = value;
 		}
 
 		/// <summary>

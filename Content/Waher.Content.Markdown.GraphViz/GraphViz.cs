@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
@@ -36,8 +34,6 @@ namespace Waher.Content.Markdown.GraphViz
 		private static string installationFolder = null;
 		private static string graphVizFolder = null;
 		private static string contentRootFolder = null;
-		private static string defaultBgColor = null;
-		private static string defaultFgColor = null;
 		private static bool supportsDot = false;
 		private static bool supportsNeato = false;
 		private static bool supportsFdp = false;
@@ -348,7 +344,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null, Document.Settings?.Variables);
 			if (!(Info is null))
 			{
 				await this.GenerateHTML(Renderer.Output, Info);
@@ -368,7 +364,8 @@ namespace Waher.Content.Markdown.GraphViz
 			{
 				Id = Id,
 				Language = Language,
-				Rows = Rows
+				Rows = Rows,
+				Document = Document
 			});
 
 			return true;
@@ -379,6 +376,7 @@ namespace Waher.Content.Markdown.GraphViz
 			public string Id;
 			public string Language;
 			public string[] Rows;
+			public MarkdownDocument Document;
 		}
 
 		private async Task ExecuteGraphViz(object State)
@@ -388,7 +386,9 @@ namespace Waher.Content.Markdown.GraphViz
 
 			try
 			{
-				GraphInfo Info = await this.GetFileName(AsyncState.Language, AsyncState.Rows, ResultType.Svg, true);
+				GraphInfo Info = await this.GetFileName(AsyncState.Language, AsyncState.Rows, ResultType.Svg, true,
+					AsyncState.Document.Settings?.Variables);
+
 				if (!(Info is null))
 					await this.GenerateHTML(Output, Info);
 			}
@@ -477,10 +477,10 @@ namespace Waher.Content.Markdown.GraphViz
 			public string Hash;
 		}
 
-		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists)
+		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists, Variables Variables)
 		{
 			GraphInfo Result = new GraphInfo();
-			string Graph = MarkdownDocument.AppendRows(Rows);
+			string GraphText = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -491,7 +491,10 @@ namespace Waher.Content.Markdown.GraphViz
 			else
 				Result.Title = string.Empty;
 
-			Result.Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Graph + Language));
+			string GraphBgColor = GetColor(Graph.GraphBgColorVariableName, Variables);
+			string GraphFgColor = GetColor(Graph.GraphFgColorVariableName, Variables);
+
+			Result.Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(GraphText + Language + GraphBgColor + GraphFgColor));
 
 			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 			string FileName = Path.Combine(GraphVizFolder, Result.Hash);
@@ -522,7 +525,7 @@ namespace Waher.Content.Markdown.GraphViz
 				return null;
 
 			string TxtFileName = FileName + ".txt";
-			await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.Default);
+			await Resources.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);
 
 			StringBuilder Arguments = new StringBuilder();
 
@@ -531,31 +534,31 @@ namespace Waher.Content.Markdown.GraphViz
 			Arguments.Append("\" -T");
 			Arguments.Append(Type.ToString().ToLower());
 
-			if (!string.IsNullOrEmpty(defaultBgColor))
+			if (!string.IsNullOrEmpty(GraphBgColor))
 			{
 				Arguments.Append(" -Gbgcolor=\"");
-				Arguments.Append(defaultBgColor);
+				Arguments.Append(GraphBgColor);
 				Arguments.Append('"');
 			}
 
-			if (!string.IsNullOrEmpty(defaultFgColor))
+			if (!string.IsNullOrEmpty(GraphFgColor))
 			{
 				Arguments.Append(" -Gcolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				//Arguments.Append("\" -Nfillcolor=\"");
 				//Arguments.Append(defaultFgColor);
 				Arguments.Append("\" -Nfontcolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\" -Nlabelfontcolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\" -Npencolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\" -Efontcolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\" -Elabelfontcolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\" -Epencolor=\"");
-				Arguments.Append(defaultFgColor);
+				Arguments.Append(GraphFgColor);
 				Arguments.Append("\"");
 			}
 
@@ -624,6 +627,22 @@ namespace Waher.Content.Markdown.GraphViz
 			return await ResultSource.Task;
 		}
 
+		private static string GetColor(string VariableName, Variables Variables)
+		{
+			if (Variables is null)
+				return null;
+
+			if (!Variables.TryGetVariable(VariableName, out Variable v))
+				return null;
+
+			if (v.ValueObject is SKColor Color)
+				return Graph.ToRGBAStyle(Color);
+			else if (v.ValueObject is string s)
+				return s;
+			else
+				return null;
+		}
+
 		/// <summary>
 		/// Generates plain text for the code content.
 		/// </summary>
@@ -635,7 +654,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -655,7 +674,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -673,7 +692,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -702,7 +721,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -726,7 +745,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			StringBuilder Output = Renderer.Output;
 
 			Output.AppendLine("\\begin{figure}[h]");
@@ -758,7 +777,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return null;
 
@@ -768,24 +787,6 @@ namespace Waher.Content.Markdown.GraphViz
 			{
 				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
 			}
-		}
-
-		/// <summary>
-		/// Default Background color
-		/// </summary>
-		public static string DefaultBgColor
-		{
-			get => defaultBgColor;
-			set => defaultBgColor = value;
-		}
-
-		/// <summary>
-		/// Default Foreground color
-		/// </summary>
-		public static string DefaultFgColor
-		{
-			get => defaultFgColor;
-			set => defaultFgColor = value;
 		}
 
 		/// <summary>
@@ -801,7 +802,7 @@ namespace Waher.Content.Markdown.GraphViz
 		{
 			try
 			{
-				GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true);
+				GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 				if (Info is null)
 					return false;
 

@@ -10,6 +10,7 @@ using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.IoTGateway.Setup;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -57,11 +58,32 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 
 			if (!(Variables is null))
 			{
-				Variables["GraphBgColor"] = Def.GraphBgColor;
-				Variables["GraphFgColor"] = Def.GraphFgColor;
+				Variables[Graph.GraphBgColorVariableName] = Def.GraphBgColor;
+				Variables[Graph.GraphFgColorVariableName] = Def.GraphFgColor;
 			}
 
 			return new ObjectValue(Def);
+		}
+
+		/// <summary>
+		/// Gets the current theme definition, based on the host information available in the session varaibles.
+		/// </summary>
+		/// <param name="Variables">Session variables.</param>
+		/// <returns>Theme definition</returns>
+		public static ThemeDefinition GetCurrentTheme(Variables Variables)
+		{
+			ThemeDefinition Def = currentDefinition;
+
+			if (!(Variables is null) &&
+				Variables.TryGetVariable("Request", out Variable v) && 
+				v.ValueObject is IHostReference HostRef)
+			{
+				string Host = GetDomainSetting.IsAlternativeDomain(HostRef.Host);
+				if (!string.IsNullOrEmpty(Host))
+					Def = GetTheme(Host);
+			}
+
+			return Def;
 		}
 
 		/// <summary>
@@ -70,27 +92,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		public static ThemeDefinition CurrentTheme
 		{
 			get => currentDefinition;
-			internal set
-			{
-				bool DeleteCahces = !(currentDefinition is null) && currentDefinition.Id != value.Id;
-
-				currentDefinition = value;
-
-				string Color = ColorToString(currentDefinition.GraphBgColor);
-				GraphViz.DefaultBgColor = Color;
-				PlantUml.DefaultBgColor = Color;
-
-				Color = ColorToString(currentDefinition.GraphFgColor);
-				GraphViz.DefaultFgColor = Color;
-				PlantUml.DefaultFgColor = Color;
-
-				if (DeleteCahces)
-				{
-					GraphViz.DeleteOldFiles(TimeSpan.Zero, false);
-					PlantUml.DeleteOldFiles(TimeSpan.Zero, false);
-					XmlLayout.DeleteOldFiles(TimeSpan.Zero, false);
-				}
-			}
+			internal set => currentDefinition = value;
 		}
 
 		/// <summary>
@@ -106,7 +108,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 					return Result;
 			}
 
-			return CurrentTheme;
+			return currentDefinition;
 		}
 
 		/// <summary>

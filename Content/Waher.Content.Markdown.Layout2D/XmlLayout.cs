@@ -235,7 +235,10 @@ namespace Waher.Content.Markdown.Layout2D
 			else
 				Result.Title = string.Empty;
 
-			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Xml + Language));
+			string GraphBgColor = GetColor(Graph.GraphBgColorVariableName, Session);
+			string GraphFgColor = GetColor(Graph.GraphFgColorVariableName, Session);
+
+			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Xml + Language + GraphBgColor + GraphFgColor));
 
 			string LayoutFolder = Path.Combine(contentRootFolder, "Layout");
 			string FileName = Path.Combine(LayoutFolder, Hash);
@@ -271,6 +274,22 @@ namespace Waher.Content.Markdown.Layout2D
 			}
 
 			return Result;
+		}
+
+		private static string GetColor(string VariableName, Variables Variables)
+		{
+			if (Variables is null)
+				return null;
+
+			if (!Variables.TryGetVariable(VariableName, out Variable v))
+				return null;
+
+			if (v.ValueObject is SKColor Color)
+				return Graph.ToRGBAStyle(Color);
+			else if (v.ValueObject is string s)
+				return s;
+			else
+				return null;
 		}
 
 		/// <summary>

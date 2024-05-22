@@ -5,6 +5,7 @@ using System.Xml;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Script;
+using Waher.Script.Graphs;
 using Waher.Script.Graphs.Functions.Colors;
 
 namespace Waher.IoTGateway.Setup
@@ -145,12 +146,12 @@ namespace Waher.IoTGateway.Setup
 											this.fontFamily = E2.InnerText;
 											break;
 
-										case "GraphBgColor":
+										case Graph.GraphBgColorVariableName:
 											if (Color.TryParse(E2.InnerText, out cl))
 												this.graphBgColor = cl;
 											break;
 
-										case "GraphFgColor":
+										case Graph.GraphFgColorVariableName:
 											if (Color.TryParse(E2.InnerText, out cl))
 												this.graphFgColor = cl;
 											break;
@@ -406,10 +407,10 @@ namespace Waher.IoTGateway.Setup
 			Variables["LinkColorVisited"] = this.linkColorVisited;
 			Variables["LinkColorHot"] = this.linkColorHot;
 			Variables["FontFamily"] = this.fontFamily;
-			Variables["GraphBgColor"] = this.graphBgColor;
-			Variables["GraphFgColor"] = this.graphFgColor;
 			Variables["BackgroundImages"] = this.backgroundImages;
 			Variables["BannerImages"] = this.bannerImages;
+			Variables[Graph.GraphBgColorVariableName] = this.graphBgColor;
+			Variables[Graph.GraphFgColorVariableName] = this.graphFgColor;
 
 			foreach (KeyValuePair<string, string> P in this.GetCustomProperties())
 				Variables[P.Key] = P.Value;

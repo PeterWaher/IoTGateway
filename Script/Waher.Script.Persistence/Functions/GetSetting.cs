@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Runtime.Settings;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -80,7 +82,7 @@ namespace Waher.Script.Persistence.Functions
 		{
 			int i = 0;
 			int c = Arguments.Length;
-			string Host = c < 3 ? null : Arguments[i++].AssociatedObjectValue?.ToString();
+			string Host = c < 3 ? null : GetHost(Arguments[i++].AssociatedObjectValue);
 			string Name = Arguments[i++].AssociatedObjectValue?.ToString();
 			object DefaultValue = Arguments[i].AssociatedObjectValue;
 			object Result;
@@ -91,6 +93,16 @@ namespace Waher.Script.Persistence.Functions
 				Result = await HostSettings.GetAsync(Host, Name, DefaultValue);
 
 			return Expression.Encapsulate(Result);
+		}
+
+		internal static string GetHost(object Value)
+		{
+			if (Value is IHostReference Ref)
+				return Ref.Host;
+			else if (Value is string s)
+				return s;
+			else
+				return Value?.ToString();
 		}
 	}
 }

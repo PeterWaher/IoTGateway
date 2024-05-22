@@ -14,7 +14,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Represents an HTTP request.
 	/// </summary>
-	public class HttpRequest : IDisposable
+	public class HttpRequest : IDisposable, IHostReference
 	{
 		private readonly HttpRequestHeader header;
 		private Stream dataStream;
@@ -190,6 +190,11 @@ namespace Waher.Networking.HTTP
 			get => this.response;
 			internal set => this.response = value;
 		}
+
+		/// <summary>
+		/// Host reference.
+		/// </summary>
+		public string Host => this.header?.Host?.Value;
 
 #if WINDOWS_UWP
 		/// <summary>

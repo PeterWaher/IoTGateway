@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Security;
@@ -57,7 +58,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// 
 	/// SOCKS5 is defined in RFC 1928.
 	/// </summary>
-	public class Socks5Client : Sniffable, IDisposable
+	public class Socks5Client : Sniffable, IDisposable, IHostReference
 	{
 		private BinaryTcpClient client;
 		private Socks5State state = Socks5State.Offline;

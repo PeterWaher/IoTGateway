@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 	/// </summary>
-	public class XmppClient : Sniffable, IDisposable
+	public class XmppClient : Sniffable, IDisposable, IHostReference
 	{
 		/// <summary>
 		/// http://etherx.jabber.org/streams

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Waher.Content;
 using Waher.Persistence.Attributes;
 
 namespace Waher.IoTGateway.Setup.Databases
@@ -8,7 +6,7 @@ namespace Waher.IoTGateway.Setup.Databases
 	/// <summary>
 	/// MongoDB Settings.
 	/// </summary>
-	public class MongoDBSettings : DatabaseSettings
+	public class MongoDBSettings : DatabaseSettings, IHostReference
 	{
 		private string host = string.Empty;
 		private string database = "IoTGateway";

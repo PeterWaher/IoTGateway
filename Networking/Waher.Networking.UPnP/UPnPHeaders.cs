@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Content;
 
 namespace Waher.Networking.UPnP
 {
@@ -28,7 +28,7 @@ namespace Waher.Networking.UPnP
 	/// <summary>
 	/// Class managing any HTTP headers in a UPnP UDP request/response.
 	/// </summary>
-	public class UPnPHeaders : IEnumerable<KeyValuePair<string, string>>
+	public class UPnPHeaders : IEnumerable<KeyValuePair<string, string>>, IHostReference
 	{
 		private readonly Dictionary<string, string> headers = new Dictionary<string, string>();
 		private readonly HttpDirection direction = HttpDirection.Unknown;

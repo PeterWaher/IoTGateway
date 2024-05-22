@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -13,7 +14,7 @@ using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Ip
 {
-	public class IpHost : ProvisionedMeteringNode, ISensor
+	public class IpHost : ProvisionedMeteringNode, ISensor, IHostReference
 	{
 		private string host = string.Empty;
 

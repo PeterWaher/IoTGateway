@@ -53,7 +53,7 @@ namespace Waher.Client.WPF.Model
 	/// <summary>
 	/// Class representing a normal XMPP account.
 	/// </summary>
-	public class XmppAccountNode : TreeNode, IMenuAggregator
+	public class XmppAccountNode : TreeNode, IMenuAggregator, IHostReference
 	{
 		private const string SensorGroupName = "Sensors";
 		private const string EventsGroupName = "Events";

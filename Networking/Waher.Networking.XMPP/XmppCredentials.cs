@@ -5,13 +5,14 @@ using Windows.Security.Cryptography.Certificates;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
+using Waher.Content;
 
 namespace Waher.Networking.XMPP
 {
 	/// <summary>
 	/// Class containing credentials for an XMPP client connection.
 	/// </summary>
-	public class XmppCredentials
+	public class XmppCredentials : IHostReference
 	{
 		/// <summary>
 		/// Default XMPP Server port.

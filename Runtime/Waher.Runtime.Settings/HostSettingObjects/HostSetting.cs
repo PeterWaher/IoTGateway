@@ -1,4 +1,4 @@
-using System;
+using Waher.Content;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.Settings.HostSettingObjects
@@ -10,7 +10,7 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 	[CollectionName("HostSettings")]
 	[ArchivingTime]		// No Limit
 	[Index("Host", "Key")]
-	public abstract class HostSetting
+	public abstract class HostSetting : IHostReference
 	{
 		private string objectId = null;
 		private string host = string.Empty;

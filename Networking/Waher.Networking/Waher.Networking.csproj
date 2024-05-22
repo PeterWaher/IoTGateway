@@ -8,7 +8,7 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, simplified communication libraries for text and/or binary protocols, etc., as well as classes for building client and server applications.</Description>
     <Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -17,7 +17,7 @@
     <AssemblyVersion>2.2.5</AssemblyVersion>
     <FileVersion>2.2.5</FileVersion>
     <Version>2.2.5</Version>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -31,11 +31,11 @@
     <None Remove="Schema\SnifferOutput.xsd" />
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
   <ItemGroup>

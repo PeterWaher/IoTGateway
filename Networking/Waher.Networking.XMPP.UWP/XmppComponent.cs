@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP
 	/// Manages an XMPP component connection, as defined in XEP-0114:
 	/// http://xmpp.org/extensions/xep-0114.html
 	/// </summary>
-	public class XmppComponent : Sniffable, IDisposable
+	public class XmppComponent : Sniffable, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 40000000;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.CoAP.Options;
 
 namespace Waher.Networking.CoAP
@@ -9,7 +10,7 @@ namespace Waher.Networking.CoAP
 	/// <summary>
 	/// Contains information about a CoAP message.
 	/// </summary>
-	public class CoapMessage
+	public class CoapMessage : IHostReference
 	{
 		private Dictionary<string, string> uriQuery = null;
 		private Dictionary<string, string> locationQuery = null;

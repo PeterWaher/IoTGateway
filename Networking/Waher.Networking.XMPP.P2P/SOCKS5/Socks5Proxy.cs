@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -13,7 +14,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// <summary>
 	/// Class managing a SOCKS5 proxy associated with the current XMPP server.
 	/// </summary>
-	public class Socks5Proxy : XmppExtension
+	public class Socks5Proxy : XmppExtension, IHostReference
 	{
 		/// <summary>
 		/// http://jabber.org/protocol/bytestreams

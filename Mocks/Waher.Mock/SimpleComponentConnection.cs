@@ -17,7 +17,7 @@ namespace Waher.Mock
 	/// <summary>
 	/// Class containing information about a simple XMPP component connection.
 	/// </summary>
-	public class SimpleComponentConfiguration
+	public class SimpleComponentConfiguration : IHostReference
 	{
 #if !WINDOWS_UWP
 		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Mock.Schema.SimpleComponentConfiguration.xsd");

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 #if WINDOWS_UWP
@@ -53,7 +51,7 @@ namespace Waher.Networking.MQTT
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
 	/// </summary>
-	public class MqttClient : Sniffable, IDisposable
+	public class MqttClient : Sniffable, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 

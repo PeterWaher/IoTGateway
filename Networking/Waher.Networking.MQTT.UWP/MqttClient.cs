@@ -53,7 +53,7 @@ namespace Waher.Networking.MQTT
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
 	/// </summary>
-	public class MqttClient : Sniffable, IDisposable
+	public class MqttClient : Sniffable, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -26,7 +27,7 @@ namespace Waher.Networking.XMPP
 	/// Manages an XMPP component connection, as defined in XEP-0114:
 	/// http://xmpp.org/extensions/xep-0114.html
 	/// </summary>
-	public class XmppComponent : Sniffable, IDisposable
+	public class XmppComponent : Sniffable, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 40000000;

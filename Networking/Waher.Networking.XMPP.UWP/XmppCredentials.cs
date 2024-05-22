@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP
 	/// <summary>
 	/// Class containing credentials for an XMPP client connection.
 	/// </summary>
-	public class XmppCredentials
+	public class XmppCredentials : IHostReference
 	{
 		/// <summary>
 		/// Default XMPP Server port.

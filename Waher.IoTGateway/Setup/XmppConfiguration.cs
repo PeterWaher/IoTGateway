@@ -48,7 +48,7 @@ namespace Waher.IoTGateway.Setup
 	/// <summary>
 	/// XMPP Configuration
 	/// </summary>
-	public partial class XmppConfiguration : SystemMultiStepConfiguration
+	public partial class XmppConfiguration : SystemMultiStepConfiguration, IHostReference
 	{
 		private static XmppConfiguration instance = null;
 		private static string defaultFacility = string.Empty;

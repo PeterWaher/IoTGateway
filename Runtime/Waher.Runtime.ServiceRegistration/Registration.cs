@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Content;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.ServiceRegistration
@@ -7,7 +8,7 @@ namespace Waher.Runtime.ServiceRegistration
 	/// Local registration object.
 	/// </summary>
 	[CollectionName("Registration")]
-	public class Registration
+	public class Registration : IHostReference
 	{
 		private DateTime created = DateTime.MinValue;
 		private DateTime updated = DateTime.MinValue;

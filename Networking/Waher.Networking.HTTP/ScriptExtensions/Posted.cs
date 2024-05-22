@@ -20,18 +20,12 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName
-		{
-			get { return "Posted"; }
-		}
+		public string ConstantName => nameof(Posted);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
 		/// </summary>
-		public string[] Aliases
-		{
-			get { return null; }
-		}
+		public string[] Aliases => null;
 
 		/// <summary>
 		/// Gets the constant value element.

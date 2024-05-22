@@ -25,7 +25,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName => "Language";
+		public string ConstantName => nameof(Language);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.

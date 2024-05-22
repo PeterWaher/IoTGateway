@@ -23,7 +23,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName => "Namespace";
+		public string ConstantName => nameof(Namespace);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.

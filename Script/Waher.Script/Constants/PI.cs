@@ -20,18 +20,12 @@ namespace Waher.Script.Constants
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName
-		{
-			get { return "π"; }
-		}
+		public string ConstantName => "π";
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
 		/// </summary>
-		public string[] Aliases
-		{
-			get { return new string[] { "pi" }; }
-		}
+		public string[] Aliases => new string[] { "pi" };
 
 		/// <summary>
 		/// Gets the constant value element.

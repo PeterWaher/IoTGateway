@@ -596,7 +596,7 @@ namespace Waher.Networking.HTTP
 							if (ContentObject is string s)
 							{
 								Content = Encoding.UTF8.GetBytes(s);
-								ContentType = "text/plain; charset=utf-8";
+								ContentType = PlainTextCodec.DefaultContentType + "; charset=utf-8";
 							}
 							else if (!(ContentObject is null))
 							{
@@ -658,7 +658,7 @@ namespace Waher.Networking.HTTP
 							((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304))
 						{
 							Content = Encoding.UTF8.GetBytes(ex.Message);
-							ContentType = "text/plain; charset=utf-8";
+							ContentType = PlainTextCodec.DefaultContentType + "; charset=utf-8";
 						}
 					}
 

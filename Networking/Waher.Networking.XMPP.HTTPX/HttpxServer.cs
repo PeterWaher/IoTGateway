@@ -1,16 +1,15 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Xml;
+using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Security;
-using System.Security.Cryptography.X509Certificates;
-using Waher.Content;
-using System.Runtime.ExceptionServices;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -154,7 +153,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									MemoryStream ms = new MemoryStream();
 
 									if (Header.ContentType is null)
-										Header.Add(new HttpField("Content-Type", "text/plain"));
+										Header.Add(new HttpField("Content-Type", PlainTextCodec.DefaultContentType));
 
 									byte[] Data = Header.ContentType.Encoding.GetBytes(N2.InnerText);
 									ms.Write(Data, 0, Data.Length);

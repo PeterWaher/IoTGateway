@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -56,7 +57,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Automatic backups value invalid.");
 				await Response.SendResponse();
 				return;
@@ -66,7 +67,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Backup time invalid.");
 				await Response.SendResponse();
 				return;
@@ -76,7 +77,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Invalid number of days specified.");
 				await Response.SendResponse();
 				return;
@@ -86,7 +87,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Invalid number of months specified.");
 				await Response.SendResponse();
 				return;
@@ -96,7 +97,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Invalid number of years specified.");
 				await Response.SendResponse();
 				return;

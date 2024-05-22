@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Content.Text;
 using Waher.Networking.XMPP.BitsOfBinary;
 
 namespace Waher.Networking.XMPP.Test
@@ -52,11 +53,11 @@ namespace Waher.Networking.XMPP.Test
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
-				string ContentId = await this.bobClient2.StoreData(Bin, "text/plain");
+				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType);
 
 				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{
-					if (e.Ok && e.ContentId == ContentId && e.ContentType == "text/plain" && Encoding.UTF8.GetString(e.Data) == s)
+					if (e.Ok && e.ContentId == ContentId && e.ContentType == PlainTextCodec.DefaultContentType && Encoding.UTF8.GetString(e.Data) == s)
 						Done.Set();
 					else
 						Error.Set();
@@ -83,13 +84,13 @@ namespace Waher.Networking.XMPP.Test
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
-				string ContentId = await this.bobClient2.StoreData(Bin, "text/plain", DateTime.Now.AddMinutes(1));
+				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType, DateTime.Now.AddMinutes(1));
 
 				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{
 					double d;
 
-					if (e.Ok && e.ContentId == ContentId && e.ContentType == "text/plain" && Encoding.UTF8.GetString(e.Data) == s &&
+					if (e.Ok && e.ContentId == ContentId && e.ContentType == PlainTextCodec.DefaultContentType && Encoding.UTF8.GetString(e.Data) == s &&
 						e.Expires.HasValue && (d = (e.Expires.Value - DateTime.Now).TotalSeconds) >= 50 && d <= 60)
 					{
 						Done.Set();

@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.IoTGateway.WebResources.ExportFormats;
@@ -104,7 +105,7 @@ namespace Waher.IoTGateway.WebResources
 					{
 						Response.StatusCode = 409;
 						Response.StatusMessage = "Conflict";
-						Response.ContentType = "text/plain";
+						Response.ContentType = PlainTextCodec.DefaultContentType;
 						T = Response.Write("Export is underway.");
 					}
 					else
@@ -145,7 +146,7 @@ namespace Waher.IoTGateway.WebResources
 				Task _ = DoExport(ExportInfo, Database, Ledger, WebContent, Folders.ToArray());
 
 				Response.StatusCode = 200;
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write(ExportInfo.LocalBackupFileName);
 			}
 			catch (Exception ex)

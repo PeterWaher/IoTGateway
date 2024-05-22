@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -84,7 +85,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Export folder must be rooted. Relative paths are not accepted.");
 					await Response.SendResponse();
 					return;
@@ -94,7 +95,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Export folder does not exist, or cannot be accessed or reached.");
 					await Response.SendResponse();
 					return;
@@ -110,7 +111,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Not allowed to write data to the export folder.");
 					await Response.SendResponse();
 					return;
@@ -123,7 +124,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Key folder must be rooted. Relative paths are not accepted.");
 					await Response.SendResponse();
 					return;
@@ -133,7 +134,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Key folder does not exist, or cannot be accessed or reached.");
 					await Response.SendResponse();
 					return;
@@ -149,7 +150,7 @@ namespace Waher.IoTGateway.WebResources
 				{
 					Response.StatusCode = 400;
 					Response.StatusMessage = "Bad Request";
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write("Not allowed to write data to the key folder.");
 					await Response.SendResponse();
 					return;

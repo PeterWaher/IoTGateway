@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
+using Waher.Content.Text;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
@@ -91,7 +92,7 @@ namespace Waher.WebService.Script
 
 					s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
 
-					Response.ContentType = "text/plain";
+					Response.ContentType = PlainTextCodec.DefaultContentType;
 					await Response.Write(s);
 					await Response.SendResponse();
 				}

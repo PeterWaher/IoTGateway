@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
@@ -88,7 +89,7 @@ namespace Waher.Networking.HTTP.Test
 			{
 				int i;
 
-				resp.ContentType = "text/plain";
+				resp.ContentType = PlainTextCodec.DefaultContentType;
 				for (i = 0; i < 1000; i++)
 					await resp.Write(new string('a', 100));
 			});
@@ -545,7 +546,7 @@ namespace Waher.Networking.HTTP.Test
 		public void Test_28_Content_Conversion()
 		{
 			HttpFolderResource Resource = new("/Test28", "Data", false, false, true, false);
-			Resource.AllowTypeConversion("text/plain", "text/x-test1", "text/x-test2", "text/x-test3");
+			Resource.AllowTypeConversion(PlainTextCodec.DefaultContentType, "text/x-test1", "text/x-test2", "text/x-test3");
 
 			server.Register(Resource);
 

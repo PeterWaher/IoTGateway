@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Multipart;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 
@@ -125,7 +126,7 @@ namespace Waher.Networking.XMPP.Mail
 							{
 								switch (XML.Attribute(E, "type").ToLower())
 								{
-									case "text/plain":
+									case PlainTextCodec.DefaultContentType:
 										PlainText = E.InnerText;
 										break;
 

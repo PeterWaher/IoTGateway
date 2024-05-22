@@ -19,11 +19,16 @@ namespace Waher.Content.Text
 		}
 
 		/// <summary>
+		/// text/plain
+		/// </summary>
+		public const string DefaultContentType = "text/plain";
+
+		/// <summary>
 		/// Plain text content types.
 		/// </summary>
 		public static readonly string[] PlainTextContentTypes = new string[]
 		{
-			"text/plain",
+			DefaultContentType,
 			"text/sgml",
 			"text/richtext"
 		};
@@ -68,7 +73,7 @@ namespace Waher.Content.Text
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == "text/plain")
+			if (ContentType == DefaultContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -123,7 +128,7 @@ namespace Waher.Content.Text
 				case "note":
 				case "utf8":
 				case "plain":
-					ContentType = "text/plain";
+					ContentType = PlainTextCodec.DefaultContentType;
 					return true;
 
 				case "sgml":
@@ -150,7 +155,7 @@ namespace Waher.Content.Text
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/plain":
+				case PlainTextCodec.DefaultContentType:
 					FileExtension = "txt";
 					return true;
 
@@ -179,7 +184,7 @@ namespace Waher.Content.Text
 		{
 			if (Object is string)
 			{
-				if (InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+				if (InternetContent.IsAccepted(PlainTextCodec.DefaultContentType, AcceptedContentTypes))
 				{
 					Grade = Grade.Ok;
 					return true;
@@ -215,11 +220,11 @@ namespace Waher.Content.Text
 
 			if (Encoding is null)
 			{
-				ContentType = "text/plain; charset=utf-8";
+				ContentType = PlainTextCodec.DefaultContentType + "; charset=utf-8";
 				Encoding = Encoding.UTF8;
 			}
 			else
-				ContentType = "text/plain; charset=" + Encoding.WebName;
+				ContentType = PlainTextCodec.DefaultContentType + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Object.ToString()), ContentType));
 		}

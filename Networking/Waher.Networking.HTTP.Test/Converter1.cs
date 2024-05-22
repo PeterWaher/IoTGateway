@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.Test
@@ -12,7 +12,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 		}
 
-		public string[] FromContentTypes => new string[] { "text/plain" };
+		public string[] FromContentTypes => new string[] { PlainTextCodec.DefaultContentType };
 		public string[] ToContentTypes => new string[] { "text/x-test1" };
 		public Grade ConversionGrade => Grade.Ok;
 

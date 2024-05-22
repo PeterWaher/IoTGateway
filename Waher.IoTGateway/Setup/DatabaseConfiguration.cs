@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
+using Waher.Content.Text;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -285,7 +286,7 @@ namespace Waher.IoTGateway.Setup
 				await Gateway.InternalDatabase.Update(this);
 			}
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			if (Database.Locked)
 				await Response.Write("2");

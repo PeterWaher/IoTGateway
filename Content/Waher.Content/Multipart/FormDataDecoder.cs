@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Multipart
@@ -173,7 +174,7 @@ namespace Waher.Content.Multipart
 				byte[] Data2 = new byte[i - j - 4 - k];
 				EmbeddedContent EmbeddedContent = new EmbeddedContent()
 				{
-					ContentType = "text/plain",
+					ContentType = PlainTextCodec.DefaultContentType,
 					Raw = Data2
 				};
 

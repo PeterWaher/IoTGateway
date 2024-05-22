@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Waher.Content.Text;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -31,7 +32,7 @@ namespace Waher.Things.Script.Parameters
         [Page(2, "Script", 100)]
         [Header(75, "Value:")]
         [ToolTip(76, "Value presented to user.")]
-        [ContentType("text/plain")]
+        [ContentType(PlainTextCodec.DefaultContentType)]
         public string[] Value { get; set; }
 
         /// <summary>

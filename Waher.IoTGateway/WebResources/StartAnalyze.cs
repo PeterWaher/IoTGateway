@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -78,7 +79,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Response.StatusCode = 409;
 				Response.StatusMessage = "Conflict";
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write("Analysis is underway.");
 			}
 
@@ -102,7 +103,7 @@ namespace Waher.IoTGateway.WebResources
 				Task _ = Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
 
 				Response.StatusCode = 200;
-				Response.ContentType = "text/plain";
+				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write(FileName);
 				await Response.SendResponse();
 			}

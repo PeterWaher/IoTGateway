@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
+using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
@@ -559,7 +560,7 @@ namespace Waher.IoTGateway
 
 					if (!(Response is null))
 					{
-						Response.ContentType = "text/plain";
+						Response.ContentType = PlainTextCodec.DefaultContentType;
 						await Response.Write("Request took too long to complete.");
 						await Response.SendResponse();
 					}

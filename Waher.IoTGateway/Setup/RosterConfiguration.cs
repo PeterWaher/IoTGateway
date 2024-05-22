@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Content.Markdown;
+using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
@@ -374,7 +375,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			if (!XmppClient.BareJidRegEx.IsMatch(JID))
 				await Response.Write("0");
@@ -427,7 +428,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
@@ -452,7 +453,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
@@ -477,7 +478,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
@@ -504,7 +505,7 @@ namespace Waher.IoTGateway.Setup
 			if (JID is null || string.IsNullOrEmpty(JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
@@ -569,7 +570,7 @@ namespace Waher.IoTGateway.Setup
 			Client.UpdateRosterItem(Contact.BareJid, Contact.Name, GroupsArray);
 			Log.Informational("Contact groups updated.", Contact.BareJid, new KeyValuePair<string, object>("Groups", sb.ToString()));
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 			await Response.Write("1");
 		}
 
@@ -651,7 +652,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 
@@ -685,7 +686,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is string JID))
 				throw new BadRequestException();
 
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			XmppClient Client = Gateway.XmppClient;
 

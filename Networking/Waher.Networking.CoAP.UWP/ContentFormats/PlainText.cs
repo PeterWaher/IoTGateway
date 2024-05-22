@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Waher.Content.Text;
 
 namespace Waher.Networking.CoAP.ContentFormats
 {
@@ -32,7 +32,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public string ContentType
 		{
-			get { return "text/plain; charset=utf-8"; }
+			get { return PlainTextCodec.DefaultContentType + "; charset=utf-8"; }
 		}
 	}
 }

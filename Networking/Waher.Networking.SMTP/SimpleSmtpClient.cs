@@ -6,10 +6,11 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Multipart;
-using Waher.Content;
+using Waher.Content.Text;
 using Waher.Networking.SASL;
 using Waher.Networking.SMTP.Exceptions;
 using Waher.Networking.Sniffers;
@@ -611,7 +612,7 @@ namespace Waher.Networking.SMTP
 				},
 				new EmbeddedContent()
 				{
-					ContentType = "text/plain; charset=utf-8",
+					ContentType = PlainTextCodec.DefaultContentType + "; charset=utf-8",
 					Raw = Encoding.UTF8.GetBytes(PlainText)
 				},
 				new EmbeddedContent()

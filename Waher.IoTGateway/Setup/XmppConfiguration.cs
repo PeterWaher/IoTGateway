@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Persistence;
@@ -547,7 +548,7 @@ namespace Waher.IoTGateway.Setup
 		private Task RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
 			Response.StatusCode = 200;
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			return Response.Write(RandomPassword.CreateRandomPassword());
 		}

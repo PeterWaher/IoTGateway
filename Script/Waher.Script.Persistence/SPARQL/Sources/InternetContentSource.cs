@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Semantic;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Exceptions;
@@ -60,7 +61,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				// TODO: Include credentials in request, if available.
 
 				Result = await InternetContent.GetAsync(Source,
-					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, text/plain;q=0.1"));
+					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, " + PlainTextCodec.DefaultContentType + ";q=0.1"));
 
 				if (Result is ISemanticCube Cube)
 					return Cube;

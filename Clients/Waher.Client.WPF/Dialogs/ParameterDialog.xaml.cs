@@ -940,12 +940,12 @@ namespace Waher.Client.WPF.Dialogs
 			Editor.Options.ShowSpaces = false;
 			Editor.Options.ShowTabs = false;
 
-			string ContentType = Field.ContentType?.ToLower() ?? "text/plain";
+			string ContentType = Field.ContentType?.ToLower() ?? TextCodec.DefaultContentType;
 			string SyntaxHighlightingResource = null;
 
 			switch (ContentType)
 			{
-				case "text/plain":
+				case TextCodec.DefaultContentType:
 					Editor.WordWrap = true;
 					break;
 

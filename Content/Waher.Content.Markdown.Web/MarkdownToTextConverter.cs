@@ -1,5 +1,6 @@
-﻿using Waher.Runtime.Inventory;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Content.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Web
 {
@@ -24,7 +25,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"text/plain"
+					PlainTextCodec.DefaultContentType
 				};
 			}
 		}

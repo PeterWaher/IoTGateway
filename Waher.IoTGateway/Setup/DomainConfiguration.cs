@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking;
@@ -492,7 +493,7 @@ namespace Waher.IoTGateway.Setup
 		private Task TestDomainName(HttpRequest Request, HttpResponse Response)
 		{
 			Response.StatusCode = 200;
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 			return Response.Write(this.token);
 		}
 

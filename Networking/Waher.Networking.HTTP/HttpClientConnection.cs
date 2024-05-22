@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
+using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
@@ -260,7 +261,7 @@ namespace Waher.Networking.HTTP
 				case "text":
 					switch (ContentType)
 					{
-						case "text/plain":
+						case PlainTextCodec.DefaultContentType:
 						case "text/csv":
 						case "text/x-json":
 						case "text/tab-separated-values":

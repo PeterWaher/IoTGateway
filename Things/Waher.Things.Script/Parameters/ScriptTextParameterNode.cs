@@ -2,6 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -80,7 +81,7 @@ namespace Waher.Things.Script.Parameters
         /// <returns>Internet Content-Type.</returns>
         public string GetContentType()
         {
-            return string.IsNullOrEmpty(this.contentType) ? "text/plain" : this.contentType;
+            return string.IsNullOrEmpty(this.contentType) ? PlainTextCodec.DefaultContentType : this.contentType;
         }
 
         /// <summary>

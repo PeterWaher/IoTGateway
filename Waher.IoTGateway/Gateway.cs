@@ -26,6 +26,7 @@ using Waher.Content.Markdown.Rendering;
 using Waher.Content.Markdown.Web;
 using Waher.Content.Markdown.Web.WebScript;
 using Waher.Content.SystemFiles;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -4634,7 +4635,7 @@ namespace Waher.IoTGateway
 			}
 			else
 			{
-				IsText = ContentType.StartsWith("text/plain");
+				IsText = ContentType.StartsWith(PlainTextCodec.DefaultContentType);
 				IsMarkdown = ContentType.StartsWith("text/markdown");
 				IsEmpty = false;
 			}

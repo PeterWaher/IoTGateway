@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.IoTGateway.WebResources.ExportFormats;
@@ -82,7 +83,7 @@ namespace Waher.IoTGateway.WebResources
 			Log.Informational("Export deleted.", FileName);
 
 			Response.StatusCode = 200;
-			Response.ContentType = "text/plain";
+			Response.ContentType = PlainTextCodec.DefaultContentType;
 			await Response.Write("1");
 
 			ExportFormat.UpdateClientsFileDeleted(FileName);

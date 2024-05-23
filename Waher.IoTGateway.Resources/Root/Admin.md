@@ -83,6 +83,7 @@ MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");
 MenuFooter();
 
 MenuHeader("Security");
+MenuItem("robots.txt","/Settings/EditRobots.md","Admin.Security.Edit.RobotsTxt");
 MenuItem("Roles","/Settings/Roles.md","Admin.Security.Roles");
 MenuItem("Users","/Settings/Users.md","Admin.Security.Users");
 MenuFooter();

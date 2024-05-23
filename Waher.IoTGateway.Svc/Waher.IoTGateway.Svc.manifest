@@ -847,6 +847,7 @@
 			<Content fileName='Database.md'/>
 			<Content fileName='Domain.js'/>
 			<Content fileName='Domain.md'/>
+			<Content fileName="EditRobots.md"/>
 			<Content fileName="ExpandPrivilege.ws"/>
 			<Content fileName='Introduction.md'/>
 			<Content fileName="LegalIdentities.md"/>

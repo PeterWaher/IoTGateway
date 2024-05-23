@@ -229,6 +229,9 @@
 				<Content fileName="Deployment.uml"/>
 			</Folder>
 		</Folder>
+		<Folder name="Settings">
+			<Content fileName="EditRobots.md"/>
+		</Folder>
 		<Folder name="Templates">
 			<Content fileName="Repeat.md"/>
 		</Folder>

@@ -1914,6 +1914,7 @@
 								<File Id='Database.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.md'/>
 								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
 								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
+								<File Id='EditRobots.md' Name='EditRobots.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\EditRobots.md'/>
 								<File Id='ExpandPrivilege.ws' Name='ExpandPrivilege.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\ExpandPrivilege.ws'/>
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
 								<File Id='LegalIdentities.md' Name='LegalIdentities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentities.md'/>
@@ -1950,6 +1951,7 @@
 								<RemoveFile Id='RemoveDatabase.md' Name='Database.md' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.js' Name='Domain.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.md' Name='Domain.md' On='uninstall'/>
+								<RemoveFile Id='RemoveEditRobots.md' Name='EditRobots.md' On='uninstall'/>
 								<RemoveFile Id='RemoveExpandPrivilege.ws' Name='ExpandPrivilege.ws' On='uninstall'/>
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
 								<RemoveFile Id='RemoveLegalIdentities.md' Name='LegalIdentities.md' On='uninstall'/>

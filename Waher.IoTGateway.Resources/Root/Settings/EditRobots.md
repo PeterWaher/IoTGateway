@@ -13,7 +13,7 @@ Login: /Login.md
 robots.txt
 =============
 
-The contents of the [robots.txt](http://www.robotstxt.org) file can be customized on this page. This is a domain-specific page, so
+The contents of the [robots.txt](https://www.robotstxt.org) file can be customized on this page. This is a domain-specific page, so
 if you edit the contents of this file using an alternative domain name, that configuration will be available only for that domain.
 Editing the file using the main domain name (or `localhost`, or using an IP-address), will edit the default version. The contents
 of the file in the root foled will be kept intact. The contents of the file will be stored in the database, to avoid it being

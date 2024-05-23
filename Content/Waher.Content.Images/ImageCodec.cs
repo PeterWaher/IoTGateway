@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using SkiaSharp;
@@ -21,19 +20,39 @@ namespace Waher.Content.Images
 		}
 
 		/// <summary>
+		/// image/webp
+		/// </summary>
+		public const string ContentTypeWebP = "image/webp";
+
+		/// <summary>
+		/// image/png
+		/// </summary>
+		public const string ContentTypePng = "image/png";
+
+		/// <summary>
+		/// image/jpeg
+		/// </summary>
+		public const string ContentTypeJpg = "image/jpeg";
+
+		/// <summary>
+		/// image/x-icon
+		/// </summary>
+		public const string ContentTypeIco = "image/x-icon";
+
+		/// <summary>
 		/// Image content types.
 		/// </summary>
 		public static readonly string[] ImageContentTypes = new string[] 
 		{
-			"image/webp", 
-			"image/png", 
+			ContentTypeWebP, 
+			ContentTypePng,
+			ContentTypeJpg,
+			ContentTypeIco,
 			"image/bmp",
 			"image/gif", 
-			"image/jpeg", 
 			"image/tiff", 
 			"image/x-wmf", 
-			"image/x-emf", 
-			"image/x-icon"
+			"image/x-emf"
 		};
 
 		/// <summary>
@@ -152,35 +171,35 @@ namespace Waher.Content.Images
 					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", nameof(Object));
 			}
 
-			if (InternetContent.IsAccepted("image/webp", AcceptedContentTypes))
+			if (InternetContent.IsAccepted(ContentTypeWebP, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Webp, 100);
-				ContentType = "image/webp";
+				ContentType = ContentTypeWebP;
 			}
-			else if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypePng, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Png, 100);
-				ContentType = "image/png";
+				ContentType = ContentTypePng;
 			}
 			else if (InternetContent.IsAccepted("image/bmp", AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Bmp, 100);
 				ContentType = "image/bmp";
 			}
-			else if (InternetContent.IsAccepted("image/jpeg", AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(CntentTypeJpg, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Jpeg, 90);
-				ContentType = "image/jpeg";
+				ContentType = ContentTypeJpg;
 			}
 			else if (InternetContent.IsAccepted("image/gif", AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Gif, 100);
 				ContentType = "image/gif";
 			}
-			else if (InternetContent.IsAccepted("image/x-icon", AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypeIco, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Ico, 100);
-				ContentType = "image/x-icon";
+				ContentType = ContentTypeIco;
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
@@ -205,7 +224,7 @@ namespace Waher.Content.Images
 			switch (FileExtension.ToLower())
 			{
 				case "png":
-					ContentType = "image/png";
+					ContentType = ContentTypePng;
 					return true;
 
 				case "bmp":
@@ -218,11 +237,11 @@ namespace Waher.Content.Images
 
 				case "jpg":
 				case "jpeg":
-					ContentType = "image/jpeg";
+					ContentType = ContentTypeJpg;
 					return true;
 
 				case "webp":
-					ContentType = "image/webp";
+					ContentType = ContentTypeWebP;
 					return true;
 
 				case "tif":
@@ -239,7 +258,7 @@ namespace Waher.Content.Images
 					return true;
 	
 				case "ico":
-					ContentType = "image/x-icon";
+					ContentType = ContentTypeIco;
 					return true;
 
 				case "svg":
@@ -262,7 +281,7 @@ namespace Waher.Content.Images
 		{
 			switch (ContentType.ToLower())
 			{
-				case "image/png":
+				case ContentTypePng:
 					FileExtension = "png";
 					return true;
 
@@ -274,11 +293,11 @@ namespace Waher.Content.Images
 					FileExtension = "gif";
 					return true;
 
-				case "image/jpeg":
+				case ContentTypeJpg:
 					FileExtension = "jpg";
 					return true;
 
-				case "image/webp":
+				case ContentTypeWebP:
 					FileExtension = "webp";
 					return true;
 
@@ -294,7 +313,7 @@ namespace Waher.Content.Images
 					FileExtension = "emf";
 					return true;
 
-				case "image/x-icon":
+				case ContentTypeIco:
 					FileExtension = "ico";
 					return true;
 

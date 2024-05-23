@@ -186,7 +186,7 @@ namespace Waher.Content.Images
 				Data = Image.Encode(SKEncodedImageFormat.Bmp, 100);
 				ContentType = "image/bmp";
 			}
-			else if (InternetContent.IsAccepted(CntentTypeJpg, AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypeJpg, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Jpeg, 90);
 				ContentType = ContentTypeJpg;

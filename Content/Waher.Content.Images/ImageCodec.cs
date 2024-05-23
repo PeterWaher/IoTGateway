@@ -37,7 +37,7 @@ namespace Waher.Content.Images
 		/// <summary>
 		/// image/x-icon
 		/// </summary>
-		public const string ContentTypeIco = "image/x-icon";
+		public const string ContentTypeIcon = "image/x-icon";
 
 		/// <summary>
 		/// Image content types.
@@ -47,7 +47,7 @@ namespace Waher.Content.Images
 			ContentTypeWebP, 
 			ContentTypePng,
 			ContentTypeJpg,
-			ContentTypeIco,
+			ContentTypeIcon,
 			"image/bmp",
 			"image/gif", 
 			"image/tiff", 
@@ -196,10 +196,10 @@ namespace Waher.Content.Images
 				Data = Image.Encode(SKEncodedImageFormat.Gif, 100);
 				ContentType = "image/gif";
 			}
-			else if (InternetContent.IsAccepted(ContentTypeIco, AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypeIcon, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Ico, 100);
-				ContentType = ContentTypeIco;
+				ContentType = ContentTypeIcon;
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
@@ -258,7 +258,7 @@ namespace Waher.Content.Images
 					return true;
 	
 				case "ico":
-					ContentType = ContentTypeIco;
+					ContentType = ContentTypeIcon;
 					return true;
 
 				case "svg":
@@ -313,7 +313,7 @@ namespace Waher.Content.Images
 					FileExtension = "emf";
 					return true;
 
-				case ContentTypeIco:
+				case ContentTypeIcon:
 					FileExtension = "ico";
 					return true;
 

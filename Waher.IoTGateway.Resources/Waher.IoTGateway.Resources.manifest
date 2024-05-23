@@ -230,6 +230,7 @@
 			</Folder>
 		</Folder>
 		<Folder name="Settings">
+			<Content fileName="EditFavIcon.md"/>
 			<Content fileName="EditRobots.md"/>
 		</Folder>
 		<Folder name="Templates">

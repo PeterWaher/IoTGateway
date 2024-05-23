@@ -31,7 +31,7 @@ if exists(Posted) then
     SetDomainSetting(Request,RobotsTxt,PTextContents);
 );
 
-s:=Waher.IoTGateway.DomainSettings.GetFileSettingAsync(Request,RobotsTxt);
+s:=Waher.IoTGateway.DomainSettings.GetTextFileSettingAsync(Request,RobotsTxt);
 s.Replace("\r\n","\n").Replace("\r","\n").Replace("\n","\r\n")}}</textarea>
 
 <button type="submit" class="posButton">Apply</button>

@@ -238,6 +238,8 @@
     <None Remove="Root\Sparql.js" />
     <None Remove="Root\Sparql.md" />
     <None Remove="Root\TargetBlank.js" />
+    <None Remove="Root\Settings\EditFavIcon.md" />
+    <None Remove="Root\Settings\EditRobots.md" />
     <None Remove="Root\Templates\Repeat.md" />
     <None Remove="Root\Video\small.3gp" />
     <None Remove="Root\Video\small.flv" />
@@ -895,6 +897,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\TargetBlank.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\EditFavIcon.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\EditRobots.md">

@@ -13,14 +13,15 @@ namespace Waher.IoTGateway.WebResources
     {
         private readonly string fileName;
         private readonly string contentType;
+        private readonly bool isText;
 
         /// <summary>
         /// Represents a file-based resource that can have custom values depending on what domain the resource is requested.
         /// </summary>
         /// <param name="ResourceName">Name of resource.</param>
-        /// <param name="FileName"></param>
+        /// <param name="FileName">Name of text file containing default contents.</param>
         public HttpConfigurableFileResource(string ResourceName, string FileName)
-            : this(ResourceName, FileName, PlainTextCodec.DefaultContentType)
+            : this(ResourceName, FileName, PlainTextCodec.DefaultContentType, true)
         {
         }
 
@@ -28,12 +29,26 @@ namespace Waher.IoTGateway.WebResources
         /// Represents a file-based resource that can have custom values depending on what domain the resource is requested.
         /// </summary>
         /// <param name="ResourceName">Name of resource.</param>
-        /// <param name="FileName"></param>
+        /// <param name="FileName">Name of text file containing default contents.</param>
+        /// <param name="ContentType">Content-Type of text file.</param>
         public HttpConfigurableFileResource(string ResourceName, string FileName, string ContentType)
+            : this(ResourceName, FileName, ContentType, true)
+        {
+        }
+
+        /// <summary>
+        /// Represents a file-based resource that can have custom values depending on what domain the resource is requested.
+        /// </summary>
+        /// <param name="ResourceName">Name of resource.</param>
+        /// <param name="FileName">Name of file containing default contents.</param>
+        /// <param name="ContentType">Content-Type of file.</param>
+        /// <param name="IsText">If file is a text file (true) or a binary file (false)</param>
+        public HttpConfigurableFileResource(string ResourceName, string FileName, string ContentType, bool IsText)
             : base(ResourceName)
         {
             this.fileName = Path.GetFullPath(FileName);
             this.contentType = ContentType;
+            this.isText = IsText;
         }
 
         /// <summary>
@@ -59,13 +74,24 @@ namespace Waher.IoTGateway.WebResources
         /// <exception cref="HttpException">If an error occurred when processing the method.</exception>
         public async Task GET(HttpRequest Request, HttpResponse Response)
         {
-            string Content = await DomainSettings.GetFileSettingAsync(Request, this.fileName);
             DateTime TP = await DomainSettings.GetFileSettingTimestampAsync(Request, this.fileName);
 
             Response.ContentType = this.contentType;
             Response.Date = TP;
-            
-            await Response.Write(Content);
+
+            if (this.isText)
+            {
+                string Content = await DomainSettings.GetTextFileSettingAsync(Request, this.fileName);
+                await Response.Write(Content);
+            }
+            else
+            {
+                byte[] Content = await DomainSettings.GetBinaryFileSettingAsync(Request, this.fileName);
+
+                Response.ContentLength = Content.Length;
+                
+                await Response.Write(Content);
+            }
         }
     }
 }

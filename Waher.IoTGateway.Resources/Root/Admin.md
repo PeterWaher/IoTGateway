@@ -79,6 +79,7 @@ MenuItem("Signature Requests","/SignatureRequests.md","Admin.Legal.SignatureRequ
 MenuFooter();
 
 MenuHeader("Presentation");
+MenuItem("favicon.ico","/Settings/EditFavIcon.md","Admin.Presentation.Edit.FavIconIco");
 MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");
 MenuFooter();
 

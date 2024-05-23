@@ -81,6 +81,7 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Script.Operators.Membership;
+using Waher.Content.Images;
 
 namespace Waher.IoTGateway
 {
@@ -994,6 +995,7 @@ namespace Waher.IoTGateway
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", GoToDefaultPage);
 				webServer.Register(new HttpConfigurableFileResource("/robots.txt", Path.Combine(rootFolder, "robots.txt"), PlainTextCodec.DefaultContentType));
+				webServer.Register(new HttpConfigurableFileResource("/favicon.ico", Path.Combine(rootFolder, "favicon.ico"), ImageCodec.ContentTypeIcon));
 				webServer.Register(new ClientEvents());
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());

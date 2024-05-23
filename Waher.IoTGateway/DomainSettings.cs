@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway
@@ -501,23 +502,23 @@ namespace Waher.IoTGateway
         #region Getting file-based settings
 
         /// <summary>
-        /// Gets the contents of a configurable domain-sensitive file.
+        /// Gets the contents of a configurable domain-sensitive text file.
         /// </summary>
         /// <param name="HostRef">Host reference</param>
         /// <param name="FileName">Full path of file.</param>
         /// <returns>Setting value.</returns>
-        public static Task<string> GetFileSettingAsync(IHostReference HostRef, string FileName)
+        public static Task<string> GetTextFileSettingAsync(IHostReference HostRef, string FileName)
         {
-            return GetFileSettingAsync(HostRef.Host, FileName);
+            return GetTextFileSettingAsync(HostRef.Host, FileName);
         }
 
         /// <summary>
-        /// Gets the contents of a configurable domain-sensitive file.
+        /// Gets the contents of a configurable domain-sensitive text file.
         /// </summary>
         /// <param name="Host">Host reference</param>
         /// <param name="FileName">Full path of file.</param>
         /// <returns>Setting value.</returns>
-        public static async Task<string> GetFileSettingAsync(string Host, string FileName)
+        public static async Task<string> GetTextFileSettingAsync(string Host, string FileName)
         {
             Host = IsAlternativeDomain(Host);
 
@@ -532,6 +533,49 @@ namespace Waher.IoTGateway
                 return Content;
 
             return await Resources.ReadAllTextAsync(FileName);
+        }
+
+        /// <summary>
+        /// Gets the contents of a configurable domain-sensitive binary file.
+        /// </summary>
+        /// <param name="HostRef">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Setting value.</returns>
+        public static Task<byte[]> GetBinaryFileSettingAsync(IHostReference HostRef, string FileName)
+        {
+            return GetBinaryFileSettingAsync(HostRef.Host, FileName);
+        }
+
+        /// <summary>
+        /// Gets the contents of a configurable domain-sensitive binary file.
+        /// </summary>
+        /// <param name="Host">Host reference</param>
+        /// <param name="FileName">Full path of file.</param>
+        /// <returns>Setting value.</returns>
+        public static async Task<byte[]> GetBinaryFileSettingAsync(string Host, string FileName)
+        {
+            Host = IsAlternativeDomain(Host);
+
+            string Content;
+
+            if (!string.IsNullOrEmpty(Host))
+                Content = await HostSettings.GetAsync(Host, FileName, string.Empty);
+            else
+                Content = await RuntimeSettings.GetAsync(FileName, string.Empty);
+
+            if (!string.IsNullOrEmpty(Content))
+            {
+                try
+                {
+                    return Convert.FromBase64String(Content);
+                }
+                catch (Exception ex)
+                {
+                    Log.Critical(ex);
+                }
+            }
+
+            return await Resources.ReadAllBytesAsync(FileName);
         }
 
         /// <summary>

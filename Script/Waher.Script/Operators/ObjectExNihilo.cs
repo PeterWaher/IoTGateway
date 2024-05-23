@@ -263,6 +263,29 @@ namespace Waher.Script.Operators
 						return Result;
 				}
 			}
+			else if (CheckAgainst.AssociatedObjectValue is IDictionary<string, string> Object3)
+			{
+				this.CheckQuick();
+
+				foreach (KeyValuePair<string, string> P in Object3)
+				{
+					if (!(this.quick.ContainsKey(P.Key)))
+						return PatternMatchResult.NoMatch;
+				}
+
+				foreach (KeyValuePair<string, ScriptNode> P in this.members)
+				{
+					if (Object3.TryGetValue(P.Key, out string s))
+						Result = P.Value.PatternMatch(new StringValue(s), AlreadyFound);
+					else
+						Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
+
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
+			}
+			else
+				return PatternMatchResult.NoMatch;
 
 			return PatternMatchResult.Match;
 		}

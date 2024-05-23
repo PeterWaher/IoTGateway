@@ -16,13 +16,13 @@ robots.txt
 The contents of the [robots.txt](https://www.robotstxt.org) file can be customized on this page. This is a domain-specific page, so
 if you edit the contents of this file using an alternative domain name, that configuration will be available only for that domain.
 Editing the file using the main domain name (or `localhost`, or using an IP-address), will edit the default version. The contents
-of the file in the root foled will be kept intact. The contents of the file will be stored in the database, to avoid it being
+of the file in the root folder will be kept intact. The contents of the file will be stored in the database to avoid it being
 updated when the software is updated.
 
 <form action="EditRobots.md" method="post">
 
-Contents of `robots.txt`:  
-<textarea name="TextContents" style="min-height:40vh">{{
+<label for="TextContents">Contents of `robots.txt`:</label>  
+<textarea id="TextContents" name="TextContents" style="min-height:40vh">{{
 RobotsTxt:=System.IO.Path.Combine(Waher.IoTGateway.Gateway.RootFolder,"robots.txt");
 
 if exists(Posted) then 

@@ -323,6 +323,43 @@ namespace Waher.Content.Markdown.Model
 			return this.lastChar = ch;
 		}
 
+		public char NextCharRaw()
+		{
+			char ch;
+
+			if (this.pos >= this.len)
+			{
+				this.current++;
+				if (this.current > this.end)
+				{
+					this.pos = 0;
+					this.len = 0;
+
+					ch = (char)0;
+				}
+				else
+				{
+					this.currentRow = this.rows[this.current];
+					this.pos = 0;
+					this.len = this.currentRow.Length;
+					this.lineBreakAfter = this.currentRow.EndsWith("  ");
+
+					if (this.lineBreakAfter)
+					{
+						this.currentRow = this.currentRow.Substring(0, this.len - 2);
+						this.len -= 2;
+						ch = '\r';
+					}
+					else
+						ch = '\n';
+				}
+			}
+			else
+				ch = this.currentRow[this.pos++];
+
+			return this.lastChar = ch;
+		}
+
 		public bool CheckRestOfTermination(char ch, int Count)
 		{
 			if (this.pos + Count > this.len)
@@ -425,7 +462,7 @@ namespace Waher.Content.Markdown.Model
 
 			while (true)
 			{
-				ch = this.NextChar();
+				ch = this.NextCharRaw();
 
 				if (ch == 0)
 				{
@@ -458,6 +495,26 @@ namespace Waher.Content.Markdown.Model
 
 						return sb.ToString();
 					}
+				}
+				else if (ch == '\n')	// Next line, no trailing double-space
+				{
+					if (i > 0)
+					{
+						sb.Append(Token.Substring(0, i));
+						i = 0;
+					}
+
+					sb.AppendLine();
+				}
+				else if (ch == '\r')    // Next line, with trailing double-space
+				{
+					if (i > 0)
+					{
+						sb.Append(Token.Substring(0, i));
+						i = 0;
+					}
+
+					sb.AppendLine("  ");
 				}
 				else if (char.ToUpper(ch) == Token[i])
 				{

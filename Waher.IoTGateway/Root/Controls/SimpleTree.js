@@ -22,6 +22,11 @@
 	}
 }
 
+async function SelectNodeLabel(Event, NodeLabel)
+{
+	SelectNode(Event, NodeLabel.parentElement);
+}
+
 async function ExpandNode(Event, Node)
 {
 	try
@@ -152,6 +157,13 @@ async function ExpandNode(Event, Node)
 					Span.innerHTML = Rec.collapsedImg;
 
 					Li.insertBefore(Span, Li.firstChild);
+
+					Loop = Li.firstElementChild;
+					while (Loop)
+					{
+						Loop.setAttribute("onclick", "SelectNodeLabel(event,this)");
+						Loop = Loop.nextElementSibling;
+					}
 				}
 
 				Ul.appendChild(Li);

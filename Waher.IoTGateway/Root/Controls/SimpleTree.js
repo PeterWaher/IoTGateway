@@ -19,7 +19,6 @@
 	catch (e) 
 	{
 		console.log(e);
-		console.log(xhttp.responseText);
 	}
 }
 
@@ -125,6 +124,9 @@ async function ExpandNode(Event, Node)
 					Li.className = "Expandable";
 					Li.setAttribute("data-expand", Rec.expand);
 					Li.setAttribute("onclick", "ExpandNode(event,this)");
+
+					if (Rec.select)
+						Li.setAttribute("data-select", Rec.select);
 				}
 				else if (Rec.select) 
 				{
@@ -159,11 +161,10 @@ async function ExpandNode(Event, Node)
 	catch (e)
 	{
 		console.log(e);
-		console.log(xhttp.responseText);
 	}
 }
 
-function CollapseNode(Event, Node)
+async function CollapseNode(Event, Node)
 {
 	if (Event)
 		Event.stopPropagation();
@@ -184,6 +185,8 @@ function CollapseNode(Event, Node)
 
 		Loop = Loop.nextSibling;
 	}
+
+	await SelectNode(Event, Node);
 }
 
 function NoOperation(Event, Node)

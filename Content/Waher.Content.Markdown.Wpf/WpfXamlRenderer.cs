@@ -1439,6 +1439,7 @@ namespace Waher.Content.Markdown.Wpf
 			int Column;
 			int Row, NrRows;
 			int RowNr = 0;
+			int NrColumns = Element.Columns;
 
 			this.XmlOutput.WriteStartElement("Grid");
 			this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMargins);
@@ -1447,7 +1448,7 @@ namespace Waher.Content.Markdown.Wpf
 
 			this.XmlOutput.WriteStartElement("Grid.ColumnDefinitions");
 
-			for (Column = 0; Column < Element.Columns; Column++)
+			for (Column = 0; Column < NrColumns; Column++)
 			{
 				this.XmlOutput.WriteStartElement("ColumnDefinition");
 				this.XmlOutput.WriteAttributeString("Width", "Auto");
@@ -1467,29 +1468,29 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteEndElement();
 
 			for (Row = 0, NrRows = Element.Headers.Length; Row < NrRows; Row++, RowNr++)
-				await this.Render(Element.Headers[Row], RowNr, true, Element);
+				await this.Render(Element.Headers[Row], Element.HeaderCellAlignments[Row], RowNr, true, Element);
 
 			for (Row = 0, NrRows = Element.Rows.Length; Row < NrRows; Row++, RowNr++)
-				await this.Render(Element.Rows[Row], RowNr, false, Element);
+				await this.Render(Element.Rows[Row], Element.RowCellAlignments[Row], RowNr, false, Element);
 
 			this.XmlOutput.WriteEndElement();
 		}
 
-		private async Task Render(MarkdownElement[] CurrentRow, int RowNr, bool Bold, Table Element)
+		private async Task Render(MarkdownElement[] CurrentRow, TextAlignment?[] CellAlignments, int RowNr, bool Bold, Table Element)
 		{
 			TextAlignment Bak = this.Alignment;
 			MarkdownElement E;
+			int NrColumns = Element.Columns;
 			int Column;
-			int NrColumns;
 			int ColSpan;
 
-			for (Column = 0, NrColumns = CurrentRow.Length; Column < NrColumns; Column++)
+			for (Column = 0; Column < NrColumns; Column++)
 			{
 				E = CurrentRow[Column];
 				if (E is null)
 					continue;
 
-				this.Alignment = Element.Alignments[Column];
+				this.Alignment = CellAlignments[Column] ?? Element.ColumnAlignments[Column];
 				ColSpan = Column + 1;
 				while (ColSpan < NrColumns && CurrentRow[ColSpan] is null)
 					ColSpan++;

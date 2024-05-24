@@ -1296,6 +1296,8 @@ namespace Waher.Content.Markdown
 				{
 					MarkdownElement[][] Headers = new MarkdownElement[TableInformation.NrHeaderRows][];
 					MarkdownElement[][] DataRows = new MarkdownElement[TableInformation.NrDataRows][];
+					TextAlignment?[][] HeaderCellAlignments = new TextAlignment?[TableInformation.NrHeaderRows][];
+					TextAlignment?[][] DataCellAlignments = new TextAlignment?[TableInformation.NrDataRows][];
 					LinkedList<MarkdownElement> CellElements;
 					string[] Row;
 					int[] Positions;
@@ -1308,15 +1310,19 @@ namespace Waher.Content.Markdown
 						Positions = TableInformation.HeaderPositions[j];
 
 						Headers[j] = new MarkdownElement[c];
+						HeaderCellAlignments[j] = new TextAlignment?[c];
 
 						for (i = 0; i < c; i++)
 						{
 							s = Row[i];
 							if (s is null)
+							{
 								Headers[j][i] = null;
+								HeaderCellAlignments[j][i] = null;
+							}
 							else
 							{
-								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
+								CellElements = this.ParseCell(Row[i], Positions[i], out HeaderCellAlignments[j][i]);
 
 								if (!(CellElements.First is null) && CellElements.First.Next is null)
 								{
@@ -1349,15 +1355,19 @@ namespace Waher.Content.Markdown
 						Positions = TableInformation.RowPositions[j];
 
 						DataRows[j] = new MarkdownElement[c];
+						DataCellAlignments[j] = new TextAlignment?[c];
 
 						for (i = 0; i < c; i++)
 						{
 							s = Row[i];
 							if (s is null)
+							{
 								DataRows[j][i] = null;
+								DataCellAlignments[j][i] = null;
+							}
 							else
 							{
-								CellElements = this.ParseBlock(new string[] { Row[i] }, new int[] { Positions[i] });
+								CellElements = this.ParseCell(Row[i], Positions[i], out DataCellAlignments[j][i]);
 
 								if (!(CellElements.First is null) && CellElements.First.Next is null)
 								{
@@ -1385,7 +1395,7 @@ namespace Waher.Content.Markdown
 					}
 
 					Elements.AddLast(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.AlignmentDefinitions,
-						TableInformation.Caption, TableInformation.Id));
+						HeaderCellAlignments, DataCellAlignments, TableInformation.Caption, TableInformation.Id));
 
 					continue;
 				}
@@ -1576,6 +1586,40 @@ namespace Waher.Content.Markdown
 			}
 			else
 				return Content;
+		}
+
+		private LinkedList<MarkdownElement> ParseCell(string Cell, int Position, out TextAlignment? Alignment)
+		{
+			if (Cell.StartsWith("<<"))
+			{
+				Position += 2;
+
+				if (Cell.EndsWith(">>"))
+				{
+					Alignment = TextAlignment.Center;
+					Cell = Cell.Substring(2, Cell.Length - 4);
+				}
+				else
+				{
+					Alignment = TextAlignment.Left;
+					Cell = Cell.Substring(2);
+				}
+			}
+			else if (Cell.StartsWith(">>") && Cell.EndsWith("<<"))
+			{
+				Alignment = TextAlignment.Center;
+				Cell = Cell.Substring(2, Cell.Length - 4);
+				Position += 2;
+			}
+			else if (Cell.EndsWith(">>"))
+			{
+				Alignment = TextAlignment.Right;
+				Cell = Cell.Substring(0, Cell.Length - 2);
+			}
+			else
+				Alignment = null;
+
+			return this.ParseBlock(new string[] { Cell }, new int[] { Position });
 		}
 
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int[] Positions)

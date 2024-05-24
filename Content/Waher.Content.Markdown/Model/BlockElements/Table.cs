@@ -11,8 +11,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	{
 		private readonly MarkdownElement[][] headers;
 		private readonly MarkdownElement[][] rows;
-		private readonly TextAlignment[] alignments;
-		private readonly string[] alignmentDefinitions;
+		private readonly TextAlignment?[][] headerCellAlignments;
+		private readonly TextAlignment?[][] rowCellAlignments;
+		private readonly TextAlignment[] columnAlignments;
+		private readonly string[] columnAlignmentDefinitions;
 		private readonly string caption;
 		private readonly string id;
 		private readonly int columns;
@@ -24,19 +26,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Columns">Columns in table.</param>
 		/// <param name="Headers">Header rows.</param>
 		/// <param name="Rows">Data rows.</param>
-		/// <param name="Alignments">Column alignments.</param>
-		/// <param name="AlignmentDefinitions">How the alignments where defined.</param>
+		/// <param name="ColumnAlignments">Column alignments.</param>
+		/// <param name="ColumnAlignmentDefinitions">How the column alignments where defined.</param>
+		/// <param name="HeaderCellAlignments">Individual cell alignments for header cells.</param>
+		/// <param name="RowCellAlignments">Individual cell alignments for row cells.</param>
 		/// <param name="Caption">Table caption.</param>
 		/// <param name="Id">Table ID.</param>
 		public Table(MarkdownDocument Document, int Columns, MarkdownElement[][] Headers, MarkdownElement[][] Rows,
-			TextAlignment[] Alignments, string[] AlignmentDefinitions, string Caption, string Id)
+			TextAlignment[] ColumnAlignments, string[] ColumnAlignmentDefinitions, TextAlignment?[][] HeaderCellAlignments,
+			TextAlignment?[][] RowCellAlignments, string Caption, string Id)
 			: base(Document)
 		{
 			this.columns = Columns;
 			this.headers = Headers;
 			this.rows = Rows;
-			this.alignments = Alignments;
-			this.alignmentDefinitions = AlignmentDefinitions;
+			this.columnAlignments = ColumnAlignments;
+			this.columnAlignmentDefinitions = ColumnAlignmentDefinitions;
+			this.headerCellAlignments = HeaderCellAlignments;
+			this.rowCellAlignments = RowCellAlignments;
 			this.caption = Caption;
 			this.id = Id;
 		}
@@ -52,14 +59,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public MarkdownElement[][] Rows => this.rows;
 
 		/// <summary>
-		/// Table cell alignments.
+		/// Table column alignments.
 		/// </summary>
-		public TextAlignment[] Alignments => this.alignments;
+		public TextAlignment[] ColumnAlignments => this.columnAlignments;
 
 		/// <summary>
-		/// Originbal Table cell alignment definitions.
+		/// Originbal Table column alignment definitions.
 		/// </summary>
-		public string[] AlignmentDefinitions => this.alignmentDefinitions;
+		public string[] ColumnAlignmentDefinitions => this.columnAlignmentDefinitions;
+
+		/// <summary>
+		/// Header cell alignments in table.
+		/// </summary>
+		public TextAlignment?[][] HeaderCellAlignments => this.headerCellAlignments;
+
+		/// <summary>
+		/// Row cell alignments in table.
+		/// </summary>
+		public TextAlignment?[][] RowCellAlignments => this.rowCellAlignments;
 
 		/// <summary>
 		/// Table caption.
@@ -150,8 +167,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				this.caption == x.caption &&
 				this.id == x.id &&
 				this.columns == x.columns &&
-				AreEqual(this.alignments, x.alignments) &&
-				AreEqual(this.alignmentDefinitions, x.alignmentDefinitions) &&
+				AreEqual(this.columnAlignments, x.columnAlignments) &&
+				AreEqual(this.columnAlignmentDefinitions, x.columnAlignmentDefinitions) &&
 				base.SameMetaData(E);
 		}
 
@@ -166,10 +183,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				this.caption == x.caption &&
 				this.id == x.id &&
 				this.columns == x.columns &&
-				AreEqual(this.alignments, x.alignments) &&
-				AreEqual(this.alignmentDefinitions, x.alignmentDefinitions) &&
+				AreEqual(this.columnAlignments, x.columnAlignments) &&
+				AreEqual(this.columnAlignmentDefinitions, x.columnAlignmentDefinitions) &&
 				AreEqual(this.headers, x.headers) &&
 				AreEqual(this.rows, x.rows) &&
+				AreEqual(this.headerCellAlignments, x.headerCellAlignments) &&
+				AreEqual(this.rowCellAlignments, x.rowCellAlignments) &&
 				base.Equals(obj);
 		}
 
@@ -189,16 +208,22 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			h2 = this.columns.GetHashCode();
 
 			h1 = ((h1 << 5) + h1) ^ h2;
-			h2 = GetHashCode(this.alignments);
+			h2 = GetHashCode(this.columnAlignments);
 
 			h1 = ((h1 << 5) + h1) ^ h2;
-			h2 = GetHashCode(this.alignmentDefinitions);
+			h2 = GetHashCode(this.columnAlignmentDefinitions);
 
 			h1 = ((h1 << 5) + h1) ^ h2;
 			h2 = GetHashCode(this.headers);
 
 			h1 = ((h1 << 5) + h1) ^ h2;
 			h2 = GetHashCode(this.rows);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.headerCellAlignments);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.rowCellAlignments);
 
 			h1 = ((h1 << 5) + h1) ^ h2;
 
@@ -226,6 +251,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			int h2;
 
 			foreach (MarkdownElement[] Item in Items)
+			{
+				h2 = GetHashCode(Item);
+				h1 = ((h1 << 5) + h1) ^ h2;
+			}
+
+			return h1;
+		}
+
+		private static bool AreEqual(TextAlignment?[][] Items1, TextAlignment?[][] Items2)
+		{
+			int i, c = Items1.Length;
+			if (Items2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!AreEqual(Items1[i], Items2[i]))
+					return false;
+			}
+
+			return true;
+		}
+
+		private static int GetHashCode(TextAlignment?[][] Items)
+		{
+			int h1 = 0;
+			int h2;
+
+			foreach (TextAlignment?[] Item in Items)
 			{
 				h2 = GetHashCode(Item);
 				h1 = ((h1 << 5) + h1) ^ h2;

@@ -1691,6 +1691,33 @@ This is transformed to:
 **Note**: It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
 reason for maintaining columns in the markdown text aligned, is to make it more readable.
 
+You can provide cell-specific alignment overrides by using the left, right and center alignment constructs within a cell. This can be done both
+in headers and in data cells of the table. Example:
+
+    | Cell alignment table                        |||
+    | Left          | Center        | Right         |
+    | <<Left        | <<Left        | <<Left        |
+    | Right>>       | Right>>       | Right>>       |
+    | >>Center<<    | >>Center<<    | >>Center<<    |
+    |:--------------|:-------------:|--------------:|
+    | Normal        | Normal        | Normal        |
+    | <<Left        | <<Left        | <<Left        |
+    | Right>>       | Right>>       | Right>>       |
+    | >>Center<<    | >>Center<<    | >>Center<<    |
+
+This generates a table that looks like:
+
+| Cell alignment table                        |||
+| Left          | Center        | Right         |
+| <<Left        | <<Left        | <<Left        |
+| Right>>       | Right>>       | Right>>       |
+| >>Center<<    | >>Center<<    | >>Center<<    |
+|:--------------|:-------------:|--------------:|
+| Normal        | Normal        | Normal        |
+| <<Left        | <<Left        | <<Left        |
+| Right>>       | Right>>       | Right>>       |
+| >>Center<<    | >>Center<<    | >>Center<<    |
+
 You can combine footnotes and tables as a way to create tables with cells that contain more
 complex content, that does not fit into simple short lines. If a cell has a single footnote
 reference, it will be assumed that the contents of that footnote should be rendered in the

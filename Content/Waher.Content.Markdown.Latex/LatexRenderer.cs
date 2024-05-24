@@ -1259,13 +1259,17 @@ namespace Waher.Content.Markdown.Latex
 		public override async Task Render(Table Element)
 		{
 			MarkdownElement E;
+			MarkdownElement[] Row;
+			TextAlignment?[] CellAlignments;
+			int NrRows, RowIndex;
+			int NrColumns = Element.Columns;
 			string s;
 			int i, j, k;
 
 			this.Output.AppendLine("\\begin{table}[!h]");
 			this.Output.AppendLine("\\centering");
 			this.Output.Append("\\begin{tabular}{");
-			foreach (TextAlignment Alignment in Element.Alignments)
+			foreach (TextAlignment Alignment in Element.ColumnAlignments)
 			{
 				this.Output.Append('|');
 				this.RenderAlignment(Alignment);
@@ -1274,16 +1278,20 @@ namespace Waher.Content.Markdown.Latex
 			this.Output.AppendLine("|}");
 			this.Output.AppendLine("\\hline");
 
-			foreach (MarkdownElement[] Row in Element.Headers)
+			NrRows = Element.Headers.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
-				for (i = 0; i < Element.Columns; i++)
+				Row = Element.Headers[RowIndex];
+				CellAlignments = Element.HeaderCellAlignments[RowIndex];
+
+				for (i = 0; i < NrColumns; i++)
 				{
 					if (i > 0)
 						this.Output.Append(" & ");
 
 					k = 1;
 					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
+					while (j < NrColumns && Row[j++] is null)
 						k++;
 
 					if (k > 1)
@@ -1291,7 +1299,7 @@ namespace Waher.Content.Markdown.Latex
 						this.Output.Append("\\multicolumn{");
 						this.Output.Append(k.ToString());
 						this.Output.Append("}{|");
-						this.RenderAlignment(Element.Alignments[i]);
+						this.RenderAlignment(CellAlignments[i] ?? Element.ColumnAlignments[i]);
 						this.Output.Append("|}{");
 					}
 
@@ -1308,16 +1316,20 @@ namespace Waher.Content.Markdown.Latex
 
 			this.Output.AppendLine("\\hline");
 
-			foreach (MarkdownElement[] Row in Element.Rows)
+			NrRows = Element.Rows.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
-				for (i = 0; i < Element.Columns; i++)
+				Row = Element.Rows[RowIndex];
+				CellAlignments = Element.RowCellAlignments[RowIndex];
+
+				for (i = 0; i < NrColumns; i++)
 				{
 					if (i > 0)
 						this.Output.Append(" & ");
 
 					k = 1;
 					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
+					while (j < NrColumns && Row[j++] is null)
 						k++;
 
 					if (k > 1)
@@ -1325,7 +1337,7 @@ namespace Waher.Content.Markdown.Latex
 						this.Output.Append("\\multicolumn{");
 						this.Output.Append(k.ToString());
 						this.Output.Append("}{|");
-						this.RenderAlignment(Element.Alignments[i]);
+						this.RenderAlignment(CellAlignments[i] ?? Element.ColumnAlignments[i]);
 						this.Output.Append("|}{");
 					}
 

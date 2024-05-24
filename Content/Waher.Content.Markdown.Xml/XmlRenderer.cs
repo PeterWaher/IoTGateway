@@ -810,30 +810,47 @@ namespace Waher.Content.Markdown.Xml
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(Table Element)
 		{
+			MarkdownElement E;
+			MarkdownElement[] Row;
+			TextAlignment?[] CellAlignments;
+			int NrRows, RowIndex;
+			int NrColumns = Element.Columns;
+			int ColumnIndex;
+
 			this.xmlOutput.WriteStartElement(nameof(Table));
 			this.xmlOutput.WriteAttributeString("caption", Element.Caption);
 			this.xmlOutput.WriteAttributeString("id", Element.Id);
 			this.xmlOutput.WriteAttributeString("columns", Element.Columns.ToString());
 
-			foreach (TextAlignment Col in Element.Alignments)
+			foreach (TextAlignment Col in Element.ColumnAlignments)
 			{
 				this.xmlOutput.WriteStartElement("Column");
 				this.xmlOutput.WriteAttributeString("alignment", Col.ToString());
 				this.xmlOutput.WriteEndElement();
 			}
 
-			foreach (MarkdownElement[] Row in Element.Headers)
+			NrRows = Element.Headers.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
+				Row = Element.Headers[RowIndex];
+				CellAlignments = Element.HeaderCellAlignments[RowIndex];
+
 				this.xmlOutput.WriteStartElement("HeaderRow");
 
-				foreach (MarkdownElement E in Row)
+				for (ColumnIndex = 0;ColumnIndex<NrColumns; ColumnIndex++)
 				{
+					E = Row[ColumnIndex];
+
 					if (E is null)
 						this.xmlOutput.WriteElementString("Continue", string.Empty);
 					else
 					{
 						this.xmlOutput.WriteStartElement("HeaderCell");
+						this.xmlOutput.WriteAttributeString("alignment", 
+							(CellAlignments[ColumnIndex] ?? Element.ColumnAlignments[ColumnIndex]).ToString());
+
 						await E.Render(this);
+
 						this.xmlOutput.WriteEndElement();
 					}
 				}
@@ -841,18 +858,28 @@ namespace Waher.Content.Markdown.Xml
 				this.xmlOutput.WriteEndElement();
 			}
 
-			foreach (MarkdownElement[] Row in Element.Rows)
+			NrRows = Element.Rows.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
+				Row = Element.Rows[RowIndex];
+				CellAlignments = Element.RowCellAlignments[RowIndex];
+
 				this.xmlOutput.WriteStartElement("Row");
 
-				foreach (MarkdownElement E in Row)
+				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
 				{
+					E = Row[ColumnIndex];
+
 					if (E is null)
 						this.xmlOutput.WriteElementString("Continue", string.Empty);
 					else
 					{
 						this.xmlOutput.WriteStartElement("Cell");
+						this.xmlOutput.WriteAttributeString("alignment",
+							(CellAlignments[ColumnIndex] ?? Element.ColumnAlignments[ColumnIndex]).ToString());
+
 						await E.Render(this);
+
 						this.xmlOutput.WriteEndElement();
 					}
 				}

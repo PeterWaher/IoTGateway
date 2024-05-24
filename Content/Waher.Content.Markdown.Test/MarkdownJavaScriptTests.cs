@@ -46,6 +46,9 @@ namespace Waher.Content.Markdown.Test
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 
+			ExpectedJavaScript = ExpectedJavaScript.Replace("\\r\\n", "\\n").Replace("\\r", "\\n");
+			GeneratedJavaScript = GeneratedJavaScript.Replace("\\r\\n", "\\n").Replace("\\r", "\\n");
+
 			MarkdownHtmlTests.AssertEqual(ExpectedJavaScript, GeneratedJavaScript, "Generated JavaScript does not match expected JavaScript.");
 
 			if (ExecuteJavaScript)

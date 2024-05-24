@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Test
 
 			if (Generated != Expected)
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new();
 
 				sb.AppendLine(Message);
 				sb.AppendLine();
@@ -83,6 +83,8 @@ namespace Waher.Content.Markdown.Test
 			string s2;
 			int i = 0;
 
+			s = s.Replace("\r\n", "\n").Replace('\r', '\n');
+
 			foreach (Match M in guids.Matches(s))
 			{
 				s2 = "GUID" + (++i).ToString();
@@ -94,7 +96,7 @@ namespace Waher.Content.Markdown.Test
 			return s;
 		}
 
-		private readonly static Regex guids = new Regex(@"[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){4}[0-9a-fA-F]{8}", RegexOptions.Multiline | RegexOptions.Compiled);
+		private readonly static Regex guids = new(@"[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){4}[0-9a-fA-F]{8}", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		[TestMethod]
 		public async Task Test_01_Paragraphs()

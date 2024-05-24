@@ -1579,6 +1579,10 @@ namespace Waher.Content.Markdown.Rendering
 		public override async Task Render(Table Element)
 		{
 			MarkdownElement E;
+			MarkdownElement[] Row;
+			TextAlignment?[] CellAlignments;
+			int NrRows, RowIndex;
+			int NrColumns = Element.Columns;
 			int i, j, k;
 
 			this.Output.AppendLine("<table>");
@@ -1598,7 +1602,7 @@ namespace Waher.Content.Markdown.Rendering
 			}
 
 			this.Output.AppendLine("<colgroup>");
-			foreach (TextAlignment Alignment in Element.Alignments)
+			foreach (TextAlignment Alignment in Element.ColumnAlignments)
 			{
 				this.Output.Append("<col style=\"text-align:");
 				this.Output.Append(Alignment.ToString().ToLower());
@@ -1607,11 +1611,16 @@ namespace Waher.Content.Markdown.Rendering
 			this.Output.AppendLine("</colgroup>");
 
 			this.Output.AppendLine("<thead>");
-			foreach (MarkdownElement[] Row in Element.Headers)
+
+			NrRows = Element.Headers.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
+				Row = Element.Headers[RowIndex];
+				CellAlignments = Element.HeaderCellAlignments[RowIndex];
+
 				this.Output.AppendLine("<tr>");
 
-				for (i = 0; i < Element.Columns; i++)
+				for (i = 0; i < NrColumns; i++)
 				{
 					E = Row[i];
 					if (E is null)
@@ -1619,11 +1628,11 @@ namespace Waher.Content.Markdown.Rendering
 
 					k = 1;
 					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
+					while (j < NrColumns && Row[j++] is null)
 						k++;
 
 					this.Output.Append("<th style=\"text-align:");
-					this.Output.Append(Element.Alignments[i].ToString().ToLower());
+					this.Output.Append((CellAlignments[i] ?? Element.ColumnAlignments[i]).ToString().ToLower());
 
 					if (k > 1)
 					{
@@ -1641,11 +1650,16 @@ namespace Waher.Content.Markdown.Rendering
 			this.Output.AppendLine("</thead>");
 
 			this.Output.AppendLine("<tbody>");
-			foreach (MarkdownElement[] Row in Element.Rows)
+
+			NrRows = Element.Rows.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
+				Row = Element.Rows[RowIndex];
+				CellAlignments = Element.RowCellAlignments[RowIndex];
+
 				this.Output.AppendLine("<tr>");
 
-				for (i = 0; i < Element.Columns; i++)
+				for (i = 0; i < NrColumns; i++)
 				{
 					E = Row[i];
 					if (E is null)
@@ -1653,11 +1667,11 @@ namespace Waher.Content.Markdown.Rendering
 
 					k = 1;
 					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
+					while (j < NrColumns && Row[j++] is null)
 						k++;
 
 					this.Output.Append("<td style=\"text-align:");
-					this.Output.Append(Element.Alignments[i].ToString().ToLower());
+					this.Output.Append((CellAlignments[i] ?? Element.ColumnAlignments[i]).ToString().ToLower());
 
 					if (k > 1)
 					{

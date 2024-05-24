@@ -31,6 +31,19 @@
 |:-----------|:---------:|-----------|
 | No  | headers  | table  |
 
+| Cell alignment table                         |||
+| Left           | Center         | Right          |
+| <<Left         | <<Left         | <<Left         |
+| Right>>        | Right>>        | Right>>        |
+| >>Center<<     | >>Center<<     | >>Center<<     |
+| >>Justified<<  | >>Justified<<  | >>Justified<<  |
+|:--------------|:-------------:|--------------:|
+| Normal         | Normal         | Normal         |
+| <<Left         | <<Left         | <<Left         |
+| Right>>        | Right>>        | Right>>        |
+| >>Center<<     | >>Center<<     | >>Center<<     |
+| >>Justified<<  | >>Justified<<  | >>Justified<<  |
+
 
 
 [^e11]:	| Info about cell   ||

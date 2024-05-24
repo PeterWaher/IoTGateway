@@ -22,6 +22,8 @@ namespace Waher.Content.Markdown.Consolidation
 		private readonly Dictionary<string, int> columnIndices = new Dictionary<string, int>();
 		private readonly Dictionary<long, MarkdownElement> headers = new Dictionary<long, MarkdownElement>();
 		private readonly Dictionary<long, MarkdownElement> cells = new Dictionary<long, MarkdownElement>();
+		private readonly Dictionary<long, TextAlignment?> headerAlignments = new Dictionary<long, TextAlignment?>();
+		private readonly Dictionary<long, TextAlignment?> cellAlignments = new Dictionary<long, TextAlignment?>();
 		private readonly Dictionary<int, TextAlignment> columnAlignments = new Dictionary<int, TextAlignment>();
 		private readonly Dictionary<int, string> sources = new Dictionary<int, string>();
 		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
@@ -48,33 +50,44 @@ namespace Waher.Content.Markdown.Consolidation
 		public static async Task<ConsolidatedTable> CreateAsync(string Source, Table MarkdownTable)
 		{
 			ConsolidatedTable Result = new ConsolidatedTable(MarkdownTable);
-			int i, j;
+			MarkdownElement[] Row;
+			TextAlignment?[] CellAlignments;
+			int RowIndex, NrRows;
+			int ColumnIndex, NrColumns = MarkdownTable.Columns;
+			long l;
 
-			i = 0;
-			foreach (TextAlignment Alignment in MarkdownTable.Alignments)
+			for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
 			{
-				Result.columnIndices[await Result.GetHeaderKey(MarkdownTable.Headers, i)] = i;
-				Result.columnAlignments[i++] = Alignment;
+				Result.columnIndices[await Result.GetHeaderKey(MarkdownTable.Headers, ColumnIndex)] = ColumnIndex;
+				Result.columnAlignments[ColumnIndex] = MarkdownTable.ColumnAlignments[ColumnIndex];
 			}
 
-			i = 0;
-			foreach (MarkdownElement[] Row in MarkdownTable.Headers)
+			for (RowIndex = 0, NrRows = MarkdownTable.Headers.Length; RowIndex < NrRows; RowIndex++)
 			{
-				j = 0;
-				foreach (MarkdownElement Element in Row)
-					Result.headers[(((long)i) << 32) + j++] = Element;
+				Row = MarkdownTable.Headers[RowIndex];
+				CellAlignments = MarkdownTable.HeaderCellAlignments[RowIndex];
 
-				i++;
+				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
+				{
+					l = (((long)RowIndex) << 32) + ColumnIndex;
+					Result.headers[l] = Row[ColumnIndex];
+					Result.headerAlignments[l] = CellAlignments[ColumnIndex];
+				}
 			}
 
-			i = 0;
-			foreach (MarkdownElement[] Row in MarkdownTable.Rows)
+			for (RowIndex = 0, NrRows = MarkdownTable.Headers.Length; RowIndex < NrRows; RowIndex++)
 			{
-				j = 0;
-				foreach (MarkdownElement Element in Row)
-					Result.cells[(((long)i) << 32) + j++] = Element;
+				Row = MarkdownTable.Rows[RowIndex];
+				CellAlignments = MarkdownTable.RowCellAlignments[RowIndex];
 
-				Result.sources[i++] = Source;
+				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
+				{
+					l = (((long)RowIndex) << 32) + ColumnIndex;
+					Result.cells[l] = Row[ColumnIndex];
+					Result.cellAlignments[l] = CellAlignments[ColumnIndex];
+				}
+
+				Result.sources[ColumnIndex] = Source;
 			}
 
 			return Result;
@@ -205,12 +218,16 @@ namespace Waher.Content.Markdown.Consolidation
 				if (MarkdownTable.Headers.Length > this.nrHeaderRows)
 					this.nrHeaderRows = MarkdownTable.Headers.Length;
 
+				MarkdownElement[] Row;
+				TextAlignment?[] CellAlignments;
 				int[] Indices = new int[MarkdownTable.Columns];
 				int i, i2, j, j2;
+				int RowIndex, NrRows;
+				long l;
 				string Key;
 
 				i = 0;
-				foreach (TextAlignment Alignment in MarkdownTable.Alignments)
+				foreach (TextAlignment Alignment in MarkdownTable.ColumnAlignments)
 				{
 					Key = await this.GetHeaderKey(MarkdownTable.Headers, i);
 
@@ -220,9 +237,15 @@ namespace Waher.Content.Markdown.Consolidation
 						this.columnIndices[Key] = i2;
 						this.columnAlignments[i2] = Alignment;
 
-						j = 0;
-						foreach (MarkdownElement[] Row in MarkdownTable.Headers)
-							this.headers[(((long)j++) << 32) + i2] = Row[i];
+						for (RowIndex = 0, NrRows = MarkdownTable.Headers.Length; RowIndex < NrRows; RowIndex++)
+						{
+							Row = MarkdownTable.Headers[RowIndex];
+							CellAlignments = MarkdownTable.HeaderCellAlignments[RowIndex];
+
+							l = (((long)RowIndex) << 32) + i2;
+							this.headers[l] = Row[i];
+							this.headerAlignments[l] = CellAlignments[i];
+						}
 					}
 
 					Indices[i++] = i2;
@@ -233,13 +256,19 @@ namespace Waher.Content.Markdown.Consolidation
 
 				this.nrCellRows += MarkdownTable.Rows.Length;
 
-				foreach (MarkdownElement[] Row in MarkdownTable.Rows)
+				for (RowIndex = 0, NrRows = MarkdownTable.Rows.Length; RowIndex < NrRows; RowIndex++)
 				{
+					Row = MarkdownTable.Rows[RowIndex];
+					CellAlignments = MarkdownTable.RowCellAlignments[RowIndex];
+
 					j = 0;
 					foreach (MarkdownElement Element in Row)
 					{
-						j2 = Indices[j++];
-						this.cells[(((long)i2) << 32) + j2] = Element;
+						j2 = Indices[j];
+						l = (((long)i2) << 32) + j2;
+						this.cells[l] = Element;
+						this.cellAlignments[l] = CellAlignments[j];
+						j++;
 					}
 
 					i++;
@@ -261,6 +290,8 @@ namespace Waher.Content.Markdown.Consolidation
 			await this.synchObj.WaitAsync();
 			try
 			{
+				TextAlignment? CellAlignment;
+				long l;
 				int i, j;
 
 				for (i = 0; i < this.nrHeaderRows; i++)
@@ -269,14 +300,47 @@ namespace Waher.Content.Markdown.Consolidation
 
 					for (j = 0; j < this.nrColumns; j++)
 					{
-						if (this.headers.TryGetValue((((long)i) << 32) + j, out MarkdownElement E))
+						l = (((long)i) << 32) + j;
+
+						if (!this.headerAlignments.TryGetValue(l, out CellAlignment))
+							CellAlignment = null;
+
+						if (this.headers.TryGetValue(l, out MarkdownElement E))
 						{
 							if (E is null)
 								Markdown.Append('|');
 							else
 							{
 								Markdown.Append(' ');
-								await E.GenerateMarkdown(Markdown);
+
+								if (CellAlignment.HasValue)
+								{
+									switch (CellAlignment.Value)
+									{
+										case TextAlignment.Left:
+											Markdown.Append("<<");
+											await E.GenerateMarkdown(Markdown);
+											break;
+
+										case TextAlignment.Center:
+											Markdown.Append(">>");
+											await E.GenerateMarkdown(Markdown);
+											Markdown.Append("<<");
+											break;
+
+										case TextAlignment.Right:
+											await E.GenerateMarkdown(Markdown);
+											Markdown.Append(">>");
+											break;
+
+										default:
+											await E.GenerateMarkdown(Markdown);
+											break;
+									}
+								}
+								else
+									await E.GenerateMarkdown(Markdown);
+
 								Markdown.Append(" |");
 							}
 						}
@@ -329,14 +393,47 @@ namespace Waher.Content.Markdown.Consolidation
 
 					for (j = 0; j < this.nrColumns; j++)
 					{
-						if (this.cells.TryGetValue((((long)i) << 32) + j, out MarkdownElement E))
+						l = (((long)i) << 32) + j;
+
+						if (!this.cellAlignments.TryGetValue(l, out CellAlignment))
+							CellAlignment = null;
+
+						if (this.cells.TryGetValue(l, out MarkdownElement E))
 						{
 							if (E is null)
 								Markdown.Append('|');
 							else
 							{
 								Markdown.Append(' ');
-								await E.GenerateMarkdown(Markdown);
+
+								if (CellAlignment.HasValue)
+								{
+									switch (CellAlignment.Value)
+									{
+										case TextAlignment.Left:
+											Markdown.Append("<<");
+											await E.GenerateMarkdown(Markdown);
+											break;
+
+										case TextAlignment.Center:
+											Markdown.Append(">>");
+											await E.GenerateMarkdown(Markdown);
+											Markdown.Append("<<");
+											break;
+
+										case TextAlignment.Right:
+											await E.GenerateMarkdown(Markdown);
+											Markdown.Append(">>");
+											break;
+
+										default:
+											await E.GenerateMarkdown(Markdown);
+											break;
+									}
+								}
+								else
+									await E.GenerateMarkdown(Markdown);
+
 								Markdown.Append(" |");
 							}
 						}

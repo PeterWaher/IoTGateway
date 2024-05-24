@@ -955,16 +955,19 @@ namespace Waher.Content.Markdown.Contracts
 		{
 			this.XmlOutput.WriteStartElement("table");
 
-			foreach (MarkdownElement[] Row in Element.Headers)
-				await this.Render(Row, true, Element);
+			int NrRows;
+			int RowIndex;
 
-			foreach (MarkdownElement[] Row in Element.Rows)
-				await this.Render(Row, false, Element);
+			for (RowIndex = 0, NrRows = Element.Headers.Length; RowIndex < NrRows; RowIndex++)
+				await this.Render(Element.Headers[RowIndex], Element.HeaderCellAlignments[RowIndex], true, Element);
+
+			for (RowIndex = 0, NrRows = Element.Rows.Length; RowIndex < NrRows; RowIndex++)
+				await this.Render(Element.Rows[RowIndex], Element.RowCellAlignments[RowIndex], false, Element);
 
 			this.XmlOutput.WriteEndElement();
 		}
 
-		private async Task Render(MarkdownElement[] Row, bool HeaderRow, Table Element)
+		private async Task Render(MarkdownElement[] Row, TextAlignment?[] CellAlignments, bool HeaderRow, Table Element)
 		{
 			int i, c = Row.Length;
 
@@ -985,7 +988,7 @@ namespace Waher.Content.Markdown.Contracts
 					}
 
 					this.XmlOutput.WriteStartElement("cell");
-					this.XmlOutput.WriteAttributeString("alignment", Element.Alignments[i].ToString());
+					this.XmlOutput.WriteAttributeString("alignment", (CellAlignments[i] ?? Element.ColumnAlignments[i]).ToString());
 					this.XmlOutput.WriteAttributeString("colSpan", Span.ToString());
 					this.XmlOutput.WriteAttributeString("header", CommonTypes.Encode(HeaderRow));
 

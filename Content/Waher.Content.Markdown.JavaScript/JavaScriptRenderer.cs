@@ -1244,6 +1244,10 @@ namespace Waher.Content.Markdown.JavaScript
 		public override async Task Render(Table Element)
 		{
 			MarkdownElement E;
+			MarkdownElement[] Row;
+			TextAlignment?[] CellAlignments;
+			int NrRows, RowIndex;
+			int NrColumns = Element.Columns;
 			int i, j, k;
 			bool OnlyRows = false;
 
@@ -1278,17 +1282,22 @@ namespace Waher.Content.Markdown.JavaScript
 
 				this.AppendHtmlLine("<colgroup>");
 
-				foreach (TextAlignment Alignment in Element.Alignments)
+				foreach (TextAlignment Alignment in Element.ColumnAlignments)
 					this.AppendHtmlLine("<col style=\"text-align:" + Alignment.ToString().ToLower() + "\"/>");
 
 				this.AppendHtmlLine("</colgroup>");
 
 				this.AppendHtmlLine("<thead>");
-				foreach (MarkdownElement[] Row in Element.Headers)
+
+				NrRows = Element.Headers.Length;
+				for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 				{
+					Row = Element.Headers[RowIndex];
+					CellAlignments = Element.HeaderCellAlignments[RowIndex];
+
 					this.AppendHtmlLine("<tr>");
 
-					for (i = 0; i < Element.Columns; i++)
+					for (i = 0; i < NrColumns; i++)
 					{
 						E = Row[i];
 						if (E is null)
@@ -1296,11 +1305,11 @@ namespace Waher.Content.Markdown.JavaScript
 
 						k = 1;
 						j = i + 1;
-						while (j < Element.Columns && Row[j++] is null)
+						while (j < NrColumns && Row[j++] is null)
 							k++;
 
 						this.AppendHtml("<th style=\"text-align:" +
-							Element.Alignments[i].ToString().ToLower());
+							(CellAlignments[i] ?? Element.ColumnAlignments[i]).ToString().ToLower());
 
 						if (k > 1)
 							this.AppendHtml("\" colspan=\"" + k.ToString());
@@ -1317,11 +1326,15 @@ namespace Waher.Content.Markdown.JavaScript
 				this.AppendHtmlLine("<tbody>");
 			}
 
-			foreach (MarkdownElement[] Row in Element.Rows)
+			NrRows = Element.Rows.Length;
+			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
+				Row = Element.Rows[RowIndex];
+				CellAlignments = Element.RowCellAlignments[RowIndex];
+
 				this.AppendHtmlLine("<tr>");
 
-				for (i = 0; i < Element.Columns; i++)
+				for (i = 0; i < NrColumns; i++)
 				{
 					E = Row[i];
 					if (E is null)
@@ -1329,11 +1342,11 @@ namespace Waher.Content.Markdown.JavaScript
 
 					k = 1;
 					j = i + 1;
-					while (j < Element.Columns && Row[j++] is null)
+					while (j < NrColumns && Row[j++] is null)
 						k++;
 
 					this.AppendHtml("<td style=\"text-align:" +
-						Element.Alignments[i].ToString().ToLower());
+							(CellAlignments[i] ?? Element.ColumnAlignments[i]).ToString().ToLower());
 
 					if (k > 1)
 						this.AppendHtml("\" colspan=\"" + k.ToString());

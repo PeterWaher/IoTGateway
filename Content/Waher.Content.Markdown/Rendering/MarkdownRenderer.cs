@@ -1128,16 +1128,16 @@ namespace Waher.Content.Markdown.Rendering
 
 			string[][] Headers = new string[c = Element.Headers.Length][];
 			for (i = 0; i < c; i++)
-				Headers[i] = await this.Render(Element.Headers[i], Widths, Element);
+				Headers[i] = await this.Render(Element.Headers[i], Element.HeaderCellAlignments[i], Widths, Element);
 
 			string[][] Rows = new string[d = Element.Rows.Length][];
 			for (i = 0; i < d; i++)
-				Rows[i] = await this.Render(Element.Rows[i], Widths, Element);
+				Rows[i] = await this.Render(Element.Rows[i], Element.RowCellAlignments[i], Widths, Element);
 
 			for (i = 0; i < c; i++)
 				this.Render(Headers[i], Widths, Element);
 
-			foreach (string Headline in Element.AlignmentDefinitions)
+			foreach (string Headline in Element.ColumnAlignmentDefinitions)
 			{
 				this.Output.Append('|');
 				this.Output.Append(Headline);
@@ -1207,13 +1207,14 @@ namespace Waher.Content.Markdown.Rendering
 			this.Output.AppendLine();
 		}
 
-		private async Task<string[]> Render(MarkdownElement[] Elements, int[] Widths, Table Element)
+		private async Task<string[]> Render(MarkdownElement[] Elements, TextAlignment?[] Alignments, int[] Widths, Table Element)
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
 				string[] Result = new string[Element.Columns];
 				string s;
 				MarkdownElement E;
+				TextAlignment? Alignment;
 				int Len, LastLen;
 				int i, j;
 
@@ -1224,8 +1225,29 @@ namespace Waher.Content.Markdown.Rendering
 						continue;
 
 					await E.Render(Renderer);
-					Result[i] = s = Renderer.ToString();
+					s = Renderer.ToString();
 					Renderer.Clear();
+
+					Alignment = Alignments[i];
+					if (Alignment.HasValue)
+					{
+						switch (Alignment.Value)
+						{
+							case TextAlignment.Left:
+								s = "<<" + s;
+								break;
+
+							case TextAlignment.Right:
+								s += ">>";
+								break;
+
+							case TextAlignment.Center:
+								s = ">>" + s + "<<";
+								break;
+						}
+					}
+
+					Result[i] = s;
 
 					LastLen = s.Length + 2;    // One space on each side of content.
 					j = i + 1;

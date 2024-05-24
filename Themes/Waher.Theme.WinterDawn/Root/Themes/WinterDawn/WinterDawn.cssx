@@ -675,12 +675,12 @@ table caption
 
 tr:nth-child(odd)
 {
-    background-color: rgba(255,255,255,0.3);
+    background-color: rgba(0,0,0,0.02);
 }
 
 tr:nth-child(even)
 {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(0,0,0,0.1);
 }
 
 table, th, td

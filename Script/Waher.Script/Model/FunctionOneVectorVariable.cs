@@ -256,7 +256,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateVectorAsync(IVector Argument, Variables Variables)
 		{
-            return Task.FromResult<IElement>(this.EvaluateVector(Argument, Variables));
+            return Task.FromResult(this.EvaluateVector(Argument, Variables));
 		}
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateVectorAsync(DoubleVector Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateVector(Argument, Variables));
+            return Task.FromResult(this.EvaluateVector(Argument, Variables));
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateVectorAsync(ComplexVector Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateVector(Argument, Variables));
+            return Task.FromResult(this.EvaluateVector(Argument, Variables));
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public virtual Task<IElement> EvaluateVectorAsync(BooleanVector Argument, Variables Variables)
         {
-            return Task.FromResult<IElement>(this.EvaluateVector(Argument, Variables));
+            return Task.FromResult(this.EvaluateVector(Argument, Variables));
         }
     }
 }

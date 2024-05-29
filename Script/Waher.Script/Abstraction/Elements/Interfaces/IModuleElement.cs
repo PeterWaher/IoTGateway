@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Abstraction.Elements
+﻿namespace Waher.Script.Abstraction.Elements
 {
 	/// <summary>
 	/// Basic interface for all types of module elements.

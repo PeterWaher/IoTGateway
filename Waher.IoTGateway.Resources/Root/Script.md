@@ -1036,9 +1036,11 @@ The following functions operate on vectors:
 | `Count(v)`                                             | Number of elements in the vector `v`. | `Count([1,2,3,4,5])` |
 | `Count(v,x)`                                           | Number of elements in the vector `v` that are equal to `x`. | `Count([1,2,3,2,1],2)` |
 | `FindElements(Search,V)`                               | Finds elements in a vector, and returns a vector of N elements representing the indices, where N is the number of elements found. | `FindElements("Hello",V)` |
+| `First(v)`                                             | Returns the first element in a vector `v`. | `First([1,2,3,4,5])` |
 | `IndexOf(v,x[,From])`                                  | Returns the zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `IndexOf(v,1)` |
 | `Join(v)`                                              | Joins a vector of vectors, into a larger vector. | `Join(v)` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])`       | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
+| `Last(v)`                                              | Returns the last element in a vector `v`. | `Last([1,2,3,4,5])` |
 | `LastIndexOf(v,x[,From])`                              | Returns the last zero-based index of `x` in `v`. If `x` is not found in `v`, `-1` is returned. If `From` is provided, search is started from this index. | `LastIndexOf(v,1)` |
 | `Left(v,N)`                                            | Returns a vector with the left-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Left(v,3)` |
 | `Max(v)`                                               | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
@@ -1049,8 +1051,12 @@ The following functions operate on vectors:
 | `Nor(v)`                                               | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
 | `Ones(N)`                                              | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
 | `Or(v)`                                                | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
+| `PopFirst(v)`                                          | Returns the first element in a vector `v`, and if `v` is a variable reference, the variable will contain a vector where the first element has been removed. | `PopFirst(v)` |
+| `PopLast(v)`                                           | Returns the last element in a vector `v`, and if `v` is a variable reference, the variable will contain a vector where the last element has been removed. | `PopLast(v)` |
 | `Prod(v)`                                              | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)`                                           | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `PushFirst(v)`                                         | Adds a new element to a vector `v`, increasing its dimention, adding the element as the first element. If `v` is a variable reference, the variable will contain the new vector. | `PushFirst(x,v)` |
+| `PushLast(v)`                                          | Adds a new element to a vector `v`, increasing its dimention, adding the element as the last element. If `v` is a variable reference, the variable will contain the new vector. | `PushLast(x,v)` |
 | `Reverse(s)`                                           | Returns a string with the characters of the string `s` reversed. | `Reverse("Hello World")` |
 | `Reverse(v)`                                           | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
 | `Right(v,N)`                                           | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |

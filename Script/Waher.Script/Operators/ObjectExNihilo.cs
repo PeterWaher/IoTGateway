@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators
 {
@@ -227,7 +229,7 @@ namespace Waher.Script.Operators
 
 				foreach (KeyValuePair<string, IElement> P in Object)
 				{
-					if (!(this.quick.ContainsKey(P.Key)))
+					if (!this.quick.ContainsKey(P.Key))
 						return PatternMatchResult.NoMatch;
 				}
 
@@ -248,14 +250,19 @@ namespace Waher.Script.Operators
 
 				foreach (KeyValuePair<string, object> P in Object2)
 				{
-					if (!(this.quick.ContainsKey(P.Key)))
+					if (!this.quick.ContainsKey(P.Key))
 						return PatternMatchResult.NoMatch;
 				}
 
 				foreach (KeyValuePair<string, ScriptNode> P in this.members)
 				{
 					if (Object2.TryGetValue(P.Key, out object E))
-						Result = P.Value.PatternMatch(Expression.Encapsulate(E), AlreadyFound);
+					{
+						if (E is Array A)
+							Result = P.Value.PatternMatch(VectorDefinition.Encapsulate(A, false, this), AlreadyFound);
+						else
+							Result = P.Value.PatternMatch(Expression.Encapsulate(E), AlreadyFound);
+					}
 					else
 						Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
 
@@ -269,7 +276,7 @@ namespace Waher.Script.Operators
 
 				foreach (KeyValuePair<string, string> P in Object3)
 				{
-					if (!(this.quick.ContainsKey(P.Key)))
+					if (!this.quick.ContainsKey(P.Key))
 						return PatternMatchResult.NoMatch;
 				}
 

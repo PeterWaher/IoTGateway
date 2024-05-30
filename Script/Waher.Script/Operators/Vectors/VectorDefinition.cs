@@ -88,8 +88,6 @@ namespace Waher.Script.Operators.Vectors
 				return new ComplexVector(zv);
 			else if (Elements is DateTime[] dtv)
 				return new DateTimeVector(dtv);
-			else if (Elements is object[] ov)
-				return new ObjectVector(ov);
 			else
 			{
 				LinkedList<IElement> Elements2 = new LinkedList<IElement>();

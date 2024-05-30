@@ -162,6 +162,20 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 				if (Obj is string[] Names)
 					FieldNames = Names;
+				else if (Obj is object[] Objects)
+				{
+					int j, d = Objects.Length;
+
+					FieldNames = new string[d];
+
+					for (j = 0; j < d; j++)
+					{
+						if (Objects[j] is string s)
+							FieldNames[j] = s;
+						else
+							throw new ScriptRuntimeException("Expected a string array or null as third argument.", this);
+					}
+				}
 				else if (Obj is null)
 					FieldNames = null;
 				else

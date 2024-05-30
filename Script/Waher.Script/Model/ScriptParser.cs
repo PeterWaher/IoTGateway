@@ -175,7 +175,7 @@ namespace Waher.Script.Model
 		/// Parses a statement.
 		/// </summary>
 		/// <returns>Script node.</returns>
-		public ScriptNode ParseStatement() => this.expression.ParseStatement();
+		public ScriptNode ParseStatement() => this.expression.ParseStatement(false);
 
 		/// <summary>
 		/// Parses an element list.

@@ -331,7 +331,7 @@ namespace Waher.Script
 
 		internal ScriptNode ParseSequence()
 		{
-			ScriptNode Node = this.ParseStatement();
+			ScriptNode Node = this.ParseStatement(true);
 			this.SkipWhiteSpace();
 
 			if (Node is null)
@@ -339,7 +339,7 @@ namespace Waher.Script
 				while (Node is null && this.PeekNextChar() == ';')
 				{
 					this.pos++;
-					Node = this.ParseStatement();
+					Node = this.ParseStatement(true);
 					this.SkipWhiteSpace();
 				}
 			}
@@ -352,7 +352,7 @@ namespace Waher.Script
 			if (!(Node is null) && this.PeekNextChar() == ';')
 			{
 				this.pos++;
-				ScriptNode Node2 = this.ParseStatement();
+				ScriptNode Node2 = this.ParseStatement(true);
 				if (!(Node2 is null))
 				{
 					LinkedList<ScriptNode> Statements = new LinkedList<ScriptNode>();
@@ -363,7 +363,7 @@ namespace Waher.Script
 					while (this.PeekNextChar() == ';')
 					{
 						this.pos++;
-						Node2 = this.ParseStatement();
+						Node2 = this.ParseStatement(true);
 						if (Node2 is null)
 							break;
 
@@ -378,7 +378,7 @@ namespace Waher.Script
 			return Node;
 		}
 
-		internal ScriptNode ParseStatement()
+		internal ScriptNode ParseStatement(bool ParseLists)
 		{
 			this.SkipWhiteSpace();
 
@@ -391,7 +391,7 @@ namespace Waher.Script
 					{
 						this.pos += 2;
 
-						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 						this.SkipWhiteSpace();
 						if (this.PeekNextToken().ToUpper() != "WHILE")
@@ -399,19 +399,19 @@ namespace Waher.Script
 
 						this.pos += 5;
 
-						ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
+						ScriptNode Condition = this.AssertOperandNotNull(this.ParseIf());
 
 						return new DoWhile(Statement, Condition, Start, this.pos - Start, this);
 					}
 					else
-						return this.ParseList();
+						return ParseLists ? this.ParseList() : this.ParseIf();
 
 				case 'W':
 					if (this.PeekNextToken().ToUpper() == "WHILE")
 					{
 						this.pos += 5;
 
-						ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
+						ScriptNode Condition = this.AssertOperandNotNull(this.ParseIf());
 
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() == ':')
@@ -421,19 +421,19 @@ namespace Waher.Script
 						else
 							throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
-						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 						return new WhileDo(Condition, Statement, Start, this.pos - Start, this);
 					}
 					else
-						return this.ParseList();
+						return ParseLists ? this.ParseList() : this.ParseIf();
 
 				case 'F':
 					switch (this.PeekNextToken().ToUpper())
 					{
 						case "FOREACH":
 							this.pos += 7;
-							if (!(this.AssertOperandNotNull(this.ParseList()) is In In))
+							if (!(this.AssertOperandNotNull(this.ParseIf()) is In In))
 								throw new SyntaxException("IN statement expected", this.pos, this.script);
 
 							VariableReference Ref = In.LeftOperand as VariableReference;
@@ -448,7 +448,7 @@ namespace Waher.Script
 							else
 								throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
-							ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+							ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 							return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start, this);
 
@@ -459,7 +459,7 @@ namespace Waher.Script
 							if (this.PeekNextToken().ToUpper() == "EACH")
 							{
 								this.pos += 4;
-								In = this.AssertOperandNotNull(this.ParseList()) as In;
+								In = this.AssertOperandNotNull(this.ParseIf()) as In;
 								if (In is null)
 									throw new SyntaxException("IN statement expected", this.pos, this.script);
 
@@ -475,13 +475,13 @@ namespace Waher.Script
 								else
 									throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
-								Statement = this.AssertOperandNotNull(this.ParseStatement());
+								Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 								return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start, this);
 							}
 							else
 							{
-								if (!(this.AssertOperandNotNull(this.ParseList()) is Assignment Assignment))
+								if (!(this.AssertOperandNotNull(this.ParseIf()) is Assignment Assignment))
 									throw new SyntaxException("Assignment expected", this.pos, this.script);
 
 								this.SkipWhiteSpace();
@@ -490,14 +490,14 @@ namespace Waher.Script
 
 								this.pos += 2;
 
-								ScriptNode To = this.AssertOperandNotNull(this.ParseList());
+								ScriptNode To = this.AssertOperandNotNull(this.ParseIf());
 								ScriptNode Step;
 
 								this.SkipWhiteSpace();
 								if (this.PeekNextToken().ToUpper() == "STEP")
 								{
 									this.pos += 4;
-									Step = this.AssertOperandNotNull(this.ParseList());
+									Step = this.AssertOperandNotNull(this.ParseIf());
 								}
 								else
 									Step = null;
@@ -510,13 +510,13 @@ namespace Waher.Script
 								else
 									throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
-								Statement = this.AssertOperandNotNull(this.ParseStatement());
+								Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 								return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Start, this.pos - Start, this);
 							}
 
 						default:
-							return this.ParseList();
+							return ParseLists ? this.ParseList() : this.ParseIf();
 					}
 
 				case 'T':
@@ -524,25 +524,25 @@ namespace Waher.Script
 					{
 						this.pos += 3;
 
-						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 						this.SkipWhiteSpace();
 						switch (this.PeekNextToken().ToUpper())
 						{
 							case "FINALLY":
 								this.pos += 7;
-								ScriptNode Finally = this.AssertOperandNotNull(this.ParseStatement());
+								ScriptNode Finally = this.AssertOperandNotNull(this.ParseStatement(false));
 								return new TryFinally(Statement, Finally, Start, this.pos - Start, this);
 
 							case "CATCH":
 								this.pos += 5;
-								ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement());
+								ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement(false));
 
 								this.SkipWhiteSpace();
 								if (this.PeekNextToken().ToUpper() == "FINALLY")
 								{
 									this.pos += 7;
-									Finally = this.AssertOperandNotNull(this.ParseStatement());
+									Finally = this.AssertOperandNotNull(this.ParseStatement(false));
 									return new TryCatchFinally(Statement, Catch, Finally, Start, this.pos - Start, this);
 								}
 								else
@@ -553,7 +553,7 @@ namespace Waher.Script
 						}
 					}
 					else
-						return this.ParseList();
+						return ParseLists ? this.ParseList() : this.ParseIf();
 
 				case ']':
 					this.pos++;
@@ -579,11 +579,11 @@ namespace Waher.Script
 					else
 					{
 						this.pos--;
-						return this.ParseList();
+						return ParseLists ? this.ParseList() : this.ParseIf();
 					}
 
 				default:
-					return this.ParseList();
+					return ParseLists ? this.ParseList() : this.ParseIf();
 			}
 		}
 
@@ -643,13 +643,13 @@ namespace Waher.Script
 				else
 					throw new SyntaxException("THEN expected.", this.pos, this.script);
 
-				IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+				IfTrue = this.AssertOperandNotNull(this.ParseStatement(false));
 
 				this.SkipWhiteSpace();
 				if (this.PeekNextToken().ToUpper() == "ELSE")
 				{
 					this.pos += 4;
-					IfFalse = this.AssertOperandNotNull(this.ParseStatement());
+					IfFalse = this.AssertOperandNotNull(this.ParseStatement(false));
 				}
 				else
 					IfFalse = null;
@@ -680,23 +680,23 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '?')
 						{
 							this.pos++;
-							IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+							IfTrue = this.AssertOperandNotNull(this.ParseStatement(false));
 							return new TryCatch(Condition, IfTrue, Start, this.pos - Start, this);
 						}
 						else
 						{
-							IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+							IfTrue = this.AssertOperandNotNull(this.ParseStatement(false));
 							return new NullCheck(Condition, IfTrue, Start, this.pos - Start, this);
 						}
 
 					default:
-						IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+						IfTrue = this.AssertOperandNotNull(this.ParseStatement(false));
 
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() == ':')
 						{
 							this.pos++;
-							IfFalse = this.AssertOperandNotNull(this.ParseStatement());
+							IfFalse = this.AssertOperandNotNull(this.ParseStatement(false));
 						}
 						else
 							IfFalse = null;
@@ -726,7 +726,7 @@ namespace Waher.Script
 					if (this.PeekNextChar() == '=')
 					{
 						this.pos++;
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Assignment(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -826,7 +826,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Operators.Assignments.WithSelf.AddToSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -855,7 +855,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Operators.Assignments.WithSelf.SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -885,7 +885,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Operators.Assignments.WithSelf.MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -914,7 +914,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Operators.Assignments.WithSelf.DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -943,7 +943,7 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 						if (!(Ref is null))
 							return new Operators.Assignments.WithSelf.PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -973,7 +973,7 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 							if (!(Ref is null))
 								return new Operators.Assignments.WithSelf.BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -996,7 +996,7 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								Right = this.AssertRightOperandNotNull(this.ParseStatement());
+								Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 								if (!(Ref is null))
 									return new Operators.Assignments.WithSelf.LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -1031,7 +1031,7 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 							if (!(Ref is null))
 								return new Operators.Assignments.WithSelf.BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -1054,7 +1054,7 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								Right = this.AssertRightOperandNotNull(this.ParseStatement());
+								Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 								if (!(Ref is null))
 									return new Operators.Assignments.WithSelf.LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -1091,7 +1091,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 							if (!(Ref is null))
 								return new Operators.Assignments.WithSelf.ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -1129,7 +1129,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement(false));
 
 							if (!(Ref is null))
 								return new Operators.Assignments.WithSelf.ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start, this);
@@ -2512,7 +2512,7 @@ namespace Waher.Script
 							}
 							else
 							{
-								ScriptNode IfNull = this.AssertOperandNotNull(this.ParseStatement());
+								ScriptNode IfNull = this.AssertOperandNotNull(this.ParseStatement(false));
 								Node = new NullCheck(Node, IfNull, Start, this.pos - Start, this);
 							}
 							break;
@@ -3664,7 +3664,7 @@ namespace Waher.Script
 
 				bool WsBak = this.canSkipWhitespace;
 				this.canSkipWhitespace = true;
-				Node = this.ParseStatement();
+				Node = this.ParseStatement(true);
 
 				this.SkipWhiteSpace();
 				switch (this.PeekNextChar())
@@ -3771,7 +3771,7 @@ namespace Waher.Script
 				bool WsBak = this.canSkipWhitespace;
 				this.canSkipWhitespace = true;
 
-				Node = this.ParseStatement();
+				Node = this.ParseStatement(true);
 
 				this.SkipWhiteSpace();
 				if ((ch = this.PeekNextChar()) == ':')
@@ -3811,7 +3811,7 @@ namespace Waher.Script
 						while ((ch = this.PeekNextChar()) == ',')
 						{
 							this.pos++;
-							Node = this.ParseStatement();
+							Node = this.ParseStatement(false);
 
 							this.SkipWhiteSpace();
 							if (this.PeekNextChar() != ':')

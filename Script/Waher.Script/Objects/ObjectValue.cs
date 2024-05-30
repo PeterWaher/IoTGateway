@@ -93,15 +93,15 @@ namespace Waher.Script.Objects
         /// <returns>If conversion was possible.</returns>
         public override bool TryConvertTo(Type DesiredType, out object Value)
         {
-			if (this.value is null)
+            TypeInfo TI = DesiredType.GetTypeInfo();
+
+            if (this.value is null)
 			{
 				Value = null;
-				return true;
-			}
+				return !TI.IsValueType || !(Nullable.GetUnderlyingType(DesiredType) is null);
+            }
 			else
 			{
-				TypeInfo TI = DesiredType.GetTypeInfo();
-
 				if (TI.IsAssignableFrom(this.value.GetType().GetTypeInfo()))
 				{
 					Value = this.value;

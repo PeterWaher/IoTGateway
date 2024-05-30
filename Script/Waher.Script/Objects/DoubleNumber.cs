@@ -234,15 +234,25 @@ namespace Waher.Script.Objects
 					return true;
 				}
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(double).GetTypeInfo()))
-			{
-				Value = this.value;
-				return true;
-			}
 			else if (DesiredType == typeof(DoubleNumber))
 			{
 				Value = this;
 				return true;
+			}
+			else
+			{
+				TypeInfo TI = DesiredType.GetTypeInfo();
+
+				if (TI.IsEnum)
+				{
+					Value = Enum.ToObject(DesiredType, (int)this.value);
+					return true;
+				}
+				else if (TI.IsAssignableFrom(typeof(double).GetTypeInfo()))
+				{
+					Value = this.value;
+					return true;
+				}
 			}
 
 			return Expression.TryConvert(this.value, DesiredType, out Value);

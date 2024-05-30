@@ -56,7 +56,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Expression">Expression.</param>
 		public ReadSensorData(ScriptNode Sensor, ScriptNode FieldTypes, ScriptNode Fields, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Sensor, FieldTypes, Fields },
-				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal },
 				  Start, Length, Expression)
 		{
 		}
@@ -74,7 +74,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		public ReadSensorData(ScriptNode Sensor, ScriptNode FieldTypes, ScriptNode Fields, ScriptNode From,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Sensor, FieldTypes, Fields, From },
-				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector, ArgumentType.Scalar },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Scalar },
 				  Start, Length, Expression)
 		{
 		}
@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		public ReadSensorData(ScriptNode Sensor, ScriptNode FieldTypes, ScriptNode Fields, ScriptNode From, ScriptNode To,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Sensor, FieldTypes, Fields, From, To },
-				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
 		{
 		}
@@ -158,28 +158,40 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 			if (i < c)
 			{
-				if (Arguments[i++].AssociatedObjectValue is string[] Names)
+				Obj = Arguments[i++].AssociatedObjectValue;
+
+				if (Obj is string[] Names)
 					FieldNames = Names;
+				else if (Obj is null)
+					FieldNames = null;
 				else
-					throw new ScriptRuntimeException("Expected a string array as third argument.", this);
+					throw new ScriptRuntimeException("Expected a string array or null as third argument.", this);
 			}
 			else
 				FieldNames = null;
 
 			if (i < c)
 			{
-				if (Arguments[i++].AssociatedObjectValue is DateTime TP)
+				Obj = Arguments[i++].AssociatedObjectValue;
+
+				if (Obj is DateTime TP)
 					From = TP;
+				else if (Obj is null)
+					From = DateTime.MinValue;
 				else
-					throw new ScriptRuntimeException("Expected a Date & Time as fourth argument.", this);
+					throw new ScriptRuntimeException("Expected a Date & Time or null as fourth argument.", this);
 			}
 			else
 				From = DateTime.MinValue;
 
 			if (i < c)
 			{
-				if (Arguments[i++].AssociatedObjectValue is DateTime TP)
+				Obj = Arguments[i++].AssociatedObjectValue;
+
+				if (Obj is DateTime TP)
 					To = TP;
+				else if (Obj is null)
+					To = DateTime.MaxValue;
 				else
 					throw new ScriptRuntimeException("Expected a Date & Time as fifth argument.", this);
 			}

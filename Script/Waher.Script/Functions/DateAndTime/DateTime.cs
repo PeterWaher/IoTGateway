@@ -331,7 +331,7 @@ namespace Waher.Script.Functions.DateAndTime
 				{
 					string s = Obj?.ToString() ?? string.Empty;
 
-					if (!System.DateTime.TryParse(s, out TP))
+					if (!TryParse(s, out TP))
 					{
 						if (long.TryParse(s, out long Ticks))
 							TP = FromInteger(Ticks, DateTimeKind.Unspecified);

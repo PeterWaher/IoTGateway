@@ -172,7 +172,7 @@ namespace Waher.Script.Functions.DateAndTime
 				{
 					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
 
-					if (!System.DateTime.TryParse(s, out TP))
+					if (!DateTime.TryParse(s, out TP))
 					{
 						if (long.TryParse(s, out long Ticks))
 							TP = DateTime.FromInteger(Ticks, DateTimeKind.Local);

@@ -9,6 +9,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Security;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -221,8 +222,9 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			IThingReference[] Nodes = new IThingReference[] { Sensor };
 			ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, FieldNames, Origin)
 				?? throw new ScriptRuntimeException("Not authorized to read sensor-data from node.", this);
+			string Actor = Origin is IUser User ? User.UserName : nameof(ReadSensorData);
 
-			InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(nameof(ReadSensorData),
+			InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Actor,
 				Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, From, To,
 				(sender, e) =>
 				{

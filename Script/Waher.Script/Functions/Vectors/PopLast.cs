@@ -42,7 +42,7 @@ namespace Waher.Script.Functions.Vectors
             if (c == 0)
                 return ObjectValue.Null;
 
-            IElement Result = Argument.GetElement(0);
+            IElement Result = Argument.GetElement(c - 1);
 
             if (!(this.reference is null))
             {

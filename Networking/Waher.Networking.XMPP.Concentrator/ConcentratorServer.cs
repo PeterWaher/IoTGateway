@@ -277,17 +277,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			foreach (DataSourceRec Rec in Sources)
 				Rec.Source.OnEvent -= this.DataSource_OnEvent;
 
-			if (!(this.sensorServer is null))
-			{
-				this.sensorServer.Dispose();
-				this.sensorServer = null;
-			}
+			this.sensorServer?.Dispose();
+			this.sensorServer = null;
 
-			if (!(this.controlServer is null))
-			{
-				this.controlServer.Dispose();
-				this.controlServer = null;
-			}
+			this.controlServer?.Dispose();
+			this.controlServer = null;
 		}
 
 		/// <summary>

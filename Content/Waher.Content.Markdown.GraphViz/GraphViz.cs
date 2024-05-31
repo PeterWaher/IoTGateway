@@ -103,6 +103,27 @@ namespace Waher.Content.Markdown.GraphViz
 		}
 
 		/// <summary>
+		/// Suffix used by executable files on the platform.
+		/// </summary>
+		public static string ExecutableSuffix
+		{
+			get
+			{
+				switch (Environment.OSVersion.Platform)
+				{
+					case PlatformID.Win32S:
+					case PlatformID.Win32Windows:
+					case PlatformID.Win32NT:
+					case PlatformID.WinCE:
+						return ".exe";
+
+					default:
+						return string.Empty;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Sets the installation folder of GraphViz.
 		/// </summary>
 		/// <param name="Folder">Installation folder.</param>
@@ -113,13 +134,15 @@ namespace Waher.Content.Markdown.GraphViz
 			if (!string.IsNullOrEmpty(installationFolder) && Folder != installationFolder)
 				throw new Exception("GraphViz installation folder has already been set.");
 
+			string Suffix = ExecutableSuffix;
+
 			installationFolder = Folder;
-			supportsDot = File.Exists(Path.Combine(installationFolder, "bin", "dot.exe"));
-			supportsNeato = File.Exists(Path.Combine(installationFolder, "bin", "neato.exe"));
-			supportsFdp = File.Exists(Path.Combine(installationFolder, "bin", "fdp.exe"));
-			supportsSfdp = File.Exists(Path.Combine(installationFolder, "bin", "sfdp.exe"));
-			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi.exe"));
-			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo.exe"));
+			supportsDot = File.Exists(Path.Combine(installationFolder, "bin", "dot" + Suffix));
+			supportsNeato = File.Exists(Path.Combine(installationFolder, "bin", "neato" + Suffix));
+			supportsFdp = File.Exists(Path.Combine(installationFolder, "bin", "fdp" + Suffix));
+			supportsSfdp = File.Exists(Path.Combine(installationFolder, "bin", "sfdp" + Suffix));
+			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi" + Suffix));
+			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo" + Suffix));
 
 			graphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 
@@ -569,7 +592,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 			{
-				FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
+				FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ExecutableSuffix),
 				Arguments = Arguments.ToString(),
 				UseShellExecute = false,
 				RedirectStandardError = true,

@@ -62,11 +62,6 @@ namespace Waher.Things.Files
 			return Task.FromResult(Parent is FolderNode || Parent is SubFolderNode);
 		}
 
-		public override Task StartReadout(ISensorReadout Request, bool DoneAfter)
-		{
-			return base.StartReadout(Request, DoneAfter);
-		}
-
 		/// <summary>
 		/// Populates a variable collection with variables before script execution.
 		/// </summary>

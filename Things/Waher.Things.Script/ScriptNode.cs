@@ -15,7 +15,7 @@ namespace Waher.Things.Script
 	/// <summary>
 	/// Node defined by script.
 	/// </summary>
-	public class ScriptNode : VirtualNode, ISensor
+	public class ScriptNode : VirtualNode
 	{
 		private string[] sensorScript;
 		private Expression parsedSensorScript;
@@ -106,7 +106,7 @@ namespace Waher.Things.Script
 				};
 
 				object Obj = await this.ParsedSensorDataScript.EvaluateAsync(v);
-				ReportFields(Request, Obj, true);
+				ReportFields(Request, Obj, DoneAfter);
 
 				await this.RemoveErrorAsync("ScriptError");
 			}
@@ -198,5 +198,29 @@ namespace Waher.Things.Script
 
 			return Commands.ToArray();
 		}
-	}
+
+		/// <summary>
+		/// If the node can be read.
+		/// </summary>
+		public override bool IsReadable
+		{
+			get
+			{
+				if (base.IsReadable)
+					return true;
+
+				if (this.sensorScript is null || this.sensorScript.Length == 0)
+					return false;
+
+				try
+				{
+					return !(this.ParsedSensorDataScript?.Root is null);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+    }
 }

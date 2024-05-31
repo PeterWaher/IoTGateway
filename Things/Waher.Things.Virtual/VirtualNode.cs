@@ -536,12 +536,26 @@ namespace Waher.Things.Virtual
 		}
 
 		/// <summary>
-		/// Starts the readout of the sensor.
+		/// If the node can be read.
 		/// </summary>
-		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
-		/// be reported by the caller (false).</param>
-		public virtual Task StartReadout(ISensorReadout Request, bool DoneAfter)
+		public override bool IsReadable
+		{
+			get
+			{
+				lock (this.fields)
+				{
+					return this.fields.Count > 0;
+				}
+			}
+		}
+
+        /// <summary>
+        /// Starts the readout of the sensor.
+        /// </summary>
+        /// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+        /// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+        /// be reported by the caller (false).</param>
+        public virtual Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
 			List<SensorData.Field> ToReport = new List<SensorData.Field>();
 
@@ -561,10 +575,44 @@ namespace Waher.Things.Virtual
 		}
 
 		/// <summary>
-		/// Get control parameters for the actuator.
+		/// If the node can be controlled.
 		/// </summary>
-		/// <returns>Collection of control parameters for actuator.</returns>
-		public Task<ControlParameter[]> GetControlParameters()
+		public override bool IsControllable 
+		{
+			get
+			{
+				if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string CallbackUrl &&
+					this.TryGetMetaDataValue("Payload", out Obj) && Obj is string PayloadScript &&
+					this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string FieldName &&
+					this.TryGetMetaDataValue("FieldValue", out object FieldValue))
+				{
+					return
+						FieldValue is double ||
+						FieldValue is string ||
+						FieldValue is bool ||
+						FieldValue is Enum ||
+						FieldValue is DateTime ||
+						FieldValue is TimeSpan ||
+						FieldValue is Duration ||
+						FieldValue is sbyte ||
+						FieldValue is short ||
+						FieldValue is int ||
+						FieldValue is long ||
+						FieldValue is byte ||
+						FieldValue is ushort ||
+						FieldValue is uint ||
+						FieldValue is ulong;
+				}
+				else
+					return false;
+			}
+		}
+
+        /// <summary>
+        /// Get control parameters for the actuator.
+        /// </summary>
+        /// <returns>Collection of control parameters for actuator.</returns>
+        public Task<ControlParameter[]> GetControlParameters()
 		{
 			List<ControlParameter> Parameters = new List<ControlParameter>();
 

@@ -63,12 +63,29 @@ namespace Waher.Things.Script
 		}
 
 		/// <summary>
-		/// Starts the readout of the sensor.
+		/// If the node can be read.
 		/// </summary>
-		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
-		/// be reported by the caller (false).</param>
-		public override async Task StartReadout(ISensorReadout Request, bool DoneAfter)
+		public override bool IsReadable
+		{
+			get
+			{
+				if (base.IsReadable)
+					return true;
+
+				if (string.IsNullOrEmpty(this.ScriptNodeId))
+					return false;
+
+				return true;
+			}
+		}
+
+        /// <summary>
+        /// Starts the readout of the sensor.
+        /// </summary>
+        /// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+        /// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+        /// be reported by the caller (false).</param>
+        public override async Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
 			try
 			{
@@ -96,7 +113,7 @@ namespace Waher.Things.Script
 				};
 
 				object Obj = await ScriptNode.ParsedSensorDataScript.EvaluateAsync(v);
-				ScriptNode.ReportFields(Request, Obj, true);
+				ScriptNode.ReportFields(Request, Obj, DoneAfter);
 
 				await this.RemoveErrorAsync("ScriptError");
 			}

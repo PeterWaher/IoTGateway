@@ -1,4 +1,4 @@
-@startuml
+@startgantt
 saturday are closed
 sunday are closed
 
@@ -10,4 +10,4 @@ Project starts the 1st of january 2021
 
 2021-01-18 to 2021-01-22 are named [End's committee]
 2021-01-18 to 2021-01-22 are colored in salmon 
-@enduml
+@endgantt

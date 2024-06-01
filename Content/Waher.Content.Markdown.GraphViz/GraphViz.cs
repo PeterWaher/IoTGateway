@@ -32,6 +32,7 @@ namespace Waher.Content.Markdown.GraphViz
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
 		private static string installationFolder = null;
+		private static string binFolder = null;
 		private static string graphVizFolder = null;
 		private static string contentRootFolder = null;
 		private static bool supportsDot = false;
@@ -85,7 +86,8 @@ namespace Waher.Content.Markdown.GraphViz
 					SetInstallationFolder(Folder);
 
 					Log.Informational("GraphViz found. Integration with Markdown added.",
-						new KeyValuePair<string, object>("Folder", installationFolder),
+						new KeyValuePair<string, object>("Installation Folder", installationFolder),
+						new KeyValuePair<string, object>("Binary Folder", binFolder),
 						new KeyValuePair<string, object>("dot", supportsDot),
 						new KeyValuePair<string, object>("neato", supportsNeato),
 						new KeyValuePair<string, object>("fdp", supportsFdp),
@@ -137,12 +139,29 @@ namespace Waher.Content.Markdown.GraphViz
 			string Suffix = ExecutableSuffix;
 
 			installationFolder = Folder;
-			supportsDot = File.Exists(Path.Combine(installationFolder, "bin", "dot" + Suffix));
-			supportsNeato = File.Exists(Path.Combine(installationFolder, "bin", "neato" + Suffix));
-			supportsFdp = File.Exists(Path.Combine(installationFolder, "bin", "fdp" + Suffix));
-			supportsSfdp = File.Exists(Path.Combine(installationFolder, "bin", "sfdp" + Suffix));
-			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi" + Suffix));
-			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo" + Suffix));
+
+			switch (Environment.OSVersion.Platform)
+			{
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+				case PlatformID.Win32NT:
+				case PlatformID.WinCE:
+				default:
+					binFolder = Path.Combine(installationFolder, "bin");
+					break;
+
+				case PlatformID.Unix:
+				case PlatformID.MacOSX:
+					binFolder = installationFolder;
+					break;
+			}
+
+			supportsDot = File.Exists(Path.Combine(binFolder, "dot" + Suffix));
+			supportsNeato = File.Exists(Path.Combine(binFolder, "neato" + Suffix));
+			supportsFdp = File.Exists(Path.Combine(binFolder, "fdp" + Suffix));
+			supportsSfdp = File.Exists(Path.Combine(binFolder, "sfdp" + Suffix));
+			supportsTwopi = File.Exists(Path.Combine(binFolder, "twopi" + Suffix));
+			supportsCirco = File.Exists(Path.Combine(binFolder, "circo" + Suffix));
 
 			graphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 
@@ -210,24 +229,40 @@ namespace Waher.Content.Markdown.GraphViz
 		{
 			string InstallationFolder;
 
-			InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFilesX86);
-			if (string.IsNullOrEmpty(InstallationFolder))
+			switch (Environment.OSVersion.Platform)
 			{
-				InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFiles);
-				if (string.IsNullOrEmpty(InstallationFolder))
-				{
-					InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.Programs);
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+				case PlatformID.Win32NT:
+				case PlatformID.WinCE:
+				default:
+					InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFilesX86);
 					if (string.IsNullOrEmpty(InstallationFolder))
 					{
-						InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFilesX86);
+						InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.ProgramFiles);
 						if (string.IsNullOrEmpty(InstallationFolder))
 						{
-							InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFiles);
+							InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.Programs);
 							if (string.IsNullOrEmpty(InstallationFolder))
-								InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonPrograms);
+							{
+								InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFilesX86);
+								if (string.IsNullOrEmpty(InstallationFolder))
+								{
+									InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFiles);
+									if (string.IsNullOrEmpty(InstallationFolder))
+										InstallationFolder = SearchForInstallationFolder(Environment.SpecialFolder.CommonPrograms);
+								}
+							}
 						}
 					}
-				}
+					break;
+
+				case PlatformID.Unix:
+				case PlatformID.MacOSX:
+					InstallationFolder = "/opt/local/bin";
+					if (!Directory.Exists(InstallationFolder))
+						InstallationFolder = null;
+					break;
 			}
 
 			return InstallationFolder;
@@ -592,7 +627,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 			{
-				FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ExecutableSuffix),
+				FileName = Path.Combine(binFolder, Language.ToLower() + ExecutableSuffix),
 				Arguments = Arguments.ToString(),
 				UseShellExecute = false,
 				RedirectStandardError = true,

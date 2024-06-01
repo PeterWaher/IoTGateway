@@ -643,8 +643,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			P.ErrorDataReceived += (sender, e) =>
 			{
-				Log.Error("Unable to generate graph: " + e.Data);
-				ResultSource.TrySetResult(null);
+				ResultSource.TrySetException(new Exception("Unable to generate graph:\r\n\r\n" + e.Data));
 			};
 
 			P.Exited += async (sender, e) =>
@@ -654,8 +653,7 @@ namespace Waher.Content.Markdown.GraphViz
 					if (P.ExitCode != 0)
 					{
 						string ErrorText = await P.StandardError.ReadToEndAsync();
-						Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
-						ResultSource.TrySetResult(null);
+						ResultSource.TrySetException(new Exception("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText));
 					}
 					else
 					{

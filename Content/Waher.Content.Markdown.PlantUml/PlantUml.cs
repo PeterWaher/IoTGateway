@@ -184,17 +184,23 @@ namespace Waher.Content.Markdown.PlantUml
 				SpecialFolder.ProgramFilesX86
 			}));
 
-
 			if (Types.TryGetModuleParameter("Runtime", out object Obj) && Obj is string RuntimeFolder)
 			{
 				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFiles.ToString()));
 				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFilesX86.ToString()));
 			}
 
+			string PathVar = Environment.GetEnvironmentVariable("PATH");
+			if (!string.IsNullOrEmpty(PathVar))
+			{
+				string[] Paths = PathVar.Split(Path.PathSeparator);
+				Folders.AddRange(Paths);
+			}
+
 			string[] Folders2 = Folders.ToArray();
 
 			JarPath = FileSystem.FindLatestFile(Folders2, "plantuml.jar", 1);
-			JavaPath = FileSystem.FindLatestFile(Folders2, "java.exe", 3);
+			JavaPath = FileSystem.FindLatestFile(Folders2, "java" + FileSystem.ExecutableExtension, 3);
 		}
 
 		/// <summary>

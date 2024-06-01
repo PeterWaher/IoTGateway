@@ -221,5 +221,26 @@ namespace Waher.Content.SystemFiles
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Extension used by executable files on the platform.
+		/// </summary>
+		public static string ExecutableExtension
+		{
+			get
+			{
+				switch (Environment.OSVersion.Platform)
+				{
+					case PlatformID.Win32S:
+					case PlatformID.Win32Windows:
+					case PlatformID.Win32NT:
+					case PlatformID.WinCE:
+						return ".exe";
+
+					default:
+						return string.Empty;
+				}
+			}
+		}
 	}
 }

@@ -44,5 +44,6 @@
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
   </ItemGroup>
 </Project>

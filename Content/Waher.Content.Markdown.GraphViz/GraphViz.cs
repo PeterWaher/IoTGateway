@@ -13,6 +13,7 @@ using Waher.Content.Markdown.Model.CodeContent;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Markdown.Wpf;
 using Waher.Content.Markdown.Xamarin;
+using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
@@ -105,27 +106,6 @@ namespace Waher.Content.Markdown.GraphViz
 		}
 
 		/// <summary>
-		/// Suffix used by executable files on the platform.
-		/// </summary>
-		public static string ExecutableSuffix
-		{
-			get
-			{
-				switch (Environment.OSVersion.Platform)
-				{
-					case PlatformID.Win32S:
-					case PlatformID.Win32Windows:
-					case PlatformID.Win32NT:
-					case PlatformID.WinCE:
-						return ".exe";
-
-					default:
-						return string.Empty;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Sets the installation folder of GraphViz.
 		/// </summary>
 		/// <param name="Folder">Installation folder.</param>
@@ -136,7 +116,7 @@ namespace Waher.Content.Markdown.GraphViz
 			if (!string.IsNullOrEmpty(installationFolder) && Folder != installationFolder)
 				throw new Exception("GraphViz installation folder has already been set.");
 
-			string Suffix = ExecutableSuffix;
+			string Suffix = FileSystem.ExecutableExtension;
 
 			installationFolder = Folder;
 
@@ -627,7 +607,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 			{
-				FileName = Path.Combine(binFolder, Language.ToLower() + ExecutableSuffix),
+				FileName = Path.Combine(binFolder, Language.ToLower() + FileSystem.ExecutableExtension),
 				Arguments = Arguments.ToString(),
 				UseShellExecute = false,
 				RedirectStandardError = true,

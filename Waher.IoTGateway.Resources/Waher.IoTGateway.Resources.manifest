@@ -187,6 +187,7 @@
 			<Content fileName="logo-WaherDataAB-200x39.png"/>
 			<Content fileName="logo-WaherDataAB-300x58.png"/>
 			<Content fileName="logo-WaherDataAB-400x77.png"/>
+			<Content fileName="PlantUmlExample.uml"/>
 		</Folder>
 		<Folder name="MarkdownLab">
 			<Content fileName="MarkdownLab.js"/>

@@ -35,6 +35,7 @@
     <ProjectReference Include="..\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

@@ -1801,11 +1801,13 @@
 								<File Id='logo_WaherDataAB_300x58.png' Name='logo-WaherDataAB-300x58.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-300x58.png'/>
 								<File Id='logo_WaherDataAB_400x77.png' Name='logo-WaherDataAB-400x77.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-400x77.png'/>
 								<File Id='logo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-500x97.png'/>
+								<File Id='PlantUmlExample.uml' Name='PlantUmlExample.uml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\PlantUmlExample.uml' KeyPath='yes'/>
 								<RemoveFile Id='RemoveGraphVizExample.gv' Name='GraphVizExample.gv' On='uninstall' />
 								<RemoveFile Id='Removelogo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' On='uninstall'/>
 								<RemoveFile Id='Removelogo_WaherDataAB_300x58.png' Name='logo-WaherDataAB-300x58.png' On='uninstall'/>
 								<RemoveFile Id='Removelogo_WaherDataAB_400x77.png' Name='logo-WaherDataAB-400x77.png' On='uninstall'/>
 								<RemoveFile Id='Removelogo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' On='uninstall'/>
+								<RemoveFile Id='RemovePlantUmlExample.uml' Name='PlantUmlExample.uml' On='uninstall' />
 							</Component>
 						</Directory>
 						<Directory Id='MarkdownLab' Name='MarkdownLab'>

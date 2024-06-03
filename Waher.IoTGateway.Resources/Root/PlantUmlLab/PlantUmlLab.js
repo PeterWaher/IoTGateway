@@ -39,5 +39,6 @@ function ShowExample(Name)
 	}
 
 	xhttp.open("GET", "Examples/"+Name, true);
+	xhttp.setRequestHeader("Accept", "text/vnd.plantuml");
 	xhttp.send();
 }

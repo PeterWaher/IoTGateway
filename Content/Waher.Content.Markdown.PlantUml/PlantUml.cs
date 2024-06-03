@@ -25,6 +25,23 @@ using static System.Environment;
 
 namespace Waher.Content.Markdown.PlantUml
 {
+	internal enum ResultType
+	{
+		Svg,
+		Png
+	}
+
+	internal class GraphInfo
+	{
+		public string BaseFileName;
+		public string TxtFileName;
+		public string ImageFileName;
+		public string PlantUmlFolder;
+		public string Title;
+		public string AsyncId;
+		public bool Sent;
+	}
+
 	/// <summary>
 	/// Class managing PlantUML integration into Markdown documents.
 	/// </summary>
@@ -248,7 +265,7 @@ namespace Waher.Content.Markdown.PlantUml
 		{
 			StringBuilder Output = Renderer.Output;
 			bool GenerateIfNotExists = asyncHtmlOutput is null;
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Svg, GenerateIfNotExists);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Svg, GenerateIfNotExists);
 			if (GenerateIfNotExists || File.Exists(Info.ImageFileName))
 			{
 				this.GenerateHTML(Output, Info);
@@ -266,7 +283,7 @@ namespace Waher.Content.Markdown.PlantUml
 				}
 			}
 
-			Document.QueueAsyncTask(this.ExecutePlantUml, new AsyncState(ResultType.Svg, Info));
+			Document.QueueAsyncTask(ExecutePlantUml, new AsyncState(ResultType.Svg, Info));
 
 			return true;
 		}
@@ -297,7 +314,7 @@ namespace Waher.Content.Markdown.PlantUml
 
 				try
 				{
-					await this.ExecutePlantUml(AsyncState.Type, AsyncState.GraphInfos.ToArray());
+					await ExecutePlantUml(AsyncState.Type, AsyncState.GraphInfos.ToArray());
 
 					foreach (GraphInfo Info in AsyncState.GraphInfos)
 					{
@@ -324,7 +341,7 @@ namespace Waher.Content.Markdown.PlantUml
 			}
 		}
 
-		private async Task ExecutePlantUml(ResultType Type, params GraphInfo[] Files)
+		private static async Task ExecutePlantUml(ResultType Type, params GraphInfo[] Files)
 		{
 			StringBuilder Arguments = new StringBuilder();
 			Arguments.Append("-jar \"");
@@ -423,26 +440,13 @@ namespace Waher.Content.Markdown.PlantUml
 			Output.AppendLine("</figure>");
 		}
 
-		private enum ResultType
+		internal static Task<GraphInfo> GetGraphInfo(string Language, string[] Rows, ResultType Type)
 		{
-			Svg,
-			Png
+			return GetGraphInfo(Language, MarkdownDocument.AppendRows(Rows), Type);
 		}
 
-		private class GraphInfo
+		internal static async Task<GraphInfo> GetGraphInfo(string Language, string Graph, ResultType Type)
 		{
-			public string BaseFileName;
-			public string TxtFileName;
-			public string ImageFileName;
-			public string PlantUmlFolder;
-			public string Title;
-			public string AsyncId;
-			public bool Sent;
-		}
-
-		private async Task<GraphInfo> GetGraphInfo(string Language, string[] Rows, ResultType Type)
-		{
-			string Graph = MarkdownDocument.AppendRows(Rows);
 			string FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Graph + Language));
 			string PlantUmlFolder = Path.Combine(contentRootFolder, "PlantUML");
 
@@ -477,12 +481,18 @@ namespace Waher.Content.Markdown.PlantUml
 			return Result;
 		}
 
-		private async Task<GraphInfo> GetGraphInfo(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists)
+		internal static Task<GraphInfo> GetGraphInfo(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists)
 		{
-			GraphInfo Result = await this.GetGraphInfo(Language, Rows, Type);
+			return GetGraphInfo(Language, MarkdownDocument.AppendRows(Rows), Type, GenerateIfNotExists);
+		}
+
+		internal static async Task<GraphInfo> GetGraphInfo(string Language, string GraphDefinition, ResultType Type, bool GenerateIfNotExists)
+		{
+			GraphInfo Result = await GetGraphInfo(Language, GraphDefinition, Type);
 
 			if (GenerateIfNotExists && !File.Exists(Result.ImageFileName))
-				await this.ExecutePlantUml(Type, Result);
+				await ExecutePlantUml(Type, Result);
+
 			return Result;
 		}
 
@@ -497,7 +507,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -516,7 +526,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Svg, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Svg, true);
 			if (Info is null)
 				return false;
 
@@ -536,7 +546,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -564,7 +574,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return false;
 
@@ -588,7 +598,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 			StringBuilder Output = Renderer.Output;
 
 			Output.AppendLine("\\begin{figure}[h]");
@@ -620,7 +630,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 			if (Info is null)
 				return null;
 
@@ -645,7 +655,7 @@ namespace Waher.Content.Markdown.PlantUml
 		{
 			try
 			{
-				GraphInfo Info = await this.GetGraphInfo(Language, Rows, ResultType.Png, true);
+				GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Png, true);
 				if (Info is null)
 					return false;
 

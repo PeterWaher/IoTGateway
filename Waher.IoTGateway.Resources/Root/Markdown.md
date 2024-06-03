@@ -1406,9 +1406,6 @@ Results in:
 
 ![Image Link to GraphViz diagram](/Images/GraphVizExample.gv.png)
 
-**Note**: When using an IMG tag directly, you do not need to add additional extensions for type conversion, as the IMG tag results in requests
-including only image Content-Types, triggering implicity content conversion automatically.
-
 For more information about the GraphViz syntax, see the [GraphViz documentation](http://www.graphviz.org/documentation/).
 
 #### UML with PlantUML
@@ -1481,6 +1478,25 @@ make sure to restart the {{AppName}} service (or the machine). PlantUML and Java
 PlantUML is installed in the program data folder.
 
 **Note 2**: You can use the [PlantUML Lab](PlantUmlLab/PlantUmlLab.md) to experiment with PlantUML syntax.
+
+You can also place a PlantUML graph definition in a `.uml` file and link to it from an IMG tag in your web pages. It will be
+automatically converted to an image, as requests from `IMG` tags request image content only. Example:
+
+    <img src="/Images/PlantUmlExample.uml"/>
+
+Results in:
+
+<img src="/Images/PlantUmlExample.uml"/>
+
+If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to resource, to let the Markdown parser know
+you are embedding image content, and not some other form of content. That will explicitly convert the graph to an image of the requested type
+(i.e to PNG or SVG formats). The both cases, the graph will be converted to an image of the requested type when requested by the browser. Example:
+
+    ![Image Link to PlantUML diagram](/Images/PlantUmlExample.uml.png)
+
+Results in:
+
+![Image Link to PlantUML diagram](/Images/PlantUmlExample.uml.png)
 
 For more information about PlantUML syntax, see the [PlantUML Language Reference Guide](http://plantuml.com/PlantUML_Language_Reference_Guide.pdf).
 

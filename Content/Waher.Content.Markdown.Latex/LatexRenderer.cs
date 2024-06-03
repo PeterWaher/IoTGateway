@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Images;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
@@ -391,7 +392,7 @@ namespace Waher.Content.Markdown.Latex
 			{
 				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
 				byte[] Bin = Pixels.EncodeAsPng();
-				string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+				string FileName = await ImageContent.GetTemporaryFile(Bin, ImageCodec.FileExtensionPng);
 
 				if (AloneInParagraph)
 				{
@@ -416,7 +417,7 @@ namespace Waher.Content.Markdown.Latex
 			else if (Result is PixelInformation Pixels)
 			{
 				byte[] Bin = Pixels.EncodeAsPng();
-				string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+				string FileName = await ImageContent.GetTemporaryFile(Bin, ImageCodec.FileExtensionPng);
 
 				if (AloneInParagraph)
 				{
@@ -443,7 +444,7 @@ namespace Waher.Content.Markdown.Latex
 				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
 				{
 					byte[] Bin = Data.ToArray();
-					string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+					string FileName = await ImageContent.GetTemporaryFile(Bin, ImageCodec.FileExtensionPng);
 
 					if (AloneInParagraph)
 					{

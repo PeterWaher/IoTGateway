@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -1520,7 +1521,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				string Cid = Guid.NewGuid().ToString();
 				s = "![Image result](cid:" + Cid + ")";
-				await this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last, new Tuple<string, string, byte[]>(Cid, "image/png", Bin));
+				await this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last, new Tuple<string, string, byte[]>(Cid, ImageCodec.ContentTypePng, Bin));
 			}
 			else if (Support.Markdown)
 			{
@@ -1530,8 +1531,8 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else if (AllowHttpUpload && !(this.httpUpload is null) && this.httpUpload.HasSupport)
 			{
-				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
-				string ContentType = "image/png";
+				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + "." + ImageCodec.FileExtensionPng;
+				string ContentType = ImageCodec.ContentTypePng;
 
 				this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
 				{
@@ -1575,7 +1576,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else if (Support.Html && !(this.bobClient is null) && Support.BitsOfBinary)
 			{
-				s = await this.bobClient.StoreData(Bin, "image/png");
+				s = await this.bobClient.StoreData(Bin, ImageCodec.ContentTypePng);
 
 				if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
 					!(v.ValueObject is Dictionary<string, bool> ContentIDs))

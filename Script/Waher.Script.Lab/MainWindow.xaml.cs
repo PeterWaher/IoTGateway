@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Wpf;
 using Waher.Events;
@@ -414,7 +415,7 @@ namespace Waher.Script.Lab
 				SaveFileDialog Dialog = new SaveFileDialog()
 				{
 					Title = "Save Image",
-					DefaultExt = "png",
+					DefaultExt = ImageCodec.FileExtensionPng,
 					Filter = "PNG files (*.png)|*.png|All Image files (*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff)|*.bmp, *.gif, *.jpg, *.jpeg, *.png, *.tif, *.tiff|All files (*.*)|*.*",
 					OverwritePrompt = true
 				};
@@ -424,27 +425,31 @@ namespace Waher.Script.Lab
 				{
 					BitmapEncoder Encoder;
 
-					switch (System.IO.Path.GetExtension(Dialog.FileName).ToLower())
+					string Extension = System.IO.Path.GetExtension(Dialog.FileName).ToLower();
+					if (Extension.StartsWith("."))
+						Extension = Extension.Substring(1);
+
+					switch (Extension)
 					{
-						case ".jpg":
-						case ".jpeg":
+						case ImageCodec.FileExtensionJpg:
+						case "jpeg":
 							Encoder = new JpegBitmapEncoder();
 							break;
 
-						case ".bmp":
+						case ImageCodec.FileExtensionBmp:
 							Encoder = new BmpBitmapEncoder();
 							break;
 
-						case ".gif":
+						case ImageCodec.FileExtensionGif:
 							Encoder = new GifBitmapEncoder();
 							break;
 
-						case ".tif":
+						case ImageCodec.FileExtensionTiff:
 						case ".tiff":
 							Encoder = new TiffBitmapEncoder();
 							break;
 
-						case ".png":
+						case ImageCodec.FileExtensionPng:
 						default:
 							Encoder = new PngBitmapEncoder();
 							break;

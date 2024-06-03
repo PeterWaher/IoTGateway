@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
@@ -545,11 +546,11 @@ namespace Waher.Content.Markdown.GraphViz
 			{
 				case ResultType.Svg:
 				default:
-					Result.FileName = FileName + ".svg";
+					Result.FileName = FileName + "." + ImageCodec.FileExtensionSvg;
 					break;
 
 				case ResultType.Png:
-					Result.FileName = FileName + ".png";
+					Result.FileName = FileName + "." + ImageCodec.FileExtensionPng;
 					break;
 			}
 
@@ -847,7 +848,7 @@ namespace Waher.Content.Markdown.GraphViz
 					return false;
 
 				byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
-				string ContentType = "image/png";
+				string ContentType = ImageCodec.ContentTypePng;
 
 				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
 					return false;

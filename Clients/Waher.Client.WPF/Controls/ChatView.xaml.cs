@@ -17,6 +17,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Consolidation;
 using Waher.Content.Xml;
@@ -82,7 +83,7 @@ namespace Waher.Client.WPF.Controls
 					Folder = AppDomain.CurrentDomain.BaseDirectory;
 
 				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24,
-					Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", "png", "64x64", "%FILENAME%"),
+					Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", ImageCodec.FileExtensionPng, "64x64", "%FILENAME%"),
 					Path.Combine(Path.GetDirectoryName(Folder), "Graphics", "Emoji1.zip"),
 					Path.Combine(MainWindow.AppDataFolder, "Graphics"));
 			}

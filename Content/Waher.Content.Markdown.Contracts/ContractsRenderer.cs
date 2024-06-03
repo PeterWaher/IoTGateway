@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Images;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
@@ -378,7 +379,7 @@ namespace Waher.Content.Markdown.Contracts
 				else
 					this.XmlOutput.WriteStartElement("imageInline");
 
-				this.XmlOutput.WriteAttributeString("contentType", "image/png");
+				this.XmlOutput.WriteAttributeString("contentType", ImageCodec.ContentTypePng);
 				this.XmlOutput.WriteAttributeString("width", GraphSettings.Width.ToString());
 				this.XmlOutput.WriteAttributeString("height", GraphSettings.Height.ToString());
 
@@ -404,7 +405,7 @@ namespace Waher.Content.Markdown.Contracts
 				else
 					this.XmlOutput.WriteStartElement("imageInline");
 
-				this.XmlOutput.WriteAttributeString("contentType", "image/png");
+				this.XmlOutput.WriteAttributeString("contentType", ImageCodec.ContentTypePng);
 				this.XmlOutput.WriteAttributeString("width", Pixels.Width.ToString());
 				this.XmlOutput.WriteAttributeString("height", Pixels.Height.ToString());
 
@@ -428,7 +429,7 @@ namespace Waher.Content.Markdown.Contracts
 					else
 						this.XmlOutput.WriteStartElement("imageInline");
 
-					this.XmlOutput.WriteAttributeString("contentType", "image/png");
+					this.XmlOutput.WriteAttributeString("contentType", ImageCodec.ContentTypePng);
 					this.XmlOutput.WriteAttributeString("width", Img.Width.ToString());
 					this.XmlOutput.WriteAttributeString("height", Img.Height.ToString());
 

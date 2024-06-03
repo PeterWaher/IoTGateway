@@ -31,5 +31,6 @@ https://waher.se/Markdown.md</Description>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+    <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
   </ItemGroup>
 </Project>

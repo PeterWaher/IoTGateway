@@ -45,6 +45,82 @@ namespace Waher.Content.Images
 		public const string ContentTypeSvg = "image/svg+xml";
 
 		/// <summary>
+		/// image/bmp
+		/// </summary>
+		public const string ContentTypeBmp = "image/bmp";
+
+		/// <summary>
+		/// image/gif
+		/// </summary>
+		public const string ContentTypeGif = "image/gif";
+
+		/// <summary>
+		/// image/tiff
+		/// </summary>
+		public const string ContentTypeTiff = "image/tiff";
+
+		/// <summary>
+		/// image/x-wmf
+		/// </summary>
+		public const string ContentTypeWmf = "image/x-wmf";
+
+		/// <summary>
+		/// image/x-emf
+		/// </summary>
+		public const string ContentTypeEmf = "image/x-emf";
+
+		/// <summary>
+		/// png
+		/// </summary>
+		public const string FileExtensionPng = "png";
+
+		/// <summary>
+		/// bmp
+		/// </summary>
+		public const string FileExtensionBmp = "bmp";
+
+		/// <summary>
+		/// gif
+		/// </summary>
+		public const string FileExtensionGif = "gif";
+
+		/// <summary>
+		/// jpg
+		/// </summary>
+		public const string FileExtensionJpg = "jpg";
+
+		/// <summary>
+		/// webp
+		/// </summary>
+		public const string FileExtensionWebP = "webp";
+
+		/// <summary>
+		/// tif
+		/// </summary>
+		public const string FileExtensionTiff = "tif";
+
+		/// <summary>
+		/// wmf
+		/// </summary>
+		public const string FileExtensionWmf = "wmf";
+
+		/// <summary>
+		/// emf
+		/// </summary>
+		public const string FileExtensionEmf = "emf";
+
+		/// <summary>
+		/// ico
+		/// </summary>
+		public const string FileExtensionIcon = "ico";
+
+		/// <summary>
+		/// svg
+		/// </summary>
+		public const string FileExtensionSvg = "svg";
+
+
+		/// <summary>
 		/// Image content types.
 		/// </summary>
 		public static readonly string[] ImageContentTypes = new string[] 
@@ -53,11 +129,11 @@ namespace Waher.Content.Images
 			ContentTypePng,
 			ContentTypeJpg,
 			ContentTypeIcon,
-			"image/bmp",
-			"image/gif", 
-			"image/tiff", 
-			"image/x-wmf", 
-			"image/x-emf"
+			ContentTypeBmp,
+			ContentTypeGif, 
+			ContentTypeTiff, 
+			ContentTypeWmf, 
+			ContentTypeEmf
 		};
 
 		/// <summary>
@@ -65,17 +141,17 @@ namespace Waher.Content.Images
 		/// </summary>
 		public static readonly string[] ImageFileExtensions = new string[] 
 		{
-			"webp", 
-			"png", 
-			"bmp",
-			"gif", 
-			"jpg", 
+			FileExtensionWebP, 
+			FileExtensionPng, 
+			FileExtensionBmp,
+			FileExtensionGif, 
+			FileExtensionJpg, 
 			"jpeg", 
-			"tif", 
-			"tiff", 
-			"wmf", 
-			"emf", 
-			"ico"
+			FileExtensionTiff, 
+			"tiff",
+			FileExtensionWmf, 
+			FileExtensionEmf, 
+			FileExtensionIcon
 		};
 
 		/// <summary>
@@ -186,20 +262,20 @@ namespace Waher.Content.Images
 				Data = Image.Encode(SKEncodedImageFormat.Png, 100);
 				ContentType = ContentTypePng;
 			}
-			else if (InternetContent.IsAccepted("image/bmp", AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypeBmp, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Bmp, 100);
-				ContentType = "image/bmp";
+				ContentType = ContentTypeBmp;
 			}
 			else if (InternetContent.IsAccepted(ContentTypeJpg, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Jpeg, 90);
 				ContentType = ContentTypeJpg;
 			}
-			else if (InternetContent.IsAccepted("image/gif", AcceptedContentTypes))
+			else if (InternetContent.IsAccepted(ContentTypeGif, AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Gif, 100);
-				ContentType = "image/gif";
+				ContentType = ContentTypeGif;
 			}
 			else if (InternetContent.IsAccepted(ContentTypeIcon, AcceptedContentTypes))
 			{
@@ -228,45 +304,45 @@ namespace Waher.Content.Images
 		{
 			switch (FileExtension.ToLower())
 			{
-				case "png":
+				case FileExtensionPng:
 					ContentType = ContentTypePng;
 					return true;
 
-				case "bmp":
-					ContentType = "image/bmp";
+				case FileExtensionBmp:
+					ContentType = ContentTypeBmp;
 					return true;
 
-				case "gif":
-					ContentType = "image/gif";
+				case FileExtensionGif:
+					ContentType = ContentTypeGif;
 					return true;
 
-				case "jpg":
+				case FileExtensionJpg:
 				case "jpeg":
 					ContentType = ContentTypeJpg;
 					return true;
 
-				case "webp":
+				case FileExtensionWebP:
 					ContentType = ContentTypeWebP;
 					return true;
 
-				case "tif":
+				case FileExtensionTiff:
 				case "tiff":
-					ContentType = "image/tiff";
+					ContentType = ContentTypeTiff;
 					return true;
 
-				case "wmf":
-					ContentType = "image/x-wmf";
+				case FileExtensionWmf:
+					ContentType = ContentTypeWmf;
 					return true;
 
-				case "emf":
-					ContentType = "image/x-emf";
+				case FileExtensionEmf:
+					ContentType = ContentTypeEmf;
 					return true;
 	
-				case "ico":
+				case FileExtensionIcon:
 					ContentType = ContentTypeIcon;
 					return true;
 
-				case "svg":
+				case FileExtensionSvg:
 					ContentType = ContentTypeSvg;
 					return true;
 
@@ -287,43 +363,43 @@ namespace Waher.Content.Images
 			switch (ContentType.ToLower())
 			{
 				case ContentTypePng:
-					FileExtension = "png";
+					FileExtension = FileExtensionPng;
 					return true;
 
-				case "image/bmp":
-					FileExtension = "bmp";
+				case ContentTypeBmp:
+					FileExtension = FileExtensionBmp;
 					return true;
 
-				case "image/gif":
-					FileExtension = "gif";
+				case ContentTypeGif:
+					FileExtension = FileExtensionGif;
 					return true;
 
 				case ContentTypeJpg:
-					FileExtension = "jpg";
+					FileExtension = FileExtensionJpg;
 					return true;
 
 				case ContentTypeWebP:
-					FileExtension = "webp";
+					FileExtension = FileExtensionWebP;
 					return true;
 
-				case "image/tiff":
-					FileExtension = "tif";
+				case ContentTypeTiff:
+					FileExtension = FileExtensionTiff;
 					return true;
 
-				case "image/x-wmf":
-					FileExtension = "wmf";
+				case ContentTypeWmf:
+					FileExtension = FileExtensionWmf;
 					return true;
 
-				case "image/x-emf":
-					FileExtension = "emf";
+				case ContentTypeEmf:
+					FileExtension = FileExtensionEmf;
 					return true;
 
 				case ContentTypeIcon:
-					FileExtension = "ico";
+					FileExtension = FileExtensionIcon;
 					return true;
 
 				case ContentTypeSvg:
-					FileExtension = "svg";
+					FileExtension = FileExtensionSvg;
 					return true;
 
 				default:

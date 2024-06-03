@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
@@ -470,11 +471,11 @@ namespace Waher.Content.Markdown.PlantUml
 			{
 				case ResultType.Svg:
 				default:
-					Result.ImageFileName = Result.BaseFileName + ".svg";
+					Result.ImageFileName = Result.BaseFileName + "." + ImageCodec.FileExtensionSvg;
 					break;
 
 				case ResultType.Png:
-					Result.ImageFileName = Result.BaseFileName + ".png";
+					Result.ImageFileName = Result.BaseFileName + "." + ImageCodec.FileExtensionPng;
 					break;
 			}
 
@@ -660,7 +661,7 @@ namespace Waher.Content.Markdown.PlantUml
 					return false;
 
 				byte[] Data = await Resources.ReadAllBytesAsync(Info.ImageFileName);
-				string ContentType = "image/png";
+				string ContentType = ImageCodec.ContentTypePng;
 
 				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
 					return false;

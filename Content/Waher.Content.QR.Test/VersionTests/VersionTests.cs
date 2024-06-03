@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
+using Waher.Content.Images;
 using Waher.Content.QR.Encoding;
 
 namespace Waher.Content.QR.Test.VersionTests
@@ -56,7 +57,7 @@ namespace Waher.Content.QR.Test.VersionTests
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Half.txt")), M.ToHalfBlockText());
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Quarter.txt")), M.ToQuarterBlockText());
 
-			SaveImage(M, Path.Combine(Path.Combine(Folder, Version.ToString() + ".png")));
+			SaveImage(M, Path.Combine(Path.Combine(Folder, Version.ToString() + "." + ImageCodec.FileExtensionPng)));
 		}
 
 		public static void SaveImage(QrMatrix M, string FileName)

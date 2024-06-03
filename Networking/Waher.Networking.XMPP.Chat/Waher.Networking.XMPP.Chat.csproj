@@ -45,6 +45,7 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.PEP;
@@ -84,7 +85,7 @@ namespace Waher.Networking.XMPP.Avatar
 			byte[] Bin = Resources.LoadResource(typeof(AvatarClient).Namespace + ".Images.DefaultAvatar.png",
 				typeof(AvatarClient).GetTypeInfo().Assembly);
 
-			this.defaultAvatar = new Avatar(Client.BareJID.ToLower(), "image/png", Bin, 64, 64);
+			this.defaultAvatar = new Avatar(Client.BareJID.ToLower(), ImageCodec.ContentTypePng, Bin, 64, 64);
 
 			Task.Run(() => this.LoadAvatar());
 		}
@@ -832,7 +833,7 @@ namespace Waher.Networking.XMPP.Avatar
 			foreach (UserAvatarReference Ref in e.AvatarMetaData.References)
 			{
 				if (Best is null ||
-					Best.Type != "image/png" ||
+					Best.Type != ImageCodec.ContentTypePng ||
 					Ref.Bytes > Best.Bytes)
 				{
 					Best = Ref;

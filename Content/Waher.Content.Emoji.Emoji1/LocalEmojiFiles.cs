@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content.Images;
 using Waher.Runtime.Settings;
 using Waher.Events;
 
@@ -204,16 +205,16 @@ namespace Waher.Content.Emoji.Emoji1
 		{
 			switch (this.sourceFileType)
 			{
-				case Emoji1SourceFileType.Png64: return Path.Combine(this.programDataFolder, "Emoji1", "png", "64x64", Emoji.FileName);
-				case Emoji1SourceFileType.Png128: return Path.Combine(this.programDataFolder, "Emoji1", "png", "128x128", Emoji.FileName);
-				case Emoji1SourceFileType.Png512: return Path.Combine(this.programDataFolder, "Emoji1", "png", "512x512", Emoji.FileName);
+				case Emoji1SourceFileType.Png64: return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.FileExtensionPng, "64x64", Emoji.FileName);
+				case Emoji1SourceFileType.Png128: return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.FileExtensionPng, "128x128", Emoji.FileName);
+				case Emoji1SourceFileType.Png512: return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.FileExtensionPng, "512x512", Emoji.FileName);
 				case Emoji1SourceFileType.Svg:
 				default:
 					string s = Emoji.FileName;
-					if (s.EndsWith(".png"))
-						s = s.Substring(0, s.Length - 3) + "svg";
+					if (s.EndsWith("." + ImageCodec.FileExtensionPng))
+						s = s.Substring(0, s.Length - 3) + ImageCodec.FileExtensionSvg;
 
-					return Path.Combine(this.programDataFolder, "Emoji1", "svg", s);
+					return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.ContentTypeSvg, s);
 			}
 		}
 
@@ -298,12 +299,12 @@ namespace Waher.Content.Emoji.Emoji1
 			{
 				StringBuilder Output = new StringBuilder();
 
-				Output.Append("data:image/");
+				Output.Append("data:");
 
 				if (this.sourceFileType == Emoji1SourceFileType.Svg)
-					Output.Append("svg+xml");
+					Output.Append(ImageCodec.ContentTypeSvg);
 				else
-					Output.Append("png");
+					Output.Append(ImageCodec.ContentTypePng);
 
 				Output.Append(";base64,");
 
@@ -317,8 +318,8 @@ namespace Waher.Content.Emoji.Emoji1
 			else
 			{
 				string s = Emoji.FileName;
-				if (this.sourceFileType == Emoji1SourceFileType.Svg && s.EndsWith(".png"))
-					s = s.Substring(0, s.Length - 3) + "svg";
+				if (this.sourceFileType == Emoji1SourceFileType.Svg && s.EndsWith("." + ImageCodec.FileExtensionPng))
+					s = s.Substring(0, s.Length - 3) + ImageCodec.FileExtensionSvg;
 
 				return this.imageUrl.Replace("%FILENAME%", s);
 			}

@@ -1332,6 +1332,28 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
 </Layout2D>
 ```
 
+You can also place a layout graph definition in an `.xml` file and link to it from an IMG tag in your web pages. It will be automatically
+converted to an image, as requests from `IMG` tags request image content only. Example:
+
+    <img src="/Images/Layout2DExample.xml"/>
+
+Results in:
+
+<img src="/Images/Layout2DExample.xml"/>
+
+If you embed the image in a Markdown page, you will need to add an additional image extension to the resource, to let the Markdown parser know you are embedding image content, and not some other form of content. That will explicitly convert the graph to an image of the requested type. The both cases, the graph will be converted to an image of the requested type when requested by the browser. Example:
+
+    ![Image Link to 2D Layout diagram](/Images/Layout2DExample.xml.webp)
+
+Results in:
+
+![Image Link to 2D Layout diagram](/Images/Layout2DExample.xml.webp)
+
+**Note**: Recognized image file extensions are: `.{{
+Extensions:=Create(Waher.Content.Images.ImageCodec).FileExtensions;
+LastExtension:=PopLast(Extensions);
+Concat(Extensions,"`, `.")+"` and `."+LastExtension}}`
+
 #### GraphViz diagrams
 
 If [GraphViz](http://www.graphviz.org/) is installed on the same machine as the {{AppName}}, it can be used to render diagrams from code blocks. 
@@ -1396,7 +1418,7 @@ Results in:
 
 <img src="/Images/GraphVizExample.gv"/>
 
-If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to resource, to let the Markdown parser know
+If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to the resource, to let the Markdown parser know
 you are embedding image content, and not some other form of content. That will explicitly convert the graph to an image of the requested type
 (i.e to PNG or SVG formats). The both cases, the graph will be converted to an image of the requested type when requested by the browser. Example:
 
@@ -1488,7 +1510,7 @@ Results in:
 
 <img src="/Images/PlantUmlExample.uml"/>
 
-If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to resource, to let the Markdown parser know
+If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to the resource, to let the Markdown parser know
 you are embedding image content, and not some other form of content. That will explicitly convert the graph to an image of the requested type
 (i.e to PNG or SVG formats). The both cases, the graph will be converted to an image of the requested type when requested by the browser. Example:
 

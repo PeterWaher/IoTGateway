@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Images;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
@@ -255,7 +256,7 @@ namespace Waher.Things.Metering
 
 					if (!string.IsNullOrEmpty(e.Url))
 					{
-						MediaField MediaField = new MediaField("QrCode", new Media(e.Url, "image/png", 400, 400))
+						MediaField MediaField = new MediaField("QrCode", new Media(e.Url, ImageCodec.ContentTypePng, 400, 400))
 						{
 							Priority = HeaderAttribute.DefaultPriority,
 							Ordinal = Form.FieldOrdinal++

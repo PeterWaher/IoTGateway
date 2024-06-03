@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Emoji;
+using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
 using Waher.Content.Markdown.Model;
@@ -24,12 +25,25 @@ using Waher.Security;
 
 namespace Waher.Content.Markdown.Layout2D
 {
+	internal class GraphInfo
+	{
+		public string FileName;
+		public string Title;
+		public bool Dynamic;
+		public byte[] DynamicContent;
+	}
+
 	/// <summary>
 	/// Class managing 2D XML Layout integration into Markdown documents.
 	/// </summary>
 	public class XmlLayout : IImageCodeContent, IXmlVisualizer, ICodeContentMarkdownRenderer, ICodeContentHtmlRenderer, ICodeContentTextRenderer,
 		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
+		internal const string DefaultContentType = ImageCodec.ContentTypePng;
+		internal const string DefaultFileExtension = ImageCodec.FileExtensionPng;
+		internal const SKEncodedImageFormat DefaultFormat = SKEncodedImageFormat.Png;
+		internal const int DefaultQuality = 100;
+
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
 		private static string layoutFolder = null;
@@ -164,7 +178,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return false;
 
@@ -177,7 +191,7 @@ namespace Waher.Content.Markdown.Layout2D
 			Output.Append("<figure>");
 			Output.Append("<img src=\"");
 			if (Info.Dynamic)
-				Output.Append(ImageContent.GenerateUrl(Info.DynamicContent, "image/png"));
+				Output.Append(ImageContent.GenerateUrl(Info.DynamicContent, DefaultContentType));
 			else
 				Output.Append(XML.HtmlAttributeEncode(FileName));
 
@@ -206,14 +220,6 @@ namespace Waher.Content.Markdown.Layout2D
 			return true;
 		}
 
-		private class GraphInfo
-		{
-			public string FileName;
-			public string Title;
-			public bool Dynamic;
-			public byte[] DynamicContent;
-		}
-
 		/// <summary>
 		/// Generates an image, saves it, and returns the file name of the image file.
 		/// </summary>
@@ -221,10 +227,23 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Rows">Code Block rows</param>
 		/// <param name="Session">Session variables.</param>
 		/// <returns>File name</returns>
-		private static async Task<GraphInfo> GetFileName(string Language, string[] Rows, Variables Session)
+		internal static Task<GraphInfo> GetFileName(string Language, string[] Rows, Variables Session,
+			SKEncodedImageFormat ImageFormat, int Quality, string FileExtension)
+		{
+			return GetFileName(Language, MarkdownDocument.AppendRows(Rows), Session, ImageFormat, Quality, FileExtension);
+		}
+
+		/// <summary>
+		/// Generates an image, saves it, and returns the file name of the image file.
+		/// </summary>
+		/// <param name="Language">Language</param>
+		/// <param name="Xml">Layout XML definition</param>
+		/// <param name="Session">Session variables.</param>
+		/// <returns>File name</returns>
+		internal static async Task<GraphInfo> GetFileName(string Language, string Xml, Variables Session,
+			SKEncodedImageFormat ImageFormat, int Quality, string FileExtension)
 		{
 			GraphInfo Result = new GraphInfo();
-			string Xml = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -242,7 +261,7 @@ namespace Waher.Content.Markdown.Layout2D
 
 			string LayoutFolder = Path.Combine(contentRootFolder, "Layout");
 			string FileName = Path.Combine(LayoutFolder, Hash);
-			Result.FileName = FileName + ".png";
+			Result.FileName = FileName + "." + FileExtension;
 
 			if (!File.Exists(Result.FileName))
 			{
@@ -257,7 +276,7 @@ namespace Waher.Content.Markdown.Layout2D
 					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
 					using (SKImage Img = P.Key)   // TODO: Maps
 					{
-						using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+						using (SKData Data = Img.Encode(ImageFormat, Quality))
 						{
 							Result.DynamicContent = Data.ToArray();
 							Result.Dynamic = LayoutDoc.Dynamic;
@@ -303,13 +322,13 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return false;
 
 			if (Info.Dynamic)
 			{
-				ImageContent.GenerateMarkdown(Renderer.Output, Info.DynamicContent, "image/png", Info.Title);
+				ImageContent.GenerateMarkdown(Renderer.Output, Info.DynamicContent, DefaultContentType, Info.Title);
 				return true;
 			}
 			else
@@ -327,7 +346,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			Renderer.Output.AppendLine(Info.Title);
 
 			return true;
@@ -344,7 +363,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return false;
 
@@ -354,7 +373,7 @@ namespace Waher.Content.Markdown.Layout2D
 			{
 				await Wpf.Multimedia.ImageContent.OutputWpf(Output, new ImageSource()
 				{
-					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
+					Url = ImageContent.GenerateUrl(Info.DynamicContent, DefaultContentType)
 				}, Info.Title);
 			}
 			else
@@ -383,7 +402,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return false;
 
@@ -393,7 +412,7 @@ namespace Waher.Content.Markdown.Layout2D
 			{
 				await Xamarin.Multimedia.ImageContent.OutputXamarinForms(Output, new ImageSource()
 				{
-					Url = ImageContent.GenerateUrl(Info.DynamicContent, "image/png")
+					Url = ImageContent.GenerateUrl(Info.DynamicContent, DefaultContentType)
 				});
 			}
 			else
@@ -417,12 +436,12 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return false;
 
 			if (Info.Dynamic)
-				Info.FileName = await Model.Multimedia.ImageContent.GetTemporaryFile(Info.DynamicContent, "png");
+				Info.FileName = await Model.Multimedia.ImageContent.GetTemporaryFile(Info.DynamicContent, DefaultFileExtension.Substring(1));
 
 			StringBuilder Output = Renderer.Output;
 
@@ -455,7 +474,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
 			if (Info?.FileName is null)
 				return null;
 
@@ -535,11 +554,11 @@ namespace Waher.Content.Markdown.Layout2D
 				{
 					Output.WriteStartElement("imageStandalone");
 
-					Output.WriteAttributeString("contentType", "image/png");
+					Output.WriteAttributeString("contentType", DefaultContentType);
 					Output.WriteAttributeString("width", Img.Width.ToString());
 					Output.WriteAttributeString("height", Img.Height.ToString());
 
-					using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+					using (SKData Data = Img.Encode(DefaultFormat, DefaultQuality))
 					{
 						byte[] Bin = Data.ToArray();
 

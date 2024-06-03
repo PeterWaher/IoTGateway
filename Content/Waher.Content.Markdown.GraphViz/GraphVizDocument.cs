@@ -1,12 +1,12 @@
 namespace Waher.Content.Markdown.GraphViz
 {
     /// <summary>
-    /// Encapsulates a Graphviz document
+    /// Encapsulates a GraphViz document
     /// </summary>
     public class GraphVizDocument
     {
         /// <summary>
-        /// Encapsulates a Graphviz document
+        /// Encapsulates a GraphViz document
         /// </summary>
         /// <param name="GraphDescription">Graph Description in dot file format</param>
         public GraphVizDocument(string GraphDescription)

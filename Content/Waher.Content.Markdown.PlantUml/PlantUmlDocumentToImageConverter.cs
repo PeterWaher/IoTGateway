@@ -83,7 +83,6 @@ namespace Waher.Content.Markdown.PlantUml
                 }
             }
 
-            Variables Variables = new Variables();
             GraphInfo Graph;
 
             if (Svg)

@@ -40,6 +40,11 @@ namespace Waher.Content.Images
 		public const string ContentTypeIcon = "image/x-icon";
 
 		/// <summary>
+		/// image/svg+xml
+		/// </summary>
+		public const string ContentTypeSvg = "image/svg+xml";
+
+		/// <summary>
 		/// Image content types.
 		/// </summary>
 		public static readonly string[] ImageContentTypes = new string[] 
@@ -262,7 +267,7 @@ namespace Waher.Content.Images
 					return true;
 
 				case "svg":
-					ContentType = "image/svg+xml";
+					ContentType = ContentTypeSvg;
 					return true;
 
 				default:
@@ -317,7 +322,7 @@ namespace Waher.Content.Images
 					FileExtension = "ico";
 					return true;
 
-				case "image/svg+xml":
+				case ContentTypeSvg:
 					FileExtension = "svg";
 					return true;
 

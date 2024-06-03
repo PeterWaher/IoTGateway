@@ -182,6 +182,7 @@
 			</Folder>
 		</Folder>
 		<Folder name="Images">
+			<Content fileName="GraphVizExample.gv"/>
 			<Content fileName="logo-WaherDataAB-500x97.png"/>
 			<Content fileName="logo-WaherDataAB-200x39.png"/>
 			<Content fileName="logo-WaherDataAB-300x58.png"/>

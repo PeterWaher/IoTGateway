@@ -24,6 +24,20 @@ using Waher.Security;
 
 namespace Waher.Content.Markdown.GraphViz
 {
+	internal enum ResultType
+	{
+		Svg,
+		Png
+	}
+
+	internal class GraphInfo
+	{
+		public string FileName;
+		public string Title;
+		public string MapFileName;
+		public string Hash;
+	}
+
 	/// <summary>
 	/// Class managing GraphViz integration into Markdown documents.
 	/// </summary>
@@ -382,7 +396,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Svg, asyncHtmlOutput is null, Document.Settings?.Variables);
 			if (!(Info is null))
 			{
 				await this.GenerateHTML(Renderer.Output, Info);
@@ -424,7 +438,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			try
 			{
-				GraphInfo Info = await this.GetFileName(AsyncState.Language, AsyncState.Rows, ResultType.Svg, true,
+				GraphInfo Info = await GetFileName(AsyncState.Language, AsyncState.Rows, ResultType.Svg, true,
 					AsyncState.Document.Settings?.Variables);
 
 				if (!(Info is null))
@@ -501,24 +515,14 @@ namespace Waher.Content.Markdown.GraphViz
 			}
 		}
 
-		private enum ResultType
+		internal static Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists, Variables Variables)
 		{
-			Svg,
-			Png
+			return GetFileName(Language, MarkdownDocument.AppendRows(Rows), Type, GenerateIfNotExists, Variables);
 		}
 
-		private class GraphInfo
-		{
-			public string FileName;
-			public string Title;
-			public string MapFileName;
-			public string Hash;
-		}
-
-		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type, bool GenerateIfNotExists, Variables Variables)
+		internal static async Task<GraphInfo> GetFileName(string Language, string GraphText, ResultType Type, bool GenerateIfNotExists, Variables Variables)
 		{
 			GraphInfo Result = new GraphInfo();
-			string GraphText = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -690,7 +694,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Svg, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -710,7 +714,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -728,7 +732,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -757,7 +761,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return false;
 
@@ -781,7 +785,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			StringBuilder Output = Renderer.Output;
 
 			Output.AppendLine("\\begin{figure}[h]");
@@ -813,7 +817,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+			GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 			if (Info is null)
 				return null;
 
@@ -838,7 +842,7 @@ namespace Waher.Content.Markdown.GraphViz
 		{
 			try
 			{
-				GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
+				GraphInfo Info = await GetFileName(Language, Rows, ResultType.Png, true, Document.Settings?.Variables);
 				if (Info is null)
 					return false;
 

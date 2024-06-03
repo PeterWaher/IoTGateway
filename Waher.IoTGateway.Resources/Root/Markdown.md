@@ -1387,6 +1387,28 @@ or the entire graph.
 
 **Note 3**: You can use the [GraphViz Lab](GraphVizLab/GraphVizLab.md) to experiment with GraphViz syntax.
 
+You can also place a GraphViz graph definition in a `.dv` or `.dot` file and link to it from an IMG tag in your web pages. It will be
+automatically converted to an image, as requests from `IMG` tags request image content only. Example:
+
+    <img src="/Images/GraphVizExample.gv"/>
+
+Results in:
+
+<img src="/Images/GraphVizExample.gv"/>
+
+If you embed the image in a Markdown page, you will need to add the extension `.png` or `.svg` to resource, to let the Markdown parser know
+you are embedding image content, and not some other form of content. That will explicitly convert the graph to an image of the requested type
+(i.e to PNG or SVG formats). The both cases, the graph will be converted to an image of the requested type when requested by the browser. Example:
+
+    ![Image Link to GraphViz diagram](/Images/GraphVizExample.gv.png)
+
+Results in:
+
+![Image Link to GraphViz diagram](/Images/GraphVizExample.gv.png)
+
+**Note**: When using an IMG tag directly, you do not need to add additional extensions for type conversion, as the IMG tag results in requests
+including only image Content-Types, triggering implicity content conversion automatically.
+
 For more information about the GraphViz syntax, see the [GraphViz documentation](http://www.graphviz.org/documentation/).
 
 #### UML with PlantUML

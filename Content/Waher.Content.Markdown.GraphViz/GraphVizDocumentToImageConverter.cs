@@ -83,17 +83,43 @@ namespace Waher.Content.Markdown.GraphViz
                 }
             }
 
+            string Language;
+
+            if (string.IsNullOrEmpty(State.FromFileName))
+                Language = "dot";
+            else
+            {
+                Language = Path.GetExtension(State.FromFileName).ToLower();
+                if (Language.StartsWith("."))
+                    Language = Language.Substring(1);
+
+                switch (Language)
+                {
+                    case "dot":
+                    case "neato":
+                    case "fdp":
+                    case "sfdp":
+                    case "twopi":
+                    case "circo":
+                        break;
+
+                    default:
+                        Language = "dot";
+                        break;
+                }
+            }
+
             Variables Variables = new Variables();
             GraphInfo Graph;
 
             if (Svg)
             {
-                Graph = await GraphViz.GetFileName("dot", GraphDescription, ResultType.Svg, true, Variables);
+                Graph = await GraphViz.GetFileName(Language, GraphDescription, ResultType.Svg, true, Variables);
                 State.ToContentType = ImageCodec.ContentTypeSvg;
             }
             else if (Png)
             {
-                Graph = await GraphViz.GetFileName("dot", GraphDescription, ResultType.Png, true, Variables);
+                Graph = await GraphViz.GetFileName(Language, GraphDescription, ResultType.Png, true, Variables);
                 State.ToContentType = ImageCodec.ContentTypePng;
             }
             else

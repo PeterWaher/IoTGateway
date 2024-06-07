@@ -2,129 +2,18 @@
 <Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
     background="ThemeBackground" font="Text" textColor="Black">
     <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}" />
-    <SolidBackground id="Core" color="{Alpha('Red',128)}" />
     <SolidBackground id="IoTGateway" color="{Alpha('Orange',128)}" />
-    <SolidBackground id="NeuroLedger" color="{Alpha('Blue',128)}" />
-    <SolidBackground id="Neuron" color="{Alpha('Green',128)}" />
-    <SolidBackground id="App" color="{Alpha('Gray',128)}" />
-    <SolidBackground id="ThirdParty" color="{Alpha('DeepSkyBlue',128)}" />
     <Font id="Text" name="Arial" size="20pt" color="White" />
-    <Horizontal>
+    <Grid columns="2">
         <Cell>
-        </Cell>
-        <Cell>
-            <Margins left="1mm" top="1mm" right="1mm" bottom="1mm">
-                <RoundedRectangle fill="Neuron" radiusX="5mm" radiusY="5mm">
-                    <Grid columns="2">
-                        <Cell colSpan="2">
-                            <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                    <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
-                                        <Label text="Windows Server Host" x="50%" y="50%"
-                                            halign="Center" valign="Center" />
-                                    </Margins>
-                                </RoundedRectangle>
-                            </Margins>
-                        </Cell>
-
-                        <Cell>
-                            <Vertical>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="OS Firewall" x="50%" y="50%"
-                                                halign="Center" valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="HTTP" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="HTTPS" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="HTTP alt." x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="XMPP (C2S)" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="XMPP (S2S)" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="SOCKS5" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="SMTP" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="SMTP alt" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                                <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-                                    <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
-                                        <Margins left="0.5em" right="0.5em" top="0.25em"
-                                            bottom="0.25em">
-                                            <Label text="RDP" x="50%" y="50%" halign="Center"
-                                                valign="Center" />
-                                        </Margins>
-                                    </RoundedRectangle>
-                                </Margins>
-                            </Vertical>
-                        </Cell>
-                    </Grid>
-
+            <Vertical>
+                <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
+                    <Label text="OS Firewall" x="50%" y="50%" halign="Center" valign="Center" />
                 </RoundedRectangle>
-            </Margins>
+                <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
+                    <Label text="HTTP alt." x="50%" y="50%" halign="Center" valign="Center" />
+                </RoundedRectangle>
+            </Vertical>
         </Cell>
-    </Horizontal>
+    </Grid>
 </Layout2D>

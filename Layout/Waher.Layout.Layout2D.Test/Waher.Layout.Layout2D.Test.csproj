@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Images\Icon_64x64_File.png" />
     <None Remove="Images\Icon_64x64_Resource.png" />
@@ -65,8 +62,8 @@
     <None Remove="Xml\Test_54_Paragraph_BLC.xml" />
     <None Remove="Xml\Test_55_Paragraph_BLR.xml" />
     <None Remove="Xml\Test_56_ImageScript.xml" />
+    <None Remove="Xml\Test_57_EmptyCells.xml" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Images\Icon_64x64_Resource.png" />
     <Content Include="Images\Icon_64x64_File.png">
@@ -82,6 +79,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_56_ImageScript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_57_EmptyCells.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_53_Paragraph_BLL.xml">
@@ -241,7 +241,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.2.1" />
@@ -251,7 +250,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
@@ -262,5 +260,4 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj" />
   </ItemGroup>
-
 </Project>

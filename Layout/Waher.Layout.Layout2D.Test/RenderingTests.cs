@@ -13,7 +13,7 @@ namespace Waher.Layout.Layout2D.Test
 	{
 		protected override async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			Layout2DDocument Doc = await Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
+			Layout2DDocument Doc = await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), ContentAttachments);
 			RenderSettings Settings = await Doc.GetRenderSettings(new Variables());
 
 			KeyValuePair<SKImage, Map[]> Result = await Doc.Render(Settings);

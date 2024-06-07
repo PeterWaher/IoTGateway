@@ -9,6 +9,7 @@ using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Graphs;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Waher.Layout.Layout2D.Test
 {
@@ -31,7 +32,7 @@ namespace Waher.Layout.Layout2D.Test
 
 		protected virtual async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			await Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
+			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), ContentAttachments);
 		}
 
 		[TestMethod]
@@ -253,7 +254,7 @@ namespace Waher.Layout.Layout2D.Test
 		[TestMethod]
 		public async Task Test_37_Images()
 		{
-			SKBitmap Bitmap = SKBitmap.Decode("Images\\Icon_64x64_File.png");
+			SKBitmap Bitmap = SKBitmap.Decode(Path.Combine("Images", "Icon_64x64_File.png"));
 			SKImage Image = SKImage.FromBitmap(Bitmap);
 
 			await this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
@@ -371,6 +372,12 @@ namespace Waher.Layout.Layout2D.Test
 		public async Task Test_56_ImageScript()
 		{
 			await this.Test("Test_56_ImageScript");
+		}
+
+		[TestMethod]
+		public async Task Test_57_EmptyCells()
+		{
+			await this.Test("Test_57_EmptyCells");
 		}
 	}
 }

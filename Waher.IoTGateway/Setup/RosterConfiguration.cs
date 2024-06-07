@@ -109,7 +109,7 @@ namespace Waher.IoTGateway.Setup
 					Task _2 = ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
 				}
 
-				while (Gateway.XmppClient.State == XmppState.Connected)
+				while (Gateway.XmppClient?.State == XmppState.Connected)
 				{
 					(string Jid, string Name, string[] Groups) = this.PopToAdd();
 					

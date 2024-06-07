@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -239,6 +240,9 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Language">Language</param>
 		/// <param name="Xml">Layout XML definition</param>
 		/// <param name="Session">Session variables.</param>
+		/// <param name="ImageFormat">Image format to generate.</param>
+		/// <param name="Quality">Quality (in percent), if required by <paramref name="ImageFormat"/>.</param>
+		/// <param name="FileExtension">File extension.</param>
 		/// <returns>File name</returns>
 		internal static async Task<GraphInfo> GetFileName(string Language, string Xml, Variables Session,
 			SKEncodedImageFormat ImageFormat, int Quality, string FileExtension)
@@ -265,30 +269,23 @@ namespace Waher.Content.Markdown.Layout2D
 
 			if (!File.Exists(Result.FileName))
 			{
-				try
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Xml);
+
+				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
+				RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
+
+				KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
+				using (SKImage Img = P.Key)   // TODO: Maps
 				{
-					XmlDocument Doc = new XmlDocument();
-					Doc.LoadXml(Xml);
-
-					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
-					RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
-
-					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
-					using (SKImage Img = P.Key)   // TODO: Maps
+					using (SKData Data = Img.Encode(ImageFormat, Quality))
 					{
-						using (SKData Data = Img.Encode(ImageFormat, Quality))
-						{
-							Result.DynamicContent = Data.ToArray();
-							Result.Dynamic = LayoutDoc.Dynamic;
+						Result.DynamicContent = Data.ToArray();
+						Result.Dynamic = LayoutDoc.Dynamic;
 
-							if (!LayoutDoc.Dynamic)
-								await Resources.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
-						}
+						if (!LayoutDoc.Dynamic)
+							await Resources.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
 					}
-				}
-				catch (Exception)
-				{
-					return null;
 				}
 			}
 

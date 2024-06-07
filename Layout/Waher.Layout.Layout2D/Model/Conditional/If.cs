@@ -209,7 +209,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		}
 
 		/// <summary>
-		/// Exports attributes to XML.
+		/// Exports the local attributes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public override void ExportStateAttributes(XmlWriter Output)
@@ -217,6 +217,24 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			base.ExportStateAttributes(Output);
 
 			this.condition?.ExportState(Output);
+		}
+
+		/// <summary>
+		/// Exports the current state of child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateChildren(XmlWriter Output)
+		{
+			if (this.conditionResult)
+			{
+				if (this.ifTrue?.IsVisible ?? false)
+					this.ifTrue?.ExportState(Output);
+			}
+			else
+			{
+				if (this.ifFalse?.IsVisible ?? false)
+					this.ifFalse.ExportState(Output);
+			}
 		}
 
 	}

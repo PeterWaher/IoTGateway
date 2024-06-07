@@ -354,5 +354,20 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
+		/// <summary>
+		/// Exports the current state of child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateChildren(XmlWriter Output)
+		{
+			base.ExportStateChildren(Output);
+
+			if (this.HasChildren)
+			{
+				foreach (ILayoutElement Child in this.children)
+					Child.ExportState(Output);
+			}
+		}
+
 	}
 }

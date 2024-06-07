@@ -479,7 +479,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		}
 
 		/// <summary>
-		/// Exports attributes to XML.
+		/// Exports the local attributes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public override void ExportStateAttributes(XmlWriter Output)
@@ -489,6 +489,19 @@ namespace Waher.Layout.Layout2D.Model.Content
 			this.font?.ExportState(Output);
 			this.halign?.ExportState(Output);
 			this.valign?.ExportState(Output);
+		}
+
+		/// <summary>
+		/// Exports the current state of child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateChildren(XmlWriter Output)
+		{
+			if (!(this.text is null))
+			{
+				foreach (ILayoutElement Child in this.text)
+					Child.ExportState(Output);
+			}
 		}
 
 	}

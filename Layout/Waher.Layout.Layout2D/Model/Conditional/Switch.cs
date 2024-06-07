@@ -198,5 +198,15 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 				await this.activeCase.Draw(State);
 		}
 
+		/// <summary>
+		/// Exports the current state of child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateChildren(XmlWriter Output)
+		{
+			if (this.activeCase?.IsVisible ?? false)
+				this.activeCase.ExportState(Output);
+		}
+
 	}
 }

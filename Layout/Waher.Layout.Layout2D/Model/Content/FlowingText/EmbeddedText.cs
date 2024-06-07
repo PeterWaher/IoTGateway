@@ -117,5 +117,18 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			}
 		}
 
+		/// <summary>
+		/// Exports the current state of child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateChildren(XmlWriter Output)
+		{
+			if (!(this.text is null))
+			{
+				foreach (ILayoutElement Child in this.text)
+					Child.ExportState(Output);
+			}
+		}
+
 	}
 }

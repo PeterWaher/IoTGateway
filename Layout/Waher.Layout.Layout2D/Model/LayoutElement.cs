@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.References;
 using Waher.Script;
@@ -506,6 +507,23 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Exports the element to XML.
 		/// </summary>
+		/// <returns>XML representation of subtree.</returns>
+		public string ToXml()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			using (XmlWriter w = XmlWriter.Create(sb, XML.WriterSettings(true, true)))
+			{
+				this.ToXml(w);
+				w.Flush();
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public void ToXml(XmlWriter Output)
 		{
@@ -662,8 +680,8 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (X1.Ok && Y1.Ok)
 			{
-				State.CalcDrawingSize(X1.Result, ref X, true);
-				State.CalcDrawingSize(Y1.Result, ref Y, false);
+				State.CalcDrawingSize(X1.Result, ref X, true, this);
+				State.CalcDrawingSize(Y1.Result, ref Y, false, this);
 
 				return new CalculatedPoint(X, Y);
 			}
@@ -676,7 +694,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (X != a)
 					{
-						State.MeasureRelative = true;
+						State.ReportMeasureRelative(this);
 						X = a;
 					}
 
@@ -684,7 +702,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Y != a)
 					{
-						State.MeasureRelative = true;
+						State.ReportMeasureRelative(this);
 						Y = a;
 					}
 
@@ -833,24 +851,41 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <returns>XML state representation of subtree.</returns>
+		public string ExportState()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			using (XmlWriter w = XmlWriter.Create(sb, XML.WriterSettings(true, true)))
+			{
+				this.ExportState(w);
+				w.Flush();
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Exports the local attributes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output</param>
 		public virtual void ExportStateAttributes(XmlWriter Output)
 		{
 			this.id?.ExportState(Output);
-			ExportStateAttribute(nameof(left), this.left, Output);
-			ExportStateAttribute(nameof(right), this.right, Output);
-			ExportStateAttribute(nameof(top), this.top, Output);
-			ExportStateAttribute(nameof(bottom), this.bottom, Output);
-			ExportStateAttribute(nameof(width), this.width, Output);
-			ExportStateAttribute(nameof(height), this.height, Output);
-			ExportStateAttribute(nameof(explicitWidth), this.explicitWidth, Output);
-			ExportStateAttribute(nameof(explicitHeight), this.explicitHeight, Output);
-			ExportStateAttribute(nameof(minWidth), this.minWidth, Output);
-			ExportStateAttribute(nameof(minHeight), this.minHeight, Output);
-			ExportStateAttribute(nameof(maxWidth), this.maxWidth, Output);
-			ExportStateAttribute(nameof(maxHeight), this.maxHeight, Output);
+			ExportStateAttribute("_" + nameof(left), this.left, Output);
+			ExportStateAttribute("_" + nameof(right), this.right, Output);
+			ExportStateAttribute("_" + nameof(top), this.top, Output);
+			ExportStateAttribute("_" + nameof(bottom), this.bottom, Output);
+			ExportStateAttribute("_" + nameof(width), this.width, Output);
+			ExportStateAttribute("_" + nameof(height), this.height, Output);
+			ExportStateAttribute("_" + nameof(explicitWidth), this.explicitWidth, Output);
+			ExportStateAttribute("_" + nameof(explicitHeight), this.explicitHeight, Output);
+			ExportStateAttribute("_" + nameof(minWidth), this.minWidth, Output);
+			ExportStateAttribute("_" + nameof(minHeight), this.minHeight, Output);
+			ExportStateAttribute("_" + nameof(maxWidth), this.maxWidth, Output);
+			ExportStateAttribute("_" + nameof(maxHeight), this.maxHeight, Output);
 		}
 
 		protected static void ExportStateAttribute(string Name, float? Value, XmlWriter Output)

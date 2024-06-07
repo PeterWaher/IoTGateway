@@ -93,7 +93,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			EvaluationResult<Length> RadiusLength = await this.radius.TryEvaluate(State.Session);
 			if (RadiusLength.Ok)
 			{
-				State.CalcDrawingSize(RadiusLength.Result, ref this.r, true);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.r, true, (ILayoutElement)this);
 				this.Width = this.ExplicitWidth = this.Height = this.ExplicitHeight = 2 * this.r;
 			}
 			else

@@ -124,7 +124,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					float X = this.xCoordinate + Value.Value;
 					if (X != this.xCoordinate2)
 					{
-						State.MeasureRelative = true;
+						State.ReportMeasureRelative(this);
 						this.xCoordinate2 = X;
 					}
 				}
@@ -142,7 +142,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					float Y = this.yCoordinate + Value.Value;
 					if (Y != this.yCoordinate2)
 					{
-						State.MeasureRelative = true;
+						State.ReportMeasureRelative(this);
 						this.yCoordinate2 = Y;
 					}
 				}

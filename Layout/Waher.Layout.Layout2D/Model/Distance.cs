@@ -74,7 +74,7 @@ namespace Waher.Layout.Layout2D.Model
 
 			EvaluationResult<Length> Distance = await this.distance.TryEvaluate(State.Session);
 			if (Distance.Ok)
-				State.CalcDrawingSize(Distance.Result, ref this.dist, true);
+				State.CalcDrawingSize(Distance.Result, ref this.dist, true, this);
 			else
 				this.defined = false;
 		}

@@ -182,13 +182,13 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 			Size = State.Font.Size;
 			EvaluationResult<Length> SizeLength = await this.size.TryEvaluate(State.Session);
 			if (SizeLength.Ok)
-				State.CalcDrawingSize(SizeLength.Result, ref Size, false);
+				State.CalcDrawingSize(SizeLength.Result, ref Size, false, (ILayoutElement)this);
 
 			this.lineHeightValue = Size * DefaultLineHeightRelative;
 			EvaluationResult<Length> LineHeightLength = await this.lineHeight.TryEvaluate(State.Session);
 			if (LineHeightLength.Ok)
 			{
-				State.CalcDrawingSize(LineHeightLength.Result, ref this.lineHeightValue, false);
+				State.CalcDrawingSize(LineHeightLength.Result, ref this.lineHeightValue, false, (ILayoutElement)this);
 				this.lineHeightExplicit = true;
 			}
 			else

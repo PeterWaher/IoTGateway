@@ -16,6 +16,7 @@ using Waher.Layout.Layout2D.Model.Backgrounds;
 using System.Threading.Tasks;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Content.Xml;
+using Waher.Script.Constants;
 
 namespace Waher.Layout.Layout2D
 {
@@ -199,7 +200,15 @@ namespace Waher.Layout.Layout2D
 				Xml = await Expression.TransformAsync(Xml, "{{", "}}", Session);
 
 			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
+
+			try
+			{
+				Doc.LoadXml(Xml);
+			}
+			catch (XmlException ex)
+			{
+				throw XML.AnnotateException(ex, Xml);
+			}
 
 			return await FromXml(Doc, Session, Attachments);
 		}
@@ -346,7 +355,7 @@ namespace Waher.Layout.Layout2D
 
 				while (!(this.root is null))
 				{
-					State.MeasureRelative = false;
+					State.ClearRelativeMeasurement(--Limit <= 0);
 					await this.root.MeasureDimensions(State);
 
 					this.RaiseMeasuringDimensions(State);
@@ -354,8 +363,11 @@ namespace Waher.Layout.Layout2D
 					if (!State.MeasureRelative)
 						break;
 
-					if (--Limit <= 0)
-						throw new InvalidOperationException("Layout positions not well defined.");
+					if (Limit <= 0)
+					{
+						string ShortestBranch = State.GetShortestRelativeMeasurementStateXml();
+						throw new InvalidOperationException("Layout positions not well defined. Dimensions diverge:\r\n\r\n" + ShortestBranch);
+					}
 				}
 
 				this.root?.MeasurePositions(State);
@@ -621,7 +633,7 @@ namespace Waher.Layout.Layout2D
 					if (Width.Ok)
 					{
 						float w = Result.Width;
-						State.CalcDrawingSize(Width.Result, ref w, true);
+						State.CalcDrawingSize(Width.Result, ref w, true, this.root);
 						Result.Width = (int)(w + 0.5f);
 					}
 
@@ -629,7 +641,7 @@ namespace Waher.Layout.Layout2D
 					if (Height.Ok)
 					{
 						float h = Result.Height;
-						State.CalcDrawingSize(Height.Result, ref h, false);
+						State.CalcDrawingSize(Height.Result, ref h, false, this.root);
 						Result.Height = (int)(h + 0.5f);
 					}
 				}

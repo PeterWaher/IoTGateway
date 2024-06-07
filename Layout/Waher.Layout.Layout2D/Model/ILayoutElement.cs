@@ -180,6 +180,12 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Exports the element to XML.
 		/// </summary>
+		/// <returns>XML representation of subtree.</returns>
+		string ToXml();
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
 		/// <param name="Output">XML output.</param>
 		void ToXml(XmlWriter Output);
 
@@ -246,6 +252,12 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		Task DrawShape(DrawingState State);
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <returns>XML state representation of subtree.</returns>
+		string ExportState();
 
 		/// <summary>
 		/// Exports the internal state of the layout.

@@ -1,15 +1,22 @@
-﻿using System;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System;
+using System.Collections.Generic;
 using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
+	/// Delegate to methods that return a string from a layout element.
+	/// </summary>
+	public delegate string ElementToString(ILayoutElement Element);
+
+	/// <summary>
 	/// Current drawing state.
 	/// </summary>
 	public class DrawingState : IDisposable
 	{
+		private Dictionary<ILayoutElement, bool> relativeElements = null;
 		private readonly Variables session;
 		private readonly SKPaint textRoot;
 		private readonly SKPaint defaultPen;
@@ -23,6 +30,7 @@ namespace Waher.Layout.Layout2D.Model
 		private SKSize areaSize;
 		private SKSize viewportSize;
 		private readonly float pixelsPerInch;
+		private bool logRelativeElements = false;
 
 		/// <summary>
 		/// Current drawing state.
@@ -153,7 +161,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="L">Length</param>
 		/// <param name="Size">Calculated size.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
-		public void CalcDrawingSize(Length L, ref float Size, bool Horizontal)
+		/// <param name="Element">Element being measured.</param>
+		public void CalcDrawingSize(Length L, ref float Size, bool Horizontal, ILayoutElement Element)
 		{
 			switch (L.Unit)
 			{
@@ -192,7 +201,7 @@ namespace Waher.Layout.Layout2D.Model
 					float Size2 = L.Value * this.text.TextSize;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -209,7 +218,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.height_x.Value;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -222,7 +231,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.width_0.Value;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -232,7 +241,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.textRoot.TextSize;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -242,7 +251,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Width / 100;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -252,7 +261,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Height / 100;
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -266,7 +275,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -280,7 +289,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -294,7 +303,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						this.MeasureRelative = true;
+						this.ReportMeasureRelative(Element);
 						Size = Size2;
 					}
 					break;
@@ -346,6 +355,82 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// If layout contains relative sizes and dimensions should be recalculated.
 		/// </summary>
-		public bool MeasureRelative { get; set; }
+		public bool MeasureRelative
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Relative elements.
+		/// </summary>
+		public IEnumerable<ILayoutElement> RelativeElements => this.relativeElements.Keys;
+
+		/// <summary>
+		/// Reports an element as having relative measurements.
+		/// </summary>
+		public void ReportMeasureRelative(ILayoutElement Element)
+		{
+			this.MeasureRelative = true;
+			if (this.logRelativeElements)
+				this.relativeElements[Element] = true;
+		}
+
+		/// <summary>
+		/// Clears information about first relative measurement.
+		/// </summary>
+		/// <param name="LogRelativeElements">If relative elements should be logged.</param>
+		public void ClearRelativeMeasurement(bool LogRelativeElements)
+		{
+			this.MeasureRelative = false;
+			this.logRelativeElements = LogRelativeElements;
+			if (this.logRelativeElements)
+			{
+				if (this.relativeElements is null)
+					this.relativeElements = new Dictionary<ILayoutElement, bool>();
+				else
+					this.relativeElements.Clear();
+			}
+		}
+
+		/// <summary>
+		/// Gets the shortest relative measurements element, given an element to string mapping.
+		/// </summary>
+		/// <param name="Map">Maps an element to a string.</param>
+		public string GetShortestRelativeMeasurement(ElementToString Map)
+		{
+			string Best = string.Empty;
+			int BestLen = int.MaxValue;
+
+			foreach (ILayoutElement Element in this.relativeElements.Keys)
+			{
+				string Item = Map(Element);
+				int Len = Item.Length;
+
+				if (Len < BestLen)
+				{
+					Best = Item;
+					BestLen = Len;
+				}
+			}
+
+			return Best;
+		}
+
+		/// <summary>
+		/// Gets the shortest subtree XML of an element with relative measurements.
+		/// </summary>
+		public string GetShortestRelativeMeasurementXml()
+		{
+			return this.GetShortestRelativeMeasurement((E) => E.ToXml());
+		}
+
+		/// <summary>
+		/// Gets the shortest subtree State XML of an element with relative measurements.
+		/// </summary>
+		public string GetShortestRelativeMeasurementStateXml()
+		{
+			return this.GetShortestRelativeMeasurement((E) => E.ExportState());
+		}
 	}
 }

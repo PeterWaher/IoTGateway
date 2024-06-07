@@ -5,7 +5,7 @@ using Waher.Script;
 namespace Waher.Layout.Layout2D.Model.Groups
 {
 	/// <summary>
-	/// Lays ut cells horizontally
+	/// Lays ut cells vertically
 	/// </summary>
 	public class VerticalCells : ICellLayout
 	{
@@ -15,7 +15,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private float maxWidth = 0;
 
 		/// <summary>
-		/// Lays ut cells horizontally
+		/// Lays ut cells vertically
 		/// </summary>
 		/// <param name="Session">Current session</param>
 		public VerticalCells(Variables Session)

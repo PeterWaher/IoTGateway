@@ -370,6 +370,9 @@ namespace Waher.Layout.Layout2D
 						}
 
 						Surface = SKSurface.Create(new SKImageInfo(Width, Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+						if (Surface is null)
+							throw new InvalidOperationException("Unable to render layout.");
+							
 						Canvas = Surface.Canvas;
 						State.Canvas = Canvas;
 

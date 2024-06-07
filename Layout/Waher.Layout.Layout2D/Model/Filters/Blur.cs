@@ -108,5 +108,18 @@ namespace Waher.Layout.Layout2D.Model.Filters
 				Dest.tileMode = this.tileMode?.CopyIfNotPreset(Destination.Document);
 			}
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.sigmaX?.ExportState(Output);
+			this.sigmaY?.ExportState(Output);
+			this.tileMode?.ExportState(Output);
+		}
 	}
 }

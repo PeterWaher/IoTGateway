@@ -83,5 +83,16 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measured distance
 		/// </summary>
 		protected float dist;
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.distance?.ExportState(Output);
+		}
 	}
 }

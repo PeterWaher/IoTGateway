@@ -91,5 +91,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			return new GridCells(State.Session, NrColumns);
 		}
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.columns?.ExportState(Output);
+		}
+
 	}
 }

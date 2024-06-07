@@ -193,6 +193,18 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
+		/// Exports the state of the attribute.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public void ExportState(XmlWriter Output)
+		{
+			if (this.hasPresetValue)
+				Output.WriteAttributeString(this.name, this.ToString(this.presetValue));
+			else if (this.hasEvaluatedValue)
+				Output.WriteAttributeString(this.name, this.ToString(this.evaluatedValue));
+		}
+
+		/// <summary>
 		/// Evaluate the attribute value.
 		/// </summary>
 		/// <param name="Session">Current session.</param>

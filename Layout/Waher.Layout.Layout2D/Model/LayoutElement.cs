@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.References;
 using Waher.Script;
@@ -816,5 +817,54 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		public void ExportState(XmlWriter Output)
+		{
+			if (this.isVisible)
+			{
+				Output.WriteStartElement(this.GetType().Name);
+				this.ExportStateAttributes(Output);
+				this.ExportStateChildren(Output);
+				Output.WriteEndElement();
+			}
+		}
+
+		/// <summary>
+		/// Exports the local attributes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		public virtual void ExportStateAttributes(XmlWriter Output)
+		{
+			this.id?.ExportState(Output);
+			ExportStateAttribute(nameof(left), this.left, Output);
+			ExportStateAttribute(nameof(right), this.right, Output);
+			ExportStateAttribute(nameof(top), this.top, Output);
+			ExportStateAttribute(nameof(bottom), this.bottom, Output);
+			ExportStateAttribute(nameof(width), this.width, Output);
+			ExportStateAttribute(nameof(height), this.height, Output);
+			ExportStateAttribute(nameof(explicitWidth), this.explicitWidth, Output);
+			ExportStateAttribute(nameof(explicitHeight), this.explicitHeight, Output);
+			ExportStateAttribute(nameof(minWidth), this.minWidth, Output);
+			ExportStateAttribute(nameof(minHeight), this.minHeight, Output);
+			ExportStateAttribute(nameof(maxWidth), this.maxWidth, Output);
+			ExportStateAttribute(nameof(maxHeight), this.maxHeight, Output);
+		}
+
+		protected static void ExportStateAttribute(string Name, float? Value, XmlWriter Output)
+		{
+			if (Value.HasValue)
+				Output.WriteAttributeString(Name, CommonTypes.Encode(Value.Value));
+		}
+
+		/// <summary>
+		/// Exports the child nodes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		public virtual void ExportStateChildren(XmlWriter Output)
+		{
+		}
 	}
 }

@@ -184,6 +184,19 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.radiusX?.ExportState(Output);
+			this.radiusY?.ExportState(Output);
+			this.clockwise?.ExportState(Output);
+		}
+
 		// TODO: IDirectedElement
 	}
 }

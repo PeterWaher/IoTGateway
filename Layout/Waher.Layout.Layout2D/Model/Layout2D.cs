@@ -296,5 +296,19 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			if (!(BackgroundBak is null))
 				State.ShapeFill = BackgroundBak;
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.font?.ExportState(Output);
+			this.pen?.ExportState(Output);
+			this.background?.ExportState(Output);
+			this.textColor?.ExportState(Output);
+		}
 	}
 }

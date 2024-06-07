@@ -208,5 +208,16 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			}
 		}
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.condition?.ExportState(Output);
+		}
+
 	}
 }

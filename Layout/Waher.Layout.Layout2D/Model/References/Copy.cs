@@ -134,5 +134,16 @@ namespace Waher.Layout.Layout2D.Model.References
 		
 			await base.Draw(State);
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.@ref?.ExportState(Output);
+		}
 	}
 }

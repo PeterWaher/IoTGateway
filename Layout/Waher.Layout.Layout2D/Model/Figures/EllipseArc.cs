@@ -338,5 +338,22 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			await base.Draw(State);
 		}
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.radiusX?.ExportState(Output);
+			this.radiusY?.ExportState(Output);
+			this.startDegrees?.ExportState(Output);
+			this.endDegrees?.ExportState(Output);
+			this.spanDegrees?.ExportState(Output);
+			this.clockwise?.ExportState(Output);
+			this.center?.ExportState(Output);
+		}
+
 	}
 }

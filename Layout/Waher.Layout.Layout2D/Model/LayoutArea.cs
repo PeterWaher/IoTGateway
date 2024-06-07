@@ -245,5 +245,24 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.width?.ExportState(Output);
+			this.height?.ExportState(Output);
+			this.maxWidth?.ExportState(Output);
+			this.maxHeight?.ExportState(Output);
+			this.minWidth?.ExportState(Output);
+			this.minHeight?.ExportState(Output);
+			this.keepAspectRatio?.ExportState(Output);
+			this.overflow?.ExportState(Output);
+			this.onClick?.ExportState(Output);
+		}
+
 	}
 }

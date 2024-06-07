@@ -84,5 +84,16 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		protected float weight;
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.w?.ExportState(Output);
+		}
+
 	}
 }

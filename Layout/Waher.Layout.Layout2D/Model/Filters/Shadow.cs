@@ -133,5 +133,20 @@ namespace Waher.Layout.Layout2D.Model.Filters
 				Dest.color = this.color?.CopyIfNotPreset(Destination.Document);
 			}
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.dX?.ExportState(Output);
+			this.dY?.ExportState(Output);
+			this.sigmaX?.ExportState(Output);
+			this.sigmaY?.ExportState(Output);
+			this.color?.ExportState(Output);
+		}
 	}
 }

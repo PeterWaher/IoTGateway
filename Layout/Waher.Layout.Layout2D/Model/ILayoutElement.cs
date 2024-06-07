@@ -246,5 +246,11 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		Task DrawShape(DrawingState State);
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		void ExportState(XmlWriter Output);
 	}
 }

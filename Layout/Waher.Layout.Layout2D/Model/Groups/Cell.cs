@@ -364,5 +364,20 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				State.Canvas.SetMatrix(M);
 			}
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.halign?.ExportState(Output);
+			this.valign?.ExportState(Output);
+			this.colSpan?.ExportState(Output);
+			this.rowSpan?.ExportState(Output);
+			this.border?.ExportState(Output);
+		}
 	}
 }

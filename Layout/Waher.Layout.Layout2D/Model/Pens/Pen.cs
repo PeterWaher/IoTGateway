@@ -191,5 +191,19 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// </summary>
 		protected float? penMiter;
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.width?.ExportState(Output);
+			this.cap?.ExportState(Output);
+			this.join?.ExportState(Output);
+			this.miter?.ExportState(Output);
+		}
+
 	}
 }

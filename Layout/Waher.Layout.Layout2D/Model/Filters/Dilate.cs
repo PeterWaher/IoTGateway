@@ -94,5 +94,17 @@ namespace Waher.Layout.Layout2D.Model.Filters
 				Dest.radiusY = this.radiusY?.CopyIfNotPreset(Destination.Document);
 			}
 		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.radiusX?.ExportState(Output);
+			this.radiusY?.ExportState(Output);
+		}
 	}
 }

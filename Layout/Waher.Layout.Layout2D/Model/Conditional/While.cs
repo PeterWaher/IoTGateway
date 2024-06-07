@@ -171,5 +171,17 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// </summary>
 		protected override bool MeasureChildrenDimensions => false;
 
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.expression?.ExportState(Output);
+			this.testAfter?.ExportState(Output);
+		}
+
 	}
 }

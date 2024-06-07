@@ -15,6 +15,7 @@ using Waher.Layout.Layout2D.Model;
 using Waher.Layout.Layout2D.Model.Backgrounds;
 using System.Threading.Tasks;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Content.Xml;
 
 namespace Waher.Layout.Layout2D
 {
@@ -348,6 +349,8 @@ namespace Waher.Layout.Layout2D
 					State.MeasureRelative = false;
 					await this.root.MeasureDimensions(State);
 
+					this.RaiseMeasuringDimensions(State);
+
 					if (!State.MeasureRelative)
 						break;
 
@@ -356,6 +359,7 @@ namespace Waher.Layout.Layout2D
 				}
 
 				this.root?.MeasurePositions(State);
+				this.RaiseMeasuringPositions(State);
 
 				switch (Settings.ImageSize)
 				{
@@ -372,7 +376,7 @@ namespace Waher.Layout.Layout2D
 						Surface = SKSurface.Create(new SKImageInfo(Width, Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
 						if (Surface is null)
 							throw new InvalidOperationException("Unable to render layout.");
-							
+
 						Canvas = Surface.Canvas;
 						State.Canvas = Canvas;
 
@@ -420,6 +424,59 @@ namespace Waher.Layout.Layout2D
 			{
 				State?.Dispose();
 				Surface?.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the layout dimensions are being measured. Event can be raised multiple times
+		/// during the rendering process.
+		/// </summary>
+		public event DrawingEventHandler OnMeasuringDimensions = null;
+
+		/// <summary>
+		/// Raises the <see cref="OnMeasuringDimensions"/> event.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void RaiseMeasuringDimensions(DrawingState State)
+		{
+			DrawingEventHandler h = this.OnMeasuringDimensions;
+
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new DrawingEventArgs(this, State));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the layout positions are being measured. Event is eaised once after dimensions have been measured.
+		/// </summary>
+		public event DrawingEventHandler OnMeasuringPositions = null;
+
+		/// <summary>
+		/// Raises the <see cref="OnMeasuringPositions"/> event.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void RaiseMeasuringPositions(DrawingState State)
+		{
+			DrawingEventHandler h = this.OnMeasuringPositions;
+
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new DrawingEventArgs(this, State));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -622,6 +679,52 @@ namespace Waher.Layout.Layout2D
 		{
 			get;
 			internal set;
+		}
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <returns>XML output</returns>
+		public string ExportState()
+		{
+			return this.ExportState(XML.WriterSettings(true, true));
+		}
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <param name="Settings">XML Writer settings.</param>
+		/// <returns>XML output</returns>
+		public string ExportState(XmlWriterSettings Settings)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.ExportState(Output, Settings);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		/// <param name="Settings">XML Writer settings.</param>
+		public void ExportState(StringBuilder Output, XmlWriterSettings Settings)
+		{
+			using (XmlWriter w = XmlWriter.Create(Output, Settings))
+			{
+				this.ExportState(w);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the internal state of the layout.
+		/// </summary>
+		/// <param name="Output">XML output</param>
+		public void ExportState(XmlWriter Output)
+		{
+			Output.WriteStartElement("Layout2DState", "http://waher.se/Schema/Layout2DState.xsd");
+			this.root?.ExportState(Output);
+			Output.WriteEndElement();
 		}
 
 	}

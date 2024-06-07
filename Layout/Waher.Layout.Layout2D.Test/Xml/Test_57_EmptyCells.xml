@@ -3,16 +3,16 @@
     background="ThemeBackground" font="Text" textColor="Black">
     <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}" />
     <SolidBackground id="IoTGateway" color="{Alpha('Orange',128)}" />
-    <Font id="Text" name="Arial" size="20pt" color="White" />
-    <Grid columns="2">
+    <Font id="Text" name="Arial" size="20pt" color="Black" />
+    <Grid columns="1">
         <Cell>
             <Vertical>
-                <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
+                <Rectangle fill="IoTGateway">
                     <Label text="OS Firewall" x="50%" y="50%" halign="Center" valign="Center" />
-                </RoundedRectangle>
-                <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="IoTGateway">
+                </Rectangle>
+                <Rectangle fill="IoTGateway">
                     <Label text="HTTP alt." x="50%" y="50%" halign="Center" valign="Center" />
-                </RoundedRectangle>
+                </Rectangle>
             </Vertical>
         </Cell>
     </Grid>

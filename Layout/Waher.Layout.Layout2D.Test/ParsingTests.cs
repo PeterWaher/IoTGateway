@@ -1,5 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Images;
@@ -8,8 +11,6 @@ using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Graphs;
-using System.Threading.Tasks;
-using System.IO;
 
 namespace Waher.Layout.Layout2D.Test
 {
@@ -375,6 +376,7 @@ namespace Waher.Layout.Layout2D.Test
 		}
 
 		[TestMethod]
+		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task Test_57_EmptyCells()
 		{
 			await this.Test("Test_57_EmptyCells");

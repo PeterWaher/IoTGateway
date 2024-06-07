@@ -162,7 +162,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		protected float yCoordinate2;
 
 		/// <summary>
-		/// Exports attributes to XML.
+		/// Exports the local attributes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public override void ExportStateAttributes(XmlWriter Output)

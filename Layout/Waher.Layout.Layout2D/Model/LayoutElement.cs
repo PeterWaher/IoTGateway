@@ -860,11 +860,12 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Exports the child nodes of the current element.
+		/// Exports the current state of child nodes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output</param>
 		public virtual void ExportStateChildren(XmlWriter Output)
 		{
+			// No children by default.
 		}
 	}
 }

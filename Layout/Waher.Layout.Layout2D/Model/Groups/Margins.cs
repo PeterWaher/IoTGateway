@@ -263,7 +263,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		}
 
 		/// <summary>
-		/// Exports attributes to XML.
+		/// Exports the local attributes of the current element.
 		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public override void ExportStateAttributes(XmlWriter Output)

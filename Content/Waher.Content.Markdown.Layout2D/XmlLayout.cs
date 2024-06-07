@@ -523,9 +523,10 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If renderer was able to generate output.</returns>
 		public async Task<bool> RenderContractXml(ContractsRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
+			string Xml = MarkdownDocument.AppendRows(Rows);
+
 			try
 			{
-				string Xml = MarkdownDocument.AppendRows(Rows);
 				string Title;
 				int i = Language.IndexOf(':');
 
@@ -575,6 +576,12 @@ namespace Waher.Content.Markdown.Layout2D
 				}
 
 				return true;
+			}
+			catch (XmlException ex)
+			{
+				ex = XML.AnnotateException(ex, Xml);
+				Log.Critical(ex);
+				return false;
 			}
 			catch (Exception ex)
 			{

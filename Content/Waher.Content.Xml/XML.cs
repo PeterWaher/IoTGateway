@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Reflection;
 using System.Collections;
+using Waher.Runtime.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -1430,6 +1431,48 @@ namespace Waher.Content.Xml
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Creates a new XML Exception object, with reference to the source XML file, for information.
+		/// </summary>
+		/// <param name="ex">XML Exception object.</param>
+		/// <param name="Xml">Original XML</param>
+		public static XmlException AnnotateException(XmlException ex)
+		{
+			return AnnotateException(ex, null);
+		}
+
+		/// <summary>
+		/// Creates a new XML Exception object, with reference to the source XML file, for information.
+		/// </summary>
+		/// <param name="ex">XML Exception object.</param>
+		/// <param name="Xml">Original XML</param>
+		public static XmlException AnnotateException(XmlException ex, string Xml)
+		{
+			if (ex.LineNumber == 0 && ex.LinePosition == 0)
+				return ex;
+				
+			StringBuilder sb = new StringBuilder();
+
+			sb.AppendLine(ex.Message);
+			sb.AppendLine();
+			sb.Append("Line Number: ");
+			sb.AppendLine(ex.LineNumber.ToString());
+			sb.Append("Line Position: ");
+			sb.AppendLine(ex.LinePosition.ToString());
+
+			if (!string.IsNullOrEmpty(Xml))
+			{
+				string Row = Xml.GetRow(ex.LineNumber);
+				if (!string.IsNullOrEmpty(Row))
+				{
+					sb.Append("Row: ");
+					sb.AppendLine(Row);
+				}
+			}
+
+			return new XmlException(sb.ToString(), ex.InnerException, ex.LineNumber, ex.LinePosition);
 		}
 
 		#endregion

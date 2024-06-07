@@ -1237,6 +1237,8 @@ namespace Waher.IoTGateway
 
 						foreach (string LanguageFile in LanguageFiles)
 						{
+							string Xml = null;
+
 							try
 							{
 								FileName = LanguageFile;
@@ -1250,7 +1252,7 @@ namespace Waher.IoTGateway
 								{
 									Log.Informational("Importing language file.", FileName);
 
-									string Xml = await Resources.ReadAllTextAsync(LanguageFile);
+									Xml = await Resources.ReadAllTextAsync(LanguageFile);
 									XmlDocument Doc = new XmlDocument()
 									{
 										PreserveWhitespace = true
@@ -1266,6 +1268,11 @@ namespace Waher.IoTGateway
 
 									RuntimeSettings.Set(FileName, LastWriteTime);
 								}
+							}
+							catch (XmlException ex)
+							{
+								ex = XML.AnnotateException(ex, Xml);
+								Log.Critical(ex, LanguageFile);
 							}
 							catch (Exception ex)
 							{

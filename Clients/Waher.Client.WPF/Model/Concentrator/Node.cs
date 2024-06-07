@@ -1099,6 +1099,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public override async void Paste()
 		{
 			bool Error = false;
+			string s = null;
 
 			try
 			{
@@ -1116,7 +1117,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (!System.Windows.Clipboard.ContainsText())
 					return;
 
-				string s = System.Windows.Clipboard.GetText();
+				s = System.Windows.Clipboard.GetText();
 				if (string.IsNullOrEmpty(s))
 					return;
 
@@ -1126,6 +1127,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				await ImportFromXml(FullJid, ConcentratorClient, this, Doc.DocumentElement);
+			}
+			catch (XmlException ex)
+			{
+				ex = XML.AnnotateException(ex);
+				MainWindow.ErrorBox(ex.Message);
+				Error = true;
 			}
 			catch (Exception ex)
 			{

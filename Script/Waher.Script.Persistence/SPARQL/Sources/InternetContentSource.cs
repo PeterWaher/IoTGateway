@@ -55,6 +55,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			RequestOrigin Caller)
 		{
 			object Result = null;
+			string XmlString = null;
 
 			try
 			{
@@ -81,7 +82,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 							PreserveWhitespace = true
 						};
 
-						Xml.LoadXml(s);
+						Xml.LoadXml(XmlString = s);
 
 						return new RdfDocument(Xml);
 					}
@@ -89,6 +90,13 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 						return new TurtleDocument(s);
 				}
 
+			}
+			catch (XmlException ex)
+			{
+				if (NullIfNotFound)
+					return null;
+				else
+					throw XML.AnnotateException(ex, XmlString);
 			}
 			catch (Exception ex)
 			{

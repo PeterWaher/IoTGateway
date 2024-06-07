@@ -6,6 +6,7 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Script;
 using Waher.Networking.HTTP.ScriptExtensions;
 using System.Text;
+using Waher.Content.Xml;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -57,6 +58,8 @@ namespace Waher.IoTGateway.WebResources
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			string Xml = null;
+
 			try
 			{
 				Gateway.AssertUserAuthenticated(Request, "Admin.Legal.ProposeContract");
@@ -80,14 +83,14 @@ namespace Waher.IoTGateway.WebResources
 						throw new BadRequestException("Contract parameter values not valid.");
 
 					StringBuilder sb = new StringBuilder();
-					
+
 					Contract.NormalizeXml(ParsedContract.Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
 
 					Doc = new XmlDocument()
 					{
 						PreserveWhitespace = true
 					};
-					Doc.LoadXml(sb.ToString());
+					Doc.LoadXml(Xml = sb.ToString());
 
 					ParsedContract.Contract.ForMachines = Doc.DocumentElement;
 
@@ -114,6 +117,10 @@ namespace Waher.IoTGateway.WebResources
 				}
 				else
 					throw new UnsupportedMediaTypeException("Invalid type of posted data.");
+			}
+			catch (XmlException ex)
+			{
+				await Response.SendResponse(XML.AnnotateException(ex, Xml));
 			}
 			catch (Exception ex)
 			{

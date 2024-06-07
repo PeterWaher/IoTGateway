@@ -186,6 +186,19 @@ namespace Waher.Client.WPF.Model.PubSub
 									};
 									Xml.LoadXml(Payload);
 								}
+								catch (XmlException ex)
+								{
+									ex = XML.AnnotateException(ex, Payload);
+									Form["Payload"].Error = ex.Message;
+
+									MainWindow.UpdateGui(async () =>
+									{
+										Dialog = await ParameterDialog.CreateAsync(Form);
+										Dialog.ShowDialog();
+									});
+
+									return Task.CompletedTask;
+								}
 								catch (Exception ex)
 								{
 									Form["Payload"].Error = ex.Message;

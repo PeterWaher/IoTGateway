@@ -80,7 +80,6 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
-using Waher.Script.Operators.Membership;
 using Waher.Content.Images;
 
 namespace Waher.IoTGateway

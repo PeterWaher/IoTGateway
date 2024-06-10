@@ -896,9 +896,11 @@ namespace Waher.Networking
 				if (!this.disposed)
 				{
 #if WINDOWS_UWP
-					await this.dataWriter.FlushAsync();
+					if (!(this.dataWriter is null))
+						await this.dataWriter.FlushAsync();
 #else
-					await this.stream?.FlushAsync();
+					if (!(this.stream is null))
+						await this.stream?.FlushAsync();
 #endif
 					if (this.disposeWhenDone)
 					{

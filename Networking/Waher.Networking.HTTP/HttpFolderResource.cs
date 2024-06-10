@@ -514,6 +514,24 @@ namespace Waher.Networking.HTTP
 			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request, null);
 		}
 
+		/// <summary>
+		/// Sets any default response headers registered on the file folder object, to a HTTP Response object.
+		/// </summary>
+		/// <param name="Response">HTTP Response.</param>
+		public void SetDefaultResponseHeaders(HttpResponse Response)
+		{
+			SetDefaultResponseHeaders(Response, this.defaultResponseHeaders);
+		}
+
+		private static void SetDefaultResponseHeaders(HttpResponse Response, IEnumerable<KeyValuePair<string, string>> DefaultResponseHeaders)
+		{
+			if (!(DefaultResponseHeaders is null))
+			{
+				foreach (KeyValuePair<string, string> P in DefaultResponseHeaders)
+					Response.SetHeader(P.Key, P.Value);
+			}
+		}
+
 		private static async Task SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
 			DateTime LastModified, HttpResponse Response, HttpRequest Request, LinkedList<KeyValuePair<string, string>> DefaultResponseHeaders)
 		{
@@ -530,11 +548,7 @@ namespace Waher.Networking.HTTP
 			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
 			Progress.Buffer = new byte[Progress.BlockSize];
 
-			if (!(DefaultResponseHeaders is null))
-			{
-				foreach (KeyValuePair<string, string> P in DefaultResponseHeaders)
-					Response.SetHeader(P.Key, P.Value);
-			}
+			SetDefaultResponseHeaders(Response, DefaultResponseHeaders);
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;

@@ -253,7 +253,7 @@ namespace Waher.Layout.Layout2D
 		public static async Task<Layout2DDocument> FromXml(XmlElement Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
 			if (Xml.LocalName != LocalName || Xml.NamespaceURI != Namespace)
-				throw new ArgumentException("XML does not represend a 2D layout document.", nameof(Xml));
+				throw new ArgumentException("XML does not represent a 2D layout document.", nameof(Xml));
 
 			lock (elementTypes)
 			{

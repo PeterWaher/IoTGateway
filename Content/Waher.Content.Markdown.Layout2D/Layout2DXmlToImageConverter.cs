@@ -2,12 +2,11 @@ using SkiaSharp;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Images;
-using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Xml.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 
-namespace Waher.Content.Markdown.GraphViz
+namespace Waher.Content.Markdown.Layout2D
 {
     /// <summary>
     /// Converts GraphViz documents to images.
@@ -34,7 +33,7 @@ namespace Waher.Content.Markdown.GraphViz
         /// <summary>
         /// How well the content is converted.
         /// </summary>
-        public virtual Grade ConversionGrade => Grade.Excellent;
+        public virtual Grade ConversionGrade => Grade.Barely;
 
         /// <summary>
         /// Performs the actual conversion.

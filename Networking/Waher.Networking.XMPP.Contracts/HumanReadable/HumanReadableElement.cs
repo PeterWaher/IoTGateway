@@ -17,7 +17,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public abstract Task<bool> IsWellDefined();
+		/// <returns>Returns first failing element, if found.</returns>
+		public abstract Task<HumanReadableElement> IsWellDefined();
 
 		/// <summary>
 		/// Serializes the element in normalized form.

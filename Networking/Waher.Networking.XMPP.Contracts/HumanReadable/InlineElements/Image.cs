@@ -70,40 +70,42 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override async Task<bool> IsWellDefined()
+		/// <returns>Returns first failing element, if found.</returns>
+		public override async Task<HumanReadableElement> IsWellDefined()
 		{
 			if (this.data is null || this.data.Length == 0)
-				return false;
+				return this;
 
 			if (string.IsNullOrEmpty(this.contentType) || !this.contentType.StartsWith("image/"))
-				return false;
+				return this;
 
 			if (string.IsNullOrEmpty(this.alt))
-				return false;
+				return this;
 
 			if (this.width <= 0 || this.width > MaxSize)
-				return false;
+				return this;
 
 			if (this.height <= 0 || this.height > MaxSize)
-				return false;
+				return this;
 
-			if (!await base.IsWellDefined())
-				return false;
+			HumanReadableElement E = await base.IsWellDefined();
+			if (!(E is null))
+				return E;
 
 			try
 			{
 				object Obj = await InternetContent.DecodeAsync(this.contentType, this.Data, null);
 				if (Obj is null)
-					return false;
+					return this;
 
 				if (Obj is IDisposable Disposable)
 					Disposable.Dispose();
 
-				return true;
+				return null;
 			}
 			catch (Exception)
 			{
-				return false;
+				return this;
 			}
 		}
 

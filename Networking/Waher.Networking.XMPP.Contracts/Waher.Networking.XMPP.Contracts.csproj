@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -9,9 +8,9 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Implements the XMPP IoT legal identities, smart contracts and signatures extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
     <Copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Contracts</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot legal smart contracts signatures</PackageTags>
@@ -22,11 +21,9 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Contracts.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Schema\E2E.xsd" />
     <None Remove="Schema\LegalIdentities.xsd" />
@@ -35,7 +32,6 @@
     <None Remove="Schema\Xml.xsd" />
     <None Remove="Schema\Xmlns.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Schema\E2E.xsd" />
     <EmbeddedResource Include="Schema\LegalIdentities.xsd" />
@@ -48,7 +44,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Schema\SmartContracts.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
@@ -62,16 +57,14 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
 </Project>

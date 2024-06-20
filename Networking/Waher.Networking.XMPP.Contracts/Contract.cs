@@ -330,8 +330,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a contract XML Document, and returns the contract definition in it.
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
-		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		/// <exception cref="Exception">If XML is invalid.</exception>
+		/// <returns>Parsed contract.</returns>
+		/// <exception cref="Exception">If XML is invalid or contains errors.</exception>
 		[Obsolete("Use the Parse(XmlDocument Xml, ContractsClient Client) overload instead.")]
 		public static Task<ParsedContract> Parse(XmlDocument Xml)
 		{
@@ -343,14 +343,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
-		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		/// <exception cref="Exception">If XML is invalid.</exception>
+		/// <returns>Parsed contract.</returns>
+		/// <exception cref="Exception">If XML is invalid or contains errors.</exception>
 		public static Task<ParsedContract> Parse(XmlDocument Xml, ContractsClient Client)
 		{
 			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts,
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
-			return Parse(Xml.DocumentElement, Client);
+			return Parse(Xml.DocumentElement, Client, true);
 		}
 
 		private static readonly XmlSchema identitiesSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.LegalIdentities.xsd");
@@ -364,10 +364,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		[Obsolete("Use the Parse(XmlElement Xml, ContractsClient Client) overload instead.")]
+		[Obsolete("Use the Parse(XmlElement Xml, ContractsClient Client, bool) overload instead.")]
 		public static Task<ParsedContract> Parse(XmlElement Xml)
 		{
-			return Parse(Xml, null);
+			return Parse(Xml, null, false);
 		}
 
 		/// <summary>
@@ -376,7 +376,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Xml">XML representation</param>
 		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		public static async Task<ParsedContract> Parse(XmlElement Xml, ContractsClient Client)
+		[Obsolete("Use the Parse(XmlElement, Client, bool) overload instead")]
+		public static Task<ParsedContract> Parse(XmlElement Xml, ContractsClient Client)
+		{
+			return Parse(Xml, Client, false);
+		}
+
+		/// <summary>
+		/// Parses a contract from is XML representation.
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <param name="Client">Connected contracts client. If offline or null, partial validation in certain cases will be performed.</param>
+		/// <param name="ExceptionIfError">If an exception should be thrown if unale to parse contract (true), or if null should be returned (false)</param>
+		/// <returns>Parsed contract (or null if it contains errors and <paramref name="ExceptionIfError"/> is false).</returns>
+		public static async Task<ParsedContract> Parse(XmlElement Xml, ContractsClient Client, bool ExceptionIfError)
 		{
 			bool HasVisibility = false;
 			Contract Result = new Contract();
@@ -401,6 +414,8 @@ namespace Waher.Networking.XMPP.Contracts
 							Result.visibility = Visibility;
 							HasVisibility = true;
 						}
+						else if (ExceptionIfError)
+							throw new Exception("Invalid visibility: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -408,6 +423,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "duration":
 						if (Waher.Content.Duration.TryParse(Attr.Value, out Duration D))
 							Result.duration = D;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid duration: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -415,6 +432,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "archiveReq":
 						if (Waher.Content.Duration.TryParse(Attr.Value, out D))
 							Result.archiveReq = D;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid required archiving time: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -422,6 +441,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "archiveOpt":
 						if (Waher.Content.Duration.TryParse(Attr.Value, out D))
 							Result.archiveOpt = D;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid optional archiving time: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -429,6 +450,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "signAfter":
 						if (XML.TryParse(Attr.Value, out DateTime TP))
 							Result.signAfter = TP;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid sign after time: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -436,6 +459,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "signBefore":
 						if (XML.TryParse(Attr.Value, out TP))
 							Result.signBefore = TP;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid sign before time: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -443,6 +468,8 @@ namespace Waher.Networking.XMPP.Contracts
 					case "canActAsTemplate":
 						if (CommonTypes.TryParse(Attr.Value, out bool b))
 							Result.canActAsTemplate = b;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid Boolean value: " + Attr.Value);
 						else
 							return null;
 						break;
@@ -451,20 +478,53 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					default:
-						if (Attr.Prefix == "xmlns")
+						if (Attr.Prefix == "xmlns" || Attr.NamespaceURI== "http://www.w3.org/2001/XMLSchema-instance")
 							break;
+						else if (ExceptionIfError)
+							throw new Exception("Invalid attribute: " + Attr.Name);
 						else
 							return null;
 				}
 			}
 
-			if (!HasVisibility ||
-				Result.duration is null ||
-				Result.archiveReq is null ||
-				Result.archiveOpt is null ||
-				Result.signBefore <= Result.signAfter)
+			if (!HasVisibility)
 			{
-				return null;
+				if (ExceptionIfError)
+					throw new Exception("Visibility required.");
+				else
+					return null;
+			}
+
+			if (Result.duration is null)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Duration required.");
+				else
+					return null;
+			}
+
+			if (Result.archiveReq is null)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Required archiving time required.");
+				else
+					return null;
+			}
+
+			if (Result.archiveOpt is null)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Optional archiving time required.");
+				else
+					return null;
+			}
+
+			if (Result.signBefore <= Result.signAfter)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Before signature time must not occur after the after signature time.");
+				else
+					return null;
 			}
 
 			List<HumanReadableText> ForHumans = new List<HumanReadableText>();
@@ -474,6 +534,7 @@ namespace Waher.Networking.XMPP.Contracts
 			List<Attachment> Attachments = new List<Attachment>();
 			XmlElement Content = null;
 			HumanReadableText Text;
+			HumanReadableElement ErrorElement;
 			bool First = true;
 			bool PartsDefined = false;
 
@@ -507,12 +568,19 @@ namespace Waher.Networking.XMPP.Contracts
 								case "name":
 									Role.Name = Attr.Value;
 									if (string.IsNullOrEmpty(Role.Name))
-										return null;
+									{
+										if (ExceptionIfError)
+											throw new Exception("Role name cannot be empty.");
+										else
+											return null;
+									}
 									break;
 
 								case "minCount":
 									if (int.TryParse(Attr.Value, out int i) && i >= 0)
 										Role.MinCount = i;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid minimum count.");
 									else
 										return null;
 									break;
@@ -520,6 +588,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "maxCount":
 									if (int.TryParse(Attr.Value, out i) && i >= 0)
 										Role.MaxCount = i;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid maximum count.");
 									else
 										return null;
 									break;
@@ -527,6 +597,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "canRevoke":
 									if (CommonTypes.TryParse(Attr.Value, out bool b))
 										Role.CanRevoke = b;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid can Revoke value.");
 									else
 										return null;
 									break;
@@ -537,6 +609,8 @@ namespace Waher.Networking.XMPP.Contracts
 								default:
 									if (Attr.Prefix == "xmlns")
 										break;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid role attribute: " + Attr.Name);
 									else
 										return null;
 							}
@@ -546,7 +620,10 @@ namespace Waher.Networking.XMPP.Contracts
 							Role.MinCount < 0 ||
 							Role.MaxCount < 0)
 						{
-							return null;
+							if (ExceptionIfError)
+								throw new Exception("Role name missing, or invalid role counts.");
+							else
+								return null;
 						}
 
 						foreach (XmlNode N2 in E.ChildNodes)
@@ -556,18 +633,44 @@ namespace Waher.Networking.XMPP.Contracts
 								if (E2.LocalName == "description")
 								{
 									Text = HumanReadableText.Parse(E2);
-									if (Text is null || !await Text.IsWellDefined())
-										return null;
+
+									if (Text is null)
+									{
+										if (ExceptionIfError)
+											throw new Exception("Unable to parse human-readable text for role.");
+										else
+											return null;
+									}
+
+									ErrorElement = await Text.IsWellDefined();
+									if (!(ErrorElement is null))
+									{
+										if (ExceptionIfError)
+										{
+											StringBuilder sb = new StringBuilder();
+											ErrorElement.Serialize(sb);
+											throw new Exception("Human-readable text not well-defined for role: " + sb.ToString());
+										}
+										else
+											return null;
+									}
 
 									Descriptions.Add(Text);
 								}
+								else if (ExceptionIfError)
+									throw new Exception("Unrecognized element: " + E2.Name);
 								else
 									return null;
 							}
 						}
 
 						if (Descriptions.Count == 0)
-							return null;
+						{
+							if (ExceptionIfError)
+								throw new Exception("Missing description.");
+							else
+								return null;
+						}
 
 						Role.Descriptions = Descriptions.ToArray();
 
@@ -586,14 +689,24 @@ namespace Waher.Networking.XMPP.Contracts
 								{
 									case "open":
 										if (Mode.HasValue)
-											return null;
+										{
+											if (ExceptionIfError)
+												throw new Exception("Duplicate mode.");
+											else
+												return null;
+										}
 
 										Mode = ContractParts.Open;
 										break;
 
 									case "templateOnly":
 										if (Mode.HasValue)
-											return null;
+										{
+											if (ExceptionIfError)
+												throw new Exception("Duplicate mode.");
+											else
+												return null;
+										}
 
 										Mode = ContractParts.TemplateOnly;
 										break;
@@ -602,7 +715,12 @@ namespace Waher.Networking.XMPP.Contracts
 										if (Mode.HasValue)
 										{
 											if (Mode.Value != ContractParts.ExplicitlyDefined)
-												return null;
+											{
+												if (ExceptionIfError)
+													throw new Exception("Duplicate mode.");
+												else
+													return null;
+											}
 										}
 										else
 											Mode = ContractParts.ExplicitlyDefined;
@@ -628,13 +746,20 @@ namespace Waher.Networking.XMPP.Contracts
 												default:
 													if (Attr.Prefix == "xmlns")
 														break;
+													else if (ExceptionIfError)
+														throw new Exception("Unrecognized attribute: " + Attr.Name);
 													else
 														return null;
 											}
 										}
 
-										if (LegalId is null || RoleRef is null || string.IsNullOrEmpty(LegalId) || string.IsNullOrEmpty(RoleRef))
-											return null;
+										if (string.IsNullOrEmpty(LegalId) || string.IsNullOrEmpty(RoleRef))
+										{
+											if (ExceptionIfError)
+												throw new Exception("Missing legal ID or role reference for part.");
+											else
+												return null;
+										}
 
 										bool RoleFound = false;
 
@@ -648,7 +773,12 @@ namespace Waher.Networking.XMPP.Contracts
 										}
 
 										if (!RoleFound)
-											return null;
+										{
+											if (ExceptionIfError)
+												throw new Exception("Role not found: " + RoleRef);
+											else
+												return null;
+										}
 
 										if (Parts is null)
 											Parts = new List<Part>();
@@ -662,13 +792,21 @@ namespace Waher.Networking.XMPP.Contracts
 										break;
 
 									default:
-										return null;
+										if (ExceptionIfError)
+											throw new Exception("Unrecognized element: " + E2.Name);
+										else
+											return null;
 								}
 							}
 						}
 
 						if (!Mode.HasValue)
-							return null;
+						{
+							if (ExceptionIfError)
+								throw new Exception("Missing mode.");
+							else
+								return null;
+						}
 
 						Result.partsMode = Mode.Value;
 						Result.parts = Parts?.ToArray();
@@ -726,24 +864,55 @@ namespace Waher.Networking.XMPP.Contracts
 										break;
 
 									default:
-										return null;
+										if (ExceptionIfError)
+											throw new Exception("Unrecognized parameter type: " + E2.Name);
+										else
+											return null;
 								}
 
 								if (!await P2.Import(E2))
-									return null;
-
+								{
+									if (ExceptionIfError)
+										throw new Exception("Unable to parse parameter.");
+									else
+										return null;
+								}
+	
 								Parameters.Add(P2);
 							}
 						}
 
 						if (Parameters.Count == 0)
-							return null;
+						{
+							if (ExceptionIfError)
+								throw new Exception("No parameters in defined.");
+							else
+								return null;
+						}
 						break;
 							
 					case "humanReadableText":
 						Text = HumanReadableText.Parse(E);
-						if (Text is null || !await Text.IsWellDefined())
-							return null;
+						if (Text is null)
+						{
+							if (ExceptionIfError)
+								throw new Exception("Unable to parse human-readable text for contract.");
+							else
+								return null;
+						}
+
+						ErrorElement = await Text.IsWellDefined();
+						if (!(ErrorElement is null))
+						{
+							if (ExceptionIfError)
+							{
+								StringBuilder sb = new StringBuilder();
+								ErrorElement.Serialize(sb);
+								throw new Exception("Human-readable text not well-defined for contract: " + sb.ToString());
+							}
+							else
+								return null;
+						}
 
 						ForHumans.Add(Text);
 						break;
@@ -770,6 +939,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "timestamp":
 									if (XML.TryParse(Attr.Value, out DateTime TP))
 										Signature.Timestamp = TP;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid signature timestamp.");
 									else
 										return null;
 									break;
@@ -777,6 +948,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "transferable":
 									if (CommonTypes.TryParse(Attr.Value, out bool b))
 										Signature.Transferable = b;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid signature transferable status.");
 									else
 										return null;
 									break;
@@ -787,6 +960,8 @@ namespace Waher.Networking.XMPP.Contracts
 								default:
 									if (Attr.Prefix == "xmlns")
 										break;
+									else if (ExceptionIfError)
+										throw new Exception("Unrecognized signature attribute: " + Attr.Name);
 									else
 										return null;
 							}
@@ -799,7 +974,10 @@ namespace Waher.Networking.XMPP.Contracts
 							string.IsNullOrEmpty(Signature.Role) ||
 							Signature.Timestamp == DateTime.MinValue)
 						{
-							return null;
+							if (ExceptionIfError)
+								throw new Exception("Incomplete Signature.");
+							else
+								return null;
 						}
 
 						Signatures.Add(Signature);
@@ -863,6 +1041,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "schemaHashFunction":
 									if (Enum.TryParse(Attr.Value, out Security.HashFunction H))
 										Result.contentSchemaHashFunction = H;
+									else if (ExceptionIfError)
+										throw new Exception("Unrecognized schema hash function.");
 									else
 										return null;
 									break;
@@ -873,6 +1053,8 @@ namespace Waher.Networking.XMPP.Contracts
 								default:
 									if (Attr.Prefix == "xmlns")
 										break;
+									else if (ExceptionIfError)
+										throw new Exception("Unrecognized status attribute: " + Attr.Name);
 									else
 										return null;
 							}
@@ -900,7 +1082,12 @@ namespace Waher.Networking.XMPP.Contracts
 									{
 										string Name = XML.Attribute(E3, "name");
 										if (!RoleParameters.TryGetValue(Name, out RoleParameter RoleParameter))
-											return null;
+										{
+											if (ExceptionIfError)
+												throw new Exception("Invalid role parameter reference: " + Name);
+											else
+												return null;
+										}
 
 										RoleParameter.SetValue(XML.Attribute(E3, "value"));
 									}
@@ -919,6 +1106,8 @@ namespace Waher.Networking.XMPP.Contracts
 								case "timestamp":
 									if (XML.TryParse(Attr.Value, out DateTime TP))
 										ServerSignature.Timestamp = TP;
+									else if (ExceptionIfError)
+										throw new Exception("Invalid server signature timestamp.");
 									else
 										return null;
 									break;
@@ -929,6 +1118,8 @@ namespace Waher.Networking.XMPP.Contracts
 								default:
 									if (Attr.Prefix == "xmlns")
 										break;
+									else if (ExceptionIfError)
+										throw new Exception("Unrecognized server signature attribute: " + Attr.Name);
 									else
 										return null;
 							}
@@ -937,7 +1128,12 @@ namespace Waher.Networking.XMPP.Contracts
 						ServerSignature.DigitalSignature = Convert.FromBase64String(E.InnerText);
 
 						if (ServerSignature.Timestamp == DateTime.MinValue)
-							return null;
+						{
+							if (ExceptionIfError)
+								throw new Exception("Invalid server signature timestamp.");
+							else
+								return null;
+						}
 
 						Result.serverSignature = ServerSignature;
 						break;
@@ -957,12 +1153,36 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					default:
-						return null;
+						if (ExceptionIfError)
+							throw new Exception("Unrecognized element: " + E.Name);
+						else
+							return null;
 				}
 			}
 
-			if (Content is null || ForHumans.Count == 0 || !PartsDefined)
-				return null;
+			if (Content is null)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Missing machine-readable content.");
+				else
+					return null;
+			}
+
+			if (ForHumans.Count == 0)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Missing human-readable content.");
+				else
+					return null;
+			}
+
+			if (!PartsDefined)
+			{
+				if (ExceptionIfError)
+					throw new Exception("Missing part definitions.");
+				else
+					return null;
+			}
 
 			Variables Variables = new Variables
 			{

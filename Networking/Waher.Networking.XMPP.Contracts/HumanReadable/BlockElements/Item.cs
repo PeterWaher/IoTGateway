@@ -98,32 +98,46 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override async Task<bool> IsWellDefined()
+		/// <returns>Returns first failing element, if found.</returns>
+		public override async Task<HumanReadableElement> IsWellDefined()
 		{
 			if (!(this.inlineElements is null))
 			{
 				if (!(this.blockElements is null))
-					return false;
+					return this;
 
 				foreach (InlineElement E in this.inlineElements)
 				{
-					if (E is null || !await E.IsWellDefined())
-						return false;
+					if (E is null)
+						return this;
+
+					HumanReadableElement E2 = await E.IsWellDefined();
+					if (!(E2 is null))
+						return E2;
 				}
 			}
 			else if (!(this.blockElements is null))
 			{
 				foreach (BlockElement E in this.blockElements)
 				{
-					if (E is null || !await E.IsWellDefined())
-						return false;
+					if (E is null)
+						return this;
+
+					HumanReadableElement E2 = await E.IsWellDefined();
+					if (!(E2 is null))
+						return E2;
 				}
 			}
-			else
-				return false;
+			else if (!this.CanBeEmpty)
+				return this;
 
-			return true;
+			return null;
 		}
+
+		/// <summary>
+		/// If item can be empty.
+		/// </summary>
+		public virtual bool CanBeEmpty => false;
 
 		/// <summary>
 		/// Serializes the element in normalized form.

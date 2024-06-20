@@ -20,7 +20,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override Task<bool> IsWellDefined() => Task.FromResult(true);
+		/// <returns>Returns first failing element, if found.</returns>
+		public override Task<HumanReadableElement> IsWellDefined() => Task.FromResult<HumanReadableElement>(null);
 
 		/// <summary>
 		/// Generates markdown for the human-readable text.

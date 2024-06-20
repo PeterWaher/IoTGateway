@@ -22,22 +22,27 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override async Task<bool> IsWellDefined()
+		/// <returns>Returns first failing element, if found.</returns>
+		public override async Task<HumanReadableElement> IsWellDefined()
 		{
 			if (this.cells is null)
-				return false;
+				return this;
 
 			bool Found = false;
 
 			foreach (Cell E in this.cells)
 			{
-				if (E is null || !await E.IsWellDefined())
-					return false;
+				if (E is null)
+					return this;
+
+				HumanReadableElement E2 = await E.IsWellDefined();
+				if (!(E2 is null))
+					return E2;
 
 				Found = true;
 			}
 
-			return Found;
+			return Found ? null : this;
 		}
 
 		/// <summary>

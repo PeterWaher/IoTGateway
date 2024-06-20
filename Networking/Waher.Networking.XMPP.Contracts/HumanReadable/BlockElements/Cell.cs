@@ -48,13 +48,19 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
-		public override Task<bool> IsWellDefined()
+		/// <returns>Returns first failing element, if found.</returns>
+		public override Task<HumanReadableElement> IsWellDefined()
 		{
 			if (this.ColumnSpan <= 0)
-				return Task.FromResult(false);
+				return Task.FromResult<HumanReadableElement>(this);
 
 			return base.IsWellDefined();
 		}
+
+		/// <summary>
+		/// If item can be empty.
+		/// </summary>
+		public override bool CanBeEmpty => true;
 
 		/// <summary>
 		/// Serializes the element in normalized form.

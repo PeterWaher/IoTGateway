@@ -26,24 +26,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -75,7 +63,9 @@ namespace Waher.IoTGateway.WebResources
 
 				if (Posted is XmlDocument Doc)
 				{
-					ParsedContract ParsedContract = await Contract.Parse(Doc, Gateway.ContractsClient);
+					ParsedContract ParsedContract = await Contract.Parse(Doc, Gateway.ContractsClient)
+						?? throw new BadRequestException("Unable to parse contract.");
+
 					if (ParsedContract.HasStatus)
 						throw new ForbiddenException("Contract must not have a status section.");
 

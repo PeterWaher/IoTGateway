@@ -2349,7 +2349,7 @@ namespace Waher.Networking.XMPP.Contracts
 				E.LocalName == "contract" &&
 				E.NamespaceURI == NamespaceSmartContracts)
 			{
-				ParsedContract Parsed = await Contract.Parse(E, this);
+				ParsedContract Parsed = await Contract.Parse(E, this, false);
 				Contract = Parsed?.Contract;
 				if (Contract is null)
 					e.Ok = false;
@@ -2865,7 +2865,7 @@ namespace Waher.Networking.XMPP.Contracts
 						switch (E2.LocalName)
 						{
 							case "contract":
-								ParsedContract ParsedContract = await Contract.Parse(E2, this);
+								ParsedContract ParsedContract = await Contract.Parse(E2, this, false);
 
 								if (!(ParsedContract is null))
 									Contracts.Add(ParsedContract.Contract);
@@ -4256,7 +4256,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (HumanReadableText Text in Texts)
 			{
-				if (!await Text.IsWellDefined())
+				if (!(await Text.IsWellDefined() is null))
 					return false;
 			}
 
@@ -5843,8 +5843,8 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (N is XmlElement E && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
 					{
-						ParsedContract Parsed = await Contract.Parse(E, this);
-						Contract = Parsed.Contract;
+						ParsedContract Parsed = await Contract.Parse(E, this, false);
+						Contract = Parsed?.Contract;
 						break;
 					}
 				}
@@ -5967,8 +5967,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
 				{
-					ParsedContract Parsed = await Contract.Parse(E, this);
-					Contract = Parsed.Contract;
+					ParsedContract Parsed = await Contract.Parse(E, this, false);
+					if (Parsed is null)
+						e.Ok = false;
+					else
+						Contract = Parsed.Contract;
 				}
 				else
 					e.Ok = false;
@@ -6204,8 +6207,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
 				{
-					ParsedContract Parsed = await Contract.Parse(E, this);
-					Contract = Parsed.Contract;
+					ParsedContract Parsed = await Contract.Parse(E, this, false);
+					if (Parsed is null)
+						e.Ok = false;
+					else
+						Contract = Parsed.Contract;
 				}
 				else
 					e.Ok = false;

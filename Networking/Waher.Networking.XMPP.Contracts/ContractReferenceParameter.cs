@@ -366,7 +366,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						case "label": // Smart contract
 							Label Label = Label.Parse(E);
-							if (Label is null || !await Label.IsWellDefined())
+							if (Label is null || !(await Label.IsWellDefined() is null))
 								return false;
 
 							Labels.Add(Label);
@@ -374,7 +374,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						case "Label": // Simplified (ex. state machine note command).
 							Label = Label.ParseSimplified(E);
-							if (Label is null || !await Label.IsWellDefined())
+							if (Label is null || !(await Label.IsWellDefined() is null))
 								return false;
 
 							Labels.Add(Label);

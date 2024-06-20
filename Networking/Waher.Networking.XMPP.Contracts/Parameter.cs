@@ -239,7 +239,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						case "description": // Smart contract
 							HumanReadableText Text = HumanReadableText.Parse(E);
-							if (Text is null || !await Text.IsWellDefined())
+							if (Text is null || !(await Text.IsWellDefined() is null))
 								return false;
 
 							Descriptions.Add(Text);
@@ -247,7 +247,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						case "Description": // Simplified (ex. state machine note command).
 							Text = HumanReadableText.ParseSimplified(E);
-							if (Text is null || !await Text.IsWellDefined())
+							if (Text is null || !(await Text.IsWellDefined() is null))
 								return false;
 
 							Descriptions.Add(Text);

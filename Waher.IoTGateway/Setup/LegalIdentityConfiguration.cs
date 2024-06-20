@@ -515,18 +515,21 @@ namespace Waher.IoTGateway.Setup
 			LegalIdentity ID2;
 			bool Added = false;
 
-			foreach (LegalIdentity ID in Identities)
+			if (!(Identities is null)
 			{
-				if (Changed is null || ID.Id != Changed.Id)
-					ID2 = ID;
-				else
+				foreach (LegalIdentity ID in Identities)
 				{
-					ID2 = Changed;
-					Added = true;
-				}
+					if (Changed is null || ID.Id != Changed.Id)
+						ID2 = ID;
+					else
+					{
+						ID2 = Changed;
+						Added = true;
+					}
 
-				if (All || ID2.State == IdentityState.Approved)
-					Result.Add(ID2);
+					if (All || ID2.State == IdentityState.Approved)
+						Result.Add(ID2);
+				}
 			}
 
 			if (!Added && !(Changed is null) && (All || Changed.State == IdentityState.Approved))

@@ -515,7 +515,7 @@ namespace Waher.IoTGateway.Setup
 			LegalIdentity ID2;
 			bool Added = false;
 
-			if (!(Identities is null)
+			if (!(Identities is null))
 			{
 				foreach (LegalIdentity ID in Identities)
 				{

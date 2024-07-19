@@ -2398,6 +2398,15 @@ The following predefined variables are available in web pages hosted by the IoT 
 | `Runtime`      | Returns the time elapsed since the gateway was started.  |
 | `Started`      | Date and Time of when the gateway started.               |
 
+#### Gateway Console Extensions (Waher.IoTGateway.Console)
+
+The following functions are available in the `Waher.IoTGateway.Console` console application library. Running the IoT Gateway
+as a console application, adds these functions to the script engine.
+
+| Function              | Description                                            | Example |
+|-----------------------|--------------------------------------------------------|---------|
+| `RsaFromPem(PemFile)` | Creates an RSA object from the contents of a PEM file. | `RsaFromPem(PemContents)` |
+
 #### Gateway Service Extensions (Waher.IoTGateway.Svc)
 
 The following functions are available in the `Waher.IoTGateway.Svc` Windows Service host application library. Running the IoT Gateway
@@ -2405,6 +2414,7 @@ as a Windows Service, adds these functions to the script engine.
 
 | Function                                                       | Description                                                                                                                                                                | Example |
 |----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `RsaFromPem(PemFile)`                                          | Creates an RSA object from the contents of a PEM file.                                                                                        | `RsaFromPem(PemContents)` |
 | `DecPerformanceCounter(CategoryName[,Instance],CounterName)`   | Decrements a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `DecPerformanceCounter("My Counters","My Instance","My Counter")` |
 | `IncPerformanceCounter(CategoryName[,Instance],CounterName)`   | Increments a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `IncPerformanceCounter("My Counters","My Instance","My Counter")` |
 | `PerformanceCategory(CategoryName)`                            | Returns a `System.Diagnostics.PerformanceCounterCategory` object, given the category name.                                                                                 | `properties(PerformanceCategory("Processor"))` |

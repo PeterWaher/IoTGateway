@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Waher.Security.JWS;
 
 namespace Waher.Security.JWT
@@ -50,7 +51,7 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtFactory : IDisposable
 	{
-		private HmacSha256 algorithm;
+		private JwsAlgorithm algorithm;
 		private TimeSpan timeMargin = TimeSpan.Zero;
 		private readonly KeyValuePair<string, object>[] header = new KeyValuePair<string, object>[]
 		{
@@ -60,18 +61,81 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// A factory that can create and validate JWT tokens.
 		/// </summary>
-		public JwtFactory()
+		/// <param name="Algorithm">JWS Algorithm to use for signatures</param>
+		public JwtFactory(JwsAlgorithm Algorithm)
 		{
-			this.algorithm = new HmacSha256();
+			this.algorithm = Algorithm;
 		}
 
 		/// <summary>
-		/// A factory that can create and validate JWT tokens.
+		/// A factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
+		/// </summary>
+		[Obsolete("Use any of the static Create methods instead, or specify the JWS algorithm explicitly.")]
+		public JwtFactory()
+			: this(new HmacSha256())
+		{
+		}
+
+		/// <summary>
+		/// A factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
 		/// </summary>
 		/// <param name="Secret">Secret used for creating and validating signatures.</param>
+		[Obsolete("Use any of the static Create methods instead, or specify the JWS algorithm explicitly.")]
 		public JwtFactory(byte[] Secret)
+			: this(new HmacSha256(Secret))
 		{
-			this.algorithm = new HmacSha256(Secret);
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
+		/// </summary>
+		public static JwtFactory CreateHmacSha256()
+		{
+			return new JwtFactory(new HmacSha256());
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
+		/// </summary>
+		/// <param name="Secret">Secret used for creating and validating signatures.</param>
+		public static JwtFactory CreateHmacSha256(byte[] Secret)
+		{
+			return new JwtFactory(new HmacSha256(Secret));
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		public static JwtFactory CreateRsa256()
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256());
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="KeySize">Key size.</param>
+		public static JwtFactory CreateRsa256(int KeySize)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(KeySize));
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="Algorithm">RSA Algorithm used for creating and validating signatures.</param>
+		public static JwtFactory CreatRsa256(RSA Algorithm)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(Algorithm));
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="Parameters">RSA Parameters</param>
+		public static JwtFactory CreateRsa256(RSAParameters Parameters)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(Parameters));
 		}
 
 		/// <summary>
@@ -127,7 +191,7 @@ namespace Waher.Security.JWT
 				Reason = Reason.NoAlgorithm;
 				return false;
 			}
-			else if (!(Token.Algorithm is HmacSha256))
+			else if (!(Token.Algorithm is JwsAlgorithm))
 			{
 				Reason = Reason.UnsupportedAlgorithm;
 				return false;

@@ -34,7 +34,7 @@ namespace Waher.WebService.Tesseract.Test
 		[TestMethod]
 		public async Task Test_001_DetectService()
 		{
-			TesseractApi Api = new TesseractApi();
+			TesseractApi Api = new();
 
 			await Api.Start();
 			try
@@ -54,7 +54,7 @@ namespace Waher.WebService.Tesseract.Test
 		{
 			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
-			TesseractApi Api = new TesseractApi();
+			TesseractApi Api = new();
 
 			await Api.Start();
 			try
@@ -77,22 +77,22 @@ namespace Waher.WebService.Tesseract.Test
 		{
 			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
-			TesseractApi Api = new TesseractApi();
+			TesseractApi Api = new();
 
-			using JwtFactory Factory = new JwtFactory();
+			using JwtFactory Factory = JwtFactory.CreateHmacSha256();
 			Types.SetModuleParameter("JWT", Factory);
 
 			string Token = Factory.Create();
 
-			using HttpServer WebServer = new HttpServer(8081);
+			using HttpServer WebServer = new(8081);
 			WebServer.Register(new ApiResource(Api, new JwtAuthentication("Test", null, Factory)));
 
 			await Api.Start();
 			try
 			{
-				Uri Uri = new Uri("http://localhost:8081/Tesseract/Api");
-				using HttpClient HttpClient = new HttpClient();
-				using HttpRequestMessage Request = new HttpRequestMessage()
+				Uri Uri = new("http://localhost:8081/Tesseract/Api");
+				using HttpClient HttpClient = new();
+				using HttpRequestMessage Request = new()
 				{
 					RequestUri = Uri,
 					Method = HttpMethod.Post,

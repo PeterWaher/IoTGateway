@@ -8,7 +8,7 @@
     <Product>Waher.IoTGateway</Product>
     <Description>The Waher.Persistence project provides the basic architecture and framework for accessing objects in an object database, based solely on meta-data provided through the corresponding class definitions.</Description>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -17,7 +17,7 @@
     <AssemblyVersion>1.10.1</AssemblyVersion>
     <FileVersion>1.10.1</FileVersion>
     <Version>1.10.1</Version>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -34,11 +34,11 @@
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
 </Project>

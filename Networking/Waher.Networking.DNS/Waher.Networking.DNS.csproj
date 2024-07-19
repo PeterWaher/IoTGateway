@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -9,9 +8,9 @@
     <Product>Waher.IoTGateway</Product>
     <Description>Class library for resolving DNS host, mailbox and service names on the network. It also supports reverse address lookups, International Domain Names (IDN), DNS Black Lists (DNSBL), text records, and maintains a local Resource Record cache. DNS over HTTPS (DoH) can also be activated.</Description>
     <Copyright>Copyright © Waher Data AB 2019-2024. All rights reserved.</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.DNS</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication dns resolve host service names https doh</PackageTags>
@@ -22,15 +21,12 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>$(ProjectDir)\Waher.Networking.DNS.xml</DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
@@ -40,16 +36,14 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
-
 </Project>

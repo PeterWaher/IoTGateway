@@ -51,7 +51,7 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtFactory : IDisposable
 	{
-		private JwsAlgorithm algorithm;
+		private IJwsAlgorithm algorithm;
 		private TimeSpan timeMargin = TimeSpan.Zero;
 		private readonly KeyValuePair<string, object>[] header = new KeyValuePair<string, object>[]
 		{
@@ -62,7 +62,7 @@ namespace Waher.Security.JWT
 		/// A factory that can create and validate JWT tokens.
 		/// </summary>
 		/// <param name="Algorithm">JWS Algorithm to use for signatures</param>
-		public JwtFactory(JwsAlgorithm Algorithm)
+		public JwtFactory(IJwsAlgorithm Algorithm)
 		{
 			this.algorithm = Algorithm;
 		}

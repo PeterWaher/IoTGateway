@@ -81,19 +81,26 @@ namespace Waher.Security.JWT.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			if (!(Arguments[0].AssociatedObjectValue is HttpRequest Request))
+			int c = Arguments.Length;
+			int i = 0;
+
+			if (!(Arguments[i++].AssociatedObjectValue is HttpRequest Request))
 				throw new ScriptRuntimeException("Expected an HTTP Request in the first argument.", this);
 
-			string Realm = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Realm = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
 
-			if (!(Arguments[2].AssociatedObjectValue is IUserSource Users))
+			if (!(Arguments[i++].AssociatedObjectValue is IUserSource Users))
 				throw new ScriptRuntimeException("Expected a users collection as the third argument.", this);
 
-			if (Arguments.Length > 3)
-			{
-				object Obj = Arguments[3].AssociatedObjectValue;
+			JwtFactory Factory = CreateJwt.Factory;
 
-				if (Obj is bool UseEncryption)
+			while (i < c)
+			{
+				object Obj = Arguments[i++].AssociatedObjectValue;
+
+				if (Obj is JwtFactory Factory2)
+					Factory = Factory2;
+				else if (Obj is bool UseEncryption)
 				{
 					if (UseEncryption && !Request.Encrypted)
 						throw new ForbiddenException("Access to resource requires encryption.");
@@ -112,8 +119,8 @@ namespace Waher.Security.JWT.Functions
 
 			JwtAuthentication Mechanism = this.last;
 
-			if (Mechanism is null || this.last.Realm != Realm || this.last.Users != Users)
-				Mechanism = this.last = new JwtAuthentication(Realm, Users, CreateJwt.Factory);
+			if (Mechanism is null || this.last.Realm != Realm || this.last.Users != Users || this.last.Factory != Factory)
+				Mechanism = this.last = new JwtAuthentication(Realm, Users, Factory);
 
 			if (Request.Header.Authorization is null)
 				throw new UnauthorizedException("Unauthorized access prohibited.", new string[] { Mechanism.GetChallenge() });

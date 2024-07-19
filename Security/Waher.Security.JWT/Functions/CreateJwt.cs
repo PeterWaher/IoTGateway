@@ -4,6 +4,7 @@ using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -12,19 +13,33 @@ namespace Waher.Security.JWT.Functions
 	/// <summary>
 	/// Creates a Java Web Token (JWT)
 	/// </summary>
-	public class CreateJwt : FunctionOneVariable
+	public class CreateJwt : FunctionMultiVariate
 	{
 		private static JwtFactory factory = null;
 
 		/// <summary>
 		/// Creates a Java Web Token (JWT)
 		/// </summary>
-		/// <param name="Argument">Argument.</param>
+		/// <param name="Claims">Claims.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public CreateJwt(ScriptNode Argument, int Start, int Length, Expression Expression)
-			: base(Argument, Start, Length, Expression)
+		public CreateJwt(ScriptNode Claims, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Claims }, argumentTypes1Normal, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a Java Web Token (JWT)
+		/// </summary>
+		/// <param name="Claims">Claims.</param>
+		/// <param name="Factory">JWT Factory.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public CreateJwt(ScriptNode Claims, ScriptNode Factory, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Claims, Factory }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Scalar }, 
+			Start, Length, Expression)
 		{
 		}
 
@@ -55,7 +70,7 @@ namespace Waher.Security.JWT.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "Claims" };
+		public override string[] DefaultArgumentNames => new string[] { "Claims", "Factory" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -66,23 +81,23 @@ namespace Waher.Security.JWT.Functions
 		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument">Function argument.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument, Variables Variables)
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			return this.EvaluateAsync(Argument, Variables).Result;
+			return this.EvaluateAsync(Arguments, Variables).Result;
 		}
 
 		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument">Function argument.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override async Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			object Obj = Argument.AssociatedObjectValue;
+			object Obj = Arguments[0].AssociatedObjectValue;
 			IEnumerable<KeyValuePair<string, object>> Claims;
 
 			if (Obj is IEnumerable<KeyValuePair<string, IElement>> GenObj)
@@ -99,7 +114,13 @@ namespace Waher.Security.JWT.Functions
 			else
 				Claims = await Database.Generalize(Obj);
 
-			return new StringValue(Factory.Create(Claims));
+			if (Arguments.Length == 1)
+				return new StringValue(Factory.Create(Claims));
+
+			if (!(Arguments[1].AssociatedObjectValue is JwtFactory Factory2))
+				throw new ScriptRuntimeException("Expected a JWT Factory as second argument.", this);
+
+			return new StringValue(Factory2.Create(Claims));
 		}
 	}
 }

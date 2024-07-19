@@ -191,7 +191,7 @@ namespace Waher.Security.JWT
 				Reason = Reason.NoAlgorithm;
 				return false;
 			}
-			else if (!(Token.Algorithm is JwsAlgorithm))
+			else if (Token.Algorithm is null)
 			{
 				Reason = Reason.UnsupportedAlgorithm;
 				return false;
@@ -219,9 +219,17 @@ namespace Waher.Security.JWT
 				}
 			}
 
-			if (!this.algorithm.IsValid(Token.Header, Token.Payload, Token.Signature))
+			try
 			{
-				Reason = Reason.InvalidSignature;
+				if (!this.algorithm.IsValid(Token.Header, Token.Payload, Token.Signature))
+				{
+					Reason = Reason.InvalidSignature;
+					return false;
+				}
+			}
+			catch (Exception)
+			{
+				Reason = Reason.UnsupportedAlgorithm;
 				return false;
 			}
 

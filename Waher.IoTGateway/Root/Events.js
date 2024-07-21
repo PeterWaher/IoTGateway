@@ -549,6 +549,7 @@ async function CallServer(Resource, RequestPayload, Language)
 			xhttp.open("GET", Resource, true);
 
 		xhttp.setRequestHeader("Accept", "application/json");
+		xhttp.setRequestHeader("X-TabID", TabID);
 
 		if (Language)
 			xhttp.setRequestHeader("Accept-Language", Language);

@@ -44,7 +44,7 @@ namespace Waher.Content
 		{
 			int Pos = 0;
 			int Len = Json.Length;
-			object Result = Parse(Json, ref Pos, Len);
+			object Result = Parse(Json, ref Pos, Len, false);
 			char ch;
 
 			while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
@@ -56,7 +56,7 @@ namespace Waher.Content
 			return Result;
 		}
 
-		private static object Parse(string Json, ref int Pos, int Len)
+		private static object Parse(string Json, ref int Pos, int Len, bool AllowLabel)
 		{
 			StringBuilder sb = null;
 			int State = 0;
@@ -112,7 +112,7 @@ namespace Waher.Content
 
 							while (true)
 							{
-								Array.Add(JSON.Parse(Json, ref Pos, Len));
+								Array.Add(JSON.Parse(Json, ref Pos, Len, false));
 
 								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
 									Pos++;
@@ -149,7 +149,10 @@ namespace Waher.Content
 
 							while (true)
 							{
-								if (!(Parse(Json, ref Pos, Len) is string Key))
+								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
+									Pos++;
+
+								if (!(Parse(Json, ref Pos, Len, true) is string Key))
 									throw new Exception("Expected member name.");
 
 								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
@@ -163,7 +166,7 @@ namespace Waher.Content
 
 								Pos++;
 
-								Object[Key] = JSON.Parse(Json, ref Pos, Len);
+								Object[Key] = JSON.Parse(Json, ref Pos, Len, false);
 
 								while (Pos < Len && ((ch = Json[Pos]) <= ' ' || ch == 160))
 									Pos++;
@@ -192,6 +195,12 @@ namespace Waher.Content
 
 							Pos++;
 							return Object;
+						}
+						else if (AllowLabel && (char.IsLetter(ch) || ch == '_' || ch == '$'))
+						{
+							sb = new StringBuilder();
+							sb.Append(ch);
+							State += 21;
 						}
 						else
 							throw new Exception("Invalid JSON.");
@@ -423,6 +432,16 @@ namespace Waher.Content
 							return null;
 						else
 							throw new Exception("Invalid JSON.");
+
+					case 21: // Label.
+						if (char.IsLetter(ch) || char.IsDigit(ch) || ch == '_' || ch == '$')
+							sb.Append(ch);
+						else
+						{
+							Pos--;
+							return sb.ToString();
+						}
+						break;
 				}
 			}
 

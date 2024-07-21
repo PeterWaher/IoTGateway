@@ -19,11 +19,16 @@ namespace Waher.Content.Html.JavaScript
 		}
 
 		/// <summary>
+		/// application/javascript
+		/// </summary>
+		public const string DefaultContentType = "application/javascript";
+
+		/// <summary>
 		/// JavaScript content types.
 		/// </summary>
 		public static readonly string[] JavaScriptContentTypes = new string[]
 		{
-			"application/javascript"
+			DefaultContentType
 		};
 
 		/// <summary>
@@ -91,7 +96,7 @@ namespace Waher.Content.Html.JavaScript
 			switch (FileExtension.ToLower())
 			{
 				case "js":
-					ContentType = JavaScriptContentTypes[0];
+					ContentType = DefaultContentType;
 					return true;
 
 				default:
@@ -110,7 +115,7 @@ namespace Waher.Content.Html.JavaScript
 		{
 			switch (ContentType.ToLower())
 			{
-				case "application/javascript":
+				case DefaultContentType:
 					FileExtension = JavaScriptFileExtensions[0];
 					return true;
 

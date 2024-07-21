@@ -247,7 +247,7 @@ namespace Waher.Security.JWT
 		/// <returns>JWT token.</returns>
 		public string Create(params KeyValuePair<string, object>[] Claims)
 		{
-			return this.Create((IEnumerable<KeyValuePair<string, object>>)Claims);
+			return this.Create(null, (IEnumerable<KeyValuePair<string, object>>)Claims);
 		}
 
 		/// <summary>
@@ -260,7 +260,51 @@ namespace Waher.Security.JWT
 		/// <returns>JWT token.</returns>
 		public string Create(IEnumerable<KeyValuePair<string, object>> Claims)
 		{
-			this.algorithm.Sign(this.header, Claims, out string Header, out string Payload,
+			return this.Create(null, Claims);
+		}
+
+		/// <summary>
+		/// Creates a new JWT token.
+		/// </summary>
+		/// <param name="Headers">Optional additional headers to include in token.</param>
+		/// <param name="Claims">Claims to include in token.
+		/// 
+		/// For a list of public claim names, see:
+		/// https://www.iana.org/assignments/jwt/jwt.xhtml</param>
+		/// <returns>JWT token.</returns>
+		public string Create(KeyValuePair<string, object>[] Headers, KeyValuePair<string, object>[] Claims)
+		{
+			return this.Create((IEnumerable<KeyValuePair<string, object>>)Headers, (IEnumerable<KeyValuePair<string, object>>)Claims);
+		}
+
+		/// <summary>
+		/// Creates a new JWT token.
+		/// </summary>
+		/// <param name="Headers">Optional additional headers to include in token.</param>
+		/// <param name="Claims">Claims to include in token.
+		/// 
+		/// For a list of public claim names, see:
+		/// https://www.iana.org/assignments/jwt/jwt.xhtml</param>
+		/// <returns>JWT token.</returns>
+		public string Create(IEnumerable<KeyValuePair<string, object>> Headers, IEnumerable<KeyValuePair<string, object>> Claims)
+		{
+			IEnumerable<KeyValuePair<string, object>> Headers2;
+
+			if (Headers is null)
+				Headers2 = this.header;
+			else
+			{
+				List<KeyValuePair<string, object>> Union = new List<KeyValuePair<string, object>>();
+
+				Union.AddRange(this.header);
+
+				foreach (KeyValuePair<string, object> P in Headers)
+					Union.Add(P);
+
+				Headers2 = Union.ToArray();
+			}
+
+			this.algorithm.Sign(Headers2, Claims, out string Header, out string Payload,
 				out string Signature);
 
 			return Header + "." + Payload + "." + Signature;

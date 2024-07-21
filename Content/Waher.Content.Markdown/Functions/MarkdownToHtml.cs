@@ -53,18 +53,41 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
+			return new StringValue(await ToHtml(Argument, Variables));
+		}
+
+		/// <summary>
+		/// Converts a Markdown snippet to a HTML snippet.
+		/// </summary>
+		/// <param name="Markdown">Markdown</param>
+		/// <returns>HTML</returns>
+		public static  Task<string> ToHtml(string Markdown)
+		{
+			return ToHtml(Markdown, null);
+		}
+
+		/// <summary>
+		/// Converts a Markdown snippet to a HTML snippet.
+		/// </summary>
+		/// <param name="Markdown">Markdown</param>
+		/// <param name="Variables">Optional collection of variables.</param>
+		/// <returns>HTML</returns>
+		public static async Task<string> ToHtml(string Markdown, Variables Variables)
+		{
 			MarkdownDocument Doc;
 
-			Argument = "BodyOnly: 1\r\n\r\n" + Argument;
+			Markdown = "BodyOnly: 1\r\n\r\n" + Markdown;
 
-			if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) && v.ValueObject is MarkdownSettings ParentSettings)
-				Doc = await MarkdownDocument.CreateAsync(Argument, ParentSettings);
+			if (!(Variables is null) &&
+				Variables.TryGetVariable(" MarkdownSettings ", out Variable v) &&
+				v.ValueObject is MarkdownSettings ParentSettings)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown, ParentSettings);
+			}
 			else
-				Doc = await MarkdownDocument.CreateAsync(Argument);
+				Doc = await MarkdownDocument.CreateAsync(Markdown);
 
-			string Html = await Doc.GenerateHTML();
-
-			return new StringValue(Html);
+			return await Doc.GenerateHTML();
 		}
 
 	}

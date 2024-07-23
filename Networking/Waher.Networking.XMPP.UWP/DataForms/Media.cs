@@ -111,7 +111,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Height, if specified, null if unspecified.
 		/// </summary>
 		public int? Height => this.height;
-
+	
 		/// <summary>
 		/// Binary content, if available in the form.
 		/// </summary>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.DataForms.DataTypes
+﻿namespace Waher.Networking.XMPP.DataForms.DataTypes
 {
 	/// <summary>
 	/// String Data Type (xs:string)

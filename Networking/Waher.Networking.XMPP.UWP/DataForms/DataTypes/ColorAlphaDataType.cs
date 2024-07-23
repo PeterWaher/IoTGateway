@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Waher.Content;
 
 namespace Waher.Networking.XMPP.DataForms.DataTypes
@@ -38,22 +37,38 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			if (Value.Length != 8)
+			if (TryParse(Value, out ColorReference Result))
+				return Result;
+			else
 				return null;
+		}
+
+		/// <summary>
+		/// Tries to parse a string into a color reference value.
+		/// </summary>
+		/// <param name="Value">String-representation of color.</param>
+		/// <param name="Color">Parsed color reference.</param>
+		/// <returns>If successful.</returns>
+		public static bool TryParse(string Value, out ColorReference Color)
+		{
+			Color = null;
+			if (Value.Length != 8)
+				return false;
 
 			if (!byte.TryParse(Value.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte R))
-				return null;
+				return false;
 
 			if (!byte.TryParse(Value.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte G))
-				return null;
+				return false;
 
 			if (!byte.TryParse(Value.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte B))
-				return null;
+				return false;
 
 			if (!byte.TryParse(Value.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A))
-				return null;
+				return false;
 
-			return new ColorReference(R, G, B, A);
+			Color = new ColorReference(R, G, B, A);
+			return true;
 		}
 	}
 }

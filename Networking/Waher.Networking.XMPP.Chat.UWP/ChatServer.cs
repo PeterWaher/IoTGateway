@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;

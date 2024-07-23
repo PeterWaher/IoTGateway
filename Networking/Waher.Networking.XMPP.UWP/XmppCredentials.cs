@@ -5,6 +5,7 @@ using Windows.Security.Cryptography.Certificates;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
+using Waher.Content;
 
 namespace Waher.Networking.XMPP
 {

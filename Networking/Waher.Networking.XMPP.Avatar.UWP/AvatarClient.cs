@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.PEP;

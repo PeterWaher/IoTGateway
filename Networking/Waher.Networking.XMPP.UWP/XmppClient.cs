@@ -14,6 +14,7 @@ using Windows.Security.Cryptography.Certificates;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;

@@ -2756,6 +2756,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -2841,6 +2842,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -2851,6 +2853,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -5609,6 +5618,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -5694,6 +5704,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -5704,6 +5715,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -8498,6 +8516,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -8583,6 +8602,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -8593,6 +8613,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -11360,6 +11387,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -11445,6 +11473,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -11455,6 +11484,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -14258,6 +14294,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -14343,6 +14380,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -14353,6 +14391,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -17120,6 +17165,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -17205,6 +17251,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -17215,6 +17262,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -20018,6 +20072,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.9",
           "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Runtime.Text": "1.1.2",
           "Waher.Script": "2.6.7"
         }
       },
@@ -20103,6 +20158,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "Waher.Content": "2.6.9",
           "Waher.Persistence": "1.10.1",
           "Waher.Runtime.Threading": "1.2.1"
         }
@@ -20113,6 +20169,13 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.3"
+        }
+      },
+      "Waher.Runtime.Text/1.1.2": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Threading/1.2.1": {
@@ -30250,6 +30313,11 @@
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
+    },
+    "Waher.Runtime.Text/1.1.2": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj"
     },
     "Waher.Runtime.Threading/1.2.1": {
       "type": "project",

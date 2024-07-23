@@ -12,6 +12,7 @@ using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Things.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -33,11 +34,47 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
-			DataForm Parameters = new DataForm(Client, FormType.Form, e.To, e.From);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
 
+			return await GetEditableForm(Client, Language, e.From, e.To, EditableObject, Title);
+		}
+
+		/// <summary>
+		/// Gets a data form containing editable parameters from an object.
+		/// </summary>
+		/// <param name="Client">Client</param>
+		/// <param name="Language">Language to use for localized strings.</param>
+		/// <param name="From">From addres</param>
+		/// <param name="To">To addres</param>
+		/// <param name="EditableObject">Object whose parameters will be edited.</param>
+		/// <param name="Title">Title of form.</param>
+		/// <returns>Data form containing editable parameters.</returns>
+		public static async Task<DataForm> GetEditableForm(XmppClient Client, Language Language, string From, string To, object EditableObject, string Title)
+		{
+			Type T = EditableObject.GetType();
+			DataForm Parameters = new DataForm(Client, FormType.Form, To, From);
+
 			if (EditableObject is IEditableObject Editable)
+			{
 				await Editable.PopulateForm(Parameters, Language);
+
+				if (!(Parameters.Pages is null))
+				{
+					List<Page> Pages = new List<Page>();
+					bool Changed = false;
+
+					foreach (Page Page in Parameters.Pages)
+					{
+						if (!(Page.Elements is null) && Page.Elements.Length > 0)
+							Pages.Add(Page);
+						else
+							Changed = true;
+					}
+
+					if (Changed)
+						Parameters.Pages = Pages.ToArray();
+				}				
+			}
 			else
 			{
 				Namespace Namespace = null;
@@ -313,6 +350,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						DataType DataType;
 
+						s = null;
+
 						if (PropertyType == typeof(string))
 							DataType = StringDataType.Instance;
 						else if (PropertyType == typeof(sbyte))
@@ -357,13 +396,36 @@ namespace Waher.Networking.XMPP.Concentrator
 								DataType = DateDataType.Instance;
 							else
 								DataType = DateTimeDataType.Instance;
+
+							if (PropertyValue is DateTime TP)
+							{
+								if (TP == DateTime.MinValue || TP == DateTime.MaxValue)
+									s = string.Empty;
+								else
+									s = XML.Encode(TP, DateOnly);
+							}
 						}
 						else if (PropertyType == typeof(decimal))
+						{
 							DataType = DecimalDataType.Instance;
+
+							if (PropertyValue is decimal d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(double))
+						{
 							DataType = DoubleDataType.Instance;
+
+							if (PropertyValue is double d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(float))
+						{
 							DataType = DoubleDataType.Instance;    // Use xs:double anyway
+
+							if (PropertyValue is float d)
+								s = CommonTypes.Encode(d);
+						}
 						else if (PropertyType == typeof(TimeSpan))
 							DataType = TimeDataType.Instance;
 						else if (PropertyType == typeof(Uri))
@@ -381,7 +443,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
 
-						s = PropertyValue?.ToString();
+						if (s is null)
+							s = PropertyValue?.ToString();
+
 						if (Nullable && s is null)
 							s = string.Empty;
 
@@ -605,22 +669,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Result of a set properties operation.
-		/// </summary>
-		public class SetEditableFormResult
-		{
-			/// <summary>
-			/// If any errors were encountered.
-			/// </summary>
-			public KeyValuePair<string, string>[] Errors;
-
-			/// <summary>
-			/// Actual property values set.
-			/// </summary>
-			public List<KeyValuePair<string, object>> Tags;
-		}
-
-		/// <summary>
 		/// Sets parameters from a data form in an object.
 		/// </summary>
 		/// <param name="e">IQ Event Arguments describing the request.</param>
@@ -633,11 +681,24 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
+			return await SetEditableForm(Language, EditableObject, Form, OnlySetChanged);
+		}
 
+		/// <summary>
+		/// Sets parameters from a data form in an object.
+		/// </summary>
+		/// <param name="Language">User language.</param>
+		/// <param name="EditableObject">Object whose parameters will be set.</param>
+		/// <param name="Form">Data Form.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public static async Task<SetEditableFormResult> SetEditableForm(Language Language, object EditableObject, DataForm Form, bool OnlySetChanged)
+		{
 			if (EditableObject is IEditableObject Editable)
 				return await Editable.SetParameters(Form, Language, OnlySetChanged);
 			else
 			{
+				Type T = EditableObject.GetType();
 				List<KeyValuePair<string, string>> Errors = null;
 				PropertyInfo PropertyInfo;
 				FieldInfo FieldInfo;
@@ -993,17 +1054,17 @@ namespace Waher.Networking.XMPP.Concentrator
 								if (!(Rec.PInfo is null))
 								{
 									Rec.PInfo.SetValue(EditableObject, Rec.Value);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.PInfo.Name, Rec.Value));
+									Result.AddTag(Rec.PInfo.Name, Rec.Value);
 								}
 								else if (!(Rec.FInfo is null))
 								{
 									Rec.FInfo.SetValue(EditableObject, Rec.Value);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.FInfo.Name, Rec.Value));
+									Result.AddTag(Rec.FInfo.Name, Rec.Value);
 								}
 								else
 								{
 									await Rec.CustomFormProperties.SetCustomProperty(Rec.Field);
-									Result.Tags.Add(new KeyValuePair<string, object>(Rec.Field.Var, Rec.Value));
+									Result.AddTag(Rec.Field.Var, Rec.Value);
 								}
 							}
 							catch (Exception ex)

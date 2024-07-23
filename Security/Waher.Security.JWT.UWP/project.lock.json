@@ -2753,7 +2753,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -5550,7 +5551,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -8383,7 +8385,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -11189,7 +11192,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -14031,7 +14035,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -16837,7 +16842,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {
@@ -19679,7 +19685,8 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
-          "Waher.Runtime.Inventory": "1.1.5"
+          "Waher.Runtime.Inventory": "1.1.5",
+          "Waher.Script": "2.6.7"
         }
       },
       "Waher.Security.LoginMonitor.UWP/1.0.0": {

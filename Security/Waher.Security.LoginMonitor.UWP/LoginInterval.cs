@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Waher.Content;
 
 namespace Waher.Security.LoginMonitor
 {
@@ -9,8 +8,10 @@ namespace Waher.Security.LoginMonitor
 	/// </summary>
 	public class LoginInterval
 	{
-		private readonly TimeSpan interval;
+		private readonly TimeSpan intervalTimeSpan;
+		private readonly Duration intervalDuration;
 		private readonly int nrAttempts;
+		private readonly bool isDuration;
 
 		/// <summary>
 		/// Number of failing login attempts possible during given time period.
@@ -25,14 +26,43 @@ namespace Waher.Security.LoginMonitor
 			if (Interval <= TimeSpan.Zero)
 				throw new ArgumentException("Must be positive.", nameof(Interval));
 
-			this.interval = Interval;
+			this.intervalTimeSpan = Interval;
+			this.intervalDuration = Duration.Zero;
 			this.nrAttempts = NrAttempts;
+			this.isDuration = false;
 		}
 
 		/// <summary>
-		/// Number of allowed login attempts.
+		/// Number of failing login attempts possible during given time period.
 		/// </summary>
-		public TimeSpan Interval => this.interval;
+		/// <param name="NrAttempts">Number of allowed login attempts.</param>
+		/// <param name="Interval">Time period during which failing attempts can be made.</param>
+		public LoginInterval(int NrAttempts, Duration Interval)
+		{
+			if (NrAttempts <= 0)
+				throw new ArgumentException("Must be positive.", nameof(NrAttempts));
+
+			if (Interval <= Duration.Zero)
+				throw new ArgumentException("Must be positive.", nameof(Interval));
+
+			this.intervalTimeSpan = TimeSpan.Zero;
+			this.intervalDuration = Interval;
+			this.nrAttempts = NrAttempts;
+			this.isDuration = true;
+		}
+
+		/// <summary>
+		/// Adds an interval to a time stamp.
+		/// </summary>
+		/// <param name="TP">Timestamp to add the interval to.</param>
+		/// <returns>Timestamp + interval.<</returns>
+		public DateTime AddIntervalTo(DateTime TP)
+		{
+			if (this.isDuration)
+				return TP + this.intervalDuration;
+			else
+				return TP + this.intervalTimeSpan;
+		}
 
 		/// <summary>
 		/// Time period during which failing attempts can be made.

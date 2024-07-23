@@ -9,6 +9,7 @@ using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Content.Text;
 using Waher.Networking.HTTP.ContentEncodings;
 
 namespace Waher.Networking.HTTP

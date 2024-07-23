@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;

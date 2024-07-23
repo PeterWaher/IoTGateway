@@ -218,6 +218,22 @@ namespace Waher.Networking.XMPP.DataForms
 		}
 
 		/// <summary>
+		/// Sets the value of the field.
+		/// 
+		/// The value is validated.
+		/// </summary>
+		/// <param name="Value">Value.</param>
+		/// <returns>Parsed value.</returns>
+		public object SetValue(string Value)
+		{
+			object[] Result = this.SetValue(new string[] { Value });
+			if (Result is null || Result.Length == 0)
+				return null;
+			else
+				return Result[0];
+		}
+
+		/// <summary>
 		/// Sets the value, or values, of the field.
 		/// 
 		/// The values are validated.

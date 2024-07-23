@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 #if WINDOWS_UWP

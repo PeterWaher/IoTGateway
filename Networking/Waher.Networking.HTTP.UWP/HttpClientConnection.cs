@@ -4,8 +4,11 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Json;
+using Waher.Content.Text;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
@@ -642,12 +645,12 @@ namespace Waher.Networking.HTTP
 			}
 			catch (HttpException ex)
 			{
-				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 				await this.SendResponse(Request, null, ex, !Result, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
-				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
 				Log.Critical(ex);
 
@@ -660,7 +663,7 @@ namespace Waher.Networking.HTTP
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
-					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code, 
+					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
 						InsufficientStorageException.StatusMessage, "Insufficient space."), true);
 				}
 				else
@@ -668,9 +671,18 @@ namespace Waher.Networking.HTTP
 
 				Result = false;
 			}
+			catch (XmlException ex)
+			{
+				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
+
+				ex = XML.AnnotateException(ex);
+				Log.Critical(ex);
+
+				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
+			}
 			catch (Exception ex)
 			{
-				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
+				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
 				Log.Critical(ex);
 
@@ -762,6 +774,68 @@ namespace Waher.Networking.HTTP
 					try
 					{
 						await this.SendResponse(Request, Response, ex, false, this.Merge(ex.HeaderFields, Response.Cookies));
+					}
+					catch (Exception)
+					{
+						this.CloseStream();
+					}
+				}
+				else
+					this.CloseStream();
+			}
+			catch (System.NotImplementedException ex)
+			{
+				Log.Critical(ex);
+
+				if (Response is null || !Response.HeaderSent)
+				{
+					try
+					{
+						await this.SendResponse(Request, Response, new NotImplementedException(ex.Message), true);
+					}
+					catch (Exception)
+					{
+						this.CloseStream();
+					}
+				}
+				else
+					this.CloseStream();
+			}
+			catch (IOException ex)
+			{
+				Log.Critical(ex);
+
+				if (Response is null || !Response.HeaderSent)
+				{
+					try
+					{
+						int Win32ErrorCode = ex.HResult & 0xFFFF;
+						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+						{
+							await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
+								InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+						}
+						else
+							await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
+					}
+					catch (Exception)
+					{
+						this.CloseStream();
+					}
+				}
+				else
+					this.CloseStream();
+			}
+			catch (XmlException ex)
+			{
+				ex = XML.AnnotateException(ex);
+				Log.Critical(ex);
+
+				if (Response is null || !Response.HeaderSent)
+				{
+					try
+					{
+						await this.SendResponse(Request, Response, new InternalServerErrorException(ex.Message), true);
 					}
 					catch (Exception)
 					{

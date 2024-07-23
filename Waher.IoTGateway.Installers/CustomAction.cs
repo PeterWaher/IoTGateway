@@ -94,21 +94,23 @@ namespace Waher.IoTGateway.Installers
 
 				Result += "IoT Gateway" + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(Result))
-				{
-					try
-					{
-						Directory.CreateDirectory(Result);
-					}
-					catch (Exception ex)
-					{
-						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-						{
-							Result = Result.Replace("/usr/share", "/usr/local/share");
-							Directory.CreateDirectory(Result);
-						}
-						else
-							ExceptionDispatchInfo.Capture(ex).Throw();
-					}
+					Directory.CreateDirectory(Result);
+				//{
+				//	try
+				//	{
+				//		Directory.CreateDirectory(Result);
+				//	}
+				//	catch (Exception ex)
+				//	{
+				//		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				//		{
+				//			Result = Result.Replace("/usr/share", "/usr/local/share");
+				//			Directory.CreateDirectory(Result);
+				//		}
+				//		else
+				//			ExceptionDispatchInfo.Capture(ex).Throw();
+				//	}
+				//}
 
 				return Result;
 			}
@@ -835,8 +837,8 @@ namespace Waher.IoTGateway.Installers
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
-					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				//if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
+				//	ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
 
 				Session.Log("Using default program data folder: " + ProgramDataFolder);
 			}
@@ -1201,8 +1203,8 @@ namespace Waher.IoTGateway.Installers
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
-					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				//if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
+				//	ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
 
 				Session.Log("Using default program data folder: " + ProgramDataFolder);
 			}

@@ -27,8 +27,8 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Script.Graphs.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Script.Graphs.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.88.7" />

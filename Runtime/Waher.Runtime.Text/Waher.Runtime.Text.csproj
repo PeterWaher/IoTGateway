@@ -20,8 +20,8 @@
     <FileVersion>1.1.2</FileVersion>
     <Version>1.1.2</Version>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Runtime.Text.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Runtime.Text.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

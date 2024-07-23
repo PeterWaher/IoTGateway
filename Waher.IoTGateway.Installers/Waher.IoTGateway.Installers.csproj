@@ -140,6 +140,12 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\Difference.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\EditOperation.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\EditScript.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\HarmonizedTextMap.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\Step.cs" />
+    <Compile Include=".bak\Waher.Runtime.Text\StringExtensions.cs" />
     <Compile Include=".bak\Waher.Script\Abstraction\Elements\Interfaces\ISemiGroupElementWise.cs" />
     <Compile Include=".bak\Waher.Script\Constants\NowUtc.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Q.cs" />
@@ -723,11 +729,13 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Runtime\Waher.Runtime.Inventory\*.cs" "$(ProjectDir).bak\Waher.Runtime.Inventory" /S /Y
 xcopy "$(SolutionDir)Runtime\Waher.Runtime.Temporary\*.cs" "$(ProjectDir).bak\Waher.Runtime.Temporary" /S /Y
+xcopy "$(SolutionDir)Runtime\Waher.Runtime.Text\*.cs" "$(ProjectDir).bak\Waher.Runtime.Text" /S /Y
 xcopy "$(SolutionDir)Events\Waher.Events\*.cs" "$(ProjectDir).bak\Waher.Events" /S /Y
 xcopy "$(SolutionDir)Content\Waher.Content\*.cs" "$(ProjectDir).bak\Waher.Content" /S /Y
 xcopy "$(SolutionDir)Content\Waher.Content.Xml\*.cs" "$(ProjectDir).bak\Waher.Content.Xml" /S /Y

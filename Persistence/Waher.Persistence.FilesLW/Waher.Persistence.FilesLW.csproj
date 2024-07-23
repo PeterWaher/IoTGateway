@@ -27,8 +27,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;LW;NETSTANDARD1_3</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Persistence.FilesLW.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Persistence.FilesLW.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

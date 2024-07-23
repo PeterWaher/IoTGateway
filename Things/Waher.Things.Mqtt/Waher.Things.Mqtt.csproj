@@ -22,8 +22,8 @@
     <Version>1.1.5</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Things.Mqtt.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Things.Mqtt.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

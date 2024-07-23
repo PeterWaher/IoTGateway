@@ -17,6 +17,7 @@
 		<dependencies>
 			<dependency id="Waher.Content" version="2.6.9"/>
 			<dependency id="Waher.Content.Emoji" version="2.0.1"/>
+			<dependency id="Waher.Content.Images" version="2.1.6"/>
 			<dependency id="Waher.Content.Html" version="2.3.0"/>
 			<dependency id="Waher.Content.Markdown" version="3.0.1"/>
 			<dependency id="Waher.Content.Xml" version="2.2.6"/>

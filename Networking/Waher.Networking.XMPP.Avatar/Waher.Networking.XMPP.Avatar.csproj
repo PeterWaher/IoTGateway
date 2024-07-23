@@ -21,8 +21,8 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Avatar.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Avatar.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\DefaultAvatar.png" />

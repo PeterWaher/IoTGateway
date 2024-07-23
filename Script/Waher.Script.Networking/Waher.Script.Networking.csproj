@@ -21,8 +21,8 @@ Script Syntax: https://waher.se/Script.md#networkingRelatedFunctionsWaherScriptN
     <FileVersion>2.0.3</FileVersion>
     <Version>2.0.3</Version>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Script.Networking.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Script.Networking.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

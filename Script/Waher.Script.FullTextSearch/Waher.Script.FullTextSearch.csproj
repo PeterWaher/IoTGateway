@@ -21,8 +21,8 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptFu
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Script.FullTextSearch.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Script.FullTextSearch.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

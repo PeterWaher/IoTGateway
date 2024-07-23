@@ -21,7 +21,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>0</WarningLevel>
-    <DocumentationFile>$(ProjectDir)\Waher.Runtime.Transactions.xml</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup>
+			<DocumentationFile>$(ProjectDir)\Waher.Runtime.Transactions.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

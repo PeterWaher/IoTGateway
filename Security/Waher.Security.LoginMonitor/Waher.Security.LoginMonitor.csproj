@@ -21,8 +21,8 @@
     <Version>1.0.9</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Security.LoginMonitor.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Security.LoginMonitor.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

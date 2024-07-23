@@ -144,6 +144,7 @@
     <Compile Include="Queries\QuerySection.cs" />
     <Compile Include="Queries\QueryTable.cs" />
     <Compile Include="RemoteSniffer.cs" />
+    <Compile Include="SetEditableFormResult.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Concentrator.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

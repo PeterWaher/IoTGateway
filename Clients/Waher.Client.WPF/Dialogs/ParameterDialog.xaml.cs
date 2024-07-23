@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using Waher.Client.WPF.Dialogs.AvalonExtensions;
 using Waher.Content;
+using Waher.Content.Text;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
@@ -940,12 +941,12 @@ namespace Waher.Client.WPF.Dialogs
 			Editor.Options.ShowSpaces = false;
 			Editor.Options.ShowTabs = false;
 
-			string ContentType = Field.ContentType?.ToLower() ?? TextCodec.DefaultContentType;
+			string ContentType = Field.ContentType?.ToLower() ?? PlainTextCodec.DefaultContentType;
 			string SyntaxHighlightingResource = null;
 
 			switch (ContentType)
 			{
-				case TextCodec.DefaultContentType:
+				case PlainTextCodec.DefaultContentType:
 					Editor.WordWrap = true;
 					break;
 

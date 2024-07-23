@@ -19,8 +19,8 @@
     <FileVersion>2.2.2</FileVersion>
     <Version>2.2.2</Version>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Layout.Layout2D.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Layout.Layout2D.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Schema\Layout2D.xsd" />

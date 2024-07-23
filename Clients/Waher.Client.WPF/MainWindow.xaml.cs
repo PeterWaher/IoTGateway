@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Threading;
@@ -136,7 +137,7 @@ namespace Waher.Client.WPF
 				{
 					Directory.CreateDirectory(appDataFolder);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
 					if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 					{

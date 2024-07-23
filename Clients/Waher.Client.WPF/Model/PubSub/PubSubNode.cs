@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;

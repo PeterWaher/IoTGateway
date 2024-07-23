@@ -40,8 +40,8 @@ Edwards448 (Goldilocks)</Description>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Security.EllipticCurves.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Security.EllipticCurves.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

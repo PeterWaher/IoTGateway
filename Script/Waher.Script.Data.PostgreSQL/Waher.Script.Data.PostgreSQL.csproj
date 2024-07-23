@@ -23,8 +23,8 @@ https://waher.se/Script.md#externalPostgreSQLDatabaseRelatedFunctionsWaherScript
     <AssemblyVersion>2.0.5</AssemblyVersion>
     <FileVersion>2.0.5</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Script.Data.PostgreSQL.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Script.Data.PostgreSQL.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="8.0.2" />

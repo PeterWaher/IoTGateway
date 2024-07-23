@@ -23,8 +23,8 @@ https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataM
     <AssemblyVersion>2.0.4</AssemblyVersion>
     <FileVersion>2.0.4</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Script.Data.MySQL.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Script.Data.MySQL.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

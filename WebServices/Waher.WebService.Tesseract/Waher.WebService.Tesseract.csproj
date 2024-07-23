@@ -20,8 +20,8 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.WebService.Tesseract.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.WebService.Tesseract.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Root\Tesseract\Api.md" />

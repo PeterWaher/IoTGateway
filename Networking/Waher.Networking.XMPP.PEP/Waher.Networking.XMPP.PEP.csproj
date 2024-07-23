@@ -29,8 +29,8 @@ XEP-0118: User Tune</Description>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.PEP.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.PEP.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

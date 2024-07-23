@@ -22,7 +22,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup>
     <DocumentationFile>$(ProjectDir)\Waher.Content.QR.xml</DocumentationFile>
   </PropertyGroup>
 

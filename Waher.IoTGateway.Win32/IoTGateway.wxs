@@ -1797,12 +1797,12 @@
 									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 								</CreateFolder>
 								<File Id='GraphVizExample.gv' Name='GraphVizExample.gv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\GraphVizExample.gv' KeyPath='yes'/>
-								<File Id='Layout2DExample.xml' Name='Layout2DExample.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\Layout2DExample.xml' KeyPath='yes'/>
-								<File Id='logo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-200x39.png' KeyPath='yes'/>
+								<File Id='Layout2DExample.xml' Name='Layout2DExample.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\Layout2DExample.xml'/>
+								<File Id='logo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-200x39.png'/>
 								<File Id='logo_WaherDataAB_300x58.png' Name='logo-WaherDataAB-300x58.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-300x58.png'/>
 								<File Id='logo_WaherDataAB_400x77.png' Name='logo-WaherDataAB-400x77.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-400x77.png'/>
 								<File Id='logo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-500x97.png'/>
-								<File Id='PlantUmlExample.uml' Name='PlantUmlExample.uml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\PlantUmlExample.uml' KeyPath='yes'/>
+								<File Id='PlantUmlExample.uml' Name='PlantUmlExample.uml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\PlantUmlExample.uml'/>
 								<RemoveFile Id='RemoveGraphVizExample.gv' Name='GraphVizExample.gv' On='uninstall' />
 								<RemoveFile Id='RemoveLayout2DExample.xml' Name='Layout2DExample.xml' On='uninstall' />
 								<RemoveFile Id='Removelogo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' On='uninstall'/>

@@ -23,8 +23,8 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C$(ProjectDir)\Waher.Persistence.MongoDB.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Persistence.MongoDB.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

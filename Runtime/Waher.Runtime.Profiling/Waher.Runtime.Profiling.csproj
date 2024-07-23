@@ -19,8 +19,8 @@
     <FileVersion>1.0.8</FileVersion>
     <Version>1.0.8</Version>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C$(ProjectDir)\Waher.Runtime.Profiling.xml</DocumentationFile>
+	<PropertyGroup>
+		<DocumentationFile>$(ProjectDir)\Waher.Runtime.Profiling.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

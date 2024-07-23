@@ -23,7 +23,7 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup>
     <DocumentationFile>$(ProjectDir)\Waher.Networking.XMPP.Synchronization.xml</DocumentationFile>
   </PropertyGroup>
 

@@ -175,7 +175,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.SetPresence(Availability.Chat);
 
 			this.sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
-			this.sessions.Removed += Sessions_Removed;
+			this.sessions.Removed += this.Sessions_Removed;
 		}
 
 		/// <summary>
@@ -204,7 +204,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.SetPresence(Availability.Chat);
 
 			this.sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
-			this.sessions.Removed += Sessions_Removed;
+			this.sessions.Removed += this.Sessions_Removed;
 		}
 
 		/// <inheritdoc/>
@@ -1413,12 +1413,12 @@ namespace Waher.Networking.XMPP.Chat
 				if (Result is Graph G)
 				{
 					PixelInformation Pixels = G.CreatePixels(G.GetSettings(Variables, 600, 300));
-					await ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
+					await this.ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}
 				else if (Result.AssociatedObjectValue is SKImage Img)
 				{
-					await ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
+					await this.ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}
 				else if (Result.AssociatedObjectValue is Exception ex)
@@ -1557,17 +1557,17 @@ namespace Waher.Networking.XMPP.Chat
 
 								HttpResponseMessage Response = await HttpClient.PutAsync(e.PutUrl, Body);
 								if (!Response.IsSuccessStatusCode)
-									await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+									await this.ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 								else
 									await this.SendChatMessage(To, OrgSubject, OrgCommand, "![Image result](" + e.GetUrl + ")", Support, Last);
 							}
 						}
 						else
-							await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+							await this.ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 					}
 					catch (Exception)
 					{
-						await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+						await this.ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 					}
 
 				}, null);

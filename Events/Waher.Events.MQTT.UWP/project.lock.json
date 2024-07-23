@@ -2647,6 +2647,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -5378,6 +5379,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -8145,6 +8147,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -10885,6 +10888,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -13661,6 +13665,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -16401,6 +16406,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }
@@ -19177,6 +19183,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "Waher.Content": "1.0.0",
           "Waher.Events": "1.0.0",
           "Waher.Networking.UWP": "1.0.0"
         }

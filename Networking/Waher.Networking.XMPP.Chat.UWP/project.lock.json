@@ -2764,6 +2764,15 @@
           "Waher.Content.Xml": "2.2.6"
         }
       },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
+        }
+      },
       "Waher.Content.Markdown/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -5777,6 +5786,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
           "Waher.Content.Xml": "2.2.6"
+        }
+      },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
         }
       },
       "Waher.Content.Markdown/3.0.1": {
@@ -8830,6 +8848,15 @@
           "Waher.Content.Xml": "2.2.6"
         }
       },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
+        }
+      },
       "Waher.Content.Markdown/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -11852,6 +11879,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
           "Waher.Content.Xml": "2.2.6"
+        }
+      },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
         }
       },
       "Waher.Content.Markdown/3.0.1": {
@@ -14914,6 +14950,15 @@
           "Waher.Content.Xml": "2.2.6"
         }
       },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
+        }
+      },
       "Waher.Content.Markdown/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -17936,6 +17981,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
           "Waher.Content.Xml": "2.2.6"
+        }
+      },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
         }
       },
       "Waher.Content.Markdown/3.0.1": {
@@ -20996,6 +21050,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.9",
           "Waher.Content.Xml": "2.2.6"
+        }
+      },
+      "Waher.Content.Images/2.1.6": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "2.88.7",
+          "Waher.Content": "2.6.9"
         }
       },
       "Waher.Content.Markdown/3.0.1": {
@@ -31340,6 +31403,11 @@
       "path": "../../Content/Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../../Content/Waher.Content.Html/Waher.Content.Html.csproj"
     },
+    "Waher.Content.Images/2.1.6": {
+      "type": "project",
+      "path": "../../Content/Waher.Content.Images/Waher.Content.Images.csproj",
+      "msbuildProject": "../../Content/Waher.Content.Images/Waher.Content.Images.csproj"
+    },
     "Waher.Content.Markdown/3.0.1": {
       "type": "project",
       "path": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj",
@@ -31509,6 +31577,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Html\\Waher.Content.Html.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Html\\Waher.Content.Html.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Images\\Waher.Content.Images.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Images\\Waher.Content.Images.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"

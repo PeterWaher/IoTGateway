@@ -41,7 +41,7 @@
 		<file src="bin\Release\Waher.Content.Markdown.Web.UWP.pdb" target="ref\uap10.0" />
 
 		<!-- XML documentation file goes together with the reference library. -->
-		<file src="Waher.Content.Markdown.Web.UWP.XML" target="ref\uap10.0" />
+		<file src="bin\Release\Waher.Content.Markdown.Web.UWP.XML" target="ref\uap10.0" />
 
 		<!-- Resource files go together with the reference library. -->
 		<file src="bin\Release\Waher.Content.Markdown.Web.UWP.pri" target="ref\uap10.0" />

@@ -20,7 +20,7 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 	<PropertyGroup>
-		<DocumentationFile>$(ProjectDir)\Waher.Content.Asn1.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

@@ -31,7 +31,7 @@
     <file src="bin\Release\Waher.Networking.XMPP.Synchronization.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="Waher.Networking.XMPP.Synchronization.UWP.XML" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.Synchronization.UWP.XML" target="ref\uap10.0" />
 
     <!-- Resource files go together with the reference library. -->
     <file src="bin\Release\Waher.Networking.XMPP.Synchronization.UWP.pri" target="ref\uap10.0" />

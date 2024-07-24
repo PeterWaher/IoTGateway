@@ -1254,9 +1254,9 @@
 
   <ItemGroup>
     <PackageReference Include="JSTest.NET" Version="1.1.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.2.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.2.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.0" />
   </ItemGroup>
 
   <ItemGroup>

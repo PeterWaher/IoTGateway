@@ -37,7 +37,7 @@ https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataM
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="2.3.5" />
+    <PackageReference Include="MySqlConnector" Version="2.3.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />

@@ -44,9 +44,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="2.3.5" />
-    <PackageReference Include="Npgsql" Version="8.0.2" />
-    <PackageReference Include="SkiaSharp" Version="2.88.7" />
+    <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
   </ItemGroup>

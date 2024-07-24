@@ -115,9 +115,11 @@
     <DebugType>pdbonly</DebugType>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>$(ProjectDir)\Waher.Events.Socket.UWP.XML</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>

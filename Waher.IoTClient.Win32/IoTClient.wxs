@@ -300,7 +300,6 @@
 							<File Id='Waher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Temporary.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Text.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.dll' Vital='yes'/>
-							<File Id='Waher.Runtime.Threading.Sync.dll' Name='Waher.Runtime.Threading.Sync.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.Sync.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.dll' Vital='yes'/>
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Content.dll' Name='Waher.Script.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Content.dll' Vital='yes'/>
@@ -379,7 +378,6 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Runtime.Threading.Sync.dll' Name='Waher.Runtime.Threading.Sync.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.dll' Name='Waher.Script.Content.dll' On='uninstall'/>
@@ -483,8 +481,6 @@
 							<File Id='Waher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Text.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.xml' Vital='yes'/>
-							<File Id='Waher.Runtime.Threading.Sync.pdb' Name='Waher.Runtime.Threading.Sync.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.Sync.pdb' Vital='yes'/>
-							<File Id='Waher.Runtime.Threading.Sync.xml' Name='Waher.Runtime.Threading.Sync.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.Sync.xml' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.xml' Vital='yes'/>
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
@@ -592,8 +588,6 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Runtime.Threading.Sync.pdb' Name='Waher.Runtime.Threading.Sync.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Runtime.Threading.Sync.xml' Name='Waher.Runtime.Threading.Sync.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>

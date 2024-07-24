@@ -33,7 +33,7 @@
 		<file src="bin\Release\Waher.Security.JWT.UWP.pdb" target="ref\uap10.0" />
 
 		<!-- XML documentation file goes together with the reference library. -->
-		<file src="bin\Release\Waher.Security.JWT.UWP.XML" target="ref\uap10.0" />
+		<file src="bin\x86\Release\Waher.Security.JWT.UWP.XML" target="ref\uap10.0" />
 
 		<!-- Resource files go together with the reference library. -->
 		<file src="bin\Release\Waher.Security.JWT.UWP.pri" target="ref\uap10.0" />

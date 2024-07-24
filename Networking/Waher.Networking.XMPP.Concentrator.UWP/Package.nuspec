@@ -42,7 +42,7 @@
 		<file src="bin\Release\Waher.Networking.XMPP.Concentrator.UWP.pdb" target="ref\uap10.0" />
 
 		<!-- XML documentation file goes together with the reference library. -->
-		<file src="bin\Release\Waher.Networking.XMPP.Concentrator.UWP.XML" target="ref\uap10.0" />
+		<file src="bin\x86\Release\Waher.Networking.XMPP.Concentrator.UWP.XML" target="ref\uap10.0" />
 
 		<!-- Resource files go together with the reference library. -->
 		<file src="bin\Release\Waher.Networking.XMPP.Concentrator.UWP.pri" target="ref\uap10.0" />

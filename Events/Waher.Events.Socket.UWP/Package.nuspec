@@ -31,6 +31,6 @@
     <file src="bin\Release\Waher.Events.Socket.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\Release\Waher.Events.Socket.UWP.XML" target="ref\uap10.0" />
+    <file src="bin\x86\Release\Waher.Events.Socket.UWP.XML" target="ref\uap10.0" />
   </files>
 </package>

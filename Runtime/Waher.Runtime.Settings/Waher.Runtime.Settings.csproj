@@ -14,10 +14,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence settings</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.10</AssemblyVersion>
-    <FileVersion>1.0.10</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
     <PackageIconUrl />
-    <Version>1.0.10</Version>
+    <Version>1.1.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Runtime\Waher.Runtime.Settings\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

@@ -14,9 +14,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database file storage</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.11.6</AssemblyVersion>
-    <FileVersion>1.11.6</FileVersion>
-    <Version>1.11.6</Version>
+    <AssemblyVersion>1.11.7</AssemblyVersion>
+    <FileVersion>1.11.7</FileVersion>
+    <Version>1.11.7</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence.FilesLW\</UpgradeBackupLocation>

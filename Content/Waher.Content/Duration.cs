@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Script.Functions.DateAndTime;

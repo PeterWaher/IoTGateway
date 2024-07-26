@@ -17,7 +17,7 @@ namespace Waher.Security.LoginMonitor.Test
 		private static readonly TimeSpan Zero = TimeSpan.Zero;
 		private static readonly TimeSpan OneH = TimeSpan.FromHours(1);
 		private static readonly TimeSpan _23H = TimeSpan.FromHours(23);
-		private static readonly TimeSpan _5D23H = new TimeSpan(5, 23, 0, 0, 0);
+		private static readonly TimeSpan _5D23H = new(5, 23, 0, 0, 0);
 		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 
@@ -58,25 +58,25 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_01_Fail1()
 		{
-			await this.TestFails(Zero);
+			await TestFails(Zero);
 		}
 
 		[TestMethod]
 		public async Task Test_02_Fail2()
 		{
-			await this.TestFails(Zero, Zero);
+			await TestFails(Zero, Zero);
 		}
 
 		[TestMethod]
 		public async Task Test_03_Fail5()
 		{
-			await this.TestFails(Zero, Zero, Zero, Zero, Zero);
+			await TestFails(Zero, Zero, Zero, Zero, Zero);
 		}
 
 		[TestMethod]
 		public async Task Test_04_Fail6()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH);
 		}
@@ -84,7 +84,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_05_Fail7()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero);
 		}
@@ -92,7 +92,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_06_Fail10()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero);
 		}
@@ -100,7 +100,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_07_Fail11()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H);
@@ -109,7 +109,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_08_Fail12()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero);
@@ -118,7 +118,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_09_Fail15()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero);
@@ -127,7 +127,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_10_Fail16()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -137,7 +137,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_11_Fail17()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -147,7 +147,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_12_Fail20()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -157,7 +157,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_13_Fail21()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -168,7 +168,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_14_Fail22()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -179,7 +179,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_15_Fail25()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -190,7 +190,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_16_Fail26()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -202,7 +202,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_17_Fail27()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -214,7 +214,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_18_Fail30()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -226,7 +226,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_19_Fail31()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -239,7 +239,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_20_Fail32()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -252,7 +252,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_21_Fail35()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -265,7 +265,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_22_Fail36()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -279,7 +279,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_23_Fail37()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -293,7 +293,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_24_Fail40()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -308,7 +308,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[ExpectedException(typeof(Exception))]
 		public async Task Test_25_Fail41()
 		{
-			await this.TestFails(
+			await TestFails(
 				Zero, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
@@ -320,9 +320,9 @@ namespace Waher.Security.LoginMonitor.Test
 				_5D23H);
 		}
 
-		private async Task TestFails(params TimeSpan[] Spans)
+		private static async Task TestFails(params TimeSpan[] Spans)
 		{
-			DateTime TP = new DateTime(3000, 1, 1, 0, 0, 0);
+			DateTime TP = new(3000, 1, 1, 0, 0, 0);
 			DateTime TP2;
 			int Count = Spans.Length;
 			int i;
@@ -350,7 +350,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestMethod]
 		public async Task Test_26_SparseFails()
 		{
-			DateTime TP = new DateTime(2020, 1, 1, 0, 0, 0);
+			DateTime TP = new(2020, 1, 1, 0, 0, 0);
 			int i;
 
 			for (i = 0; i < 41; i++)

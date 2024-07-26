@@ -55,7 +55,7 @@ namespace Waher.Security.LoginMonitor
 		/// Adds an interval to a time stamp.
 		/// </summary>
 		/// <param name="TP">Timestamp to add the interval to.</param>
-		/// <returns>Timestamp + interval.<</returns>
+		/// <returns>Timestamp + interval.</returns>
 		public DateTime AddIntervalTo(DateTime TP)
 		{
 			if (this.isDuration)

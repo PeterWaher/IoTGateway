@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Content;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
@@ -10,41 +11,25 @@ using Waher.Runtime.Inventory;
 namespace Waher.Security.LoginMonitor.Test
 {
 	[TestClass]
-	public class LoginAuditorTests
+	public class LoginAuditorDurationTests
 	{
 		private const string remoteEndpoint = "TestEP";
 		private const string protocol = "Test";
-		private static readonly TimeSpan Zero = TimeSpan.Zero;
-		private static readonly TimeSpan OneH = TimeSpan.FromHours(1);
-		private static readonly TimeSpan _23H = TimeSpan.FromHours(23);
-		private static readonly TimeSpan _5D23H = new(5, 23, 0, 0, 0);
+		private static readonly Duration Zero = Duration.Zero;
+		private static readonly Duration OneH = Duration.FromHours(1);
+		private static readonly Duration _23H = Duration.FromHours(23);
+		private static readonly Duration _5D23H = new(false, 0, 0, 5, 23, 0, 0);
 		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 
-		[AssemblyInitialize]
-		public static async Task AssemblyInitialize(TestContext _)
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
 		{
-			Types.Initialize(
-				typeof(Database).Assembly,
-				typeof(FilesProvider).Assembly,
-				typeof(ObjectSerializer).Assembly,
-				typeof(LoginAuditor).Assembly);
-
-			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
-			Database.Register(filesProvider);
-
 			auditor = new LoginAuditor("Login Auditor",
-				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
-				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
-				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
-				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
-		}
-
-		[AssemblyCleanup]
-		public static void AssemblyCleanup()
-		{
-			filesProvider?.Dispose();
-			filesProvider = null;
+				new LoginInterval(5, Duration.FromHours(1)),        // Maximum 5 failed login attempts in an hour
+				new LoginInterval(2, Duration.FromDays(1)),         // Maximum 2x5 failed login attempts in a day
+				new LoginInterval(2, Duration.FromDays(7)),         // Maximum 2x2x5 failed login attempts in a week
+				new LoginInterval(2, Duration.FromYears(1000)));    // Maximum 2x2x2x5 failed login attempts in total, then blocked.
 		}
 
 		[TestInitialize]
@@ -320,11 +305,11 @@ namespace Waher.Security.LoginMonitor.Test
 				_5D23H);
 		}
 
-		private static async Task TestFails(params TimeSpan[] Spans)
+		private static async Task TestFails(params Duration[] Durations)
 		{
 			DateTime TP = new(3000, 1, 1, 0, 0, 0);
 			DateTime TP2;
-			int Count = Spans.Length;
+			int Count = Durations.Length;
 			int i;
 
 			for (i = 0; i < Count; i++)
@@ -340,7 +325,7 @@ namespace Waher.Security.LoginMonitor.Test
 				else
 					TP2 = TP;
 
-				Assert.AreEqual(Spans[i], TP2 - TP);
+				Assert.AreEqual(Durations[i], Duration.FromTimeSpan(TP2 - TP));
 				TP = TP2;
 
 				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP, string.Empty);

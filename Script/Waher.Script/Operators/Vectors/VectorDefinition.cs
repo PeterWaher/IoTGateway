@@ -77,8 +77,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Elements">Vector elements.</param>
 		/// <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
-		/// <returns>Encapsulated vector.</returns>
-		public static IVector Encapsulate(Array Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
+		/// <returns>Encapsulated vector (or, in the case on a byte array, an object value containing the binary information as a value).</returns>
+		public static IElement Encapsulate(Array Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
 		{
 			if (Elements is double[] dv)
 				return new DoubleVector(dv);
@@ -88,6 +88,8 @@ namespace Waher.Script.Operators.Vectors
 				return new ComplexVector(zv);
 			else if (Elements is DateTime[] dtv)
 				return new DateTimeVector(dtv);
+			else if (Elements is byte[] Bin)
+				return new ObjectValue(Bin);
 			else
 			{
 				LinkedList<IElement> Elements2 = new LinkedList<IElement>();

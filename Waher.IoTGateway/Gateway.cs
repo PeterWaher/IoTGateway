@@ -2638,6 +2638,7 @@ namespace Waher.IoTGateway
 			{
 				string FileName;
 				string Arguments;
+				bool WaitForExit;
 
 				switch (Environment.OSVersion.Platform)
 				{
@@ -2647,12 +2648,14 @@ namespace Waher.IoTGateway
         			case PlatformID.WinCE:
 						FileName = "netstat.exe";
 						Arguments = "-a -n -o";
+						WaitForExit = false;
 						break;
 
 					case PlatformID.Unix:
 					case PlatformID.MacOSX:
 						FileName = "netstat";
 						Arguments = "-anv -p tcp";
+						WaitForExit = true;
 						break;
 
 					default:
@@ -2677,9 +2680,13 @@ namespace Waher.IoTGateway
 
 					Proc.StartInfo = StartInfo;
 					Proc.Start();
-					Proc.WaitForExit(5000);
-					if (!Proc.HasExited)
-						return;
+
+					if (WaitForExit)
+					{
+						Proc.WaitForExit(5000);
+						if (!Proc.HasExited)
+							return;
+					}
 
 					string Output = Proc.StandardOutput.ReadToEnd();
 					if (DoLog)

@@ -44,6 +44,25 @@ namespace Waher.Content
 		}
 
 		/// <summary>
+		/// Represents a duration value, as defined by the xsd:duration data type:
+		/// http://www.w3.org/TR/xmlschema-2/#duration
+		/// </summary>
+		/// <param name="s">String representation of duration.</param>
+		public Duration(string s)
+		{
+			if (!TryParse(s, out Duration Result))
+				throw new ArgumentException("Invalid duration", nameof(s));
+
+			this.years = Result.years;
+			this.months = Result.months;
+			this.days = Result.days;
+			this.hours = Result.hours;
+			this.minutes = Result.minutes;
+			this.seconds = Result.seconds;
+			this.negation = Result.negation;
+		}
+
+		/// <summary>
 		/// Parses a duration from its string representation.
 		/// </summary>
 		/// <param name="s">String representation of duration.</param>

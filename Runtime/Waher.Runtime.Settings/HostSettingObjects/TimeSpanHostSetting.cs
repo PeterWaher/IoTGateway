@@ -23,8 +23,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public TimeSpanHostSetting(string Name, string Key, TimeSpan Value)
-			: base(Name, Key)
+		public TimeSpanHostSetting(string Host, string Key, TimeSpan Value)
+			: base(Host, Key)
 		{
 			this.value = Value;
 		}

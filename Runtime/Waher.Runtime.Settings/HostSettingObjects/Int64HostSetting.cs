@@ -1,4 +1,3 @@
-using System;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.Settings.HostSettingObjects
@@ -23,8 +22,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public Int64HostSetting(string Name, string Key, long Value)
-			: base(Name, Key)
+		public Int64HostSetting(string Host, string Key, long Value)
+			: base(Host, Key)
 		{
 			this.value = Value;
 		}

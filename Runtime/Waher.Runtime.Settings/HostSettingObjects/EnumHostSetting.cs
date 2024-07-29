@@ -27,8 +27,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public EnumHostSetting(string Name, string Key, Enum Value)
-			: base(Name, Key)
+		public EnumHostSetting(string Host, string Key, Enum Value)
+			: base(Host, Key)
 		{
 			this.Value = Value;
 		}

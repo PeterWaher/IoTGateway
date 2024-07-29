@@ -874,20 +874,26 @@ namespace Waher.Layout.Layout2D.Model
 		public virtual void ExportStateAttributes(XmlWriter Output)
 		{
 			this.id?.ExportState(Output);
-			ExportStateAttribute("_" + nameof(left), this.left, Output);
-			ExportStateAttribute("_" + nameof(right), this.right, Output);
-			ExportStateAttribute("_" + nameof(top), this.top, Output);
-			ExportStateAttribute("_" + nameof(bottom), this.bottom, Output);
-			ExportStateAttribute("_" + nameof(width), this.width, Output);
-			ExportStateAttribute("_" + nameof(height), this.height, Output);
-			ExportStateAttribute("_" + nameof(explicitWidth), this.explicitWidth, Output);
-			ExportStateAttribute("_" + nameof(explicitHeight), this.explicitHeight, Output);
-			ExportStateAttribute("_" + nameof(minWidth), this.minWidth, Output);
-			ExportStateAttribute("_" + nameof(minHeight), this.minHeight, Output);
-			ExportStateAttribute("_" + nameof(maxWidth), this.maxWidth, Output);
-			ExportStateAttribute("_" + nameof(maxHeight), this.maxHeight, Output);
+			ExportStateAttribute("_" + nameof(this.left), this.left, Output);
+			ExportStateAttribute("_" + nameof(this.right), this.right, Output);
+			ExportStateAttribute("_" + nameof(this.top), this.top, Output);
+			ExportStateAttribute("_" + nameof(this.bottom), this.bottom, Output);
+			ExportStateAttribute("_" + nameof(this.width), this.width, Output);
+			ExportStateAttribute("_" + nameof(this.height), this.height, Output);
+			ExportStateAttribute("_" + nameof(this.explicitWidth), this.explicitWidth, Output);
+			ExportStateAttribute("_" + nameof(this.explicitHeight), this.explicitHeight, Output);
+			ExportStateAttribute("_" + nameof(this.minWidth), this.minWidth, Output);
+			ExportStateAttribute("_" + nameof(this.minHeight), this.minHeight, Output);
+			ExportStateAttribute("_" + nameof(this.maxWidth), this.maxWidth, Output);
+			ExportStateAttribute("_" + nameof(this.maxHeight), this.maxHeight, Output);
 		}
 
+		/// <summary>
+		/// Exports an optional state attribute.
+		/// </summary>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="Value">Value of attribute.</param>
+		/// <param name="Output">XML Output.</param>
 		protected static void ExportStateAttribute(string Name, float? Value, XmlWriter Output)
 		{
 			if (Value.HasValue)

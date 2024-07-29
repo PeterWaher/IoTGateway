@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Attributes;
-
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
@@ -28,8 +20,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public BooleanHostSetting(string Name, string Key, bool Value)
-			: base(Name, Key)
+		public BooleanHostSetting(string Host, string Key, bool Value)
+			: base(Host, Key)
 		{
 			this.value = Value;
 		}

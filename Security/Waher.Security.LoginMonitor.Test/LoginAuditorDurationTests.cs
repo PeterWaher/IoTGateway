@@ -1,12 +1,7 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Persistence.Serialization;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Security.LoginMonitor.Test
 {
@@ -19,7 +14,6 @@ namespace Waher.Security.LoginMonitor.Test
 		private static readonly Duration OneH = Duration.FromHours(1);
 		private static readonly Duration _23H = Duration.FromHours(23);
 		private static readonly Duration _5D23H = new(false, 0, 0, 5, 23, 0, 0);
-		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 
 		[ClassInitialize]

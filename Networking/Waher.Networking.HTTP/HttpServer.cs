@@ -1035,10 +1035,14 @@ namespace Waher.Networking.HTTP
 			{
 				try
 				{
-					this.Information("Switching to TLS.");
+					if (this.HasSniffers)
+					{
+						this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
+							", Trust Certificates: " + TrustCertificates.ToString() + ")");
+					}
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-						ClientCertificates, null, TrustClientCertificates);
+						ClientCertificates, null, TrustCertificates);
 
 					if (this.HasSniffers)
 					{

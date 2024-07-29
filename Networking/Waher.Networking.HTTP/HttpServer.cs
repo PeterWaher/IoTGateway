@@ -837,6 +837,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ClientCertificates">If client certificates are not used, optional or required.</param>
 		/// <param name="TrustClientCertificates">If client certificates should be trusted, even if they do not validate.</param>
+		/// <param name="PortSpecificSettings">Port-specific mTLS settings.</param>
 		/// <param name="LockSettings">If client certificate settings should be locked.</param>
 		public void ConfigureMutualTls(ClientCertificates ClientCertificates, bool TrustClientCertificates,
 			Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificSettings, bool LockSettings)

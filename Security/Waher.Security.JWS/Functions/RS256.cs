@@ -26,7 +26,7 @@ namespace Waher.Security.JWS.Functions
 		/// <summary>
 		/// Creates an RSASSA-PKCS1-v1_5 SHA-256 JSON Web Signature key.
 		/// </summary>
-		/// <param name="Secret">Secret</param>
+		/// <param name="Rsa">RSA definition</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>

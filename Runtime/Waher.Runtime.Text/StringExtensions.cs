@@ -1,5 +1,8 @@
 namespace Waher.Runtime.Text
 {
+    /// <summary>
+    /// String extensions
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>

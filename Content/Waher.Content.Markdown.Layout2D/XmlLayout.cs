@@ -226,6 +226,9 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Language">Language</param>
 		/// <param name="Rows">Code Block rows</param>
 		/// <param name="Session">Session variables.</param>
+		/// <param name="ImageFormat">Format of image requested.</param>
+		/// <param name="Quality">Quality of compression (if relevant).</param>
+		/// <param name="FileExtension">File extension to use.</param>
 		/// <returns>File name</returns>
 		internal static Task<GraphInfo> GetFileName(string Language, string[] Rows, Variables Session,
 			SKEncodedImageFormat ImageFormat, int Quality, string FileExtension)

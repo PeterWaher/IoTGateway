@@ -1437,7 +1437,6 @@ namespace Waher.Content.Xml
 		/// Creates a new XML Exception object, with reference to the source XML file, for information.
 		/// </summary>
 		/// <param name="ex">XML Exception object.</param>
-		/// <param name="Xml">Original XML</param>
 		public static XmlException AnnotateException(XmlException ex)
 		{
 			return AnnotateException(ex, null);

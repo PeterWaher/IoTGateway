@@ -12,14 +12,15 @@ namespace Waher.Script.Functions.Vectors
     {
         private readonly VariableReference reference;
 
-        /// <summary>
-        /// PushLast(v)
-        /// </summary>
-        /// <param name="Argument">Argument.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+		/// <summary>
+		/// PushLast(v)
+		/// </summary>
+		/// <param name="Element">Element to push.</param>
+		/// <param name="Vector">Vector to receive element.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public PushLast(ScriptNode Element, ScriptNode Vector, int Start, int Length, Expression Expression)
+		public PushLast(ScriptNode Element, ScriptNode Vector, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { Element, Vector }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Vector },
             Start, Length, Expression)
         {

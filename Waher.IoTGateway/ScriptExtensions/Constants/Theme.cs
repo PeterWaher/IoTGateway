@@ -32,7 +32,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// </summary>
 		public string ConstantName => nameof(Theme);
 
-		/// <	summary>
+		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
 		/// </summary>
 		public string[] Aliases => null;

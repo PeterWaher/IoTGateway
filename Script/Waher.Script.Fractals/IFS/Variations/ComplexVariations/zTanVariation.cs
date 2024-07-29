@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZTanVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZTanVariation : FlameVariationZeroParameters
     {
-        public ZTanVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZTanVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double Mod = Math.Exp(-y);
             double zr = Mod * Math.Cos(x);
@@ -31,6 +40,9 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = (sini * cosr - sinr * cosi) * d;
         }
 
-        public override string FunctionName => nameof(ZTanVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZTanVariation);
     }
 }

@@ -10,23 +10,46 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Gpio
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public enum InputPinMode
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		Input,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		InputPullUp,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		InputPullDown
 	}
 
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class DigitalInput : Pin, ISensor
 	{
 		private GpioPin pin = null;
 		private InputPinMode mode = InputPinMode.Input;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public DigitalInput()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(2, "GPIO")]
 		[Header(7, "Mode:", 20)]
 		[ToolTip(8, "Select drive mode of pin.")]
@@ -65,11 +88,17 @@ namespace Waher.Things.Gpio
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Controller), 5, "Digital Input");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task StartReadout(ISensorReadout Request)
 		{
 			try
@@ -137,6 +166,9 @@ namespace Waher.Things.Gpio
 				FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Controller).Namespace, 12));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task DestroyAsync()
 		{
 			if (!(this.pin is null))
@@ -148,6 +180,9 @@ namespace Waher.Things.Gpio
 			return base.DestroyAsync();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

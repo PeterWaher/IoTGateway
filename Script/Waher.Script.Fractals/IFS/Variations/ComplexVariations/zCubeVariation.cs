@@ -1,15 +1,22 @@
-﻿using System;
-
-namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
+﻿namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZCubeVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZCubeVariation : FlameVariationZeroParameters
     {
-        public ZCubeVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZCubeVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r = x * x - y * y;
             double i = 2 * x * y;
@@ -19,6 +26,9 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             x = x2;
         }
 
-        public override string FunctionName => nameof(ZCubeVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZCubeVariation);
     }
 }

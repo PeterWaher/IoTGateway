@@ -20,17 +20,26 @@ namespace Waher.Script.Fractals.ColorModels
 	/// </example>
 	public class LinearColors : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public LinearColors(ScriptNode Colors, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Colors }, new ArgumentType[] { ArgumentType.Vector }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public LinearColors(ScriptNode Colors, ScriptNode N, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Colors, N },
 				  new ArgumentType[] { ArgumentType.Vector, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public LinearColors(ScriptNode Colors, ScriptNode N, ScriptNode BandSize, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { Colors, N, BandSize }, 
 				  new ArgumentType[] { ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
@@ -183,7 +192,9 @@ namespace Waher.Script.Fractals.ColorModels
             return Result;
         }
 
-        public override string FunctionName => nameof(LinearColors);
-
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(LinearColors);
     }
 }

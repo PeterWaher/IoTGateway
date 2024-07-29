@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZCosVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZCosVariation : FlameVariationZeroParameters
     {
-        public ZCosVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZCosVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double Mod = Math.Exp(-y);
             double zr = Mod * (Math.Cos(x));
@@ -23,6 +32,9 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = zi * 0.5;
         }
 
-        public override string FunctionName => nameof(ZCosVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZCosVariation);
     }
 }

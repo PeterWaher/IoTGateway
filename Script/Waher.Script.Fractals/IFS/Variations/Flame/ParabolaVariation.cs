@@ -4,11 +4,17 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class ParabolaVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ParabolaVariation : FlameVariationMultipleParameters
     {
         private readonly double width;
         private readonly double height;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ParabolaVariation(ScriptNode width, ScriptNode height, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { width, height }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
@@ -17,6 +23,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.height = 0;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ParabolaVariation(double Width, double Height, ScriptNode width, ScriptNode height, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { width, height }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
@@ -25,6 +34,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.height = Height;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -33,6 +45,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double Width = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -41,7 +56,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             return new ParabolaVariation(Width, Height, this.Arguments[0], this.Arguments[1], this.Start, this.Length, this.Expression);
 		}
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r1;
 
@@ -59,6 +77,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(ParabolaVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ParabolaVariation);
     }
 }

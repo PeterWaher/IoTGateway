@@ -4,7 +4,10 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class SuperShapeVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class SuperShapeVariation : FlameVariationMultipleParameters
     {
         private readonly double m;
         private readonly double n1;
@@ -13,6 +16,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
         private readonly double holes;
         private readonly double rnd;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public SuperShapeVariation(ScriptNode m, ScriptNode n1, ScriptNode n2, ScriptNode n3,
 			ScriptNode holes, ScriptNode rnd, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { m, n1, n2, n3, holes, rnd },
@@ -28,6 +34,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.rnd = 0;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public SuperShapeVariation(double M, double N1, double N2, double N3,
 			double Holes, double Rnd, ScriptNode m, ScriptNode n1, ScriptNode n2, ScriptNode n3,
 			ScriptNode holes, ScriptNode rnd, int Start, int Length, Expression Expression)
@@ -44,7 +53,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.rnd = Rnd;
         }
 
-        public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double M = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
             double N1 = Expression.ToDouble(Arguments[1].AssociatedObjectValue);
@@ -58,6 +70,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Arguments[5], this.Start, this.Length, this.Expression);
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -66,7 +81,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r1;
 
@@ -87,6 +105,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(SuperShapeVariation);
-    }
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(SuperShapeVariation);
+	}
 }

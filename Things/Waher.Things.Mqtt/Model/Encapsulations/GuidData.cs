@@ -26,6 +26,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.value = Value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void DataReported(MqttContent Content)
 		{
 			this.value = Guid.Parse(CommonTypes.GetString(Content.Data, Encoding.UTF8));
@@ -34,19 +37,31 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.retain = Content.Header.Retain;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 36, "GUID");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new StringField(ThingReference, this.timestamp, this.Append(Prefix, "Value"), 
 				this.value.ToString(), FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override bool IsControllable => true;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override ControlParameter[] GetControlParameters()
 		{
 			return new ControlParameter[]
@@ -62,6 +77,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			};
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.value.ToString());

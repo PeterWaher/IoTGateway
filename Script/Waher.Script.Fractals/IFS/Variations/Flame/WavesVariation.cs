@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class WavesVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class WavesVariation : FlameVariationZeroParameters
     {
-        public WavesVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public WavesVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double t = this.homogeneousTransform[2];
             double x2 = x + this.homogeneousTransform[1] * Math.Sin(y / (t * t + 1e-6));
@@ -19,6 +28,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             x = x2;
         }
 
-        public override string FunctionName => nameof(WavesVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(WavesVariation);
     }
 }

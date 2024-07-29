@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
@@ -10,7 +9,10 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Fractals.IFS
 {
-    public class FlameFunction
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class FlameFunction
     {
 		private readonly DoubleNumber xv, yv;
 		private readonly ComplexNumber zv;
@@ -40,7 +42,10 @@ namespace Waher.Script.Fractals.IFS
         private bool hasVariations;
         private bool isTransparent = false;
 
-        public FlameFunction(DoubleMatrix M, ScriptNode Node)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public FlameFunction(DoubleMatrix M, ScriptNode Node)
         {
 			double[,] E = M.Values;
 
@@ -85,14 +90,20 @@ namespace Waher.Script.Fractals.IFS
                 throw new ScriptRuntimeException("Linear transformation must be a 2D or homogeneous 2D transformation.", Node);
         }
 
-        public void Add(IFlameVariation Variation)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void Add(IFlameVariation Variation)
         {
             this.variationsList.Add(Variation);
             this.variationsWeightList.Add(1);
             this.lastVariation = Variation;
         }
 
-        public void Add(ILambdaExpression Variation)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void Add(ILambdaExpression Variation)
         {
             switch (Variation.NrArguments)
             {
@@ -113,7 +124,10 @@ namespace Waher.Script.Fractals.IFS
             this.lastVariation = Variation;
         }
 
-        public void SetWeight(double Weight)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void SetWeight(double Weight)
         {
             if (this.lastVariation is IFlameVariation)
                 this.variationsWeightList[this.variationsWeightList.Count - 1] = Weight;
@@ -125,7 +139,10 @@ namespace Waher.Script.Fractals.IFS
                 this.weight = Weight;
         }
 
-        public void SetColor(SKColor Color)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void SetColor(SKColor Color)
         {
             this.color = Color;
             this.red = this.color.Red / 255.0;
@@ -134,7 +151,10 @@ namespace Waher.Script.Fractals.IFS
             this.isTransparent = (this.color.Alpha == 0);
         }
 
-        public void SetColorHsl(double H, double S, double L)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void SetColorHsl(double H, double S, double L)
         {
             this.color = SKColors.Black;
             this.red = H / 360.0;
@@ -163,7 +183,10 @@ namespace Waher.Script.Fractals.IFS
                 this.variations[i].Initialize(this.homogeneousTransform, this.variationWeights[i]);
         }
 
-        public double Weight => this.weight;
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public double Weight => this.weight;
 
         internal bool Operate(FlameState point, Variables Variables)
         {

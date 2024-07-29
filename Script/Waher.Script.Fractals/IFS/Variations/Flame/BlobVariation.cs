@@ -4,12 +4,18 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class BlobVariation : FlameVariationMultipleParameters
 	{
 		private readonly double high;
 		private readonly double low;
 		private readonly double waves;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public BlobVariation(ScriptNode high, ScriptNode low, ScriptNode waves, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { high, low, waves }, new ArgumentType[] { ArgumentType.Scalar,
 				ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
@@ -29,6 +35,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.waves = Waves;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -37,6 +46,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			double High = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -47,6 +59,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Start, this.Length, this.Expression);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Operate(ref double x, ref double y)
 		{
 			double r = Math.Sqrt(x * x + y * y);
@@ -56,6 +71,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			y = r * Math.Sin(a);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(BlobVariation);
 	}
 }

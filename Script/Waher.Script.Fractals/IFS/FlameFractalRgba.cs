@@ -24,6 +24,9 @@ namespace Waher.Script.Fractals.IFS
     /// </example>
     public class FlameFractalRgba : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, ScriptNode DimY, ScriptNode SuperSampling,
 			ScriptNode Gamma, ScriptNode Vibrancy, ScriptNode Seed, int Start, int Length, Expression Expression)
@@ -36,6 +39,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, ScriptNode DimY, ScriptNode SuperSampling,
 			ScriptNode Gamma, ScriptNode Vibrancy, int Start, int Length, Expression Expression)
@@ -48,6 +54,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, ScriptNode DimY, ScriptNode SuperSampling,
 			ScriptNode Gamma, int Start, int Length, Expression Expression)
@@ -60,6 +69,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, ScriptNode DimY, ScriptNode SuperSampling,
 			int Start, int Length, Expression Expression)
@@ -71,6 +83,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, ScriptNode DimY, int Start, int Length,
 			Expression Expression)
@@ -82,6 +97,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, FlameFunctions, Preview, Parallel, DimX },
@@ -92,6 +110,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, ScriptNode Parallel, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, FlameFunctions, Preview, Parallel },
@@ -101,6 +122,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			ScriptNode Preview, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, FlameFunctions, Preview },
@@ -110,6 +134,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public FlameFractalRgba(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode FlameFunctions,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, FlameFunctions },
@@ -119,6 +146,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -131,8 +161,14 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(FlameFractalRgba);
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] Aliases
         {
             get
@@ -141,7 +177,10 @@ namespace Waher.Script.Fractals.IFS
             }
         }
 
-        public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double xc, yc;
             double dr;
@@ -357,7 +396,10 @@ namespace Waher.Script.Fractals.IFS
             return sb.ToString();
         }
 
-        public static void EstimateSize(out double xCenter, out double yCenter, out double rDelta, FlameFunction[] Functions, 
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static void EstimateSize(out double xCenter, out double yCenter, out double rDelta, FlameFunction[] Functions, 
 			int Width, int Height, int Seed, long N, Variables Variables, ScriptNode Node)
         {
             double TotWeight = 0;
@@ -457,7 +499,10 @@ namespace Waher.Script.Fractals.IFS
                 rDelta = d;
         }
 
-        public static FractalGraph CalcFlame(double xCenter, double yCenter, double rDelta, long N,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static FractalGraph CalcFlame(double xCenter, double yCenter, double rDelta, long N,
             FlameFunction[] Functions, int Width, int Height, int Seed, int SuperSampling, double Gamma,
             double Vibrancy, bool Preview, bool Parallel, Variables Variables, ScriptNode Node,
             FractalZoomScript FractalZoomScript, object State)

@@ -28,6 +28,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.nrDecimals = NrDecimals;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void DataReported(MqttContent Content)
 		{
 			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
@@ -42,19 +45,31 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				throw new Exception("Invalid floating-point value.");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 35, "Floating-point");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new QuantityField(ThingReference, this.timestamp, this.Append(Prefix, "Value"), 
 				this.value, this.nrDecimals, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override bool IsControllable => true;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override ControlParameter[] GetControlParameters()
 		{
 			return new ControlParameter[]
@@ -70,6 +85,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			};
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.value.ToString());

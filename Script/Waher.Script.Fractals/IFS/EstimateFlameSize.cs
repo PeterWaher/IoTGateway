@@ -25,9 +25,9 @@ namespace Waher.Script.Fractals.IFS
 	///     ];
 	///     v:=EstimateFlameSize(5000, f);
 	/// 	Dim:=max(abs(v))
-	/// ) while N-->0 && Dim>100;
+	/// ) while N-->0 &amp;&amp; Dim>100;
 	/// 
-	/// if N<=0 then error("No coefficients found.");
+	/// if N&lt;=0 then error("No coefficients found.");
 	/// 
 	/// [xc, yc, dr]:=v;
 	/// 
@@ -41,6 +41,9 @@ namespace Waher.Script.Fractals.IFS
 	/// </example>
 	public class EstimateFlameSize : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public EstimateFlameSize(ScriptNode N, ScriptNode FlameFunctions, ScriptNode DimX, ScriptNode DimY, ScriptNode Seed, 
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N, FlameFunctions, DimX, DimY, Seed }, 
@@ -49,6 +52,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public EstimateFlameSize(ScriptNode N, ScriptNode FlameFunctions, ScriptNode DimX, ScriptNode DimY, 
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N, FlameFunctions, DimX, DimY },
@@ -56,18 +62,27 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public EstimateFlameSize(ScriptNode N, ScriptNode FlameFunctions, ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N, FlameFunctions, DimX },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Vector, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public EstimateFlameSize(ScriptNode N, ScriptNode FlameFunctions, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N, FlameFunctions },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Vector }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -79,9 +94,15 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(EstimateFlameSize);
 
-        public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             long N;
             int dimx, dimy;

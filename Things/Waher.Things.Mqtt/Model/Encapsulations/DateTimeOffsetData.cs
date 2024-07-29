@@ -26,6 +26,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.value = Value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void DataReported(MqttContent Content)
 		{
 			if (CommonTypes.TryParseRfc822(CommonTypes.GetString(Content.Data, Encoding.UTF8), out DateTimeOffset Value))
@@ -39,19 +42,31 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				throw new Exception("Invalid web date & time value.");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 33, "Date and Time");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new DateTimeField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
 				this.value.DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override bool IsControllable => true;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override ControlParameter[] GetControlParameters()
 		{
 			return new ControlParameter[]
@@ -75,6 +90,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			};
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.value.ToString());

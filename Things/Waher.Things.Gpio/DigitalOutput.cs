@@ -11,25 +11,56 @@ using Waher.Things.ControlParameters;
 
 namespace Waher.Things.Gpio
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public enum OutputPinMode
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		Output,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		OutputOpenDrain,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		OutputOpenDrainPullUp,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		OutputOpenSource,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		OutputOpenSourcePullDown
 	}
 
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class DigitalOutput : Pin, ISensor, IActuator
 	{
 		private GpioPin pin = null;
 		private OutputPinMode mode = OutputPinMode.Output;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public DigitalOutput()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(2, "GPIO")]
 		[Header(7, "Mode:", 20)]
 		[ToolTip(8, "Select drive mode of pin.")]
@@ -78,11 +109,17 @@ namespace Waher.Things.Gpio
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Controller), 6, "Digital Output");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task StartReadout(ISensorReadout Request)
 		{
 			try
@@ -142,6 +179,9 @@ namespace Waher.Things.Gpio
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task DestroyAsync()
 		{
 			if (!(this.pin is null))
@@ -153,6 +193,9 @@ namespace Waher.Things.Gpio
 			return base.DestroyAsync();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
 			return Task.FromResult<ControlParameter[]>(new ControlParameter[]
@@ -189,6 +232,9 @@ namespace Waher.Things.Gpio
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

@@ -7,9 +7,15 @@ using Waher.Things.Ip;
 
 namespace Waher.Things.Mqtt
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	[Singleton]
 	public class MqttModule : IModule
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task Start()
 		{
 			try
@@ -33,6 +39,9 @@ namespace Waher.Things.Mqtt
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task Stop()
 		{
 			return Task.CompletedTask;

@@ -17,26 +17,36 @@ namespace Waher.Things.Gpio
 		/// <summary>
 		/// Node representing a GPIO conroller.
 		/// </summary>
-		///	<param name="Id">Node ID.</param>
-		/// <param name="Controller">GPIO Controller</param>
 		public Controller()
 			: base()
 		{
 			this.controller = GpioController.GetDefault();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public GpioController GpioController => this.controller;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult<bool>(Child is Pin);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return (Parent is Root) && !((await GpioController.GetDefaultAsync() is null));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Controller), 1, "General Purpose I/O");

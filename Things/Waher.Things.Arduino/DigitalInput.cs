@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
 using Waher.Persistence.Attributes;
@@ -12,22 +10,41 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public enum DigitalInputPinMode
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		Input,
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		InputPullUp
 	}
 
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class DigitalInput : DigitalPin, ISensor
 	{
 		private DigitalInputPinMode mode = DigitalInputPinMode.Input;
 		private bool initialized = false;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public DigitalInput()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(9, "Mode:", 20)]
 		[ToolTip(10, "Select drive mode of pin.")]
@@ -44,6 +61,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Initialize()
 		{
 			RemoteDevice Device = this.Device;
@@ -67,11 +87,17 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Module), 8, "Digital Input");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task StartReadout(ISensorReadout Request)
 		{
 			try
@@ -116,12 +142,18 @@ namespace Waher.Things.Arduino
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Pin_ValueChanged(PinState NewState)
 		{
 			this.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", NewState == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
 				typeof(Module).Namespace, 13));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

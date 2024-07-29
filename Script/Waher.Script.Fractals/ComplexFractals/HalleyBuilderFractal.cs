@@ -17,7 +17,10 @@ namespace Waher.Script.Fractals.ComplexFractals
     /// </example>
     public class HalleyBuilderFractal : FunctionMultiVariate
     {
-        public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { z, dr, R, Coefficients, Palette, DimX, DimY }, 
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
@@ -25,6 +28,9 @@ namespace Waher.Script.Fractals.ComplexFractals
         {
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients, Palette, DimX },
@@ -33,6 +39,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients, Palette },
@@ -41,6 +50,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients },
@@ -49,6 +61,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleyBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, int Start, int Length, 
 			Expression Expression)
 			: base(new ScriptNode[] { z, dr, R },
@@ -57,6 +72,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -65,6 +83,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             string ColorExpression = null;
@@ -239,6 +260,9 @@ namespace Waher.Script.Fractals.ComplexFractals
             return sb.ToString();
         }
 
-        public override string FunctionName => nameof(HalleyBuilderFractal);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(HalleyBuilderFractal);
     }
 }

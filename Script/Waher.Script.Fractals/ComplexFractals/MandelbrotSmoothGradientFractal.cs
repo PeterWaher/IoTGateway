@@ -24,6 +24,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// </example>
 	public class MandelbrotSmoothGradientFractal : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { z, f, dr, Palette, DimX, DimY }, 
@@ -32,6 +35,9 @@ namespace Waher.Script.Fractals.ComplexFractals
         {
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr, Palette, DimX },
@@ -40,6 +46,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr, Palette },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
@@ -47,12 +56,18 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -61,6 +76,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             string ColorExpression = null;
@@ -190,7 +208,10 @@ namespace Waher.Script.Fractals.ComplexFractals
             return sb.ToString();
         }
 
-        public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
             SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
         {
@@ -260,7 +281,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
-        public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
             ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
             ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
@@ -389,7 +413,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
-        public override string FunctionName => nameof(MandelbrotSmoothGradientFractal);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(MandelbrotSmoothGradientFractal);
 
     }
 }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
-using Microsoft.Maker.Serial;
-using Windows.Devices.Enumeration;
-using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -15,15 +9,24 @@ using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Arduino
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class UsbConnectedDevice : MeteringNode
 	{
 		private string portName = string.Empty;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public UsbConnectedDevice()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(2, "Port")]
 		[Header(3, "Name:")]
 		[ToolTip(4, "Name of USB serial port.")]
@@ -34,6 +37,9 @@ namespace Waher.Things.Arduino
 			set => this.portName = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public RemoteDevice Device
 		{
 			get
@@ -42,6 +48,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task AddAsync(INode Child)
 		{
 			Task Result = base.AddAsync(Child);
@@ -53,6 +62,9 @@ namespace Waher.Things.Arduino
 			return Result;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<bool> RemoveAsync(INode Child)
 		{
 			bool Result = await base.RemoveAsync(Child);
@@ -64,6 +76,9 @@ namespace Waher.Things.Arduino
 			return Result;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected override void SortChildrenAfterLoadLocked(List<MeteringNode> Children)
 		{
 			base.SortChildrenAfterLoadLocked(Children);
@@ -90,16 +105,25 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult<bool>(Child is Pin);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult<bool>(Parent is Root);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Module), 1, "USB Connected Device");

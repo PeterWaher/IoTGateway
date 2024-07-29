@@ -19,6 +19,9 @@ namespace Waher.Script.Fractals.ComplexFractals
     /// </example>
     public class NewtonBuilderFractal : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { z, dr, R, c, Palette, DimX, DimY }, 
@@ -28,6 +31,9 @@ namespace Waher.Script.Fractals.ComplexFractals
         {
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, Palette, DimX },
@@ -37,6 +43,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, Palette },
@@ -46,6 +55,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c },
@@ -55,6 +67,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBuilderFractal(ScriptNode z, ScriptNode dr, ScriptNode R, int Start, int Length,
 			Expression Expression)
 			: base(new ScriptNode[] { z, dr, R },
@@ -63,6 +78,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -71,6 +89,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             string ColorExpression = null;
@@ -245,6 +266,9 @@ namespace Waher.Script.Fractals.ComplexFractals
             return sb.ToString();
         }
 
-        public override string FunctionName => nameof(NewtonBuilderFractal);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(NewtonBuilderFractal);
     }
 }

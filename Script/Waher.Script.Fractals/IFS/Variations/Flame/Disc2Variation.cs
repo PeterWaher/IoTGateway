@@ -4,12 +4,18 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class Disc2Variation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class Disc2Variation : FlameVariationMultipleParameters
     {
         private readonly double rotation;
         private readonly double twist;
 
-        public Disc2Variation(ScriptNode rotation, ScriptNode twist, int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public Disc2Variation(ScriptNode rotation, ScriptNode twist, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { rotation, twist }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
 		{
@@ -25,6 +31,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.twist = Twist;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -33,6 +42,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double Rotation = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -42,7 +54,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Start, this.Length, this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double d2rtp = this.rotation * Math.PI;
             double s0 = Math.Sin(this.twist);
@@ -73,6 +88,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private const double pi2 = 2 * Math.PI;
 
-        public override string FunctionName => nameof(Disc2Variation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(Disc2Variation);
     }
 }

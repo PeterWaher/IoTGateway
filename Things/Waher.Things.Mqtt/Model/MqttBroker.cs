@@ -10,6 +10,9 @@ using Waher.Things.Metering;
 
 namespace Waher.Things.Mqtt.Model
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class MqttBroker : IDisposable
 	{
 		private static Scheduler scheduler = null;
@@ -28,6 +31,9 @@ namespace Waher.Things.Mqtt.Model
 		private MqttQualityOfService willQoS;
 		private DateTime nextCheck;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
 			string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
@@ -74,6 +80,9 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public void Dispose()
 		{
 			this.Close();
@@ -100,12 +109,18 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task DataReceived(MqttContent Content)
 		{
 			MqttTopic Topic = await this.GetTopic(Content.Topic, true);
 			Topic?.DataReported(Content);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public void SetWill(string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
 			if (this.willTopic != WillTopic || this.willData != WillData || this.willRetain != WillRetain || this.willQoS != WillQoS)
@@ -218,6 +233,9 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew)
 		{
 			if (string.IsNullOrEmpty(TopicString))
@@ -288,6 +306,9 @@ namespace Waher.Things.Mqtt.Model
 				return await Topic.GetTopic(Parts, 1, CreateNew, this);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public bool Remove(string LocalTopic)
 		{
 			if (!(LocalTopic is null))

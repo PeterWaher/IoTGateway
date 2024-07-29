@@ -11,15 +11,24 @@ using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Mqtt
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class MqttTopicNode : ProvisionedMeteringNode, ISensor, IActuator
 	{
 		private string localTopic = string.Empty;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MqttTopicNode()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(2, "MQTT")]
 		[Header(22, "Local Topic:")]
 		[ToolTip(23, "Local topic, unique among siblings.")]
@@ -30,8 +39,14 @@ namespace Waher.Things.Mqtt
 			set => this.localTopic = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string LocalId => this.localTopic;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[IgnoreMember]
 		public string FullTopic
 		{
@@ -50,6 +65,9 @@ namespace Waher.Things.Mqtt
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[IgnoreMember]
 		public MqttBrokerNode Broker
 		{
@@ -69,27 +87,42 @@ namespace Waher.Things.Mqtt
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult(Child is MqttTopicNode);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult(Parent is MqttTopicNode || Parent is MqttBrokerNode);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 24, "Topic");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task<MqttTopic> GetTopic()
 		{
 			MqttBroker Broker = this.Broker?.GetBroker();
 			return await Broker?.GetTopic(this.FullTopic, false);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
@@ -101,6 +134,9 @@ namespace Waher.Things.Mqtt
 			return Parameters;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async override Task<bool> RemoveAsync(INode Child)
 		{
 			if (Child is MqttTopicNode Topic)
@@ -109,11 +145,17 @@ namespace Waher.Things.Mqtt
 			return await base.RemoveAsync(Child);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
 			return Task.FromResult<ControlParameter[]>(this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0]);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task StartReadout(ISensorReadout Request)
 		{
 			try

@@ -34,6 +34,9 @@ namespace Waher.Things.Mqtt.Model
 			return Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static MqttBroker GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, string UserName, string Password,
 			string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
@@ -70,6 +73,9 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void DestroyBroker(string Key)
 		{
 			MqttBroker Broker;

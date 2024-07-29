@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class PowerVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class PowerVariation : FlameVariationZeroParameters
     {
-        public PowerVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public PowerVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r = Math.Sqrt(x * x + y * y);
             double a = Math.Atan2(x, y);
@@ -19,6 +28,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * s;
         }
 
-        public override string FunctionName => nameof(PowerVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(PowerVariation);
     }
 }

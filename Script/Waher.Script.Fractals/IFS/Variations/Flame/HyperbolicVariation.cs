@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class HyperbolicVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class HyperbolicVariation : FlameVariationZeroParameters
     {
-        public HyperbolicVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public HyperbolicVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r = Math.Sqrt(x * x + y * y) + 1e-6;
             double a = Math.Atan2(x, y);
@@ -17,6 +26,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * Math.Cos(a);
         }
 
-        public override string FunctionName => nameof(HyperbolicVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(HyperbolicVariation);
     }
 }

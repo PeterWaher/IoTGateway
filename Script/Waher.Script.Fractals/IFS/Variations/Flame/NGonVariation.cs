@@ -4,14 +4,20 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class NGonVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class NGonVariation : FlameVariationMultipleParameters
     {
         private readonly double power;
         private readonly double sides;
         private readonly double corners;
         private readonly double circle;
 
-        public NGonVariation(ScriptNode high, ScriptNode low, ScriptNode corners, ScriptNode circle,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public NGonVariation(ScriptNode high, ScriptNode low, ScriptNode corners, ScriptNode circle,
 			int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { high, low, corners, circle },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar },
@@ -23,6 +29,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.circle = 0;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NGonVariation(double High, double Low, double Corners, double Circle, 
 			ScriptNode high, ScriptNode low, ScriptNode corners, ScriptNode circle,
 			int Start, int Length, Expression Expression)
@@ -36,6 +45,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.circle = Circle;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -44,6 +56,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double High = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -56,7 +71,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double p2 = Math.PI * 2 / this.sides;
             double a = Math.Atan2(y, x);
@@ -71,6 +89,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y *= k;
         }
 
-        public override string FunctionName => nameof(NGonVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(NGonVariation);
     }
 }

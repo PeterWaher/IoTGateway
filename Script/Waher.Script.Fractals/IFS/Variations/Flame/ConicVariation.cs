@@ -4,11 +4,17 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class ConicVariation : FlameVariationMultipleParameters
 	{
 		private readonly double holes;
 		private readonly double eccentricity;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ConicVariation(ScriptNode holes, ScriptNode eccentricity, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { holes, eccentricity }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
@@ -26,6 +32,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.eccentricity = Eccentricity;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -34,6 +43,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			double Holes = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -43,6 +55,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Start, this.Length, this.Expression);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Operate(ref double x, ref double y)
 		{
 			double r1;
@@ -60,6 +75,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
 		private readonly Random gen = new Random();
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(ConicVariation);
 	}
 }

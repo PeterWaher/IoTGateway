@@ -40,6 +40,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// </example>
 	public class NewtonTopographyFractal : FunctionMultiVariate
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonTopographyFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, Palette, DimX, DimY },
@@ -49,6 +52,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonTopographyFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, Palette, DimX },
@@ -58,6 +64,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonTopographyFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode Palette,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, Palette },
@@ -67,6 +76,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonTopographyFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c },
@@ -76,6 +88,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -84,6 +99,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			string ColorExpression = null;
@@ -264,6 +282,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewtonTopography(double rCenter, double iCenter, double rDelta, Complex R,
 			double[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node,
 			FractalZoomScript FractalZoomScript, object State)
@@ -377,6 +398,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewtonTopography(double rCenter, double iCenter, double rDelta, Complex R,
 			Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node,
 			FractalZoomScript FractalZoomScript, object State)
@@ -512,6 +536,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewtonTopography(double rCenter, double iCenter, double rDelta, Complex R,
 			ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
@@ -642,6 +669,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(NewtonTopographyFractal);
 	}
 }

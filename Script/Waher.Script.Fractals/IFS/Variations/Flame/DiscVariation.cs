@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class DiscVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class DiscVariation : FlameVariationZeroParameters
     {
-        public DiscVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public DiscVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r = Math.Sqrt(x * x + y * y);
             double a = Math.Atan2(x, y);
@@ -17,6 +26,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = a * Math.Cos(r * Math.PI) / Math.PI;
         }
 
-        public override string FunctionName => nameof(DiscVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(DiscVariation);
     }
 }

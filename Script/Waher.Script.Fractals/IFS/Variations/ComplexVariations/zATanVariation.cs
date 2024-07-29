@@ -1,15 +1,22 @@
-﻿using System;
-
-namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
+﻿namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZATanVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZATanVariation : FlameVariationZeroParameters
     {
-        public ZATanVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZATanVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double zr = 1 + y;
             double zi = -x;
@@ -23,6 +30,9 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = (zi * zr2 - zr * zi2) * d;
         }
 
-        public override string FunctionName => nameof(ZATanVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZATanVariation);
     }
 }

@@ -126,6 +126,9 @@ namespace Waher.Script.Fractals.IFS
 	/// </example>
 	public class IfsFractal : FunctionMultiVariate
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public IfsFractal(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode Transforms,
 			ScriptNode DimX, ScriptNode DimY, ScriptNode Seed, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, Transforms, DimX, DimY, Seed }, 
@@ -135,6 +138,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public IfsFractal(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode Transforms,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, Transforms, DimX, DimY },
@@ -143,6 +149,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public IfsFractal(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode Transforms,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, Transforms, DimX },
@@ -151,6 +160,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public IfsFractal(ScriptNode xc, ScriptNode yc, ScriptNode dr, ScriptNode N, ScriptNode Transforms,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { xc, yc, dr, N, Transforms },
@@ -159,6 +171,9 @@ namespace Waher.Script.Fractals.IFS
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -167,6 +182,9 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			double xc, yc;
@@ -292,6 +310,9 @@ namespace Waher.Script.Fractals.IFS
 
 		private static readonly Random gen = new Random();
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(IfsFractal);
 
 		private string FractalZoomScript(double r, double i, double Size, object State)
@@ -326,6 +347,9 @@ namespace Waher.Script.Fractals.IFS
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcIfs(double xCenter, double yCenter, double rDelta, long N,
 			DoubleMatrix[] Functions, double[] Weights, SKColor[] Colors, int Width, int Height, int Seed,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
@@ -496,6 +520,9 @@ namespace Waher.Script.Fractals.IFS
 			return new FractalGraph(Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcIfs(double xCenter, double yCenter, double rDelta, long N,
 			ILambdaExpression[] Functions, double[] Weights, SKColor[] Colors, int Width, int Height, int Seed,
 			ScriptNode Node, Variables Variables, FractalZoomScript FractalZoomScript, object State)

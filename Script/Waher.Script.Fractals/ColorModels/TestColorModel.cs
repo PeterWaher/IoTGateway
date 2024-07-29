@@ -1,5 +1,4 @@
-﻿using System;
-using SkiaSharp;
+﻿using SkiaSharp;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Abstraction.Elements;
@@ -20,6 +19,7 @@ namespace Waher.Script.Fractals.ColorModels
 		/// <param name="Argument">Argument.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public TestColorModel(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
@@ -75,6 +75,9 @@ namespace Waher.Script.Fractals.ColorModels
 			}
 		}
 
-        public override string FunctionName => nameof(TestColorModel);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(TestColorModel);
     }
 }

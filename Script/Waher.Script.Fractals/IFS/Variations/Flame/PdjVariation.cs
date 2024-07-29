@@ -4,13 +4,19 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class PdjVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class PdjVariation : FlameVariationMultipleParameters
     {
         private readonly double a;
         private readonly double b;
         private readonly double c;
         private readonly double d;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public PdjVariation(ScriptNode a, ScriptNode b, ScriptNode c, ScriptNode d,
 			int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { a, b, c, d},
@@ -23,6 +29,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.d = 0;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public PdjVariation(double A, double B, double C, double D, 
 			ScriptNode a, ScriptNode b, ScriptNode c, ScriptNode d,
 			int Start, int Length, Expression Expression)
@@ -36,6 +45,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.d = D;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -44,6 +56,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double A = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -56,12 +71,18 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             x = Math.Sin(this.a * y) - Math.Cos(this.b * x);
             y = Math.Sin(this.c * x) - Math.Cos(this.d * y);
         }
 
-        public override string FunctionName => nameof(PdjVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(PdjVariation);
     }
 }

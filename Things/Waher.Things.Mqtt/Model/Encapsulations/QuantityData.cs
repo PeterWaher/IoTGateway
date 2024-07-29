@@ -16,6 +16,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// </summary>
 	public class QuantityData : Data
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static readonly Regex RegEx = new Regex(@"^(?'Magnitude'[+-]?\d*([.]\d*)?([eE][+-]?\d+)?)\s+(?'Unit'[^\s]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
 		private string unit;
@@ -33,6 +36,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.unit = Unit;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void DataReported(MqttContent Content)
 		{
 			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
@@ -48,19 +54,31 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				throw new Exception("Invalid physical quantity value.");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 39, "Quantity");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new QuantityField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
 				this.value, this.nrDecimals, this.unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override bool IsControllable => true;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override ControlParameter[] GetControlParameters()
 		{
 			return new ControlParameter[]
@@ -76,6 +94,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			};
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.value.ToString("F" + this.nrDecimals.ToString()) + " " + this.unit);

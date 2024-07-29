@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class RaysVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class RaysVariation : FlameVariationZeroParameters
     {
-        public RaysVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public RaysVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r1;
 
@@ -26,6 +35,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(RaysVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(RaysVariation);
     }
 }

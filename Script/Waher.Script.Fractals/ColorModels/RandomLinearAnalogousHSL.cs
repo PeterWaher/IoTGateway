@@ -23,16 +23,25 @@ namespace Waher.Script.Fractals.ColorModels
 	/// </example>
 	public class RandomLinearAnalogousHSL : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public RandomLinearAnalogousHSL(ScriptNode N, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N }, argumentTypes1Scalar, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public RandomLinearAnalogousHSL(ScriptNode N, ScriptNode BandSize, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { N, BandSize }, argumentTypes2Scalar, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public RandomLinearAnalogousHSL(ScriptNode N, ScriptNode BandSize, ScriptNode Seed, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { N, BandSize, Seed }, argumentTypes3Scalar, Start, Length, Expression)
         {
@@ -94,12 +103,18 @@ namespace Waher.Script.Fractals.ColorModels
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static SKColor[] CreatePalette(int N, int BandSize, ScriptNode Node)
         {
             return CreatePalette(N, BandSize, null, Node);
         }
 
-        public static SKColor[] CreatePalette(int N, int BandSize, out int Seed, ScriptNode Node, Variables Variables)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static SKColor[] CreatePalette(int N, int BandSize, out int Seed, ScriptNode Node, Variables Variables)
         {
             lock (gen)
             {
@@ -111,7 +126,10 @@ namespace Waher.Script.Fractals.ColorModels
 			return CreatePalette(N, BandSize, Seed, Node);
         }
 
-        public static SKColor[] CreatePalette(int N, int BandSize, int? Seed, ScriptNode Node)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static SKColor[] CreatePalette(int N, int BandSize, int? Seed, ScriptNode Node)
         {
             if (N <= 0)
                 throw new ScriptRuntimeException("N in RandomLinearAnalogousHSL(N[,BandSize]) has to be positive.", Node);
@@ -194,6 +212,9 @@ namespace Waher.Script.Fractals.ColorModels
 
         private static readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(RandomLinearAnalogousHSL);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(RandomLinearAnalogousHSL);
     }
 }

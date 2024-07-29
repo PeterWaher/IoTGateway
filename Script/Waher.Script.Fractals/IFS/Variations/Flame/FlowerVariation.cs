@@ -4,12 +4,18 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class FlowerVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class FlowerVariation : FlameVariationMultipleParameters
     {
         private readonly double holes;
         private readonly double petals;
 
-        public FlowerVariation(ScriptNode holes, ScriptNode petals, int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public FlowerVariation(ScriptNode holes, ScriptNode petals, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { holes, petals }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
 		{
@@ -25,6 +31,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.petals = Petals;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -33,6 +42,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             double Holes = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -41,7 +53,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             return new FlowerVariation(Holes, Petals, this.Arguments[0], this.Arguments[1], this.Start, this.Length, this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r1;
 
@@ -58,6 +73,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(FlowerVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(FlowerVariation);
     }
 }

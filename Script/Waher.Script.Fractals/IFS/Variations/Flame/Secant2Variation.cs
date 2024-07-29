@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class Secant2Variation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class Secant2Variation : FlameVariationZeroParameters
     {
-        public Secant2Variation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public Secant2Variation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double r = Math.Sqrt(x * x + y * y) * this.variationWeight;
             double c = Math.Cos(r);
@@ -19,6 +28,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 y = 1 / (c - 1);
         }
 
-        public override string FunctionName => nameof(Secant2Variation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(Secant2Variation);
     }
 }

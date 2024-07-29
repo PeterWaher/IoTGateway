@@ -1,14 +1,19 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class CurlVariation : FlameVariationMultipleParameters
 	{
 		private readonly double c1;
 		private readonly double c2;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public CurlVariation(ScriptNode c1, ScriptNode c2, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { c1, c2 }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
@@ -25,6 +30,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.c2 = C2;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -33,6 +41,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			double C1 = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -42,6 +53,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Start, this.Length, this.Expression);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Operate(ref double x, ref double y)
 		{
 			double t1 = 1 + this.c1 * x + this.c2 * (x * x - y * y);
@@ -51,6 +65,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			y = (y * t1 - x * t2) / r;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(CurlVariation);
 	}
 }

@@ -30,6 +30,9 @@ namespace Waher.Script.Fractals.ComplexFractals
     /// </example>
     public class NovaFractal : FunctionMultiVariate
     {
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NovaFractal(ScriptNode r, ScriptNode i, ScriptNode dr, ScriptNode R, ScriptNode p, 
 			ScriptNode Palette, ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { r, i, dr, R, p, Palette, DimX, DimY }, 
@@ -39,6 +42,9 @@ namespace Waher.Script.Fractals.ComplexFractals
         {
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NovaFractal(ScriptNode r, ScriptNode i, ScriptNode dr, ScriptNode R, ScriptNode p,
 			ScriptNode Palette, ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { r, i, dr, R, p, Palette, DimX },
@@ -48,6 +54,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NovaFractal(ScriptNode r, ScriptNode i, ScriptNode dr, ScriptNode R, ScriptNode p,
 			ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { r, i, dr, R, p, Palette },
@@ -57,6 +66,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NovaFractal(ScriptNode r, ScriptNode i, ScriptNode dr, ScriptNode R, ScriptNode p,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { r, i, dr, R, p },
@@ -66,6 +78,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -74,6 +89,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             string ColorExpression = null;
@@ -208,7 +226,10 @@ namespace Waher.Script.Fractals.ComplexFractals
             return sb.ToString();
         }
 
-        public static FractalGraph CalcNova(double rCenter, double iCenter, double rDelta, double Rr, double Ri,
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public static FractalGraph CalcNova(double rCenter, double iCenter, double rDelta, double Rr, double Ri,
             double pr, double pi, SKColor[] Palette, int Width, int Height, ScriptNode Node, 
             FractalZoomScript FractalZoomScript, object State)
         {
@@ -339,6 +360,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
-        public override string FunctionName => nameof(NovaFractal);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(NovaFractal);
     }
 }

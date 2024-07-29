@@ -16,7 +16,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// </summary>
 	public class HexStringData : Data
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public const string RegExString = @"^\s*([A-Fa-f0-9]{2}){1,}\s*$";
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static readonly Regex RegEx = new Regex(RegExString, RegexOptions.Compiled | RegexOptions.Singleline);
 
 		private byte[] value;
@@ -30,6 +37,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.value = Value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void DataReported(MqttContent Content)
 		{
 			this.value = Security.Hashes.StringToBinary(CommonTypes.GetString(Content.Data, Encoding.ASCII));
@@ -38,19 +48,31 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.retain = Content.Header.Retain;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
 			return Language.GetStringAsync(typeof(MqttTopicNode), 43, "HEX");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new Int32Field(ThingReference, this.timestamp, this.Append(Prefix, "#Bytes"), 
 				this.value.Length, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override bool IsControllable => true;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override ControlParameter[] GetControlParameters()
 		{
 			return new ControlParameter[]
@@ -66,6 +88,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			};
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			if (this.value is null)

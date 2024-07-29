@@ -1,19 +1,29 @@
-﻿using System;
-
-namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
+﻿namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZConjugateVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZConjugateVariation : FlameVariationZeroParameters
     {
-        public ZConjugateVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZConjugateVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             y = -y;
         }
 
-        public override string FunctionName => nameof(ZConjugateVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZConjugateVariation);
     }
 }

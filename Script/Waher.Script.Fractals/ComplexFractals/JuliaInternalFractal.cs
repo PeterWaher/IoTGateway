@@ -35,6 +35,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// </example>
 	public class JuliaInternalFractal : FunctionMultiVariate
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public JuliaInternalFractal(ScriptNode z, ScriptNode c, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, c, dr, Palette, DimX, DimY },
@@ -43,6 +46,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public JuliaInternalFractal(ScriptNode z, ScriptNode c, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, c, dr, Palette, DimX },
@@ -51,6 +57,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public JuliaInternalFractal(ScriptNode z, ScriptNode c, ScriptNode dr, ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, c, dr, Palette },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
@@ -58,12 +67,18 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public JuliaInternalFractal(ScriptNode z, ScriptNode c, ScriptNode dr, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, c, dr },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -72,6 +87,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			string ColorExpression = null;
@@ -223,6 +241,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcJulia(double rCenter, double iCenter, double R0, double I0, double rDelta,
 			SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
@@ -311,6 +332,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcJulia(double rCenter, double iCenter, ILambdaExpression f, ScriptNode _,
 			double rDelta, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
@@ -466,6 +490,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(JuliaInternalFractal);
 	}
 }

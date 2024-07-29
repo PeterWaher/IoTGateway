@@ -8,30 +8,52 @@ using Waher.Script.Operators;
 
 namespace Waher.Script.Fractals.IFS.Variations
 {
-    public abstract class FlameVariationMultipleParameters : FunctionMultiVariate, IFlameVariation
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public abstract class FlameVariationMultipleParameters : FunctionMultiVariate, IFlameVariation
     {
-        protected double[] homogeneousTransform = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-        protected double variationWeight = 1;
+		/// <summary>
+		/// TODO
+		/// </summary>
+		protected double[] homogeneousTransform = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
-        public FlameVariationMultipleParameters(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		protected double variationWeight = 1;
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public FlameVariationMultipleParameters(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length, Expression Expression)
             : base(Arguments, ArgumentTypes, Start, Length, Expression)
         {
         }
 
-        public override string ToString()
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string ToString()
         {
             return LambdaDefinition.ToString(this);
         }
 
-        #region IFlameVariation Members
+		#region IFlameVariation Members
 
-        public void Initialize(double[] HomogeneousTransform, double VariationWeight)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public void Initialize(double[] HomogeneousTransform, double VariationWeight)
         {
             this.homogeneousTransform = HomogeneousTransform;
             this.variationWeight = VariationWeight;
         }
 
-        public abstract void Operate(ref double x, ref double y);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public abstract void Operate(ref double x, ref double y);
 
 		#endregion
 
@@ -66,17 +88,26 @@ namespace Waher.Script.Fractals.IFS.Variations
 
 		#region IElement members
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
 			return this;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public bool TryConvertTo(Type DesiredType, out object Value)
 		{
 			Value = null;
 			return false;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ISet AssociatedSet
 		{
 			get
@@ -85,6 +116,9 @@ namespace Waher.Script.Fractals.IFS.Variations
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public object AssociatedObjectValue
 		{
 			get
@@ -93,6 +127,9 @@ namespace Waher.Script.Fractals.IFS.Variations
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public bool IsScalar
 		{
 			get
@@ -101,6 +138,9 @@ namespace Waher.Script.Fractals.IFS.Variations
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ICollection<IElement> ChildElements
 		{
 			get

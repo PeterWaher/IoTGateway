@@ -1,17 +1,25 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Fractals
 {
-    public class JuliaStepVariation : FlameVariationOneComplexParameter
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class JuliaStepVariation : FlameVariationOneComplexParameter
     {
-        public JuliaStepVariation(ScriptNode Parameter1, ScriptNode Parameter2, int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public JuliaStepVariation(ScriptNode Parameter1, ScriptNode Parameter2, int Start, int Length, Expression Expression)
             : base(Parameter1, Parameter2, Start, Length, Expression)
         {
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public JuliaStepVariation(ScriptNode Parameter1, int Start, int Length, Expression Expression)
 			: base(Parameter1, null, Start, Length, Expression)
 		{
@@ -28,6 +36,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
         {
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			if (Arguments[1] is null || Arguments[1].AssociatedObjectValue is null)
@@ -44,13 +55,19 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
 			}
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double x2 = x * x - y * y + this.re;
             y = 2 * x * y + this.im;
             x = x2;
         }
 
-        public override string FunctionName => nameof(JuliaStepVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(JuliaStepVariation);
     }
 }

@@ -37,6 +37,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// </example>
 	public class NewtonBasinFractal : FunctionMultiVariate
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBasinFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode N,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, N, DimX, DimY },
@@ -46,6 +49,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBasinFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode N,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, N, DimX },
@@ -55,6 +61,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBasinFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c, ScriptNode N,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c, N },
@@ -64,6 +73,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public NewtonBasinFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode c,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, c },
@@ -73,6 +85,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -81,6 +96,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			double[] Coefficients = null;
@@ -247,6 +265,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, double[] Coefficients, 
 			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
@@ -420,6 +441,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, Complex[] Coefficients, 
 			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
@@ -615,6 +639,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R,
 			ILambdaExpression f, ScriptNode _, Variables Variables, int N, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
@@ -812,6 +839,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(NewtonBasinFractal);
 	}
 }

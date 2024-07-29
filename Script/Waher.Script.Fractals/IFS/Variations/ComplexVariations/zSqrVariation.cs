@@ -1,21 +1,31 @@
-﻿using System;
-
-namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
+﻿namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class ZSqrVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ZSqrVariation : FlameVariationZeroParameters
     {
-        public ZSqrVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ZSqrVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double x2 = x * x - y * y;
             y = 2 * x * y;
             x = x2;
         }
 
-        public override string FunctionName => nameof(ZSqrVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ZSqrVariation);
     }
 }

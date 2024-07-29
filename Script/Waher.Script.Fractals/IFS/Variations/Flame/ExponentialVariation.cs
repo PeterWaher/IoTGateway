@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class ExponentialVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class ExponentialVariation : FlameVariationZeroParameters
     {
-        public ExponentialVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public ExponentialVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double e = Math.Exp(x - 1);
             y *= Math.PI;
@@ -17,6 +26,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = e * Math.Sin(y);
         }
 
-        public override string FunctionName => nameof(ExponentialVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(ExponentialVariation);
     }
 }

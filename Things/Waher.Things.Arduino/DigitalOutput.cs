@@ -1,32 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
 using Waher.Events;
-using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
-using Waher.Things.Attributes;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class DigitalOutput : DigitalPin, ISensor, IActuator
 	{
 		private bool initialized = false;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public DigitalOutput()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Module), 17, "Digital Output");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Initialize()
 		{
 			RemoteDevice Device = this.Device;
@@ -40,6 +49,9 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task StartReadout(ISensorReadout Request)
 		{
 			try
@@ -84,12 +96,18 @@ namespace Waher.Things.Arduino
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Pin_ValueChanged(PinState NewState)
 		{
 			this.NewMomentaryValues(new BooleanField(this, DateTime.Now, "Value", NewState == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
 				typeof(Module).Namespace, 13));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
 			RemoteDevice Device = this.Device;
@@ -116,6 +134,9 @@ namespace Waher.Things.Arduino
 			});
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

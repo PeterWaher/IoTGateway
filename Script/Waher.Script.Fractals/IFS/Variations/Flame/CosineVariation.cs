@@ -2,14 +2,23 @@
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class CosineVariation : FlameVariationZeroParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class CosineVariation : FlameVariationZeroParameters
     {
-        public CosineVariation(int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public CosineVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             x *= Math.PI;
             double x2 = Math.Cos(x) * Math.Cosh(y);
@@ -17,6 +26,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             x = x2;
         }
 
-        public override string FunctionName => nameof(CosineVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(CosineVariation);
     }
 }

@@ -13,11 +13,20 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Arduino
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public enum AnalogInputPinMode
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		Input
 	}
 
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class AnalogInput : AnalogPin, ISensor
 	{
 		private AnalogInputPinMode mode = AnalogInputPinMode.Input;
@@ -28,11 +37,17 @@ namespace Waher.Things.Arduino
 		private byte nrDecimals = 0;
 		private bool initialized = false;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public AnalogInput()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(9, "Mode:", 20)]
 		[ToolTip(10, "Select drive mode of pin.")]
@@ -48,6 +63,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(24, "Field Name:", 30)]
 		[ToolTip(25, "Name of calculated field.")]
@@ -58,6 +76,9 @@ namespace Waher.Things.Arduino
 			set => this.fieldName = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(20, "Value Expression:", 40)]
 		[ToolTip(21, "Enter expression to scale the raw value into a physical quantity. The raw value will be available in the variable 'Raw'. Any script construct can be used, including adding units. For more information, see: https://waher.se/Script.md")]
@@ -76,6 +97,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(27, "Unit:", 50)]
 		[ToolTip(28, "Unit to use, if one is not provided by the expression above.")]
@@ -86,6 +110,9 @@ namespace Waher.Things.Arduino
 			set => this.unit = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(5, "Arduino")]
 		[Header(22, "Number of decimals:", 60)]
 		[ToolTip(23, "Number of decimals to use when presenting calculated value.")]
@@ -96,11 +123,17 @@ namespace Waher.Things.Arduino
 			set => this.nrDecimals = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Module), 16, "Analog Input");
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Initialize()
 		{
 			RemoteDevice Device = this.Device;
@@ -120,6 +153,9 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
@@ -222,6 +258,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task Pin_ValueChanged(ushort Value)
 		{
 			List<Field> Fields = new List<Field>();
@@ -232,6 +271,9 @@ namespace Waher.Things.Arduino
 				this.NewMomentaryValues(F);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

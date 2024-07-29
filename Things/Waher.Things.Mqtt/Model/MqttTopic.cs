@@ -8,7 +8,6 @@ using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
-using Waher.Runtime.Inventory;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
@@ -17,6 +16,9 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Mqtt.Model
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class MqttTopic
 	{
 		private readonly SortedDictionary<string, MqttTopic> topics = new SortedDictionary<string, MqttTopic>();
@@ -30,6 +32,9 @@ namespace Waher.Things.Mqtt.Model
 		private DateTime exTP = DateTime.MinValue;
 		private Data data = null;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MqttTopic(MqttTopicNode Node, string FullTopic, string LocalTopic, MqttTopic Parent, MqttBroker Broker)
 		{
 			this.node = Node;
@@ -39,8 +44,19 @@ namespace Waher.Things.Mqtt.Model
 			this.broker = Broker;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MqttTopicNode Node => this.node;
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public string LocalTopic => this.localTopic;
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public string FullTopic => this.fullTopic;
 
 		private MqttTopic[] GetChildNodes()
@@ -141,6 +157,9 @@ namespace Waher.Things.Mqtt.Model
 				return await Topic.GetTopic(Parts, Index, CreateNew, Broker);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task DataReported(MqttContent Content)
 		{
 			int Len = Content.Data.Length;
@@ -385,16 +404,25 @@ namespace Waher.Things.Mqtt.Model
 			return this.node.LogErrorAsync("Error", ex.Message);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string ToString()
 		{
 			return this.fullTopic;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public void StartReadout(ISensorReadout Request)
 		{
 			Task.Run(() => this.StartReadout(this.node, Request, string.Empty, true));
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			try
@@ -429,6 +457,9 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public ControlParameter[] GetControlParameters()
 		{
 			if (this.data is null || !this.data.IsControllable)
@@ -437,6 +468,9 @@ namespace Waher.Things.Mqtt.Model
 				return this.data.GetControlParameters();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(LinkedList<Parameter> Parameters,
 			Language Language, RequestOrigin _)
 		{
@@ -455,6 +489,9 @@ namespace Waher.Things.Mqtt.Model
 			return Parameters;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public bool Remove(string LocalTopic)
 		{
 			lock (this.topics)
@@ -463,7 +500,9 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public MqttClient MqttClient => this.broker?.Client;
-
 	}
 }

@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
 using Waher.Events;
 using Waher.Runtime.Inventory;
-using Waher.Things;
-using Waher.Things.Metering;
-using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Arduino
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class Module : IModule
 	{
 		private static Dictionary<string, UsbState> serialPorts = new Dictionary<string, UsbState>();
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Module()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public async Task Start()
 		{
 			try
@@ -65,6 +68,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static DeviceInformation GetDeviceInformation(string Name)
 		{
 			return GetState(Name)?.DeviceInformation;
@@ -86,6 +92,9 @@ namespace Waher.Things.Arduino
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Task Stop()
 		{
 			UsbState[] States;

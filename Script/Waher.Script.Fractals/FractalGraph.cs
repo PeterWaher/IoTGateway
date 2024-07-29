@@ -75,7 +75,7 @@ namespace Waher.Script.Fractals
 		public ScriptNode Node => this.node;
 
 		/// <summary>
-		/// <see cref="Graph.GetImageClickScript"/>
+		/// <see cref="Graph.GetBitmapClickScript"/>
 		/// </summary>
 		public override string GetBitmapClickScript(double X, double Y, object[] States)
 		{
@@ -93,6 +93,9 @@ namespace Waher.Script.Fractals
 			return this.fractalZoomScript(r, i, this.size, this.state);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static SKColor[] ToPalette(ObjectVector Vector)
 		{
 			int i, c = Vector.Dimension;
@@ -104,6 +107,9 @@ namespace Waher.Script.Fractals
 			return Palette;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void Smooth(double[] ColorIndex, double[] Boundary, int Width, int Height, int N,
 			SKColor[] Palette, ScriptNode Node, Variables Variables)
 		{
@@ -200,6 +206,9 @@ namespace Waher.Script.Fractals
 			Variables.Status(Node.Expression, string.Empty);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void Smooth(double[] R, double[] G, double[] B, double[] A,
 			double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA,
 			int Width, int Height, ScriptNode Node, Variables Variables)
@@ -354,6 +363,9 @@ namespace Waher.Script.Fractals
 			Variables.Status(Node.Expression, string.Empty);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static double[] FindBoundaries(double[] ColorIndex, int Width, int Height)
 		{
 			// Finding boundary values:
@@ -512,6 +524,9 @@ namespace Waher.Script.Fractals
 			return Boundary;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static int[] FindBoundaries(int[] ColorIndex, int Width, int Height)
 		{
 			// Finding boundary values:
@@ -670,6 +685,9 @@ namespace Waher.Script.Fractals
 			return Boundary;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static (double[], double[], double[], double[]) FindBoundaries(double[] R, double[] G, double[] B, double[] A, int Width, int Height)
 		{
 			// Finding boundary values:
@@ -1092,6 +1110,9 @@ namespace Waher.Script.Fractals
 			return (BoundaryR, BoundaryG, BoundaryB, BoundaryA);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static PixelInformation ToPixels(double[] ColorIndex, int Width, int Height, SKColor[] Palette)
 		{
 			int N = Palette.Length;
@@ -1169,6 +1190,9 @@ namespace Waher.Script.Fractals
 			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static PixelInformation ToPixels(int[] ColorIndex, int Width, int Height, SKColor[] Palette)
 		{
 			int N = Palette.Length;
@@ -1215,6 +1239,9 @@ namespace Waher.Script.Fractals
 			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static PixelInformation ToPixels(double[] R, double[] G, double[] B, double[] A, int Width, int Height)
 		{
 			int Size = Width * Height;
@@ -1242,6 +1269,9 @@ namespace Waher.Script.Fractals
 			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void Diff(double[] ColorIndex, int Width, int Height, out double[] dx, out double[] dy)
 		{
 			int Size = Width * Height;
@@ -1296,6 +1326,9 @@ namespace Waher.Script.Fractals
 			dy[i] = ColorIndex[i] - ColorIndex[i - Width];
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void Abs(double[] ColorIndex, int Width, int Height, double[] dx, double[] dy)
 		{
 			int i, c = Width * Height;
@@ -1310,6 +1343,9 @@ namespace Waher.Script.Fractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static void Angle(double[] ColorIndex, int Width, int Height, int N, double[] dx, double[] dy)
 		{
 			int i, c = Width * Height;

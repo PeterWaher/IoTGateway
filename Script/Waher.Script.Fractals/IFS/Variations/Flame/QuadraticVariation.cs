@@ -4,11 +4,17 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public class QuadraticVariation : FlameVariationMultipleParameters
 	{
 		private readonly double[] cx;
 		private readonly double[] cy;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public QuadraticVariation(ScriptNode Coefficients, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Coefficients }, argumentTypes1Matrix, Start, Length, Expression)
 		{
@@ -16,6 +22,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.cy = new double[6];
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public QuadraticVariation(ScriptNode XCoefficients, ScriptNode YCoefficients, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { XCoefficients, YCoefficients }, new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector },
 				  Start, Length, Expression)
@@ -24,6 +33,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.cy = new double[6];
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public QuadraticVariation(ScriptNode cx1, ScriptNode cx2, ScriptNode cx3,
 			ScriptNode cx4, ScriptNode cx5, ScriptNode cx6,
 			ScriptNode cy1, ScriptNode cy2, ScriptNode cy3,
@@ -40,6 +52,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.cy = new double[6];
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public QuadraticVariation(double cx1, double cx2, double cx3, double cx4, double cx5, double cx6,
 			double cy1, double cy2, double cy3, double cy4, double cy5, double cy6,
 			ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length, Expression Expression)
@@ -49,6 +64,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			this.cy = new double[] { cy1, cy2, cy3, cy4, cy5, cy6 };
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			switch (Arguments.Length)
@@ -122,6 +140,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				this.Arguments, this.ArgumentTypes, Start, Length, Expression);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -134,6 +155,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override void Operate(ref double x, ref double y)
 		{
 			double x2 = x * x;
@@ -148,6 +172,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			x = NextX;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(QuadraticVariation);
 	}
 }

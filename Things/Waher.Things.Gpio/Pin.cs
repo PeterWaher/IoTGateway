@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
 using Waher.Persistence.Attributes;
@@ -12,15 +10,24 @@ using Waher.Things.Metering;
 
 namespace Waher.Things.Gpio
 {
+	/// <summary>
+	/// TODO
+	/// </summary>
 	public abstract class Pin : ProvisionedMeteringNode
 	{
 		private byte pinNr = 0;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Pin()
 			: base()
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Page(2, "GPIO")]
 		[Header(3, "Pin number:", 10)]
 		[ToolTip(4, "Pin number on parent controller.")]
@@ -33,6 +40,9 @@ namespace Waher.Things.Gpio
 			set => this.pinNr = value;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public GpioController Controller
 		{
 			get
@@ -44,16 +54,25 @@ namespace Waher.Things.Gpio
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult<bool>(false);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult<bool>(Parent is Controller);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected string GetStatusMessage(GpioOpenStatus Status)
 		{
 			switch (Status)
@@ -68,6 +87,9 @@ namespace Waher.Things.Gpio
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

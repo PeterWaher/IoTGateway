@@ -4,12 +4,18 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class JuliaNVariation : FlameVariationMultipleParameters
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class JuliaNVariation : FlameVariationMultipleParameters
     {
         private readonly double dist;
         private readonly int power;
 
-        public JuliaNVariation(ScriptNode power, ScriptNode dist, int Start, int Length, Expression Expression)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public JuliaNVariation(ScriptNode power, ScriptNode dist, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { power, dist }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
 				  Start, Length, Expression)
 		{
@@ -25,6 +31,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.dist = Dist;
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -33,6 +42,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {
             int Power = (int)Expression.ToDouble(Arguments[0].AssociatedObjectValue);
@@ -41,7 +53,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             return new JuliaNVariation(Power, Dist, this.Arguments[0], this.Arguments[1], this.Start, this.Length, this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             int p3;
 
@@ -60,6 +75,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(JuliaNVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(JuliaNVariation);
     }
 }

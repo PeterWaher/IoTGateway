@@ -4,10 +4,16 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
-    public class RadialBlurVariation : FlameVariationOneParameter
+	/// <summary>
+	/// TODO
+	/// </summary>
+	public class RadialBlurVariation : FlameVariationOneParameter
     {
         private readonly double angle;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public RadialBlurVariation(ScriptNode Parameter, int Start, int Length, Expression Expression)
             : base(Parameter, Start, Length, Expression)
         {
@@ -19,12 +25,18 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             this.angle = Angle;
         }
 
-        public override IElement Evaluate(IElement Argument, Variables Variables)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override IElement Evaluate(IElement Argument, Variables Variables)
         {
             return new RadialBlurVariation(Expression.ToDouble(Argument.AssociatedObjectValue), this.Argument, this.Start, this.Length, this.Expression);
         }
 
-        public override void Operate(ref double x, ref double y)
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override void Operate(ref double x, ref double y)
         {
             double p1 = this.angle * Math.PI / 2;
             double r1, r2, r3, r4;
@@ -47,6 +59,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName => nameof(RadialBlurVariation);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override string FunctionName => nameof(RadialBlurVariation);
     }
 }

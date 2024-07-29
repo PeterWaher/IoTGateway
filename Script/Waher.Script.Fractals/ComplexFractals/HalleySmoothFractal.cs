@@ -39,6 +39,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 	/// </example>
 	public class HalleySmoothFractal : FunctionMultiVariate
 	{
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients, Palette, DimX, DimY },
@@ -47,6 +50,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients, Palette, DimX },
@@ -55,6 +61,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients, Palette },
@@ -63,6 +72,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, ScriptNode R, ScriptNode Coefficients,
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R, Coefficients },
@@ -71,18 +83,27 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, ScriptNode R, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr, R },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public HalleySmoothFractal(ScriptNode z, ScriptNode dr, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, dr },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -91,6 +112,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			string ColorExpression = null;
@@ -270,6 +294,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			double[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
@@ -407,6 +434,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
@@ -576,6 +606,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
@@ -721,6 +754,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string FunctionName => nameof(HalleySmoothFractal);
 	}
 }

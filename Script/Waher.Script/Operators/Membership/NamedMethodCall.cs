@@ -221,8 +221,10 @@ namespace Waher.Script.Operators.Membership
 							for (i = 0; i < this.nrParameters; i++)
 							{
 								PT = Rec.Parameters[i].ParameterType;
+								IElement Argument = Arguments[i];
 
-								if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
+								if (PT.IsByRef && ((Value = Argument.AssociatedObjectValue) is null ||
+									Argument.TryConvertTo(PT.GetElementType(), out Value)))
 								{
 									if (ParameterValues is null)
 									{
@@ -241,7 +243,7 @@ namespace Waher.Script.Operators.Membership
 									else
 										ByRef.Add(new KeyValuePair<string, int>(null, i));
 								}
-								else if (Arguments[i].TryConvertTo(PT, out Value))
+								else if (Argument.TryConvertTo(PT, out Value))
 								{
 									if (ParameterValues is null)
 									{
@@ -254,7 +256,7 @@ namespace Waher.Script.Operators.Membership
 								}
 								else
 								{
-									if (Arguments[i].IsScalar || Variables is null)
+									if (Argument.IsScalar || Variables is null)
 										break;
 
 									if (Extend is null)

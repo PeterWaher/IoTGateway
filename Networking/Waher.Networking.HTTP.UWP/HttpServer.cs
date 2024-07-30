@@ -195,11 +195,35 @@ namespace Waher.Networking.HTTP
 		/// <param name="Sniffers">Sniffers.</param>
 		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, bool AdaptToNetworkChanges,
 			params ISniffer[] Sniffers)
+			: this(HttpPorts, HttpsPorts, ServerCertificate, AdaptToNetworkChanges, ClientCertificates.NotUsed, false, null, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements an HTTPS server.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP Ports</param>
+		/// <param name="HttpsPorts">HTTPS Ports</param>
+		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
+		/// <param name="AdaptToNetworkChanges">If the server is to adapt to network changes automatically.</param>
+		/// <param name="ClientCertificates">If client certificates are not used, optional or required.</param>
+		/// <param name="TrustClientCertificates">If client certificates should be trusted, even if they do not validate.</param>
+		/// <param name="PortSpecificSettings">Port-specific mTLS settings.</param>
+		/// <param name="LockSettings">If client certificate settings should be locked.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, bool AdaptToNetworkChanges,
+			ClientCertificates ClientCertificates, bool TrustClientCertificates,
+			Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificSettings, bool LockSettings,
+			params ISniffer[] Sniffers)
 #endif
 			: base(Sniffers)
 		{
 #if !WINDOWS_UWP
 			this.serverCertificate = ServerCertificate;
+			this.clientCertificates = ClientCertificates;
+			this.trustClientCertificates = TrustClientCertificates;
+			this.portSpecificMTlsSettings = PortSpecificSettings;
+			this.clientCertificateSettingsLocked = LockSettings;
 #endif
 			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
 			this.sessions.Removed += this.Sessions_Removed;
@@ -256,21 +280,39 @@ namespace Waher.Networking.HTTP
 				LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
 				this.listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 
-				await this.AddHttpPorts(HttpPorts, Listeners);
-
 				foreach (KeyValuePair<StreamSocketListener, Guid> P in Listeners)
-					P.Key.Dispose();
+				{
+					try
+					{
+						P.Key.Dispose();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				await this.AddHttpPorts(HttpPorts, Listeners);
 #else
 				int[] HttpsPorts = this.httpsPorts;
 				this.httpsPorts = new int[0];
 				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
 				this.listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 
+				foreach (KeyValuePair<TcpListener, bool> P in Listeners)
+				{
+					try
+					{
+						P.Key.Stop();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
 				this.AddHttpPorts(HttpPorts, Listeners);
 				this.AddHttpsPorts(HttpsPorts, Listeners);
-
-				foreach (KeyValuePair<TcpListener, bool> P in Listeners)
-					P.Key.Stop();
 #endif
 				this.OnNetworkChanged?.Invoke(this, EventArgs.Empty);
 			}
@@ -1035,10 +1077,14 @@ namespace Waher.Networking.HTTP
 			{
 				try
 				{
-					this.Information("Switching to TLS.");
+					if (this.HasSniffers)
+					{
+						this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
+							", Trust Certificates: " + TrustCertificates.ToString() + ")");
+					}
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-						ClientCertificates, null, TrustClientCertificates);
+						ClientCertificates, null, TrustCertificates);
 
 					if (this.HasSniffers)
 					{

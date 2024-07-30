@@ -926,6 +926,9 @@ namespace Waher.IoTGateway
 							webServer.Unregister(Resource);
 					}
 
+					webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, PortSpecificMTlsSettings, true);
+					webServer.NetworkChanged();
+
 					webServer.AddHttpPorts(GetConfigPorts("HTTP"));
 
 					if (!(certificate is null))
@@ -937,7 +940,10 @@ namespace Waher.IoTGateway
 				else
 				{
 					if (!(certificate is null))
-						webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
+					{
+						webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate, true,
+							ClientCertificates, TrustClientCertificates, PortSpecificMTlsSettings, true);
+					}
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
@@ -968,8 +974,6 @@ namespace Waher.IoTGateway
 						}
 					}
 				}
-
-				webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, PortSpecificMTlsSettings, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);

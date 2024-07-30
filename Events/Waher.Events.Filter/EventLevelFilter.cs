@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Filters events based on their <see cref="EventLevel"/> value.
 	/// </summary>
-	public class EventLevelFilter
+	public class EventLevelFilter : ICustomEventFilter
 	{
 		/// <summary>
 		/// Filters events based on their <see cref="EventLevel"/> value.
@@ -68,6 +68,16 @@
 		/// If minor events are allowed.
 		/// </summary>
 		public bool AllowMinor { get; set; }
+
+		/// <summary>
+		/// Checks if an event is allowed.
+		/// </summary>
+		/// <param name="Event">Event to check.</param>
+		/// <returns>If event is allowed.</returns>
+		public bool IsAllowed(Event Event)
+		{
+			return this.IsAllowed(Event.Level);
+		}
 
 		/// <summary>
 		/// Checks if an event level is allowed.

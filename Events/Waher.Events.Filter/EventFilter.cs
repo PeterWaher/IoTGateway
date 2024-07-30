@@ -159,6 +159,11 @@ namespace Waher.Events.Filter
 		public EventLevelFilter AllowEmergency { get; set; }
 
 		/// <summary>
+		/// Secondary event sink receiving the events passing the filter.
+		/// </summary>
+		public IEventSink SecondarySink => this.sink;
+
+		/// <summary>
 		/// Checks if an event is allowed.
 		/// </summary>
 		/// <param name="Event">Event to check.</param>

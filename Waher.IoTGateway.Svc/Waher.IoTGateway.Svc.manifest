@@ -335,6 +335,9 @@
 	<Assembly fileName="Waher.Events.Files.dll" />
 	<Assembly fileName="Waher.Events.Files.pdb" />
 	<Assembly fileName="Waher.Events.Files.xml" />
+	<Assembly fileName="Waher.Events.Filter.dll" />
+	<Assembly fileName="Waher.Events.Filter.pdb" />
+	<Assembly fileName="Waher.Events.Filter.xml" />
 	<Assembly fileName="Waher.Events.pdb" />
 	<Assembly fileName="Waher.Events.Persistence.dll" />
 	<Assembly fileName="Waher.Events.Persistence.pdb" />

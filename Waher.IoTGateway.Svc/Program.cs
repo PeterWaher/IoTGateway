@@ -18,6 +18,7 @@ using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 using System.Diagnostics;
 using Waher.Networking.HTTP.Brotli;
+using Waher.Events.Filter;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -278,7 +279,9 @@ namespace Waher.IoTGateway.Svc
 					case PlatformID.Win32Windows:
 					case PlatformID.Win32NT:
 					case PlatformID.WinCE:
-						Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName));
+						Log.Register(new EventFilter("Windows Event Log Filter",
+							new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName),
+							EventType.Notice));
 						break;
 				}
 

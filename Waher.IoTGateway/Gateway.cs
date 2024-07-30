@@ -81,6 +81,7 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Content.Images;
+using Waher.Events.Filter;
 
 namespace Waher.IoTGateway
 {
@@ -277,7 +278,7 @@ namespace Waher.IoTGateway
 				appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
-				Log.Register(new AlertNotifier("Alert Notifier"));
+				Log.Register(new EventFilter("Alert Filter", new AlertNotifier("Alert Notifier"), EventType.Alert));
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
@@ -1722,7 +1723,11 @@ namespace Waher.IoTGateway
 			}
 
 			if (!string.IsNullOrEmpty(xmppCredentials.Events))
-				Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false));
+			{
+				Log.Register(new EventFilter("XMPP Event Filter",
+					new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false),
+					EventType.Notice));
+			}
 
 			if (!string.IsNullOrEmpty(xmppCredentials.ThingRegistry))
 			{

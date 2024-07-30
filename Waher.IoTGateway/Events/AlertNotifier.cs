@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown;
 using Waher.Events;
@@ -10,12 +9,12 @@ using Waher.Events;
 namespace Waher.IoTGateway.Events
 {
 	/// <summary>
-	/// Event sink that forwards alert and emergency messages as notification messages to administrators.
+	/// Event sink that forwards events as notification messages to administrators.
 	/// </summary>
 	public class AlertNotifier : EventSink
 	{
 		/// <summary>
-		/// Event sink that forwards alert and emergency messages as notification messages to administrators.
+		/// Event sink that forwards events as notification messages to administrators.
 		/// </summary>
 		/// <param name="ObjectID">Log Object ID</param>
 		public AlertNotifier(string ObjectID)
@@ -29,47 +28,35 @@ namespace Waher.IoTGateway.Events
 		/// <param name="Event">Event to queue.</param>
 		public override Task Queue(Event Event)
 		{
-			switch (Event.Type)
+			StringBuilder Markdown = new StringBuilder();
+
+			if (!Event.Message.Contains("=======" + Environment.NewLine))
 			{
-				case EventType.Alert:
-				case EventType.Emergency:
-					StringBuilder Markdown = new StringBuilder();
-
-					if (!Event.Message.Contains("=======" + Environment.NewLine))
-					{
-						if (Event.Type == EventType.Alert)
-							Markdown.AppendLine("Alert");
-						else
-							Markdown.AppendLine("Emergency");
-
-						Markdown.AppendLine("===============");
-						Markdown.AppendLine();
-					}
-
-					Markdown.AppendLine(Event.Message);
-
-					Markdown.AppendLine();
-					Markdown.AppendLine("| Information ||");
-					Markdown.AppendLine("|:------|:-----|");
-
-					this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
-					this.AppendLabel("Event ID", Event.EventId, Markdown);
-					this.AppendLabel("Actor", Event.Actor, Markdown);
-					this.AppendLabel("Object", Event.Object, Markdown);
-					this.AppendLabel("Module", Event.Module, Markdown);
-					this.AppendLabel("Facility", Event.Facility, Markdown);
-
-					if (!(Event.Tags is null))
-					{
-						foreach (KeyValuePair<string, object> P in Event.Tags)
-							this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);
-					}
-
-					Gateway.SendNotification(Markdown.ToString());
-					break;
+				Markdown.AppendLine(Event.Type.ToString());
+				Markdown.AppendLine("===============");
+				Markdown.AppendLine();
 			}
 
-			return Task.CompletedTask;
+			Markdown.AppendLine(Event.Message);
+
+			Markdown.AppendLine();
+			Markdown.AppendLine("| Information ||");
+			Markdown.AppendLine("|:------|:-----|");
+
+			this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
+			this.AppendLabel("Event ID", Event.EventId, Markdown);
+			this.AppendLabel("Actor", Event.Actor, Markdown);
+			this.AppendLabel("Object", Event.Object, Markdown);
+			this.AppendLabel("Module", Event.Module, Markdown);
+			this.AppendLabel("Facility", Event.Facility, Markdown);
+
+			if (!(Event.Tags is null))
+			{
+				foreach (KeyValuePair<string, object> P in Event.Tags)
+					this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);
+			}
+
+			return Gateway.SendNotification(Markdown.ToString());
 		}
 
 		private void AppendLabel(string Label, string Value, StringBuilder Markdown)

@@ -586,6 +586,7 @@
 							<File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.dll' Vital='yes'/>
 							<File Id='Waher.Events.Console.dll' Name='Waher.Events.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Console.dll' Vital='yes'/>
 							<File Id='Waher.Events.Files.dll' Name='Waher.Events.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Files.dll' Vital='yes'/>
+							<File Id='Waher.Events.Filter.dll' Name='Waher.Events.Filter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Filter.dll' Vital='yes'/>
 							<File Id='Waher.Events.Persistence.dll' Name='Waher.Events.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Events.Statistics.dll' Name='Waher.Events.Statistics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Statistics.dll' Vital='yes'/>
 							<File Id='Waher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.dll' Vital='yes'/>
@@ -725,6 +726,7 @@
 							<RemoveFile Id='RemoveWaher.Events.Console.dll' Name='Waher.Events.Console.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Files.dll' Name='Waher.Events.Files.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Filter.dll' Name='Waher.Events.Filter.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Persistence.dll' Name='Waher.Events.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Statistics.dll' Name='Waher.Events.Statistics.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' On='uninstall'/>

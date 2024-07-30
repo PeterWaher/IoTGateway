@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Events
+﻿namespace Waher.Events
 {
 	/// <summary>
 	/// Implement this interface on exception classes to allow the log to extract object information in corresponding events.

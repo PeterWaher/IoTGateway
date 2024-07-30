@@ -1004,6 +1004,7 @@
 			</Folder>
 			<Folder name='PersonalData'>
 				<Content fileName='Backups.md'/>
+				<Content fileName='EventLogs.md'/>
 				<Content fileName='LocalDatabase.md'/>
 				<Content fileName='LocalSensorsAndDevices.md'/>
 				<Content fileName='NetworkIdentity.md'/>

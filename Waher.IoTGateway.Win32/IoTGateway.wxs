@@ -2008,11 +2008,13 @@
 									</CreateFolder>
 									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
 									<File Id='PiiBackups.md' Name='Backups.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\Backups.md' Vital='yes' KeyPath='yes'/>
+									<File Id='PiiEventLogs.md' Name='EventLogs.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\EventLogs.md'/>
 									<File Id='PiiLocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md'/>
 									<File Id='PiiLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalSensorsAndDevices.md'/>
 									<File Id='PiiNetworkIdentity.md' Name='NetworkIdentity.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\NetworkIdentity.md'/>
 									<File Id='PiiWebPages.md' Name='WebPages.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\WebPages.md'/>
 									<RemoveFile Id='RemovePiiBackups.md' Name='Backups.md' On='uninstall'/>
+									<RemoveFile Id='RemovePiiEventLogs.md' Name='EventLogs.md' On='uninstall'/>
 									<RemoveFile Id='RemovePiiLocalDatabase.md' Name='LocalDatabase.md' On='uninstall'/>
 									<RemoveFile Id='RemovePiiLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' On='uninstall'/>
 									<RemoveFile Id='RemovePiiNetworkIdentity.md' Name='NetworkIdentity.md' On='uninstall'/>

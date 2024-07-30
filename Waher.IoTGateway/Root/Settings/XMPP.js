@@ -279,6 +279,7 @@ function ConnectionOK1(data)
         data.pep &&
         data.thingRegistry &&
         data.provisioning &&
+        data.eventLog &&
         data.pubSub &&
         data.muc &&
         data.legal &&
@@ -302,6 +303,8 @@ function ConnectionOK1(data)
     document.getElementById("ThingRegistryJID").innerText = data.thingRegistry;
     document.getElementById("Provisioning").innerText = data.provisioning ? "✓" : "✗";
     document.getElementById("ProvisioningJID").innerText = data.provisioning;
+    document.getElementById("EventLog").innerText = data.eventLog ? "✓" : "✗";
+    document.getElementById("EventLogJID").innerText = data.eventLog;
     document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "✗";
     document.getElementById("PubSubJID").innerText = data.pubSub;
     document.getElementById("Muc").innerText = data.muc ? "✓" : "✗";

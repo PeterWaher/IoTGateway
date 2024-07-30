@@ -186,6 +186,7 @@ limit applications using the server to interoperate accordingly.
 | Personal Eventing | <span id="Pep">{{Config.PersonalEventing ? "✓" : "✗"}}</span> | <span id="PepJID">{{Config.PersonalEventing ? Config.BareJid : ""}}</span> |
 | Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "✗" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
 | Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "✗" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
+| Event Log | <span id="EventLog">{{empty(Config.Events) ? "✗" : "✓"}}</span> | <span id="EventLogJID">{{Config.Events}}</span> |
 | Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "✗" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
 | Multi-User Chat | <span id="Muc">{{empty(Config.MultiUserChat) ? "✗" : "✓"}}</span> | <span id="MucJID">{{Config.MultiUserChat}}</span> |
 | Legal Identities | <span id="Legal">{{empty(Config.LegalIdentities) ? "✗" : "✓"}}</span> | <span id="LegalJID">{{Config.LegalIdentities}}</span> |

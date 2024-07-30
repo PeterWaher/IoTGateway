@@ -2,7 +2,7 @@
 -------------
 
 Events are logged in the local internal encrypted database, where they are available for 90 days before being deleted. Events are also made 
-available in text log files for security reasons in the following folder: `{{System.IO.Path.Combine(Waher.IoTGateway.Gateway.AppDataFolder,"Data")}}`.
+available in text log files for security reasons in the following folder: `{{System.IO.Path.Combine(Waher.IoTGateway.Gateway.AppDataFolder,"Events")}}`.
 Events are stored in this folder for 7 days. The reason for storing events locally, is for trouble-shooting, in case something goes wrong, or for 
 analyzing performance.
 

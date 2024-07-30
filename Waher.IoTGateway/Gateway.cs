@@ -1726,7 +1726,7 @@ namespace Waher.IoTGateway
 			{
 				Log.Register(new EventFilter("XMPP Event Filter",
 					new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false),
-					EventType.Notice));
+					EventType.Error));
 			}
 
 			if (!string.IsNullOrEmpty(xmppCredentials.ThingRegistry))

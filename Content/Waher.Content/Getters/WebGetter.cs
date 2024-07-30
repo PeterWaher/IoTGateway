@@ -125,7 +125,8 @@ namespace Waher.Content.Getters
 				AllowAutoRedirect = true,
 				CheckCertificateRevocationList = true,
 				ClientCertificateOptions = ClientCertificateOption.Automatic,
-				ServerCertificateCustomValidationCallback = Validator.RemoteCertificateValidationCallback
+				ServerCertificateCustomValidationCallback = Validator.RemoteCertificateValidationCallback,
+				AutomaticDecompression = (DecompressionMethods)(-1)		// All
 			};
 
 			try

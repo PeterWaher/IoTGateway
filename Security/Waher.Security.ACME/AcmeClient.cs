@@ -46,7 +46,7 @@ namespace Waher.Security.ACME
 				this.httpClient = new HttpClient(new HttpClientHandler()
 				{
 					AllowAutoRedirect = true,
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+					AutomaticDecompression = (DecompressionMethods)(-1),     // All
 					CheckCertificateRevocationList = true,
 					SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
 				}, true);

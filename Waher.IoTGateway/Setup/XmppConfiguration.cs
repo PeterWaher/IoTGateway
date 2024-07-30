@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -12,16 +13,16 @@ using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Persistence;
+using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Security.Users;
-using Waher.Runtime.Language;
-using Waher.IoTGateway.ScriptExtensions.Functions;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -848,7 +849,8 @@ namespace Waher.IoTGateway.Setup
 #if !NETFW
 								ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
 #endif
-								UseCookies = false
+								UseCookies = false,
+								AutomaticDecompression = (DecompressionMethods)(-1)     // All
 							})
 							{
 								Timeout = TimeSpan.FromMilliseconds(60000)

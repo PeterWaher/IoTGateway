@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -224,7 +225,8 @@ namespace Waher.Networking.XMPP.BOSH
 #if !NETFW
 								ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
 #endif
-								UseCookies = false
+								UseCookies = false,
+								AutomaticDecompression = (DecompressionMethods)(-1)     // All
 							})
 							{
 								Timeout = TimeSpan.FromMilliseconds(60000)
@@ -419,7 +421,8 @@ namespace Waher.Networking.XMPP.BOSH
 #if !NETFW
 						ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
 #endif
-						UseCookies = false
+						UseCookies = false,
+						AutomaticDecompression = (DecompressionMethods)(-1)     // All
 					})
 					{
 						Timeout = TimeSpan.FromMilliseconds(60000)

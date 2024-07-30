@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.IoTGateway.Setup.PersonalData
+﻿namespace Waher.IoTGateway.Setup.PersonalData
 {
 	/// <summary>
 	/// Information about the local database.

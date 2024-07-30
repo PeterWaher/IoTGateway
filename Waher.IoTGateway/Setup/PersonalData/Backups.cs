@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.IoTGateway.Setup.PersonalData;
-
-namespace Waher.IoTGateway.Setup.PersonalData
+﻿namespace Waher.IoTGateway.Setup.PersonalData
 {
 	/// <summary>
 	/// Information about backups.

@@ -107,8 +107,11 @@ namespace Waher.Events
 			if (!string.IsNullOrEmpty(Event.Module))
 				this.AddTag(Output, "Module", Event.Module, false);
 
-			foreach (KeyValuePair<string, object> P in Event.Tags)
-				this.AddTag(Output, P.Key, P.Value, false);
+			if (!(Event.Tags is null) && Event.Tags.Length > 0)
+			{
+				foreach (KeyValuePair<string, object> P in Event.Tags)
+					this.AddTag(Output, P.Key, P.Value, false);
+			}
 
 			Output.AppendLine();
 

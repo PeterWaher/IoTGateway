@@ -175,118 +175,121 @@ namespace Waher.Events.XMPP
 			Xml.Append(XML.Encode(Event.Message));
 			Xml.Append("</message>");
 
-			foreach (KeyValuePair<string, object> Tag in Event.Tags)
+			if (!(Event.Tags is null) && Event.Tags.Length > 0)
 			{
-				Xml.Append("<tag name='");
-				Xml.Append(XML.Encode(Tag.Key));
-
-				if (Tag.Value is null)
-					Xml.Append("' value=''/>");
-				else
+				foreach (KeyValuePair<string, object> Tag in Event.Tags)
 				{
-					object Value = Tag.Value;
+					Xml.Append("<tag name='");
+					Xml.Append(XML.Encode(Tag.Key));
 
-					if (Value is bool b)
-					{
-						Xml.Append("' type='xs:boolean' value='");
-						Xml.Append(CommonTypes.Encode(b));
-						Xml.Append("'/>");
-					}
-					else if (Value is byte ui8)
-					{
-						Xml.Append("' type='xs:unsignedByte' value='");
-						Xml.Append(ui8.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is short i16)
-					{
-						Xml.Append("' type='xs:short' value='");
-						Xml.Append(i16.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is int i32)
-					{
-						Xml.Append("' type='xs:int' value='");
-						Xml.Append(i32.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is long i64)
-					{
-						Xml.Append("' type='xs:long' value='");
-						Xml.Append(i64.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is sbyte i8)
-					{
-						Xml.Append("' type='xs:byte' value='");
-						Xml.Append(i8.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is ushort ui16)
-					{
-						Xml.Append("' type='xs:unsignedShort' value='");
-						Xml.Append(ui16.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is uint ui32)
-					{
-						Xml.Append("' type='xs:unsignedInt' value='");
-						Xml.Append(ui32.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is ulong ui64)
-					{
-						Xml.Append("' type='xs:unsignedLong' value='");
-						Xml.Append(ui64.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is decimal dc)
-					{
-						Xml.Append("' type='xs:decimal' value='");
-						Xml.Append(CommonTypes.Encode(dc));
-						Xml.Append("'/>");
-					}
-					else if (Value is double db)
-					{
-						Xml.Append("' type='xs:double' value='");
-						Xml.Append(CommonTypes.Encode(db));
-						Xml.Append("'/>");
-					}
-					else if (Value is float fl)
-					{
-						Xml.Append("' type='xs:float' value='");
-						Xml.Append(CommonTypes.Encode(fl));
-						Xml.Append("'/>");
-					}
-					else if (Value is DateTime dt)
-					{
-						Xml.Append("' type='xs:dateTime' value='");
-						Xml.Append(XML.Encode(dt));
-						Xml.Append("'/>");
-					}
-					else if (Value is string || Value is char)
-					{
-						Xml.Append("' type='xs:string' value='");
-						Xml.Append(XML.Encode(Value.ToString()));
-						Xml.Append("'/>");
-					}
-					else if (Value is TimeSpan ts)
-					{
-						Xml.Append("' type='xs:time' value='");
-						Xml.Append(ts.ToString());
-						Xml.Append("'/>");
-					}
-					else if (Value is Uri u)
-					{
-						Xml.Append("' type='xs:anyURI' value='");
-						Xml.Append(XML.Encode(u.ToString()));
-						Xml.Append("'/>");
-					}
+					if (Tag.Value is null)
+						Xml.Append("' value=''/>");
 					else
 					{
-						Xml.Append("' value='");
-						Xml.Append(XML.Encode(Value.ToString()));
-						Xml.Append("'/>");
+						object Value = Tag.Value;
+
+						if (Value is bool b)
+						{
+							Xml.Append("' type='xs:boolean' value='");
+							Xml.Append(CommonTypes.Encode(b));
+							Xml.Append("'/>");
+						}
+						else if (Value is byte ui8)
+						{
+							Xml.Append("' type='xs:unsignedByte' value='");
+							Xml.Append(ui8.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is short i16)
+						{
+							Xml.Append("' type='xs:short' value='");
+							Xml.Append(i16.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is int i32)
+						{
+							Xml.Append("' type='xs:int' value='");
+							Xml.Append(i32.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is long i64)
+						{
+							Xml.Append("' type='xs:long' value='");
+							Xml.Append(i64.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is sbyte i8)
+						{
+							Xml.Append("' type='xs:byte' value='");
+							Xml.Append(i8.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is ushort ui16)
+						{
+							Xml.Append("' type='xs:unsignedShort' value='");
+							Xml.Append(ui16.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is uint ui32)
+						{
+							Xml.Append("' type='xs:unsignedInt' value='");
+							Xml.Append(ui32.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is ulong ui64)
+						{
+							Xml.Append("' type='xs:unsignedLong' value='");
+							Xml.Append(ui64.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is decimal dc)
+						{
+							Xml.Append("' type='xs:decimal' value='");
+							Xml.Append(CommonTypes.Encode(dc));
+							Xml.Append("'/>");
+						}
+						else if (Value is double db)
+						{
+							Xml.Append("' type='xs:double' value='");
+							Xml.Append(CommonTypes.Encode(db));
+							Xml.Append("'/>");
+						}
+						else if (Value is float fl)
+						{
+							Xml.Append("' type='xs:float' value='");
+							Xml.Append(CommonTypes.Encode(fl));
+							Xml.Append("'/>");
+						}
+						else if (Value is DateTime dt)
+						{
+							Xml.Append("' type='xs:dateTime' value='");
+							Xml.Append(XML.Encode(dt));
+							Xml.Append("'/>");
+						}
+						else if (Value is string || Value is char)
+						{
+							Xml.Append("' type='xs:string' value='");
+							Xml.Append(XML.Encode(Value.ToString()));
+							Xml.Append("'/>");
+						}
+						else if (Value is TimeSpan ts)
+						{
+							Xml.Append("' type='xs:time' value='");
+							Xml.Append(ts.ToString());
+							Xml.Append("'/>");
+						}
+						else if (Value is Uri u)
+						{
+							Xml.Append("' type='xs:anyURI' value='");
+							Xml.Append(XML.Encode(u.ToString()));
+							Xml.Append("'/>");
+						}
+						else
+						{
+							Xml.Append("' value='");
+							Xml.Append(XML.Encode(Value.ToString()));
+							Xml.Append("'/>");
+						}
 					}
 				}
 			}

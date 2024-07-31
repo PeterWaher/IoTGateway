@@ -50,7 +50,7 @@ namespace Waher.IoTGateway.Events
 			this.AppendLabel("Module", Event.Module, Markdown);
 			this.AppendLabel("Facility", Event.Facility, Markdown);
 
-			if (!(Event.Tags is null))
+			if (!(Event.Tags is null) && Event.Tags.Length > 0)
 			{
 				foreach (KeyValuePair<string, object> P in Event.Tags)
 					this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);

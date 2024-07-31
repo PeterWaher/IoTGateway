@@ -146,7 +146,7 @@ namespace Waher.Events.WindowsEventLog
 				Message.AppendLine(Event.Facility);
 			}
 
-			if (!(Event.Tags is null))
+			if (!(Event.Tags is null) && Event.Tags.Length > 0)
 			{
 				foreach (KeyValuePair<string, object> Tag in Event.Tags)
 				{

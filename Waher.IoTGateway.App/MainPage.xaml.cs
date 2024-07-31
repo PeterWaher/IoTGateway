@@ -115,14 +115,17 @@ namespace Waher.IoTGateway.App
 					sb.Append(Event.Actor);
 				}
 
-				foreach (KeyValuePair<string, object> Parameter in Event.Tags)
+				if (!(Event.Tags is null) && Event.Tags.Length > 0)
 				{
-					sb.Append(" [");
-					sb.Append(Parameter.Key);
-					sb.Append("=");
-					if (!(Parameter.Value is null))
-						sb.Append(Parameter.Value.ToString());
-					sb.Append("]");
+					foreach (KeyValuePair<string, object> Parameter in Event.Tags)
+					{
+						sb.Append(" [");
+						sb.Append(Parameter.Key);
+						sb.Append("=");
+						if (!(Parameter.Value is null))
+							sb.Append(Parameter.Value.ToString());
+						sb.Append("]");
+					}
 				}
 
 				if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))

@@ -10,6 +10,7 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 	[CollectionName("HostSettings")]
 	[ArchivingTime]		// No Limit
 	[Index("Host", "Key")]
+	[Index("Key", "Host")]
 	public abstract class HostSetting : IHostReference
 	{
 		private string objectId = null;

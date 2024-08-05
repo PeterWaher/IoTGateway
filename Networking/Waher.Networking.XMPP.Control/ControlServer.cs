@@ -215,9 +215,8 @@ namespace Waher.Networking.XMPP.Control
 							Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
 						else
 						{
-							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-							if (Ref is null)
-								throw new ItemNotFoundException("Node not found.", e.IQ);
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition)
+								?? throw new ItemNotFoundException("Node not found.", e.IQ);
 
 							Nodes.AddLast(Ref);
 						}
@@ -721,9 +720,8 @@ namespace Waher.Networking.XMPP.Control
 						Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
 					else
 					{
-						IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-						if (Ref is null)
-							throw new ItemNotFoundException("Node not found.", e.IQ);
+						IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition)
+							?? throw new ItemNotFoundException("Node not found.", e.IQ);
 
 						Nodes.AddLast(Ref);
 					}
@@ -856,31 +854,23 @@ namespace Waher.Networking.XMPP.Control
 				await this.ReturnForm(e, Parameters, Nodes);
 		}
 
-		private async Task ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
+		/// <summary>
+		/// Serializes a set of control parameters into an XML Data Form.
+		/// </summary>
+		/// <param name="Parameters">Set of control parameters.</param>
+		/// <param name="FirstNode">First node in a collection of nodes being edited.</param>
+		/// <param name="Title">Title of form.</param>
+		/// <returns>XML Data Form.</returns>
+		public static async Task<string> SerializeControlForm(ControlParameter[] Parameters, IThingReference FirstNode, string Title)
 		{
 			StringBuilder Xml = new StringBuilder();
 			XmlWriter Output = XmlWriter.Create(Xml, XML.WriterSettings(false, true));
-			IThingReference FirstNode;
 
 			Output.WriteStartElement("x", XmppClient.NamespaceData);
 			Output.WriteAttributeString("xmlns", "xdv", null, XmppClient.NamespaceDataValidate);
 			Output.WriteAttributeString("xmlns", "xdl", null, XmppClient.NamespaceDataLayout);
 			Output.WriteAttributeString("xmlns", "xdd", null, XmppClient.NamespaceDynamicForms);
-
-			if (Nodes is null)
-			{
-				FirstNode = null;
-				Output.WriteElementString("title", this.client.BareJID);
-			}
-			else
-			{
-				FirstNode = Nodes.First.Value;
-
-				if (Nodes.First.Next is null)
-					Output.WriteElementString("title", Nodes.First.Value.NodeId);
-				else
-					Output.WriteElementString("title", Nodes.Count.ToString() + " nodes");
-			}
+			Output.WriteElementString("title", Title);
 
 			LinkedList<string> PagesInOrder = new LinkedList<string>();
 			Dictionary<string, LinkedList<ControlParameter>> ParametersPerPage = new Dictionary<string, LinkedList<ControlParameter>>();
@@ -918,7 +908,26 @@ namespace Waher.Networking.XMPP.Control
 			Output.WriteEndElement();
 			Output.Flush();
 
-			e.IqResult(Xml.ToString());
+			return Xml.ToString();
+		}
+
+		private string GetControlFormTitle(LinkedList<IThingReference> Nodes)
+		{
+			if (Nodes is null)
+				return this.client.BareJID;
+			else
+			{
+				if (Nodes.First.Next is null)
+					return Nodes.First.Value.NodeId;
+				else
+					return Nodes.Count.ToString() + " nodes";
+			}
+		}
+
+		private async Task ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
+		{
+			string Form = (await SerializeControlForm(Parameters, Nodes?.First?.Value, this.GetControlFormTitle(Nodes)));
+			e.IqResult(Form);
 		}
 
 

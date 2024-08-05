@@ -418,6 +418,28 @@ namespace Waher.Networking.XMPP.DataForms
 			this.pages = new Page[] { new Page(this, this.title, this.fields) };
 		}
 
+		/// <summary>
+		/// Parses a data form in XML format.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="Xml">XML representation of data form.</param>
+		/// <param name="OnSubmit">Method to call when user submits form.</param>
+		/// <param name="OnCancel">Method to call when user cancels form.</param>
+		/// <param name="From">Sender address.</param>
+		/// <param name="To">Recipient address.</param>
+		/// <returns>Parsed data form.</returns>
+		/// <exception cref="Exception">Exception thrown if XML does not represent an XMPP Data Form.</exception>
+		public static DataForm Parse(XmppClient Client, string Xml, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To)
+		{
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml);
+
+			if (Doc.DocumentElement.LocalName != "x")
+				throw new Exception("Not an XMPP Data Form XML document.");
+
+			return new DataForm(Client, Doc.DocumentElement, OnSubmit, OnCancel, From, To);
+		}
+
 		private Field ParseField(XmlElement E, out Media Media)
 		{
 			string Label = XML.Attribute(E, "label");

@@ -87,14 +87,16 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				case 1:
 					object Obj = Arguments[0].AssociatedObjectValue;
 					if (Obj is Array A)
-					{ 
+					{
 						if (!(A is string[] Pages))
 							Pages = (string[])Expression.ConvertTo(A, typeof(string[]), Node);
-						
+
 						return ClientEvents.GetTabIDsForLocations(Pages);
 					}
 					else if (Obj is IUser User)
 						return ClientEvents.GetTabIDsForUser(User);
+					else if (Obj is null)
+						return new string[0];
 					else
 						return ClientEvents.GetTabIDsForLocation(Obj?.ToString());
 

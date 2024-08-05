@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Markdown;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Persistence;
@@ -169,7 +170,10 @@ namespace Waher.IoTGateway.Setup
 				await Database.Update(this);
 
 				if (this.addresses.Length > 0)
-					await Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
+				{
+					await Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" +
+						MarkdownDocument.Encode(Gateway.ApplicationName) + "**.");
+				}
 
 				if (!string.IsNullOrEmpty(TabID))
 					await Response.Write(1);

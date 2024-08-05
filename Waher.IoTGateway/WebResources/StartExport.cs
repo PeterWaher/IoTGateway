@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -660,7 +661,8 @@ namespace Waher.IoTGateway.WebResources
 							Log.Critical(ex);
 							Reschedule = true;
 
-							await Gateway.SendNotification("Unable to upload backup to " + Recipient + ".\r\n\r\n" + ex.Message);
+							await Gateway.SendNotification("Unable to upload backup to " + MarkdownDocument.Encode(Recipient) + 
+								".\r\n\r\n" + MarkdownDocument.Encode(ex.Message));
 						}
 					}
 				}

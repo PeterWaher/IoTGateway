@@ -755,7 +755,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							continue;
 						}
 
-						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found: " + Field.Var));
+						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found."));
 						continue;
 					}
 

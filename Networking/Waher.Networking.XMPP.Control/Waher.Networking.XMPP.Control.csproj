@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Implements the XMPP IoT control extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
+    <Description>Implements the XMPP IoT control extesion as defined by the Neuro-Foundation (neuro-foundation.io).</Description>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -13,7 +13,7 @@
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp iot actuator control ieee</PackageTags>
+    <PackageTags>networking communication xmpp iot actuator control Neuro-Foundation</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.0.5</AssemblyVersion>
     <FileVersion>2.0.5</FileVersion>

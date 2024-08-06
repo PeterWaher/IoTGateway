@@ -13,20 +13,20 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Implements an XMPP sensor client interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class SensorClient : XmppExtension
 	{
 		/// <summary>
-		/// urn:ieee:iot:sd:1.0
+		/// urn:nf:iot:sd:1.0
 		/// </summary>
-		public const string NamespaceSensorData = "urn:ieee:iot:sd:1.0";
+		public const string NamespaceSensorData = "urn:nf:iot:sd:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:events:1.0
+		/// urn:nf:iot:events:1.0
 		/// </summary>
-		public const string NamespaceSensorEvents = "urn:ieee:iot:events:1.0";
+		public const string NamespaceSensorEvents = "urn:nf:iot:events:1.0";
 
 		private readonly Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
 		private readonly object synchObj = new object();
@@ -34,8 +34,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Implements an XMPP sensor client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public SensorClient(XmppClient Client)
@@ -497,7 +497,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Parses sensor data field definitions.
 		/// </summary>
-		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
+		/// <param name="Content">Fields element containing sensor data as defined in neuro-foundation.io.</param>
 		/// <returns>Parsed fields.</returns>
 		public static SensorData ParseFields(XmlElement Content)
 		{
@@ -515,7 +515,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Parses sensor data field definitions.
 		/// </summary>
-		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
+		/// <param name="Content">Fields element containing sensor data as defined in the neuro-foundation.io.</param>
 		/// <param name="Done">If sensor data readout is done.</param>
 		/// <returns>Parsed fields.</returns>
 		public static Tuple<List<Field>, List<ThingError>> ParseFields(XmlElement Content, out bool Done)
@@ -526,7 +526,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Parses sensor data field definitions.
 		/// </summary>
-		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
+		/// <param name="Content">Fields element containing sensor data as defined in the neuro-foundation.io.</param>
 		/// <param name="Done">If sensor data readout is done.</param>
 		/// <param name="Id">Readout identity.</param>
 		/// <returns>Parsed fields.</returns>

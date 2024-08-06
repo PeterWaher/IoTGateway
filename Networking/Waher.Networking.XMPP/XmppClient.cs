@@ -223,9 +223,9 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceSearch = "jabber:iq:search";
 
 		/// <summary>
-		/// urn:ieee:iot:qos:1.0
+		/// urn:nf:iot:qos:1.0
 		/// </summary>
-		public const string NamespaceQualityOfService = "urn:ieee:iot:qos:1.0";
+		public const string NamespaceQualityOfService = "urn:nf:iot:qos:1.0";
 
 		/// <summary>
 		/// urn:xmpp:ping

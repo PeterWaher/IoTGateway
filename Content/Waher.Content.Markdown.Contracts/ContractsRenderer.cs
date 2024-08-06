@@ -354,7 +354,7 @@ namespace Waher.Content.Markdown.Contracts
 
 		/// <summary>
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
-		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// Ref: https://neuro-foundation.io/SmartContracts.md#humanReadableText
 		/// </summary>
 		/// <param name="Result">Script output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>

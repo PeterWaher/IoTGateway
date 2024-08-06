@@ -31,15 +31,15 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// <summary>
 	/// Implements an XMPP concentrator server interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
-		/// urn:ieee:iot:concentrator:1.0
+		/// urn:nf:iot:concentrator:1.0
 		/// </summary>
-		public const string NamespaceConcentrator = "urn:ieee:iot:concentrator:1.0";
+		public const string NamespaceConcentrator = "urn:nf:iot:concentrator:1.0";
 
 		private readonly Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
 		private readonly Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
@@ -54,8 +54,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Implements an XMPP concentrator server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="DataSources">Data sources.</param>
@@ -67,8 +67,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Implements an XMPP concentrator server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryClient">Thing Registry client.</param>

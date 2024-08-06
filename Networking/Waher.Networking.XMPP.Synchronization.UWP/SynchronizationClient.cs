@@ -11,14 +11,14 @@ using Waher.Events;
 namespace Waher.Networking.XMPP.Synchronization
 {
 	/// <summary>
-	/// Implements the clock synchronization extesion as defined by the IEEE XMPP IoT Interface working group.
+	/// Implements the clock synchronization extesion as defined by the Neuro-Foundation (neuro-foundation.io).
 	/// </summary>
 	public class SynchronizationClient : IDisposable
 	{
 		/// <summary>
-		/// urn:ieee:iot:synchronization:1.0
+		/// urn:nf:iot:synchronization:1.0
 		/// </summary>
-		public const string NamespaceSynchronization = "urn:ieee:iot:synchronization:1.0";
+		public const string NamespaceSynchronization = "urn:nf:iot:synchronization:1.0";
 
 		private static Calibration calibration;
 		private readonly static Stopwatch clock = CreateWatch();
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		}
 
 		/// <summary>
-		/// Implements the clock synchronization extesion as defined by the IEEE XMPP IoT Interface working group.
+		/// Implements the clock synchronization extesion as defined by the Neuro-Foundation (neuro-foundation.io).
 		/// THe internal clock is calibrated with the high frequency timer.
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>

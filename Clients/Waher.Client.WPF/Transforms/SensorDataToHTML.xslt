@@ -3,7 +3,7 @@
 				xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 				xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 				xmlns:sd1="http://waher.se/Schema/SensorData.xsd"
-				xmlns:sd2="urn:ieee:iot:sd:1.0"
+				xmlns:sd2="urn:nf:iot:sd:1.0"
 				exclude-result-prefixes="msxsl">
 
   <xsl:output method="html" indent="no"/>

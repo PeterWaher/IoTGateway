@@ -21,14 +21,14 @@ namespace Waher.Networking.XMPP.P2P
 	public class EndpointSecurity : IEndToEndEncryption
 	{
 		/// <summary>
-		/// urn:ieee:iot:e2e:1.0
+		/// urn:nf:iot:e2e:1.0
 		/// </summary>
-		public const string IoTHarmonizationE2E = "urn:ieee:iot:e2e:1.0";
+		public const string IoTHarmonizationE2E = "urn:nf:iot:e2e:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:p2p:1.0
+		/// urn:nf:iot:p2p:1.0
 		/// </summary>
-		public const string IoTHarmonizationP2P = "urn:ieee:iot:p2p:1.0";
+		public const string IoTHarmonizationP2P = "urn:nf:iot:p2p:1.0";
 
 		private static Dictionary<string, IE2eEndpoint> endpointTypes = new Dictionary<string, IE2eEndpoint>();
 		private static bool initialized = false;

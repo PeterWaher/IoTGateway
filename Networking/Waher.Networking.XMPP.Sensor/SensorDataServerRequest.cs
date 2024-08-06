@@ -158,7 +158,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a set of fields to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output.</param>
@@ -171,7 +171,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a set of fields to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output.</param>
@@ -185,7 +185,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a set of fields to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output.</param>
@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a set of fields to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output.</param>
@@ -224,7 +224,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a set of fields to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output. Can be null.</param>
@@ -379,7 +379,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a field to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a field to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Error">Error to output.</param>
@@ -389,7 +389,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a field to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// Outputs a field to XML using the field format specified in the neuro-foundation.io.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Field">Field to output.</param>

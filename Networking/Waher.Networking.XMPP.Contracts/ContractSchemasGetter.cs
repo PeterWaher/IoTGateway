@@ -52,19 +52,19 @@ namespace Waher.Networking.XMPP.Contracts
 
 			switch (Uri.OriginalString)
 			{
-				case "urn:ieee:iot:e2e:1.0":
+				case "urn:nf:iot:e2e:1.0":
 					SchemaName = "E2E.xsd";
 					break;
 
-				case "urn:ieee:iot:leg:id:1.0":
+				case "urn:nf:iot:leg:id:1.0":
 					SchemaName = "LegalIdentities.xsd";
 					break;
 
-				case "urn:ieee:iot:p2p:1.0":
+				case "urn:nf:iot:p2p:1.0":
 					SchemaName = "P2P.xsd";
 					break;
 
-				case "urn:ieee:iot:leg:sc:1.0":
+				case "urn:nf:iot:leg:sc:1.0":
 					SchemaName = "SmartContracts.xsd";
 					break;
 

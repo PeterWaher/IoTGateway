@@ -36,20 +36,20 @@ namespace Waher.Networking.XMPP.Contracts
 	/// <summary>
 	/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ContractsClient : XmppExtension
 	{
 		/// <summary>
-		/// urn:ieee:iot:leg:id:1.0
+		/// urn:nf:iot:leg:id:1.0
 		/// </summary>
-		public const string NamespaceLegalIdentities = "urn:ieee:iot:leg:id:1.0";
+		public const string NamespaceLegalIdentities = "urn:nf:iot:leg:id:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:leg:sc:1.0
+		/// urn:nf:iot:leg:sc:1.0
 		/// </summary>
-		public const string NamespaceSmartContracts = "urn:ieee:iot:leg:sc:1.0";
+		public const string NamespaceSmartContracts = "urn:nf:iot:leg:sc:1.0";
 
 		/// <summary>
 		/// http://waher.se/schema/Onboarding/v1.xsd
@@ -75,8 +75,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// 
 		/// Before the Contracts Client can be used, you either need to load previously stored
 		/// keys using <see cref="LoadKeys(bool)"/>, or generate new keys, calling
@@ -92,8 +92,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// 
 		/// Before the Contracts Client can be used, you either need to load previously stored
 		/// keys using <see cref="LoadKeys(bool)"/>, or generate new keys, calling
@@ -6049,7 +6049,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						foreach (AuthenticationHeaderValue Header in Response.Headers.WwwAuthenticate)
 						{
-							if (Header.Scheme == "IEEEP1451.99.Sign")
+							if (Header.Scheme == "NeuroFoundation.Sign")
 							{
 								KeyValuePair<string, string>[] Parameters = CommonTypes.ParseFieldValues(Header.Parameter);
 								string Realm = null;

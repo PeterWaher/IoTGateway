@@ -43,7 +43,7 @@ namespace Waher.Service.PcSensor
 				Console.Out.WriteLine("Welcome to the PC Sensor application.");
 				Console.Out.WriteLine(new string('-', 79));
 				Console.Out.WriteLine("This application will publish performace couters as sensor values.");
-				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the IEEE XMPP IoT extensions.");
+				Console.Out.WriteLine("Values will be published over XMPP using the interface defined by the Neuro-Foundation.");
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));

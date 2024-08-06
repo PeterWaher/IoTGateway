@@ -65,15 +65,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		private readonly string thingRegistryAddress;
 
 		/// <summary>
-		/// urn:ieee:iot:disco:1.0
+		/// urn:nf:iot:disco:1.0
 		/// </summary>
-		public const string NamespaceDiscovery = "urn:ieee:iot:disco:1.0";
+		public const string NamespaceDiscovery = "urn:nf:iot:disco:1.0";
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryAddress">Thing Registry XMPP address.</param>

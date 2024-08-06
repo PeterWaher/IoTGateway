@@ -299,12 +299,12 @@ namespace Waher.Mock
 						{
 							ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
 
-							if (e2.Features.ContainsKey("urn:ieee:iot:disco:1.0") && string.IsNullOrEmpty(Credentials.ThingRegistry))
+							if (e2.Features.ContainsKey("urn:nf:iot:disco:1.0") && string.IsNullOrEmpty(Credentials.ThingRegistry))
 								Credentials.ThingRegistry = Item.JID;
 							else
 								Credentials.ThingRegistry = string.Empty;
 
-							if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
+							if (e2.Features.ContainsKey("urn:nf:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
 								Credentials.Provisioning = Item.JID;
 							else
 								Credentials.Provisioning = string.Empty;
@@ -584,7 +584,7 @@ namespace Waher.Mock
 								Console.Out.WriteLine("Checking " + Item.JID + ".");
 								ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
 
-								if (e2.Features.ContainsKey("urn:ieee:iot:disco:1.0") && string.IsNullOrEmpty(Credentials.ThingRegistry))
+								if (e2.Features.ContainsKey("urn:nf:iot:disco:1.0") && string.IsNullOrEmpty(Credentials.ThingRegistry))
 								{
 									Console.Out.WriteLine("Thing registry found.");
 									Credentials.ThingRegistry = Item.JID;
@@ -592,7 +592,7 @@ namespace Waher.Mock
 								else
 									Credentials.ThingRegistry = string.Empty;
 
-								if (e2.Features.ContainsKey("urn:ieee:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
+								if (e2.Features.ContainsKey("urn:nf:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
 								{
 									Console.Out.WriteLine("Provisioning server found.");
 									Credentials.Provisioning = Item.JID;

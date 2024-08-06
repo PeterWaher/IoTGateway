@@ -39,7 +39,7 @@ namespace Waher.Mock.Temperature
 				Console.Out.WriteLine("Welcome to the Mock Temperature sensor application.");
 				Console.Out.WriteLine(new string('-', 79));
 				Console.Out.WriteLine("This application will simulate an outside temperature sensor.");
-				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the IEEE XMPP IoT extensions.");
+				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the Neuro-Foundation IoT extensions.");
 				Console.Out.WriteLine("You can also chat with the sensor.");
 
 				Log.Register(new ConsoleEventSink());

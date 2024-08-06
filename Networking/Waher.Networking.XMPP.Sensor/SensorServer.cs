@@ -22,8 +22,8 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Implements an XMPP sensor server interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// 
 	/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 	/// http://www.xmpp.org/extensions/inbox/iot-events.html
@@ -37,8 +37,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// 
 		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 		/// http://www.xmpp.org/extensions/inbox/iot-events.html
@@ -53,8 +53,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// 
 		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 		/// http://www.xmpp.org/extensions/inbox/iot-events.html

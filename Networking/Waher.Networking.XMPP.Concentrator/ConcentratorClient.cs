@@ -20,8 +20,8 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// <summary>
 	/// Implements an XMPP concentrator client interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ConcentratorClient : XmppExtension
 	{
@@ -31,8 +31,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Implements an XMPP concentrator client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		public ConcentratorClient(XmppClient Client)

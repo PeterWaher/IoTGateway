@@ -5,12 +5,12 @@ using Waher.Content.Markdown.Contracts;
 namespace Waher.Content.Markdown.Web
 {
 	/// <summary>
-	/// Converts Markdown documents to IEEE 1451.99 Smart Contract XML documents.
+	/// Converts Markdown documents to Neuro-Foundation Smart Contract XML documents.
 	/// </summary>
 	public class MarkdownToSmartContractConverter : MarkdownToHtmlConverter
 	{
 		/// <summary>
-		/// Converts Markdown documents to IEEE 1451.99 Smart Contract XML documents.
+		/// Converts Markdown documents to Neuro-Foundation Smart Contract XML documents.
 		/// </summary>
 		public MarkdownToSmartContractConverter()
 		{
@@ -25,7 +25,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"application/xml+ieee1451.99"
+					"application/xml+iotsc"
 				};
 			}
 		}

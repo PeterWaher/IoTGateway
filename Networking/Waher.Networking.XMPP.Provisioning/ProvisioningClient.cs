@@ -28,8 +28,8 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Implements an XMPP provisioning client interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ProvisioningClient : XmppExtension
 	{
@@ -41,25 +41,25 @@ namespace Waher.Networking.XMPP.Provisioning
 		private bool managePresenceSubscriptionRequests = true;
 
 		/// <summary>
-		/// urn:ieee:iot:prov:t:1.0
+		/// urn:nf:iot:prov:t:1.0
 		/// </summary>
-		public const string NamespaceProvisioningToken = "urn:ieee:iot:prov:t:1.0";
+		public const string NamespaceProvisioningToken = "urn:nf:iot:prov:t:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:prov:d:1.0
+		/// urn:nf:iot:prov:d:1.0
 		/// </summary>
-		public const string NamespaceProvisioningDevice = "urn:ieee:iot:prov:d:1.0";
+		public const string NamespaceProvisioningDevice = "urn:nf:iot:prov:d:1.0";
 
 		/// <summary>
-		/// urn:ieee:iot:prov:o:1.0
+		/// urn:nf:iot:prov:o:1.0
 		/// </summary>
-		public const string NamespaceProvisioningOwner = "urn:ieee:iot:prov:o:1.0";
+		public const string NamespaceProvisioningOwner = "urn:nf:iot:prov:o:1.0";
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
@@ -71,8 +71,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>

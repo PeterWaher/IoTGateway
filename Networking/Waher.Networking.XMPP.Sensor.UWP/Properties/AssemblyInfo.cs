@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.XMPP.Sensor.UWP")]
-[assembly: AssemblyDescription("Implements the XMPP IoT sensor data extesion as defined by the IEEE XMPP IoT Interface working group.")]
+[assembly: AssemblyDescription("Implements the XMPP IoT sensor data extesion as defined by the Neuro-Foundation (neuro-foundation.io).")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]

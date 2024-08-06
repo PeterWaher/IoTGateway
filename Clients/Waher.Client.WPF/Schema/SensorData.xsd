@@ -3,11 +3,11 @@
 		   targetNamespace="http://waher.se/Schema/SensorData.xsd"
 		   elementFormDefault="qualified"
 		   xmlns="http://waher.se/Schema/SensorData.xsd"
-		   xmlns:sd="urn:ieee:iot:sd:1.0"
+		   xmlns:sd="urn:nf:iot:sd:1.0"
 		   xmlns:mstns="http://waher.se/Schema/SensorData.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<xs:import namespace="urn:ieee:iot:sd:1.0"/>
+	<xs:import namespace="urn:nf:iot:sd:1.0"/>
 	
 	<xs:element name="SensorData">
 		<xs:complexType>

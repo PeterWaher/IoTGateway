@@ -1080,7 +1080,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
             <Margins left="0.5em" right="0.5em">
-                <Label text="IoT Harmonization Edge Services (IEEE P1451.99)" x="50%" y="50%" halign="Center" valign="Center"/>
+                <Label text="Neuro-Foundation Edge Services" x="50%" y="50%" halign="Center" valign="Center"/>
             </Margins>
             </RoundedRectangle>
         </Margins>

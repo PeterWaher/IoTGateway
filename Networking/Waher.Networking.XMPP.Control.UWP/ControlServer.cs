@@ -26,8 +26,8 @@ namespace Waher.Networking.XMPP.Control
 	/// <summary>
 	/// Implements an XMPP control server interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ControlServer : XmppExtension
 	{
@@ -38,8 +38,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// Implements an XMPP control server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="Parameters">Default set of control parameters. If set of control parameters vary depending on node, leave this
@@ -52,8 +52,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// Implements an XMPP control server interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningClient">Provisioning client, if actuator supports provisioning.</param>

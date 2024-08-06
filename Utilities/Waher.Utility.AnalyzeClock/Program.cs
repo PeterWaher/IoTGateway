@@ -15,8 +15,8 @@ namespace Waher.Utility.AnalyzeClock
 	{
 		/// <summary>
 		/// Analyzes the difference between the clock on the local machine with the clock on
-		/// another machine, connected to the XMPP network, and compatible with the IEEE
-		/// XMPP IoT extensions.
+		/// another machine, connected to the XMPP network, and compatible with the Neuro-Foundation
+		/// interfaces.
 		/// 
 		/// Command line switches:
 		/// 
@@ -202,8 +202,8 @@ namespace Waher.Utility.AnalyzeClock
 				if (Help || c == 0)
 				{
 					Console.Out.WriteLine("Analyzes the difference between the clock on the local machine with the clock on");
-					Console.Out.WriteLine("another machine, connected to the XMPP network, and compatible with the IEEE");
-					Console.Out.WriteLine("XMPP IoT extensions.");
+					Console.Out.WriteLine("another machine, connected to the XMPP network, and compatible with the Neuro-Foundation");
+					Console.Out.WriteLine("interfaces.");
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("Command line switches:");
 					Console.Out.WriteLine();

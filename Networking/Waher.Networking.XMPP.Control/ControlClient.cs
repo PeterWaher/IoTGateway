@@ -21,21 +21,21 @@ namespace Waher.Networking.XMPP.Control
 	/// <summary>
 	/// Implements an XMPP control client interface.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class ControlClient : XmppExtension
 	{
 		/// <summary>
-		/// urn:ieee:iot:ctr:1.0
+		/// urn:nf:iot:ctr:1.0
 		/// </summary>
-		public const string NamespaceControl = "urn:ieee:iot:ctr:1.0";
+		public const string NamespaceControl = "urn:nf:iot:ctr:1.0";
 
 		/// <summary>
 		/// Implements an XMPP control client interface.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public ControlClient(XmppClient Client)

@@ -6,7 +6,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Extends the rendering capabilities of the Markdown library defined in Waher.Content.Markdown, by providing a renderer to Smart Contract XML, as proposed in IEEE P1451.99.
+    <Description>Extends the rendering capabilities of the Markdown library defined in Waher.Content.Markdown, by providing a renderer to Smart Contract XML, as defined in neuro-foundation.io.
 
 For a description of the Markdown flavour supported by the parser, see:
 https://waher.se/Markdown.md</Description>
@@ -15,7 +15,7 @@ https://waher.se/Markdown.md</Description>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Markdown XML Smart Contract IEEE P1451.99</PackageTags>
+    <PackageTags>Markdown XML Smart Contract Neuro-Foundation</PackageTags>
     <AssemblyVersion>3.1.0</AssemblyVersion>
     <FileVersion>3.1.0</FileVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

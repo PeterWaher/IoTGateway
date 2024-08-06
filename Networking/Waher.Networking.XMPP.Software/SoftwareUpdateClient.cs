@@ -14,8 +14,8 @@ namespace Waher.Networking.XMPP.Software
 	/// <summary>
 	/// Implements an XMPP interface for remote software updates.
 	/// 
-	/// The interface is defined in the IEEE XMPP IoT extensions:
-	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
 	/// </summary>
 	public class SoftwareUpdateClient : XmppExtension
 	{
@@ -29,15 +29,15 @@ namespace Waher.Networking.XMPP.Software
 		private readonly Random rnd = new Random();
 
 		/// <summary>
-		/// urn:ieee:iot:swu:1.0
+		/// urn:nf:iot:swu:1.0
 		/// </summary>
-		public const string NamespaceSoftwareUpdates = "urn:ieee:iot:swu:1.0";
+		public const string NamespaceSoftwareUpdates = "urn:nf:iot:swu:1.0";
 
 		/// <summary>
 		/// Implements an XMPP interface for remote software updates.
 		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ComponentAddress">Component XMPP Address.</param>

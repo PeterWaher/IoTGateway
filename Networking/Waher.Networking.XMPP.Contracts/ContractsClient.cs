@@ -6351,7 +6351,6 @@ namespace Waher.Networking.XMPP.Contracts
 			IE2eEndpoint LocalEndpoint = await this.GetMatchingLocalKeyAsync();
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
 			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
-			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
 			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
 			byte[] IV = new byte[16];
@@ -6361,6 +6360,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			for (i = 0; i < 32; i++)
 				Secret[i] ^= NonceDigest[i];
+
+			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
 
 			Array.Copy(Digest, 0, Key, 0, 16);
 			Array.Copy(Digest, 16, IV, 0, 16);

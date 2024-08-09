@@ -104,9 +104,9 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.peer is null))
 			{
-				this.peer.OnSent += Peer_OnSent;
-				this.peer.OnReceived += Peer_OnReceived;
-				this.peer.OnClosed += Peer_OnClosed;
+				this.peer.OnSent += this.Peer_OnSent;
+				this.peer.OnReceived += this.Peer_OnReceived;
+				this.peer.OnClosed += this.Peer_OnClosed;
 			}
 		}
 
@@ -127,9 +127,9 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.peer is null))
 			{
-				this.peer.OnSent -= Peer_OnSent;
-				this.peer.OnReceived -= Peer_OnReceived;
-				this.peer.OnClosed -= Peer_OnClosed;
+				this.peer.OnSent -= this.Peer_OnSent;
+				this.peer.OnReceived -= this.Peer_OnReceived;
+				this.peer.OnClosed -= this.Peer_OnClosed;
 			}
 		}
 
@@ -723,8 +723,7 @@ namespace Waher.Networking.XMPP.P2P
 				this.CallCallbacks();
 			else if (NewState == XmppState.Error || NewState == XmppState.Offline)
 			{
-				if (!(this.parent is null))
-					this.parent.PeerClosed(this);
+				this.parent?.PeerClosed(this);
 
 				if (!(this.xmppClient is null))
 				{

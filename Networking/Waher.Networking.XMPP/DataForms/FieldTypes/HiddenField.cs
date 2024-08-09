@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="Var">Variable name</param>
 		/// <param name="Value">Value for the field (string representations).</param>
 		public HiddenField(string Var, string Value)
-			: base(null, Var, string.Empty, false, new string[] { Value }, null, string.Empty, null, null, string.Empty, false, true, false)
+			: base(null, Var, string.Empty, false, new string[] { Value }, null, string.Empty, null, null, string.Empty, false, false, false)
 		{
 		}
 
@@ -48,7 +48,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="Label">Label</param>
 		/// <param name="Value">Value for the field (string representations).</param>
 		public HiddenField(string Var, string Label, string Value)
-			: base(null, Var, Label, false, new string[] { Value }, null, string.Empty, null, null, string.Empty, false, true, false)
+			: base(null, Var, Label, false, new string[] { Value }, null, string.Empty, null, null, string.Empty, false, false, false)
 		{
 		}
 

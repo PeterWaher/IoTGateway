@@ -217,7 +217,8 @@ namespace Waher.IoTGateway.Svc
 			int SessionId = ChangeDescription.SessionId;
 			List<KeyValuePair<string, object>> Tags = new()
 			{
-				new("SessionId", SessionId)
+				new("SessionId", SessionId),
+				new("Domain", Gateway.Domain.Value)
 			};
 
 			AddWtsUserName(Tags, SessionId);

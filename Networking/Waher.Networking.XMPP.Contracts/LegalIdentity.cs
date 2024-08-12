@@ -46,6 +46,7 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private string id = null;
 		private string provider = null;
+		private string @namespace = ContractsClient.NamespaceLegalIdentities;
 		private IdentityState state = IdentityState.Created;
 		private DateTime created = DateTime.MinValue;
 		private DateTime updated = DateTime.MinValue;
@@ -91,6 +92,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.provider;
 			set => this.provider = value;
+		}
+
+		/// <summary>
+		/// Namespace used when serializing the identity for signatures.
+		/// </summary>
+		public string Namespace
+		{
+			get => this.@namespace;
+			set => this.@namespace = value;
 		}
 
 		/// <summary>
@@ -203,7 +213,8 @@ namespace Waher.Networking.XMPP.Contracts
 			List<Attachment> Attachments = new List<Attachment>();
 			LegalIdentity Result = new LegalIdentity()
 			{
-				id = XML.Attribute(Xml, "id")
+				id = XML.Attribute(Xml, "id"),
+				@namespace = Xml.NamespaceURI
 			};
 
 			foreach (XmlNode N in Xml.ChildNodes)
@@ -366,7 +377,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (IncludeNamespace)
 			{
 				Xml.Append(" xmlns=\"");
-				Xml.Append(ContractsClient.NamespaceLegalIdentities);
+				Xml.Append(this.@namespace);
 				Xml.Append('"');
 			}
 

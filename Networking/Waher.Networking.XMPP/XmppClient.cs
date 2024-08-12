@@ -8089,47 +8089,73 @@ namespace Waher.Networking.XMPP
 		/// <returns>Component JID, if found, or null if not.</returns>
 		public async Task<string> FindComponentAsync(string Jid, string Feature)
 		{
-			string Key = Jid + " " + Feature;
+			KeyValuePair<string, string> P = await this.FindComponentAsync(Jid, new string[] { Feature });
+			return P.Key;
+		}
+
+		/// <summary>
+		/// Finds a component having one of a specific set of features, servicing a JID.
+		/// </summary>
+		/// <param name="Jid">JID</param>
+		/// <param name="Features">Requested set of features.</param>
+		/// <returns>Component JID and corresponding namespace, if found, or null if not.</returns>
+		public async Task<KeyValuePair<string, string>> FindComponentAsync(string Jid, params string[] Features)
+		{
+			string Key;
 
 			lock (this.synchObject)
 			{
-				if (this.services.TryGetValue(Key, out string Service))
-					return Service;
+				foreach (string Feature in Features)
+				{
+					Key = Jid + " " + Feature;
+
+					if (this.services.TryGetValue(Key, out string Service))
+						return new KeyValuePair<string, string>(Service, Feature);
+				}
 			}
 
-			string BareJid = GetBareJID(Jid);
-			int i = BareJid.IndexOf('@');
-			string Domain = BareJid.Substring(i + 1);
+			string Domain = GetDomain(Jid);
 
 			ServiceDiscoveryEventArgs e = await this.ServiceDiscoveryAsync(Domain);
-			string Result = null;
 
-			if (e.HasFeature(Feature))
-				Result = Domain;
-			else
+			foreach (string Feature in Features)
 			{
-				ServiceItemsDiscoveryEventArgs e2 = await this.ServiceItemsDiscoveryAsync(Domain);
-
-				foreach (Item Component in e2.Items)
+				if (e.HasFeature(Feature))
 				{
-					e = await this.ServiceDiscoveryAsync(Component.JID);
+					Key = Jid + " " + Feature;
+
+					lock (this.synchObject)
+					{
+						this.services[Key] = Domain;
+					}
+
+					return new KeyValuePair<string, string>(Domain, Feature);
+				}
+			}
+
+			ServiceItemsDiscoveryEventArgs e2 = await this.ServiceItemsDiscoveryAsync(Domain);
+
+			foreach (Item Component in e2.Items)
+			{
+				e = await this.ServiceDiscoveryAsync(Component.JID);
+
+				foreach (string Feature in Features)
+				{
 					if (e.HasFeature(Feature))
 					{
-						Result = Component.JID;
-						break;
+						Key = Jid + " " + Feature;
+
+						lock (this.synchObject)
+						{
+							this.services[Key] = Component.JID;
+						}
+
+						return new KeyValuePair<string, string>(Component.JID, Feature);
 					}
 				}
 			}
 
-			if (!string.IsNullOrEmpty(Result))
-			{
-				lock (this.synchObject)
-				{
-					this.services[Key] = Result;
-				}
-			}
-
-			return Result;
+			return new KeyValuePair<string, string>(null, null);
 		}
 
 		#endregion

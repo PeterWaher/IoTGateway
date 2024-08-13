@@ -184,7 +184,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (!(this.Descriptions is null))
 					{
 						foreach (HumanReadableText Description in this.Descriptions)
-							Description.Serialize(Xml, "description", false);
+							Description.Serialize(Xml, "description", null);
 					}
 
 					if (!(this.labels is null))

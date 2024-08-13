@@ -70,7 +70,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		private void AppendFields(ThingReference ThingReference, List<Field> Fields, ISensorReadout Request, XmlElement Value, string Prefix)
 		{
-			if (Value.NamespaceURI == SensorClient.NamespaceSensorData)
+			if (Array.IndexOf(SensorClient.NamespacesSensorData, Value.NamespaceURI) >= 0)
 			{
 				Networking.XMPP.Sensor.SensorData SensorData = SensorClient.ParseFields(Value);
 				if (!(SensorData.Fields is null))

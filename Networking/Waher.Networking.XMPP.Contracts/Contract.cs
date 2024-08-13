@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string provider = null;
 		private string forMachinesLocalName = null;
 		private string forMachinesNamespace = null;
+		private string @namespace = ContractsClient.NamespaceSmartContractsCurrent;
 		private byte[] contentSchemaDigest = null;
 		private XmlElement forMachines = null;
 		private Role[] roles = null;
@@ -90,6 +91,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.templateId;
 			set => this.templateId = value;
+		}
+
+		/// <summary>
+		/// Namespace used when serializing the identity for signatures.
+		/// </summary>
+		public string Namespace
+		{
+			get => this.@namespace;
+			set => this.@namespace = value;
 		}
 
 		/// <summary>
@@ -347,7 +357,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="Exception">If XML is invalid or contains errors.</exception>
 		public static Task<ParsedContract> Parse(XmlDocument Xml, ContractsClient Client)
 		{
-			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts,
+			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContractsCurrent,
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
 			return Parse(Xml.DocumentElement, Client, true);
@@ -392,7 +402,10 @@ namespace Waher.Networking.XMPP.Contracts
 		public static async Task<ParsedContract> Parse(XmlElement Xml, ContractsClient Client, bool ExceptionIfError)
 		{
 			bool HasVisibility = false;
-			Contract Result = new Contract();
+			Contract Result = new Contract()
+			{
+				Namespace = Xml.NamespaceURI
+			};
 			ParsedContract ParsedContract = new ParsedContract()
 			{
 				Contract = Result,
@@ -1427,7 +1440,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (IncludeNamespace)
 			{
 				Xml.Append(" xmlns=\"");
-				Xml.Append(ContractsClient.NamespaceSmartContracts);
+				Xml.Append(this.@namespace);
 				Xml.Append('"');
 			}
 
@@ -1436,7 +1449,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.forMachines is null)
 				throw new InvalidOperationException("No Machine-readable XML provided.");
 
-			NormalizeXml(this.forMachines, Xml, ContractsClient.NamespaceSmartContracts);
+			NormalizeXml(this.forMachines, Xml, this.@namespace);
 
 			if (!(this.roles is null))
 			{
@@ -1455,7 +1468,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append("\">");
 
 					foreach (HumanReadableText Description in Role.Descriptions)
-						Description.Serialize(Xml, "description", false);
+						Description.Serialize(Xml, "description", null);
 
 					Xml.Append("</role>");
 				}

@@ -30,10 +30,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <summary>
         /// Namespace of the E2E symmetric cipher
         /// </summary>
-        public virtual string Namespace
-        {
-            get { return EndpointSecurity.IoTHarmonizationE2E; }
-        }
+        public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
 
         /// <summary>
         /// If Authenticated Encryption with Associated Data is used
@@ -774,7 +771,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             Xml.Append(" xmlns=\"");
             Xml.Append(this.Namespace);
             Xml.Append("\" r=\"");
-            if (Sender.Namespace != EndpointSecurity.IoTHarmonizationE2E)
+            if (Sender.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
             {
                 Xml.Append(Sender.Namespace);
                 Xml.Append('#');

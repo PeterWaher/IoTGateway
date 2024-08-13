@@ -343,7 +343,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<canReadRule xmlns='");
-			Xml.Append(ProvisioningClient.NamespaceProvisioningOwner);
+			Xml.Append(ProvisioningClient.NamespaceProvisioningOwnerCurrent);
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(this.JID));
 			Xml.Append("' remoteJid='");

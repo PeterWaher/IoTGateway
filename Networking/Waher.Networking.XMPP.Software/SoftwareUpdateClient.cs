@@ -29,9 +29,28 @@ namespace Waher.Networking.XMPP.Software
 		private readonly Random rnd = new Random();
 
 		/// <summary>
+		/// urn:ieee:iot:swu:1.0
+		/// </summary>
+		public const string NamespaceSoftwareUpdatesIeeeV1 = "urn:ieee:iot:swu:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:swu:1.0
 		/// </summary>
-		public const string NamespaceSoftwareUpdates = "urn:nf:iot:swu:1.0";
+		public const string NamespaceSoftwareUpdatesNeuroFoundationV1 = "urn:nf:iot:swu:1.0";
+
+		/// <summary>
+		/// Current namespace for software updates.
+		/// </summary>
+		public const string NamespaceSoftwareUpdatesCurrent = NamespaceSoftwareUpdatesNeuroFoundationV1;
+
+		/// <summary>
+		/// Namespaces supported for software updates.
+		/// </summary>
+		public static readonly string[] NamespacesSoftwareUpdates = new string[]
+		{
+			NamespaceSoftwareUpdatesIeeeV1,
+			NamespaceSoftwareUpdatesNeuroFoundationV1
+		};
 
 		/// <summary>
 		/// Implements an XMPP interface for remote software updates.
@@ -50,8 +69,19 @@ namespace Waher.Networking.XMPP.Software
 			if (!Directory.Exists(PackageFolder))
 				Directory.CreateDirectory(PackageFolder);
 
-			this.Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
-			this.Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
+			#region Neuro-Foundation V1
+
+			this.Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdatesNeuroFoundationV1, this.PackageNotificationHandler, true);
+			this.Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdatesNeuroFoundationV1, this.PackageDeletedNotificationHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.Client.RegisterMessageHandler("packageInfo", NamespaceSoftwareUpdatesIeeeV1, this.PackageNotificationHandler, true);
+			this.Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdatesIeeeV1, this.PackageDeletedNotificationHandler, false);
+
+			#endregion
 		}
 
 		/// <inheritdoc/>
@@ -59,8 +89,19 @@ namespace Waher.Networking.XMPP.Software
 		{
 			base.Dispose();
 
-			this.Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdates, this.PackageNotificationHandler, true);
-			this.Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
+			#region Neuro-Foundation V1
+
+			this.Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdatesNeuroFoundationV1, this.PackageNotificationHandler, true);
+			this.Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdatesNeuroFoundationV1, this.PackageDeletedNotificationHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdatesIeeeV1, this.PackageNotificationHandler, true);
+			this.Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdatesIeeeV1, this.PackageDeletedNotificationHandler, false);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -89,7 +130,7 @@ namespace Waher.Networking.XMPP.Software
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getPackageInfo xmlns='");
-			Xml.Append(NamespaceSoftwareUpdates);
+			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("' fileName='");
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("'/>");
@@ -99,7 +140,7 @@ namespace Waher.Networking.XMPP.Software
 				XmlElement E = e.FirstElement;
 				Package PackageInfo = null;
 
-				if (e.Ok && !(E is null) && E.LocalName == "packageInfo" && E.NamespaceURI == NamespaceSoftwareUpdates)
+				if (e.Ok && !(E is null) && E.LocalName == "packageInfo")
 					PackageInfo = Package.Parse(E);
 				else
 					e.Ok = false;
@@ -154,7 +195,7 @@ namespace Waher.Networking.XMPP.Software
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getPackages xmlns='");
-			Xml.Append(NamespaceSoftwareUpdates);
+			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("'/>");
 
 			this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
@@ -162,13 +203,13 @@ namespace Waher.Networking.XMPP.Software
 				XmlElement E = e.FirstElement;
 				Package[] PackagesInfo = null;
 
-				if (e.Ok && !(E is null) && E.LocalName == "packages" && E.NamespaceURI == NamespaceSoftwareUpdates)
+				if (e.Ok && !(E is null) && E.LocalName == "packages")
 				{
 					List<Package> Packages = new List<Package>();
 
 					foreach (XmlNode N in E.ChildNodes)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "packageInfo" && E2.NamespaceURI == NamespaceSoftwareUpdates)
+						if (N is XmlElement E2 && E2.LocalName == "packageInfo")
 							Packages.Add(Package.Parse(E2));
 					}
 
@@ -228,7 +269,7 @@ namespace Waher.Networking.XMPP.Software
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<subscribe xmlns='");
-			Xml.Append(NamespaceSoftwareUpdates);
+			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("' fileName='");
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("'/>");
@@ -272,7 +313,7 @@ namespace Waher.Networking.XMPP.Software
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<unsubscribe xmlns='");
-			Xml.Append(NamespaceSoftwareUpdates);
+			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("' fileName='");
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("'/>");
@@ -316,7 +357,7 @@ namespace Waher.Networking.XMPP.Software
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSubscriptions xmlns='");
-			Xml.Append(NamespaceSoftwareUpdates);
+			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("'/>");
 
 			this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
@@ -324,13 +365,13 @@ namespace Waher.Networking.XMPP.Software
 				XmlElement E = e.FirstElement;
 				string[] FileNames = null;
 
-				if (e.Ok && !(E is null) && E.LocalName == "subscriptions" && E.NamespaceURI == NamespaceSoftwareUpdates)
+				if (e.Ok && !(E is null) && E.LocalName == "subscriptions")
 				{
 					List<string> Subscriptions = new List<string>();
 
 					foreach (XmlNode N in E.ChildNodes)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "subscription" && E2.NamespaceURI == NamespaceSoftwareUpdates)
+						if (N is XmlElement E2 && E2.LocalName == "subscription")
 							Subscriptions.Add(E2.InnerText);
 					}
 

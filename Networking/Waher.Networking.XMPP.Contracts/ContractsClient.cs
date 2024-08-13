@@ -42,14 +42,52 @@ namespace Waher.Networking.XMPP.Contracts
 	public class ContractsClient : XmppExtension
 	{
 		/// <summary>
+		/// urn:ieee:iot:leg:id:1.0
+		/// </summary>
+		public const string NamespaceLegalIdentitiesIeeeV1 = "urn:ieee:iot:leg:id:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:leg:id:1.0
 		/// </summary>
-		public const string NamespaceLegalIdentities = "urn:nf:iot:leg:id:1.0";
+		public const string NamespaceLegalIdentitiesNeuroFoundationV1 = "urn:nf:iot:leg:id:1.0";
+
+		/// <summary>
+		/// Current namespace for legal identities.
+		/// </summary>
+		public const string NamespaceLegalIdentitiesCurrent = NamespaceLegalIdentitiesNeuroFoundationV1;
+
+		/// <summary>
+		/// Namespaces supported for legal identities.
+		/// </summary>
+		public static readonly string[] NamespacesLegalIdentities = new string[]
+		{
+			NamespaceLegalIdentitiesIeeeV1,
+			NamespaceLegalIdentitiesNeuroFoundationV1
+		};
+
+		/// <summary>
+		/// urn:ieee:iot:leg:sc:1.0
+		/// </summary>
+		public const string NamespaceSmartContractsIeeeV1 = "urn:ieee:iot:leg:sc:1.0";
 
 		/// <summary>
 		/// urn:nf:iot:leg:sc:1.0
 		/// </summary>
-		public const string NamespaceSmartContracts = "urn:nf:iot:leg:sc:1.0";
+		public const string NamespaceSmartContractsNeuroFoundationV1 = "urn:nf:iot:leg:sc:1.0";
+
+		/// <summary>
+		/// Current namespce for smart contracts.
+		/// </summary>
+		public const string NamespaceSmartContractsCurrent = NamespaceSmartContractsNeuroFoundationV1;
+
+		/// <summary>
+		/// Namespaces supported for smart contracts.
+		/// </summary>
+		public static readonly string[] NamespacesSmartContracts = new string[]
+		{
+			NamespaceSmartContractsIeeeV1,
+			NamespaceSmartContractsNeuroFoundationV1
+		};
 
 		/// <summary>
 		/// http://waher.se/schema/Onboarding/v1.xsd
@@ -109,20 +147,43 @@ namespace Waher.Networking.XMPP.Contracts
 			this.approvedSources = ApprovedSources;
 			this.localKeys = null;
 
-			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
-			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionClientUrl", NamespaceLegalIdentities, this.PetitionClientUrlEventHandler, false);
+			#region NeuroFoundation V1
 
-			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
-			this.client.RegisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
-			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
-			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
-			this.client.RegisterMessageHandler("contractProposal", NamespaceSmartContracts, this.ContractProposalMessageHandler, false);
+			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentitiesNeuroFoundationV1, this.IdentityMessageHandler, true);
+			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionIdentityMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionSignatureMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionClientUrl", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionClientUrlEventHandler, false);
+
+			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContractsNeuroFoundationV1, this.ContractSignedMessageHandler, true);
+			this.client.RegisterMessageHandler("contractCreated", NamespaceSmartContractsNeuroFoundationV1, this.ContractCreatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContractsNeuroFoundationV1, this.ContractUpdatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContractsNeuroFoundationV1, this.ContractDeletedMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContractsNeuroFoundationV1, this.PetitionContractMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContractsNeuroFoundationV1, this.PetitionContractResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("contractProposal", NamespaceSmartContractsNeuroFoundationV1, this.ContractProposalMessageHandler, false);
+
+			#endregion
+
+			#region IEEE v1
+
+			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentitiesIeeeV1, this.IdentityMessageHandler, true);
+			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionIdentityMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionSignatureMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionClientUrl", NamespaceLegalIdentitiesIeeeV1, this.PetitionClientUrlEventHandler, false);
+
+			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContractsIeeeV1, this.ContractSignedMessageHandler, true);
+			this.client.RegisterMessageHandler("contractCreated", NamespaceSmartContractsIeeeV1, this.ContractCreatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContractsIeeeV1, this.ContractUpdatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContractsIeeeV1, this.ContractDeletedMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContractsIeeeV1, this.PetitionContractMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContractsIeeeV1, this.PetitionContractResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("contractProposal", NamespaceSmartContractsIeeeV1, this.ContractProposalMessageHandler, false);
+
+			#endregion
 
 			this.aes = Aes.Create();
 			this.aes.BlockSize = 128;
@@ -138,20 +199,43 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public override void Dispose()
 		{
-			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
-			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionClientUrl", NamespaceLegalIdentities, this.PetitionClientUrlEventHandler, false);
+			#region NeuroFoundation V1
 
-			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
-			this.client.UnregisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
-			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
-			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
-			this.client.UnregisterMessageHandler("contractProposal", NamespaceSmartContracts, this.ContractProposalMessageHandler, false);
+			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentitiesNeuroFoundationV1, this.IdentityMessageHandler, true);
+			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionIdentityMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionSignatureMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionClientUrl", NamespaceLegalIdentitiesNeuroFoundationV1, this.PetitionClientUrlEventHandler, false);
+
+			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContractsNeuroFoundationV1, this.ContractSignedMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractCreated", NamespaceSmartContractsNeuroFoundationV1, this.ContractCreatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContractsNeuroFoundationV1, this.ContractUpdatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContractsNeuroFoundationV1, this.ContractDeletedMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContractsNeuroFoundationV1, this.PetitionContractMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContractsNeuroFoundationV1, this.PetitionContractResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractProposal", NamespaceSmartContractsNeuroFoundationV1, this.ContractProposalMessageHandler, false);
+
+			#endregion
+
+			#region IEEE v1
+
+			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentitiesIeeeV1, this.IdentityMessageHandler, true);
+			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionIdentityMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionSignatureMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentitiesIeeeV1, this.PetitionSignatureResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionClientUrl", NamespaceLegalIdentitiesIeeeV1, this.PetitionClientUrlEventHandler, false);
+
+			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContractsIeeeV1, this.ContractSignedMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractCreated", NamespaceSmartContractsIeeeV1, this.ContractCreatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContractsIeeeV1, this.ContractUpdatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContractsIeeeV1, this.ContractDeletedMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContractsIeeeV1, this.PetitionContractMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContractsIeeeV1, this.PetitionContractResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractProposal", NamespaceSmartContractsIeeeV1, this.ContractProposalMessageHandler, false);
+
+			#endregion
 
 			this.localKeys?.Dispose();
 			this.localKeys = null;
@@ -661,12 +745,12 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentities + "\"/>", async (sender, e) =>
+				this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 					{
 						foreach (XmlNode N in E.ChildNodes)
 						{
@@ -862,7 +946,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetIdApplicationAttributes(IdApplicationAttributesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentities + "'/>", (sender, e) =>
+			this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", (sender, e) =>
 			{
 				try
 				{
@@ -932,13 +1016,13 @@ namespace Waher.Networking.XMPP.Contracts
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<apply xmlns=\"");
-					Xml.Append(NamespaceLegalIdentities);
+					Xml.Append(NamespaceLegalIdentitiesCurrent);
 					Xml.Append("\">");
 
 					StringBuilder Identity = new StringBuilder();
 
 					Identity.Append("<identity><clientPublicKey>");
-					e.Key.ToXml(Identity, NamespaceLegalIdentities);
+					e.Key.ToXml(Identity, NamespaceLegalIdentitiesCurrent);
 					Identity.Append("</clientPublicKey>");
 
 					foreach (Property Property in Properties)
@@ -971,7 +1055,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						if (e2.Ok && !((E = e2.FirstElement) is null) &&
 							E.LocalName == "identity" &&
-							E.NamespaceURI == NamespaceLegalIdentities)
+							E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 						{
 							Identity2 = LegalIdentity.Parse(E);
 							await this.UpdateSettings(Identity2, e.Key.PublicKey);
@@ -1055,7 +1139,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<readyForApproval xmlns=\"");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\" id=\"");
 			Xml.Append(XML.Encode(LegalIdentityId));
 			Xml.Append("\"/>");
@@ -1322,7 +1406,8 @@ namespace Waher.Networking.XMPP.Contracts
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
 			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
-				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
+				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
+				out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)
 			{
 				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
@@ -1350,7 +1435,8 @@ namespace Waher.Networking.XMPP.Contracts
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
 			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
-				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
+				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
+				out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)
 			{
 				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
@@ -1651,7 +1737,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void GetLegalIdentities(string Address, LegalIdentitiesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentities + "\"/>",
+			this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>",
 				this.IdentitiesResponse, new object[] { Callback, State });
 		}
 
@@ -1662,7 +1748,7 @@ namespace Waher.Networking.XMPP.Contracts
 			LegalIdentity[] Identities = null;
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentities)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 			{
 				List<LegalIdentity> IdentitiesList = new List<LegalIdentity>();
 
@@ -1757,12 +1843,12 @@ namespace Waher.Networking.XMPP.Contracts
 		public void GetLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
 		{
 			this.client.SendIqGet(Address, "<getLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentities + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -1833,12 +1919,12 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			this.client.SendIqSet(Address, "<obsoleteLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentities + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -1912,12 +1998,12 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			this.client.SendIqSet(Address, "<compromisedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentities + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -2195,7 +2281,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Convert.ToBase64String(Signature));
 
 			Xml.Append("\" xmlns=\"");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\"/>");
 
 			this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
@@ -2203,7 +2289,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -2311,11 +2397,12 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<createContract xmlns=\"");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("\">");
 
 			Contract Contract = new Contract()
 			{
+				Namespace = NamespaceSmartContractsCurrent,
 				ForMachines = ForMachines,
 				ForHumans = ForHumans,
 				Roles = Roles,
@@ -2346,8 +2433,7 @@ namespace Waher.Networking.XMPP.Contracts
 			XmlElement E;
 
 			if (e.Ok && !((E = e.FirstElement) is null) &&
-				E.LocalName == "contract" &&
-				E.NamespaceURI == NamespaceSmartContracts)
+				E.LocalName == "contract")
 			{
 				ParsedContract Parsed = await Contract.Parse(E, this, false);
 				Contract = Parsed?.Contract;
@@ -2482,7 +2568,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<createContract xmlns=\"");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("\"><template archiveOpt=\"");
 			Xml.Append(ArchiveOptional.ToString());
 			Xml.Append("\" archiveReq=\"");
@@ -2673,7 +2759,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getCreatedContracts references='true' xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 
 			if (Offset > 0)
 			{
@@ -2703,7 +2789,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
+					if (N is XmlElement E2 && E2.LocalName == "ref")
 					{
 						string Id = XML.Attribute(E2, "id");
 						IDs.Add(Id);
@@ -2829,7 +2915,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getCreatedContracts references='false' xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 
 			if (Offset > 0)
 			{
@@ -2860,7 +2946,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (N is XmlElement E2 && E2.NamespaceURI == NamespaceSmartContracts)
+					if (N is XmlElement E2)
 					{
 						switch (E2.LocalName)
 						{
@@ -2981,7 +3067,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Xml.Clear();
 					Xml.Append("<signContract xmlns='");
-					Xml.Append(NamespaceSmartContracts);
+					Xml.Append(NamespaceSmartContractsCurrent);
 					Xml.Append("' id='");
 					Xml.Append(XML.Encode(Contract.ContractId));
 					Xml.Append("' role='");
@@ -3087,7 +3173,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSignedContracts references='true' xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 
 			if (Offset > 0)
 			{
@@ -3207,7 +3293,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSignedContracts references='false' xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 
 			if (Offset > 0)
 			{
@@ -3317,7 +3403,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getContract xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
@@ -3451,7 +3537,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getContracts xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("'>");
 
 			foreach (string ContractId in ContractIds)
@@ -3533,7 +3619,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<obsoleteContract xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
@@ -3603,7 +3689,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<deleteContract xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
@@ -3745,7 +3831,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<updateContract xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("'>");
 
 			Contract.Serialize(Xml, false, true, true, true, false, false, false);
@@ -4345,7 +4431,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<contractProposal xmlns=\"");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("\" contractId=\"");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("\" role=\"");
@@ -4409,24 +4495,24 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetSchemas(string Address, SchemaReferencesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContracts + "'/>",
+			this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContractsCurrent + "'/>",
 				async (sender, e) =>
 				{
 					XmlElement E = e.FirstElement;
 					List<SchemaReference> Schemas = new List<SchemaReference>();
 
-					if (e.Ok && !(E is null) && E.LocalName == "schemas" && E.NamespaceURI == NamespaceSmartContracts)
+					if (e.Ok && !(E is null) && E.LocalName == "schemas")
 					{
 						foreach (XmlNode N in E.ChildNodes)
 						{
-							if (N is XmlElement E2 && E2.LocalName == "schemaRef" && E2.NamespaceURI == NamespaceSmartContracts)
+							if (N is XmlElement E2 && E2.LocalName == "schemaRef")
 							{
 								string Namespace = XML.Attribute(E2, "namespace");
 								List<SchemaDigest> Digests = new List<SchemaDigest>();
 
 								foreach (XmlNode N2 in E2.ChildNodes)
 								{
-									if (N2 is XmlElement E3 && E3.LocalName == "digest" && E3.NamespaceURI == NamespaceSmartContracts)
+									if (N2 is XmlElement E3 && E3.LocalName == "digest")
 									{
 										if (!Enum.TryParse(XML.Attribute(E3, "function"), out HashFunction Function))
 											continue;
@@ -4534,7 +4620,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSchema xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' namespace='");
 			Xml.Append(XML.Encode(Namespace));
 
@@ -4555,7 +4641,7 @@ namespace Waher.Networking.XMPP.Contracts
 					XmlElement E = e.FirstElement;
 					byte[] Schema = null;
 
-					if (e.Ok && !(E is null) && E.LocalName == "schema" && E.NamespaceURI == NamespaceSmartContracts)
+					if (e.Ok && !(E is null) && E.LocalName == "schema")
 						Schema = Convert.FromBase64String(E.InnerText);
 					else
 						e.Ok = false;
@@ -4677,7 +4763,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getLegalIdentities xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' contractId='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("' current='");
@@ -4775,7 +4861,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNetworkIdentities xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' contractId='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
@@ -4785,7 +4871,7 @@ namespace Waher.Networking.XMPP.Contracts
 				NetworkIdentity[] Identities = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "networkIdentities" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "networkIdentities")
 				{
 					List<NetworkIdentity> IdentitiesList = new List<NetworkIdentity>();
 
@@ -4906,7 +4992,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<searchPublicContracts xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 
 			if (Offset > 0)
 			{
@@ -4958,14 +5044,14 @@ namespace Waher.Networking.XMPP.Contracts
 				List<string> IDs = null;
 				bool More = false;
 
-				if (e.Ok && !(E is null) && E.LocalName == "searchResult" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !(E is null) && E.LocalName == "searchResult")
 				{
 					More = XML.Attribute(E, "more", false);
 					IDs = new List<string>();
 
 					foreach (XmlNode N in E.ChildNodes)
 					{
-						if (N is XmlElement E2 && E2.LocalName == "ref" && E2.NamespaceURI == NamespaceSmartContracts)
+						if (N is XmlElement E2 && E2.LocalName == "ref")
 						{
 							string Id = XML.Attribute(E2, "id");
 							IDs.Add(Id);
@@ -5072,7 +5158,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionIdentity xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' pid='");
@@ -5119,7 +5205,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<petitionIdentityResponse xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' pid='");
@@ -5148,7 +5234,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (XmlNode N in e.Content.ChildNodes)
 				{
-					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (N is XmlElement E && E.LocalName == "identity")
 					{
 						Identity = LegalIdentity.Parse(E);
 						break;
@@ -5202,7 +5288,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (XmlNode N in e.Content.ChildNodes)
 				{
-					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (N is XmlElement E && E.LocalName == "identity")
 					{
 						Identity = LegalIdentity.Parse(E);
 						break;
@@ -5288,7 +5374,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Signature = await this.SignAsync(Data, PeerReview ? SignWith.CurrentKeys : SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionSignature xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' pid='");
@@ -5344,7 +5430,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<petitionSignatureResponse xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' pid='");
@@ -5376,9 +5462,6 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				if (N.NamespaceURI != NamespaceLegalIdentities)
-					continue;
-
 				if (!(N is XmlElement E))
 					continue;
 
@@ -5408,8 +5491,7 @@ namespace Waher.Networking.XMPP.Contracts
 						XmlDocument Doc = new XmlDocument();
 						Doc.LoadXml(s);
 
-						if (Doc.DocumentElement.LocalName == "identity" &&
-							Doc.DocumentElement.NamespaceURI == NamespaceLegalIdentities)
+						if (Doc.DocumentElement.LocalName == "identity")
 						{
 							LegalIdentity TempId = LegalIdentity.Parse(Doc.DocumentElement);
 
@@ -5481,7 +5563,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				if (N is XmlElement E && E.NamespaceURI == NamespaceLegalIdentities)
+				if (N is XmlElement E)
 				{
 					switch (E.LocalName)
 					{
@@ -5648,7 +5730,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' tp='");
 			Xml.Append(XML.Encode(DateTime.UtcNow));
 			Xml.Append("' xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("'><reviewed>");
 			Identity.Serialize(Xml, true, true, true, true, true, true, true);
 			Xml.Append("</reviewed><reviewer>");
@@ -5710,7 +5792,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionContract xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("' pid='");
@@ -5757,7 +5839,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<petitionContractResponse xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("' pid='");
@@ -5787,7 +5869,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (XmlNode N in e.Content.ChildNodes)
 				{
-					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (N is XmlElement E && E.LocalName == "identity")
 					{
 						Identity = LegalIdentity.Parse(E);
 						break;
@@ -5841,7 +5923,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (XmlNode N in e.Content.ChildNodes)
 				{
-					if (N is XmlElement E && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+					if (N is XmlElement E && E.LocalName == "contract")
 					{
 						ParsedContract Parsed = await Contract.Parse(E, this, false);
 						Contract = Parsed?.Contract;
@@ -5887,7 +5969,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<addAttachment xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' getUrl='");
@@ -5901,7 +5983,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -5951,7 +6033,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<addAttachment xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' contractId='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("' getUrl='");
@@ -5965,7 +6047,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Contract Contract = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract")
 				{
 					ParsedContract Parsed = await Contract.Parse(E, this, false);
 					if (Parsed is null)
@@ -6142,7 +6224,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<removeAttachment xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' attachmentId='");
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
@@ -6152,7 +6234,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -6195,7 +6277,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<removeAttachment xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' attachmentId='");
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
@@ -6205,7 +6287,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Contract Contract = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract")
 				{
 					ParsedContract Parsed = await Contract.Parse(E, this, false);
 					if (Parsed is null)
@@ -6425,7 +6507,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<authorizeAccess xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
 			Xml.Append("' remoteId='");
@@ -6504,7 +6586,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<authorizeAccess xmlns='");
-			Xml.Append(NamespaceSmartContracts);
+			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("' remoteId='");
@@ -6578,7 +6660,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<reviewIdProviders xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("'/>");
 
 			this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (sender, e) =>
@@ -6588,16 +6670,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (e.Ok &&
 					!((E = e.FirstElement) is null) &&
-					E.LocalName == "providers" &&
-					E.NamespaceURI == NamespaceLegalIdentities)
+					E.LocalName == "providers")
 				{
 					Providers = new List<ServiceProviderWithLegalId>();
 
 					foreach (XmlNode N in E.ChildNodes)
 					{
-						if (N is XmlElement E2 &&
-							E2.LocalName == "provider" &&
-							E2.NamespaceURI == NamespaceLegalIdentities)
+						if (N is XmlElement E2 && E2.LocalName == "provider")
 						{
 							ServiceProviderWithLegalId Provider = this.ParseServiceProviderWithLegalId(E2);
 
@@ -6756,7 +6835,7 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<selectReviewService xmlns='");
-			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("' provider='");
 			Xml.Append(XML.Encode(Provider));
 			Xml.Append("' serviceId='");

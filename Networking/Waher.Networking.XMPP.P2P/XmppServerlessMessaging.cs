@@ -76,7 +76,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			// TODO: Implement support for NAT-PMP
 
-			this.p2pNetwork.OnPeerConnected += P2PNetwork_OnPeerConnected;
+			this.p2pNetwork.OnPeerConnected += this.P2PNetwork_OnPeerConnected;
 		}
 
 		/// <summary>
@@ -664,7 +664,7 @@ namespace Waher.Networking.XMPP.P2P
 				!(this.p2pNetwork.ExternalEndpoint is null))
 			{
 				Xml.Append("<p2p xmlns='");
-				Xml.Append(EndpointSecurity.IoTHarmonizationP2P);
+				Xml.Append(EndpointSecurity.IoTHarmonizationP2PCurrent);
 				Xml.Append("' extIp='");
 				Xml.Append(this.p2pNetwork.ExternalAddress.ToString());
 				Xml.Append("' extPort='");

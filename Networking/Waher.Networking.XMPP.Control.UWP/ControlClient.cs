@@ -27,9 +27,28 @@ namespace Waher.Networking.XMPP.Control
 	public class ControlClient : XmppExtension
 	{
 		/// <summary>
+		/// urn:ieee:iot:ctr:1.0
+		/// </summary>
+		public const string NamespaceControlIeeeV1 = "urn:ieee:iot:ctr:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:ctr:1.0
 		/// </summary>
-		public const string NamespaceControl = "urn:nf:iot:ctr:1.0";
+		public const string NamespaceControlNeuroFoundationV1 = "urn:nf:iot:ctr:1.0";
+
+		/// <summary>
+		/// Current namespace for actuator control operations.
+		/// </summary>
+		public const string NamespaceControlCurrent = NamespaceControlNeuroFoundationV1;
+
+		/// <summary>
+		/// Supported control namespaces
+		/// </summary>
+		public static readonly string[] NamespacesControl = new string[]
+		{
+			NamespaceControlNeuroFoundationV1,
+			NamespaceControlIeeeV1
+		};
 
 		/// <summary>
 		/// Implements an XMPP control client interface.
@@ -97,7 +116,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(CommonTypes.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -149,7 +168,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -208,7 +227,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value, DateOnly));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -260,7 +279,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(CommonTypes.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -312,7 +331,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -366,7 +385,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value.GetType().FullName));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -418,7 +437,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -470,7 +489,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -522,7 +541,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -574,7 +593,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		private async Task SetResultCallback(object _, IqResultEventArgs e)
@@ -591,7 +610,7 @@ namespace Waher.Networking.XMPP.Control
 
 			if (e.Ok)
 			{
-				if (!(E is null) && E.LocalName == "resp" && E.NamespaceURI == NamespaceControl)
+				if (!(E is null) && E.LocalName == "resp")
 				{
 					List<ThingReference> Nodes = null;
 					List<string> ParameterNames = null;
@@ -657,7 +676,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append("<");
 			Xml.Append(Command);
 			Xml.Append(" xmlns='");
-			Xml.Append(NamespaceControl);
+			Xml.Append(NamespaceControlCurrent);
 
 			if (!string.IsNullOrEmpty(ServiceToken))
 			{
@@ -819,7 +838,7 @@ namespace Waher.Networking.XMPP.Control
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<set xmlns='");
-			Xml.Append(NamespaceControl);
+			Xml.Append(NamespaceControlCurrent);
 			Xml.Append("'>");
 
 			this.Serialize(Xml, Nodes);
@@ -827,7 +846,7 @@ namespace Waher.Networking.XMPP.Control
 
 			Xml.Append("</set>");
 
-			Form.Client.SendIqSet(Form.From, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+			Form.Client.SendIqSet(Form.From, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		private Task CancelForm(object Sender, DataForm Form)

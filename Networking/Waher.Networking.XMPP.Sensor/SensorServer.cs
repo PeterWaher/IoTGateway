@@ -33,6 +33,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private readonly Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
 		private readonly Scheduler scheduler = new Scheduler();
 		private readonly ProvisioningClient provisioningClient;
+		private readonly bool supportsEvents;
 
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
@@ -66,19 +67,44 @@ namespace Waher.Networking.XMPP.Sensor
 			: base(Client)
 		{
 			this.provisioningClient = ProvisioningClient;
+			this.supportsEvents = SupportsEvents;
 
-			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
-			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
-			this.client.RegisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
-			this.client.RegisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+			#region Neuro-Foundation V1
 
-			if (SupportsEvents)
+			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.ReqHandler, true);
+			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.ReqHandler, false);
+			this.client.RegisterIqGetHandler("cancel", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.CancelHandler, false);
+			this.client.RegisterIqSetHandler("cancel", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.CancelHandler, false);
+
+			if (this.supportsEvents)
 			{
-				this.client.RegisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, true);
-				this.client.RegisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, false);
-				this.client.RegisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
-				this.client.RegisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
+				this.client.RegisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.SubscribeHandler, true);
+				this.client.RegisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.SubscribeHandler, false);
+				this.client.RegisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.UnsubscribeHandler, false);
+				this.client.RegisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.UnsubscribeHandler, false);
+			}
 
+			#endregion
+
+			#region IEEE V1
+
+			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorDataIeeeV1, this.ReqHandler, true);
+			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorDataIeeeV1, this.ReqHandler, false);
+			this.client.RegisterIqGetHandler("cancel", SensorClient.NamespaceSensorDataIeeeV1, this.CancelHandler, false);
+			this.client.RegisterIqSetHandler("cancel", SensorClient.NamespaceSensorDataIeeeV1, this.CancelHandler, false);
+
+			if (this.supportsEvents)
+			{
+				this.client.RegisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.SubscribeHandler, true);
+				this.client.RegisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.SubscribeHandler, false);
+				this.client.RegisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.UnsubscribeHandler, false);
+				this.client.RegisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.UnsubscribeHandler, false);
+			}
+
+			#endregion
+
+			if (this.supportsEvents)
+			{
 				this.client.OnPresenceUnsubscribe += this.Client_OnPresenceUnsubscribed;
 				this.client.OnPresenceUnsubscribed += this.Client_OnPresenceUnsubscribed;
 				this.client.OnPresence += this.Client_OnPresence;
@@ -145,15 +171,46 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			base.Dispose();
 
-			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
-			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
-			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
-			this.client.UnregisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+			#region Neuro-Foundation V1
 
-			this.client.UnregisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, true);
-			this.client.UnregisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, false);
-			this.client.UnregisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
-			this.client.UnregisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
+			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.ReqHandler, true);
+			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.ReqHandler, false);
+			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.CancelHandler, false);
+			this.client.UnregisterIqSetHandler("cancel", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.CancelHandler, false);
+
+			if (this.supportsEvents)
+			{
+				this.client.UnregisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.SubscribeHandler, true);
+				this.client.UnregisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.SubscribeHandler, false);
+				this.client.UnregisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.UnsubscribeHandler, false);
+				this.client.UnregisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEventsNeuroFoundationV1, this.UnsubscribeHandler, false);
+			}
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorDataIeeeV1, this.ReqHandler, true);
+			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorDataIeeeV1, this.ReqHandler, false);
+			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorDataIeeeV1, this.CancelHandler, false);
+			this.client.UnregisterIqSetHandler("cancel", SensorClient.NamespaceSensorDataIeeeV1, this.CancelHandler, false);
+
+			if (this.supportsEvents)
+			{
+				this.client.UnregisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.SubscribeHandler, true);
+				this.client.UnregisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.SubscribeHandler, false);
+				this.client.UnregisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.UnsubscribeHandler, false);
+				this.client.UnregisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEventsIeeeV1, this.UnsubscribeHandler, false);
+			}
+
+			#endregion
+
+			if (this.supportsEvents)
+			{
+				this.client.OnPresenceUnsubscribe -= this.Client_OnPresenceUnsubscribed;
+				this.client.OnPresenceUnsubscribed -= this.Client_OnPresenceUnsubscribed;
+				this.client.OnPresence -= this.Client_OnPresence;
+			}
 		}
 
 		/// <summary>
@@ -292,7 +349,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
-				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
+				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken, e.Query.NamespaceURI);
 
 			if (!(this.provisioningClient is null))
 			{
@@ -385,12 +442,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Request.When > DateTime.Now)
 			{
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "' queued='true'/>");
+				e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 				Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 			}
 			else
 			{
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "'/>");
+				e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
 				this.PerformReadout(Request);
 			}
 		}
@@ -399,7 +456,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			SensorDataServerRequest Request = (SensorDataServerRequest)P;
 
-			this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<started xmlns='" + SensorClient.NamespaceSensorData + "' id='" +
+			this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<started xmlns='" + Request.Namespace + "' id='" +
 				XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
 			this.PerformReadout(Request);
@@ -412,7 +469,7 @@ namespace Waher.Networking.XMPP.Sensor
 			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
 			if (h is null)
 			{
-				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + SensorClient.NamespaceSensorData + "' id='" +
+				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + Request.Namespace + "' id='" +
 					XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
 				lock (this.requests)
@@ -754,7 +811,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 				SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From,
 					Nodes, FieldTypes, Fields2, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue,
-					ServiceToken, DeviceToken, UserToken);
+					ServiceToken, DeviceToken, UserToken, e.Query.NamespaceURI);
 				bool NewRequest;
 
 				lock (this.requests)
@@ -765,12 +822,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (Request.When > Now)
 				{
-					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "' queued='true'/>");
+					e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 					Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 				}
 				else
 				{
-					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "'/>");
+					e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
 					this.PerformReadout(Request);
 				}
 			}
@@ -781,7 +838,7 @@ namespace Waher.Networking.XMPP.Sensor
 			lock (this.subscriptionsByThing)
 			{
 				Subscription = new Subscription(Id, e.From, Nodes, FieldNames, FieldTypes, MaxAge, MinInterval, MaxInterval,
-					ServiceToken, DeviceToken, UserToken);
+					ServiceToken, DeviceToken, UserToken, e.Query.NamespaceURI);
 
 				foreach (IThingReference Thing in Nodes)
 				{
@@ -821,7 +878,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (!Req)
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "'/>");
+				e.IqResult("<accepted xmlns='" + Subscription.Namespace.Replace(":iot:events:", ":iot:sd:") + "' id='" + XML.Encode(Id) + "'/>");
 
 			this.UpdateSubscriptionTimers(Now, Subscription);
 		}
@@ -1013,7 +1070,7 @@ namespace Waher.Networking.XMPP.Sensor
 			SensorDataServerRequest Request = new SensorDataServerRequest(Subscription.Id, this, Subscription.From,
 				Subscription.From, Subscription.NodeReferences, Subscription.FieldTypes, Subscription.FieldNames,
 				DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, Subscription.ServiceToken, Subscription.DeviceToken,
-				Subscription.UserToken);
+				Subscription.UserToken, Subscription.Namespace.Replace(":iot:events:", ":iot:sd:"));
 			bool NewRequest;
 
 			lock (this.requests)

@@ -1000,7 +1000,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			DataForm Form = await Request.Task;
 
 			sb.Append("<createNewNode xmlns='");
-			sb.Append(ConcentratorServer.NamespaceConcentrator);
+			sb.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			sb.Append("' type='");
 			sb.Append(XML.Encode(Node.NodeType));
 
@@ -1084,7 +1084,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					return
 						!(Doc.DocumentElement is null) &&
 						Doc.DocumentElement.LocalName == "createNewNode" &&
-						Doc.DocumentElement.NamespaceURI == ConcentratorServer.NamespaceConcentrator;
+						Doc.DocumentElement.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent;
 				}
 				catch (Exception)
 				{
@@ -1099,7 +1099,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public override async void Paste()
 		{
 			bool Error = false;
-			string s = null;
 
 			try
 			{
@@ -1117,7 +1116,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (!System.Windows.Clipboard.ContainsText())
 					return;
 
-				s = System.Windows.Clipboard.GetText();
+				string s = System.Windows.Clipboard.GetText();
 				if (string.IsNullOrEmpty(s))
 					return;
 
@@ -1153,7 +1152,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			if (Xml is null ||
 				Xml.LocalName != "createNewNode" ||
-				Xml.NamespaceURI != ConcentratorServer.NamespaceConcentrator)
+				Xml.NamespaceURI != ConcentratorServer.NamespaceConcentratorCurrent)
 			{
 				throw new Exception("Clipboard does not contain node information.");
 			}

@@ -93,7 +93,7 @@ namespace Waher.Networking.XMPP.Sensor
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<unsubscribe xmlns='");
-				Xml.Append(SensorClient.NamespaceSensorEvents);
+				Xml.Append(SensorClient.NamespaceSensorEventsCurrent);
 				Xml.Append("' id='");
 				Xml.Append(this.Id);
 				Xml.Append("'/>");

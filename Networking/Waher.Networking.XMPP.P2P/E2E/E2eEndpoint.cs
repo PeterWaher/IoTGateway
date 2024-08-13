@@ -60,10 +60,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <summary>
         /// Namespace of the E2E encryption scheme
         /// </summary>
-        public virtual string Namespace
-        {
-            get { return EndpointSecurity.IoTHarmonizationE2E; }
-        }
+        public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
 
         /// <summary>
         /// Remote public key.

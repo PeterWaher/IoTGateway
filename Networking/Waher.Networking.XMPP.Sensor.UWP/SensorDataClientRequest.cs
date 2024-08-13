@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.Sensor
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<cancel xmlns='");
-			Xml.Append(SensorClient.NamespaceSensorData);
+			Xml.Append(SensorClient.NamespaceSensorDataCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");

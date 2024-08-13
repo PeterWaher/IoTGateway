@@ -16,9 +16,19 @@ namespace Waher.Networking.XMPP.Synchronization
 	public class SynchronizationClient : IDisposable
 	{
 		/// <summary>
+		/// urn:ieee:iot:synchronization:1.0
+		/// </summary>
+		public const string NamespaceSynchronizationIeeeV1 = "urn:ieee:iot:synchronization:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:synchronization:1.0
 		/// </summary>
-		public const string NamespaceSynchronization = "urn:nf:iot:synchronization:1.0";
+		public const string NamespaceSynchronizationNeuroFoundationV1 = "urn:nf:iot:synchronization:1.0";
+
+		/// <summary>
+		/// Current namespace of clock synchronization.
+		/// </summary>
+		public const string NamespaceSynchronizationCurrent = NamespaceSynchronizationNeuroFoundationV1;
 
 		private static Calibration calibration;
 		private readonly static Stopwatch clock = CreateWatch();
@@ -80,8 +90,19 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.timer = null;
 			this.clockSourceJID = null;
 
-			this.client.RegisterIqGetHandler("req", NamespaceSynchronization, this.Clock, true);
-			this.client.RegisterIqGetHandler("sourceReq", NamespaceSynchronization, this.SourceReq, true);
+			#region Neuro-Foundation V1
+
+			this.client.RegisterIqGetHandler("req", NamespaceSynchronizationNeuroFoundationV1, this.Clock, true);
+			this.client.RegisterIqGetHandler("sourceReq", NamespaceSynchronizationNeuroFoundationV1, this.SourceReq, true);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.RegisterIqGetHandler("req", NamespaceSynchronizationIeeeV1, this.Clock, true);
+			this.client.RegisterIqGetHandler("sourceReq", NamespaceSynchronizationIeeeV1, this.SourceReq, true);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -136,8 +157,20 @@ namespace Waher.Networking.XMPP.Synchronization
 
 			if (!(this.client is null))
 			{
-				this.client.UnregisterIqGetHandler("req", NamespaceSynchronization, this.Clock, true);
-				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronization, this.SourceReq, true);
+				#region Neuro-Foundation V1
+
+				this.client.UnregisterIqGetHandler("req", NamespaceSynchronizationNeuroFoundationV1, this.Clock, true);
+				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronizationNeuroFoundationV1, this.SourceReq, true);
+
+				#endregion
+
+				#region IEEE V1
+
+				this.client.UnregisterIqGetHandler("req", NamespaceSynchronizationIeeeV1, this.Clock, true);
+				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronizationIeeeV1, this.SourceReq, true);
+
+				#endregion
+				
 				this.client = null;
 			}
 		}
@@ -180,7 +213,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<resp xmlns='");
-			Xml.Append(NamespaceSynchronization);
+			Xml.Append(e.Query.NamespaceURI);
 
 			if (Now.Ticks.HasValue)
 			{
@@ -234,7 +267,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		{
 			DateTimeHF ClientTime1 = SynchronizationClient.Now;
 
-			this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
+			this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronizationCurrent + "'/>", (sender, e) =>
 			{
 				DateTimeHF ClientTime2 = SynchronizationClient.Now;
 				XmlElement E;
@@ -243,7 +276,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				long? LatencyHF;
 				long? ClockDifferenceHF;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "resp" && E.NamespaceURI == NamespaceSynchronization &&
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "resp" && 
 					DateTimeHF.TryParse(E.InnerText, out DateTimeHF ServerTime))
 				{
 					long dt1 = ServerTime - ClientTime1;
@@ -884,7 +917,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<sourceResp xmlns='");
-				Xml.Append(NamespaceSynchronization);
+				Xml.Append(NamespaceSynchronizationCurrent);
 				Xml.Append("'>");
 				Xml.Append(XML.Encode(XmppClient.GetBareJID(this.clockSourceJID)));
 				Xml.Append("</sourceResp>");
@@ -905,12 +938,12 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void QueryClockSource(string To, ClockSourceEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronization + "'/>", (sender, e) =>
+			this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronizationCurrent + "'/>", (sender, e) =>
 			{
 				XmlElement E;
 				string ClockSourceJID = null;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sourceResp" && E.NamespaceURI == NamespaceSynchronization)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sourceResp")
 					ClockSourceJID = E.InnerText;
 
 				try

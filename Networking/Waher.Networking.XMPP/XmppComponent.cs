@@ -145,10 +145,23 @@ namespace Waher.Networking.XMPP
 		private void RegisterDefaultHandlers()
 		{
 			this.RegisterIqGetHandler("query", XmppClient.NamespaceServiceDiscoveryInfo, this.ServiceDiscoveryRequestHandler, true);
-			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
-			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
-			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
 			this.RegisterIqGetHandler("ping", XmppClient.NamespacePing, this.PingRequestHandler, true);
+
+			#region Neuro-Foundation V1
+
+			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfServiceNeuroFoundationV1, this.AcknowledgedQoSMessageHandler, true);
+			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfServiceNeuroFoundationV1, this.AssuredQoSMessageHandler, false);
+			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfServiceNeuroFoundationV1, this.DeliverQoSMessageHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfServiceIeeeV1, this.AcknowledgedQoSMessageHandler, true);
+			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfServiceIeeeV1, this.AssuredQoSMessageHandler, false);
+			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfServiceIeeeV1, this.DeliverQoSMessageHandler, false);
+
+			#endregion
 		}
 
 		private void ResetState()
@@ -2344,7 +2357,7 @@ namespace Waher.Networking.XMPP
 				case QoSLevel.Acknowledged:
 					Xml.Clear();
 					Xml.Append("<qos:acknowledged xmlns:qos='");
-					Xml.Append(XmppClient.NamespaceQualityOfService);
+					Xml.Append(XmppClient.NamespaceQualityOfServiceCurrent);
 					Xml.Append("'>");
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
@@ -2358,7 +2371,7 @@ namespace Waher.Networking.XMPP
 
 					Xml.Clear();
 					Xml.Append("<qos:assured xmlns:qos='");
-					Xml.Append(XmppClient.NamespaceQualityOfService);
+					Xml.Append(XmppClient.NamespaceQualityOfServiceCurrent);
 					Xml.Append("' msgId='");
 					Xml.Append(MsgId);
 					Xml.Append("'>");
@@ -2389,7 +2402,7 @@ namespace Waher.Networking.XMPP
 							StringBuilder Xml = new StringBuilder();
 
 							Xml.Append("<qos:deliver xmlns:qos='");
-							Xml.Append(XmppClient.NamespaceQualityOfService);
+							Xml.Append(XmppClient.NamespaceQualityOfServiceCurrent);
 							Xml.Append("' msgId='");
 							Xml.Append(MsgId);
 							Xml.Append("'/>");

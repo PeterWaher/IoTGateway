@@ -37,9 +37,28 @@ namespace Waher.Networking.XMPP.Concentrator
 	public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
+		/// urn:ieee:iot:concentrator:1.0
+		/// </summary>
+		public const string NamespaceConcentratorIeeeV1 = "urn:ieee:iot:concentrator:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:concentrator:1.0
 		/// </summary>
-		public const string NamespaceConcentrator = "urn:nf:iot:concentrator:1.0";
+		public const string NamespaceConcentratorNeuroFoundationV1 = "urn:nf:iot:concentrator:1.0";
+
+		/// <summary>
+		/// Neuro-Foundation v1 namespace
+		/// </summary>
+		public const string NamespaceConcentratorCurrent = NamespaceConcentratorNeuroFoundationV1;
+
+		/// <summary>
+		/// Supported concentrator namespaces.
+		/// </summary>
+		public static readonly string[] NamespacesConcentrator = new string[]
+		{
+			NamespaceConcentratorNeuroFoundationV1,
+			NamespaceConcentratorIeeeV1
+		};
 
 		private readonly Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
 		private readonly Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
@@ -98,54 +117,111 @@ namespace Waher.Networking.XMPP.Concentrator
 			foreach (IDataSource DataSource in DataSources)
 				this.Register(DataSource);
 
-			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
+			#region Neuro-Foundation V1 handlers
 
-			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
-			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
-			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
+			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentratorNeuroFoundationV1, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
 
-			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
-			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
-			this.client.RegisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
-			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
-			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
-			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
-			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
-			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
+			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
+			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
+			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
 
-			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
-			this.client.RegisterIqSetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
-			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
-			this.client.RegisterIqSetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
+			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentratorNeuroFoundationV1, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
+			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentratorNeuroFoundationV1, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
+			this.client.RegisterIqGetHandler("getNode", NamespaceConcentratorNeuroFoundationV1, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
+			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentratorNeuroFoundationV1, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
+			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentratorNeuroFoundationV1, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
+			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentratorNeuroFoundationV1, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
+			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentratorNeuroFoundationV1, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
+			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentratorNeuroFoundationV1, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
 
-			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
-			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
-			this.client.RegisterIqSetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);                                         // (ConcentratorClient.CreateNewNode, called when submitting form)
-			this.client.RegisterIqSetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);                                             // ConcentratorClient.DestroyNode
+			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentratorNeuroFoundationV1, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
+			this.client.RegisterIqSetHandler("setNodeParametersAfterEdit", NamespaceConcentratorNeuroFoundationV1, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
+			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentratorNeuroFoundationV1, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
+			this.client.RegisterIqSetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentratorNeuroFoundationV1, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
 
-			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
+			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentratorNeuroFoundationV1, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
+			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentratorNeuroFoundationV1, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
+			this.client.RegisterIqSetHandler("createNewNode", NamespaceConcentratorNeuroFoundationV1, this.CreateNewNodeHandler, false);                                         // (ConcentratorClient.CreateNewNode, called when submitting form)
+			this.client.RegisterIqSetHandler("destroyNode", NamespaceConcentratorNeuroFoundationV1, this.DestroyNodeHandler, false);                                             // ConcentratorClient.DestroyNode
 
-			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
-			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
-			this.client.RegisterIqSetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
-			this.client.RegisterIqSetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
-			this.client.RegisterIqSetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
-			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);                         // TODO:
-			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);               // TODO:
-			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
-			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
-			this.client.RegisterIqSetHandler("abortCommonNodeQuery", NamespaceConcentrator, this.AbortCommonNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentratorNeuroFoundationV1, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
 
-			this.client.RegisterIqSetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);                                               // TODO:
-			this.client.RegisterIqSetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);                                           // TODO:
-			this.client.RegisterIqSetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);                                             // TODO:
-			this.client.RegisterIqSetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);                                         // TODO:
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentratorNeuroFoundationV1, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentratorNeuroFoundationV1, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
+			this.client.RegisterIqSetHandler("executeNodeCommand", NamespaceConcentratorNeuroFoundationV1, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
+			this.client.RegisterIqSetHandler("executeNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
+			this.client.RegisterIqSetHandler("abortNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentratorNeuroFoundationV1, this.GetCommonNodeCommandsHandler, false);                         // TODO:
+			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentratorNeuroFoundationV1, this.GetCommonCommandParametersHandler, false);               // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentratorNeuroFoundationV1, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
+			this.client.RegisterIqSetHandler("abortCommonNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.AbortCommonNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
 
-			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
-			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
+			this.client.RegisterIqSetHandler("moveNodeUp", NamespaceConcentratorNeuroFoundationV1, this.MoveNodeUpHandler, false);                                               // TODO:
+			this.client.RegisterIqSetHandler("moveNodeDown", NamespaceConcentratorNeuroFoundationV1, this.MoveNodeDownHandler, false);                                           // TODO:
+			this.client.RegisterIqSetHandler("moveNodesUp", NamespaceConcentratorNeuroFoundationV1, this.MoveNodesUpHandler, false);                                             // TODO:
+			this.client.RegisterIqSetHandler("moveNodesDown", NamespaceConcentratorNeuroFoundationV1, this.MoveNodesDownHandler, false);                                         // TODO:
 
-			this.client.RegisterIqSetHandler("registerSniffer", NamespaceConcentrator, this.RegisterSnifferHandler, false);
-			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
+			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentratorNeuroFoundationV1, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
+			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentratorNeuroFoundationV1, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
+
+			this.client.RegisterIqSetHandler("registerSniffer", NamespaceConcentratorNeuroFoundationV1, this.RegisterSnifferHandler, false);
+			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentratorNeuroFoundationV1, this.UnregisterSnifferHandler, false);
+
+			#endregion
+
+			#region IEEE V1 handlers
+
+			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentratorIeeeV1, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
+
+			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentratorIeeeV1, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
+			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentratorIeeeV1, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
+			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentratorIeeeV1, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
+
+			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentratorIeeeV1, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
+			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentratorIeeeV1, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
+			this.client.RegisterIqGetHandler("getNode", NamespaceConcentratorIeeeV1, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
+			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentratorIeeeV1, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
+			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentratorIeeeV1, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
+			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentratorIeeeV1, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
+			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentratorIeeeV1, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
+			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentratorIeeeV1, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
+
+			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentratorIeeeV1, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
+			this.client.RegisterIqSetHandler("setNodeParametersAfterEdit", NamespaceConcentratorIeeeV1, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
+			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentratorIeeeV1, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
+			this.client.RegisterIqSetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentratorIeeeV1, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
+
+			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentratorIeeeV1, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
+			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentratorIeeeV1, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
+			this.client.RegisterIqSetHandler("createNewNode", NamespaceConcentratorIeeeV1, this.CreateNewNodeHandler, false);                                         // (ConcentratorClient.CreateNewNode, called when submitting form)
+			this.client.RegisterIqSetHandler("destroyNode", NamespaceConcentratorIeeeV1, this.DestroyNodeHandler, false);                                             // ConcentratorClient.DestroyNode
+
+			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentratorIeeeV1, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
+
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentratorIeeeV1, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentratorIeeeV1, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
+			this.client.RegisterIqSetHandler("executeNodeCommand", NamespaceConcentratorIeeeV1, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
+			this.client.RegisterIqSetHandler("executeNodeQuery", NamespaceConcentratorIeeeV1, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
+			this.client.RegisterIqSetHandler("abortNodeQuery", NamespaceConcentratorIeeeV1, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentratorIeeeV1, this.GetCommonNodeCommandsHandler, false);                         // TODO:
+			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentratorIeeeV1, this.GetCommonCommandParametersHandler, false);               // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentratorIeeeV1, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
+			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentratorIeeeV1, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
+			this.client.RegisterIqSetHandler("abortCommonNodeQuery", NamespaceConcentratorIeeeV1, this.AbortCommonNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+
+			this.client.RegisterIqSetHandler("moveNodeUp", NamespaceConcentratorIeeeV1, this.MoveNodeUpHandler, false);                                               // TODO:
+			this.client.RegisterIqSetHandler("moveNodeDown", NamespaceConcentratorIeeeV1, this.MoveNodeDownHandler, false);                                           // TODO:
+			this.client.RegisterIqSetHandler("moveNodesUp", NamespaceConcentratorIeeeV1, this.MoveNodesUpHandler, false);                                             // TODO:
+			this.client.RegisterIqSetHandler("moveNodesDown", NamespaceConcentratorIeeeV1, this.MoveNodesDownHandler, false);                                         // TODO:
+
+			this.client.RegisterIqSetHandler("subscribe", NamespaceConcentratorIeeeV1, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
+			this.client.RegisterIqSetHandler("unsubscribe", NamespaceConcentratorIeeeV1, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
+
+			this.client.RegisterIqSetHandler("registerSniffer", NamespaceConcentratorIeeeV1, this.RegisterSnifferHandler, false);
+			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentratorIeeeV1, this.UnregisterSnifferHandler, false);
+
+			#endregion
 		}
 
 		private async Task ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
@@ -205,54 +281,111 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			base.Dispose();
 
-			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);
+			#region Neuro-Foundation V1 handlers
 
-			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);
-			this.client.UnregisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);
-			this.client.UnregisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);
+			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentratorNeuroFoundationV1, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
 
-			this.client.UnregisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);
-			this.client.UnregisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);
-			this.client.UnregisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);
-			this.client.UnregisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);
-			this.client.UnregisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);
-			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
-			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
-			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
+			this.client.UnregisterIqGetHandler("getRootDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
+			this.client.UnregisterIqGetHandler("getChildDataSources", NamespaceConcentratorNeuroFoundationV1, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
 
-			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);
-			this.client.UnregisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);
-			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);
-			this.client.UnregisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);
+			this.client.UnregisterIqGetHandler("containsNode", NamespaceConcentratorNeuroFoundationV1, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
+			this.client.UnregisterIqGetHandler("containsNodes", NamespaceConcentratorNeuroFoundationV1, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
+			this.client.UnregisterIqGetHandler("getNode", NamespaceConcentratorNeuroFoundationV1, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
+			this.client.UnregisterIqGetHandler("getNodes", NamespaceConcentratorNeuroFoundationV1, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
+			this.client.UnregisterIqGetHandler("getAllNodes", NamespaceConcentratorNeuroFoundationV1, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
+			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentratorNeuroFoundationV1, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
+			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentratorNeuroFoundationV1, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
+			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentratorNeuroFoundationV1, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
 
-			this.client.UnregisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, false);
-			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, false);
-			this.client.UnregisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);
-			this.client.UnregisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);
+			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentratorNeuroFoundationV1, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
+			this.client.UnregisterIqSetHandler("setNodeParametersAfterEdit", NamespaceConcentratorNeuroFoundationV1, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
+			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentratorNeuroFoundationV1, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
+			this.client.UnregisterIqSetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentratorNeuroFoundationV1, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
 
+			this.client.UnregisterIqGetHandler("getAddableNodeTypes", NamespaceConcentratorNeuroFoundationV1, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
+			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentratorNeuroFoundationV1, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
+			this.client.UnregisterIqSetHandler("createNewNode", NamespaceConcentratorNeuroFoundationV1, this.CreateNewNodeHandler, false);                                         // (ConcentratorClient.CreateNewNode, called when submitting form)
+			this.client.UnregisterIqSetHandler("destroyNode", NamespaceConcentratorNeuroFoundationV1, this.DestroyNodeHandler, false);                                             // ConcentratorClient.DestroyNode
 
-			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
+			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentratorNeuroFoundationV1, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
 
-			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);
-			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);
-			this.client.UnregisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);
-			this.client.UnregisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);
-			this.client.UnregisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);
-			this.client.UnregisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);
-			this.client.UnregisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);
-			this.client.UnregisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);
-			this.client.UnregisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);
+			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentratorNeuroFoundationV1, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
+			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentratorNeuroFoundationV1, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
+			this.client.UnregisterIqSetHandler("executeNodeCommand", NamespaceConcentratorNeuroFoundationV1, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
+			this.client.UnregisterIqSetHandler("executeNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
+			this.client.UnregisterIqSetHandler("abortNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+			this.client.UnregisterIqGetHandler("getCommonNodeCommands", NamespaceConcentratorNeuroFoundationV1, this.GetCommonNodeCommandsHandler, false);                         // TODO:
+			this.client.UnregisterIqGetHandler("getCommonCommandParameters", NamespaceConcentratorNeuroFoundationV1, this.GetCommonCommandParametersHandler, false);               // TODO:
+			this.client.UnregisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentratorNeuroFoundationV1, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
+			this.client.UnregisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
+			this.client.UnregisterIqSetHandler("abortCommonNodeQuery", NamespaceConcentratorNeuroFoundationV1, this.AbortCommonNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
 
-			this.client.UnregisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
-			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
+			this.client.UnregisterIqSetHandler("moveNodeUp", NamespaceConcentratorNeuroFoundationV1, this.MoveNodeUpHandler, false);                                               // TODO:
+			this.client.UnregisterIqSetHandler("moveNodeDown", NamespaceConcentratorNeuroFoundationV1, this.MoveNodeDownHandler, false);                                           // TODO:
+			this.client.UnregisterIqSetHandler("moveNodesUp", NamespaceConcentratorNeuroFoundationV1, this.MoveNodesUpHandler, false);                                             // TODO:
+			this.client.UnregisterIqSetHandler("moveNodesDown", NamespaceConcentratorNeuroFoundationV1, this.MoveNodesDownHandler, false);                                         // TODO:
 
-			this.client.UnregisterIqSetHandler("subscribe", NamespaceConcentrator, this.SubscribeHandler, false);
-			this.client.UnregisterIqSetHandler("unsubscribe", NamespaceConcentrator, this.UnsubscribeHandler, false);
+			this.client.UnregisterIqSetHandler("subscribe", NamespaceConcentratorNeuroFoundationV1, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
+			this.client.UnregisterIqSetHandler("unsubscribe", NamespaceConcentratorNeuroFoundationV1, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
 
-			this.client.UnregisterIqSetHandler("registerSniffer", NamespaceConcentrator, this.RegisterSnifferHandler, false);
-			this.client.UnregisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
+			this.client.UnregisterIqSetHandler("registerSniffer", NamespaceConcentratorNeuroFoundationV1, this.UnregisterSnifferHandler, false);
+			this.client.UnregisterIqSetHandler("unregisterSniffer", NamespaceConcentratorNeuroFoundationV1, this.UnregisterSnifferHandler, false);
+
+			#endregion
+
+			#region IEEE V1 handlers
+
+			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentratorIeeeV1, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
+
+			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentratorIeeeV1, this.GetAllDataSourcesHandler, false);                                 // ConcentratorClient.GetAllDataSources
+			this.client.UnregisterIqGetHandler("getRootDataSources", NamespaceConcentratorIeeeV1, this.GetRootDataSourcesHandler, false);                               // ConcentratorClient.GetRootDataSources
+			this.client.UnregisterIqGetHandler("getChildDataSources", NamespaceConcentratorIeeeV1, this.GetChildDataSourcesHandler, false);                             // ConcentratorClient.GetChildDataSources
+
+			this.client.UnregisterIqGetHandler("containsNode", NamespaceConcentratorIeeeV1, this.ContainsNodeHandler, false);                                           // ConcentratorClient.ContainsNode
+			this.client.UnregisterIqGetHandler("containsNodes", NamespaceConcentratorIeeeV1, this.ContainsNodesHandler, false);                                         // ConcentratorClient.ContainsNodes
+			this.client.UnregisterIqGetHandler("getNode", NamespaceConcentratorIeeeV1, this.GetNodeHandler, false);                                                     // ConcentratorClient.GetNode
+			this.client.UnregisterIqGetHandler("getNodes", NamespaceConcentratorIeeeV1, this.GetNodesHandler, false);                                                   // ConcentratorClient.GetNodes
+			this.client.UnregisterIqGetHandler("getAllNodes", NamespaceConcentratorIeeeV1, this.GetAllNodesHandler, false);                                             // ConcentratorClient.GetAllNodes
+			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentratorIeeeV1, this.GetNodeInheritanceHandler, false);                               // ConcentratorClient.GetNodeInheritance
+			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentratorIeeeV1, this.GetRootNodesHandler, false);                                           // ConcentratorClient.GetRootNodes
+			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentratorIeeeV1, this.GetChildNodesHandler, false);                                         // ConcentratorClient.GetChildNodes
+
+			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentratorIeeeV1, this.GetNodeParametersForEditHandler, false);                   // ConcentratorClient.GetNodeParametersForEdit
+			this.client.UnregisterIqSetHandler("setNodeParametersAfterEdit", NamespaceConcentratorIeeeV1, this.SetNodeParametersAfterEditHandler, false);               // (ConcentratorClient.EditNode)
+			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentratorIeeeV1, this.GetCommonNodeParametersForEditHandler, false);       // TODO:
+			this.client.UnregisterIqSetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentratorIeeeV1, this.SetCommonNodeParametersAfterEditHandler, false);   // TODO:
+
+			this.client.UnregisterIqGetHandler("getAddableNodeTypes", NamespaceConcentratorIeeeV1, this.GetAddableNodeTypesHandler, false);                             // ConcentratorClient.GetAddableNodeTypes
+			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentratorIeeeV1, this.GetParametersForNewNodeHandler, false);                     // ConcentratorClient.GetParametersForNewNode
+			this.client.UnregisterIqSetHandler("createNewNode", NamespaceConcentratorIeeeV1, this.CreateNewNodeHandler, false);                                         // (ConcentratorClient.CreateNewNode, called when submitting form)
+			this.client.UnregisterIqSetHandler("destroyNode", NamespaceConcentratorIeeeV1, this.DestroyNodeHandler, false);                                             // ConcentratorClient.DestroyNode
+
+			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentratorIeeeV1, this.GetAncestorsHandler, false);                                           // ConcentratorClient.GetAncestors
+
+			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentratorIeeeV1, this.GetNodeCommandsHandler, false);                                     // ConcentratorClient.GetNodeCommands
+			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentratorIeeeV1, this.GetCommandParametersHandler, false);                           // ConcentratorClient.GetCommandParameters, ConcentratorClient.GetQueryParameters.
+			this.client.UnregisterIqSetHandler("executeNodeCommand", NamespaceConcentratorIeeeV1, this.ExecuteNodeCommandHandler, false);                               // ConcentratorClient.ExecuteCommand
+			this.client.UnregisterIqSetHandler("executeNodeQuery", NamespaceConcentratorIeeeV1, this.ExecuteNodeQueryHandler, false);                                   // ConcentratorClient.ExecuteQuery
+			this.client.UnregisterIqSetHandler("abortNodeQuery", NamespaceConcentratorIeeeV1, this.AbortNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+			this.client.UnregisterIqGetHandler("getCommonNodeCommands", NamespaceConcentratorIeeeV1, this.GetCommonNodeCommandsHandler, false);                         // TODO:
+			this.client.UnregisterIqGetHandler("getCommonCommandParameters", NamespaceConcentratorIeeeV1, this.GetCommonCommandParametersHandler, false);               // TODO:
+			this.client.UnregisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentratorIeeeV1, this.ExecuteCommonNodeCommandHandler, false);                   // TODO:
+			this.client.UnregisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentratorIeeeV1, this.ExecuteCommonNodeQueryHandler, false);                       // TODO:
+			this.client.UnregisterIqSetHandler("abortCommonNodeQuery", NamespaceConcentratorIeeeV1, this.AbortCommonNodeQueryHandler, false);                                       // ConcentratorClient.AbortQuery
+
+			this.client.UnregisterIqSetHandler("moveNodeUp", NamespaceConcentratorIeeeV1, this.MoveNodeUpHandler, false);                                               // TODO:
+			this.client.UnregisterIqSetHandler("moveNodeDown", NamespaceConcentratorIeeeV1, this.MoveNodeDownHandler, false);                                           // TODO:
+			this.client.UnregisterIqSetHandler("moveNodesUp", NamespaceConcentratorIeeeV1, this.MoveNodesUpHandler, false);                                             // TODO:
+			this.client.UnregisterIqSetHandler("moveNodesDown", NamespaceConcentratorIeeeV1, this.MoveNodesDownHandler, false);                                         // TODO:
+
+			this.client.UnregisterIqSetHandler("subscribe", NamespaceConcentratorIeeeV1, this.SubscribeHandler, false);                                                 // ConcentratorClient.Subscribe
+			this.client.UnregisterIqSetHandler("unsubscribe", NamespaceConcentratorIeeeV1, this.UnsubscribeHandler, false);                                             // ConcentratorClient.Unsubscribe
+
+			this.client.UnregisterIqSetHandler("registerSniffer", NamespaceConcentratorIeeeV1, this.UnregisterSnifferHandler, false);
+			this.client.UnregisterIqSetHandler("unregisterSniffer", NamespaceConcentratorIeeeV1, this.UnregisterSnifferHandler, false);
+
+			#endregion
 
 			Query[] Queries;
 			DataSourceRec[] Sources;
@@ -316,7 +449,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 			using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(false, true)))
 			{
-				w.WriteStartElement("strings", NamespaceConcentrator);
+				w.WriteStartElement("strings", e.Query.NamespaceURI);
 
 				w.WriteElementString("value", "getCapabilities");
 
@@ -625,7 +758,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<dataSources xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (IDataSource Source in this.DataSources)
@@ -659,7 +792,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<dataSources xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (IDataSource Source in this.RootDataSources)
@@ -698,7 +831,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<dataSources xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 
 				IEnumerable<IDataSource> ChildSources = Rec.Source.ChildSources;
 				if (!(ChildSources is null))
@@ -744,7 +877,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			bool Result = (!(Node is null) && await Node.CanViewAsync(Caller));
 
-			e.IqResult("<bool xmlns='" + NamespaceConcentrator + "'>" + CommonTypes.Encode(Result) + "</bool>");
+			e.IqResult("<bool xmlns='" + e.Query.NamespaceURI + "'>" + CommonTypes.Encode(Result) + "</bool>");
 		}
 
 		private async Task ContainsNodesHandler(object Sender, IqEventArgs e)
@@ -758,7 +891,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool Result;
 
 			Xml.Append("<bools xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (XmlNode N in e.Query.ChildNodes)
@@ -892,7 +1025,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<nodeInfo xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'");
 
 				await this.ExportAttributes(Xml, Node, Language);
@@ -951,7 +1084,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmlElement E;
 
 			Xml.Append("<nodeInfos xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (XmlNode N in e.Query.ChildNodes)
@@ -1043,7 +1176,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Nodes.AddLast(N);
 
 				Xml.Append("<nodeInfos xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'>");
 
 				while (!(Nodes.First is null))
@@ -1121,7 +1254,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				SortedDictionary<string, bool> Interfaces = null;
 
 				Xml.Append("<inheritance xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'><baseClasses>");
 
 				do
@@ -1190,7 +1323,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<nodeInfos xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'>");
 
 				foreach (INode Node in Rec.Source.RootNodes)
@@ -1245,7 +1378,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<nodeInfos xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'>");
 
 				if (Node.HasChildren)
@@ -1303,7 +1436,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<nodeInfos xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'>");
 
 				while (!(Node is null))
@@ -1706,7 +1839,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						await Node.UpdateAsync();
 
 						Xml.Append("<nodeInfo xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(e.Query.NamespaceURI);
 						Xml.Append("'");
 						await this.ExportAttributes(Xml, Node, Language);
 						Xml.Append(">");
@@ -2013,7 +2146,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			INode PresumptiveChild;
 
 			Xml.Append("<nodeTypes xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
@@ -2221,7 +2354,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await Node.AddAsync(PresumptiveChild);
 
 				Xml.Append("<nodeInfo xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'");
 				await this.ExportAttributes(Xml, PresumptiveChild, Language);
 				Xml.Append(">");
@@ -2531,7 +2664,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<commands xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("'>");
 
 				if (Node.HasCommands)
@@ -2994,7 +3127,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string s;
 
 			Xml.Append("<queryProgress xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(NamespaceConcentratorCurrent);
 
 			if (!string.IsNullOrEmpty(s = Node.SourceId))
 			{
@@ -3511,7 +3644,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<commands xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			if (!(CommonCommands is null))
@@ -3733,7 +3866,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ErrorMessage;
 
 			Xml.Append("<partialExecution xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (INode N in Nodes)
@@ -3916,7 +4049,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			bool PartialSuccess = false;
 
 			Xml.Append("<partialExecution xmlns='");
-			Xml.Append(NamespaceConcentrator);
+			Xml.Append(e.Query.NamespaceURI);
 			Xml.Append("'>");
 
 			foreach (INode N in Nodes)
@@ -4214,7 +4347,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 			{
 				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
-				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this);
+				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this, e.Query.NamespaceURI);
 				DateTime MaxExpires = DateTime.UtcNow.AddDays(1);
 
 				if (Expires > MaxExpires)
@@ -4225,7 +4358,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.Append("<sniffer xmlns='");
-				Xml.Append(NamespaceConcentrator);
+				Xml.Append(e.Query.NamespaceURI);
 				Xml.Append("' snifferId='");
 				Xml.Append(Sniffer.Id);
 				Xml.Append("' expires='");
@@ -4347,7 +4480,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					case SourceEventType.NodeAdded:
 						NodeAdded NodeAdded = (NodeAdded)Event;
 						Xml.Append("<nodeAdded xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 
 						if (!string.IsNullOrEmpty(NodeAdded.AfterNodeId))
 						{
@@ -4377,7 +4510,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						NodeUpdated NodeUpdated = (NodeUpdated)Event;
 
 						Xml.Append("<nodeUpdated xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 
 						if (!string.IsNullOrEmpty(NodeUpdated.OldId) && NodeUpdated.OldId != NodeUpdated.NodeId)
 						{
@@ -4391,7 +4524,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					case SourceEventType.NodeStatusChanged:
 						NodeStatusChanged NodeStatusChanged = (NodeStatusChanged)Event;
 						Xml.Append("<nodeStatusChanged xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 
 						this.Append(Xml, NodeStatusChanged);
 
@@ -4410,21 +4543,21 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					case SourceEventType.NodeRemoved:
 						Xml.Append("<nodeRemoved xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 						this.Append(Xml, (NodeRemoved)Event);
 						Xml.Append("'/>");
 						break;
 
 					case SourceEventType.NodeMovedUp:
 						Xml.Append("<nodeMovedUp xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 						this.Append(Xml, (NodeMovedUp)Event);
 						Xml.Append("'/>");
 						break;
 
 					case SourceEventType.NodeMovedDown:
 						Xml.Append("<nodeMovedDown xmlns='");
-						Xml.Append(NamespaceConcentrator);
+						Xml.Append(NamespaceConcentratorCurrent);
 						this.Append(Xml, (NodeMovedDown)Event);
 						Xml.Append("'/>");
 						break;

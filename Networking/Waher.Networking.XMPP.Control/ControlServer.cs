@@ -68,8 +68,19 @@ namespace Waher.Networking.XMPP.Control
 			foreach (ControlParameter P in Parameters)
 				this.controlParametersByName[P.Name] = P;
 
-			this.client.RegisterIqSetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
-			this.client.RegisterIqGetHandler("getForm", ControlClient.NamespaceControl, this.GetFormHandler, false);
+			#region Neuro-Foundation v1
+
+			this.client.RegisterIqSetHandler("set", ControlClient.NamespaceControlNeuroFoundationV1, this.SetHandler, true);
+			this.client.RegisterIqGetHandler("getForm", ControlClient.NamespaceControlNeuroFoundationV1, this.GetFormHandler, false);
+
+			#endregion
+
+			#region IEEE v1
+
+			this.client.RegisterIqSetHandler("set", ControlClient.NamespaceControlIeeeV1, this.SetHandler, true);
+			this.client.RegisterIqGetHandler("getForm", ControlClient.NamespaceControlIeeeV1, this.GetFormHandler, false);
+
+			#endregion
 		}
 
 		/// <inheritdoc/>
@@ -80,13 +91,24 @@ namespace Waher.Networking.XMPP.Control
 			this.controlParameters = null;
 			this.controlParametersByName.Clear();
 
-			this.client.UnregisterIqGetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
-			this.client.UnregisterIqGetHandler("getForm", ControlClient.NamespaceControl, this.GetFormHandler, false);
+			#region Neuro-Foundation v1
+
+			this.client.UnregisterIqSetHandler("set", ControlClient.NamespaceControlNeuroFoundationV1, this.SetHandler, true);
+			this.client.UnregisterIqGetHandler("getForm", ControlClient.NamespaceControlNeuroFoundationV1, this.GetFormHandler, false);
+
+			#endregion
+
+			#region IEEE v1
+
+			this.client.UnregisterIqSetHandler("set", ControlClient.NamespaceControlIeeeV1, this.SetHandler, true);
+			this.client.UnregisterIqGetHandler("getForm", ControlClient.NamespaceControlIeeeV1, this.GetFormHandler, false);
+
+			#endregion		
 		}
 
-		/// <summary>
-		/// Implemented extensions.
-		/// </summary>
+			/// <summary>
+			/// Implemented extensions.
+			/// </summary>
 		public override string[] Extensions => new string[] { "XEP-0325" };
 
 		/// <summary>
@@ -138,7 +160,7 @@ namespace Waher.Networking.XMPP.Control
 		internal static void ParameterNotFound(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Parameter not found.</paramError></error>");
+				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Parameter not found.</paramError></error>");
 		}
 
 		internal static void NotFound(IqEventArgs e)
@@ -149,19 +171,19 @@ namespace Waher.Networking.XMPP.Control
 		internal static void ParameterWrongType(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Invalid parameter type.</paramError></error>");
+				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Invalid parameter type.</paramError></error>");
 		}
 
 		internal static void ParameterSyntaxError(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Syntax error.</paramError></error>");
+				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Syntax error.</paramError></error>");
 		}
 
 		internal static void ParameterValueInvalid(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid.</paramError></error>");
+				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Value not valid.</paramError></error>");
 		}
 
 		internal static void ParameterBadRequest(IqEventArgs e)
@@ -396,14 +418,14 @@ namespace Waher.Networking.XMPP.Control
 								if (T is null)
 								{
 									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
+										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
 									return;
 								}
 
 								if (!T.GetTypeInfo().IsEnum)
 								{
 									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
+										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
 									return;
 								}
 
@@ -416,7 +438,7 @@ namespace Waher.Networking.XMPP.Control
 								catch (Exception)
 								{
 									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
+										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
 									return;
 								}
 
@@ -627,7 +649,7 @@ namespace Waher.Networking.XMPP.Control
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<resp xmlns=\"");
-			Xml.Append(ControlClient.NamespaceControl);
+			Xml.Append(e.Query.NamespaceURI);
 
 			if (!(Nodes is null) || !(ParameterNames is null))
 			{

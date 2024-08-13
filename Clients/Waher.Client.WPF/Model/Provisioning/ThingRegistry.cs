@@ -31,7 +31,17 @@ namespace Waher.Client.WPF.Model.Provisioning
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
-			this.supportsProvisioning = Features.ContainsKey(ProvisioningClient.NamespaceProvisioningOwner);
+			this.supportsProvisioning = false;
+
+			foreach (string Namespace in ProvisioningClient.NamespacesProvisioningOwner)
+			{
+				if (Features.ContainsKey(Namespace))
+				{
+					this.supportsProvisioning = true;
+					break;
+				}
+			}
+
 			this.registryClient = new ThingRegistryClient(this.Account.Client, JID);
 
 			if (this.supportsProvisioning)
@@ -56,7 +66,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		private async void ProcessUnhandled()
 		{
-			foreach (MessageEventArgs Message in this.Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
+			foreach (MessageEventArgs Message in this.Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwnerCurrent))
 			{
 				try
 				{

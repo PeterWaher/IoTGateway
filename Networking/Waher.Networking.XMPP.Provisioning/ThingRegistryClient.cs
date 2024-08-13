@@ -65,9 +65,28 @@ namespace Waher.Networking.XMPP.Provisioning
 		private readonly string thingRegistryAddress;
 
 		/// <summary>
+		/// urn:ieee:iot:disco:1.0
+		/// </summary>
+		public const string NamespaceDiscoveryIeeeV1 = "urn:ieee:iot:disco:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:disco:1.0
 		/// </summary>
-		public const string NamespaceDiscovery = "urn:nf:iot:disco:1.0";
+		public const string NamespaceDiscoveryNeuroFoundationV1 = "urn:nf:iot:disco:1.0";
+
+		/// <summary>
+		/// Current namespace for IoT Discovery
+		/// </summary>
+		public const string NamespaceDiscoveryCurrent = NamespaceDiscoveryNeuroFoundationV1;
+
+		/// <summary>
+		/// Namespaces supported for discovery.
+		/// </summary>
+		public static readonly string[] NamespacesDiscovery = new string[]
+		{
+			NamespaceDiscoveryIeeeV1,
+			NamespaceDiscoveryNeuroFoundationV1
+		};
 
 		/// <summary>
 		/// Implements an XMPP provisioning client interface.
@@ -82,9 +101,21 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			this.thingRegistryAddress = ThingRegistryAddress;
 
-			this.client.RegisterIqSetHandler("claimed", NamespaceDiscovery, this.ClaimedHandler, true);
-			this.client.RegisterIqSetHandler("removed", NamespaceDiscovery, this.RemovedHandler, false);
-			this.client.RegisterIqSetHandler("disowned", NamespaceDiscovery, this.DisownedHandler, false);
+			#region Neuro-Foundation V1
+
+			this.client.RegisterIqSetHandler("claimed", NamespaceDiscoveryNeuroFoundationV1, this.ClaimedHandler, true);
+			this.client.RegisterIqSetHandler("removed", NamespaceDiscoveryNeuroFoundationV1, this.RemovedHandler, false);
+			this.client.RegisterIqSetHandler("disowned", NamespaceDiscoveryNeuroFoundationV1, this.DisownedHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.RegisterIqSetHandler("claimed", NamespaceDiscoveryIeeeV1, this.ClaimedHandler, true);
+			this.client.RegisterIqSetHandler("removed", NamespaceDiscoveryIeeeV1, this.RemovedHandler, false);
+			this.client.RegisterIqSetHandler("disowned", NamespaceDiscoveryIeeeV1, this.DisownedHandler, false);
+
+			#endregion
 		}
 
 		/// <inheritdoc/>
@@ -92,9 +123,21 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			base.Dispose();
 
-			this.client.UnregisterIqSetHandler("claimed", NamespaceDiscovery, this.ClaimedHandler, true);
-			this.client.UnregisterIqSetHandler("removed", NamespaceDiscovery, this.RemovedHandler, false);
-			this.client.UnregisterIqSetHandler("disowned", NamespaceDiscovery, this.DisownedHandler, false);
+			#region Neuro-Foundation V1
+
+			this.client.UnregisterIqSetHandler("claimed", NamespaceDiscoveryNeuroFoundationV1, this.ClaimedHandler, true);
+			this.client.UnregisterIqSetHandler("removed", NamespaceDiscoveryNeuroFoundationV1, this.RemovedHandler, false);
+			this.client.UnregisterIqSetHandler("disowned", NamespaceDiscoveryNeuroFoundationV1, this.DisownedHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.UnregisterIqSetHandler("claimed", NamespaceDiscoveryIeeeV1, this.ClaimedHandler, true);
+			this.client.UnregisterIqSetHandler("removed", NamespaceDiscoveryIeeeV1, this.RemovedHandler, false);
+			this.client.UnregisterIqSetHandler("disowned", NamespaceDiscoveryIeeeV1, this.DisownedHandler, false);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -232,7 +275,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<register xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 
 			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
@@ -253,7 +296,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					string OwnerJid = string.Empty;
 					bool IsPublic = false;
 
-					if (e.Ok && !(E is null) && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "claimed")
 					{
 						OwnerJid = XML.Attribute(E, "jid");
 						IsPublic = XML.Attribute(E, "public", false);
@@ -353,7 +396,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<mine xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 			Request.Append("' public='");
 			Request.Append(CommonTypes.Encode(Public));
 			Request.Append("'>");
@@ -370,7 +413,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					string NodeJid = string.Empty;
 					ThingReference Node = ThingReference.Empty;
 
-					if (e.Ok && !(E is null) && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "claimed")
 					{
 						string NodeId = XML.Attribute(E, "id");
 						string SourceId = XML.Attribute(E, "src");
@@ -502,7 +545,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<remove xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 
 			Request.Append("' jid='");
 			Request.Append(XML.Encode(ThingJid));
@@ -653,7 +696,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<update xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 
 			if (!string.IsNullOrEmpty(ThingJid))
 			{
@@ -676,7 +719,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					XmlElement E = e.FirstElement;
 					bool Disowned = false;
 
-					if (e.Ok && !(E is null) && E.LocalName == "disowned" && E.NamespaceURI == NamespaceDiscovery)
+					if (e.Ok && !(E is null) && E.LocalName == "disowned")
 					{
 						Disowned = true;
 
@@ -761,7 +804,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<unregister xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 
 			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
@@ -848,7 +891,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<disown xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 
 			Request.Append("' jid='");
 			Request.Append(XML.Encode(ThingJid));
@@ -940,7 +983,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<search xmlns='");
-			Request.Append(NamespaceDiscovery);
+			Request.Append(NamespaceDiscoveryCurrent);
 			Request.Append("' offset='");
 			Request.Append(Offset.ToString());
 			Request.Append("' maxCount='");
@@ -973,14 +1016,14 @@ namespace Waher.Networking.XMPP.Provisioning
 			string Name;
 			bool More = false;
 
-			if (e.Ok && !(E is null) && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
+			if (e.Ok && !(E is null) && E.LocalName == "found")
 			{
 				More = XML.Attribute(E, "more", false);
 
 				foreach (XmlNode N in E.ChildNodes)
 				{
 					E2 = N as XmlElement;
-					if (E2.LocalName == "thing" && E2.NamespaceURI == NamespaceDiscovery)
+					if (E2.LocalName == "thing")
 					{
 						Jid = XML.Attribute(E2, "jid");
 						NodeId = XML.Attribute(E2, "id");
@@ -1805,7 +1848,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void FindThingRegistry(string DeviceBareJid, ServiceEventHandler Callback, object State)
 		{
-			this.client.FindComponent(DeviceBareJid, NamespaceDiscovery, Callback, State);
+			this.client.FindComponent(DeviceBareJid, NamespacesDiscovery, Callback, State);
 		}
 
 		/// <summary>
@@ -1813,9 +1856,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="DeviceBareJid">Device Bare JID</param>
 		/// <returns>Thing Registry, if found.</returns>
-		public Task<string> FindThingRegistryAsync(string DeviceBareJid)
+		public async Task<string> FindThingRegistryAsync(string DeviceBareJid)
 		{
-			return this.client.FindComponentAsync(DeviceBareJid, NamespaceDiscovery);
+			KeyValuePair<string, string> P = await this.client.FindComponentAsync(DeviceBareJid, NamespacesDiscovery);
+			return P.Key;
 		}
 
 		#endregion

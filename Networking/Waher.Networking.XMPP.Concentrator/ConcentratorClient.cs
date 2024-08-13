@@ -38,14 +38,31 @@ namespace Waher.Networking.XMPP.Concentrator
 		public ConcentratorClient(XmppClient Client)
 			: base(Client)
 		{
-			Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
-			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
-			Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
-			Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
-			Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
-			Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
-			Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
-			Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
+			#region Neuro-Foundation V1 handlers
+
+			Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
+			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
+			Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
+
+			#endregion
+
+			#region IEEE V1 handlers
+
+			Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
+			Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
+			Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
+			Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -55,14 +72,31 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			base.Dispose();
 
-			this.client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
-			this.client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
-			this.client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
+			#region Neuro-Foundation V1 handlers
+
+			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
+			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
+
+			#endregion
+
+			#region IEEE V1 handlers
+
+			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
+			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -78,14 +112,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetCapabilities(string To, CapabilitiesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
+			this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
 					List<string> Capabilities = new List<string>();
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "strings" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "strings" &&
+						E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 					{
 						foreach (XmlNode N in E)
 						{
@@ -116,7 +151,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetAllDataSources(string To, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
+			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
@@ -128,7 +163,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "dataSources" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "dataSources" && 
+				E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -160,7 +196,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetRootDataSources(string To, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
+			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
@@ -176,7 +212,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetChildDataSources(string To, string SourceID, DataSourcesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "' src='" + XML.Encode(SourceID) + "'/>", async (sender, e) =>
+			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "' src='" + XML.Encode(SourceID) + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
@@ -217,7 +253,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<containsNode xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -308,7 +344,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<containsNodes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			Xml.Append("'>");
 
@@ -336,7 +372,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "bools" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "bools" && 
+				E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 			{
 				foreach (XmlNode N in E)
 				{
@@ -405,7 +442,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNode xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -635,7 +672,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'>");
@@ -728,7 +765,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getAllNodes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
@@ -793,7 +830,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodeInheritance xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -811,7 +848,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<string> BaseClasses = new List<string>();
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "inheritance" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "inheritance" &&
+					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -862,7 +900,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getRootNodes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -917,7 +955,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getChildNodes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -972,7 +1010,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getAncestors xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1022,7 +1060,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getAddableNodeTypes xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1034,7 +1072,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				List<LocalizedString> Types = new List<LocalizedString>();
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeTypes" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeTypes" && 
+					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					foreach (XmlNode N in E)
 					{
@@ -1157,7 +1196,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getParametersForNewNode xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("' type='");
 			Xml.Append(XML.Encode(NodeType));
 			Xml.Append("'");
@@ -1215,7 +1254,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<createNewNode xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("' type='");
 			Xml.Append(XML.Encode(NodeType));
 			Xml.Append("'");
@@ -1318,7 +1357,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<destroyNode xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1411,7 +1450,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodeParametersForEdit xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1466,7 +1505,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<setNodeParametersAfterEdit xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1570,7 +1609,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<registerSniffer xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1584,7 +1623,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				string SnifferId = null;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sniffer" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sniffer" && 
+					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					SnifferId = XML.Attribute(E, "snifferId");
 					Expires = XML.Attribute(E, "expires", DateTime.MinValue);
@@ -1657,7 +1697,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<unregisterSniffer xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1787,7 +1827,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getNodeCommands xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -1799,7 +1839,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				XmlElement E;
 				List<NodeCommand> Commands = new List<NodeCommand>();
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "commands" && E.NamespaceURI == ConcentratorServer.NamespaceConcentrator)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "commands" &&
+					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{
@@ -2028,7 +2069,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getCommandParameters xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -2337,7 +2378,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(TagName);
 			Xml.Append(" xmlns='");
 
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -2443,7 +2484,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<abortNodeQuery xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
@@ -2502,7 +2543,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<subscribe xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
 			Xml.Append("' ttl='");
@@ -2554,7 +2595,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<unsubscribe xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("' src='");
 			Xml.Append(XML.Encode(SourceID));
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);

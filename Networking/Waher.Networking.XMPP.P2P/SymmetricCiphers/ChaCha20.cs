@@ -26,11 +26,6 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         public override string LocalName => "cha";
 
         /// <summary>
-        /// Namespace of the E2E symmetric cipher
-        /// </summary>
-        public override string Namespace => EndpointSecurity.IoTHarmonizationE2E;
-
-        /// <summary>
         /// Creates a new symmetric cipher object with the same settings as the current object.
         /// </summary>
         /// <returns>New instance</returns>

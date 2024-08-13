@@ -41,12 +41,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (XmlNode N2 in e.FirstElement.ChildNodes)
 				{
-					if (N2 is XmlElement E &&
-						E.LocalName == "required" &&
-						E.NamespaceURI == ContractsClient.NamespaceLegalIdentities)
-					{
+					if (N2 is XmlElement E && E.LocalName == "required")
 						Required.Add(E.InnerText);
-					}
 				}
 
 				this.requiredProperties = Required.ToArray();

@@ -25,6 +25,7 @@ namespace Waher.Networking.XMPP.Sensor
 	{
 		private Dictionary<ThingReference, List<Field>> momentaryFields = null;
 		private readonly SensorServer sensorServer;
+		private readonly string @namespace;
 		private bool started = false;
 
 		/// <summary>
@@ -43,11 +44,13 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token.</param>
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
+		/// <param name="Namespace">Namespace used.</param>
 		public SensorDataServerRequest(string Id, SensorServer SensorServer, string RemoteJID, string Actor, IThingReference[] Nodes, FieldType Types,
-			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
+			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken, string Namespace)
 			: base(Id, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorServer = SensorServer;
+			this.@namespace = Namespace;
 		}
 
 		/// <summary>
@@ -55,10 +58,12 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public SensorServer SensorServer => this.sensorServer;
 
-		internal string Key
-		{
-			get { return this.RemoteJID + " " + this.Id; }
-		}
+		/// <summary>
+		/// Namespace used.
+		/// </summary>
+		public string Namespace => this.@namespace;
+
+		internal string Key => this.RemoteJID + " " + this.Id;
 
 		/// <summary>
 		/// If the readout process is started or not.
@@ -196,7 +201,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
 		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, IEnumerable<ThingError> Errors, string Id, bool Done, IsIncludedDelegate IsIncluded)
 		{
-			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorData);
+			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorDataCurrent);
 			Xml.WriteAttributeString("id", Id);
 
 			if (!Done)
@@ -539,7 +544,7 @@ namespace Waher.Networking.XMPP.Sensor
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<resp xmlns='");
-			Xml.Append(SensorClient.NamespaceSensorData);
+			Xml.Append(SensorClient.NamespaceSensorDataCurrent);
 			Xml.Append("' id='");
 			Xml.Append(this.Id);
 
@@ -628,7 +633,7 @@ namespace Waher.Networking.XMPP.Sensor
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<started xmlns='");
-			Xml.Append(SensorClient.NamespaceSensorData);
+			Xml.Append(SensorClient.NamespaceSensorDataCurrent);
 			Xml.Append("' id='");
 			Xml.Append(this.Id);
 			Xml.Append("'/>");

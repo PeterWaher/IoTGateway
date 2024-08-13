@@ -223,9 +223,19 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceSearch = "jabber:iq:search";
 
 		/// <summary>
+		/// urn:ieee:iot:qos:1.0
+		/// </summary>
+		public const string NamespaceQualityOfServiceIeeeV1 = "urn:ieee:iot:qos:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:qos:1.0
 		/// </summary>
-		public const string NamespaceQualityOfService = "urn:nf:iot:qos:1.0";
+		public const string NamespaceQualityOfServiceNeuroFoundationV1 = "urn:nf:iot:qos:1.0";
+
+		/// <summary>
+		/// Current namespace for Quality of Service.
+		/// </summary>
+		public const string NamespaceQualityOfServiceCurrent = NamespaceQualityOfServiceNeuroFoundationV1;
 
 		/// <summary>
 		/// urn:xmpp:ping
@@ -838,10 +848,23 @@ namespace Waher.Networking.XMPP
 			this.RegisterIqSetHandler("query", NamespaceRoster, this.RosterPushHandler, true);
 			this.RegisterIqGetHandler("query", NamespaceServiceDiscoveryInfo, this.ServiceDiscoveryRequestHandler, true);
 			this.RegisterIqGetHandler("query", NamespaceSoftwareVersion, this.SoftwareVersionRequestHandler, true);
-			this.RegisterIqSetHandler("acknowledged", NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
-			this.RegisterIqSetHandler("assured", NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
-			this.RegisterIqSetHandler("deliver", NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
 			this.RegisterIqGetHandler("ping", NamespacePing, this.PingRequestHandler, true);
+
+			#region Neuro-Foundation V1
+
+			this.RegisterIqSetHandler("acknowledged", NamespaceQualityOfServiceNeuroFoundationV1, this.AcknowledgedQoSMessageHandler, true);
+			this.RegisterIqSetHandler("assured", NamespaceQualityOfServiceNeuroFoundationV1, this.AssuredQoSMessageHandler, false);
+			this.RegisterIqSetHandler("deliver", NamespaceQualityOfServiceNeuroFoundationV1, this.DeliverQoSMessageHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.RegisterIqSetHandler("acknowledged", NamespaceQualityOfServiceIeeeV1, this.AcknowledgedQoSMessageHandler, true);
+			this.RegisterIqSetHandler("assured", NamespaceQualityOfServiceIeeeV1, this.AssuredQoSMessageHandler, false);
+			this.RegisterIqSetHandler("deliver", NamespaceQualityOfServiceIeeeV1, this.DeliverQoSMessageHandler, false);
+
+			#endregion
 
 			this.RegisterMessageHandler("updated", NamespaceDynamicForms, this.DynamicFormUpdatedHandler, true);
 
@@ -5894,7 +5917,7 @@ namespace Waher.Networking.XMPP
 				case QoSLevel.Acknowledged:
 					Xml.Clear();
 					Xml.Append("<qos:acknowledged xmlns:qos='");
-					Xml.Append(NamespaceQualityOfService);
+					Xml.Append(NamespaceQualityOfServiceCurrent);
 					Xml.Append("'>");
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
@@ -5908,7 +5931,7 @@ namespace Waher.Networking.XMPP
 
 					Xml.Clear();
 					Xml.Append("<qos:assured xmlns:qos='");
-					Xml.Append(NamespaceQualityOfService);
+					Xml.Append(NamespaceQualityOfServiceCurrent);
 					Xml.Append("' msgId='");
 					Xml.Append(MsgId);
 					Xml.Append("'>");
@@ -5939,7 +5962,7 @@ namespace Waher.Networking.XMPP
 							StringBuilder Xml = new StringBuilder();
 
 							Xml.Append("<qos:deliver xmlns:qos='");
-							Xml.Append(NamespaceQualityOfService);
+							Xml.Append(NamespaceQualityOfServiceCurrent);
 							Xml.Append("' msgId='");
 							Xml.Append(MsgId);
 							Xml.Append("'/>");
@@ -8054,25 +8077,41 @@ namespace Waher.Networking.XMPP
 		/// <param name="Feature">Requested feature.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public async void FindComponent(string Jid, string Feature, ServiceEventHandler Callback, object State)
+		public void FindComponent(string Jid, string Feature, ServiceEventHandler Callback, object State)
+		{
+			this.FindComponent(Jid, new string[] { Feature }, Callback, State);
+		}
+
+		/// <summary>
+		/// Finds a component having a specific feature, servicing a JID.
+		/// </summary>
+		/// <param name="Jid">JID</param>
+		/// <param name="Features">Requested features.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async void FindComponent(string Jid, string[] Features, ServiceEventHandler Callback, object State)
 		{
 			string Service;
+			string Feature;
 
 			try
 			{
-				Service = await this.FindComponentAsync(Jid, Feature);
+				KeyValuePair<string, string> P = await this.FindComponentAsync(Jid, Features);
+				Service = P.Key;
+				Feature = P.Value;
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 				Service = null;
+				Feature = null;
 			}
 
 			if (!(Callback is null))
 			{
 				try
 				{
-					await Callback(this, new ServiceEventArgs(Service, State));
+					await Callback(this, new ServiceEventArgs(Service, Feature, State));
 				}
 				catch (Exception ex)
 				{

@@ -865,9 +865,9 @@ namespace Waher.Client.WPF.Model
 				XmppContact Node = (XmppContact)e.State;
 				object OldTag;
 
-				if (e.HasFeature(ConcentratorServer.NamespaceConcentrator))
+				if (e.HasAnyFeature(ConcentratorServer.NamespacesConcentrator))
 				{
-					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool SupportsEvents = e.HasAnyFeature(SensorClient.NamespacesSensorEvents);
 					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
@@ -891,10 +891,10 @@ namespace Waher.Client.WPF.Model
 
 					this.AddGroups(Node, Groups.ToArray());
 				}
-				else if (e.HasFeature(ControlClient.NamespaceControl))
+				else if (e.HasAnyFeature(ControlClient.NamespacesControl))
 				{
-					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
-					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool IsSensor = e.HasAnyFeature(SensorClient.NamespacesSensorData);
+					bool SupportsEvents = e.HasAnyFeature(SensorClient.NamespacesSensorEvents);
 					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
@@ -921,9 +921,9 @@ namespace Waher.Client.WPF.Model
 
 					this.AddGroups(Node, Groups.ToArray());
 				}
-				else if (e.HasFeature(SensorClient.NamespaceSensorData))
+				else if (e.HasAnyFeature(SensorClient.NamespacesSensorData))
 				{
-					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool SupportsEvents = e.HasAnyFeature(SensorClient.NamespacesSensorEvents);
 					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
@@ -1189,7 +1189,7 @@ namespace Waher.Client.WPF.Model
 									return;
 							}
 
-							if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
+							if (e2.HasAnyFeature(ThingRegistryClient.NamespacesDiscovery))
 							{
 								ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
 								Component = ThingRegistry;
@@ -1204,7 +1204,7 @@ namespace Waher.Client.WPF.Model
 								this.AddMucClient(Item.JID);
 								Component = new MucService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.mucClient);
 							}
-							else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
+							else if (e2.HasAnyFeature(ContractsClient.NamespacesLegalIdentities))
 								Component = await LegalService.Create(this, Item.JID, Item.Name, Item.Node, e2.Features);
 							else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 								Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);

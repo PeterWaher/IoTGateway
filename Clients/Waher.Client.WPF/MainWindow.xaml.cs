@@ -1170,7 +1170,8 @@ namespace Waher.Client.WPF
 						if (string.IsNullOrEmpty(Question2.Sender))
 						{
 							string ThingDomain = XmppClient.GetDomain(Question2.JID);
-							string Component = await Owner.Client.FindComponentAsync(ThingDomain, ProvisioningClient.NamespaceProvisioningOwner);
+							KeyValuePair<string, string> P = await Owner.Client.FindComponentAsync(ThingDomain, ProvisioningClient.NamespacesProvisioningOwner);
+							string Component = P.Key;
 
 							if (!string.IsNullOrEmpty(Component))
 							{

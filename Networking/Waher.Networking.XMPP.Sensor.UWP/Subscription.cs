@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private readonly string deviceToken;
 		private readonly string userToken;
 		private readonly string id;
+		private readonly string @namespace;
 		private bool active = true;
 		private bool supressedTrigger = false;
 
@@ -41,9 +42,10 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Service Token.</param>
 		/// <param name="DeviceToken">Device Token.</param>
 		/// <param name="UserToken">User Token.</param>
+		/// <param name="Namespace">Namepsace used.</param>
 		public Subscription(string Id, string From, IThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
 			FieldType FieldTypes, Duration? MaxAge, Duration? MinInterval, Duration? MaxInterval, string ServiceToken, string DeviceToken,
-			string UserToken)
+			string UserToken, string Namespace)
 		{
 			this.nodes = new Dictionary<IThingReference, bool>();
 
@@ -60,7 +62,13 @@ namespace Waher.Networking.XMPP.Sensor
 			this.serviceToken = ServiceToken;
 			this.deviceToken = DeviceToken;
 			this.userToken = UserToken;
+			this.@namespace = Namespace;
 		}
+
+		/// <summary>
+		/// Namespace used.
+		/// </summary>
+		public string Namespace => this.@namespace;
 
 		/// <summary>
 		/// Removes a node reference from the subscription.
@@ -87,10 +95,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Nodes in subscription.
 		/// </summary>
-		public Dictionary<IThingReference, bool>.KeyCollection Nodes
-		{
-			get { return this.nodes.Keys; }
-		}
+		public Dictionary<IThingReference, bool>.KeyCollection Nodes => this.nodes.Keys;
 
 		/// <summary>
 		/// Fields in subscription.

@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <param name="Xml">XML Output.</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			this.Serialize(Xml, "humanReadableText", false);
+			this.Serialize(Xml, "humanReadableText", null);
 		}
 
 		/// <summary>
@@ -82,8 +82,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
 		/// <param name="TagName">Local name of the text.</param>
-		/// <param name="IncludeNamespace">If namespace attribute should be included.</param>
-		public void Serialize(StringBuilder Xml, string TagName, bool IncludeNamespace)
+		/// <param name="Namespace">Optional namespace to include. Can be null or empty.</param>
+		public void Serialize(StringBuilder Xml, string TagName, string Namespace)
 		{
 			Xml.Append('<');
 			Xml.Append(TagName);
@@ -95,10 +95,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 				Xml.Append('"');
 			}
 
-			if (IncludeNamespace)
+			if (!string.IsNullOrEmpty(Namespace))
 			{
 				Xml.Append(" xmlns=\"");
-				Xml.Append(ContractsClient.NamespaceSmartContracts);
+				Xml.Append(Namespace);
 				Xml.Append('"');
 			}
 

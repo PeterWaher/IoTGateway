@@ -126,7 +126,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Namespace of the event element.
 		/// </summary>
-		public override string Namespace => SensorClient.NamespaceSensorData;
+		public override string Namespace => SensorClient.NamespaceSensorDataCurrent;
 
 		/// <summary>
 		/// XML representation of the event.

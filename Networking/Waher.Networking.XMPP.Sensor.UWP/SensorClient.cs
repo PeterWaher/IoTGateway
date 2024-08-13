@@ -19,14 +19,52 @@ namespace Waher.Networking.XMPP.Sensor
 	public class SensorClient : XmppExtension
 	{
 		/// <summary>
+		/// urn:ieee:iot:sd:1.0
+		/// </summary>
+		public const string NamespaceSensorDataIeeeV1 = "urn:ieee:iot:sd:1.0";
+
+		/// <summary>
 		/// urn:nf:iot:sd:1.0
 		/// </summary>
-		public const string NamespaceSensorData = "urn:nf:iot:sd:1.0";
+		public const string NamespaceSensorDataNeuroFoundationV1 = "urn:nf:iot:sd:1.0";
+
+		/// <summary>
+		/// Current namespace for sensor data.
+		/// </summary>
+		public const string NamespaceSensorDataCurrent = NamespaceSensorDataNeuroFoundationV1;
+
+		/// <summary>
+		/// Supported sensor-data namespaces.
+		/// </summary>
+		public static readonly string[] NamespacesSensorData = new string[]
+		{
+			NamespaceSensorDataNeuroFoundationV1,
+			NamespaceSensorDataIeeeV1
+		};
+
+		/// <summary>
+		/// urn:ieee:iot:events:1.0
+		/// </summary>
+		public const string NamespaceSensorEventsIeeeV1 = "urn:ieee:iot:events:1.0";
 
 		/// <summary>
 		/// urn:nf:iot:events:1.0
 		/// </summary>
-		public const string NamespaceSensorEvents = "urn:nf:iot:events:1.0";
+		public const string NamespaceSensorEventsNeuroFoundationV1 = "urn:nf:iot:events:1.0";
+
+		/// <summary>
+		/// Current namespace for sensor data events.
+		/// </summary>
+		public const string NamespaceSensorEventsCurrent = NamespaceSensorEventsNeuroFoundationV1;
+
+		/// <summary>
+		/// Supported sensor event namespaces.
+		/// </summary>
+		public static readonly string[] NamespacesSensorEvents = new string[]
+		{
+			NamespaceSensorEventsNeuroFoundationV1,
+			NamespaceSensorEventsIeeeV1
+		};
 
 		private readonly Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
 		private readonly object synchObj = new object();
@@ -41,9 +79,21 @@ namespace Waher.Networking.XMPP.Sensor
 		public SensorClient(XmppClient Client)
 			: base(Client)
 		{
-			this.client.RegisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
-			this.client.RegisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
-			this.client.RegisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
+			#region Neuro-Foundation V1
+
+			this.client.RegisterMessageHandler("started", NamespaceSensorDataNeuroFoundationV1, this.StartedHandler, false);
+			this.client.RegisterMessageHandler("done", NamespaceSensorDataNeuroFoundationV1, this.DoneHandler, false);
+			this.client.RegisterMessageHandler("resp", NamespaceSensorDataNeuroFoundationV1, this.FieldsHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.RegisterMessageHandler("started", NamespaceSensorDataIeeeV1, this.StartedHandler, false);
+			this.client.RegisterMessageHandler("done", NamespaceSensorDataIeeeV1, this.DoneHandler, false);
+			this.client.RegisterMessageHandler("resp", NamespaceSensorDataIeeeV1, this.FieldsHandler, false);
+
+			#endregion
 		}
 
 		/// <inheritdoc/>
@@ -51,9 +101,21 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			base.Dispose();
 
-			this.client.UnregisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
-			this.client.UnregisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
-			this.client.UnregisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
+			#region Neuro-Foundation V1
+
+			this.client.UnregisterMessageHandler("started", NamespaceSensorDataNeuroFoundationV1, this.StartedHandler, false);
+			this.client.UnregisterMessageHandler("done", NamespaceSensorDataNeuroFoundationV1, this.DoneHandler, false);
+			this.client.UnregisterMessageHandler("resp", NamespaceSensorDataNeuroFoundationV1, this.FieldsHandler, false);
+
+			#endregion
+
+			#region IEEE V1
+
+			this.client.UnregisterMessageHandler("started", NamespaceSensorDataIeeeV1, this.StartedHandler, false);
+			this.client.UnregisterMessageHandler("done", NamespaceSensorDataIeeeV1, this.DoneHandler, false);
+			this.client.UnregisterMessageHandler("resp", NamespaceSensorDataIeeeV1, this.FieldsHandler, false);
+
+			#endregion
 		}
 
 		/// <summary>
@@ -241,7 +303,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			Xml.Append("<req xmlns='");
-			Xml.Append(NamespaceSensorData);
+			Xml.Append(NamespaceSensorDataCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(Id));
 
@@ -1099,7 +1161,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			Xml.Append("<subscribe xmlns='");
-			Xml.Append(NamespaceSensorEvents);
+			Xml.Append(NamespaceSensorEventsCurrent);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(Id));
 

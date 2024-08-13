@@ -188,7 +188,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append("\">");
 
 					foreach (HumanReadableText Description in this.Descriptions)
-						Description.Serialize(Xml, "description", false);
+						Description.Serialize(Xml, "description", null);
 
 					Xml.Append("</stringParameter>");
 				}

@@ -66,5 +66,37 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		{
 			return this.features.ContainsKey(Feature);
 		}
+
+		/// <summary>
+		/// Checks if the remote entity supports all of a set of features.
+		/// </summary>
+		/// <param name="Features">Set of features.</param>
+		/// <returns>If all features are supported.</returns>
+		public bool HasAllFeatures(params string[] Features)
+		{
+			foreach (string Feature in Features)
+			{
+				if (!this.HasFeature(Feature)) 
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if the remote entity supports any of a set of features.
+		/// </summary>
+		/// <param name="Features">Set of features.</param>
+		/// <returns>If any feature is supported.</returns>
+		public bool HasAnyFeature(params string[] Features)
+		{
+			foreach (string Feature in Features)
+			{
+				if (this.HasFeature(Feature))
+					return true;
+			}
+
+			return false;
+		}
 	}
 }

@@ -14,6 +14,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	{
 		private readonly string id;
 		private readonly string fullJID;
+		private readonly string @namespace;
 		private readonly DateTime expires;
 		private readonly ISniffable node;
 		private readonly ConcentratorServer concentratorServer;
@@ -25,13 +26,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Expires">When the sniffer should automatically expire.</param>
 		/// <param name="Node">Node being sniffed.</param>
 		/// <param name="ConcentratorServer">Concentrator server managing nodes.</param>
-		public RemoteSniffer(string FullJID, DateTime Expires, ISniffable Node, ConcentratorServer ConcentratorServer)
+		/// <param name="Namespace">Namespace used when creating sniffer.</param>
+		public RemoteSniffer(string FullJID, DateTime Expires, ISniffable Node, ConcentratorServer ConcentratorServer, string Namespace)
 		{
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.fullJID = FullJID;
 			this.expires = Expires.ToUniversalTime();
 			this.node = Node;
 			this.concentratorServer = ConcentratorServer;
+			this.@namespace = Namespace;
 		}
 
 		/// <summary>
@@ -58,6 +61,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// Concentrator server managing nodes.
 		/// </summary>
 		public ConcentratorServer ConcentratorServer => this.concentratorServer;
+
+		/// <summary>
+		/// Namespace used when creating sniffer.
+		/// </summary>
+		public string Namespace => this.@namespace;
 
 		/// <summary>
 		/// If the sniffer has expired.
@@ -103,7 +111,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			StringBuilder Xml = new StringBuilder();
 			Xml.Append("<sniff xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentrator);
+			Xml.Append(this.@namespace);
 			Xml.Append("' snifferId='");
 			Xml.Append(this.id);
 			Xml.Append("' timestamp='");

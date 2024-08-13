@@ -46,7 +46,7 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private string id = null;
 		private string provider = null;
-		private string @namespace = ContractsClient.NamespaceLegalIdentities;
+		private string @namespace = ContractsClient.NamespaceLegalIdentitiesCurrent;
 		private IdentityState state = IdentityState.Created;
 		private DateTime created = DateTime.MinValue;
 		private DateTime updated = DateTime.MinValue;
@@ -229,7 +229,7 @@ namespace Waher.Networking.XMPP.Contracts
 								if (N2 is XmlElement E2)
 								{
 									IE2eEndpoint Key = EndpointSecurity.ParseE2eKey(E2);
-									if (!(Key is null) && Key.Namespace == EndpointSecurity.IoTHarmonizationE2E)
+									if (!(Key is null))
 									{
                                         Result.clientPubKey = Key.PublicKey;
 
@@ -334,7 +334,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public bool HasClientPublicKey
 		{
-			get { return !string.IsNullOrEmpty(this.clientKeyName) && !(this.ClientPubKey is null); }
+			get => !string.IsNullOrEmpty(this.clientKeyName) && !(this.ClientPubKey is null);
 		}
 
 		/// <summary>
@@ -394,7 +394,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append("\" size=\"");
 					Xml.Append(this.clientKeyName.Substring(3));
 					Xml.Append("\" xmlns=\"");
-					Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
+					Xml.Append(this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:"));
 				}
 				else
 				{
@@ -403,7 +403,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(" pub=\"");
 					Xml.Append(Convert.ToBase64String(this.clientPubKey));
 					Xml.Append("\" xmlns=\"");
-					Xml.Append(EndpointSecurity.IoTHarmonizationE2E);
+					Xml.Append(this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:"));
 				}
 
 				Xml.Append("\"/></clientPublicKey>");
@@ -528,7 +528,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return RsaEndpoint.Verify(Data, Signature, KeySize, this.clientPubKey);
 			}
 			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
-				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint Endpoint) &&
+				this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:","urn:nf:"), out IE2eEndpoint Endpoint) &&
                 Endpoint is EllipticCurveEndpoint LocalEc)
 			{
 				return LocalEc.Verify(Data, this.clientPubKey, Signature);

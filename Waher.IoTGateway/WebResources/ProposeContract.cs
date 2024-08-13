@@ -74,7 +74,7 @@ namespace Waher.IoTGateway.WebResources
 
 					StringBuilder sb = new StringBuilder();
 
-					Contract.NormalizeXml(ParsedContract.Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
+					Contract.NormalizeXml(ParsedContract.Contract.ForMachines, sb, ParsedContract.Contract.Namespace);
 
 					Doc = new XmlDocument()
 					{

@@ -70,7 +70,7 @@ namespace Waher.Utility.Sign
                                 throw new Exception("Missing cipher name.");
 
                             s = args[i++];
-                            if (!EndpointSecurity.TryCreateEndpoint(s, EndpointSecurity.IoTHarmonizationE2E, out Endpoint))
+                            if (!EndpointSecurity.TryCreateEndpoint(s, EndpointSecurity.IoTHarmonizationE2ECurrent, out Endpoint))
                                 throw new Exception("Algorithm not recognized: " + s);
 
                             break;
@@ -87,7 +87,7 @@ namespace Waher.Utility.Sign
                                 {
 									using IE2eEndpoint Endpoint2 = (IE2eEndpoint)Activator.CreateInstance(T);
 
-									if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2E)
+									if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2ECurrent)
 									{
 										if (Output is null)
 											Console.Out.WriteLine(Endpoint2.LocalName);
@@ -114,7 +114,7 @@ namespace Waher.Utility.Sign
                             if (Endpoint is EllipticCurveEndpoint EC)
                             {
                                 s = EC.Curve.Export();
-                                XmlDocument Doc = new XmlDocument()
+                                XmlDocument Doc = new()
                                 {
                                     PreserveWhitespace = true
                                 };
@@ -187,7 +187,7 @@ namespace Waher.Utility.Sign
                             else
                                 throw new Exception("Only one output file name allowed.");
 
-                            XmlWriterSettings Settings = new XmlWriterSettings()
+                            XmlWriterSettings Settings = new()
                             {
                                 CloseOutput = true,
                                 ConformanceLevel = ConformanceLevel.Document,
@@ -218,7 +218,7 @@ namespace Waher.Utility.Sign
 
                             string[] FileNames;
 
-                            if (s.Contains("*") || s.Contains("?"))
+                            if (s.Contains('*') || s.Contains('?'))
                             {
                                 s = Path.Combine(CurrentDirectory, s);
 

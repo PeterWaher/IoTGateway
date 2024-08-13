@@ -273,7 +273,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							StringBuilder sb = new StringBuilder();
 
-							if (EndpointReference.Namespace != EndpointSecurity.IoTHarmonizationE2E)
+							if (EndpointReference.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
 							{
 								sb.Append(EndpointReference.Namespace);
 								sb.Append('#');
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							IE2eSymmetricCipher SymmetricCipher = EndpointReference.DefaultSymmetricCipher;
 
-							if (SymmetricCipher.Namespace != EndpointSecurity.IoTHarmonizationE2E)
+							if (SymmetricCipher.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
 							{
 								sb.Append(SymmetricCipher.Namespace);
 								sb.Append('#');

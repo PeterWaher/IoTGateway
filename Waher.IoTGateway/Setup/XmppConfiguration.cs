@@ -774,10 +774,10 @@ namespace Waher.IoTGateway.Setup
 
 								e = await Client.ServiceDiscoveryAsync(null, Item.JID, string.Empty);
 
-								if (e.HasFeature(Networking.XMPP.Provisioning.ThingRegistryClient.NamespaceDiscovery))
+								if (e.HasAnyFeature(Networking.XMPP.Provisioning.ThingRegistryClient.NamespacesDiscovery))
 									this.thingRegistry = Item.JID;
 
-								if (e.HasFeature(Networking.XMPP.Provisioning.ProvisioningClient.NamespaceProvisioningDevice))
+								if (e.HasAnyFeature(Networking.XMPP.Provisioning.ProvisioningClient.NamespacesProvisioningDevice))
 									this.provisioning = Item.JID;
 
 								if (e.HasFeature(Networking.XMPP.MUC.MultiUserChatClient.NamespaceMuc))
@@ -789,10 +789,10 @@ namespace Waher.IoTGateway.Setup
 								if (e.HasFeature(Waher.Events.XMPP.XmppEventSink.NamespaceEventLogging))
 									this.events = Item.JID;
 
-								if (e.HasFeature(Networking.XMPP.Contracts.ContractsClient.NamespaceLegalIdentities))
+								if (e.HasAnyFeature(Networking.XMPP.Contracts.ContractsClient.NamespacesLegalIdentities))
 									this.legal = Item.JID;
 
-								if (e.HasFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespaceSoftwareUpdates))
+								if (e.HasAnyFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespacesSoftwareUpdates))
 									this.software = Item.JID;
 							}
 						}

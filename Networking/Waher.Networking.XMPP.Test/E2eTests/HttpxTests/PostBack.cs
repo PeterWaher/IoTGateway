@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 	internal class PostBack : HttpSynchronousResource, IPostResource, IHttpPostMethod
 	{
 		private Cache<string, KeyValuePair<PostBackEventHandler, object>> queries = null;
-		private readonly object synchObj = new object();
+		private readonly object synchObj = new();
 		private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		public PostBack()
@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			lock (this.synchObj)
 			{
-				rnd.GetBytes(Bin);
+				this.rnd.GetBytes(Bin);
 				Key = Base64Url.Encode(Bin);
 
 				if (this.queries is null)
@@ -44,14 +44,14 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				this.queries[string.Empty] = new KeyValuePair<PostBackEventHandler, object>(null, null);    // Keep cache active to avoid multiple recreation when a series of requests occur in sequence.
 			}
 
-			return "http://localhost:8080" + this.ResourceName + "/" + Key;
+			return "http://localhost:8081" + this.ResourceName + "/" + Key;
 		}
 
 		private void Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<PostBackEventHandler, object>> e)
 		{
 			lock (this.synchObj)
 			{
-				if (!(this.queries is null) && this.queries.Count == 0)
+				if (this.queries is not null && this.queries.Count == 0)
 				{
 					this.queries.Dispose();
 					this.queries = null;
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			if (!string.IsNullOrEmpty(Referer) && (i = Referer.IndexOf(':')) >= 0)
 			{
-				EndpointReference = Referer.Substring(0, i);
+				EndpointReference = Referer[..i];
 				SymmetricCipherReference = Referer[(i + 1)..];
 			}
 			else

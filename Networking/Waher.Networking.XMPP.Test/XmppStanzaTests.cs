@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_01_ChatMessage()
 		{
 			this.ConnectClients();
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (sender, e) =>
 			{
 				Done.Set();
@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_02_ChatMessageWithSubject()
 		{
 			this.ConnectClients();
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (sender, e) =>
 			{
 				Done.Set();
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_03_ChatMessageWithSubjectAndLanguage()
 		{
 			this.ConnectClients();
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (sender, e) =>
 			{
 				Done.Set();
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_04_Presence()
 		{
 			this.ConnectClients();
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			this.client1.OnPresence += (sender, e) =>
 			{
 				if (e.From == this.client2.FullJID && e.Availability == Availability.Chat)
@@ -74,8 +74,8 @@ namespace Waher.Networking.XMPP.Test
 			if (Item1 is null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
 				Item2 is null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
 			{
-				ManualResetEvent Done2 = new ManualResetEvent(false);
-				ManualResetEvent Error2 = new ManualResetEvent(false);
+				ManualResetEvent Done2 = new(false);
+				ManualResetEvent Error2 = new(false);
 
 				this.client2.OnPresenceSubscribe += (sender, e) =>
 				{

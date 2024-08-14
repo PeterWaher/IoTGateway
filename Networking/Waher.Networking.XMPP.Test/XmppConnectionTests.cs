@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +12,7 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppConnectionTests
 	{
-		protected static ConsoleEventSink sink = null;
+		private static ConsoleEventSink sink = null;
 		protected AutoResetEvent connected = new(false);
 		protected AutoResetEvent error = new(false);
 		protected AutoResetEvent offline = new(false);
@@ -235,8 +234,16 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.WaitConnected(10000);
 
+			this.permittedExceptionType = typeof(OperationCanceledException);
+
 			this.client.HardOffline();
 			this.WaitOffline(10000);
+
+			Thread.Sleep(100);
+
+			this.offline.Reset();
+			this.error.Reset();
+			this.connected.Reset();
 
 			this.client.Reconnect();
 			this.WaitConnected(10000);

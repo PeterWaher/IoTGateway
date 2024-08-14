@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
@@ -43,8 +42,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.client2.OnNormalMessage += (sender, e) =>
 				{
@@ -110,15 +109,15 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.client2.RegisterIqGetHandler("test", "testns", (sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
-						!(e.E2eEncryption is null) &&
+						e.E2eEncryption is not null &&
 						!string.IsNullOrEmpty(e.E2eReference) &&
-						!(e.E2eSymmetricCipher is null) &&
+						e.E2eSymmetricCipher is not null &&
 						e.Query.InnerText == Check)
 					{
 						e.IqResult("<test xmlns='testns'>World</test>");
@@ -133,11 +132,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 					this.client2.FullJID, "<test xmlns='testns'>" + Send + "</test>", (sender, e) =>
 					{
 						if (e.UsesE2eEncryption &&
-							!(e.E2eEncryption is null) &&
+							e.E2eEncryption is not null &&
 							!string.IsNullOrEmpty(e.E2eReference) &&
-							!(e.E2eSymmetricCipher is null) &&
+							e.E2eSymmetricCipher is not null &&
 							e.Ok == ExpectOk &&
-							(!ExpectOk || (!(e.FirstElement is null) &&
+							(!ExpectOk || (e.FirstElement is not null &&
 							e.FirstElement.LocalName == "test" &&
 							e.FirstElement.NamespaceURI == "testns" &&
 							e.FirstElement.InnerText == "World")))
@@ -193,15 +192,15 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.client2.RegisterIqSetHandler("test", "testns", (sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
-						!(e.E2eEncryption is null) &&
+						e.E2eEncryption is not null &&
 						!string.IsNullOrEmpty(e.E2eReference) &&
-						!(e.E2eSymmetricCipher is null) &&
+						e.E2eSymmetricCipher is not null &&
 						e.Query.InnerText == "Hello")
 					{
 						e.IqResult("<test xmlns='testns'>World</test>");
@@ -215,11 +214,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
 					this.client2.FullJID, "<test xmlns='testns'>Hello</test>", (sender, e) =>
 					{
-						if (!(e.E2eEncryption is null) &&
+						if (e.E2eEncryption is not null &&
 							!string.IsNullOrEmpty(e.E2eReference) &&
-							!(e.E2eSymmetricCipher is null) &&
+							e.E2eSymmetricCipher is not null &&
 							e.Ok &&
-							!(e.FirstElement is null) &&
+							e.FirstElement is not null &&
 							e.FirstElement.LocalName == "test" &&
 							e.FirstElement.NamespaceURI == "testns" &&
 							e.FirstElement.InnerText == "World")
@@ -275,25 +274,25 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[TestMethod]
 		public void Test_13_Binary_AES()
 		{
-			this.Test_Binary(this.GenerateEndpoint(new Aes256()),
+			Test_Binary(this.GenerateEndpoint(new Aes256()),
 				this.GenerateEndpoint(new Aes256()));
 		}
 
 		[TestMethod]
 		public void Test_14_Binary_ChaCha20()
 		{
-			this.Test_Binary(this.GenerateEndpoint(new ChaCha20()),
+			Test_Binary(this.GenerateEndpoint(new ChaCha20()),
 				this.GenerateEndpoint(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public void Test_15_Binary_AEAD_ChaCha20_Poly1305()
 		{
-			this.Test_Binary(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
+			Test_Binary(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
 				this.GenerateEndpoint(new AeadChaCha20Poly1305()));
 		}
 
-		private void Test_Binary(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
+		private static void Test_Binary(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
 		{
 			byte[] Data = new byte[1024];
 			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
@@ -318,27 +317,27 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[TestMethod]
 		public Task Test_16_Stream_AES()
 		{
-			return this.Test_Stream(this.GenerateEndpoint(new Aes256()),
+			return Test_Stream(this.GenerateEndpoint(new Aes256()),
 				this.GenerateEndpoint(new Aes256()));
 		}
 
 		[TestMethod]
 		public Task Test_17_Stream_ChaCha20()
 		{
-			return this.Test_Stream(this.GenerateEndpoint(new ChaCha20()),
+			return Test_Stream(this.GenerateEndpoint(new ChaCha20()),
 				this.GenerateEndpoint(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public Task Test_18_Stream_AEAD_ChaCha20_Poly1305()
 		{
-			return this.Test_Stream(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
+			return Test_Stream(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
 				this.GenerateEndpoint(new AeadChaCha20Poly1305()));
 		}
 
-		private async Task Test_Stream(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
+		private static async Task Test_Stream(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
 		{
-			MemoryStream Data = new MemoryStream();
+			MemoryStream Data = new();
 			byte[] Temp = new byte[1024];
 			byte[] Temp2 = new byte[1024];
 			int i;
@@ -352,7 +351,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				}
 			}
 
-			MemoryStream Encrypted = new MemoryStream();
+			MemoryStream Encrypted = new();
 
 			Data.Position = 0;
 			await Endpoint1.DefaultSymmetricCipher.Encrypt(

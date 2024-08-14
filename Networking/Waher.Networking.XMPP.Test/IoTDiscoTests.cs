@@ -106,7 +106,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_1(Operators);
+			Test_SearchUri_1(Operators);
 		}
 
 		[TestMethod]
@@ -116,12 +116,12 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_1(Operators);
+			Test_SearchUri_1(Operators);
 		}
 
-		private void Test_SearchUri_1(IEnumerable<SearchOperator> Operators)
+		private static void Test_SearchUri_1(IEnumerable<SearchOperator> Operators)
 		{ 
-			Dictionary<string, bool> Tags = new Dictionary<string, bool>();
+			Dictionary<string, bool> Tags = new();
 
 			foreach (SearchOperator Op in Operators)
 			{
@@ -185,7 +185,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_2(Operators);
+			Test_SearchUri_2(Operators);
 		}
 
 		[TestMethod]
@@ -195,12 +195,12 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_2(Operators);
+			Test_SearchUri_2(Operators);
 		}
 
-		private void Test_SearchUri_2(IEnumerable<SearchOperator> Operators)
+		private static void Test_SearchUri_2(IEnumerable<SearchOperator> Operators)
 		{ 
-			Dictionary<string, bool> Tags = new Dictionary<string, bool>();
+			Dictionary<string, bool> Tags = new();
 
 			foreach (SearchOperator Op in Operators)
 			{
@@ -318,7 +318,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_3(Operators);
+			Test_SearchUri_3(Operators);
 		}
 
 		[TestMethod]
@@ -328,12 +328,12 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(ThingRegistryClient.IsIoTDiscoClaimURI(Uri));
 			Assert.IsTrue(ThingRegistryClient.IsIoTDiscoSearchURI(Uri));
 			IEnumerable<SearchOperator> Operators = ThingRegistryClient.DecodeIoTDiscoURI(Uri);
-			this.Test_SearchUri_3(Operators);
+			Test_SearchUri_3(Operators);
 		}
 
-		private void Test_SearchUri_3(IEnumerable<SearchOperator> Operators)
+		private static void Test_SearchUri_3(IEnumerable<SearchOperator> Operators)
 		{
-			Dictionary<string, bool> Tags = new Dictionary<string, bool>();
+			Dictionary<string, bool> Tags = new();
 
 			foreach (SearchOperator Op in Operators)
 			{

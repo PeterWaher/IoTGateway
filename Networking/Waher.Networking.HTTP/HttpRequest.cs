@@ -29,6 +29,7 @@ namespace Waher.Networking.HTTP
 		private Guid? requestId = null;
 		internal HttpClientConnection clientConnection = null;
 		internal bool tempSession = false;
+		internal bool defaultEncrypted = false;
 
 		/// <summary>
 		/// Represents an HTTP request.
@@ -40,12 +41,28 @@ namespace Waher.Networking.HTTP
 		/// <param name="LocalEndPoint">Local end-point.</param>
 		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
 			string LocalEndPoint)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false)
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP request.
+		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
+		/// <param name="Header">HTTP Request header.</param>
+		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		/// <param name="DefaultEncrypted">If underlying transport is encrypted by default.</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint, bool DefaultEncrypted)
 		{
 			this.server = Server;
 			this.header = Header;
 			this.dataStream = Data;
 			this.remoteEndPoint = RemoteEndPoint;
 			this.localEndPoint = LocalEndPoint;
+			this.defaultEncrypted = DefaultEncrypted;
 
 			if (!(this.dataStream is null))
 				this.dataStream.Position = 0;
@@ -200,7 +217,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the connection is encrypted or not.
 		/// </summary>
-		public bool Encrypted => false;
+		public bool Encrypted => this.defaultEncrypted;
 
 		/// <summary>
 		/// Cipher strength
@@ -220,7 +237,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the connection is encrypted or not.
 		/// </summary>
-		public bool Encrypted => this.clientConnection?.Encrypted ?? false;
+		public bool Encrypted => this.clientConnection?.Encrypted ?? this.defaultEncrypted;
 
 		/// <summary>
 		/// Cipher strength

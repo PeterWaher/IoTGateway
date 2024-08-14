@@ -191,8 +191,8 @@ namespace Waher.Networking.XMPP.HTTPX
 									}
 
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
-										new HttpRequest(this.server, Header, File, e.From, e.To), e.E2eEncryption, e.E2eReference, File, 
-                                        MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));
+										new HttpRequest(this.server, Header, File, e.From, e.To, e.UsesE2eEncryption), 
+										e.E2eEncryption, e.E2eReference, File, MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));
 									return;
 
 								case "sipub":
@@ -222,8 +222,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.server.VanityResources, HeaderFields.ToArray());
 			}
 
-			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To), e.E2eEncryption, e.E2eReference,
-				MaxChunkSize, PostResource, Ibb, Socks5);
+			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To, e.UsesE2eEncryption), 
+				e.E2eEncryption, e.E2eReference, MaxChunkSize, PostResource, Ibb, Socks5);
 		}
 
 		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, 

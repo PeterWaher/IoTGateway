@@ -23,10 +23,13 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.webServer = new HttpServer(8080);
+			this.webServer = new HttpServer(8081);
 
 			this.webServer.Register("/Hello", (Request, Response) =>
 			{
+				if (!Request.Encrypted)
+					throw new BadRequestException("Request must be encrypted.");
+
 				Response.ContentType = PlainTextCodec.DefaultContentType;
 				Response.Write("World");
 				return Response.SendResponse();
@@ -34,6 +37,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			this.webServer.Register("/Echo", null, async (Request, Response) =>
 			{
+				if (!Request.Encrypted)
+					throw new BadRequestException("Request must be encrypted.");
+
 				if (!Request.HasData)
 					throw new BadRequestException("No data.");
 
@@ -82,7 +88,10 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		{
 			base.PrepareClient2(Client);
 			this.httpxClient2 = new HttpxClient(Client, this.endpointSecurity2, 8192);
-			this.httpxServer = new HttpxServer(Client, this.webServer, 8192);
+			this.httpxServer = new HttpxServer(Client, this.webServer, 8192)
+			{
+				RequiresE2e = true
+			};
 		}
 
 		public override void DisposeClients()
@@ -107,10 +116,10 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 		private void DoGet(int Nr)
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 			MemoryStream ms = null;
 			string ContentType = null;
 
@@ -121,7 +130,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					{
 						ms = new MemoryStream();
 
-						if (!(e.Data is null))
+						if (e.Data is not null)
 							ms.Write(e.Data, 0, e.Data.Length);
 
 						ContentType = e.HttpResponse.ContentType;
@@ -154,7 +163,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestMethod]
 		public void HTTPX_Test_02_GET_PostBack()
 		{
-			PostBack PostBack = new PostBack();
+			PostBack PostBack = new();
 
 			this.webServer.Register(PostBack);
 			this.httpxClient1.PostResource = PostBack;
@@ -170,10 +179,10 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 		private async Task DoPost(int Nr)
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 			MemoryStream ms = null;
 			string ContentType = null;
 			byte[] Bin = new byte[1024 * 1024];
@@ -193,7 +202,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					{
 						ms = new MemoryStream();
 
-						if (!(e.Data is null))
+						if (e.Data is not null)
 							ms.Write(e.Data, 0, e.Data.Length);
 
 						ContentType = e.HttpResponse.ContentType;
@@ -226,7 +235,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestMethod]
 		public async Task HTTPX_Test_04_POST_PostBack()
 		{
-			PostBack PostBack = new PostBack();
+			PostBack PostBack = new();
 
 			this.webServer.Register(PostBack);
 			this.httpxClient1.PostResource = PostBack;

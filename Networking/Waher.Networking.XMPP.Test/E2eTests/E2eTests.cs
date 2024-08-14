@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.P2P;
@@ -29,19 +28,20 @@ namespace Waher.Networking.XMPP.Test.E2eTests
         {
             base.ConnectClients();
 
-            this.SubscribedTo(this.client1, this.client2);
-            this.SubscribedTo(this.client2, this.client1);
-        }
+			SubscribedTo(this.client1, this.client2);
+			SubscribedTo(this.client2, this.client1);
+		}
 
-        private void SubscribedTo(XmppClient From, XmppClient To)
+		private static void SubscribedTo(XmppClient From, XmppClient To)
         {
             RosterItem Item1 = From.GetRosterItem(To.BareJID);
             RosterItem Item2 = To.GetRosterItem(From.BareJID);
+
             if (Item1 is null || (Item1.State != SubscriptionState.Both && Item1.State != SubscriptionState.To) ||
                 Item2 is null || (Item2.State != SubscriptionState.Both && Item2.State != SubscriptionState.From))
             {
-                ManualResetEvent Done2 = new ManualResetEvent(false);
-                ManualResetEvent Error2 = new ManualResetEvent(false);
+                ManualResetEvent Done2 = new(false);
+                ManualResetEvent Error2 = new(false);
 
                 To.OnPresenceSubscribe += (sender, e) =>
                 {

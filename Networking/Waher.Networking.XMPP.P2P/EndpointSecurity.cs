@@ -1008,14 +1008,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If a symmetric cipher was found with the given name.</returns>
 		public virtual bool TryGetSymmetricCipher(string LocalName, string Namespace, out IE2eSymmetricCipher Cipher)
 		{
-			if (string.IsNullOrEmpty(Namespace))
+			switch (LocalName)
 			{
-				switch (LocalName)
-				{
-					case "aes": Cipher = this.aes; return true;
-					case "acp": Cipher = this.acp; return true;
-					case "cha": Cipher = this.cha; return true;
-				}
+				case "aes": Cipher = this.aes; return true;
+				case "acp": Cipher = this.acp; return true;
+				case "cha": Cipher = this.cha; return true;
 			}
 
 			Cipher = null;
@@ -1257,11 +1254,41 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Method to call when message has been delivered.</param>
 		/// <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
-		public virtual void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
+		public void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
 			MessageType Type, string Id, string To, string CustomXml, string Body, string Subject,
 			string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback,
 			object State)
 		{
+			this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
+				Language, ThreadId, ParentThreadId, DeliveryCallback, State, false);
+		}
+
+		/// <summary>
+		/// Sends an XMPP message to an endpoint.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="QoS">Quality of Service options</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="CustomXml">Custom XML</param>
+		/// <param name="Body">Message body</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		/// <param name="DeliveryCallback">Method to call when message has been delivered.</param>
+		/// <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
+		/// <param name="PkiSynchronized">If E2E parameters have been synchronized</param>
+		private void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
+			MessageType Type, string Id, string To, string CustomXml, string Body, string Subject,
+			string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback,
+			object State, bool PkiSynchronized)
+		{
+			if (this.client is null)
+				throw new ObjectDisposedException("Endpoint security object disposed.");
+
 			if (string.IsNullOrEmpty(Id))
 				Id = Client.NextId();
 
@@ -1366,19 +1393,43 @@ namespace Waher.Networking.XMPP.P2P
 					return;
 			}
 
-			switch (E2ETransmission)
+			if (E2ETransmission == E2ETransmission.IgnoreIfNotE2E)
+				return;
+
+			if (!PkiSynchronized)
 			{
-				case E2ETransmission.AssertE2E:
-					throw new InvalidOperationException("End-to-End Encryption not available.");
-
-				case E2ETransmission.NormalIfNotE2E:
-					Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
-						ThreadId, ParentThreadId, DeliveryCallback, State);
-					break;
-
-				case E2ETransmission.IgnoreIfNotE2E:
-					break;
+				this.SynchronizeE2e(To, async (Sender, e) =>
+				{
+					if (e.Ok)
+					{
+						this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
+							Language, ThreadId, ParentThreadId, DeliveryCallback, State, true);
+					}
+					else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
+					{
+						Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
+							ThreadId, ParentThreadId, DeliveryCallback, State);
+					}
+					else if (!(DeliveryCallback is null))
+					{
+						try
+						{
+							await DeliveryCallback(Sender, new DeliveryEventArgs(State, false));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+				}, State);
 			}
+			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
+			{
+				Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
+					ThreadId, ParentThreadId, DeliveryCallback, State);
+			}
+			else
+				throw new InvalidOperationException("End-to-End Encryption not available between " + Client.FullJID + " and " + To + ".");
 		}
 
 		/// <summary>
@@ -1582,21 +1633,56 @@ namespace Waher.Networking.XMPP.P2P
 					RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
 			}
 
-			switch (E2ETransmission)
+			if (E2ETransmission == E2ETransmission.IgnoreIfNotE2E)
 			{
-				case E2ETransmission.AssertE2E:
-					throw new InvalidOperationException("End-to-End Encryption not available between " + Client.FullJID + " and " + To + ".");
-
-				case E2ETransmission.NormalIfNotE2E:
-					return Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
-
-				case E2ETransmission.IgnoreIfNotE2E:
-				default:
-					if (uint.TryParse(Id, out uint SeqNr))
-						return SeqNr;
-					else
-						return 0;
+				if (uint.TryParse(Id, out uint SeqNr))
+					return SeqNr;
+				else
+					return 0;
 			}
+
+			if (!PkiSynchronized)
+			{
+				if (!uint.TryParse(Id, out uint SeqNr))
+				{
+					Id = Client.NextId();
+					SeqNr = uint.Parse(Id);
+				}
+
+				this.SynchronizeE2e(To, async (Sender, e) =>
+				{
+					if (e.Ok)
+					{
+						this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
+							RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, true);
+					}
+					else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
+					{
+						Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
+							NrRetries, DropOff, MaxRetryTimeout);
+					}
+					else if (!(Callback is null))
+					{
+						try
+						{
+							await Callback(Sender, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+				}, State);
+
+				return SeqNr;
+			}
+			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
+			{
+				return Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout, 
+					NrRetries, DropOff, MaxRetryTimeout);
+			}
+			else
+				throw new InvalidOperationException("End-to-End Encryption not available between " + Client.FullJID + " and " + To + ".");
 		}
 
 		/// <summary>
@@ -1720,6 +1806,17 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Callback">Method to call when response is returned.</param>
 		public void SynchronizeE2e(string FullJID, IqResultEventHandlerAsync Callback)
 		{
+			this.SynchronizeE2e(FullJID, Callback, null);
+		}
+
+		/// <summary>
+		/// Synchronizes End-to-End Encryption and Peer-to-Peer connectivity parameters with a remote entity.
+		/// </summary>
+		/// <param name="FullJID">Full JID of remote entity.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SynchronizeE2e(string FullJID, IqResultEventHandlerAsync Callback, object State)
+		{
 			this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
 			{
 				if (e.Ok && !(e.FirstElement is null))
@@ -1736,7 +1833,7 @@ namespace Waher.Networking.XMPP.P2P
 						Log.Critical(ex);
 					}
 				}
-			}, null);
+			}, State);
 		}
 
 		private string GetE2eXml()

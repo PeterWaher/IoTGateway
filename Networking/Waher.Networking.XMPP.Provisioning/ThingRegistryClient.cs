@@ -1767,6 +1767,17 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <returns>If <paramref name="Operators"/> is a search URI.</returns>
 		public static bool IsIoTDiscoSearchURI(IEnumerable<SearchOperator> Operators)
 		{
+			return IsIoTDiscoSearchURI(Operators, false);
+		}
+
+		/// <summary>
+		/// Checks if a URI is a search URI.
+		/// </summary>
+		/// <param name="Operators">Tag operators in URI</param>
+		/// <param name="RequireRegistry">If a registry is required.</param>
+		/// <returns>If <paramref name="Operators"/> is a search URI.</returns>
+		public static bool IsIoTDiscoSearchURI(IEnumerable<SearchOperator> Operators, bool RequireRegistry)
+		{
 			bool HasRegistry = false;
 
 			foreach (SearchOperator Op in Operators)
@@ -1789,7 +1800,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 			}
 
-			return HasRegistry;
+			return !RequireRegistry || HasRegistry;
 		}
 
 		/// <summary>

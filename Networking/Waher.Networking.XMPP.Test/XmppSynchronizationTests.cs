@@ -30,13 +30,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public override void DisposeClients()
 		{
-			if (!(this.synchronizationClient2 is null))
+			if (this.synchronizationClient2 is not null)
 			{
 				this.synchronizationClient2.Dispose();
 				this.synchronizationClient2 = null;
 			}
 
-			if (!(this.synchronizationClient1 is null))
+			if (this.synchronizationClient1 is not null)
 			{
 				this.synchronizationClient1.Dispose();
 				this.synchronizationClient1 = null;
@@ -90,140 +90,136 @@ namespace Waher.Networking.XMPP.Test
 
 		private void Monitor(string Source, int RecordsLeft, int IntervalMs, string FileName)
 		{
-			using (StreamWriter w = File.CreateText(FileName))
+			using StreamWriter w = File.CreateText(FileName);
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			double HfToMs = 1e3 / this.synchronizationClient1.HfFrequency;
+
+			w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)\tRaw HF Latency (ms)\tRaw HF Difference (ms)\tHF Latency Spike\tHF Difference Spike\tFiltered HF Latency (ms)\tFiltered HF Difference (ms)\tAvg HF Latency (ms)\tAvg HF Difference (ms)");
+
+			this.synchronizationClient1.OnUpdated += (sender, e) =>
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
-				double HfToMs = 1e3 / this.synchronizationClient1.HfFrequency;
-
-				w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)\tRaw HF Latency (ms)\tRaw HF Difference (ms)\tHF Latency Spike\tHF Difference Spike\tFiltered HF Latency (ms)\tFiltered HF Difference (ms)\tAvg HF Latency (ms)\tAvg HF Difference (ms)");
-
-				this.synchronizationClient1.OnUpdated += (sender, e) =>
-				{
-					try
-					{
-						DateTime TP = DateTime.Now;
-
-						w.Write(TP.Date.ToShortDateString());
-						w.Write("\t");
-						w.Write(TP.ToLongTimeString());
-						w.Write("\t");
-						if (this.synchronizationClient1.RawLatency100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.RawLatency100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.RawClockDifference100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.LatencySpikeRemoved.HasValue)
-							w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved.Value));
-						w.Write("\t");
-						if (this.synchronizationClient1.ClockDifferenceSpikeRemoved.HasValue)
-							w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved.Value));
-						w.Write("\t");
-						if (this.synchronizationClient1.FilteredLatency100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.FilteredClockDifference100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.AvgLatency100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.AvgLatency100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.AvgClockDifference100Ns.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns.Value * 1e-4));
-						w.Write("\t");
-						if (this.synchronizationClient1.RawLatencyHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.RawLatencyHf.Value * HfToMs));
-						w.Write("\t");
-						if (this.synchronizationClient1.RawClockDifferenceHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifferenceHf.Value * HfToMs));
-						w.Write("\t");
-						if (this.synchronizationClient1.LatencyHfSpikeRemoved.HasValue)
-							w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencyHfSpikeRemoved.Value));
-						w.Write("\t");
-						if (this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.HasValue)
-							w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.Value));
-						w.Write("\t");
-						if (this.synchronizationClient1.FilteredLatencyHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatencyHf.Value * HfToMs));
-						w.Write("\t");
-						if (this.synchronizationClient1.FilteredClockDifferenceHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifferenceHf.Value * HfToMs));
-						w.Write("\t");
-						if (this.synchronizationClient1.AvgLatencyHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.AvgLatencyHf.Value * HfToMs));
-						w.Write("\t");
-						if (this.synchronizationClient1.AvgClockDifferenceHf.HasValue)
-							w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifferenceHf.Value * HfToMs));
-
-						w.WriteLine();
-
-						if (--RecordsLeft == 0)
-							Done.Set();
-					}
-					catch (Exception ex)
-					{
-						Console.Out.WriteLine(ex.Message);
-						Console.Out.WriteLine(Log.CleanStackTrace(ex.StackTrace));
-						Error.Set();
-					}
-				};
-
-				this.synchronizationClient1.MonitorClockDifference(Source, 1000);
 				try
 				{
-					this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
-					{
-						if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
-							Error.Set();
-					}, null);
+					DateTime TP = DateTime.Now;
 
-					Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
+					w.Write(TP.Date.ToShortDateString());
+					w.Write("\t");
+					w.Write(TP.ToLongTimeString());
+					w.Write("\t");
+					if (this.synchronizationClient1.RawLatency100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.RawLatency100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.RawClockDifference100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifference100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.LatencySpikeRemoved.HasValue)
+						w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencySpikeRemoved.Value));
+					w.Write("\t");
+					if (this.synchronizationClient1.ClockDifferenceSpikeRemoved.HasValue)
+						w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceSpikeRemoved.Value));
+					w.Write("\t");
+					if (this.synchronizationClient1.FilteredLatency100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatency100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.FilteredClockDifference100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifference100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.AvgLatency100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.AvgLatency100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.AvgClockDifference100Ns.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifference100Ns.Value * 1e-4));
+					w.Write("\t");
+					if (this.synchronizationClient1.RawLatencyHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.RawLatencyHf.Value * HfToMs));
+					w.Write("\t");
+					if (this.synchronizationClient1.RawClockDifferenceHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.RawClockDifferenceHf.Value * HfToMs));
+					w.Write("\t");
+					if (this.synchronizationClient1.LatencyHfSpikeRemoved.HasValue)
+						w.Write(CommonTypes.Encode(this.synchronizationClient1.LatencyHfSpikeRemoved.Value));
+					w.Write("\t");
+					if (this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.HasValue)
+						w.Write(CommonTypes.Encode(this.synchronizationClient1.ClockDifferenceHfSpikeRemoved.Value));
+					w.Write("\t");
+					if (this.synchronizationClient1.FilteredLatencyHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.FilteredLatencyHf.Value * HfToMs));
+					w.Write("\t");
+					if (this.synchronizationClient1.FilteredClockDifferenceHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.FilteredClockDifferenceHf.Value * HfToMs));
+					w.Write("\t");
+					if (this.synchronizationClient1.AvgLatencyHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.AvgLatencyHf.Value * HfToMs));
+					w.Write("\t");
+					if (this.synchronizationClient1.AvgClockDifferenceHf.HasValue)
+						w.Write(Expression.ToString(this.synchronizationClient1.AvgClockDifferenceHf.Value * HfToMs));
+
+					w.WriteLine();
+
+					if (--RecordsLeft == 0)
+						Done.Set();
 				}
-				finally
+				catch (Exception ex)
 				{
-					this.synchronizationClient1.Stop();
-					w.Flush();
+					Console.Out.WriteLine(ex.Message);
+					Console.Out.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+					Error.Set();
 				}
+			};
+
+			this.synchronizationClient1.MonitorClockDifference(Source, IntervalMs);
+			try
+			{
+				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
+				{
+					if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
+						Error.Set();
+				}, null);
+
+				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
+			}
+			finally
+			{
+				this.synchronizationClient1.Stop();
+				w.Flush();
 			}
 		}
 
 		[TestMethod]
 		public void Control_Test_05_DateTime_Resolution()
 		{
-			using (StreamWriter w = File.CreateText("DateTimeResolution.tsv"))
+			using StreamWriter w = File.CreateText("DateTimeResolution.tsv");
+			Stopwatch Watch = new();
+			int RecordsLeft = 1000;
+			DateTime TP0 = DateTime.Now;
+			DateTime TP = TP0;
+			DateTime TP2;
+			long Ticks;
+			long TP0Ticks = TP0.Ticks;
+
+			Watch.Start();
+
+			w.WriteLine("Time\tTicks\tHF\tFrequency");
+
+			while (RecordsLeft-- > 0)
 			{
-				Stopwatch Watch = new Stopwatch();
-				int RecordsLeft = 1000;
-				DateTime TP0 = DateTime.Now;
-				DateTime TP = TP0;
-				DateTime TP2;
-				long Ticks;
-				long TP0Ticks = TP0.Ticks;
+				while ((TP2 = DateTime.Now).Ticks == TP.Ticks)
+					;
 
-				Watch.Start();
+				Ticks = Watch.ElapsedTicks;
+				w.WriteLine(
+					TP2.ToLongTimeString() + "." + TP2.Millisecond.ToString("D3") + "\t" +
+					(TP2.Ticks - TP0Ticks).ToString() + "\t" +
+					Ticks.ToString() + "\t" +
+					Stopwatch.Frequency.ToString());
 
-				w.WriteLine("Time\tTicks\tHF\tFrequency");
-
-				while (RecordsLeft-- > 0)
-				{
-					while ((TP2 = DateTime.Now).Ticks == TP.Ticks)
-						;
-
-					Ticks = Watch.ElapsedTicks;
-					w.WriteLine(
-						TP2.ToLongTimeString() + "." + TP2.Millisecond.ToString("D3") + "\t" +
-						(TP2.Ticks - TP0Ticks).ToString() + "\t" +
-						Ticks.ToString() + "\t" +
-						Stopwatch.Frequency.ToString());
-
-					TP = TP2;
-				}
-
-				Watch.Stop();
-
-				w.Flush();
+				TP = TP2;
 			}
+
+			Watch.Stop();
+
+			w.Flush();
 		}
 
 		[TestMethod]

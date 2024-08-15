@@ -52,13 +52,15 @@ namespace Waher.Networking.CoAP.Test
 		public void LWM2M_Read_Test_01_WaitForReboot()
 		{
 			ManualResetEvent Done = new(false);
+			ManualResetEvent Timeout = new(false);
 
 			this.lwm2mClient.OnRebootRequest += (sender, e) => Done.Set();
 			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipse.org", 5783));
 
-			Done.WaitOne(int.MaxValue);
-		}
+			Task.Delay(10000).ContinueWith((_) => Timeout.Set());
 
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Timeout }));
+		}
 
 	}
 }

@@ -120,7 +120,7 @@ namespace Waher.Runtime.Queue
 
 			this.RaiseDisposed();
 			
-			return Task.FromResult<T>(Item);
+			return Task.FromResult(Item);
 		}
 
 		/// <summary>

@@ -36,11 +36,11 @@ namespace Waher.Events.Socket.Test
 			eventsReceived = new AsyncQueue<Event>();
 			customFragmentsReceived = new AsyncQueue<XmlDocument>();
 
-			eventListener = await SocketEventRecipient.Create(8080, false);
+			eventListener = await SocketEventRecipient.Create(8081, false);
 			eventListener.EventReceived += EventListener_EventReceived;
 			eventListener.CustomFragmentReceived += EventListener_CustomFragmentReceived;
 
-			eventSink = new SocketEventSink("Event Sink", "localhost", 8080, false);
+			eventSink = new SocketEventSink("Event Sink", "localhost", 8081, false);
 			Log.Register(eventSink);
 		}
 

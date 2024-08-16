@@ -822,7 +822,8 @@ namespace Waher.Events
 				Type T = Exception.GetType();
 				if (Array.IndexOf(nestedExceptionTypes, T) < 0)
 				{
-					if (Exception is AggregateException AggregateException && AggregateException.InnerExceptions.Count == 1)
+					if (Exception is AggregateException AggregateException && 
+						AggregateException.InnerExceptions.Count == 1)
 					{
 						Exception = AggregateException.InnerExceptions[0];
 						continue;
@@ -1723,6 +1724,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Exception(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
+			Exception = UnnestException(Exception);
 			Event(GetEventType(Exception), Exception, Tags);
 		}
 

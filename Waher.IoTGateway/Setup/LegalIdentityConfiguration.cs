@@ -9,7 +9,6 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Content.Markdown;
-using Waher.Content.Xml;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.Networking.HTTP;
@@ -37,6 +36,10 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex ApplyLegalIdentityRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyLegalIdentity|[.+]<ApplyLegalIdentity>\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex ApplyIdRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyId|[.+]<ApplyId>\w*[.]\w*)",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex GenerateNewKeysRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient([.]GenerateNewKeys|[.+]<GenerateNewKeys>\w*[.]\w*)",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly object[] approvedSources = new object[]
@@ -54,7 +57,9 @@ namespace Waher.IoTGateway.Setup
 			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
 			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
 			ApplyLegalIdentityRegex,
+			ApplyIdRegex,
 			typeof(LegalIdentityConfiguration),
+			GenerateNewKeysRegex,
 			GetAttachmentRegex
 		};
 

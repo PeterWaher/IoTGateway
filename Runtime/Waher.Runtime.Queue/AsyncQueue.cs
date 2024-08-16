@@ -59,10 +59,38 @@ namespace Waher.Runtime.Queue
 		}
 
 		/// <summary>
-		/// Adds an item to the queue.
+		/// Adds an item last to the queue.
 		/// </summary>
 		/// <param name="Item">Item to add.</param>
 		public void Add(T Item)
+		{
+			this.Add(Item, false);
+		}
+
+		/// <summary>
+		/// Adds an item last to the queue.
+		/// </summary>
+		/// <param name="Item">Item to add.</param>
+		public void AddLast(T Item)
+		{
+			this.Add(Item, false);
+		}
+
+		/// <summary>
+		/// Adds an item first to the queue.
+		/// </summary>
+		/// <param name="Item">Item to add.</param>
+		public void AddFirst(T Item)
+		{
+			this.Add(Item, true);
+		}
+
+		/// <summary>
+		/// Adds an item to the queue.
+		/// </summary>
+		/// <param name="Item">Item to add.</param>
+		/// <param name="First">If item is to be added first in the queue.</param>
+		public void Add(T Item, bool First)
 		{
 			lock (this.synchObj)
 			{
@@ -71,7 +99,11 @@ namespace Waher.Runtime.Queue
 
 				if (this.subscribers.First is null)
 				{
-					this.queue.AddLast(Item);
+					if (First)
+						this.queue.AddFirst(Item);
+					else
+						this.queue.AddLast(Item);
+
 					this.countItems++;
 				}
 				else
@@ -114,13 +146,13 @@ namespace Waher.Runtime.Queue
 					if (this.terminated && this.queue.First is null)
 						this.disposed = true;
 					else
-						return Task.FromResult<T>(Item);
+						return Task.FromResult(Item);
 				}
 			}
 
 			this.RaiseDisposed();
 			
-			return Task.FromResult<T>(Item);
+			return Task.FromResult(Item);
 		}
 
 		/// <summary>

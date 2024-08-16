@@ -18,7 +18,12 @@ namespace Waher.Networking.XMPP
 		private readonly object state;
 		private readonly bool ok;
 
-		internal DeliveryEventArgs(object State, bool Ok)
+		/// <summary>
+		/// Event arguments for delivery events.
+		/// </summary>
+		/// <param name="State">State object</param>
+		///	<param name="Ok">If delivery was successful.</param>
+		public DeliveryEventArgs(object State, bool Ok)
 		{
 			this.state = State;
 			this.ok = Ok;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Model
+﻿namespace Waher.Script.Model
 {
 	/// <summary>
 	/// Base class for all unary operators performing operand null checks.
@@ -25,6 +23,11 @@ namespace Waher.Script.Model
 		{
 			this.nullCheck = NullCheck;
 		}
+
+		/// <summary>
+		/// If null check is to be used.
+		/// </summary>
+		public bool NullCheck => this.nullCheck;
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

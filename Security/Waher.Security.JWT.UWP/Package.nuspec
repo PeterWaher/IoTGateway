@@ -15,7 +15,7 @@
 		<copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</copyright>
 		<tags>security authentication jwt uwp</tags>
 		<dependencies>
-			<dependency id="Waher.Events" version="1.1.4"/>
+			<dependency id="Waher.Events" version="1.2.0"/>
 			<dependency id="Waher.Content" version="2.6.11"/>
 			<dependency id="Waher.Networking.HTTP.UWP" version="2.8.1"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.1.5"/>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Events;
 
@@ -219,7 +218,7 @@ namespace Waher.Security.CallStack
 				}
 			}
 
-			throw new UnauthorizedAccessException("Unauthorized access.");
+			throw new UnauthorizedCallstackException("Unauthorized access.");
 		}
 
 		private static bool IsMatch(Regex Regex, string s)

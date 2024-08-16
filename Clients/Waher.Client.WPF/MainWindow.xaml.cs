@@ -182,7 +182,6 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				ex = Log.UnnestException(ex);
 				Log.Exception(ex);
 				this.MainView.ShowStatus("Failure to initialize: " + ex.Message);
 				ErrorBox(ex.Message);

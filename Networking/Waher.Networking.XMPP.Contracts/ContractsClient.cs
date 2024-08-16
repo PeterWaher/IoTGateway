@@ -441,6 +441,11 @@ namespace Waher.Networking.XMPP.Contracts
 							await Database.Update(State);
 						}
 					}
+					catch (ItemNotFoundException)
+					{
+						await Database.Delete(State);
+						continue;
+					}
 					catch (Exception ex)
 					{
 						Log.Exception(ex, State.LegalId);

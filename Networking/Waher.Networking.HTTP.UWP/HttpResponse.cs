@@ -761,7 +761,7 @@ namespace Waher.Networking.HTTP
 						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 					}
 
-					IContentEncoding ContentEncoding = this.httpRequest.Header.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+					IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
 
 					if (this.contentLength.HasValue && ContentEncoding is null)
 					{

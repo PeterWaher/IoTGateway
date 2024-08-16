@@ -555,6 +555,9 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static async Task<TypeInformation> GetTypeInfoLocked(Type T, object Instance)
 		{
+			if (types is null)
+				throw new Exception("Full text search module not started, or in the process of being stopped.");
+
 			if (types.TryGetValue(T, out TypeInformation Result))
 				return Result;
 

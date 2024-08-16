@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Runtime.Inventory;
+using Waher.Security.CallStack;
 
 namespace Waher.IoTGateway.Console
 {
@@ -87,7 +88,8 @@ namespace Waher.IoTGateway.Console
 					typeof(OutOfMemoryException),
 					typeof(StackOverflowException),
 					typeof(AccessViolationException),
-					typeof(InsufficientMemoryException));
+					typeof(InsufficientMemoryException),
+					typeof(UnauthorizedCallstackException));
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));

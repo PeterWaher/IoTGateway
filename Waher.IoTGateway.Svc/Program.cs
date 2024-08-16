@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
@@ -8,17 +9,17 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking.XMPP.Provisioning;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Runtime.Inventory;
+using Waher.Events.Filter;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
-using System.Diagnostics;
 using Waher.Networking.HTTP.Brotli;
-using Waher.Events.Filter;
+using Waher.Networking.XMPP.Provisioning;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
+using Waher.Security.CallStack;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -154,7 +155,8 @@ namespace Waher.IoTGateway.Svc
 					typeof(OutOfMemoryException),
 					typeof(StackOverflowException),
 					typeof(AccessViolationException),
-					typeof(InsufficientMemoryException));
+					typeof(InsufficientMemoryException),
+					typeof(UnauthorizedCallstackException));
 
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));

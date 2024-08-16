@@ -1,35 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
-using Windows.UI.Core;
-using Windows.UI.Popups;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Waher.Content;
 using Waher.Events;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
-using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
-using Waher.Things;
-using Waher.Things.Gpio;
+using Waher.Security.CallStack;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
+using Windows.UI.Core;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 namespace Waher.IoTGateway.App
 {
@@ -45,7 +33,7 @@ namespace Waher.IoTGateway.App
 		public App()
 		{
 			this.InitializeComponent();
-			this.Suspending += OnSuspending;
+			this.Suspending += this.OnSuspending;
 		}
 
 		/// <summary>
@@ -62,7 +50,7 @@ namespace Waher.IoTGateway.App
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
 
-				rootFrame.NavigationFailed += OnNavigationFailed;
+				rootFrame.NavigationFailed += this.OnNavigationFailed;
 
 				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
 				{
@@ -96,7 +84,8 @@ namespace Waher.IoTGateway.App
 					typeof(OutOfMemoryException),
 					typeof(StackOverflowException),
 					typeof(AccessViolationException),
-					typeof(InsufficientMemoryException));
+					typeof(InsufficientMemoryException),
+					typeof(UnauthorizedCallstackException));
 
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -178,8 +167,8 @@ namespace Waher.IoTGateway.App
 
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
-				Gateway.GetMetaData += GetMetaData;
-				Gateway.OnTerminate += Gateway_OnTerminate;
+				Gateway.GetMetaData += this.GetMetaData;
+				Gateway.OnTerminate += this.Gateway_OnTerminate;
 
 				if (!await Gateway.Start(false, false, string.Empty))
 					throw new Exception("Gateway being started in another process.");

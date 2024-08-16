@@ -417,13 +417,31 @@ namespace Waher.Networking.XMPP.Contracts
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
 				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
 			{
+				LegalIdentity Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
+				if (Identity.State != State.State)
+				{
+					State.State = Identity.State;
+					State.Timestamp = Identity.Updated;
+
+					switch (Identity.State)
+					{
+						case IdentityState.Rejected:
+						case IdentityState.Obsoleted:
+						case IdentityState.Compromised:
+							State.PublicKey = null;
+							break;
+					}
+
+					await Database.Update(State);
+				}
+
 				switch (State.State)
 				{
 					case IdentityState.Created:
 					case IdentityState.Approved:
 						try
 						{
-							LegalIdentity Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
+							Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
 							await this.UpdateSettings(Identity);
 						}
 						catch (ItemNotFoundException)
@@ -432,7 +450,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Exception(ex);
+							Log.Exception(ex, State.LegalId);
 						}
 						break;
 				}

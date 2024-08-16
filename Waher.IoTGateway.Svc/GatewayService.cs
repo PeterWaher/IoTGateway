@@ -313,7 +313,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 		}
@@ -343,7 +343,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 		}

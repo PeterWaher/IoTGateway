@@ -392,7 +392,7 @@ namespace Waher.Utility.Install
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				Console.Out.WriteLine(ex.Message);
 				return -1;

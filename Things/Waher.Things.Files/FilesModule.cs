@@ -31,7 +31,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -47,7 +47,7 @@ namespace Waher.Things.Files
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 				else if (Child is VirtualNode VirtualNode)

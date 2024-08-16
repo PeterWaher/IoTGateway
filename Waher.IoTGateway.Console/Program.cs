@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -84,7 +83,13 @@ namespace Waher.IoTGateway.Console
                     return;
                 }
 
-                Log.Register(new ConsoleEventSink(false));
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
+				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -130,19 +135,25 @@ namespace Waher.IoTGateway.Console
 						}
 
 						w.Flush();
-					}
 
-					if (e.ExceptionObject is Exception ex2)
-						Log.Critical(ex2);
-					else if (e.ExceptionObject is not null)
-						Log.Critical(e.ExceptionObject.ToString());
-					else
-						Log.Critical("Unexpected null exception thrown.");
+						if (e.ExceptionObject is Exception ex2)
+							Log.Emergency(ex2);
+						else if (e.ExceptionObject is not null)
+							Log.Emergency(e.ExceptionObject.ToString());
+						else
+							Log.Emergency("Unexpected null exception thrown.");
 
-					if (e.IsTerminating)
-					{
 						Gateway.Stop().Wait();
 						Log.Terminate();
+					}
+					else
+					{
+						if (e.ExceptionObject is Exception ex2)
+							Log.Alert(ex2);
+						else if (e.ExceptionObject is not null)
+							Log.Alert(e.ExceptionObject.ToString());
+						else
+							Log.Alert("Unexpected null exception thrown.");
 					}
 				};
 
@@ -212,7 +223,7 @@ namespace Waher.IoTGateway.Console
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -240,7 +251,7 @@ namespace Waher.IoTGateway.Console
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,

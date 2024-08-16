@@ -92,6 +92,12 @@ namespace Waher.IoTGateway.App
 		{
 			try
 			{
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -138,19 +144,25 @@ namespace Waher.IoTGateway.App
 
 							w.Flush();
 						}
-					}
 
-					if (e.ExceptionObject is Exception ex2)
-						Log.Critical(ex2);
-					else if (!(e.ExceptionObject is null))
-						Log.Critical(e.ExceptionObject.ToString());
-					else
-						Log.Critical("Unexpected null exception thrown.");
+						if (e.ExceptionObject is Exception ex2)
+							Log.Emergency(ex2);
+						else if (!(e.ExceptionObject is null))
+							Log.Emergency(e.ExceptionObject.ToString());
+						else
+							Log.Emergency("Unexpected null exception thrown.");
 
-					if (e.IsTerminating)
-					{
 						Gateway.Stop().Wait();
 						Log.Terminate();
+					}
+					else
+					{
+						if (e.ExceptionObject is Exception ex2)
+							Log.Alert(ex2);
+						else if (!(e.ExceptionObject is null))
+							Log.Alert(e.ExceptionObject.ToString());
+						else
+							Log.Alert("Unexpected null exception thrown.");
 					}
 				};
 
@@ -316,7 +328,7 @@ namespace Waher.IoTGateway.App
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				});
 

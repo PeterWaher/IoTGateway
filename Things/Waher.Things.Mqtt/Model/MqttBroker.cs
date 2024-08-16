@@ -101,7 +101,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -163,7 +163,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -213,7 +213,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.processing = false;
 			}
 		}

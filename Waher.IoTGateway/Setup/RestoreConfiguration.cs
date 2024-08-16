@@ -452,7 +452,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				ShowStatus(TabID, "Failure: " + ex.Message);
 
 				await ClientEvents.PushEvent(GetTabIDs(TabID), "RestoreFinished", JSON.Encode(new Dictionary<string, object>()

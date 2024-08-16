@@ -236,7 +236,7 @@ namespace Waher.Networking.Sniffers
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.output = null;
 				return;
 			}
@@ -283,7 +283,7 @@ namespace Waher.Networking.Sniffers
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, FileName);
+						Log.Exception(ex, FileName);
 					}
 				}
 			}

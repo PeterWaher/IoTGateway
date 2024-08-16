@@ -126,7 +126,7 @@ namespace Waher.Things.Arduino
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 						return Task.CompletedTask;

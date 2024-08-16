@@ -279,7 +279,7 @@ namespace Waher.Runtime.Queue
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

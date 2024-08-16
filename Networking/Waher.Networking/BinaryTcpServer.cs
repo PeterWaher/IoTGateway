@@ -153,7 +153,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -216,7 +216,7 @@ namespace Waher.Networking
 						catch (Exception ex)
 						{
 							NrFailed++;
-							Log.Critical(ex, Profile.ProfileName);
+							Log.Exception(ex, Profile.ProfileName);
 						}
 					}
 					else
@@ -228,7 +228,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return new KeyValuePair<int, int>(NrOpened, NrFailed);
@@ -328,7 +328,7 @@ namespace Waher.Networking
 								catch (Exception ex)
 								{
 									NrFailed++;
-									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + this.port);
+									Log.Exception(ex, UnicastAddress.Address.ToString() + ":" + this.port);
 								}
 							}
 							else
@@ -342,7 +342,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return Task.CompletedTask;
@@ -449,7 +449,7 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					e.Accept = false;
 				}
 			}
@@ -496,7 +496,7 @@ namespace Waher.Networking
 				if (this.listeners is null)
 					return;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 #else
@@ -591,7 +591,7 @@ namespace Waher.Networking
 						}
 
 						if (Found)
-							Log.Critical(ex);
+							Log.Exception(ex);
 						else
 							break;  // Removed, for instance due to network change
 					}
@@ -602,7 +602,7 @@ namespace Waher.Networking
 				if (this.closed || this.listeners is null)
 					return;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -666,7 +666,7 @@ namespace Waher.Networking
 			catch (Exception ex)
 			{
 				Connection.Client.Dispose();
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -683,7 +683,7 @@ namespace Waher.Networking
 				}
 				catch (Exception ex3)
 				{
-					Log.Critical(ex3);
+					Log.Exception(ex3);
 				}
 			}
 
@@ -711,7 +711,7 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -733,7 +733,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -769,7 +769,7 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

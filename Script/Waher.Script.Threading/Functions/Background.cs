@@ -128,7 +128,7 @@ namespace Waher.Script.Threading.Functions
 				{
 					if (CatchAndLogExceptions)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						Result.TrySetResult(ObjectValue.Null);
 					}
 					else

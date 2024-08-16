@@ -146,7 +146,7 @@ namespace Waher.IoTGateway.Setup
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, FileName);
+						Log.Exception(ex, FileName);
 						continue;
 					}
 				}

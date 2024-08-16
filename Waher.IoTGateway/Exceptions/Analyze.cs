@@ -129,7 +129,7 @@ namespace Waher.IoTGateway.Exceptions
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, ExceptionFileName);
+				Log.Exception(ex, ExceptionFileName);
 			}
 			finally
 			{

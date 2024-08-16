@@ -137,7 +137,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -183,7 +183,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -397,7 +397,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -498,7 +498,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -721,7 +721,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -874,7 +874,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1101,7 +1101,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1228,7 +1228,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1289,7 +1289,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 						return;
@@ -1316,7 +1316,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1480,7 +1480,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1538,7 +1538,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 						return Task.CompletedTask;
@@ -1566,7 +1566,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1645,7 +1645,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1872,7 +1872,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -2101,7 +2101,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -2147,7 +2147,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -2428,7 +2428,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 			}, State);
@@ -2753,7 +2753,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

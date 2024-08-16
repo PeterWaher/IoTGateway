@@ -587,7 +587,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -597,7 +597,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				catch (Exception ex2)
 				{
-					Log.Critical(ex2);
+					Log.Exception(ex2);
 				}
 			}
 		}

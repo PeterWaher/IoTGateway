@@ -127,7 +127,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -147,7 +147,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -519,7 +519,7 @@ namespace Waher.Networking.XMPP.WebSocket
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 

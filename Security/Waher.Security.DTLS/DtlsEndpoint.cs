@@ -56,7 +56,7 @@ namespace Waher.Security.DTLS
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -751,7 +751,7 @@ namespace Waher.Security.DTLS
 								}
 								catch (Exception ex)
 								{
-									Log.Critical(ex);
+									Log.Exception(ex);
 								}
 
 								this.SetUnixTime(State.serverRandom, 0);
@@ -921,7 +921,7 @@ namespace Waher.Security.DTLS
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						break;
 
@@ -933,7 +933,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.HandshakeFailure(State, "Unexpected error: " + ex.Message, AlertDescription.internal_error);
 				return false;
 			}
@@ -982,7 +982,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1007,7 +1007,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			if (!(this.states is null))
@@ -1030,7 +1030,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			if (!(this.states is null))
@@ -1055,7 +1055,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, RemoteEndpoint.ToString());
+				Log.Exception(ex, RemoteEndpoint.ToString());
 			}
 		}
 

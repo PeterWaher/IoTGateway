@@ -213,7 +213,7 @@ namespace Waher.Events.MQTT
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 

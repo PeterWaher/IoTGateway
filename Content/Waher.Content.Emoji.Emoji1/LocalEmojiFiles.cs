@@ -123,7 +123,7 @@ namespace Waher.Content.Emoji.Emoji1
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace Waher.Content.Emoji.Emoji1
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{

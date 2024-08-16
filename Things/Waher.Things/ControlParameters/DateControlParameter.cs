@@ -68,7 +68,7 @@ namespace Waher.Things.ControlParameters
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -101,7 +101,7 @@ namespace Waher.Things.ControlParameters
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 		}

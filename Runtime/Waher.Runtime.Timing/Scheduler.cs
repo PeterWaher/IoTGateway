@@ -148,7 +148,7 @@ namespace Waher.Runtime.Timing
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -167,7 +167,7 @@ namespace Waher.Runtime.Timing
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

@@ -44,7 +44,7 @@ namespace Waher.Runtime.Inventory
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

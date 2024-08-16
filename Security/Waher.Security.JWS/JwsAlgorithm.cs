@@ -139,7 +139,7 @@ namespace Waher.Security.JWS
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 

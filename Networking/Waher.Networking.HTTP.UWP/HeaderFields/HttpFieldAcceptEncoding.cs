@@ -43,7 +43,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 

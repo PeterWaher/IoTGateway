@@ -106,7 +106,7 @@ namespace Waher.Events.Pipe
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.pipe?.Close();
 				this.pipe?.Dispose();
 				this.pipe = null;
@@ -133,7 +133,7 @@ namespace Waher.Events.Pipe
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.RestartPipe();
 			}
 		}
@@ -159,7 +159,7 @@ namespace Waher.Events.Pipe
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						Continue = true;
 					}
 
@@ -174,7 +174,7 @@ namespace Waher.Events.Pipe
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, this.pipeName);
+				Log.Exception(ex, this.pipeName);
 				this.RestartPipe();
 			}
 		}
@@ -302,7 +302,7 @@ namespace Waher.Events.Pipe
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return true;

@@ -195,7 +195,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -439,7 +439,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -485,7 +485,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -570,7 +570,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 					break;

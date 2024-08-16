@@ -178,7 +178,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1091,7 +1091,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1237,7 +1237,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1292,7 +1292,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1370,7 +1370,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			public Task ReportException(Exception Exception)
 			{
-				Log.Critical(Exception);
+				Log.Exception(Exception);
 				return Task.CompletedTask;
 			}
 		}

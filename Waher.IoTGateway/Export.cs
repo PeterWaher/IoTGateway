@@ -93,7 +93,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					Size = 0;
 					SizeStr = string.Empty;
 				}
@@ -176,7 +176,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -218,7 +218,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

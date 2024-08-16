@@ -255,7 +255,7 @@ namespace Waher.IoTGateway.WebResources
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						Size = 0;
 					}
 
@@ -450,7 +450,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Profiler.Exception(ex);
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				string[] Tabs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 				await ClientEvents.PushEvent(Tabs, "BackupFailed", "{\"fileName\":\"" + CommonTypes.JsonStringEncode(ExportInfo.Exporter.FileName) +
@@ -468,7 +468,7 @@ namespace Waher.IoTGateway.WebResources
 				catch (Exception ex)
 				{
 					Profiler.Exception(ex);
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				lock (synchObject)
@@ -658,7 +658,7 @@ namespace Waher.IoTGateway.WebResources
 						catch (Exception ex)
 						{
 							BackupInfo.Thread?.Exception(ex, BackupInfo.LocalFileName);
-							Log.Critical(ex);
+							Log.Exception(ex);
 							Reschedule = true;
 
 							await Gateway.SendNotification("Unable to upload backup to " + MarkdownDocument.Encode(Recipient) + 
@@ -670,7 +670,7 @@ namespace Waher.IoTGateway.WebResources
 			catch (Exception ex)
 			{
 				BackupInfo.Thread?.Exception(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 				Reschedule = true;
 			}
 			finally

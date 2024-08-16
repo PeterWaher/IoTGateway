@@ -563,7 +563,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 					else

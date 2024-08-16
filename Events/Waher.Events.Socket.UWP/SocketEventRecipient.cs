@@ -131,7 +131,7 @@ namespace Waher.Events.Socket
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					e.Accept = false;
 				}
 			}
@@ -181,7 +181,7 @@ namespace Waher.Events.Socket
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				Continue = false;
 			}
 
@@ -319,7 +319,7 @@ namespace Waher.Events.Socket
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return true;

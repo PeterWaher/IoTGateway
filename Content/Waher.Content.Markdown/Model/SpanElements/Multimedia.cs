@@ -140,7 +140,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 							continue;
 						}
 

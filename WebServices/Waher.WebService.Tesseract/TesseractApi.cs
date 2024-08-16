@@ -124,7 +124,7 @@ namespace Waher.WebService.Tesseract
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return Task.CompletedTask;
@@ -328,7 +328,7 @@ namespace Waher.WebService.Tesseract
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 
@@ -468,7 +468,7 @@ namespace Waher.WebService.Tesseract
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					};
 

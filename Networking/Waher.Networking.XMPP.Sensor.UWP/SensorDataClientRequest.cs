@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.Sensor
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

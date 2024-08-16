@@ -174,7 +174,7 @@ namespace Waher.Mock.Temperature.UWP
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}, null, 60000, 60000);
@@ -599,7 +599,7 @@ namespace Waher.Mock.Temperature.UWP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

@@ -85,7 +85,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

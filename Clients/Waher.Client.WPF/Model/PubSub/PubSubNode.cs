@@ -664,7 +664,7 @@ namespace Waher.Client.WPF.Model.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 				else

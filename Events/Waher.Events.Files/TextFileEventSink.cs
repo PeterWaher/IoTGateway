@@ -107,7 +107,7 @@ namespace Waher.Events.Files
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}

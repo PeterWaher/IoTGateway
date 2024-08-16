@@ -448,7 +448,7 @@ namespace Waher.IoTGateway
 									}
 									catch (Exception ex)
 									{
-										Log.Critical(ex, ExceptionFile);
+										Log.Exception(ex, ExceptionFile);
 									}
 								}
 
@@ -464,53 +464,53 @@ namespace Waher.IoTGateway
 								{
 									AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
 									{
-										if (exceptionFile is null)
-											return;
-
-										lock (exceptionFile)
+										if (!(exceptionFile is null))
 										{
-											if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
-												return;
-
-											exceptionFile.WriteLine(new string('-', 80));
-											exceptionFile.Write("Type: ");
-
-											if (!(e.Exception is null))
-												exceptionFile.WriteLine(e.Exception.GetType().FullName);
-											else
-												exceptionFile.WriteLine("null");
-
-											exceptionFile.Write("Time: ");
-											exceptionFile.WriteLine(DateTime.Now.ToString());
-
-											if (!(e.Exception is null))
+											lock (exceptionFile)
 											{
-												LinkedList<Exception> Exceptions = new LinkedList<Exception>();
-												Exceptions.AddLast(e.Exception);
+												if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+													return;
 
-												while (!(Exceptions.First is null))
+												exceptionFile.WriteLine(new string('-', 80));
+												exceptionFile.Write("Type: ");
+
+												if (!(e.Exception is null))
+													exceptionFile.WriteLine(e.Exception.GetType().FullName);
+												else
+													exceptionFile.WriteLine("null");
+
+												exceptionFile.Write("Time: ");
+												exceptionFile.WriteLine(DateTime.Now.ToString());
+
+												if (!(e.Exception is null))
 												{
-													Exception ex = Exceptions.First.Value;
-													Exceptions.RemoveFirst();
+													LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+													Exceptions.AddLast(e.Exception);
 
-													exceptionFile.WriteLine();
-
-													exceptionFile.WriteLine(ex.Message);
-													exceptionFile.WriteLine();
-													exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
-													exceptionFile.WriteLine();
-
-													if (ex is AggregateException ex2)
+													while (!(Exceptions.First is null))
 													{
-														foreach (Exception ex3 in ex2.InnerExceptions)
-															Exceptions.AddLast(ex3);
-													}
-													else if (!(ex.InnerException is null))
-														Exceptions.AddLast(ex.InnerException);
-												}
-											}
+														Exception ex = Exceptions.First.Value;
+														Exceptions.RemoveFirst();
 
-											exceptionFile.Flush();
+														exceptionFile.WriteLine();
+
+														exceptionFile.WriteLine(ex.Message);
+														exceptionFile.WriteLine();
+														exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+														exceptionFile.WriteLine();
+
+														if (ex is AggregateException ex2)
+														{
+															foreach (Exception ex3 in ex2.InnerExceptions)
+																Exceptions.AddLast(ex3);
+														}
+														else if (!(ex.InnerException is null))
+															Exceptions.AddLast(ex.InnerException);
+													}
+												}
+
+												exceptionFile.Flush();
+											}
 										}
 									};
 								}
@@ -757,7 +757,7 @@ namespace Waher.IoTGateway
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						continue;
 					}
 				}
@@ -867,7 +867,7 @@ namespace Waher.IoTGateway
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 
@@ -970,7 +970,7 @@ namespace Waher.IoTGateway
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 					}
@@ -988,7 +988,7 @@ namespace Waher.IoTGateway
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				};
 
@@ -1178,7 +1178,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				IDataSource[] Sources;
@@ -1197,7 +1197,7 @@ namespace Waher.IoTGateway
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						Sources = new IDataSource[0];
 					}
 				}
@@ -1276,11 +1276,11 @@ namespace Waher.IoTGateway
 							catch (XmlException ex)
 							{
 								ex = XML.AnnotateException(ex, Xml);
-								Log.Critical(ex, LanguageFile);
+								Log.Exception(ex, LanguageFile);
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex, LanguageFile);
+								Log.Exception(ex, LanguageFile);
 							}
 						}
 					}
@@ -1301,11 +1301,11 @@ namespace Waher.IoTGateway
 							sb.AppendLine(Msg);
 							sb.AppendLine("```");
 
-							Log.Alert(sb.ToString());
+							Log.Emergency(sb.ToString());
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex, UnhandledException);
+							Log.Emergency(ex, UnhandledException);
 						}
 					}
 
@@ -1346,7 +1346,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 				finally
 				{
@@ -1369,7 +1369,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (!(startingServer is null))
 				{
@@ -1491,7 +1491,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1559,7 +1559,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, ManifestFileName);
+				Log.Exception(ex, ManifestFileName);
 			}
 		}
 
@@ -1692,7 +1692,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, ManifestFileName);
+				Log.Exception(ex, ManifestFileName);
 			}
 		}
 
@@ -1887,14 +1887,14 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return true;
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return false;
@@ -1943,7 +1943,7 @@ namespace Waher.IoTGateway
 				else if (DaysLeft < 5)
 					Log.Alert(ex, domain);
 				else
-					Log.Critical(ex);
+					Log.Exception(ex);
 			}
 			finally
 			{
@@ -1966,7 +1966,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -1982,7 +1982,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -2177,7 +2177,7 @@ namespace Waher.IoTGateway
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 					}
@@ -2416,7 +2416,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -2520,7 +2520,7 @@ namespace Waher.IoTGateway
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -2535,14 +2535,14 @@ namespace Waher.IoTGateway
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -2795,14 +2795,14 @@ namespace Waher.IoTGateway
 			catch (HttpException ex)
 			{
 				if (DoLog)
-					Log.Critical(ex);
+					Log.Exception(ex);
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 			catch (Exception ex)
 			{
 				if (DoLog)
-					Log.Critical(ex);
+					Log.Exception(ex);
 
 				return;
 			}
@@ -3288,7 +3288,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return true;
@@ -3360,7 +3360,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -3591,7 +3591,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return Result;
@@ -3634,7 +3634,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -3685,13 +3685,13 @@ namespace Waher.IoTGateway
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, FileName);
+						Log.Exception(ex, FileName);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -3811,7 +3811,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -4447,7 +4447,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -5188,7 +5188,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex, ConfigurationFileName);
+				Log.Exception(ex, ConfigurationFileName);
 				return false;
 			}
 		}

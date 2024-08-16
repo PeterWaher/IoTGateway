@@ -103,7 +103,7 @@ namespace Waher.Networking.CoAP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -130,7 +130,7 @@ namespace Waher.Networking.CoAP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -291,7 +291,7 @@ namespace Waher.Networking.CoAP
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 								continue;
 							}
 
@@ -463,7 +463,7 @@ namespace Waher.Networking.CoAP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -1010,7 +1010,7 @@ namespace Waher.Networking.CoAP
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 
 								if (Type == CoapMessageType.CON && !e.Responded)
 									e.RST(CoapCode.InternalServerError);
@@ -1118,7 +1118,7 @@ namespace Waher.Networking.CoAP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 
 					if (IncomingMessage.Type == CoapMessageType.CON && !Response.Responded)
 						Response.RST(CoapCode.InternalServerError);
@@ -2010,7 +2010,7 @@ namespace Waher.Networking.CoAP
 				catch (Exception ex)
 				{
 					this.Exception(ex);
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

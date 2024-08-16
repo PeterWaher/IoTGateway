@@ -77,7 +77,7 @@ namespace Waher.Things.Arduino
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace Waher.Things.Arduino
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace Waher.Things.Arduino
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

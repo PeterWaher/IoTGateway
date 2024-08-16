@@ -183,7 +183,7 @@ namespace Waher.Client.WPF
 			catch (Exception ex)
 			{
 				ex = Log.UnnestException(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.MainView.ShowStatus("Failure to initialize: " + ex.Message);
 				ErrorBox(ex.Message);
 			}
@@ -204,6 +204,12 @@ namespace Waher.Client.WPF
 
 			try
 			{
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -674,7 +680,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return Task.CompletedTask;
@@ -1205,7 +1211,7 @@ namespace Waher.Client.WPF
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			});
 		}
@@ -1403,7 +1409,7 @@ namespace Waher.Client.WPF
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 					finally
 					{
@@ -1420,7 +1426,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				lock (guiUpdateQueue)
 				{

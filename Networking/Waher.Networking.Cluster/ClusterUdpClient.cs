@@ -160,7 +160,7 @@ namespace Waher.Networking.Cluster
 					catch (Exception ex)
 					{
 						this.endpoint.Exception(ex);
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

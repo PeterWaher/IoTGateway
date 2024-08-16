@@ -42,6 +42,12 @@ namespace Waher.Mock.Temperature
 				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the Neuro-Foundation IoT extensions.");
 				Console.Out.WriteLine("You can also chat with the sensor.");
 
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
 				Log.Register(new ConsoleEventSink());
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -99,7 +105,7 @@ namespace Waher.Mock.Temperature
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 					}, null, 60000, 60000);

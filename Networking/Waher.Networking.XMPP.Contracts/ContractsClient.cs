@@ -432,7 +432,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						break;
 				}
@@ -740,7 +740,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -870,7 +870,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -954,7 +954,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return Task.CompletedTask;
@@ -1455,7 +1455,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -3516,7 +3516,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -4330,7 +4330,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -4463,7 +4463,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -5263,7 +5263,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}, null);
 				}
@@ -5303,7 +5303,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -5541,7 +5541,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 			}
@@ -5627,7 +5627,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 					finally
 					{
@@ -5899,7 +5899,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 			}
@@ -5939,7 +5939,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -6696,7 +6696,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -6902,7 +6902,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

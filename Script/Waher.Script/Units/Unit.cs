@@ -982,7 +982,7 @@ namespace Waher.Script.Units
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					continue;
 				}
 
@@ -1004,7 +1004,7 @@ namespace Waher.Script.Units
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					continue;
 				}
 
@@ -1024,7 +1024,7 @@ namespace Waher.Script.Units
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					continue;
 				}
 

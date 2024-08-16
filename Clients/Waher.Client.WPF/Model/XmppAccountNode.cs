@@ -773,7 +773,7 @@ namespace Waher.Client.WPF.Model
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -1236,7 +1236,7 @@ namespace Waher.Client.WPF.Model
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 					}, null);

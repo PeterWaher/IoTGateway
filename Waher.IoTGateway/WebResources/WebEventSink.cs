@@ -103,7 +103,7 @@ namespace Waher.IoTGateway.WebResources
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 	}

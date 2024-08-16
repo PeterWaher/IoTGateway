@@ -356,7 +356,7 @@ namespace Waher.Content.Markdown
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex, FileName2);
+								Log.Exception(ex, FileName2);
 							}
 						}
 					}
@@ -441,7 +441,7 @@ namespace Waher.Content.Markdown
 						{
 							CheckException(ex3, TransparentExceptionTypes);
 
-							Log.Critical(ex3, FileName);
+							Log.Exception(ex3, FileName);
 
 							sb.Append("<p>");
 							sb.Append(XML.HtmlValueEncode(ex3.Message));
@@ -452,7 +452,7 @@ namespace Waher.Content.Markdown
 					{
 						CheckException(ex, TransparentExceptionTypes);
 
-						Log.Critical(ex, FileName);
+						Log.Exception(ex, FileName);
 
 						sb.AppendLine(XML.HtmlValueEncode(ex.Message));
 					}
@@ -2760,7 +2760,7 @@ namespace Waher.Content.Markdown
 								{
 									this.CheckException(ex3);
 
-									Log.Critical(ex3, this.fileName);
+									Log.Exception(ex3, this.fileName);
 
 									Elements.AddLast(new Paragraph(this, new MarkdownElement[]
 									{
@@ -2772,7 +2772,7 @@ namespace Waher.Content.Markdown
 							{
 								this.CheckException(ex);
 
-								Log.Critical(ex, this.fileName);
+								Log.Exception(ex, this.fileName);
 
 								Elements.AddLast(new Paragraph(this, new MarkdownElement[]
 								{
@@ -6363,7 +6363,7 @@ namespace Waher.Content.Markdown
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			});

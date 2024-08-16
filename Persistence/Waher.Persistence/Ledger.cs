@@ -225,7 +225,7 @@ namespace Waher.Persistence
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

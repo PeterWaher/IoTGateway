@@ -369,7 +369,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -449,7 +449,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -541,7 +541,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -587,7 +587,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -653,7 +653,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -723,7 +723,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -952,7 +952,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1095,7 +1095,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1231,7 +1231,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1319,7 +1319,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1453,7 +1453,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1580,7 +1580,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -1672,7 +1672,7 @@ namespace Waher.Networking.XMPP.PubSub
 												}
 												catch (Exception ex)
 												{
-													Log.Critical(ex);
+													Log.Exception(ex);
 												}
 											}
 											break;
@@ -1690,7 +1690,7 @@ namespace Waher.Networking.XMPP.PubSub
 												}
 												catch (Exception ex)
 												{
-													Log.Critical(ex);
+													Log.Exception(ex);
 												}
 											}
 											break;
@@ -1712,7 +1712,7 @@ namespace Waher.Networking.XMPP.PubSub
 								}
 								catch (Exception ex)
 								{
-									Log.Critical(ex);
+									Log.Exception(ex);
 								}
 							}
 							break;
@@ -1731,7 +1731,7 @@ namespace Waher.Networking.XMPP.PubSub
 								}
 								catch (Exception ex)
 								{
-									Log.Critical(ex);
+									Log.Exception(ex);
 								}
 							}
 							break;
@@ -1760,7 +1760,7 @@ namespace Waher.Networking.XMPP.PubSub
 												}
 												catch (Exception ex)
 												{
-													Log.Critical(ex);
+													Log.Exception(ex);
 												}
 											}
 											break;
@@ -2005,7 +2005,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -2078,7 +2078,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -2112,7 +2112,7 @@ namespace Waher.Networking.XMPP.PubSub
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -2193,7 +2193,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -2313,7 +2313,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -2457,7 +2457,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -2547,7 +2547,7 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);

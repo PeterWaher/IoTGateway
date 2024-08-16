@@ -571,7 +571,7 @@ namespace Waher.IoTGateway
                 }
                 catch (Exception ex)
                 {
-                    Log.Critical(ex);
+                    Log.Exception(ex);
                 }
             }
 

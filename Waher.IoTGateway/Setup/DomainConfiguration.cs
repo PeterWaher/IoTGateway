@@ -542,7 +542,7 @@ namespace Waher.IoTGateway.Setup
 			catch (Exception ex)
 			{
 				if (string.IsNullOrEmpty(TabID))
-					Log.Critical(ex);
+					Log.Exception(ex);
 				else
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
 
@@ -582,7 +582,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -878,7 +878,7 @@ namespace Waher.IoTGateway.Setup
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				});
 			}
@@ -1549,7 +1549,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				string Msg = "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message);
 

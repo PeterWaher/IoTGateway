@@ -848,7 +848,7 @@ namespace Waher.Networking.XMPP.DataForms
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Events.Log.Exception(ex);
 				}
 			}
 			else
@@ -889,7 +889,7 @@ namespace Waher.Networking.XMPP.DataForms
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Events.Log.Exception(ex);
 				}
 			}
 			else

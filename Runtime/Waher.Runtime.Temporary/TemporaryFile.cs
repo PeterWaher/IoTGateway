@@ -76,7 +76,7 @@ namespace Waher.Runtime.Temporary
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 

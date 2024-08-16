@@ -3480,10 +3480,10 @@ namespace Waher.Script
 								if (ex is AggregateException ex2)
 								{
 									foreach (Exception ex3 in ex2.InnerExceptions)
-										Log.Critical(ex3);
+										Log.Exception(ex3);
 								}
 								else
-									Log.Critical(ex);
+									Log.Exception(ex);
 							}
 						}
 					}
@@ -3539,7 +3539,7 @@ namespace Waher.Script
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -3588,7 +3588,7 @@ namespace Waher.Script
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -5438,7 +5438,7 @@ namespace Waher.Script
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex, T2.FullName);
+					Log.Exception(ex, T2.FullName);
 				}
 			}
 

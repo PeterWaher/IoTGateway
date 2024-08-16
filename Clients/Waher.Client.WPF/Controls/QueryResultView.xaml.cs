@@ -116,7 +116,7 @@ namespace Waher.Client.WPF.Controls
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			while (More);
@@ -670,7 +670,7 @@ namespace Waher.Client.WPF.Controls
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

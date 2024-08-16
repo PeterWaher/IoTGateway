@@ -215,7 +215,7 @@ namespace Waher.Security.CallStack
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 

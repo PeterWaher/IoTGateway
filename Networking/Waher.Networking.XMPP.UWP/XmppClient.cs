@@ -1318,7 +1318,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -1405,7 +1405,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -2308,7 +2308,7 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			if (e.Rejected && !e.Accepted)
@@ -4677,7 +4677,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -5279,7 +5279,7 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -7495,7 +7495,7 @@ namespace Waher.Networking.XMPP
 										}
 										catch (Exception ex)
 										{
-											Log.Critical(ex);
+											Log.Exception(ex);
 										}
 									}
 								}
@@ -7519,7 +7519,7 @@ namespace Waher.Networking.XMPP
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}
@@ -7607,7 +7607,7 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -7625,7 +7625,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 				else
@@ -7973,7 +7973,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -8059,7 +8059,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -8102,7 +8102,7 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				Service = null;
 				Feature = null;
 			}
@@ -8115,7 +8115,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

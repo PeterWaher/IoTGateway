@@ -652,13 +652,13 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				await this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result);
 			}
 			catch (IOException ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
@@ -676,7 +676,7 @@ namespace Waher.Networking.HTTP
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
 				ex = XML.AnnotateException(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -684,7 +684,7 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -785,7 +785,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (System.NotImplementedException ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -803,7 +803,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (IOException ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -829,7 +829,7 @@ namespace Waher.Networking.HTTP
 			catch (XmlException ex)
 			{
 				ex = XML.AnnotateException(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -847,7 +847,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{

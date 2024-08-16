@@ -244,7 +244,7 @@ namespace Waher.Networking.XMPP.P2P
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 								continue;
 							}
 						}
@@ -1418,7 +1418,7 @@ namespace Waher.Networking.XMPP.P2P
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}, State);
@@ -1669,7 +1669,7 @@ namespace Waher.Networking.XMPP.P2P
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 				}, State);
@@ -1830,7 +1830,7 @@ namespace Waher.Networking.XMPP.P2P
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);

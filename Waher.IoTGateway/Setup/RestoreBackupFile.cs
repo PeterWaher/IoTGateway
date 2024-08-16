@@ -87,7 +87,7 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					this.nrObjectsFailed += this.objects.Count;
 				}
 
@@ -139,7 +139,7 @@ namespace Waher.IoTGateway.Setup
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						this.nrObjectsFailed += this.objects.Count;
 					}
 

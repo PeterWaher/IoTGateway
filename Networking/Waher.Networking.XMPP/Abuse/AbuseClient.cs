@@ -190,7 +190,7 @@ namespace Waher.Networking.XMPP.Abuse
                     }
                     catch (Exception ex)
                     {
-                        Log.Critical(ex);
+                        Log.Exception(ex);
                     }
                 }
             }, null);
@@ -285,7 +285,7 @@ namespace Waher.Networking.XMPP.Abuse
                     }
                     catch (Exception ex)
                     {
-                        Log.Critical(ex);
+                        Log.Exception(ex);
                     }
                 }
 
@@ -379,7 +379,7 @@ namespace Waher.Networking.XMPP.Abuse
                 }
                 catch (Exception ex)
                 {
-                    Log.Critical(ex);
+                    Log.Exception(ex);
                 }
             }
         }

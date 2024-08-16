@@ -91,7 +91,7 @@ namespace Waher.Runtime.Inventory.Loader
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, DllFile);
+						Log.Exception(ex, DllFile);
 						continue;
 					}
 				}
@@ -134,7 +134,7 @@ namespace Waher.Runtime.Inventory.Loader
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex, DllFile);
+					Log.Exception(ex, DllFile);
 				}
 			}
 
@@ -156,7 +156,7 @@ namespace Waher.Runtime.Inventory.Loader
 			foreach (KeyValuePair<object, object> P in ex.Data)
 				Tags.Add(new KeyValuePair<string, object>(P.Key.ToString(), P.Value));
 
-			Log.Critical(ex, ex.FileName, Tags.ToArray());
+			Log.Exception(ex, ex.FileName, Tags.ToArray());
 		}
 
 		private static void LoadReferencedAssemblies(SortedDictionary<string, Assembly> LoadedAssembliesByName,

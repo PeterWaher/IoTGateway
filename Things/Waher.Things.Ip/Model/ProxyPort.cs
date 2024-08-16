@@ -246,7 +246,7 @@ namespace Waher.Things.Ip.Model
 						}
 
 						if (Found)
-							Log.Critical(ex);
+							Log.Exception(ex);
 						else
 							break;  // Removed, for instance due to network change
 					}
@@ -257,7 +257,7 @@ namespace Waher.Things.Ip.Model
 				if (this.closed || this.tcpListeners is null)
 					return;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -386,7 +386,7 @@ namespace Waher.Things.Ip.Model
 				{
 					Incoming.Dispose();
 					Outgoing.Dispose();
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else

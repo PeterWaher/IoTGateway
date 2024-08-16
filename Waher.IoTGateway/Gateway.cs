@@ -452,67 +452,86 @@ namespace Waher.IoTGateway
 									}
 								}
 
-								exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
-									" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
-								exceptionFile = File.CreateText(exceptionFileName);
-								exportExceptions = true;
-
-								exceptionFile.Write("Start of export: ");
-								exceptionFile.WriteLine(DateTime.Now.ToString());
-
 								if (FirstStart)
 								{
-									AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+									int MaxTries = 1000;
+
+									do
 									{
-										if (!(exceptionFile is null))
+										exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
+											" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
+
+										try
 										{
-											lock (exceptionFile)
-											{
-												if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
-													return;
-
-												exceptionFile.WriteLine(new string('-', 80));
-												exceptionFile.Write("Type: ");
-
-												if (!(e.Exception is null))
-													exceptionFile.WriteLine(e.Exception.GetType().FullName);
-												else
-													exceptionFile.WriteLine("null");
-
-												exceptionFile.Write("Time: ");
-												exceptionFile.WriteLine(DateTime.Now.ToString());
-
-												if (!(e.Exception is null))
-												{
-													LinkedList<Exception> Exceptions = new LinkedList<Exception>();
-													Exceptions.AddLast(e.Exception);
-
-													while (!(Exceptions.First is null))
-													{
-														Exception ex = Exceptions.First.Value;
-														Exceptions.RemoveFirst();
-
-														exceptionFile.WriteLine();
-
-														exceptionFile.WriteLine(ex.Message);
-														exceptionFile.WriteLine();
-														exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
-														exceptionFile.WriteLine();
-
-														if (ex is AggregateException ex2)
-														{
-															foreach (Exception ex3 in ex2.InnerExceptions)
-																Exceptions.AddLast(ex3);
-														}
-														else if (!(ex.InnerException is null))
-															Exceptions.AddLast(ex.InnerException);
-													}
-												}
-
-												exceptionFile.Flush();
-											}
+											exceptionFile = File.CreateText(exceptionFileName);
 										}
-									};
+										catch (IOException)
+										{
+											exceptionFile = null;
+											Thread.Sleep(1000);
+										}
+									}
+									while (exceptionFile is null && --MaxTries > 0);
+
+									exportExceptions = !(exceptionFile is null);
+
+									if (exportExceptions)
+									{
+										exceptionFile.Write("Start of export: ");
+										exceptionFile.WriteLine(DateTime.Now.ToString());
+
+										AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+										{
+											if (!(exceptionFile is null))
+											{
+												lock (exceptionFile)
+												{
+													if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+														return;
+
+													exceptionFile.WriteLine(new string('-', 80));
+													exceptionFile.Write("Type: ");
+
+													if (!(e.Exception is null))
+														exceptionFile.WriteLine(e.Exception.GetType().FullName);
+													else
+														exceptionFile.WriteLine("null");
+
+													exceptionFile.Write("Time: ");
+													exceptionFile.WriteLine(DateTime.Now.ToString());
+
+													if (!(e.Exception is null))
+													{
+														LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+														Exceptions.AddLast(e.Exception);
+
+														while (!(Exceptions.First is null))
+														{
+															Exception ex = Exceptions.First.Value;
+															Exceptions.RemoveFirst();
+
+															exceptionFile.WriteLine();
+
+															exceptionFile.WriteLine(ex.Message);
+															exceptionFile.WriteLine();
+															exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+															exceptionFile.WriteLine();
+
+															if (ex is AggregateException ex2)
+															{
+																foreach (Exception ex3 in ex2.InnerExceptions)
+																	Exceptions.AddLast(ex3);
+															}
+															else if (!(ex.InnerException is null))
+																Exceptions.AddLast(ex.InnerException);
+														}
+													}
+
+													exceptionFile.Flush();
+												}
+											}
+										};
+									}
 								}
 								break;
 

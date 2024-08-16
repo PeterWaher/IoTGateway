@@ -74,27 +74,27 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			#region Neuro-Foundation V1 handlers
 
-			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
-			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
+			this.Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
+			this.Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
 
 			#endregion
 
 			#region IEEE V1 handlers
 
-			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
-			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
+			this.Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
+			this.Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
 
 			#endregion
 		}

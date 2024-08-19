@@ -220,13 +220,22 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 			RequestOrigin Origin = await GetNode.GetOriginOfRequest(Variables);
 			IThingReference[] Nodes = new IThingReference[] { Sensor };
-			ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, FieldNames, Origin)
-				?? throw new ScriptRuntimeException("Not authorized to read sensor-data from node.", this);
+
+			if (!(Sensor is ExternalNode ExternalNode) ||
+				string.Compare(Gateway.XmppClient.BareJID, ExternalNode.Jid.Value, true) == 0)
+			{
+				ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, FieldNames, Origin)
+					?? throw new ScriptRuntimeException("Not authorized to read sensor-data from node.", this);
+
+				Nodes = Approval.Nodes;
+				FieldTypes = Approval.FieldTypes;
+				FieldNames = Approval.FieldNames;
+			}
+
 			string Actor = Origin is IUser User ? User.UserName : nameof(ReadSensorData);
 
-			InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Actor,
-				Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, From, To,
-				(sender, e) =>
+			InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(
+				Actor, Nodes, FieldTypes, FieldNames, From, To, (sender, e) =>
 				{
 					foreach (Field F in e.Fields)
 					{

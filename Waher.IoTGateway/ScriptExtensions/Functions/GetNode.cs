@@ -163,9 +163,17 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						else
 						{
 							object Arg3 = Arguments[3].AssociatedObjectValue;
-							string Jid = Arg3?.ToString() ?? string.Empty;
+							string Jid = Arg3?.ToString().Trim() ?? string.Empty;
 
-							Result = new ExternalNode(NodeId, SourceId, PartitionId, Jid);
+							if (string.Compare(Gateway.XmppClient.BareJID, Jid, true) == 0)
+							{
+								if (!TryGetDataSource(SourceId, out Source))
+									return ObjectValue.Null;
+
+								Result = await Source.GetNodeAsync(new ThingReference(NodeId, SourceId, PartitionId));
+							}
+							else
+								Result = new ExternalNode(NodeId, SourceId, PartitionId, Jid);
 						}
 					}
 				}

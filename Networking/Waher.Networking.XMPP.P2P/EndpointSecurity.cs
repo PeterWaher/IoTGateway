@@ -535,17 +535,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>E2E keys, if recognized, or null if not.</returns>
 		public static IE2eEndpoint ParseE2eKey(XmlElement E)
 		{
-			string Key = E.NamespaceURI + "#" + E.LocalName;
-
-			if (endpointTypes.TryGetValue(Key, out IE2eEndpoint E2e))
-				return E2e.Parse(E);
-			else if (initialized)
-				return null;
-
-			CreateEndpoints(128, 0, int.MaxValue);
-
-			if (endpointTypes.TryGetValue(Key, out E2e))
-				return E2e.Parse(E);
+			if (TryGetEndpoint(E.LocalName, E.NamespaceURI, out IE2eEndpoint Endpoint))
+				return Endpoint.Parse(E);
 			else
 				return null;
 		}

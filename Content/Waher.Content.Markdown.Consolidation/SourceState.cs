@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Consolidation
 			if (Doc is null)
 				return string.Empty;
 
-			this.firstText = await Doc.GenerateMarkdown();
+			this.firstText = await Doc.GenerateMarkdown(false);
 
 			return this.firstText;
 		}

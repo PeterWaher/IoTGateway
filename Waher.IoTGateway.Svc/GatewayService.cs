@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Threading;
+using Waher.Content;
 using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -320,17 +321,17 @@ namespace Waher.IoTGateway.Svc
 
 		private static string GetWtsName(int SessionId, WtsInfoClass InfoClass)
 		{
+			string Result;
+
 			try
 			{
 				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int StrLen) && StrLen > 1)
 				{
 					try
 					{
-						string Name = Marshal.PtrToStringAnsi(Buffer);
+						Result = Marshal.PtrToStringAnsi(Buffer);
 						Win32.WTSFreeMemory(Buffer);
 						Buffer = IntPtr.Zero;
-
-						return Name;
 					}
 					finally
 					{
@@ -346,7 +347,82 @@ namespace Waher.IoTGateway.Svc
 				Log.Exception(ex);
 				return null;
 			}
+
+			if (!string.IsNullOrEmpty(Result))
+				Result = CommonTypes.Escape(Result, specialCharactersToEscape, specialCharacterEscapes);
+			
+			return Result;
 		}
+
+		private static readonly char[] specialCharactersToEscape = new char[]
+		{
+			'\x00',
+			'\x01',
+			'\x02',
+			'\x03',
+			'\x04',
+			'\x05',
+			'\x06',
+			'\a',	// 7  - 0x07
+			'\b',	// 8  - 0x08
+			'\n',	// 10 - 0x0a
+			'\v',	// 11 - 0x0b
+			'\f',	// 12 - 0x0c
+			'\r',	// 13 - 0x0d
+			'\x0e',
+			'\x0f',
+			'\x10',
+			'\x11',
+			'\x12',
+			'\x13',
+			'\x14',
+			'\x15',
+			'\x16',
+			'\x17',
+			'\x18',
+			'\x19',
+			'\x1a',
+			'\x1b',
+			'\x1c',
+			'\x1d',
+			'\x1e',
+			'\x1f'
+		};
+		private static readonly string[] specialCharacterEscapes = new string[]
+		{
+			"<NUL>",	// '\x00',
+			"<SOH>",	// '\x01',
+			"<STX>",	// '\x02',
+			"<ETX>",	// '\x03',
+			"<EOT>",	// '\x04',
+			"<ENQ>",	// '\x05',
+			"<ACK>",	// '\x06',
+			"<BEL>",	// '\a',	// 7  - 0x07
+			"<BS>",		// '\b',	// 8  - 0x08
+			"<LF>",		// '\n',	// 10 - 0x0a
+			"<VT>",		// '\v',	// 11 - 0x0b
+			"<FF>",		// '\f',	// 12 - 0x0c
+			"<CR>",		// '\r',	// 13 - 0x0d
+			"<SO>",		// '\x0e',
+			"<SI>",		// '\x0f',
+			"<DLE>",	// '\x10',
+			"<DC1>",	// '\x11',
+			"<DC2>",	// '\x12',
+			"<DC3>",	// '\x13',
+			"<DC4>",	// '\x14',
+			"<NAK>",	// '\x15',
+			"<SYN>",	// '\x16',
+			"<ETB>",	// '\x17',
+			"<CAN>",	// '\x18',
+			"<EM>",		// '\x19',
+			"<SUB>",	// '\x1a',
+			"<ESC>",	// '\x1b',
+			"<FS>",		// '\x1c',
+			"<GS>",		// '\x1d',
+			"<RS>",		// '\x1e',
+			"<US>"		// '\x1f'
+		};
+
 
 		protected override void OnShutdown()
 		{

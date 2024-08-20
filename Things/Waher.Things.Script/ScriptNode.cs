@@ -34,7 +34,7 @@ namespace Waher.Things.Script
 		[Page(2, "Script", 100)]
 		[Header(3, "Sensor-data script:")]
 		[ToolTip(4, "Script that returns sensor-data fields.")]
-		[Text(TextPosition.AfterField, 5, "Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the \"this\" variable to refer to this node.")]
+		[Text(TextPosition.AfterField, 5, "Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the \"this\" variable to refer to this node, and the \"Request\" to refer to the current readout-request for process optimization.")]
 		[ContentType("application/x-webscript")]
 		[Required]
 		public string[] SensorScript
@@ -91,7 +91,8 @@ namespace Waher.Things.Script
 
 				Variables v = new Variables()
 				{
-					["this"] = this
+					["this"] = this,
+					["Request"] = Request
 				};
 
 				if (!(this.MetaData is null))

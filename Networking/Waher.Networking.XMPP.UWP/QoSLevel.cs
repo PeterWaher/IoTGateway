@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP
+﻿namespace Waher.Networking.XMPP
 {
 	/// <summary>
 	/// Quality of Service Level for asynchronous messages. Support for QoS Levels must be supported by the recipient, and is defined in:

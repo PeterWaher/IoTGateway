@@ -10,7 +10,6 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// </summary>
 	public class ForbiddenException : StanzaAuthExceptionException
 	{
-		/// <summary>
 		/// The requesting entity does not possess the necessary permissions to perform an action that only certain authorized roles or individuals
 		/// are allowed to complete (i.e., it typically relates to authorization rather than authentication); the associated error type SHOULD be
 		/// "auth".

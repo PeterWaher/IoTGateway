@@ -1,5 +1,4 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP

@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Security;
+﻿using Waher.Security;
 
 namespace Waher.Networking.XMPP.Authentication
 {

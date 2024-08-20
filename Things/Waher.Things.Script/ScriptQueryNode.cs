@@ -5,15 +5,15 @@ using Waher.Things.Virtual;
 
 namespace Waher.Things.Script
 {
-    /// <summary>
-    /// Represents a command that can be executed on a script node or script reference node.
-    /// </summary>
-    public class ScriptCommandNode : ScriptCommandNodeBase
+	/// <summary>
+	/// Represents a query that can be executed on a script node or script reference node.
+	/// </summary>
+	public class ScriptQueryNode : ScriptCommandNodeBase
     {
-        /// <summary>
-        /// Represents a command that can be executed on a script node or script reference node.
-        /// </summary>
-        public ScriptCommandNode()
+		/// <summary>
+		/// Represents a query that can be executed on a script node or script reference node.
+		/// </summary>
+		public ScriptQueryNode()
             : base()
         {
         }
@@ -22,12 +22,12 @@ namespace Waher.Things.Script
         /// Script for executing command.
         /// </summary>
         [Page(2, "Script", 100)]
-        [Header(9, "Command script:")]
-        [ToolTip(10, "Script that gets evaluated when then command is executed.")]
-        [Text(TextPosition.AfterField, 28, "Script that is evaluated when command is executed. Use the \"this\" variable to refer to the script node publishing the command.")]
-        [ContentType("application/x-webscript")]
+        [Header(90, "Query script:")]
+        [ToolTip(91, "Script that gets evaluated when then query is executed.")]
+		[Text(TextPosition.AfterField, 92, "Script that is evaluated when query is executed. Use the \"this\" variable to refer to the script node publishing the query. The \"Query\" variable will contain the current state of the query, while the \"Language\" variable contains the selected language.")]
+		[ContentType("application/x-webscript")]
         [Required]
-        public string[] CommandScript
+        public string[] QueryScript
         {
             get => this.script;
             set
@@ -44,7 +44,7 @@ namespace Waher.Things.Script
         /// <returns>Localized type node.</returns>
         public override Task<string> GetTypeNameAsync(Language Language)
         {
-            return Language.GetStringAsync(typeof(ScriptNode), 11, "Script Command");
+            return Language.GetStringAsync(typeof(ScriptNode), 93, "Script Query");
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Waher.Things.Script
         /// <returns>Command object.</returns>
         public override async Task<ICommand> GetCommand(VirtualNode Node)
         {
-            return new ScriptCommand(Node, this, await this.GetParameters(Node));
+            return new ScriptQuery(Node, this, await this.GetParameters(Node));
         }
     }
 }

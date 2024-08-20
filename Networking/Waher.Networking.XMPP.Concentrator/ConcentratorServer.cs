@@ -2995,7 +2995,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						ex = Log.UnnestException(ex);
 
-						await Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
+						await Query.LogMessage(ex);
 						await Query.Abort();
 
 						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
@@ -3401,13 +3401,22 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else
 					{
-						KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
+						try
+						{
+							KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
 
-						Xml.Append("<base64 contentType='");
-						Xml.Append(XML.Encode(Encoded.Value));
-						Xml.Append("'>");
-						Xml.Append(Convert.ToBase64String(Encoded.Key));
-						Xml.Append("</base64>");
+							Xml.Append("<base64 contentType='");
+							Xml.Append(XML.Encode(Encoded.Value));
+							Xml.Append("'>");
+							Xml.Append(Convert.ToBase64String(Encoded.Key));
+							Xml.Append("</base64>");
+						}
+						catch (Exception ex)
+						{
+							Xml.Append("<string>");
+							Xml.Append(XML.Encode(ex.Message));
+							Xml.Append("</string>");
+						}
 					}
 				}
 

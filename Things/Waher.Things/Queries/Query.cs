@@ -183,7 +183,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -275,7 +275,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -310,7 +310,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -344,7 +344,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -378,7 +378,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -387,6 +387,26 @@ namespace Waher.Things.Queries
 		/// Event raised when new records are reported for a table.
 		/// </summary>
 		public event QueryObjectEventHandler OnNewObject = null;
+
+		/// <summary>
+		/// Logs an Exception as a query message.
+		/// </summary>
+		/// <param name="Exception">Exception being logged.</param>
+		public Task LogMessage(Exception Exception)
+		{
+			return this.LogMessage(QueryEventLevel.Major, Exception);
+		}
+
+		/// <summary>
+		/// Logs an Exception as a query message.
+		/// </summary>
+		/// <param name="Level">Event level.</param>
+		/// <param name="Exception">Exception being logged.</param>
+		public Task LogMessage(QueryEventLevel Level, Exception Exception)
+		{
+			Exception = Log.UnnestException(Exception);
+			return this.LogMessage(QueryEventType.Exception, Level, Exception.Message);
+		}
 
 		/// <summary>
 		/// Logs a query message.
@@ -448,7 +468,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}
@@ -482,7 +502,7 @@ namespace Waher.Things.Queries
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					await this.LogMessage(ex);
 				}
 			}
 		}

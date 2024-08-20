@@ -25,6 +25,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
 using Waher.Security;
+using Waher.Content.Binary;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -3402,9 +3403,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					else if (Element is byte[] Bin)
 					{
 						Xml.Append("<base64 contentType='");
-						Xml.Append(XML.Encode(Encoded.Value));
+						Xml.Append(XML.Encode(BinaryCodec.DefaultContentType));
 						Xml.Append("'>");
-						Xml.Append(Convert.ToBase64String(Encoded.Key));
+						Xml.Append(Convert.ToBase64String(Bin));
 						Xml.Append("</base64>");
 					}
 					else

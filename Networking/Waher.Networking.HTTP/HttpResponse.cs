@@ -2,15 +2,15 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
+using Waher.Content.Text;
 using Waher.Events;
+using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
-using System.Threading.Tasks;
-using Waher.Content.Binary;
-using Waher.Content.Text;
-using Waher.Networking.HTTP.ContentEncodings;
 
 namespace Waher.Networking.HTTP
 {

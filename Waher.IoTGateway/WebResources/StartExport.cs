@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Content.Xml;
@@ -633,7 +634,7 @@ namespace Waher.IoTGateway.WebResources
 										// Empty response expected. Errors cause an exception to be raised.
 
 										HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
-											"application/octet-stream", FileSize, false);
+											BinaryCodec.DefaultContentType, FileSize, false);
 
 										if (!e2.Ok)
 											throw (e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file."));
@@ -645,7 +646,7 @@ namespace Waher.IoTGateway.WebResources
 										else
 											Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
 
-										await e2.PUT(fs, "application/octet-stream", 60 * 60 * 1000);   // 1h timeout
+										await e2.PUT(fs, BinaryCodec.DefaultContentType, 60 * 60 * 1000);   // 1h timeout
 
 										if (BackupInfo.IsKey)
 											Log.Informational("Key file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);

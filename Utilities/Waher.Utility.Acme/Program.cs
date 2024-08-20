@@ -4,9 +4,9 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Runtime.Inventory;
 using Waher.Security.ACME;
 using Waher.Security.PKCS;
@@ -590,7 +590,7 @@ namespace Waher.Utility.Acme
                                     LogInformational(Index.ToString() + ") HTTP challenge.",
                                         new KeyValuePair<string, object>("Resource", HttpChallenge.ResourceName),
                                         new KeyValuePair<string, object>("Response", HttpChallenge.KeyAuthorization),
-                                        new KeyValuePair<string, object>("Content-Type", "application/octet-stream"));
+                                        new KeyValuePair<string, object>("Content-Type", BinaryCodec.DefaultContentType));
 
                                     if (!string.IsNullOrEmpty(httpRootFolder))
                                     {
@@ -616,7 +616,7 @@ namespace Waher.Utility.Acme
                                         Console.Out.WriteLine(Index.ToString() + ") HTTP challenge.");
                                         Console.Out.WriteLine("Resource: " + HttpChallenge.ResourceName);
                                         Console.Out.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
-                                        Console.Out.WriteLine("Content-Type: " + "application/octet-stream");
+                                        Console.Out.WriteLine("Content-Type: " + BinaryCodec.DefaultContentType);
                                     }
                                 }
                                 else if (Challenge is AcmeDnsChallenge DnsChallenge)

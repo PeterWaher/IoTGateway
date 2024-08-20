@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Semantic;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
@@ -66,7 +67,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			{
 				string Extension = Path.GetExtension(FileName);
 				string ContentType = InternetContent.GetContentType(Extension);
-				if (string.IsNullOrEmpty(ContentType) || ContentType == "application/octet-stream")
+				if (string.IsNullOrEmpty(ContentType) || ContentType == BinaryCodec.DefaultContentType)
 					continue;
 
 				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);

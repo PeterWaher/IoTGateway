@@ -3387,7 +3387,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(Element.ToString());
 						Xml.Append("</double>");
 					}
-					else if (Element is string || Element is char)
+					else if (Element is string || Element is char || Element is Enum)
 					{
 						Xml.Append("<string>");
 						Xml.Append(XML.Encode(Element.ToString()));
@@ -3398,6 +3398,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append("<time>");
 						Xml.Append(Element.ToString());
 						Xml.Append("</time>");
+					}
+					else if (Element is byte[] Bin)
+					{
+						Xml.Append("<base64 contentType='");
+						Xml.Append(XML.Encode(Encoded.Value));
+						Xml.Append("'>");
+						Xml.Append(Convert.ToBase64String(Encoded.Key));
+						Xml.Append("</base64>");
 					}
 					else
 					{

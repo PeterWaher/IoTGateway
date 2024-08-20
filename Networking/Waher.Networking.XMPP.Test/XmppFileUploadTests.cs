@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Content.Binary;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HttpFileUpload;
 
@@ -149,7 +150,7 @@ namespace Waher.Networking.XMPP.Test
 			this.FileUpload_Test_01_Discovery();
 
 			string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".bin";
-			string ContentType = "application/octet-stream";
+			string ContentType = BinaryCodec.DefaultContentType;
 			Random Rnd = new();
 			byte[] Bin = new byte[1024];
 			Rnd.NextBytes(Bin);

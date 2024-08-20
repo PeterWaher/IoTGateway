@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Waher.Content.Binary;
 
 namespace Waher.Networking.CoAP.ContentFormats
 {
@@ -32,7 +32,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public string ContentType
 		{
-			get { return "application/octet-stream"; }
+			get { return BinaryCodec.DefaultContentType; }
 		}
 	}
 }

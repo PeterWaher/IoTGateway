@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -1570,7 +1571,7 @@ namespace Waher.IoTGateway.Setup
 				throw new NotFoundException("ACME Challenge not found.");
 
 			Response.StatusCode = 200;
-			Response.ContentType = "application/octet-stream";
+			Response.ContentType = BinaryCodec.DefaultContentType;
 			return Response.Write(System.Text.Encoding.ASCII.GetBytes(this.token));
 		}
 

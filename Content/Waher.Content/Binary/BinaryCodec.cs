@@ -19,12 +19,17 @@ namespace Waher.Content.Binary
 		}
 
 		/// <summary>
+		/// text/plain
+		/// </summary>
+		public const string DefaultContentType = "application/octet-stream";
+
+		/// <summary>
 		/// Binary content types.
 		/// </summary>
 		public static readonly string[] BinaryContentTypes = new string[]
 		{
-			"binary",
-			"application/octet-stream"
+			DefaultContentType,
+			"binary"
 		};
 
 		/// <summary>
@@ -90,7 +95,7 @@ namespace Waher.Content.Binary
 		{
 			if (FileExtension.ToLower() == "bin")
 			{
-				ContentType = "application/octet-stream";
+				ContentType = DefaultContentType;
 				return true;
 			}
 			else
@@ -110,7 +115,7 @@ namespace Waher.Content.Binary
 		{
 			switch (ContentType.ToLower())
 			{
-				case "application/octet-stream":
+				case DefaultContentType:
 				case "binary":
 					FileExtension = "bin";
 					return true;
@@ -156,7 +161,7 @@ namespace Waher.Content.Binary
 			if (!(Object is byte[] Bin))
 				throw new ArgumentException("Unable to encode as binary.", nameof(Object));
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, "application/octet-stream"));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, DefaultContentType));
 		}
 	}
 }

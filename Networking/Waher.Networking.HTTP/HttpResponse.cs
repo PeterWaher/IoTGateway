@@ -675,7 +675,7 @@ namespace Waher.Networking.HTTP
 
 					if (!(Content is null))
 					{
-						this.ContentType = string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType;
+						this.ContentType = string.IsNullOrEmpty(ContentType) ? BinaryCodec.DefaultContentType : ContentType;
 						this.ContentLength = Content.Length;
 
 						await this.Write(Content);
@@ -779,7 +779,7 @@ namespace Waher.Networking.HTTP
 							!(this.contentType.StartsWith("image/") ||
 							this.contentType.StartsWith("audio/") ||
 							this.contentType.StartsWith("video/") ||
-							this.contentType == "application/octet-stream")))
+							this.contentType == BinaryCodec.DefaultContentType)))
 						{
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);

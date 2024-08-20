@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.SourceEvents
+﻿namespace Waher.Things.SourceEvents
 {
 	/// <summary>
 	/// Node moved up event.

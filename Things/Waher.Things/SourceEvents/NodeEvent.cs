@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Persistence.Attributes;
+﻿using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SourceEvents
 {

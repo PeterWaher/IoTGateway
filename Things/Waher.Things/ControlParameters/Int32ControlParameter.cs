@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Things.ControlParameters
 {

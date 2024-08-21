@@ -3388,7 +3388,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(Element.ToString());
 						Xml.Append("</double>");
 					}
-					else if (Element is string || Element is char || Element is Enum)
+					else if (Element is string || Element is char || Element is Enum || Element is CaseInsensitiveString)
 					{
 						Xml.Append("<string>");
 						Xml.Append(XML.Encode(Element.ToString()));

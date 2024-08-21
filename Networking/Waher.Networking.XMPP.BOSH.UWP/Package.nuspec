@@ -23,7 +23,7 @@ XEP-0206: XMPP Over BOSH
 			<dependency id="Waher.Content.Xml" version="2.3.1"/>
 			<dependency id="Waher.Events" version="1.2.0"/>
 			<dependency id="Waher.Networking.UWP" version="2.2.6"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="3.0.0"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="3.1.0"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.1.5"/>
       <dependency id="Waher.Security" version="1.0.8"/>
     </dependencies>

@@ -4365,7 +4365,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 			{
 				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
-				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this, e.Query.NamespaceURI);
+				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this.client, e.Query.NamespaceURI);
 				DateTime MaxExpires = DateTime.UtcNow.AddDays(1);
 
 				if (Expires > MaxExpires)

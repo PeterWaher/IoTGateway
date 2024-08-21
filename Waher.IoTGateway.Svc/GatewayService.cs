@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
 using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -246,41 +248,80 @@ namespace Waher.IoTGateway.Svc
 			AddWtsName(Tags, "Client Info", SessionId, WtsInfoClass.WTSClientInfo);
 			AddWtsName(Tags, "Session Info", SessionId, WtsInfoClass.WTSSessionInfo);
 
+			string Message;
+
 			switch (ChangeDescription.Reason)
 			{
 				case SessionChangeReason.ConsoleConnect:
-					Log.Alert("User connected to machine via console interface.", Tags.ToArray());
+					Message = "User connected to machine via console interface.";
 					break;
 
 				case SessionChangeReason.ConsoleDisconnect:
-					Log.Alert("User disconnected console interface.", Tags.ToArray());
+					Message = "User disconnected console interface.";
 					break;
+
 				case SessionChangeReason.RemoteConnect:
-					Log.Alert("User connected remotely to machine.", Tags.ToArray());
+					Message = "User connected remotely to machine.";
 					break;
+
 				case SessionChangeReason.RemoteDisconnect:
-					Log.Alert("User disconnected remote interface.", Tags.ToArray());
+					Message = "User disconnected remote interface.";
 					break;
+
 				case SessionChangeReason.SessionLock:
-					Log.Alert("User session locked.", Tags.ToArray());
+					Message = "User session locked.";
 					break;
+
 				case SessionChangeReason.SessionLogoff:
-					Log.Alert("User logged off.", Tags.ToArray());
+					Message = "User logged off.";
 					break;
+
 				case SessionChangeReason.SessionLogon:
-					Log.Alert("User logged on.", Tags.ToArray());
+					Message = "User logged on.";
 					break;
+
 				case SessionChangeReason.SessionRemoteControl:
-					Log.Alert("User remote control status of session has changed.", Tags.ToArray());
+					Message = "User remote control status of session has changed.";
 					break;
+
 				case SessionChangeReason.SessionUnlock:
-					Log.Alert("User session unlocked.", Tags.ToArray());
+					Message = "User session unlocked.";
 					break;
 
 				default:
 					Tags.Add(new KeyValuePair<string, object>("Reason", ChangeDescription.Reason.ToString()));
-					Log.Alert("Session changed.", Tags.ToArray());
+					Message = "Session changed.";
 					break;
+			}
+
+			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain))
+				Log.Notice(Message, Tags.ToArray());
+			else
+			{
+				if ((Setup.NotificationConfiguration.Instance.Addresses?.Length ?? 0) == 0)
+					Log.Alert(Message, Tags.ToArray());
+				else
+				{
+					Log.Notice(Message, Tags.ToArray());
+
+					StringBuilder Markdown = new();
+
+					Markdown.AppendLine(MarkdownDocument.Encode(Message));
+					Markdown.AppendLine();
+					Markdown.AppendLine("| Details ||");
+					Markdown.AppendLine("|:----|:---|");
+
+					foreach (KeyValuePair<string, object> Tag in Tags)
+					{
+						Markdown.Append("| ");
+						Markdown.Append(MarkdownDocument.Encode(Tag.Key));
+						Markdown.Append(" | ");
+						Markdown.Append(MarkdownDocument.Encode(Tag.Value?.ToString() ?? string.Empty));
+						Markdown.AppendLine(" |");
+					}
+
+					Gateway.SendNotification(Markdown.ToString());
+				}
 			}
 		}
 

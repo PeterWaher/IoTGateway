@@ -14,7 +14,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		protected override bool ReleaseHandle()
 		{
-			return Win32.CloseServiceHandle(handle);
+			return Win32.CloseServiceHandle(this.handle);
 		}
 
 		public override bool IsInvalid
@@ -22,7 +22,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 			[System.Security.SecurityCritical]
 			get
 			{
-				return handle == IntPtr.Zero;
+				return this.handle == IntPtr.Zero;
 			}
 		}
 
@@ -49,7 +49,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public ServiceHandle OpenService(string serviceName, ServiceControlAccessRights desiredControlAccess)
 		{
-			if (!TryOpenService(serviceName, desiredControlAccess, out ServiceHandle service, out Win32Exception errorException))
+			if (!this.TryOpenService(serviceName, desiredControlAccess, out ServiceHandle service, out Win32Exception errorException))
 				throw errorException;
 
 			return service;

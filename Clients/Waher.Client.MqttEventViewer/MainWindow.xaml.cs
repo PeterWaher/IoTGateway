@@ -21,7 +21,7 @@ namespace Waher.Client.MqttEventViewer
 		public MainWindow()
 		{
 			currentInstance = this;
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -39,13 +39,13 @@ namespace Waher.Client.MqttEventViewer
 					TrustServer = this.Trust.IsChecked.HasValue && this.Trust.IsChecked.Value,
 				};
 
-				this.mqtt.OnStateChanged += Mqtt_OnStateChanged;
-				this.mqtt.OnConnectionError += Mqtt_OnConnectionError;
-				this.mqtt.OnError += Mqtt_OnError;
-				this.mqtt.OnSubscribed += Mqtt_OnSubscribed;
+				this.mqtt.OnStateChanged += this.Mqtt_OnStateChanged;
+				this.mqtt.OnConnectionError += this.Mqtt_OnConnectionError;
+				this.mqtt.OnError += this.Mqtt_OnError;
+				this.mqtt.OnSubscribed += this.Mqtt_OnSubscribed;
 
 				this.receptor = new MqttEventReceptor(this.mqtt);
-				this.receptor.OnEvent += Receptor_OnEvent;
+				this.receptor.OnEvent += this.Receptor_OnEvent;
 
 				this.ConnectButton.IsEnabled = false;
 				this.Host.IsEnabled = false;

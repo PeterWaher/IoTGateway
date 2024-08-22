@@ -3,7 +3,9 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Implements the XMPP IoT interoperability extesion.</Description>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Description>Implements the XMPP IoT interoperability extesion.</Description>
     <Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>

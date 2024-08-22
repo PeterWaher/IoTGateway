@@ -3,7 +3,9 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Peter Waher</Authors>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, simplified communication libraries for text and/or binary protocols, etc., as well as classes for building client and server applications.</Description>

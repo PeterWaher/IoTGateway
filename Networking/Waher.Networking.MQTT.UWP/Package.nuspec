@@ -17,7 +17,7 @@
     <dependencies>
 			<dependency id="Waher.Content" version="2.6.11"/>
 			<dependency id="Waher.Events" version="1.2.0"/>
-			<dependency id="Waher.Networking.UWP" version="2.2.6"/>
+			<dependency id="Waher.Networking.UWP" version="2.2.7"/>
     </dependencies>
   </metadata>
   <files>

@@ -151,7 +151,7 @@ namespace Waher.Content.Markdown
 			if (Object is MarkdownContent Content)
 				Markdown = Content.Markdown;
 			else if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
-				Markdown = await MarkdownDocument.GenerateMarkdown();
+				Markdown = await MarkdownDocument.GenerateMarkdown(true);
 			else
 				throw new ArgumentException("Object not a markdown document.", nameof(Object));
 

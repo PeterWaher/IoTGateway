@@ -2581,11 +2581,11 @@ namespace Waher.Script
 							if (Node is NamedMember NamedMember)
 							{
 								if (Right is null)
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], NullCheck, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, NullCheck, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
 								else
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, NullCheck, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
 							}// TODO: Dynamic named method call.
 							else
 							{
@@ -3480,10 +3480,10 @@ namespace Waher.Script
 								if (ex is AggregateException ex2)
 								{
 									foreach (Exception ex3 in ex2.InnerExceptions)
-										Log.Critical(ex3);
+										Log.Exception(ex3);
 								}
 								else
-									Log.Critical(ex);
+									Log.Exception(ex);
 							}
 						}
 					}
@@ -3539,7 +3539,7 @@ namespace Waher.Script
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -3588,7 +3588,7 @@ namespace Waher.Script
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -5438,7 +5438,7 @@ namespace Waher.Script
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex, T2.FullName);
+					Log.Exception(ex, T2.FullName);
 				}
 			}
 

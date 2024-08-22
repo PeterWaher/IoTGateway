@@ -53,7 +53,7 @@ namespace Waher.Security.DTLS
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

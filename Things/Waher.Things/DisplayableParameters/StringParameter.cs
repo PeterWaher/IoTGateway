@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Content.Xml;
 
 namespace Waher.Things.DisplayableParameters

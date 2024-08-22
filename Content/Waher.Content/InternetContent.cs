@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using System.Security.Cryptography.X509Certificates;
+using Waher.Content.Binary;
 
 namespace Waher.Content
 {
@@ -634,7 +635,7 @@ namespace Waher.Content
 			if (TryGetContentType(FileExtension, out string ContentType))
 				return ContentType;
 			else
-				return "application/octet-stream";
+				return BinaryCodec.DefaultContentType;
 		}
 
 		/// <summary>

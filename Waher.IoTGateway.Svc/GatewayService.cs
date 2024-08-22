@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
+using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -245,41 +248,80 @@ namespace Waher.IoTGateway.Svc
 			AddWtsName(Tags, "Client Info", SessionId, WtsInfoClass.WTSClientInfo);
 			AddWtsName(Tags, "Session Info", SessionId, WtsInfoClass.WTSSessionInfo);
 
+			string Message;
+
 			switch (ChangeDescription.Reason)
 			{
 				case SessionChangeReason.ConsoleConnect:
-					Log.Alert("User connected to machine via console interface.", Tags.ToArray());
+					Message = "User connected to machine via console interface.";
 					break;
 
 				case SessionChangeReason.ConsoleDisconnect:
-					Log.Alert("User disconnected console interface.", Tags.ToArray());
+					Message = "User disconnected console interface.";
 					break;
+
 				case SessionChangeReason.RemoteConnect:
-					Log.Alert("User connected remotely to machine.", Tags.ToArray());
+					Message = "User connected remotely to machine.";
 					break;
+
 				case SessionChangeReason.RemoteDisconnect:
-					Log.Alert("User disconnected remote interface.", Tags.ToArray());
+					Message = "User disconnected remote interface.";
 					break;
+
 				case SessionChangeReason.SessionLock:
-					Log.Alert("User session locked.", Tags.ToArray());
+					Message = "User session locked.";
 					break;
+
 				case SessionChangeReason.SessionLogoff:
-					Log.Alert("User logged off.", Tags.ToArray());
+					Message = "User logged off.";
 					break;
+
 				case SessionChangeReason.SessionLogon:
-					Log.Alert("User logged on.", Tags.ToArray());
+					Message = "User logged on.";
 					break;
+
 				case SessionChangeReason.SessionRemoteControl:
-					Log.Alert("User remote control status of session has changed.", Tags.ToArray());
+					Message = "User remote control status of session has changed.";
 					break;
+
 				case SessionChangeReason.SessionUnlock:
-					Log.Alert("User session unlocked.", Tags.ToArray());
+					Message = "User session unlocked.";
 					break;
 
 				default:
 					Tags.Add(new KeyValuePair<string, object>("Reason", ChangeDescription.Reason.ToString()));
-					Log.Alert("Session changed.", Tags.ToArray());
+					Message = "Session changed.";
 					break;
+			}
+
+			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain))
+				Log.Notice(Message, Tags.ToArray());
+			else
+			{
+				if ((Setup.NotificationConfiguration.Instance.Addresses?.Length ?? 0) == 0)
+					Log.Alert(Message, Tags.ToArray());
+				else
+				{
+					Log.Notice(Message, Tags.ToArray());
+
+					StringBuilder Markdown = new();
+
+					Markdown.AppendLine(MarkdownDocument.Encode(Message));
+					Markdown.AppendLine();
+					Markdown.AppendLine("| Details ||");
+					Markdown.AppendLine("|:----|:---|");
+
+					foreach (KeyValuePair<string, object> Tag in Tags)
+					{
+						Markdown.Append("| ");
+						Markdown.Append(MarkdownDocument.Encode(Tag.Key));
+						Markdown.Append(" | ");
+						Markdown.Append(MarkdownDocument.Encode(Tag.Value?.ToString() ?? string.Empty));
+						Markdown.AppendLine(" |");
+					}
+
+					Gateway.SendNotification(Markdown.ToString());
+				}
 			}
 		}
 
@@ -313,24 +355,24 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 		}
 
 		private static string GetWtsName(int SessionId, WtsInfoClass InfoClass)
 		{
+			string Result;
+
 			try
 			{
 				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int StrLen) && StrLen > 1)
 				{
 					try
 					{
-						string Name = Marshal.PtrToStringAnsi(Buffer);
+						Result = Marshal.PtrToStringAnsi(Buffer);
 						Win32.WTSFreeMemory(Buffer);
 						Buffer = IntPtr.Zero;
-
-						return Name;
 					}
 					finally
 					{
@@ -343,10 +385,85 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
+
+			if (!string.IsNullOrEmpty(Result))
+				Result = CommonTypes.Escape(Result, specialCharactersToEscape, specialCharacterEscapes);
+			
+			return Result;
 		}
+
+		private static readonly char[] specialCharactersToEscape = new char[]
+		{
+			'\x00',
+			'\x01',
+			'\x02',
+			'\x03',
+			'\x04',
+			'\x05',
+			'\x06',
+			'\a',	// 7  - 0x07
+			'\b',	// 8  - 0x08
+			'\n',	// 10 - 0x0a
+			'\v',	// 11 - 0x0b
+			'\f',	// 12 - 0x0c
+			'\r',	// 13 - 0x0d
+			'\x0e',
+			'\x0f',
+			'\x10',
+			'\x11',
+			'\x12',
+			'\x13',
+			'\x14',
+			'\x15',
+			'\x16',
+			'\x17',
+			'\x18',
+			'\x19',
+			'\x1a',
+			'\x1b',
+			'\x1c',
+			'\x1d',
+			'\x1e',
+			'\x1f'
+		};
+		private static readonly string[] specialCharacterEscapes = new string[]
+		{
+			"<NUL>",	// '\x00',
+			"<SOH>",	// '\x01',
+			"<STX>",	// '\x02',
+			"<ETX>",	// '\x03',
+			"<EOT>",	// '\x04',
+			"<ENQ>",	// '\x05',
+			"<ACK>",	// '\x06',
+			"<BEL>",	// '\a',	// 7  - 0x07
+			"<BS>",		// '\b',	// 8  - 0x08
+			"<LF>",		// '\n',	// 10 - 0x0a
+			"<VT>",		// '\v',	// 11 - 0x0b
+			"<FF>",		// '\f',	// 12 - 0x0c
+			"<CR>",		// '\r',	// 13 - 0x0d
+			"<SO>",		// '\x0e',
+			"<SI>",		// '\x0f',
+			"<DLE>",	// '\x10',
+			"<DC1>",	// '\x11',
+			"<DC2>",	// '\x12',
+			"<DC3>",	// '\x13',
+			"<DC4>",	// '\x14',
+			"<NAK>",	// '\x15',
+			"<SYN>",	// '\x16',
+			"<ETB>",	// '\x17',
+			"<CAN>",	// '\x18',
+			"<EM>",		// '\x19',
+			"<SUB>",	// '\x1a',
+			"<ESC>",	// '\x1b',
+			"<FS>",		// '\x1c',
+			"<GS>",		// '\x1d',
+			"<RS>",		// '\x1e',
+			"<US>"		// '\x1f'
+		};
+
 
 		protected override void OnShutdown()
 		{

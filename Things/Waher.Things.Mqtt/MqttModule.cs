@@ -24,7 +24,7 @@ namespace Waher.Things.Mqtt
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

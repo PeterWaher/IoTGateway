@@ -111,7 +111,7 @@ namespace Waher.Content.Markdown.PlantUml
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -693,7 +693,7 @@ namespace Waher.Content.Markdown.PlantUml
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}

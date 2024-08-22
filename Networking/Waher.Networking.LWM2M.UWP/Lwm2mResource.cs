@@ -224,7 +224,7 @@ namespace Waher.Networking.LWM2M
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -259,7 +259,7 @@ namespace Waher.Networking.LWM2M
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -370,7 +370,7 @@ namespace Waher.Networking.LWM2M
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -394,7 +394,7 @@ namespace Waher.Networking.LWM2M
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -419,7 +419,7 @@ namespace Waher.Networking.LWM2M
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 	}

@@ -127,7 +127,7 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex, T.FullName);
+					Log.Exception(ex, T.FullName);
 				}
 			}
 
@@ -157,7 +157,7 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex, A.TransparentInformationMarkdownFileName);
+					Log.Exception(ex, A.TransparentInformationMarkdownFileName);
 				}
 			}
 

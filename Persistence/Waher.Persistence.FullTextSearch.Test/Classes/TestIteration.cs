@@ -44,7 +44,7 @@ namespace Waher.Persistence.FullTextSearch.Test.Classes
 		public Task ReportException(Exception Exception)
 		{
 			this.exceptionsLogged = true;
-			Log.Critical(Exception);
+			Log.Exception(Exception);
 			return Task.CompletedTask;
 		}
 

@@ -25,6 +25,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
 using Waher.Security;
+using Waher.Content.Binary;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -559,7 +560,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -617,7 +618,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -2423,7 +2424,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 		}
@@ -2473,7 +2474,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 		}
@@ -2507,7 +2508,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return Task.CompletedTask;
@@ -2995,7 +2996,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						ex = Log.UnnestException(ex);
 
-						await Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
+						await Query.LogMessage(ex);
 						await Query.Abort();
 
 						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
@@ -3387,7 +3388,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(Element.ToString());
 						Xml.Append("</double>");
 					}
-					else if (Element is string || Element is char)
+					else if (Element is string || Element is char || Element is Enum || Element is CaseInsensitiveString)
 					{
 						Xml.Append("<string>");
 						Xml.Append(XML.Encode(Element.ToString()));
@@ -3399,15 +3400,32 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(Element.ToString());
 						Xml.Append("</time>");
 					}
+					else if (Element is byte[] Bin)
+					{
+						Xml.Append("<base64 contentType='");
+						Xml.Append(XML.Encode(BinaryCodec.DefaultContentType));
+						Xml.Append("'>");
+						Xml.Append(Convert.ToBase64String(Bin));
+						Xml.Append("</base64>");
+					}
 					else
 					{
-						KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
+						try
+						{
+							KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
 
-						Xml.Append("<base64 contentType='");
-						Xml.Append(XML.Encode(Encoded.Value));
-						Xml.Append("'>");
-						Xml.Append(Convert.ToBase64String(Encoded.Key));
-						Xml.Append("</base64>");
+							Xml.Append("<base64 contentType='");
+							Xml.Append(XML.Encode(Encoded.Value));
+							Xml.Append("'>");
+							Xml.Append(Convert.ToBase64String(Encoded.Key));
+							Xml.Append("</base64>");
+						}
+						catch (Exception ex)
+						{
+							Xml.Append("<string>");
+							Xml.Append(XML.Encode(ex.Message));
+							Xml.Append("</string>");
+						}
 					}
 				}
 
@@ -4310,7 +4328,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return new ControlParameter[0];
 			}
 		}
@@ -4347,7 +4365,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 			{
 				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
-				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this, e.Query.NamespaceURI);
+				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this.client, e.Query.NamespaceURI);
 				DateTime MaxExpires = DateTime.UtcNow.AddDays(1);
 
 				if (Expires > MaxExpires)

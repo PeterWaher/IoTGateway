@@ -322,7 +322,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 				
 				return Task.CompletedTask;
@@ -645,7 +645,7 @@ namespace Waher.Networking.XMPP.Synchronization
 									}
 									catch (Exception ex)
 									{
-										Log.Critical(ex);
+										Log.Exception(ex);
 									}
 								}
 							}, DateTime.Now);
@@ -654,7 +654,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -952,7 +952,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return Task.CompletedTask;

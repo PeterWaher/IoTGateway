@@ -45,6 +45,12 @@ namespace Waher.Service.PcSensor
 				Console.Out.WriteLine("This application will publish performace couters as sensor values.");
 				Console.Out.WriteLine("Values will be published over XMPP using the interface defined by the Neuro-Foundation.");
 
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -102,7 +108,7 @@ namespace Waher.Service.PcSensor
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 					}, null, 60000, 60000);

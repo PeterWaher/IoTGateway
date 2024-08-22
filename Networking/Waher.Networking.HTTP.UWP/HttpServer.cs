@@ -288,7 +288,7 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -307,7 +307,7 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -318,7 +318,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -437,7 +437,7 @@ namespace Waher.Networking.HTTP
 							catch (Exception ex)
 							{
 								this.failedPorts[HttpPort] = true;
-								Log.Critical(ex, Profile.ProfileName);
+								Log.Exception(ex, Profile.ProfileName);
 							}
 						}
 						else
@@ -505,7 +505,7 @@ namespace Waher.Networking.HTTP
 									catch (Exception ex)
 									{
 										this.failedPorts[HttpPort] = true;
-										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
+										Log.Exception(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
 									}
 								}
 								else
@@ -527,7 +527,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -610,7 +610,7 @@ namespace Waher.Networking.HTTP
 									catch (Exception ex)
 									{
 										this.failedPorts[HttpsPort] = true;
-										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
+										Log.Exception(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
 									}
 								}
 								else
@@ -632,7 +632,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			this.upgradePort = null;
@@ -758,7 +758,7 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -957,7 +957,7 @@ namespace Waher.Networking.HTTP
 				if (this.listeners is null)
 					return;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 #else
@@ -1048,7 +1048,7 @@ namespace Waher.Networking.HTTP
 						}
 
 						if (Found)
-							Log.Critical(ex);
+							Log.Exception(ex);
 						else
 							break;  // Removed, for instance due to network change
 					}
@@ -1059,7 +1059,7 @@ namespace Waher.Networking.HTTP
 				if (this.closed || this.listeners is null)
 					return;
 
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1149,7 +1149,7 @@ namespace Waher.Networking.HTTP
 				catch (Exception ex)
 				{
 					Client.Dispose();
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -1786,7 +1786,7 @@ namespace Waher.Networking.HTTP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1815,7 +1815,7 @@ namespace Waher.Networking.HTTP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

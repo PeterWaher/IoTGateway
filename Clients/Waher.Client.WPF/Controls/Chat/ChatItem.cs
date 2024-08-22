@@ -135,7 +135,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

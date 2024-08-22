@@ -74,27 +74,27 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			#region Neuro-Foundation V1 handlers
 
-			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
-			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
+			this.Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
+			this.Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.SniffMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeAddedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeRemovedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.NodeMovedDownMessageHandler, false);
 
 			#endregion
 
 			#region IEEE V1 handlers
 
-			this.Client.RegisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
-			this.Client.RegisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
-			this.Client.RegisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
+			this.Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorIeeeV1, this.QueryProgressHandler, false);
+			this.Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentratorIeeeV1, this.SniffMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeAddedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeUpdatedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeRemovedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeStatusChangedMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedUpMessageHandler, false);
+			this.Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
 
 			#endregion
 		}
@@ -137,7 +137,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -183,7 +183,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -397,7 +397,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -498,7 +498,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -721,7 +721,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -874,7 +874,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1101,7 +1101,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1228,7 +1228,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1289,7 +1289,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 						return;
@@ -1316,7 +1316,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1480,7 +1480,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1538,7 +1538,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 						return Task.CompletedTask;
@@ -1566,7 +1566,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1645,7 +1645,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -1671,7 +1671,17 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Registers a new sniffer on a node.
+		/// Unregisters a sniffer, without sending an unregistration message.
+		/// </summary>
+		/// <param name="SnifferId">ID of sniffer to unregister.</param>
+		/// <returns>If the sniffer was found locally and removed.</returns>
+		public bool UnregisterSniffer(string SnifferId)
+		{
+			return this.UnregisterSniffer(string.Empty, null, SnifferId, string.Empty, string.Empty, string.Empty, null, null);
+		}
+
+		/// <summary>
+		/// Unregisters a sniffer on a node.
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
@@ -1694,19 +1704,22 @@ namespace Waher.Networking.XMPP.Concentrator
 				Result = this.sniffers.Remove(SnifferId);
 			}
 
-			StringBuilder Xml = new StringBuilder();
+			if (!string.IsNullOrEmpty(To))
+			{
+				StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<unregisterSniffer xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
-			Xml.Append("'");
-			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
-			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
-			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
-			Xml.Append("' snifferId='");
-			Xml.Append(XML.Encode(SnifferId));
-			Xml.Append("'/>");
+				Xml.Append("<unregisterSniffer xmlns='");
+				Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
+				Xml.Append("'");
+				this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+				this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+				this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
+				Xml.Append("' snifferId='");
+				Xml.Append(XML.Encode(SnifferId));
+				Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+				this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			}
 
 			return Result;
 		}
@@ -1720,7 +1733,26 @@ namespace Waher.Networking.XMPP.Concentrator
 			lock (this.sniffers)
 			{
 				if (!this.sniffers.TryGetValue(SnifferId, out Sniffer))
-					return;
+					Sniffer = null;
+			}
+
+			if (Sniffer is null)
+			{
+				CustomSnifferEventHandler h = this.OnCustomSnifferMessage;
+				if (!(h is null))
+				{
+					CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
+					await h(this, e2);
+					Sniffer = e2.Sniffer;
+
+					if (Sniffer is null)
+						return;
+
+					lock (this.sniffers)
+					{
+						this.sniffers[SnifferId] = Sniffer;
+					}
+				}
 			}
 
 			foreach (XmlNode N in e.Content.ChildNodes)
@@ -1792,6 +1824,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 		}
+
+		/// <summary>
+		/// Event raised when a sniffer message has been received from a source without a registered sniffer.
+		/// </summary>
+		public event CustomSnifferEventHandler OnCustomSnifferMessage = null;
 
 		/// <summary>
 		/// Gets available commands for a node.
@@ -1872,7 +1909,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -2101,7 +2138,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -2147,7 +2184,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -2428,7 +2465,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 			}, State);
@@ -2753,7 +2790,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

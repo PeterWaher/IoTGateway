@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP
             }
             catch (Exception ex2)
             {
-                Log.Critical(ex2);
+                Log.Exception(ex2);
             }
         }
     }

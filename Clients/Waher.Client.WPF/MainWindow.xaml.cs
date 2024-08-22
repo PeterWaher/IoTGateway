@@ -55,7 +55,7 @@ namespace Waher.Client.WPF
 	public delegate Task GuiDelegateWithParameter(object Parameter);
 
 	/// <summary>
-	/// Interaction logic for MainWindow.xaml
+	/// Interaction logic for xaml
 	/// </summary>
 	public partial class MainWindow : Window
 	{
@@ -182,8 +182,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				ex = Log.UnnestException(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.MainView.ShowStatus("Failure to initialize: " + ex.Message);
 				ErrorBox(ex.Message);
 			}
@@ -204,6 +203,12 @@ namespace Waher.Client.WPF
 
 			try
 			{
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException));
+
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -496,6 +501,11 @@ namespace Waher.Client.WPF
 			if (Node is null || !Node.IsSniffable)
 				return;
 
+			this.GetSnifferView(Node, null, false);
+		}
+
+		internal SnifferView GetSnifferView(TreeNode Node, string Identifier, bool Custom)
+		{
 			SnifferView View;
 
 			foreach (TabItem Tab in this.Tabs.Items)
@@ -504,23 +514,25 @@ namespace Waher.Client.WPF
 				if (View is null)
 					continue;
 
-				if (View.Node == Node)
+				if ((!(Node is null) && View.Node == Node) || (!string.IsNullOrEmpty(Identifier) && View.Identifier == Identifier))
 				{
 					Tab.Focus();
-					return;
+					return View;
 				}
 			}
 
-			TabItem TabItem = MainWindow.NewTab(Node.Header);
+			TabItem TabItem = NewTab(Node?.Header ?? Identifier);
 			this.Tabs.Items.Add(TabItem);
 
-			View = new SnifferView(Node);
+			View = new SnifferView(Node, Identifier, Custom);
 			TabItem.Content = View;
 
 			View.Sniffer = new TabSniffer(View);
-			Node.AddSniffer(View.Sniffer);
+			Node?.AddSniffer(View.Sniffer);
 
 			this.Tabs.SelectedItem = TabItem;
+
+			return View;
 		}
 
 		private void EventLog_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -542,7 +554,7 @@ namespace Waher.Client.WPF
 				return;
 			}
 
-			TabItem TabItem = MainWindow.NewTab("Event Log");
+			TabItem TabItem = NewTab("Event Log");
 			this.Tabs.Items.Add(TabItem);
 
 			View = new LogView(true);
@@ -599,7 +611,7 @@ namespace Waher.Client.WPF
 				}
 			}
 
-			TabItem TabItem = MainWindow.NewTab(Node.Header);
+			TabItem TabItem = NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			View = new ChatView(Node, Node is RoomNode);
@@ -674,7 +686,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return Task.CompletedTask;
@@ -809,7 +821,7 @@ namespace Waher.Client.WPF
 				{
 					if (XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
 					{
-						TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
+						TabItem TabItem2 = NewTab(FromBareJid);
 						this.Tabs.Items.Add(TabItem2);
 
 						ChatView ChatView = new ChatView(ContactNode, false);
@@ -835,7 +847,7 @@ namespace Waher.Client.WPF
 									Networking.XMPP.MUC.Affiliation.None, Role.None, string.Empty);
 							}
 
-							TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
+							TabItem TabItem2 = NewTab(FromBareJid);
 							this.Tabs.Items.Add(TabItem2);
 
 							ChatView ChatView = new ChatView(ContactNode, false);
@@ -882,7 +894,7 @@ namespace Waher.Client.WPF
 
 			if (ChatView is null)
 			{
-				TabItem TabItem2 = MainWindow.NewTab(Title);
+				TabItem TabItem2 = NewTab(Title);
 				this.Tabs.Items.Add(TabItem2);
 
 				ChatView = new ChatView(Node, true);
@@ -935,7 +947,7 @@ namespace Waher.Client.WPF
 				return;
 			}
 
-			TabItem TabItem2 = MainWindow.NewTab(Title);
+			TabItem TabItem2 = NewTab(Title);
 			this.Tabs.Items.Add(TabItem2);
 
 			ChatView ChatView2 = new ChatView(Node, true);
@@ -956,7 +968,7 @@ namespace Waher.Client.WPF
 				return;
 			}
 
-			TabItem TabItem2 = MainWindow.NewTab(Title);
+			TabItem TabItem2 = NewTab(Title);
 			this.Tabs.Items.Add(TabItem2);
 
 			ChatView ChatView2 = new ChatView(Node, true);
@@ -991,7 +1003,7 @@ namespace Waher.Client.WPF
 			if (Request is null)
 				return;
 
-			TabItem TabItem = MainWindow.NewTab(Node.Header);
+			TabItem TabItem = NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, false);
@@ -1016,7 +1028,7 @@ namespace Waher.Client.WPF
 			if (Request is null)
 				return;
 
-			TabItem TabItem = MainWindow.NewTab(Node.Header);
+			TabItem TabItem = NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, false);
@@ -1047,7 +1059,7 @@ namespace Waher.Client.WPF
 			if (Request is null)
 				return;
 
-			TabItem TabItem = MainWindow.NewTab(Node.Header);
+			TabItem TabItem = NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
 			SensorDataView View = new SensorDataView(Request, Node, true);
@@ -1137,7 +1149,7 @@ namespace Waher.Client.WPF
 
 		private void Script_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TabItem TabItem = MainWindow.NewTab("Script");
+			TabItem TabItem = NewTab("Script");
 			this.Tabs.Items.Add(TabItem);
 
 			ScriptView ScriptView = new ScriptView();
@@ -1205,7 +1217,7 @@ namespace Waher.Client.WPF
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			});
 		}
@@ -1227,7 +1239,7 @@ namespace Waher.Client.WPF
 
 		private QuestionView CreateQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{
-			TabItem TabItem = MainWindow.NewTab("Questions (" + Owner.BareJID + ")");
+			TabItem TabItem = NewTab("Questions (" + Owner.BareJID + ")");
 			this.Tabs.Items.Add(TabItem);
 
 			QuestionView QuestionView = new QuestionView(Owner, ProvisioningClient);
@@ -1301,7 +1313,7 @@ namespace Waher.Client.WPF
 		{
 			if ((sender as Image)?.Tag is TabItem Item)
 			{
-				MainWindow.currentInstance?.Tabs?.Items.Remove(Item);
+				currentInstance?.Tabs?.Items.Remove(Item);
 				if (!(Item.Content is null) && Item.Content is IDisposable Disposable)
 					Disposable.Dispose();
 			}
@@ -1321,7 +1333,7 @@ namespace Waher.Client.WPF
 		{
 			UpdateGui(() =>
 			{
-				MainWindow.currentInstance.MainView.ShowStatus(Message);
+				currentInstance.MainView.ShowStatus(Message);
 				return Task.CompletedTask;
 			});
 		}
@@ -1403,7 +1415,7 @@ namespace Waher.Client.WPF
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 					finally
 					{
@@ -1420,7 +1432,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				lock (guiUpdateQueue)
 				{

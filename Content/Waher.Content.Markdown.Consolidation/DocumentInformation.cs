@@ -105,7 +105,7 @@ namespace Waher.Content.Markdown.Consolidation
 			Result.markdown = Markdown;
 			Result.id = Id;
 
-			string s = await Markdown.GenerateMarkdown();
+			string s = await Markdown.GenerateMarkdown(false);
 			s = s.Trim().Replace("\r\n", "\n").Replace('\r', '\n');
 			Result.rows = s.Split('\n');
 

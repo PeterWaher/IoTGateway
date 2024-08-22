@@ -173,7 +173,7 @@ namespace Waher.Runtime.Cache
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -418,7 +418,7 @@ namespace Waher.Runtime.Cache
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

@@ -18,16 +18,18 @@ namespace Waher.Things.Mqtt.Model
 		/// <param name="Host">Host address</param>
 		/// <param name="Port">Port number</param>
 		/// <param name="Tls">If TLS is used</param>
+		/// <param name="TrustServer">If server certificate should be automatically trusted.</param>
 		/// <param name="UserName">User name</param>
 		/// <param name="Password">Password</param>
 		/// <returns></returns>
-		public static string GetKey(string Host, int Port, bool Tls, string UserName, string Password)
+		public static string GetKey(string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password)
 		{
 			StringBuilder sb = new StringBuilder();
 
 			sb.AppendLine(Host);
 			sb.AppendLine(Port.ToString());
 			sb.AppendLine(Tls.ToString());
+			sb.AppendLine(TrustServer.ToString());
 			sb.AppendLine(UserName);
 			sb.AppendLine(Password);
 
@@ -37,8 +39,8 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static MqttBroker GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, string UserName, string Password,
-			string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
+		public static MqttBroker GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, bool TrustServer,
+			string UserName, string Password, string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
 			MqttBroker Broker;
 
@@ -55,7 +57,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			else
 			{
-				Broker = new MqttBroker(Node, Host, Port, Tls, UserName, Password, WillTopic, WillData, WillRetain, WillQoS);
+				Broker = new MqttBroker(Node, Host, Port, Tls, TrustServer, UserName, Password, WillTopic, WillData, WillRetain, WillQoS);
 
 				lock (brokers)
 				{

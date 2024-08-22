@@ -24,7 +24,7 @@ namespace Waher.Content.Markdown.Test
 			Assert.IsTrue(Emoji1LocalFiles.WaitUntilInitialized(60000));
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
-			string GeneratedMarkdown = await Doc.GenerateMarkdown();
+			string GeneratedMarkdown = await Doc.GenerateMarkdown(true);
 
 			Console.Out.WriteLine(GeneratedMarkdown);
 			Console.Out.WriteLine();

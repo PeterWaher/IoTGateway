@@ -167,7 +167,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 

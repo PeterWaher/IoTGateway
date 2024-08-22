@@ -11,6 +11,8 @@ namespace Waher.Events
 	/// </summary>
 	public static class Log
 	{
+		private static Type[] alertExceptionTypes = new Type[0];
+		private static bool alertExceptionTypesLocked = false;
 		private static IEventSink[] staticSinks = new IEventSink[0];
 		private readonly static List<IEventSink> dynamicSinks = new List<IEventSink>();
 		private static Type[] nestedExceptionTypes = new Type[]
@@ -818,7 +820,8 @@ namespace Waher.Events
 				Type T = Exception.GetType();
 				if (Array.IndexOf(nestedExceptionTypes, T) < 0)
 				{
-					if (Exception is AggregateException AggregateException && AggregateException.InnerExceptions.Count == 1)
+					if (Exception is AggregateException AggregateException && 
+						AggregateException.InnerExceptions.Count == 1)
 					{
 						Exception = AggregateException.InnerExceptions[0];
 						continue;
@@ -1621,6 +1624,151 @@ namespace Waher.Events
 		public static void Emergency(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
 			Event(EventType.Emergency, Exception, Tags);
+		}
+
+		#endregion
+
+		#region Exceptions
+
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Actor">Actor responsible for the action causing the event.</param>
+		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+		/// <param name="Level">Event Level.</param>
+		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+		/// <param name="Module">Module where the event is reported.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Actor, EventId, Level, Facility, Module, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Actor">Actor responsible for the action causing the event.</param>
+		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+		/// <param name="Level">Event Level.</param>
+		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+			string Facility, params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Actor, EventId, Level, Facility, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Actor">Actor responsible for the action causing the event.</param>
+		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+		/// <param name="Level">Event Level.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+			params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Actor, EventId, Level, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Actor">Actor responsible for the action causing the event.</param>
+		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Actor, EventId, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Actor">Actor responsible for the action causing the event.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Actor, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Object">Object related to the event.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, string Object, params KeyValuePair<string, object>[] Tags)
+		{
+			Event(GetEventType(Exception), Exception, Object, Tags);
+		}
+
+		/// <summary>
+		/// Logs an exception. Event type will be determined by the severity of the exception.
+		/// </summary>
+		/// <param name="Exception">Exception Object.</param>
+		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
+		public static void Exception(Exception Exception, params KeyValuePair<string, object>[] Tags)
+		{
+			Exception = UnnestException(Exception);
+			Event(GetEventType(Exception), Exception, Tags);
+		}
+
+		/// <summary>
+		/// Gets the event type corresponding to a given exception object.
+		/// </summary>
+		/// <param name="Exception">Exception object.</param>
+		/// <returns>Event Type corresponding to <paramref name="Exception"/>.</returns>
+		public static EventType GetEventType(Exception Exception)
+		{
+			if (Array.IndexOf(alertExceptionTypes, Exception.GetType()) >= 0)
+				return EventType.Alert;
+			else
+				return EventType.Critical;
+		}
+
+		/// <summary>
+		/// Registers a set of Exception types as Exception types that should generate 
+		/// alert log entries when logged.
+		/// </summary>
+		/// <param name="Lock">If list of exceptions should be locked after the call.</param>
+		/// <param name="ExceptionTypes">Types of exceptions.</param>
+		/// <exception cref="InvalidOperationException">If list has been locked and new types cannot be added.</exception>
+		public static void RegisterAlertExceptionType(bool Lock, params Type[] ExceptionTypes)
+		{
+			List<Type> NewTypes = new List<Type>();
+			bool Changed = false;
+
+			NewTypes.AddRange(alertExceptionTypes);
+
+			foreach (Type ExceptionType in ExceptionTypes)
+			{
+				if (!NewTypes.Contains(ExceptionType))
+				{
+					if (alertExceptionTypesLocked)
+						throw new InvalidOperationException("List of alert exception types has been locked.");
+
+					NewTypes.Add(ExceptionType);
+					Changed = true;
+				}
+			}
+
+			if (Changed)
+				alertExceptionTypes = NewTypes.ToArray();
+
+			alertExceptionTypesLocked = Lock;
 		}
 
 		#endregion

@@ -175,7 +175,7 @@ namespace Waher.Networking.Cluster
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 						catch (NotSupportedException)
@@ -186,7 +186,7 @@ namespace Waher.Networking.Cluster
 						catch (Exception ex)
 						{
 							Client?.Dispose();
-							Log.Critical(ex);
+							Log.Exception(ex);
 							continue;
 						}
 
@@ -214,7 +214,7 @@ namespace Waher.Networking.Cluster
 						catch (Exception ex)
 						{
 							Client?.Dispose();
-							Log.Critical(ex);
+							Log.Exception(ex);
 							continue;
 						}
 
@@ -338,7 +338,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -555,7 +555,7 @@ namespace Waher.Networking.Cluster
 									catch (Exception ex)
 									{
 										this.Exception(ex);
-										Log.Critical(ex);
+										Log.Exception(ex);
 										Ack = false;
 									}
 
@@ -735,7 +735,7 @@ namespace Waher.Networking.Cluster
 			catch (Exception ex)
 			{
 				this.Exception(ex);
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -779,7 +779,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (this.shuttingDown)
 					this.Dispose2();
@@ -843,7 +843,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (this.shuttingDown)
 					this.Dispose2();
@@ -898,7 +898,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -977,7 +977,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1040,7 +1040,7 @@ namespace Waher.Networking.Cluster
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -1052,7 +1052,7 @@ namespace Waher.Networking.Cluster
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1080,7 +1080,7 @@ namespace Waher.Networking.Cluster
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -1165,7 +1165,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -1252,7 +1252,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (this.shuttingDown)
 					this.Dispose2();
@@ -1307,7 +1307,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1535,7 +1535,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

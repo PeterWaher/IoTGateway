@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
@@ -8,17 +9,17 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking.XMPP.Provisioning;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Runtime.Inventory;
+using Waher.Events.Filter;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
-using System.Diagnostics;
 using Waher.Networking.HTTP.Brotli;
-using Waher.Events.Filter;
+using Waher.Networking.XMPP.Provisioning;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
+using Waher.Security.CallStack;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -91,19 +92,25 @@ namespace Waher.IoTGateway.Svc
 					}
 
 					w.Flush();
-				}
 
-				if (e.ExceptionObject is Exception ex2)
-					Log.Critical(ex2);
-				else if (e.ExceptionObject is not null)
-					Log.Critical(e.ExceptionObject.ToString());
-				else
-					Log.Critical("Unexpected null exception thrown.");
+					if (e.ExceptionObject is Exception ex2)
+						Log.Emergency(ex2);
+					else if (e.ExceptionObject is not null)
+						Log.Emergency(e.ExceptionObject.ToString());
+					else
+						Log.Emergency("Unexpected null exception thrown.");
 
-				if (e.IsTerminating)
-				{
 					Gateway.Stop().Wait();
 					Log.Terminate();
+				}
+				else
+				{
+					if (e.ExceptionObject is Exception ex2)
+						Log.Alert(ex2);
+					else if (e.ExceptionObject is not null)
+						Log.Alert(e.ExceptionObject.ToString());
+					else
+						Log.Alert("Unexpected null exception thrown.");
 				}
 			};
 
@@ -143,6 +150,13 @@ namespace Waher.IoTGateway.Svc
 				bool Error = false;
 				bool Help = false;
 				int i, c = args.Length;
+
+				Log.RegisterAlertExceptionType(true,
+					typeof(OutOfMemoryException),
+					typeof(StackOverflowException),
+					typeof(AccessViolationException),
+					typeof(InsufficientMemoryException),
+					typeof(UnauthorizedCallstackException));
 
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -350,7 +364,7 @@ namespace Waher.IoTGateway.Svc
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 
 					return 0;
@@ -373,7 +387,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				Console.Out.WriteLine(ex.Message);
 				return 1;
 			}
@@ -392,7 +406,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 			finally
@@ -473,7 +487,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -501,7 +515,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,

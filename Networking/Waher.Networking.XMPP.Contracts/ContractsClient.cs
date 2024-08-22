@@ -417,13 +417,48 @@ namespace Waher.Networking.XMPP.Contracts
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
 				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
 			{
+				LegalIdentity Identity;
+
+				if (State.State == IdentityState.Created || State.State == IdentityState.Approved)
+				{
+					try
+					{
+						Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
+						if (Identity.State != State.State)
+						{
+							State.State = Identity.State;
+							State.Timestamp = Identity.Updated;
+
+							switch (Identity.State)
+							{
+								case IdentityState.Rejected:
+								case IdentityState.Obsoleted:
+								case IdentityState.Compromised:
+									State.PublicKey = null;
+									break;
+							}
+
+							await Database.Update(State);
+						}
+					}
+					catch (ItemNotFoundException)
+					{
+						await Database.Delete(State);
+						continue;
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex, State.LegalId);
+					}
+				}
+
 				switch (State.State)
 				{
 					case IdentityState.Created:
 					case IdentityState.Approved:
 						try
 						{
-							LegalIdentity Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
+							Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
 							await this.UpdateSettings(Identity);
 						}
 						catch (ItemNotFoundException)
@@ -432,7 +467,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex, State.LegalId);
 						}
 						break;
 				}
@@ -740,7 +775,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -750,7 +785,7 @@ namespace Waher.Networking.XMPP.Contracts
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey")
 					{
 						foreach (XmlNode N in E.ChildNodes)
 						{
@@ -870,7 +905,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -954,7 +989,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return Task.CompletedTask;
@@ -1054,8 +1089,7 @@ namespace Waher.Networking.XMPP.Contracts
 						XmlElement E;
 
 						if (e2.Ok && !((E = e2.FirstElement) is null) &&
-							E.LocalName == "identity" &&
-							E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+							E.LocalName == "identity")
 						{
 							Identity2 = LegalIdentity.Parse(E);
 							await this.UpdateSettings(Identity2, e.Key.PublicKey);
@@ -1455,7 +1489,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1748,18 +1782,14 @@ namespace Waher.Networking.XMPP.Contracts
 			LegalIdentity[] Identities = null;
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identities")
 			{
 				List<LegalIdentity> IdentitiesList = new List<LegalIdentity>();
 
 				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (N is XmlElement E2 &&
-						E2.LocalName == "identity" &&
-						E2.NamespaceURI == E.NamespaceURI)
-					{
+					if (N is XmlElement E2 && E2.LocalName == "identity")
 						IdentitiesList.Add(LegalIdentity.Parse(E2));
-					}
 				}
 
 				Identities = IdentitiesList.ToArray();
@@ -1848,7 +1878,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -1924,7 +1954,7 @@ namespace Waher.Networking.XMPP.Contracts
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -2003,7 +2033,7 @@ namespace Waher.Networking.XMPP.Contracts
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -2289,7 +2319,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentitiesCurrent)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity")
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -3516,7 +3546,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -4330,7 +4360,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -4463,7 +4493,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -4877,9 +4907,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					foreach (XmlNode N in E.ChildNodes)
 					{
-						if (N is XmlElement E2 &&
-							E2.LocalName == "networkIdentity" &&
-							E2.NamespaceURI == E.NamespaceURI)
+						if (N is XmlElement E2 && E2.LocalName == "networkIdentity")
 						{
 							string BareJid = XML.Attribute(E2, "bareJid");
 							string LegalId = XML.Attribute(E2, "legalId");
@@ -5263,7 +5291,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}, null);
 				}
@@ -5303,7 +5331,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -5541,7 +5569,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 			}
@@ -5627,7 +5655,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 					finally
 					{
@@ -5899,7 +5927,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}, null);
 			}
@@ -5939,7 +5967,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -6696,7 +6724,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -6902,7 +6930,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

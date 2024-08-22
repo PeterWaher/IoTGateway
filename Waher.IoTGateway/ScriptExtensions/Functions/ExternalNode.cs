@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Persistence;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
@@ -18,7 +19,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		private readonly string nodeId;
 		private readonly string sourceId;
 		private readonly string paritionId;
-		private readonly string jid;
+		private readonly CaseInsensitiveString jid;
 
 		/// <summary>
 		/// Represents an external node.
@@ -27,7 +28,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="SourceId">Source ID</param>
 		/// <param name="ParitionId">Partition ID</param>
 		/// <param name="Jid">JID of external host.</param>
-		public ExternalNode(string NodeId, string SourceId, string ParitionId, string Jid)
+		public ExternalNode(string NodeId, string SourceId, string ParitionId, CaseInsensitiveString Jid)
 		{
 			this.nodeId = NodeId;
 			this.sourceId = SourceId;
@@ -63,10 +64,10 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					}
 				}
 
-				if (!string.IsNullOrEmpty(this.jid))
+				if (!CaseInsensitiveString.IsNullOrEmpty(this.jid))
 				{
 					sb.Append('@');
-					sb.Append(this.jid);
+					sb.Append(this.jid.Value);
 				}
 
 				return sb.ToString();
@@ -132,6 +133,11 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// Optional partition in which the Node ID is unique.
 		/// </summary>
 		public string Partition => this.paritionId;
+
+		/// <summary>
+		/// JID of remote entity.
+		/// </summary>
+		public CaseInsensitiveString Jid => this.jid;
 
 		/// <summary>
 		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
@@ -288,20 +294,20 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public Task StartReadout(ISensorReadout Request)
 		{
-			RosterItem Item = Gateway.XmppClient[this.jid];
+			RosterItem Item = Gateway.XmppClient[this.jid.Value];
 
 			if (Item is null ||
 				(Item.State != SubscriptionState.Both &&
 				Item.State != SubscriptionState.To))
 			{
-				Gateway.XmppClient.RequestPresenceSubscription(this.jid);
-				Request.ReportErrors(true, new ThingError(this, "No presence subscription approved by " + this.jid + ". New subscription request sent."));
+				Gateway.XmppClient.RequestPresenceSubscription(this.jid.Value);
+				Request.ReportErrors(true, new ThingError(this, "No presence subscription approved by " + this.jid.Value + ". New subscription request sent."));
 				return Task.CompletedTask;
 			}
 
 			if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
 			{
-				Request.ReportErrors(true, new ThingError(this, "Sensor host not online: " + this.jid));
+				Request.ReportErrors(true, new ThingError(this, "Sensor host not online: " + this.jid.Value));
 				return Task.CompletedTask;
 			}
 

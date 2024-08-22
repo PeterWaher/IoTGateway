@@ -3359,7 +3359,7 @@ namespace Waher.Persistence.Serialization
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, TypeName);
+						Log.Exception(ex, TypeName);
 						CsFolder = null;
 					}
 				}
@@ -3422,7 +3422,7 @@ namespace Waher.Persistence.Serialization
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, TypeName);
+						Log.Exception(ex, TypeName);
 					}
 				}
 

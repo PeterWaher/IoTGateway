@@ -52,7 +52,7 @@ namespace Waher.Networking.DNS
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -489,7 +489,7 @@ namespace Waher.Networking.DNS
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

@@ -160,7 +160,7 @@ namespace Waher.Events.Pipe
 			catch (Exception ex)
 			{
 				this.EmptyPipeQueue();
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace Waher.Events.Pipe
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

@@ -417,7 +417,7 @@ namespace Waher.Client.WPF.Controls
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			this.node?.ViewClosed();

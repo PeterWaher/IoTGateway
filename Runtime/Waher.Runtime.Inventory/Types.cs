@@ -305,7 +305,7 @@ namespace Waher.Runtime.Inventory
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -355,7 +355,7 @@ namespace Waher.Runtime.Inventory
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -465,7 +465,7 @@ namespace Waher.Runtime.Inventory
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 						Ok = false;
 					}
 				}
@@ -650,13 +650,13 @@ namespace Waher.Runtime.Inventory
 					catch (ReflectionTypeLoadException ex)
 					{
 						foreach (Exception ex2 in ex.LoaderExceptions)
-							Log.Critical(ex2);
+							Log.Exception(ex2);
 
 						continue;
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex, Assembly.FullName);
+						Log.Exception(ex, Assembly.FullName);
 						continue;
 					}
 
@@ -1096,7 +1096,7 @@ namespace Waher.Runtime.Inventory
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -1148,7 +1148,7 @@ namespace Waher.Runtime.Inventory
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 

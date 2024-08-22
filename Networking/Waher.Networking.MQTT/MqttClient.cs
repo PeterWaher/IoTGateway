@@ -274,7 +274,7 @@ namespace Waher.Networking.MQTT
 				catch (Exception ex2)
 				{
 					this.Exception(ex2);
-					Log.Critical(ex2);
+					Log.Exception(ex2);
 				}
 			}
 
@@ -553,7 +553,7 @@ namespace Waher.Networking.MQTT
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -637,7 +637,7 @@ namespace Waher.Networking.MQTT
 							catch (Exception ex)
 							{
 								this.Exception(ex);
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 						break;
@@ -800,7 +800,7 @@ namespace Waher.Networking.MQTT
 				catch (Exception ex2)
 				{
 					this.Exception(ex2);
-					Log.Critical(ex2);
+					Log.Exception(ex2);
 				}
 			}
 		}
@@ -838,7 +838,7 @@ namespace Waher.Networking.MQTT
 				catch (Exception ex)
 				{
 					this.Exception(ex);
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -1204,7 +1204,7 @@ namespace Waher.Networking.MQTT
 				catch (Exception ex)
 				{
 					this.Exception(ex);
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

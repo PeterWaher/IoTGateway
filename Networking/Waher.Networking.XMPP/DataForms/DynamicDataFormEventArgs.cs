@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.DataForms
+﻿namespace Waher.Networking.XMPP.DataForms
 {
 	/// <summary>
 	/// Event arguments for dynamic data form events.

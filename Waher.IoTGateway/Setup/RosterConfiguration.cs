@@ -408,7 +408,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			string[] Suggestions = e.ToArray();
@@ -599,7 +599,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			StringBuilder sb = new StringBuilder();

@@ -284,7 +284,7 @@ namespace Waher.WebService.Sparql
 			catch (Exception ex)
 			{
 				Error = true;
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (!Response.ResponseSent)
 				{
@@ -321,7 +321,7 @@ namespace Waher.WebService.Sparql
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

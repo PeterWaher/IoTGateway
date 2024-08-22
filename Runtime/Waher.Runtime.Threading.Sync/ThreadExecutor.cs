@@ -219,7 +219,7 @@ namespace Waher.Runtime.Threading.Sync
                                     }
                                     catch (Exception ex)
                                     {
-                                        Log.Critical(ex);
+                                        Log.Exception(ex);
                                     }
                                 }
                             }
@@ -234,7 +234,7 @@ namespace Waher.Runtime.Threading.Sync
             }
             catch (Exception ex)
             {
-                Log.Critical(ex);
+                Log.Exception(ex);
             }
             finally
             {

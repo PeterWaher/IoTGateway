@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Networking.XMPP.DataForms;
+﻿using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP
 {

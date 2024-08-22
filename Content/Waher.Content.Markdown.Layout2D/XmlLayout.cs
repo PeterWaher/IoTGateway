@@ -582,12 +582,12 @@ namespace Waher.Content.Markdown.Layout2D
 			catch (XmlException ex)
 			{
 				ex = XML.AnnotateException(ex, Xml);
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}

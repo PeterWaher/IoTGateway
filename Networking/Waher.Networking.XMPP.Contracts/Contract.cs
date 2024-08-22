@@ -2024,7 +2024,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 
 			return e.Value;

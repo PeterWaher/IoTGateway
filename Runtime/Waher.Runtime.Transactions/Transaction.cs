@@ -93,7 +93,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -129,7 +129,7 @@ namespace Waher.Runtime.Transactions
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						return true;
 					}
@@ -141,7 +141,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					await this.SetStateLocked(TransactionState.Error);
 					return false;
 				}
@@ -203,7 +203,7 @@ namespace Waher.Runtime.Transactions
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						return true;
 					}
@@ -215,7 +215,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					await this.SetStateLocked(TransactionState.Error);
 					return false;
 				}
@@ -265,7 +265,7 @@ namespace Waher.Runtime.Transactions
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						return true;
 					}
@@ -277,7 +277,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					await this.SetStateLocked(TransactionState.Error);
 					return false;
 				}
@@ -328,7 +328,7 @@ namespace Waher.Runtime.Transactions
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 						return true;
 					}
@@ -340,7 +340,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 					await this.SetStateLocked(TransactionState.Error);
 					return false;
 				}
@@ -412,12 +412,12 @@ namespace Waher.Runtime.Transactions
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 							}
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 							await this.SetStateLocked(TransactionState.Error);
 						}
 						break;

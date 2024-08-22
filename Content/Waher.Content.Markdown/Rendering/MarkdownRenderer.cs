@@ -22,6 +22,8 @@ namespace Waher.Content.Markdown.Rendering
 	/// </summary>
 	public class MarkdownRenderer : Renderer
 	{
+		private bool portableSyntax = true;
+
 		/// <summary>
 		/// Renders portable Markdown from a Markdown document.
 		/// </summary>
@@ -56,6 +58,16 @@ namespace Waher.Content.Markdown.Rendering
 		public MarkdownRenderer(StringBuilder Output, MarkdownDocument Document)
 			: base(Output, Document)
 		{
+		}
+		
+		/// <summary>
+		/// If a portable syntax of markdown is to be generated (true), or if generated
+		/// Markdown is to be processed on the same machine (false).
+		/// </summary>
+		public bool PortableSyntax
+		{
+			get => this.portableSyntax;
+			set => this.portableSyntax = value;
 		}
 
 		/// <summary>
@@ -834,18 +846,21 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(CodeBlock Element)
 		{
-			ICodeContentMarkdownRenderer Renderer = Element.CodeContentHandler<ICodeContentMarkdownRenderer>();
-
-			if (!(Renderer is null))
+			if (this.portableSyntax)
 			{
-				try
+				ICodeContentMarkdownRenderer Renderer = Element.CodeContentHandler<ICodeContentMarkdownRenderer>();
+
+				if (!(Renderer is null))
 				{
-					if (await Renderer.RenderMarkdown(this, Element.Rows, Element.Language, Element.Indent, Element.Document))
-						return;
-				}
-				catch (Exception)
-				{
-					// Ignore
+					try
+					{
+						if (await Renderer.RenderMarkdown(this, Element.Rows, Element.Language, Element.Indent, Element.Document))
+							return;
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 			}
 

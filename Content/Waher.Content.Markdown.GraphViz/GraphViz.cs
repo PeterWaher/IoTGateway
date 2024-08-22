@@ -116,7 +116,7 @@ namespace Waher.Content.Markdown.GraphViz
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -307,7 +307,7 @@ namespace Waher.Content.Markdown.GraphViz
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 
@@ -655,7 +655,7 @@ namespace Waher.Content.Markdown.GraphViz
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			};
 
@@ -880,7 +880,7 @@ namespace Waher.Content.Markdown.GraphViz
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}

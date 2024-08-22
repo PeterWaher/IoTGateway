@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.Queries
+﻿namespace Waher.Things.Queries
 {
 	/// <summary>
 	/// Base class for all query-related table events.

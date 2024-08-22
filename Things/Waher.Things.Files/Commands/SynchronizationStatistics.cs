@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Things.Queries;
 
 namespace Waher.Things.Files.Commands
@@ -153,7 +154,7 @@ namespace Waher.Things.Files.Commands
 		/// <param name="ex">Exception</param>
 		public async Task Error(Exception ex)
 		{
-			await this.query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
+			await this.query.LogMessage(ex);
 		}
 
 		/// <summary>

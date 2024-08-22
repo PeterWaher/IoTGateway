@@ -356,7 +356,7 @@ namespace Waher.Security.LoginMonitor
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -385,7 +385,7 @@ namespace Waher.Security.LoginMonitor
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -441,7 +441,7 @@ namespace Waher.Security.LoginMonitor
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -476,7 +476,7 @@ namespace Waher.Security.LoginMonitor
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

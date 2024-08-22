@@ -420,7 +420,7 @@ namespace Waher.Networking.UPnP
 				}
 				catch (Exception ex2)
 				{
-					Events.Log.Critical(ex2);
+					Events.Log.Exception(ex2);
 				}
 			}
 		}
@@ -471,7 +471,7 @@ namespace Waher.Networking.UPnP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

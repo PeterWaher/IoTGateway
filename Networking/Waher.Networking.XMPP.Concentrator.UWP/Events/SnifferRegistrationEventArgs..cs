@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// ID of sniffer session.
 		/// </summary>
-		public string SnifferrId => this.snifferId;
+		public string SnifferId => this.snifferId;
 
 		/// <summary>
 		/// When the sniffer should expire, if not unregistered before.

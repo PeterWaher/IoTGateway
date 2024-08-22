@@ -67,7 +67,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						if (!string.IsNullOrEmpty(Description))
 							existingService.SetDescription(Description);
 
-						if (!(FailureActions is null))
+						if (FailureActions is not null)
 						{
 							existingService.SetFailureActions(FailureActions);
 							existingService.SetFailureActionFlag(true);
@@ -94,7 +94,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						if (!string.IsNullOrEmpty(Description))
 							svc.SetDescription(Description);
 
-						if (!(FailureActions is null))
+						if (FailureActions is not null)
 						{
 							svc.SetFailureActions(FailureActions);
 							svc.SetFailureActionFlag(true);

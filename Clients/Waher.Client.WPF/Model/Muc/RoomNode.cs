@@ -278,7 +278,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

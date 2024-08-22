@@ -190,7 +190,7 @@ namespace Waher.Things.Files
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			});
 		}
@@ -208,7 +208,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -220,7 +220,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -232,7 +232,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -244,7 +244,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Waher.Things.Files
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -291,7 +291,7 @@ namespace Waher.Things.Files
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -352,7 +352,7 @@ namespace Waher.Things.Files
 						await Statistics.Error(ex);
 					else
 					{
-						Log.Critical(ex,
+						Log.Exception(ex,
 							new KeyValuePair<string, object>("Folder", this.folderPath),
 							new KeyValuePair<string, object>("Node ID", this.NodeId));
 					}

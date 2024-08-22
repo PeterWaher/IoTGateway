@@ -19,12 +19,13 @@ namespace Waher.Things.Script
         private readonly VirtualNode node;
         private readonly ScriptCommandNode commandNode;
 
-        /// <summary>
-        /// Represents a command on a script node.
-        /// </summary>
-        /// <param name="Node">Script node publishing the command.</param>
-        /// <param name="Parameters">Command parameter definitions.
-        public ScriptCommand(VirtualNode Node, ScriptCommandNode CommandNode, ScriptParameterNode[] Parameters)
+		/// <summary>
+		/// Represents a command on a script node.
+		/// </summary>
+		/// <param name="Node">Script node publishing the command.</param>
+		/// <param name="CommandNode">Script command node, defining the script for executing the command.</param>
+		/// <param name="Parameters">Command parameter definitions.</param>
+		public ScriptCommand(VirtualNode Node, ScriptCommandNode CommandNode, ScriptParameterNode[] Parameters)
         {
             this.node = Node;
             this.commandNode = CommandNode;
@@ -92,7 +93,7 @@ namespace Waher.Things.Script
         /// </summary>
         public Task ExecuteCommandAsync()
         {
-            return this.commandNode.ParsedCommandDataScript.EvaluateAsync(this.values);
+            return this.commandNode.ParsedScript.EvaluateAsync(this.values);
         }
 
         /// <summary>

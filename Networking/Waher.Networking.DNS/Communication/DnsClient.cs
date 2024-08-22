@@ -201,7 +201,7 @@ namespace Waher.Networking.DNS.Communication
 				{
 					ex = Log.UnnestException(ex);
 					this.thread?.Exception(ex);
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -240,7 +240,7 @@ namespace Waher.Networking.DNS.Communication
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

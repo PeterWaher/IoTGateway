@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.Queries
+﻿namespace Waher.Things.Queries
 {
 	/// <summary>
 	/// Represents a table in a query result.

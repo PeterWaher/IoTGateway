@@ -191,7 +191,7 @@ namespace Waher.IoTGateway.WebResources
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				string[] Tabs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 				await ClientEvents.PushEvent(Tabs, "BackupFailed", "{\"fileName\":\"" + CommonTypes.JsonStringEncode(FileName) +
@@ -206,7 +206,7 @@ namespace Waher.IoTGateway.WebResources
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				lock (synchObject)

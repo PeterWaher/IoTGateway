@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 
@@ -169,7 +170,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			Result.Add(new KeyValuePair<string, string>("Accept", "application/octet-stream"));
+			Result.Add(new KeyValuePair<string, string>("Accept", BinaryCodec.DefaultContentType));
 
 			return Result.ToArray();
 		}

@@ -281,7 +281,7 @@ namespace Waher.Layout.Layout2D
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -461,7 +461,7 @@ namespace Waher.Layout.Layout2D
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -487,7 +487,7 @@ namespace Waher.Layout.Layout2D
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -515,7 +515,7 @@ namespace Waher.Layout.Layout2D
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

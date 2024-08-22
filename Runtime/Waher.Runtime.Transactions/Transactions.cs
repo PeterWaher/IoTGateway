@@ -43,7 +43,7 @@ namespace Waher.Runtime.Transactions
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -137,7 +137,7 @@ namespace Waher.Runtime.Transactions
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -158,7 +158,7 @@ namespace Waher.Runtime.Transactions
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -184,7 +184,7 @@ namespace Waher.Runtime.Transactions
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -210,7 +210,7 @@ namespace Waher.Runtime.Transactions
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}

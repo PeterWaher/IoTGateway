@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -542,7 +543,7 @@ namespace Waher.IoTGateway.Setup
 			catch (Exception ex)
 			{
 				if (string.IsNullOrEmpty(TabID))
-					Log.Critical(ex);
+					Log.Exception(ex);
 				else
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
 
@@ -582,7 +583,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -878,7 +879,7 @@ namespace Waher.IoTGateway.Setup
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				});
 			}
@@ -1549,7 +1550,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				string Msg = "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message);
 
@@ -1570,7 +1571,7 @@ namespace Waher.IoTGateway.Setup
 				throw new NotFoundException("ACME Challenge not found.");
 
 			Response.StatusCode = 200;
-			Response.ContentType = "application/octet-stream";
+			Response.ContentType = BinaryCodec.DefaultContentType;
 			return Response.Write(System.Text.Encoding.ASCII.GetBytes(this.token));
 		}
 

@@ -157,7 +157,7 @@ namespace Waher.Things.Script
 				{
 					foreach (INode Child in Children)
 					{
-						if (Child is ScriptCommandNode CommandNode)
+						if (Child is ScriptCommandNodeBase CommandNode)
 							Commands.Add(await CommandNode.GetCommand(this));
 					}
 				}

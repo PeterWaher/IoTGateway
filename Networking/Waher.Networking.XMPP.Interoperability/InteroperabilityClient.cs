@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.Interoperability
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

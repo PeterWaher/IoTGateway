@@ -74,7 +74,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

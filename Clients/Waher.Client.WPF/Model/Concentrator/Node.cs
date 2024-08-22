@@ -563,7 +563,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 					else
@@ -653,7 +653,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						if (e.Ok)
 						{
 							if (Sniffer is TabSniffer TabSniffer)
-								TabSniffer.SnifferId = e.SnifferrId;
+								TabSniffer.SnifferId = e.SnifferId;
 						}
 						else
 							MainWindow.ErrorBox(e.ErrorText);
@@ -675,6 +675,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (Sniffer is TabSniffer TabSniffer &&
+				!TabSniffer.View.Custom &&
 				!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid) &&
 				!string.IsNullOrEmpty(TabSniffer.SnifferId))
 			{

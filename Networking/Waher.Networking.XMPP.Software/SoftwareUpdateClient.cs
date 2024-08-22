@@ -154,7 +154,7 @@ namespace Waher.Networking.XMPP.Software
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -227,7 +227,7 @@ namespace Waher.Networking.XMPP.Software
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -389,7 +389,7 @@ namespace Waher.Networking.XMPP.Software
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}, State);
@@ -438,7 +438,7 @@ namespace Waher.Networking.XMPP.Software
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -476,7 +476,7 @@ namespace Waher.Networking.XMPP.Software
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -583,7 +583,7 @@ namespace Waher.Networking.XMPP.Software
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 
@@ -604,7 +604,7 @@ namespace Waher.Networking.XMPP.Software
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

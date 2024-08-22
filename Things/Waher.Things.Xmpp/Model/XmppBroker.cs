@@ -142,7 +142,7 @@ namespace Waher.Things.Xmpp.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

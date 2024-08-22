@@ -330,7 +330,7 @@ namespace Waher.Content.Markdown.Consolidation
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -475,7 +475,7 @@ namespace Waher.Content.Markdown.Consolidation
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 							this.GenerateComplexLocked(Markdown);
 						}
 						break;
@@ -566,7 +566,7 @@ namespace Waher.Content.Markdown.Consolidation
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 							this.GenerateComplexLocked(Markdown);
 						}
 						break;
@@ -739,7 +739,7 @@ namespace Waher.Content.Markdown.Consolidation
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

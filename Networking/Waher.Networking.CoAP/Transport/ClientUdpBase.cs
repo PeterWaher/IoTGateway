@@ -40,7 +40,7 @@ namespace Waher.Networking.CoAP.Transport
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}

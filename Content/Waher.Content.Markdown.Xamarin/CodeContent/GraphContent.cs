@@ -38,7 +38,7 @@ namespace Waher.Content.Markdown.Xamarin.CodeContent
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
 
-namespace Waher.Networking.XMPP.Concentrator
+namespace Waher.Networking.XMPP
 {
 	/// <summary>
 	/// Class redirecting sniffer output to a remote client.
@@ -17,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private readonly string @namespace;
 		private readonly DateTime expires;
 		private readonly ISniffable node;
-		private readonly ConcentratorServer concentratorServer;
+		private readonly XmppClient client;
 
 		/// <summary>
 		/// Class redirecting sniffer output to a remote client.
@@ -25,15 +24,15 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FullJID">Full JID of remote client.</param>
 		/// <param name="Expires">When the sniffer should automatically expire.</param>
 		/// <param name="Node">Node being sniffed.</param>
-		/// <param name="ConcentratorServer">Concentrator server managing nodes.</param>
+		/// <param name="Client">XMPP Client transmitting messages.</param>
 		/// <param name="Namespace">Namespace used when creating sniffer.</param>
-		public RemoteSniffer(string FullJID, DateTime Expires, ISniffable Node, ConcentratorServer ConcentratorServer, string Namespace)
+		public RemoteSniffer(string FullJID, DateTime Expires, ISniffable Node, XmppClient Client, string Namespace)
 		{
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.fullJID = FullJID;
 			this.expires = Expires.ToUniversalTime();
 			this.node = Node;
-			this.concentratorServer = ConcentratorServer;
+			this.client = Client;
 			this.@namespace = Namespace;
 		}
 
@@ -58,9 +57,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		public ISniffable Node => this.node;
 
 		/// <summary>
-		/// Concentrator server managing nodes.
+		/// XMPP Client transmitting messages.
 		/// </summary>
-		public ConcentratorServer ConcentratorServer => this.concentratorServer;
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// Namespace used when creating sniffer.
@@ -124,7 +123,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private Task Send(StringBuilder Xml)
 		{
 			Xml.Append("</sniff>");
-			this.concentratorServer.Client.SendMessage(MessageType.Normal, this.fullJID, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.client.SendMessage(MessageType.Normal, this.fullJID, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 			return Task.CompletedTask;
 		}
 

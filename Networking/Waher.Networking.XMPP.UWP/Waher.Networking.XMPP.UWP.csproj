@@ -214,6 +214,7 @@
     <Compile Include="PrivateXmlEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QoSLevel.cs" />
+    <Compile Include="RemoteSniffer.cs" />
     <Compile Include="ResultSetManagement\RestrictedQuery.cs" />
     <Compile Include="ResultSetManagement\ResultPage.cs" />
     <Compile Include="RosterItem.cs" />

@@ -2,15 +2,15 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
+using Waher.Content.Text;
 using Waher.Events;
+using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
-using System.Threading.Tasks;
-using Waher.Content.Binary;
-using Waher.Content.Text;
-using Waher.Networking.HTTP.ContentEncodings;
 
 namespace Waher.Networking.HTTP
 {
@@ -553,7 +553,7 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -675,7 +675,7 @@ namespace Waher.Networking.HTTP
 
 					if (!(Content is null))
 					{
-						this.ContentType = string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType;
+						this.ContentType = string.IsNullOrEmpty(ContentType) ? BinaryCodec.DefaultContentType : ContentType;
 						this.ContentLength = Content.Length;
 
 						await this.Write(Content);
@@ -761,7 +761,7 @@ namespace Waher.Networking.HTTP
 						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
 					}
 
-					IContentEncoding ContentEncoding = this.httpRequest.Header.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+					IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
 
 					if (this.contentLength.HasValue && ContentEncoding is null)
 					{
@@ -779,7 +779,7 @@ namespace Waher.Networking.HTTP
 							!(this.contentType.StartsWith("image/") ||
 							this.contentType.StartsWith("audio/") ||
 							this.contentType.StartsWith("video/") ||
-							this.contentType == "application/octet-stream")))
+							this.contentType == BinaryCodec.DefaultContentType)))
 						{
 							Output.Append("\r\nContent-Encoding: ");
 							Output.Append(ContentEncoding.Label);
@@ -1063,7 +1063,7 @@ namespace Waher.Networking.HTTP
 			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
 				this.lastPing = TP;
-				this.httpServer.PingRequest(this.httpRequest);
+				this.httpServer?.PingRequest(this.httpRequest);
 			}
 		}
 

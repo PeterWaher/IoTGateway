@@ -18,7 +18,7 @@ namespace Waher.Things.Xmpp
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

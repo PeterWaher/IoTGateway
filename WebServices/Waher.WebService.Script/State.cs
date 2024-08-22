@@ -263,7 +263,7 @@ namespace Waher.WebService.Script
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -547,7 +547,7 @@ namespace Waher.WebService.Script
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

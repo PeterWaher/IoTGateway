@@ -1,5 +1,4 @@
-﻿using System;
-#if WINDOWS_UWP
+﻿#if WINDOWS_UWP
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Certificates;
 #else

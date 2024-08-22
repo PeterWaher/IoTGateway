@@ -219,6 +219,7 @@ namespace Waher.Client.WPF.Model
 
 			this.AddPepClient(string.Empty);
 
+			this.concentratorClient.OnCustomSnifferMessage += this.ConcentratorClient_OnCustomSnifferMessage;
 			this.concentratorClient.OnEvent += this.ConcentratorClient_OnEvent;
 
 			//this.p2pNetwork = new XmppServerlessMessaging("RDP " + this.BareJID, this.client.BareJID);
@@ -267,6 +268,21 @@ namespace Waher.Client.WPF.Model
 			this.mucClient = null;
 
 			this.mucClient = new MultiUserChatClient(this.client, MucComponentAddress);
+		}
+
+		private async Task ConcentratorClient_OnCustomSnifferMessage(object Sender, CustomSnifferEventArgs e)
+		{
+			TaskCompletionSource<SnifferView> View = new TaskCompletionSource<SnifferView>();
+			
+			MainWindow.UpdateGui(() =>
+			{
+				View.TrySetResult(MainWindow.currentInstance.GetSnifferView(null, e.FromBareJID, true));
+				return Task.CompletedTask;
+			});
+
+			SnifferView SnifferView = await View.Task;
+
+			e.Sniffer = SnifferView.Sniffer;
 		}
 
 		private async Task ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
@@ -773,7 +789,7 @@ namespace Waher.Client.WPF.Model
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			}
@@ -1236,7 +1252,7 @@ namespace Waher.Client.WPF.Model
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 
 					}, null);

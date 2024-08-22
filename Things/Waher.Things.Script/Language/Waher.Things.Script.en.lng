@@ -6,7 +6,7 @@
 			<String id="2">Script</String>
 			<String id="3">Sensor-data script:</String>
 			<String id="4"></String>
-			<String id="5">Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the "this" variable to refer to this node.</String>
+			<String id="5">Script that returns sensor-data fields. Intermediate fields can be returned using the preview function. Script should not return previewed fields, as these have already been reported. Use the "this" variable to refer to this node, and the \"Request\" to refer to the current readout-request for process optimization.</String>
 			<String id="6">Script Node:</String>
 			<String id="7">ID of template node that defines how the node operates.</String>
 			<String id="8">Script Reference Node</String>
@@ -29,7 +29,7 @@
 			<String id="25">Optional success message. If defined, it will be presented to users after the successful execution of the command.</String>
 			<String id="26">Failure Message:</String>
 			<String id="27">Optional failure message. If defined, it will be presented to users after the failed execution of the command.</String>
-			<String id="28">Script that is evaluated when command is executed. Use the &quot;this&quot; variable to refer to this node.</String>
+			<String id="28">Script that is evaluated when command is executed. Use the &quot;this&quot; variable to refer to the script node publishing the command.</String>
 			<String id="29">Default value:</String>
 			<String id="30">Default value presented to user.</String>
 			<String id="31">Pattern:</String>
@@ -91,16 +91,26 @@
 			<String id="87">Selectable option</String>
 			<String id="88">Restrict to options.</String>
 			<String id="89">If only values defined in options are valid values.</String>
-			<String id="90"></String>
-			<String id="91"></String>
-			<String id="92"></String>
-			<String id="93"></String>
+			<String id="90">Query script:</String>
+			<String id="91">Script that gets evaluated when then query is executed.</String>
+			<String id="92">Script that is evaluated when query is executed. Use the &quot;this&quot; variable to refer to the script node publishing the query. The &quot;Query&quot; variable will contain the current state of the query, while the &quot;Language&quot; variable contains the selected language.</String>
+			<String id="93">Script Query</String>
 			<String id="94"></String>
 			<String id="95"></String>
 			<String id="96"></String>
 			<String id="97"></String>
 			<String id="98"></String>
 			<String id="99"></String>
+			<String id="100"></String>
+			<String id="101"></String>
+			<String id="102"></String>
+			<String id="103"></String>
+			<String id="104"></String>
+			<String id="105"></String>
+			<String id="106"></String>
+			<String id="107"></String>
+			<String id="108"></String>
+			<String id="109"></String>
 		</Namespace>
 	</Language>
 </Translation>

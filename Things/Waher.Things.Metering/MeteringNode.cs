@@ -523,7 +523,7 @@ namespace Waher.Things.Metering
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

@@ -84,7 +84,7 @@ namespace Waher.Things.Modbus
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

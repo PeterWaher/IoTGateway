@@ -23,6 +23,7 @@ namespace Waher.Things.Mqtt.Model
 		private readonly string host;
 		private readonly int port;
 		private readonly bool tls;
+		private readonly bool trustServer;
 		private readonly string userName;
 		private readonly string password;
 		private string willTopic;
@@ -34,13 +35,14 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
+		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password,
 			string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
 			this.node = Node;
 			this.host = Host;
 			this.port = Port;
 			this.tls = Tls;
+			this.trustServer = TrustServer;
 			this.userName = UserName;
 			this.password = Password;
 			this.willTopic = WillTopic;
@@ -56,11 +58,14 @@ namespace Waher.Things.Mqtt.Model
 		private void Open()
 		{
 			this.mqttClient = new MqttClient(this.host, this.port, this.tls, this.userName, this.password, this.willTopic,
-				this.willQoS, this.willRetain, Encoding.UTF8.GetBytes(this.willData));
+				this.willQoS, this.willRetain, Encoding.UTF8.GetBytes(this.willData))
+			{
+				TrustServer = this.trustServer
+			};
 
-			this.mqttClient.OnConnectionError += MqttClient_OnConnectionError;
-			this.mqttClient.OnContentReceived += MqttClient_OnContentReceived;
-			this.mqttClient.OnStateChanged += MqttClient_OnStateChanged;
+			this.mqttClient.OnConnectionError += this.MqttClient_OnConnectionError;
+			this.mqttClient.OnContentReceived += this.MqttClient_OnContentReceived;
+			this.mqttClient.OnStateChanged += this.MqttClient_OnStateChanged;
 
 			this.nextCheck = Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckOnline, null);
 		}
@@ -71,9 +76,9 @@ namespace Waher.Things.Mqtt.Model
 			{
 				Scheduler.Remove(this.nextCheck);
 
-				this.mqttClient.OnConnectionError -= MqttClient_OnConnectionError;
-				this.mqttClient.OnContentReceived -= MqttClient_OnContentReceived;
-				this.mqttClient.OnStateChanged -= MqttClient_OnStateChanged;
+				this.mqttClient.OnConnectionError -= this.MqttClient_OnConnectionError;
+				this.mqttClient.OnContentReceived -= this.MqttClient_OnContentReceived;
+				this.mqttClient.OnStateChanged -= this.MqttClient_OnStateChanged;
 
 				this.mqttClient.Dispose();
 				this.mqttClient = null;
@@ -101,7 +106,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{
@@ -163,7 +168,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -213,7 +218,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				this.processing = false;
 			}
 		}

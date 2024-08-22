@@ -292,7 +292,7 @@ namespace Waher.Networking.CoAP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

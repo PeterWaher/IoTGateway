@@ -15,6 +15,12 @@ namespace Waher.Utility.GetEmojiCatalog
 		{
 			string Html;
 
+			Log.RegisterAlertExceptionType(true,
+				typeof(OutOfMemoryException),
+				typeof(StackOverflowException),
+				typeof(AccessViolationException),
+				typeof(InsufficientMemoryException));
+
 			Log.Register(new ConsoleEventSink(false));
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
@@ -65,7 +71,7 @@ namespace Waher.Utility.GetEmojiCatalog
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 			finally
 			{

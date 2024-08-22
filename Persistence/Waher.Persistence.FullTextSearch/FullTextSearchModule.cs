@@ -178,7 +178,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -555,6 +555,9 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static async Task<TypeInformation> GetTypeInfoLocked(Type T, object Instance)
 		{
+			if (types is null)
+				throw new Exception("Full text search module not started, or in the process of being stopped.");
+
 			if (types.TryGetValue(T, out TypeInformation Result))
 				return Result;
 
@@ -1091,7 +1094,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1237,7 +1240,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1292,7 +1295,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -1370,7 +1373,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			public Task ReportException(Exception Exception)
 			{
-				Log.Critical(Exception);
+				Log.Exception(Exception);
 				return Task.CompletedTask;
 			}
 		}

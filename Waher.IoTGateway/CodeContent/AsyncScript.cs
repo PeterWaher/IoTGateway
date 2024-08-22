@@ -159,7 +159,7 @@ namespace Waher.IoTGateway.CodeContent
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			};
 

@@ -24,6 +24,7 @@ namespace Waher.Things.Mqtt
 		private string willData = string.Empty;
 		private string brokerKey = null;
 		private bool willRetain = false;
+		private bool trustServer = false;
 
 		/// <summary>
 		/// TODO
@@ -33,6 +34,18 @@ namespace Waher.Things.Mqtt
 		{
 			this.Port = 8883;
 			this.Tls = true;
+		}
+
+		/// <summary>
+		/// If connection is encrypted using TLS or not.
+		/// </summary>
+		[Page(1, "IP")]
+		[Header(44, "Trust Server", 80)]
+		[ToolTip(45, "If the remote server certificate should be trusted even if it is not valid.")]
+		public bool TrustServer
+		{
+			get => this.trustServer;
+			set => this.trustServer = value;
 		}
 
 		/// <summary>
@@ -153,7 +166,7 @@ namespace Waher.Things.Mqtt
 			get
 			{
 				string PrevKey = this.brokerKey;
-				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.userName, this.password);
+				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password);
 
 				if (PrevKey != this.brokerKey && !string.IsNullOrEmpty(PrevKey))
 					MqttBrokers.DestroyBroker(PrevKey);
@@ -174,7 +187,7 @@ namespace Waher.Things.Mqtt
 
 		internal MqttBroker GetBroker()
 		{
-			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.userName, this.password,
+			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.TrustServer, this.userName, this.password,
 				this.willTopic, this.willData, this.willRetain, this.willQoS);
 		}
 

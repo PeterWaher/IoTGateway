@@ -179,7 +179,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -508,7 +508,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -525,7 +525,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -542,7 +542,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -576,7 +576,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					}
 
@@ -600,7 +600,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				lock (this.queue)
 				{
@@ -1013,7 +1013,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 

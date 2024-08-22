@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Authentication
+﻿namespace Waher.Networking.XMPP.Authentication
 {
 	/// <summary>
 	/// Authentication method: PLAIN

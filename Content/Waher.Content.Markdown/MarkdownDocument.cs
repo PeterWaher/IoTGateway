@@ -223,7 +223,7 @@ namespace Waher.Content.Markdown
 		{
 			get
 			{
-				return this.GenerateMarkdown().Result;
+				return this.GenerateMarkdown(false).Result;
 			}
 		}
 
@@ -356,7 +356,7 @@ namespace Waher.Content.Markdown
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex, FileName2);
+								Log.Exception(ex, FileName2);
 							}
 						}
 					}
@@ -441,7 +441,7 @@ namespace Waher.Content.Markdown
 						{
 							CheckException(ex3, TransparentExceptionTypes);
 
-							Log.Critical(ex3, FileName);
+							Log.Exception(ex3, FileName);
 
 							sb.Append("<p>");
 							sb.Append(XML.HtmlValueEncode(ex3.Message));
@@ -452,7 +452,7 @@ namespace Waher.Content.Markdown
 					{
 						CheckException(ex, TransparentExceptionTypes);
 
-						Log.Critical(ex, FileName);
+						Log.Exception(ex, FileName);
 
 						sb.AppendLine(XML.HtmlValueEncode(ex.Message));
 					}
@@ -2760,7 +2760,7 @@ namespace Waher.Content.Markdown
 								{
 									this.CheckException(ex3);
 
-									Log.Critical(ex3, this.fileName);
+									Log.Exception(ex3, this.fileName);
 
 									Elements.AddLast(new Paragraph(this, new MarkdownElement[]
 									{
@@ -2772,7 +2772,7 @@ namespace Waher.Content.Markdown
 							{
 								this.CheckException(ex);
 
-								Log.Critical(ex, this.fileName);
+								Log.Exception(ex, this.fileName);
 
 								Elements.AddLast(new Paragraph(this, new MarkdownElement[]
 								{
@@ -5375,10 +5375,21 @@ namespace Waher.Content.Markdown
 		/// Generates Markdown from the markdown text.
 		/// </summary>
 		/// <returns>Markdown</returns>
-		public async Task<string> GenerateMarkdown()
+		public Task<string> GenerateMarkdown()
+		{
+			return this.GenerateMarkdown(true);
+		}
+
+		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <param name="PortableSyntax">If a portable syntax of markdown is to be generated (true), or if generated
+		/// Markdown is to be processed on the same machine (false).</param>
+		/// <returns>Markdown</returns>
+		public async Task<string> GenerateMarkdown(bool PortableSyntax)
 		{
 			StringBuilder Output = new StringBuilder();
-			await this.GenerateMarkdown(Output);
+			await this.GenerateMarkdown(Output, PortableSyntax);
 			return Output.ToString();
 		}
 
@@ -5386,9 +5397,23 @@ namespace Waher.Content.Markdown
 		/// Generates Markdown from the markdown text.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public async Task GenerateMarkdown(StringBuilder Output)
+		public Task GenerateMarkdown(StringBuilder Output)
 		{
-			using (MarkdownRenderer Renderer = new MarkdownRenderer(Output))
+			return this.GenerateMarkdown(Output, true);
+		}
+
+		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="PortableSyntax">If a portable syntax of markdown is to be generated (true), or if generated
+		/// Markdown is to be processed on the same machine (false).</param>
+		public async Task GenerateMarkdown(StringBuilder Output, bool PortableSyntax)
+		{
+			using (MarkdownRenderer Renderer = new MarkdownRenderer(Output)
+			{
+				PortableSyntax = PortableSyntax
+			})
 			{
 				await this.RenderDocument(Renderer);
 			}
@@ -6011,7 +6036,7 @@ namespace Waher.Content.Markdown
 			MarkdownDocument NewDoc = await CreateAsync(New, Settings, TransparentExceptionTypes);
 			MarkdownDocument DiffDoc = await Compare(OldDoc, NewDoc, KeepUnchanged);
 
-			return await DiffDoc.GenerateMarkdown();
+			return await DiffDoc.GenerateMarkdown(false);
 		}
 
 		/// <summary>
@@ -6363,7 +6388,7 @@ namespace Waher.Content.Markdown
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 			});

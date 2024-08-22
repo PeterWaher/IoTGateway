@@ -694,7 +694,7 @@ namespace Waher.IoTGateway.Setup
 									}
 									catch (Exception ex)
 									{
-										Log.Critical(ex);
+										Log.Exception(ex);
 									}
 
 									break;
@@ -1016,7 +1016,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 
 				if (!string.IsNullOrEmpty(TabID))
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
@@ -1304,7 +1304,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 			finally

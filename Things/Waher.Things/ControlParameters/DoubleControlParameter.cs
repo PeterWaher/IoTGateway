@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Content;
+
 namespace Waher.Things.ControlParameters
 {
 	/// <summary>
@@ -85,7 +86,7 @@ namespace Waher.Things.ControlParameters
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return false;
 			}
 		}
@@ -122,7 +123,7 @@ namespace Waher.Things.ControlParameters
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 				return null;
 			}
 		}

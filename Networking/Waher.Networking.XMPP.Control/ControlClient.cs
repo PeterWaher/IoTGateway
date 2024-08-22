@@ -659,7 +659,7 @@ namespace Waher.Networking.XMPP.Control
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -815,7 +815,7 @@ namespace Waher.Networking.XMPP.Control
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}

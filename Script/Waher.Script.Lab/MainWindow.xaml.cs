@@ -42,6 +42,12 @@ namespace Waher.Script.Lab
 		{
 			this.InitializeComponent();
 
+			Log.RegisterAlertExceptionType(true,
+				typeof(OutOfMemoryException),
+				typeof(StackOverflowException),
+				typeof(AccessViolationException),
+				typeof(InsufficientMemoryException));
+
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
@@ -77,7 +83,7 @@ namespace Waher.Script.Lab
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Log.Exception(ex);
 			}
 		}
 
@@ -143,7 +149,7 @@ namespace Waher.Script.Lab
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 						}
 					};
 
@@ -307,7 +313,7 @@ namespace Waher.Script.Lab
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			});
 
@@ -378,7 +384,7 @@ namespace Waher.Script.Lab
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			});
 

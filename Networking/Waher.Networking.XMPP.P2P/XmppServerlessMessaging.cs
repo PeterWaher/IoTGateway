@@ -149,7 +149,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -307,7 +307,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -414,7 +414,7 @@ namespace Waher.Networking.XMPP.P2P
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						Log.Exception(ex);
 					}
 				}
 
@@ -470,7 +470,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 
 				return;
@@ -516,7 +516,7 @@ namespace Waher.Networking.XMPP.P2P
 								}
 								catch (Exception ex2)
 								{
-									Log.Critical(ex2);
+									Log.Exception(ex2);
 								}
 							});
 
@@ -524,7 +524,7 @@ namespace Waher.Networking.XMPP.P2P
 						}
 						catch (Exception ex2)
 						{
-							Log.Critical(ex2);
+							Log.Exception(ex2);
 						}
 
 						return;
@@ -568,13 +568,13 @@ namespace Waher.Networking.XMPP.P2P
 									}
 									catch (Exception ex)
 									{
-										Log.Critical(ex);
+										Log.Exception(ex);
 									}
 								}));
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Log.Exception(ex);
 								Result.CallCallbacks();
 							}
 						}

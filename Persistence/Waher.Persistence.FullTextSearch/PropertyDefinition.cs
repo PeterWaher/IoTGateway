@@ -163,7 +163,7 @@ namespace Waher.Persistence.FullTextSearch
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							Log.Exception(ex);
 							return null;
 						}
 					}

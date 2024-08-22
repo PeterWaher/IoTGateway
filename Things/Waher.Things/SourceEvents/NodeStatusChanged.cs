@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Things.DisplayableParameters;
+﻿using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.SourceEvents
 {

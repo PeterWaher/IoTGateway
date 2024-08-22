@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Temporary;
@@ -302,7 +303,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 
 						Request.Content = new StreamContent(File);
-						Request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+						Request.Content.Headers.ContentType = new MediaTypeHeaderValue(BinaryCodec.DefaultContentType);
 						Request.Content.Headers.Add("Origin", To);
 						Request.Headers.Add("From", Client.FullJID);
 

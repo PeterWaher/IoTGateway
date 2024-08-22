@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP
+﻿namespace Waher.Networking.XMPP
 {
 	/// <summary>
 	/// State of XMPP connection.

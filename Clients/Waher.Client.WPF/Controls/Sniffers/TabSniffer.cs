@@ -16,6 +16,8 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			this.view = View;
 		}
 
+		public SnifferView View => this.view;
+
 		public string SnifferId
 		{
 			get => this.snifferId;

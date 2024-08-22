@@ -209,7 +209,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						SnifferView SnifferView = new SnifferView(null);
+						SnifferView SnifferView = new SnifferView(null, null, true);
 						TabItem.Content = SnifferView;
 
 						SnifferView.Sniffer = new TabSniffer(SnifferView);

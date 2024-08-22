@@ -23,12 +23,16 @@ namespace Waher.Client.WPF.Controls
 	public partial class SnifferView : UserControl, ITabView
 	{
 		private readonly TreeNode node;
+		private readonly string identifier;
+		private readonly bool custom;
 		private TabSniffer sniffer;
 
-		public SnifferView(TreeNode Node)
+		public SnifferView(TreeNode Node, string Identifier, bool Custom)
 		{
 			this.node = Node;
+			this.identifier = Identifier;
 			this.sniffer = null;
+			this.custom = Custom;
 
 			this.InitializeComponent();
 		}
@@ -40,6 +44,8 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		public TreeNode Node => this.node;
+		public string Identifier => this.identifier;
+		public bool Custom => this.custom;
 
 		public TabSniffer Sniffer
 		{

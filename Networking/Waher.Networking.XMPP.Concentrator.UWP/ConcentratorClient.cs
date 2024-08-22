@@ -1671,7 +1671,17 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Registers a new sniffer on a node.
+		/// Unregisters a sniffer, without sending an unregistration message.
+		/// </summary>
+		/// <param name="SnifferId">ID of sniffer to unregister.</param>
+		/// <returns>If the sniffer was found locally and removed.</returns>
+		public bool UnregisterSniffer(string SnifferId)
+		{
+			return this.UnregisterSniffer(string.Empty, null, SnifferId, string.Empty, string.Empty, string.Empty, null, null);
+		}
+
+		/// <summary>
+		/// Unregisters a sniffer on a node.
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
@@ -1694,19 +1704,22 @@ namespace Waher.Networking.XMPP.Concentrator
 				Result = this.sniffers.Remove(SnifferId);
 			}
 
-			StringBuilder Xml = new StringBuilder();
+			if (!string.IsNullOrEmpty(To))
+			{
+				StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<unregisterSniffer xmlns='");
-			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
-			Xml.Append("'");
-			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
-			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
-			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
-			Xml.Append("' snifferId='");
-			Xml.Append(XML.Encode(SnifferId));
-			Xml.Append("'/>");
+				Xml.Append("<unregisterSniffer xmlns='");
+				Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
+				Xml.Append("'");
+				this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+				this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+				this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
+				Xml.Append("' snifferId='");
+				Xml.Append(XML.Encode(SnifferId));
+				Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+				this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			}
 
 			return Result;
 		}
@@ -1720,7 +1733,26 @@ namespace Waher.Networking.XMPP.Concentrator
 			lock (this.sniffers)
 			{
 				if (!this.sniffers.TryGetValue(SnifferId, out Sniffer))
-					return;
+					Sniffer = null;
+			}
+
+			if (Sniffer is null)
+			{
+				CustomSnifferEventHandler h = this.OnCustomSnifferMessage;
+				if (!(h is null))
+				{
+					CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
+					await h(this, e2);
+					Sniffer = e2.Sniffer;
+
+					if (Sniffer is null)
+						return;
+
+					lock (this.sniffers)
+					{
+						this.sniffers[SnifferId] = Sniffer;
+					}
+				}
 			}
 
 			foreach (XmlNode N in e.Content.ChildNodes)
@@ -1792,6 +1824,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 		}
+
+		/// <summary>
+		/// Event raised when a sniffer message has been received from a source without a registered sniffer.
+		/// </summary>
+		public event CustomSnifferEventHandler OnCustomSnifferMessage = null;
 
 		/// <summary>
 		/// Gets available commands for a node.

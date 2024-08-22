@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows.Media;
 using Waher.Client.WPF.Model;
 using Waher.Events;
@@ -11,6 +13,7 @@ namespace Waher.Client.WPF.Controls.Logs
 	public class LogItem : ColorableItem
 	{
 		private readonly Event e;
+		private readonly string message;
 
 		/// <summary>
 		/// Represents one item in an event log output.
@@ -19,6 +22,24 @@ namespace Waher.Client.WPF.Controls.Logs
 			: base(CalcForegroundColor(Event), CalcBackgroundColor(Event))
 		{
 			this.e = Event;
+
+			if ((Event.Tags?.Length ?? 0) == 0)
+				this.message = Event.Message;
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.Append(Event.Message);
+
+				foreach (KeyValuePair<string, object> P in Event.Tags)
+				{
+					sb.AppendLine();
+					sb.Append(P.Key);
+					sb.Append(" = ");
+					sb.Append(P.Value?.ToString() ?? string.Empty);
+				}
+
+				this.message = sb.ToString();
+			}
 		}
 
 		/// <summary>
@@ -29,42 +50,42 @@ namespace Waher.Client.WPF.Controls.Logs
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		public DateTime Timestamp { get { return this.e.Timestamp; } }
+		public DateTime Timestamp => this.e.Timestamp;
 
 		/// <summary>
 		/// Event type.
 		/// </summary>
-		public EventType Type { get { return this.e.Type; } }
+		public EventType Type => this.e.Type;
 
 		/// <summary>
 		/// Event level.
 		/// </summary>
-		public EventLevel Level { get { return this.e.Level; } }
+		public EventLevel Level => this.e.Level;
 
 		/// <summary>
 		/// Time of day of event, as a string.
 		/// </summary>
-		public string Time { get { return this.e.Timestamp.ToLongTimeString(); } }
+		public string Time => this.e.Timestamp.ToLongTimeString();
 
 		/// <summary>
 		/// Event ID
 		/// </summary>
-		public string EventId { get { return this.e.EventId; } }
+		public string EventId => this.e.EventId;
 
 		/// <summary>
 		/// Object
 		/// </summary>
-		public string Object { get { return this.e.Object; } }
+		public string Object => this.e.Object;
 
 		/// <summary>
 		/// Actor
 		/// </summary>
-		public string Actor { get { return this.e.Actor; } }
+		public string Actor => this.e.Actor;
 
 		/// <summary>
 		/// Message
 		/// </summary>
-		public string Message { get { return this.e.Message; } }
+		public string Message => this.message;
 
 		private static Color CalcForegroundColor(Event Event)
 		{

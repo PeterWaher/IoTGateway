@@ -275,7 +275,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						LogView LogView = new LogView(false);
+						LogView LogView = new LogView(null, false);
 						TabItem.Content = LogView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;

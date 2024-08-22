@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
 using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Logs;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Client.WPF.Model.Legal;
@@ -18,6 +19,7 @@ using Waher.Client.WPF.Model.Things;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Events.XMPP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -76,6 +78,7 @@ namespace Waher.Client.WPF.Model
 		private SynchronizationClient synchronizationClient;
 		private MultiUserChatClient mucClient;
 		private RemoteDesktopClient rdpClient;
+		private XmppEventReceptor eventReceptor;
 		private Socks5Proxy socks5Proxy = null;
 		//private XmppServerlessMessaging p2pNetwork;
 		private Timer connectionTimer;
@@ -216,6 +219,9 @@ namespace Waher.Client.WPF.Model
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
+			
+			this.eventReceptor = new XmppEventReceptor(this.client);
+			this.eventReceptor.OnEvent += this.EventReceptor_OnEvent;
 
 			this.AddPepClient(string.Empty);
 
@@ -268,6 +274,18 @@ namespace Waher.Client.WPF.Model
 			this.mucClient = null;
 
 			this.mucClient = new MultiUserChatClient(this.client, MucComponentAddress);
+		}
+
+		private Task EventReceptor_OnEvent(object Sender, EventEventArgs e)
+		{
+			MainWindow.UpdateGui(() =>
+			{
+				LogView View = MainWindow.currentInstance.GetLogView(e.FromBareJID);
+				View.Add(new LogItem(e.Event));
+				return Task.CompletedTask;
+			});
+
+			return Task.CompletedTask;
 		}
 
 		private async Task ConcentratorClient_OnCustomSnifferMessage(object Sender, CustomSnifferEventArgs e)
@@ -445,6 +463,9 @@ namespace Waher.Client.WPF.Model
 
 			this.e2eEncryption?.Dispose();
 			this.e2eEncryption = null;
+
+			this.eventReceptor?.Dispose();
+			this.eventReceptor = null;
 
 			if (!(this.client is null))
 			{

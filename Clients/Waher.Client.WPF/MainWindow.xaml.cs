@@ -535,6 +535,34 @@ namespace Waher.Client.WPF
 			return View;
 		}
 
+		internal LogView GetLogView(string Identifier)
+		{
+			LogView View;
+
+			foreach (TabItem Tab in this.Tabs.Items)
+			{
+				View = Tab.Content as LogView;
+				if (View is null)
+					continue;
+
+				if (!(View.Identifier is null) && View.Identifier == Identifier)
+				{
+					Tab.Focus();
+					return View;
+				}
+			}
+
+			TabItem TabItem = NewTab(Identifier);
+			this.Tabs.Items.Add(TabItem);
+
+			View = new LogView(Identifier, false);
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
+
+			return View;
+		}
+
 		private void EventLog_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
@@ -557,7 +585,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = NewTab("Event Log");
 			this.Tabs.Items.Add(TabItem);
 
-			View = new LogView(true);
+			View = new LogView(null, true);
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;

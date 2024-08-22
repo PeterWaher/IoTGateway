@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Client.WPF.Controls.Logs

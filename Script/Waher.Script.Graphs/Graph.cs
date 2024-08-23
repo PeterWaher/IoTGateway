@@ -1,17 +1,18 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using SkiaSharp;
 using System.Globalization;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+using Waher.Events;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects.Sets;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Units;
-using System.Threading.Tasks;
 
 namespace Waher.Script.Graphs
 {
@@ -864,6 +865,17 @@ namespace Waher.Script.Graphs
 				Steps.Add(d);
 				i++;
 				d = (i * Num) / Den;
+			}
+
+			if (j >= 1000)
+			{
+				Log.Alert("Graph label algorithm failure.",
+					new KeyValuePair<string, object>("Min", Min),
+					new KeyValuePair<string, object>("Max", Max),
+					new KeyValuePair<string, object>("ApproxNrLabels", ApproxNrLabels),
+					new KeyValuePair<string, object>("Numerator", Numerator),
+					new KeyValuePair<string, object>("Denominator", Denominator),
+					new KeyValuePair<string, object>("StepSize", StepSize));
 			}
 
 			return Steps.ToArray();

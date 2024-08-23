@@ -124,7 +124,7 @@ namespace Waher.Content.Multipart
 
 				if (j == d)
 				{
-					await AddPart(Data, Start, i, Form, List, BaseUri);
+					await AddPart(Data, Start, i, false, Form, List, BaseUri);
 
 					i += d;
 					while (i < c && Data[i] <= 32)
@@ -137,10 +137,10 @@ namespace Waher.Content.Multipart
 			}
 
 			if (Start < c)
-				await AddPart(Data, Start, c, Form, List, BaseUri);
+				await AddPart(Data, Start, c, true, Form, List, BaseUri);
 		}
 
-		private static async Task AddPart(byte[] Data, int Start, int i,
+		private static async Task AddPart(byte[] Data, int Start, int i, bool Last,
 			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri)
 		{
 			int j, k, l, m;
@@ -166,19 +166,20 @@ namespace Waher.Content.Multipart
 						k += 2;
 				}
 
-				if (i - j - 4 - k < 0)
+				int NrBytes = i - j - 4 - k;
+				if (NrBytes < 0 || (NrBytes == 0 && Last))
 					return;
 
 				string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
 				string Key, Value;
-				byte[] Data2 = new byte[i - j - 4 - k];
+				byte[] Data2 = new byte[NrBytes];
 				EmbeddedContent EmbeddedContent = new EmbeddedContent()
 				{
 					ContentType = PlainTextCodec.DefaultContentType,
 					Raw = Data2
 				};
 
-				Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
+				Array.Copy(Data, j + 4, Data2, 0, NrBytes);
 
 				string[] Rows = Header.Split(CommonTypes.CRLF);
 				l = Rows.Length;

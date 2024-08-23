@@ -856,9 +856,10 @@ namespace Waher.Script.Graphs
 			double StepSize = Num / Den;
 			List<double> Steps = new List<double>();
 			int i = (int)Math.Ceiling(Min / StepSize);
+			int j = 0;
 			double d = (i * Num) / Den;
 
-			while (d <= Max)
+			while (d <= Max && j++ < 1000)
 			{
 				Steps.Add(d);
 				i++;

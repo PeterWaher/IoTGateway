@@ -96,7 +96,7 @@ namespace Waher.Content.Semantic
 		/// Converts the object to a vector.
 		/// </summary>
 		/// <returns>Matrix.</returns>
-		public IVector ToVector()
+		public IElement ToVector()
 		{
 			return VectorDefinition.Encapsulate(this.triples, false, null);
 		}

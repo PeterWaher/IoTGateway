@@ -712,6 +712,7 @@ namespace Waher.Script.Test
 			await Test("[a,b,c,a,b,c][]", new double[] { a, b, c, a, b, c });
 			await Test("{a,b,c,a,b,c}[]", new double[] { a, b, c });
 			await Test("[[a,b],[b,c]][]", new object[] { new double[] { a, b }, new double[] { b, c } });
+			await Test("System.Byte[]", typeof(byte[]));
 
 			await Test("a[,]", new double[,] { { a } });
 			await Test("[a,b,c][,]", new double[,] { { a, b, c } });

@@ -3,8 +3,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
-using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Operators.Vectors
 {

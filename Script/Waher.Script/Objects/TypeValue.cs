@@ -2,17 +2,19 @@
 using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Objects
 {
 	/// <summary>
 	/// Type value.
 	/// </summary>
-	public sealed class TypeValue : Element
+	public sealed class TypeValue : Element, IToVector
 	{
         private static readonly TypeValues associatedSet = new TypeValues();
 
-        private Type value;
+        private Type @value;
+		private Type arrayType = null;
 
 		/// <summary>
 		/// Type value.
@@ -28,8 +30,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public Type Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set => this.@value = value;
 		}
 
 		/// <inheritdoc/>
@@ -41,10 +43,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return associatedSet; }
-		}
+		public override ISet AssociatedSet => associatedSet;
 
 		/// <summary>
 		/// Associated Type value.
@@ -96,6 +95,26 @@ namespace Waher.Script.Objects
             }
             else
 				return Expression.TryConvert(this.value, DesiredType, out Value);
+		}
+
+		/// <summary>
+		/// Converts the object to a vector.
+		/// </summary>
+		/// <returns>Matrix.</returns>
+		public IElement ToVector()
+		{
+			if (this.arrayType is null)
+			{
+				if (this.value.IsArray)
+					this.arrayType = this.value;
+				else
+				{
+					Array A = Array.CreateInstance(this.value, 0);
+					this.arrayType = A.GetType();
+				}
+			}
+
+			return new TypeValue(this.arrayType);
 		}
 
 	}

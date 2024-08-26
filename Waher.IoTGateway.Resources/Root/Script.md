@@ -583,6 +583,7 @@ There are various different membership operators. All have the same [order of pr
 |:----------:|:----------------------------------|:------------------:|
 | `AS`       | The `AS` operator makes sure the left operand is of the same type as the right operand. The result is **null** if they are not, or the same value as the left operand if they are.           | `Value as Type`           |
 | `IS`       | The `IS` operator checks if the left operand is of the same type as the right operand. | `Value is Type` |
+| `IS NOT`   | The `IS NOT` operator checks if the left operand is not of the same type as the right operand. | `Value is not Type` |
 | `INHERITS` | The `INHERITS` operator checks if the left operand inherits the type defined by the right operand. | `Value inherits Type` |
 | `IN`       | The `IN` operator checks if the left operand is a member of the right operand. | `Value in Set` |
 | `MATCHES`  | The `MATCHES` operator checks if the left operand matches the construct of the right operand using [pattern matching](#assignmentPatternMatching), and return `true` of the left operand matches the right, and `false` otherwise. If there's a match, any implicit variables are set accordingly. | `v matches [a,b,c]` |

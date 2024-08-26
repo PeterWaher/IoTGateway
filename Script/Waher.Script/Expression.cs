@@ -1547,7 +1547,10 @@ namespace Waher.Script
 							case "IS":
 								this.pos += 2;
 								Right = this.AssertRightOperandNotNull(this.ParseComparison());
-								Left = new Is(Left, Right, Start, this.pos - Start, this);
+								if (Right is Not Not)
+									Left = new IsNot(Left, Not.Operand, Start, this.pos - Start, this);
+								else
+									Left = new Is(Left, Right, Start, this.pos - Start, this);
 								continue;
 
 							case "INHERITS":

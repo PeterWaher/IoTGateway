@@ -412,6 +412,11 @@ namespace Waher.Script.Test
 			await Test("[a,b] IS System.Double", false);
 			await Test("a IS [System.Double,System.Int32]", new bool[] { true, false });
 
+			await Test("a IS NOT System.Double", false);
+			await Test("a IS NOT System.Int32", true);
+			await Test("[a,b] IS NOT System.Double", true);
+			await Test("a IS NOT [System.Double,System.Int32]", new bool[] { false, true });
+
 			await Test("a IN R", true);
 			await Test("a IN EmptySet", false);
 			await Test("[a,b] IN R", false);

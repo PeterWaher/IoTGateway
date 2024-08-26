@@ -23,12 +23,12 @@ namespace Waher.Script.Test
 		internal const bool r = true;
 		internal const string s = "Hello";
 		internal const string t = "Bye";
-		internal static readonly Complex z1 = new Complex(1, 2);
-		internal static readonly Complex z2 = new Complex(3, 4);
+		internal static readonly Complex z1 = new(1, 2);
+		internal static readonly Complex z2 = new(3, 4);
 
 		public static async Task Test(string Script, object ExpectedValue)
 		{
-			Variables v = new Variables()
+			Variables v = new()
 			{
 				{ "a", a },
 				{ "b", b },
@@ -42,7 +42,7 @@ namespace Waher.Script.Test
 				{ "z2", z2 }
 			};
 
-			Expression Exp = new Expression(Script);
+			Expression Exp = new(Script);
 			object Result = await Exp.EvaluateAsync(v);
 
 			if (Result is IMatrix M)
@@ -130,7 +130,7 @@ namespace Waher.Script.Test
 			}
 			else if (Expected is null)
 			{
-				if (!(Result is null))
+				if (Result is not null)
 					Assert.Fail("Expected null: " + Script);
 			}
 			else if (!Expected.Equals(Result))
@@ -542,25 +542,25 @@ namespace Waher.Script.Test
 			await Test("z1+2", new Complex(3, 2));
 			await Test("2+z1", new Complex(3, 2));
 
-			await Test("[z1,z2]+2", new Complex[] { new Complex(3, 2), new Complex(5, 4) });
-			await Test("2+[z1,z2]", new Complex[] { new Complex(3, 2), new Complex(5, 4) });
-			await Test("[z1,z2]+z2", new Complex[] { new Complex(4, 6), new Complex(6, 8) });
-			await Test("z2+[z1,z2]", new Complex[] { new Complex(4, 6), new Complex(6, 8) });
-			await Test("[z1,z2]+[1,2]", new Complex[] { new Complex(2, 2), new Complex(5, 4) });
-			await Test("[1,2]+[z1,z2]", new Complex[] { new Complex(2, 2), new Complex(5, 4) });
-			await Test("[z1,z2]+[1,(2,3)]", new Complex[] { new Complex(2, 2), new Complex(5, 7) });
-			await Test("[1,(2,3)]+[z1,z2]", new Complex[] { new Complex(2, 2), new Complex(5, 7) });
-			await Test("[z1,z2]+[z1,z2]", new Complex[] { new Complex(2, 4), new Complex(6, 8) });
+			await Test("[z1,z2]+2", new Complex[] { new(3, 2), new(5, 4) });
+			await Test("2+[z1,z2]", new Complex[] { new(3, 2), new(5, 4) });
+			await Test("[z1,z2]+z2", new Complex[] { new(4, 6), new(6, 8) });
+			await Test("z2+[z1,z2]", new Complex[] { new(4, 6), new(6, 8) });
+			await Test("[z1,z2]+[1,2]", new Complex[] { new(2, 2), new(5, 4) });
+			await Test("[1,2]+[z1,z2]", new Complex[] { new(2, 2), new(5, 4) });
+			await Test("[z1,z2]+[1,(2,3)]", new Complex[] { new(2, 2), new(5, 7) });
+			await Test("[1,(2,3)]+[z1,z2]", new Complex[] { new(2, 2), new(5, 7) });
+			await Test("[z1,z2]+[z1,z2]", new Complex[] { new(2, 4), new(6, 8) });
 
-			await Test("[[z1,z2],[z2,z1]]+2", new Complex[,] { { new Complex(3, 2), new Complex(5, 4) }, { new Complex(5, 4), new Complex(3, 2) } });
-			await Test("2+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(3, 2), new Complex(5, 4) }, { new Complex(5, 4), new Complex(3, 2) } });
-			await Test("[[z1,z2],[z2,z1]]+z2", new Complex[,] { { new Complex(4, 6), new Complex(6, 8) }, { new Complex(6, 8), new Complex(4, 6) } });
-			await Test("z2+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(4, 6), new Complex(6, 8) }, { new Complex(6, 8), new Complex(4, 6) } });
-			await Test("[[z1,z2],[z2,z1]]+[[1,2],[3,4]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(5, 2) } });
-			await Test("[[1,2],[3,4]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(5, 2) } });
-			await Test("[[z1,z2],[z2,z1]]+[[1,2],[3,(2,3)]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(3, 5) } });
-			await Test("[[1,2],[3,(2,3)]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(3, 5) } });
-			await Test("[[z1,z2],[z2,z1]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 4), new Complex(6, 8) }, { new Complex(6, 8), new Complex(2, 4) } });
+			await Test("[[z1,z2],[z2,z1]]+2", new Complex[,] { { new(3, 2), new(5, 4) }, { new(5, 4), new(3, 2) } });
+			await Test("2+[[z1,z2],[z2,z1]]", new Complex[,] { { new(3, 2), new(5, 4) }, { new(5, 4), new(3, 2) } });
+			await Test("[[z1,z2],[z2,z1]]+z2", new Complex[,] { { new(4, 6), new(6, 8) }, { new(6, 8), new(4, 6) } });
+			await Test("z2+[[z1,z2],[z2,z1]]", new Complex[,] { { new(4, 6), new(6, 8) }, { new(6, 8), new(4, 6) } });
+			await Test("[[z1,z2],[z2,z1]]+[[1,2],[3,4]]", new Complex[,] { { new(2, 2), new(5, 4) }, { new(6, 4), new(5, 2) } });
+			await Test("[[1,2],[3,4]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new(2, 2), new(5, 4) }, { new(6, 4), new(5, 2) } });
+			await Test("[[z1,z2],[z2,z1]]+[[1,2],[3,(2,3)]]", new Complex[,] { { new(2, 2), new(5, 4) }, { new(6, 4), new(3, 5) } });
+			await Test("[[1,2],[3,(2,3)]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new(2, 2), new(5, 4) }, { new(6, 4), new(3, 5) } });
+			await Test("[[z1,z2],[z2,z1]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new(2, 4), new(6, 8) }, { new(6, 8), new(2, 4) } });
 		}
 
 		[TestMethod]
@@ -744,7 +744,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Evaluation_Test_22_ObjectExNihilo()
 		{
-			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
+			Dictionary<string, IElement> Obj = new()
 			{
 				{ "Member1", new DoubleNumber(a) },
 				{ "Member2", new DoubleNumber(b) },
@@ -1041,8 +1041,12 @@ namespace Waher.Script.Test
 			await Test("x:=10;remove(x);exists(x)", false);
 			await Test("x:=10;destroy(x);exists(x)", false);
 			await Test("x:=10;delete(x);exists(x)", false);
+			
 			await Test("Create(System.String,'-',80)", new string('-', 80));
 			await Test("Create(List, System.String).GetType()", typeof(List<string>));
+			
+			await Test("CreateType(System.Collections.Generic.List,System.String)", typeof(List<string>));
+			await Test("CreateType(System.Collections.Generic.Dictionary,System.String,System.Int32)", typeof(Dictionary<string, int>));
 		}
 
 		[TestMethod]
@@ -1143,7 +1147,7 @@ namespace Waher.Script.Test
 		public async Task Evaluation_Test_43_MethodCall()
 		{
 			await Test("DateTime(2016,3,11).AddDays(10)", new DateTime(2016, 3, 21));
-			await Test("DateTime(2016,3,11).AddDays(1..3)", new DateTime[] { new DateTime(2016, 3, 12), new DateTime(2016, 3, 13), new DateTime(2016, 3, 14) });
+			await Test("DateTime(2016,3,11).AddDays(1..3)", new DateTime[] { new(2016, 3, 12), new(2016, 3, 13), new(2016, 3, 14) });
 		}
 
 		[TestMethod]
@@ -1256,7 +1260,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Evaluation_Test_61_Remove()
 		{
-			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
+			Dictionary<string, IElement> Obj = new()
 			{
 				{ "Member1", new DoubleNumber(a) },
 				{ "Member3", new DoubleNumber(c) }

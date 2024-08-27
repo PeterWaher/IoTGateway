@@ -106,10 +106,21 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
 		/// <returns>Annotated state object, if available. Null otherwise.</returns>
-		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint)
+		public Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint)
+		{
+			return this.GetAnnotatedStateObject(RemoteEndpoint, false);
+		}
+
+		/// <summary>
+		/// Gets an annotated Remote endpoint state object, if one is available.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <param name="CreateNew">If a new object can be created if none exists.</param>
+		/// <returns>Annotated state object, if available. Null otherwise.</returns>
+		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint, bool CreateNew)
 		{
 			string s = this.RemovePort(RemoteEndpoint);
-			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, false);
+			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, CreateNew);
 			if (EP is null)
 				return null;
 
@@ -289,20 +300,30 @@ namespace Waher.Security.LoginMonitor
 			if (!EP.LastFailed)
 				return null;
 
+			return this.GetEarliestLoginOpportunity(EP.State, EP.Timestamps);
+		}
+
+		/// <summary>
+		/// Gets the earliest next login opportunity for a remote endpoint, given its states and timetamps.
+		/// </summary>
+		/// <param name="States">Current login attempt states.</param>
+		/// <param name="Timestamps">Current login attempt timestamps.</param>
+		/// <returns>Earliest login opportunity.</returns>
+		public DateTime? GetEarliestLoginOpportunity(int[] States, DateTime[] Timestamps)
+		{
 			int i = 0;
-			while (i < this.nrIntervals && EP.State[i] >= this.intervals[i].NrAttempts)
+			int c = Math.Min(Math.Min(States.Length, Timestamps.Length), this.nrIntervals);
+
+			while (i < c && States[i] >= this.intervals[i].NrAttempts)
 				i++;
 
 			if (i == 0)
 				return null;
 
-			if (i >= this.nrIntervals)
-			{
-				await this.Block(EP, "No more allowed login attempts.", Protocol);
+			if (i >= c)
 				return DateTime.MaxValue;
-			}
 
-			DateTime Next = this.intervals[i - 1].AddIntervalTo(EP.Timestamps[i - 1]);
+			DateTime Next = this.intervals[i - 1].AddIntervalTo(Timestamps[i - 1]);
 			if (Next <= DateTime.Now)
 				return null;
 			else

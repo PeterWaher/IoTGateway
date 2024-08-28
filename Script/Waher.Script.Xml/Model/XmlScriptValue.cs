@@ -10,6 +10,7 @@ using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Xml.Model
@@ -182,7 +183,12 @@ namespace Waher.Script.Xml.Model
 			else if (CheckAgainst is XmlElement)
 				return this.node.PatternMatch(new ObjectValue(CheckAgainst), AlreadyFound);
 			else if (CheckAgainst is null)
-				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
+			{
+				if (this.node is ToVector)
+					return this.node.PatternMatch(new ObjectVector(Array.Empty<object>()), AlreadyFound);
+				else
+					return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
+			}
 			else
 				return PatternMatchResult.NoMatch;
 		}

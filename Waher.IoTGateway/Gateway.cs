@@ -936,6 +936,7 @@ namespace Waher.IoTGateway
 				while (ReloadConfigurations);
 
 				configuring = false;
+				loginAuditor.Domain = DomainConfiguration.Instance.Domain;
 
 				if (!(webServer is null))
 				{

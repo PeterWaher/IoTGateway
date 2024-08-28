@@ -32,6 +32,7 @@ namespace Waher.Security.LoginMonitor
 		private readonly Dictionary<string, RemoteEndpoint> states = new Dictionary<string, RemoteEndpoint>();
 		private readonly LoginInterval[] intervals;
 		private readonly int nrIntervals;
+		private CaseInsensitiveString domain;
 
 		/// <summary>
 		/// Class that monitors login events, and help applications determine malicious intent. 
@@ -51,6 +52,15 @@ namespace Waher.Security.LoginMonitor
 		{
 			this.intervals = LoginIntervals;
 			this.nrIntervals = this.intervals.Length;
+		}
+
+		/// <summary>
+		/// Main Domain the auditor operates on.
+		/// </summary>
+		public CaseInsensitiveString Domain
+		{
+			get => this.domain;
+			set => this.domain = value;
 		}
 
 		/// <summary>
@@ -165,7 +175,8 @@ namespace Waher.Security.LoginMonitor
 					Created = DateTime.Now,
 					Blocked = false,
 					State = new int[this.nrIntervals],
-					Timestamps = new DateTime[this.nrIntervals]
+					Timestamps = new DateTime[this.nrIntervals],
+					Domain = this.domain
 				};
 
 				EP.Reset(false);

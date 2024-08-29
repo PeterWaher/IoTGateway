@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -13,7 +12,7 @@ namespace Waher.Script.Operators.Comparisons
 	/// Range operator
 	/// </summary>
 	public class Range : TernaryOperator
-    {
+	{
 		private readonly bool leftInclusive;
 		private readonly bool rightInclusive;
 
@@ -103,26 +102,39 @@ namespace Waher.Script.Operators.Comparisons
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (this.left is ConstantElement LeftConstant &&
-				this.right is ConstantElement RightConstant)
-			{
-				if (!(CheckAgainst.AssociatedSet is IOrderedSet S))
-					return PatternMatchResult.NoMatch;
-
-				int i = S.Compare(CheckAgainst, LeftConstant.Constant);
-
-				if (i < 0 || (i == 0 && !this.leftInclusive))
-					return PatternMatchResult.NoMatch;
-
-				i = S.Compare(CheckAgainst, RightConstant.Constant);
-
-				if (i > 0 || (i == 0 && !this.rightInclusive))
-					return PatternMatchResult.NoMatch;
-
-				return this.middle.PatternMatch(CheckAgainst, AlreadyFound);
-			}
-			else
+			if (!(CheckAgainst.AssociatedSet is IOrderedSet S))
 				return PatternMatchResult.NoMatch;
+
+			IElement LeftLimit;
+			IElement RightLimit;
+
+			if (this.left is ConstantElement LeftConstant)
+				LeftLimit = LeftConstant.Constant;
+			else if (!(this.left is VariableReference LeftVariable) ||
+				!Expression.TryGetConstant(LeftVariable.VariableName, null, out LeftLimit))
+			{
+				return PatternMatchResult.NoMatch;
+			}
+
+			if (this.right is ConstantElement RightConstant)
+				RightLimit = RightConstant.Constant;
+			else if (!(this.right is VariableReference RightVariable) ||
+				!Expression.TryGetConstant(RightVariable.VariableName, null, out RightLimit))
+			{
+				return PatternMatchResult.NoMatch;
+			}
+
+			int i = S.Compare(CheckAgainst, LeftLimit);
+
+			if (i < 0 || (i == 0 && !this.leftInclusive))
+				return PatternMatchResult.NoMatch;
+
+			i = S.Compare(CheckAgainst, RightLimit);
+
+			if (i > 0 || (i == 0 && !this.rightInclusive))
+				return PatternMatchResult.NoMatch;
+
+			return this.middle.PatternMatch(CheckAgainst, AlreadyFound);
 		}
 
 	}

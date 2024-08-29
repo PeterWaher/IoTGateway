@@ -9,7 +9,7 @@ namespace Waher.Things.SensorData
 	/// </summary>
 	[CollectionName("SensorData")]
 	[TypeName(TypeNameSerialization.LocalName)]
-	[ArchivingTime("ArchiveDays")]
+	[ArchivingTime(nameof(ArchiveDays))]
 	[Index("Thing", "Name", "Timestamp")]
 	[Index("Thing", "Timestamp", "Name")]
 	[Index("Name", "Timestamp", "Thing")]

@@ -268,5 +268,54 @@ namespace Waher.Events.XMPP
 			ParsedValue = Value;
 			return false;
 		}
+
+		/// <summary>
+		/// Tries to get the type of a parsed value.
+		/// </summary>
+		/// <param name="Value">Parsed value.</param>
+		/// <param name="Type">Type</param>
+		/// <returns>If able to get the type.</returns>
+		public static bool TryGetType(object Value, out string Type)
+		{
+			if (Value is null)
+				Type = null;
+			else if (Value is bool)
+				Type = "xs:boolean";
+			else if (Value is byte)
+				Type = "xs:unsignedByte";
+			else if (Value is short)
+				Type = "xs:short";
+			else if (Value is int)
+				Type = "xs:int";
+			else if (Value is long)
+				Type = "xs:long";
+			else if (Value is sbyte)
+				Type = "xs:byte";
+			else if (Value is ushort)
+				Type = "xs:unsignedShort";
+			else if (Value is uint)
+				Type = "xs:unsignedInt";
+			else if (Value is ulong)
+				Type = "xs:unsignedLong";
+			else if (Value is decimal)
+				Type = "xs:decimal";
+			else if (Value is double)
+				Type = "xs:double";
+			else if (Value is float)
+				Type = "xs:float";
+			else if (Value is TimeSpan)
+				Type = "xs:time";
+			else if (Value is DateTime)
+				Type = "xs:dateTime";
+			else if (Value is string)
+				Type = "xs:string";
+			else if (Value is Uri)
+				Type = "xs:anyURI";
+			else
+				Type = null;
+			
+			return !(Type is null);
+		}
+
 	}
 }

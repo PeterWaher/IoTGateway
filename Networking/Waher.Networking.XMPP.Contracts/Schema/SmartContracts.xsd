@@ -2168,6 +2168,13 @@
 			<xs:documentation>Expect an empty response on success.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>Identifier of the smart contract hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
@@ -2212,6 +2219,11 @@
 						<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
 			</xs:sequence>
 			<xs:attribute name='pid' type='xs:string' use='required'>
 				<xs:annotation>
@@ -2239,6 +2251,13 @@
 			<xs:documentation>Note: Only one of the parts need to consent to sharing the contract this time. The rationale is to mimick how we treat contracts in the physical world. Each part has a copy of the contract, and can choose to show this copy to others, for their purposes. The other parts cannot deny this. But at least one of the parts must consent to the petition for the entity making the petition to get access to the corresponding contract.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>Identifier of the smart contract referred to by the petition.</xs:documentation>
@@ -2274,6 +2293,11 @@
 						<xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
 			</xs:sequence>
 			<xs:attribute name='pid' type='xs:string' use='required'>
 				<xs:annotation>

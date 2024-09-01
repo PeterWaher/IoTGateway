@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Xml;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -19,6 +20,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly byte[] signature;
 		private readonly bool response;
 		private readonly string clientEndpoint;
+		private readonly XmlElement context;
 
 		/// <summary>
 		/// Event arguments for signature petition responses
@@ -29,8 +31,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Digital Signature petitioned.</param>
 		/// <param name="Response">If accepted (true) or rejected (false).</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
+		/// <param name="Context">Any machine-readable context XML element available in the petition response.</param>
 		public SignaturePetitionResponseEventArgs(MessageEventArgs e, LegalIdentity RequestedIdentity, 
-			string PetitionId, byte[] Signature, bool Response, string ClientEndpoint)
+			string PetitionId, byte[] Signature, bool Response, string ClientEndpoint, XmlElement Context)
 			: base(e)
 		{
 			this.requestedIdentity = RequestedIdentity;
@@ -38,6 +41,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.signature = Signature;
 			this.response = Response;
 			this.clientEndpoint = ClientEndpoint;
+			this.context = Context;
 		}
 
 		/// <summary>
@@ -64,5 +68,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Remote endpoint of remote party client.
 		/// </summary>
 		public string ClientEndpoint => this.clientEndpoint;
+
+		/// <summary>
+		/// Any machine-readable context XML element available in the petition.
+		/// </summary>
+		public XmlElement Context => this.context;
 	}
 }

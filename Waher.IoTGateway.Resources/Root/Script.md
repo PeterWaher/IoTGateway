@@ -2565,6 +2565,15 @@ about the script functions referenced in this section is available in the [Neuro
 | `PaymentService(Definition)`     | Creates a script-based service for payments.          |
 | `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
 
+#### Sending SMS (available in TAG.Service.GatewayApi.package)
+
+The following functions are available on systems with the `TAG.Service.GatewayApi.package` installed. A more detailed description
+about the script functions referenced in this section is available in the [GatewayApiSms repository](https://github.com/Trust-Anchor-Group/GatewayApiSms).
+
+| Function                                       | Description                                           |
+|------------------------------------------------|-------------------------------------------------------|
+| `SendGatewayApiSms(Sender,Message,Recipients)` | Sends an SMS (if service is configured correctly). `Recipients` can be a phone number or vector of phone numbers. |
+
 #### OpenAI Extensions (available in TAG.XmppOpenAIBridge.package)
 
 The following functions are available on systems with the `TAG.XmppOpenAIBridge.package` installed. A more detailed description

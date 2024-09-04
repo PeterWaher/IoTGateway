@@ -555,14 +555,10 @@ namespace Waher.Networking.HTTP
 						{
 							if (Scheme.UserSessions && Request.Session is null)
 							{
-								HttpFieldCookie Cookie = Request.Header.Cookie;
-								if (!(Cookie is null))
-								{
-									string HttpSessionID = Cookie[HttpResource.HttpSessionID];
+								string HttpSessionID = HttpResource.GetSessionId(Request, Request.Response);
 
-									if (!string.IsNullOrEmpty(HttpSessionID))
-										Request.Session = this.server.GetSession(HttpSessionID);
-								}
+								if (!string.IsNullOrEmpty(HttpSessionID))
+									Request.Session = this.server.GetSession(HttpSessionID);
 
 								if (Request.Session is null)
 								{

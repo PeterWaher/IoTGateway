@@ -76,13 +76,11 @@ namespace Waher.IoTGateway.WebResources
 		/// <returns>User object, if authenticated, or null otherwise.</returns>
 		public override Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
-			HttpFieldCookie Cookie;
 			Variables Variables = Request.Session;
 			string HttpSessionID;
 
 			if (Variables is null &&
-				!((Cookie = Request.Header.Cookie) is null) &&
-				!string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
+				!string.IsNullOrEmpty(HttpSessionID = HttpResource.GetSessionId(Request, Request.Response)))
 			{
 				Request.Session = Variables = this.server.GetSession(HttpSessionID);
 			}

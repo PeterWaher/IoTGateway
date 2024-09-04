@@ -1183,6 +1183,20 @@ namespace Waher.Networking.HTTP
 		{
 			if (this.cookies is null)
 				this.cookies = new LinkedList<Cookie>();
+			else
+			{
+				LinkedListNode<Cookie> Loop = this.cookies.First;
+				while (!(Loop is null))
+				{
+					if (Loop.Value.Name == Cookie.Name)
+					{
+						Loop.Value = Cookie;
+						return;
+					}
+
+					Loop = Loop.Next;
+				}
+			}
 
 			this.cookies.AddLast(Cookie);
 		}

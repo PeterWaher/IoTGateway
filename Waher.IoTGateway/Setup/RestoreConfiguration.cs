@@ -151,7 +151,6 @@ namespace Waher.IoTGateway.Setup
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
-			HttpFieldCookie Cookie;
 			TemporaryFile File;
 			string TabID;
 			string HttpSessionID;
@@ -163,8 +162,7 @@ namespace Waher.IoTGateway.Setup
 				!int.TryParse(F.Value, out int BlockNr) ||
 				!Request.Header.TryGetHeaderField("X-More", out F) ||
 				!CommonTypes.TryParse(F.Value, out bool More) ||
-				(Cookie = Request.Header.Cookie) is null ||
-				string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
+				string.IsNullOrEmpty(HttpSessionID = HttpResource.GetSessionId(Request, Response)))
 			{
 				throw new BadRequestException();
 			}
@@ -235,7 +233,6 @@ namespace Waher.IoTGateway.Setup
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
-			HttpFieldCookie Cookie;
 			TemporaryFile BackupFile;
 			TemporaryFile KeyFile;
 			string TabID;
@@ -244,8 +241,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData ||
 				!Request.Header.TryGetHeaderField("X-TabID", out HttpField F) ||
 				string.IsNullOrEmpty(TabID = F.Value) ||
-				(Cookie = Request.Header.Cookie) is null ||
-				string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
+				string.IsNullOrEmpty(HttpSessionID = HttpResource.GetSessionId(Request, Response)))
 			{
 				throw new BadRequestException();
 			}

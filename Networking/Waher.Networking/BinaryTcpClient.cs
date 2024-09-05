@@ -1231,14 +1231,14 @@ namespace Waher.Networking
 			this.remoteCertificate?.Dispose();
 			this.remoteCertificate = null;
 
-			if (SslPolicyErrors == SslPolicyErrors.None)
-				this.remoteCertificateValid = Result = true;
-			else if ((SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null))
+			if (SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null)
 			{
 				this.remoteCertificateValid = false;
 				Result = !RequireCertificate;
 			}
-			else
+			else if(SslPolicyErrors == SslPolicyErrors.None)
+				this.remoteCertificateValid = Result = true;
+			else 
 			{
 				this.remoteCertificateValid = false;
 				Result = this.trustRemoteEndpoint;
@@ -1265,7 +1265,7 @@ namespace Waher.Networking
 				{
 					StringBuilder Base64 = new StringBuilder();
 					string s;
-					int c = Cert.Length;
+					int c = Cert?.Length ?? 0;
 					int i = 0;
 					int j;
 

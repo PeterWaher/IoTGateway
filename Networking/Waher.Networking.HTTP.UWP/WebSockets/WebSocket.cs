@@ -133,6 +133,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		public HttpRequest HttpRequest => this.httpRequest;
 
 		/// <summary>
+		/// Original HTTP response used when connection was upgrades to a WebSocket connection.
+		/// </summary>
+		public HttpResponse HttpResponse => this.httpResponse;
+
+		/// <summary>
 		/// Applications can use this property to attach a value of any type to the 
 		/// websocket connection.
 		/// </summary>

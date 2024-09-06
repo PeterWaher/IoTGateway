@@ -1434,7 +1434,31 @@ namespace Waher.IoTGateway
 			if (string.IsNullOrEmpty(webServer?.ResourceOverride))
 				throw new TemporaryRedirectException("/");
 
-			string Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+			string Markdown;
+
+			try
+			{
+				Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+			}
+			catch (Exception)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.AppendLine("Title: Starting");
+				sb.AppendLine("Description: The starting page will be displayed while the service is being started.");
+				sb.AppendLine("Cache-Control: max-age=0, no-cache, no-store");
+				sb.AppendLine("Refresh: 2");
+				sb.AppendLine();
+				sb.AppendLine("============================================================================================================================================");
+				sb.AppendLine();
+				sb.AppendLine("Starting Service");
+				sb.AppendLine("====================");
+				sb.AppendLine();
+				sb.AppendLine("Please wait while the service is being started. This page will update automatically.");
+
+				Markdown = sb.ToString();
+			}
+
 			Variables v = Request.Session ?? new Variables();
 			MarkdownSettings Settings = new MarkdownSettings(emoji1_24x24, true, v);
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);

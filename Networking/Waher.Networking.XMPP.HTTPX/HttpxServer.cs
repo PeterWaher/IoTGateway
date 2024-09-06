@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.server.RequestReceived(Request, From, Resource, SubPath);
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0)
+					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0 && Request.Header.Method != "OPTIONS")
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{

@@ -487,7 +487,7 @@ namespace Waher.Networking.HTTP
 #endif
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0)
+					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0 && Request.Header.Method != "OPTIONS")
 					{
 						ILoginAuditor Auditor = this.server.LoginAuditor;
 

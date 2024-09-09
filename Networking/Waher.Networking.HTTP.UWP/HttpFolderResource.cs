@@ -271,6 +271,93 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Checks a string to see if it contains invalid file characters.
+		/// </summary>
+		/// <param name="s">String to check.</param>
+		/// <param name="PermitFolderSeparator">If folder separator characters are permitted.</param>
+		/// <param name="PermitIpAddress">If IP Addresses are permitted.</param>
+		/// <returns>If invalid characters are found in the string.</returns>
+		public static bool ContainsInvalidFileCharacters(string s, bool PermitFolderSeparator, bool PermitIpAddress)
+		{
+			if (string.IsNullOrEmpty(s))
+				return false;
+
+			bool PrevPeriod = false;
+
+			foreach (char ch in s)
+			{
+				switch (ch)
+				{
+					case '/':
+					case '\\':
+						if (!PermitFolderSeparator)
+							return true;
+						PrevPeriod = false;
+						break;
+
+					case ':':
+						if (!PermitIpAddress || !IPAddress.TryParse(s, out _))
+							return true;
+						PrevPeriod = false;
+						break;
+
+					case '|':
+					case '<':
+					case '>':
+					case '?':
+					case '"':
+					case '*':
+					case '\x00':
+					case '\x01':
+					case '\x02':
+					case '\x03':
+					case '\x04':
+					case '\x05':
+					case '\x06':
+					case '\x07':
+					case '\x08':
+					case '\x09':
+					case '\x0a':
+					case '\x0b':
+					case '\x0c':
+					case '\x0d':
+					case '\x0e':
+					case '\x0f':
+					case '\x10':
+					case '\x11':
+					case '\x12':
+					case '\x13':
+					case '\x14':
+					case '\x15':
+					case '\x16':
+					case '\x17':
+					case '\x18':
+					case '\x19':
+					case '\x1a':
+					case '\x1b':
+					case '\x1c':
+					case '\x1d':
+					case '\x1e':
+					case '\x1f':
+						return true;
+
+					case '.':
+						if (PrevPeriod)
+							return true;
+
+						PrevPeriod = true;
+						break;
+
+					default:
+						PrevPeriod = false;
+						break;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Gets the full path of a resource in the folder.
 		/// </summary>
 		/// <param name="SubPath">Sub-path or resource.</param>
@@ -286,10 +373,10 @@ namespace Waher.Networking.HTTP
 			string ContentType;
 			int i;
 
-			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
+			if (ContainsInvalidFileCharacters(s, true, false))
 			{
 				if (ForbiddenExceptions)
-					throw new ForbiddenException("Path control characters not permitted.");
+					throw new ForbiddenException("Path control characters not permitted in resource name.");
 				else
 				{
 					Found = false;
@@ -310,6 +397,17 @@ namespace Waher.Networking.HTTP
 
 					if (i > 0)
 						Host = Host.Substring(0, i);
+
+					if (ContainsInvalidFileCharacters(Host, false, true))
+					{
+						if (ForbiddenExceptions)
+							throw new ForbiddenException("Path control characters not permitted in Host header.");
+						else
+						{
+							Found = false;
+							return null;
+						}
+					}
 				}
 
 				if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
@@ -410,8 +508,6 @@ namespace Waher.Networking.HTTP
 				return Folder;
 			}
 		}
-
-		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
 
 		private class CacheRec
 		{

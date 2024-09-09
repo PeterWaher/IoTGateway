@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Console;
 using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
@@ -43,7 +44,7 @@ namespace Waher.Networking.Sniffers
 	}
 
 	/// <summary>
-	/// Outputs sniffed data to <see cref="Console.Out"/>.
+	/// Outputs sniffed data to <see cref="Console.Out"/>, serualized by <see cref="ConsoleOut"/>.
 	/// </summary>
 	public class ConsoleOutSniffer : SnifferBase, IDisposable
 	{

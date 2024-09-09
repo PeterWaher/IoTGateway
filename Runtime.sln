@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{BC6A8396-FFEC-4B94-84A3-B0EB19F88B1D}"
 EndProject
@@ -40,6 +40,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Settings.Test", "Runtime\Waher.Runtime.Settings.Test\Waher.Runtime.Settings.Test.csproj", "{AD3F798E-67DE-4EDA-99F6-80037808AA4D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Transactions", "Runtime\Waher.Runtime.Transactions\Waher.Runtime.Transactions.csproj", "{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Console", "Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj", "{5B07093F-FC27-4AD2-9A62-BC05795FA6FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Counters", "Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj", "{ECD2FEE3-FEEA-4736-85EF-D2B2AFBDB72A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading.Sync", "Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj", "{FB8675CB-E36C-4978-B008-B2E38A894125}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +129,18 @@ Global
 		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B07093F-FC27-4AD2-9A62-BC05795FA6FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B07093F-FC27-4AD2-9A62-BC05795FA6FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B07093F-FC27-4AD2-9A62-BC05795FA6FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B07093F-FC27-4AD2-9A62-BC05795FA6FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECD2FEE3-FEEA-4736-85EF-D2B2AFBDB72A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD2FEE3-FEEA-4736-85EF-D2B2AFBDB72A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD2FEE3-FEEA-4736-85EF-D2B2AFBDB72A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD2FEE3-FEEA-4736-85EF-D2B2AFBDB72A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB8675CB-E36C-4978-B008-B2E38A894125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB8675CB-E36C-4978-B008-B2E38A894125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB8675CB-E36C-4978-B008-B2E38A894125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB8675CB-E36C-4978-B008-B2E38A894125}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

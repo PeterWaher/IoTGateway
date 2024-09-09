@@ -471,6 +471,9 @@
 	<Assembly fileName="Waher.Runtime.Cache.dll" />
 	<Assembly fileName="Waher.Runtime.Cache.pdb" />
 	<Assembly fileName="Waher.Runtime.Cache.xml" />
+	<Assembly fileName="Waher.Runtime.Console.dll" />
+	<Assembly fileName="Waher.Runtime.Console.pdb" />
+	<Assembly fileName="Waher.Runtime.Console.xml" />
 	<Assembly fileName="Waher.Runtime.Counters.dll" />
 	<Assembly fileName="Waher.Runtime.Counters.pdb" />
 	<Assembly fileName="Waher.Runtime.Counters.xml" />

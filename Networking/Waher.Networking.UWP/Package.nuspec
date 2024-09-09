@@ -16,6 +16,7 @@
     <tags>networking communication uwp</tags>
     <dependencies>
 			<dependency id="Waher.Events" version="1.2.0"/>
+			<dependency id="Waher.Runtime.Console" version="1.0.0"/>
 			<dependency id="Waher.Runtime.Threading" version="1.2.1"/>
 		</dependencies>
   </metadata>

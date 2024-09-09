@@ -30,6 +30,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
   <ItemGroup>

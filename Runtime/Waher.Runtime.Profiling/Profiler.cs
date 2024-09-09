@@ -219,6 +219,11 @@ namespace Waher.Runtime.Profiling
 		public long ElapsedTicks => this.watch.ElapsedTicks;
 
 		/// <summary>
+		/// Elapsed seconds since start.
+		/// </summary>
+		public double ElapsedSeconds => this.ToSeconds(this.ElapsedTicks);
+
+		/// <summary>
 		/// When profiling was started.
 		/// </summary>
 		public DateTime Started => this.started;

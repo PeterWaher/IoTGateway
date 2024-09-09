@@ -717,7 +717,7 @@ namespace Waher.Networking.HTTP
 					(Header.UpgradeInsecureRequests?.Upgrade ?? false) &&
 					!(Header.Host is null) &&
 					string.Compare(Header.Host.Value, "localhost", true) != 0 &&
-					((UpgradePort = this.server.UpgradePort).HasValue))
+					(UpgradePort = this.server.UpgradePort).HasValue)
 				{
 					StringBuilder Location = new StringBuilder();
 					string s;

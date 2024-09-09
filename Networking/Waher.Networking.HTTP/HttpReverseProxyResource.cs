@@ -54,7 +54,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Timeout">Timeout threshold.</param>
 		/// <param name="UseProxySession">If the proxy resource should add a session requirement
 		/// as well. This allows the proxy resource to forward user infomration to underlying
-		/// services, etc.. (Default=false)</param>
+		/// services, etc. (Default=false)</param>
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
 			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession)
 			: base(ResourceName)

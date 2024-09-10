@@ -2683,6 +2683,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -5447,6 +5448,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -8247,6 +8249,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -11020,6 +11023,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -13829,6 +13833,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -16602,6 +16607,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }
@@ -19411,6 +19417,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.0",
           "Waher.Runtime.Queue": "1.0.1"
         }

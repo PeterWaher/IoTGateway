@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
-using Waher.Runtime.Inventory;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
+
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -57,7 +55,7 @@ namespace Waher.Persistence.FilesLW.Test
 			File.Copy(DBFilesBTreeTests.DefaultBlobFileName + ".bak", DBFilesBTreeTests.DefaultBlobFileName);
 			File.Copy(DBFilesBTreeTests.DefaultLabelsFileName + ".bak", DBFilesBTreeTests.DefaultLabelsFileName);
 
-			int BlockSize = this.LoadBlockSize();
+			int BlockSize = LoadBlockSize();
 
 #if LW
 			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
@@ -73,9 +71,9 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
+			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (!(this.provider is null))
+			if (this.provider is not null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
@@ -89,12 +87,12 @@ namespace Waher.Persistence.FilesLW.Test
 				Assert.Inconclusive("No binary object file to test against.");
 
 			byte[] Bin = File.ReadAllBytes(DBFilesBTreeTests.ObjFileName);
-			BinaryDeserializer Reader = new BinaryDeserializer(DBFilesBTreeTests.CollectionName, Encoding.UTF8, Bin, uint.MaxValue);
+			BinaryDeserializer Reader = new(DBFilesBTreeTests.CollectionName, Encoding.UTF8, Bin, uint.MaxValue);
 			IObjectSerializer Serializer = await this.provider.GetObjectSerializer(typeof(Simple));
 			return (Simple)await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
-		private Guid LoadObjectId()
+		private static Guid LoadObjectId()
 		{
 			if (!File.Exists(DBFilesBTreeTests.ObjIdFileName))
 				Assert.Inconclusive("No object id file to test against.");
@@ -104,7 +102,7 @@ namespace Waher.Persistence.FilesLW.Test
 			return new Guid(Bin);
 		}
 
-		private int LoadBlockSize()
+		private static int LoadBlockSize()
 		{
 			if (!File.Exists(DBFilesBTreeTests.BlockSizeFileName))
 				Assert.Inconclusive("No block size file to test against.");
@@ -129,7 +127,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_RetryLastTest_02_Retry_Delete()
 		{
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
-			Guid ObjectId = this.LoadObjectId();
+			Guid ObjectId = LoadObjectId();
 
 			try
 			{
@@ -137,11 +135,11 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeError.xml", false));
+				ConsoleOut.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeError.xml", false));
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
-			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeAfter.xml", false));
+			ConsoleOut.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeAfter.xml", false));
 
 			await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects - 1), null, true);
 		}

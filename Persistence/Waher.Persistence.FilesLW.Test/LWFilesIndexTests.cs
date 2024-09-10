@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence.Serialization;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
-using Waher.Runtime.Inventory;
+using Waher.Persistence.Filters;
+using Waher.Runtime.Console;
 using Waher.Script;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Operators.Membership;
+
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -36,7 +35,7 @@ namespace Waher.Persistence.FilesLW.Test
 		protected IndexBTreeFile index2;
 		protected IndexBTreeFile index3;
 		protected FilesProvider provider;
-		protected Random gen = new Random();
+		protected Random gen = new();
 		protected DateTime start;
 
 		public abstract int BlockSize
@@ -50,9 +49,9 @@ namespace Waher.Persistence.FilesLW.Test
 			DBFilesBTreeTests.DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
@@ -69,9 +68,9 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
+			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (!(this.provider is null))
+			if (this.provider is not null)
 			{
 				Database.Register(new NullDatabaseProvider(), false);
 
@@ -90,8 +89,8 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_01_NormalEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
-			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
-			SortedDictionary<Guid, bool> Objects3 = new SortedDictionary<Guid, bool>();
+			SortedDictionary<Guid, bool> Objects2 = new();
+			SortedDictionary<Guid, bool> Objects3 = new();
 			Simple Prev = null;
 
 			await this.file.BeginRead();
@@ -106,8 +105,8 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (!(Prev is null))
-						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -122,8 +121,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Simple Obj = (Simple)e.Current;
 
-					if (!(Prev is null))
-						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
@@ -138,8 +137,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Simple Obj = (Simple)e.Current;
 
-					if (!(Prev is null))
-						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
@@ -180,8 +179,8 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_02_TypedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
-			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
-			SortedDictionary<Guid, bool> Objects3 = new SortedDictionary<Guid, bool>();
+			SortedDictionary<Guid, bool> Objects2 = new();
+			SortedDictionary<Guid, bool> Objects3 = new();
 			Simple Prev = null;
 			Simple Obj;
 			ulong Rank = 0;
@@ -198,8 +197,8 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (!(Prev is null))
-						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -218,8 +217,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
@@ -238,8 +237,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
@@ -256,7 +255,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(0, Objects3.Count);
 		}
 
-		private int Index1Compare(Simple Obj1, Simple Obj2)
+		private static int Index1Compare(Simple Obj1, Simple Obj2)
 		{
 			int i = Obj1.Byte.CompareTo(Obj2.Byte);
 			if (i != 0)
@@ -269,12 +268,12 @@ namespace Waher.Persistence.FilesLW.Test
 			return 0;
 		}
 
-		private int Index2Compare(Simple Obj1, Simple Obj2)
+		private static int Index2Compare(Simple Obj1, Simple Obj2)
 		{
 			return Obj1.ShortString.CompareTo(Obj2.ShortString);
 		}
 
-		private int Index3Compare(Simple Obj1, Simple Obj2)
+		private static int Index3Compare(Simple Obj1, Simple Obj2)
 		{
 			return Obj1.CIString.CompareTo(Obj2.CIString);
 		}
@@ -283,8 +282,8 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_03_LockedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
-			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
-			SortedDictionary<Guid, bool> Objects3 = new SortedDictionary<Guid, bool>();
+			SortedDictionary<Guid, bool> Objects2 = new();
+			SortedDictionary<Guid, bool> Objects3 = new();
 			Simple Prev = null;
 			Simple Obj;
 			ulong Rank = 0;
@@ -301,8 +300,8 @@ namespace Waher.Persistence.FilesLW.Test
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
 
-					if (!(Prev is null))
-						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -329,8 +328,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
@@ -357,8 +356,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index3Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
@@ -405,8 +404,8 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_05_BackwardsEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
-			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
-			SortedDictionary<Guid, bool> Objects3 = new SortedDictionary<Guid, bool>();
+			SortedDictionary<Guid, bool> Objects2 = new();
+			SortedDictionary<Guid, bool> Objects3 = new();
 			Simple Prev = null;
 			Simple Obj;
 			ulong Rank = ObjectsToEnumerate;
@@ -422,8 +421,8 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsNotNull(Obj);
 					Objects2[Obj.ObjectId] = true;
 					Objects3[Obj.ObjectId] = true;
-					if (!(Prev is null))
-						AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Greater(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -450,8 +449,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Greater(this.Index2Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Greater(Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
@@ -478,8 +477,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Greater(this.Index2Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Greater(Index2Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
@@ -498,7 +497,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
 		{
-			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
+			SortedDictionary<Guid, Simple> Result = new();
 
 			await this.provider.StartBulk();
 
@@ -522,12 +521,12 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
-			SortedDictionary<string, Simple> ObjectsSorted = this.SortObjects(Objects);
+			SortedDictionary<string, Simple> ObjectsSorted = SortObjects(Objects);
 			Simple[] Ordered = new Simple[c];
 			ObjectsSorted.Values.CopyTo(Ordered, 0);
 			Simple Prev;
 			Simple Obj;
-			Random gen = new Random();
+			Random gen = new();
 			int i, j;
 
 			for (i = 0; i < c; i++)
@@ -548,8 +547,8 @@ namespace Waher.Persistence.FilesLW.Test
 						{
 							Obj = e.Current;
 							Assert.IsNotNull(Obj);
-							if (!(Prev is null))
-								AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+							if (Prev is not null)
+								AssertEx.Less(Index1Compare(Prev, Obj), 0);
 
 							Prev = Obj;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
@@ -577,8 +576,8 @@ namespace Waher.Persistence.FilesLW.Test
 						{
 							Obj = e.Current;
 							Assert.IsNotNull(Obj);
-							if (!(Prev is null))
-								AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
+							if (Prev is not null)
+								AssertEx.Greater(Index1Compare(Prev, Obj), 0);
 
 							Prev = Obj;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
@@ -596,9 +595,9 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
-		private SortedDictionary<string, Simple> SortObjects(SortedDictionary<Guid, Simple> Objects)
+		private static SortedDictionary<string, Simple> SortObjects(SortedDictionary<Guid, Simple> Objects)
 		{
-			SortedDictionary<string, Simple> ObjectsSorted = new SortedDictionary<string, Simple>();
+			SortedDictionary<string, Simple> ObjectsSorted = new();
 
 			foreach (Simple Obj in Objects.Values)
 				ObjectsSorted[Obj.Byte.ToString("D3") + " " + (long.MaxValue - Obj.DateTime.Ticks).ToString()] = Obj;
@@ -611,7 +610,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
-			SortedDictionary<string, Simple> ObjectsSorted = this.SortObjects(Objects);
+			SortedDictionary<string, Simple> ObjectsSorted = SortObjects(Objects);
 			Simple[] Ordered = new Simple[c];
 			ObjectsSorted.Values.CopyTo(Ordered, 0);
 			int i;
@@ -645,8 +644,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Less(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
@@ -662,8 +661,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
-					if (!(Prev is null))
-						AssertEx.Greater(this.Index1Compare(Prev, Obj), 0);
+					if (Prev is not null)
+						AssertEx.Greater(Index1Compare(Prev, Obj), 0);
 
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -702,7 +701,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task DBFiles_Index_Test_UpdateObjects(int c)
 		{
-			Dictionary<Guid, Simple> Ordered = new Dictionary<Guid, Simple>();
+			Dictionary<Guid, Simple> Ordered = new();
 			Simple[] Objects = new Simple[c];
 			Simple Obj;
 			int i;
@@ -749,8 +748,8 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Same(e.Current.ObjectId, e.CurrentObjectId);
 					Assert.IsTrue(Ordered.Remove(e.Current.ObjectId));
 
-					if (!(Obj is null))
-						AssertEx.Less(this.Index1Compare(Obj, e.Current), 0);
+					if (Obj is not null)
+						AssertEx.Less(Index1Compare(Obj, e.Current), 0);
 
 					Obj = e.Current;
 				}
@@ -797,7 +796,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task DBFiles_Index_Test_DeleteObjects(int c)
 		{
-			Random Gen = new Random();
+			Random Gen = new();
 			Simple[] Objects = new Simple[c];
 			Simple Obj;
 			int i;
@@ -1106,12 +1105,12 @@ namespace Waher.Persistence.FilesLW.Test
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsTrue(Obj.ShortString.StartsWith("A"));
-					Assert.IsTrue(Obj.ShortString.Contains("B"));
+					Assert.IsTrue(Obj.ShortString.Contains('B'));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 
 				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains("B"));
+					Assert.IsFalse(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains('B'));
 			}
 			finally
 			{
@@ -1338,12 +1337,12 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
-					Assert.IsFalse(Obj.ShortString.StartsWith("A") && Obj.ShortString.Contains("B"));
+					Assert.IsFalse(Obj.ShortString.StartsWith("A") && Obj.ShortString.Contains('B'));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 
 				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsTrue(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains("B"));
+					Assert.IsTrue(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains('B'));
 			}
 			finally
 			{
@@ -1516,16 +1515,16 @@ namespace Waher.Persistence.FilesLW.Test
 			int NrFalseNegatives = 0;
 			int RecNr = 0;
 
-			Expression Exp = new Expression("select Byte, DateTime from Simple");
-			Variables v = new Variables();
+			Expression Exp = new("select Byte, DateTime from Simple");
+			Variables v = new();
 			ObjectMatrix Ans = await Exp.EvaluateAsync(v) as ObjectMatrix;
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 			int Rows = Ans.Rows;
 			int Row;
 
 			sb.AppendLine("Simple Obj;");
 			sb.AppendLine("Guid ObjectId;");
-			sb.AppendLine("SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();");
+			sb.AppendLine("SortedDictionary<Guid, Simple> Result = new();");
 			sb.AppendLine("await this.provider.StartBulk();");
 
 			for (Row = 0; Row < Rows; Row++)
@@ -1538,7 +1537,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			sb.AppendLine("await this.provider.EndBulk();");
 
-			Console.Out.WriteLine(sb.ToString());
+			ConsoleOut.WriteLine(sb.ToString());
 
 			await this.file.CheckIndicesInitialized<Simple>();
 			await this.file.BeginRead();
@@ -1590,14 +1589,14 @@ namespace Waher.Persistence.FilesLW.Test
         {
             Simple Obj;
             Guid ObjectId;
-            SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
+            SortedDictionary<Guid, Simple> Result = new();
 
             await this.provider.EndBulk();
             return Result;
         }*/
 
-		private static readonly DateTime MinDT = new DateTime(1950, 6, 7, 8, 9, 10);
-		private static readonly DateTime MaxDT = new DateTime(1990, 2, 3, 4, 5, 6);
+		private static readonly DateTime MinDT = new(1950, 6, 7, 8, 9, 10);
+		private static readonly DateTime MaxDT = new(1990, 2, 3, 4, 5, 6);
 
 		[TestMethod]
 		public async Task DBFiles_Index_Test_41_Search_TwoRanges_Open()
@@ -1885,12 +1884,12 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
-					Assert.IsTrue("ABXY".IndexOf(Obj.ShortString[0]) >= 0);
+					Assert.IsTrue("ABXY".Contains(Obj.ShortString[0]));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 
 				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse("ABXY".IndexOf(Obj2.ShortString[0]) >= 0);
+					Assert.IsFalse("ABXY".Contains(Obj2.ShortString[0]));
 			}
 			finally
 			{
@@ -1930,7 +1929,7 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					if (!(Prev is null))
+					if (Prev is not null)
 					{
 						Assert.IsTrue(Prev.SByte < Obj.SByte ||
 							(Prev.SByte == Obj.SByte && string.Compare(Prev.ShortString, Obj.ShortString) <= 0));
@@ -1955,7 +1954,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_50_Search_Paging()
 		{
 			await this.CreateObjects(ObjectsToEnumerate);
-			List<Simple> Ordered = new List<Simple>();
+			List<Simple> Ordered = new();
 			int i;
 
 			await this.file.CheckIndicesInitialized<Simple>();
@@ -2034,7 +2033,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task<SortedDictionary<Guid, Default>> CreateDefaultObjects(int NrObjects)
 		{
-			SortedDictionary<Guid, Default> Result = new SortedDictionary<Guid, Default>();
+			SortedDictionary<Guid, Default> Result = new();
 
 			while (NrObjects > 0)
 			{
@@ -2325,7 +2324,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			foreach (Simple Obj2 in Objects.Values)
-				Assert.IsFalse("ABXY".IndexOf(Obj2.CIString[0]) >= 0);
+				Assert.IsFalse("ABXY".Contains(Obj2.CIString[0]));
 
 			FileStatistics StatAfter = (await this.file.ComputeStatistics()).Key;
 			ulong NrFullFileScans = StatAfter.NrFullFileScans - StatBefore.NrFullFileScans;
@@ -2360,7 +2359,7 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					if (!(Prev is null))
+					if (Prev is not null)
 					{
 						Assert.IsTrue(Prev.SByte < Obj.SByte ||
 							(Prev.SByte == Obj.SByte && string.Compare(Prev.CIString, Obj.CIString) <= 0));
@@ -2385,7 +2384,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_61_Search_Paging_CaseInsensitive()
 		{
 			await this.CreateObjects(ObjectsToEnumerate);
-			List<Simple> Ordered = new List<Simple>();
+			List<Simple> Ordered = new();
 			int i;
 
 			await this.file.CheckIndicesInitialized<Simple>();

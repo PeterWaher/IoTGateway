@@ -78,7 +78,7 @@ namespace Waher.Persistence.FilesLW.Test
 			DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
 			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif

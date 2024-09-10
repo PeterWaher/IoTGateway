@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using Waher.Runtime.Console;
 using Waher.Script.Model;
 using Waher.Script.Xml;
 
@@ -10,9 +10,9 @@ namespace Waher.Script.Test
 	{
 		private static void Test(string Script)
 		{
-			Console.Out.WriteLine();
-			Console.Out.WriteLine(Script);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine(Script);
+			ConsoleOut.WriteLine();
 
 			Expression Exp1 = new(Script);
 			Expression Exp2 = new(Script);
@@ -22,8 +22,8 @@ namespace Waher.Script.Test
 
 			AssertParentNodesAndSubsexpressions(Exp1);
 
-			Exp1.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			Exp1.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 		}
 
 		public static void AssertParentNodesAndSubsexpressions(Expression Exp)

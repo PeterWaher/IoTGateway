@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 namespace Waher.Security.PKCS.Test
 {
@@ -34,7 +35,7 @@ namespace Waher.Security.PKCS.Test
 
 		private Exception CreateException(string Msg, byte[] Expected, byte[] Bin)
 		{
-			StringBuilder Message = new StringBuilder();
+			StringBuilder Message = new();
 
 			Message.AppendLine(Msg);
 			Message.AppendLine();
@@ -63,7 +64,7 @@ namespace Waher.Security.PKCS.Test
 					Message.Append(' ');
 				}
 
-				Message.Append(b.ToString());
+				Message.Append(b);
 			}
 		}
 
@@ -134,7 +135,7 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_08_BITSTRING_1()
 		{
-			BitArray Bits = new BitArray(20);
+			BitArray Bits = new(20);
 			int i;
 
 			for (i = 0; i < 20; i++)
@@ -380,7 +381,7 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_21_CSR_2_Generate_1024_SHA1()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(1024);
+			using RSACryptoServiceProvider RSA = new(1024);
 			RSAParameters Parameters = RSA.ExportParameters(false);
 
 			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
@@ -472,7 +473,7 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_22_CSR_3_Generate_2048_SHA1()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			using RSACryptoServiceProvider RSA = new(2048);
 			RSAParameters Parameters = RSA.ExportParameters(false);
 
 			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
@@ -564,7 +565,7 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_23_CSR_4_Generate_Simple_SHA1()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			using RSACryptoServiceProvider RSA = new(2048);
 			RSAParameters Parameters = RSA.ExportParameters(false);
 
 			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
@@ -621,7 +622,7 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_23_CSR_5_Generate_Simple_SHA256()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			using RSACryptoServiceProvider RSA = new(2048);
 			RSAParameters Parameters = RSA.ExportParameters(false);
 
 			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
@@ -678,8 +679,8 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_24_CSR_6_Generic_SHA256()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
-			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha256(RSA))
+			using RSACryptoServiceProvider RSA = new(2048);
+			CertificateRequest CertificateRequest = new(new RsaSha256(RSA))
 			{
 				Country = "SE",
 				StateOrProvince = "Stockholm",
@@ -702,8 +703,8 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_24_CSR_7_Generic_SHA384()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
-			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha384(RSA))
+			using RSACryptoServiceProvider RSA = new(4096);
+			CertificateRequest CertificateRequest = new(new RsaSha384(RSA))
 			{
 				Country = "SE",
 				StateOrProvince = "Stockholm",
@@ -726,8 +727,8 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_24_CSR_8_Generic_SHA512()
 		{
-			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
-			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha512(RSA))
+			using RSACryptoServiceProvider RSA = new(4096);
+			CertificateRequest CertificateRequest = new(new RsaSha512(RSA))
 			{
 				Country = "SE",
 				StateOrProvince = "Stockholm",
@@ -749,9 +750,9 @@ namespace Waher.Security.PKCS.Test
 
 		private void PrintCSR(byte[] CSR)
 		{
-			Console.Out.WriteLine("-----BEGIN CERTIFICATE REQUEST-----");
-			Console.Out.WriteLine(Convert.ToBase64String(CSR, Base64FormattingOptions.InsertLineBreaks));
-			Console.Out.WriteLine("-----END CERTIFICATE REQUEST-----");
+			ConsoleOut.WriteLine("-----BEGIN CERTIFICATE REQUEST-----");
+			ConsoleOut.WriteLine(Convert.ToBase64String(CSR, Base64FormattingOptions.InsertLineBreaks));
+			ConsoleOut.WriteLine("-----END CERTIFICATE REQUEST-----");
 		}
 
 	}

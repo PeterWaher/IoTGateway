@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 using Waher.Script.Graphs;
 using Waher.Script.Xml;
 
@@ -11,9 +11,9 @@ namespace Waher.Script.Test
 	{
 		private async Task Test(string Script)
 		{
-			Variables v = new Variables();
+			Variables v = new();
 
-			Expression Exp = new Expression("DrawTangent(x0[],f,min,max):=" +
+			Expression Exp = new("DrawTangent(x0[],f,min,max):=" +
 				"(" +
 				"x:=min..max|((max-min)/100);" +
 				"plot2dcurve(x,f(x),\"Blue\")+" +
@@ -21,16 +21,16 @@ namespace Waher.Script.Test
 				"scatter2d(x0,f(x0),\"Red\",5);" +
 				");" + Script);
 
-			Console.Out.WriteLine();
-			Exp.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 
 			Graph Result = await Exp.EvaluateAsync(v) as Graph;
 
 			if (Result is null)
 				Assert.Fail("Expected graph.");
 
-			GraphSettings Settings = new GraphSettings();
+			GraphSettings Settings = new();
 			Result.CreatePixels(Settings);
 
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);

@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.PKCS;
 
@@ -220,10 +221,10 @@ namespace Waher.Security.ACME.Test
 		{
 			foreach (AcmeAuthorization Authorization in Authorizations)
 			{
-				Console.Out.WriteLine(Authorization.Type);
-				Console.Out.WriteLine(Authorization.Value);
-				Console.Out.WriteLine(Authorization.Status);
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine(Authorization.Type);
+				ConsoleOut.WriteLine(Authorization.Value);
+				ConsoleOut.WriteLine(Authorization.Status);
+				ConsoleOut.WriteLine();
 
 				Print(Authorization.Value, Authorization.Challenges);
 			}
@@ -233,25 +234,25 @@ namespace Waher.Security.ACME.Test
 		{
 			foreach (AcmeChallenge Challenge in Challenges)
 			{
-				Console.Out.WriteLine(Challenge.Location);
-				Console.Out.WriteLine(Challenge.Status.ToString());
-				Console.Out.WriteLine(Challenge.Token);
+				ConsoleOut.WriteLine(Challenge.Location);
+				ConsoleOut.WriteLine(Challenge.Status.ToString());
+				ConsoleOut.WriteLine(Challenge.Token);
 
 				if (Challenge is AcmeHttpChallenge HttpChallenge)
 				{
-					Console.Out.WriteLine(HttpChallenge.ResourceName);
-					Console.Out.WriteLine(HttpChallenge.KeyAuthorization);
+					ConsoleOut.WriteLine(HttpChallenge.ResourceName);
+					ConsoleOut.WriteLine(HttpChallenge.KeyAuthorization);
 				}
 				else if (Challenge is AcmeDnsChallenge DnsChallenge)
 				{
-					Console.Out.WriteLine(DnsChallenge.ValidationDomainNamePrefix + DomainName);
-					Console.Out.WriteLine(DnsChallenge.KeyAuthorization);
+					ConsoleOut.WriteLine(DnsChallenge.ValidationDomainNamePrefix + DomainName);
+					ConsoleOut.WriteLine(DnsChallenge.KeyAuthorization);
 				}
 
 				if (Challenge.Validated.HasValue)
-					Console.Out.WriteLine(Challenge.Validated.Value);
+					ConsoleOut.WriteLine(Challenge.Validated.Value);
 
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine();
 			}
 		}
 
@@ -264,9 +265,9 @@ namespace Waher.Security.ACME.Test
 
 			foreach (AcmeOrder Order in Orders)
 			{
-				Console.Out.WriteLine(Order.Location);
-				Console.Out.WriteLine(Order.Status);
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine(Order.Location);
+				ConsoleOut.WriteLine(Order.Status);
+				ConsoleOut.WriteLine();
 
 				AcmeAuthorization[] Authorizations = await Order.GetAuthorizations();
 				Print(Authorizations);

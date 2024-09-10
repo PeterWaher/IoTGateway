@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Runtime.Console;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects;
 using Waher.Script.Persistence.SPARQL;
 
 namespace Waher.Script.Test
@@ -127,8 +127,8 @@ namespace Waher.Script.Test
 		public async Task Query_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
-			List<TurtleDocument> Docs = new List<TurtleDocument>();
-			Variables v = new Variables();
+			List<TurtleDocument> Docs = new();
+			Variables v = new();
 			string[] SourceFileNames = DataSetFileName.Split('|');
 			string[] SourceUris = SourceName?.Split('|');
 			int i, c;
@@ -153,9 +153,9 @@ namespace Waher.Script.Test
 			string[] SourceUris, TurtleDocument[] Docs)
 		{
 			string Query = LoadTextResource("Query." + QueryFileName);
-			Expression Exp = new Expression(Query);
+			Expression Exp = new(Query);
 
-			if (!(SourceUris is null) && Exp.Root is SparqlQuery SparqlQuery && SparqlQuery.NamedGraphNames.Length == 0)
+			if (SourceUris is not null && Exp.Root is SparqlQuery SparqlQuery && SparqlQuery.NamedGraphNames.Length == 0)
 				SparqlQuery.RegisterNamedGraph(SourceUris);
 
 			object Result = await Exp.EvaluateAsync(v);
@@ -166,22 +166,22 @@ namespace Waher.Script.Test
 				IMatrix M = ResultSet.ToMatrix();
 				Assert.IsNotNull(M);
 
-				Console.Out.WriteLine(Expression.ToString(M));
-				Console.Out.WriteLine();
-				Console.Out.WriteLine(Query);
+				ConsoleOut.WriteLine(Expression.ToString(M));
+				ConsoleOut.WriteLine();
+				ConsoleOut.WriteLine(Query);
 
 				foreach (TurtleDocument Doc in Docs)
 				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(Doc.Text);
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine(Doc.Text);
 				}
 
 				if (!string.IsNullOrEmpty(ResultName))
 				{
 					(string ExpectedDoc, SparqlResultSet Expected) = await LoadSparqlResultSet(ResultName);
 
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(ExpectedDoc);
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine(ExpectedDoc);
 
 					Assert.IsFalse(Expected.BooleanResult.HasValue ^ ResultSet.BooleanResult.HasValue);
 					if (Expected.BooleanResult.HasValue)
@@ -196,7 +196,7 @@ namespace Waher.Script.Test
 					c = Expected.Records?.Length ?? 0;
 					Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");
 
-					Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
+					Dictionary<string, string> BlankNodeDictionary = new();
 
 					for (i = 0; i < c; i++)
 					{
@@ -223,13 +223,13 @@ namespace Waher.Script.Test
 				IMatrix M = Model.ToMatrix();
 				Assert.IsNotNull(M);
 
-				Console.Out.WriteLine(Expression.ToString(M));
+				ConsoleOut.WriteLine(Expression.ToString(M));
 
 				if (!string.IsNullOrEmpty(ResultName))
 				{
 					TurtleDocument Expected = LoadTurtleResource(ResultName);
 
-					Dictionary<string, string> BlankNodeDictionary = new Dictionary<string, string>();
+					Dictionary<string, string> BlankNodeDictionary = new();
 					IEnumerator<ISemanticTriple> e1 = Expected.GetEnumerator();
 					IEnumerator<ISemanticTriple> e2 = Model.GetEnumerator();
 					bool b1 = e1.MoveNext();

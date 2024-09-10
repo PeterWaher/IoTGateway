@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Xsl;
 using Waher.Content.Xsl;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.Transform
 {
@@ -84,15 +85,15 @@ namespace Waher.Utility.Transform
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Transforms an XML file using an XSL Transform (XSLT) file.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-i INPUT_FILE         File name of XML file.");
-					Console.Out.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
-					Console.Out.WriteLine("-o OUTPUT_FILE        File name of output file.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Transforms an XML file using an XSL Transform (XSLT) file.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-i INPUT_FILE         File name of XML file.");
+					ConsoleOut.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
+					ConsoleOut.WriteLine("-o OUTPUT_FILE        File name of output file.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -120,7 +121,7 @@ namespace Waher.Utility.Transform
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

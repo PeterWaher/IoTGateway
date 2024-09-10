@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Utility.AnalyzeDB
@@ -121,20 +122,20 @@ namespace Waher.Utility.AnalyzeDB
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Analyzes an object database created by the Waher.Persistence.Files or");
-					Console.Out.WriteLine("Waher.Persistence.FilesLW libraries, such as the IoT Gateway database.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
-					Console.Out.WriteLine("-o OUTPUT_FILE        File name of report file.");
-					Console.Out.WriteLine("-e                    If encryption is used by the database.");
-					Console.Out.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
-					Console.Out.WriteLine("-x                    Export contents of each collection.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Analyzes an object database created by the Waher.Persistence.Files or");
+					ConsoleOut.WriteLine("Waher.Persistence.FilesLW libraries, such as the IoT Gateway database.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
+					ConsoleOut.WriteLine("-o OUTPUT_FILE        File name of report file.");
+					ConsoleOut.WriteLine("-e                    If encryption is used by the database.");
+					ConsoleOut.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
+					ConsoleOut.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
+					ConsoleOut.WriteLine("-x                    Export contents of each collection.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -152,41 +153,40 @@ namespace Waher.Utility.AnalyzeDB
 					typeof(FilesProvider).Assembly,
 					typeof(ObjectSerializer).Assembly);
 
-				using (FilesProvider FilesProvider = FilesProvider.CreateAsync(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 3600000, Encryption, false).Result)
+				using FilesProvider FilesProvider = FilesProvider.CreateAsync(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 3600000, Encryption, false).Result;
+
+				Database.Register(FilesProvider);
+
+				using StreamWriter f = File.CreateText(OutputFileName);
+				XmlWriterSettings Settings = new()
 				{
-					Database.Register(FilesProvider);
+					Encoding = Encoding,
+					Indent = true,
+					IndentChars = "\t",
+					NewLineChars = ConsoleOut.NewLine,
+					OmitXmlDeclaration = false,
+					WriteEndDocumentOnClose = true
+				};
 
-					using StreamWriter f = File.CreateText(OutputFileName);
-					XmlWriterSettings Settings = new XmlWriterSettings()
+				using XmlWriter w = XmlWriter.Create(f, Settings);
+				if (string.IsNullOrEmpty(XsltPath))
+				{
+					i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
+					if (i > 0)
 					{
-						Encoding = Encoding,
-						Indent = true,
-						IndentChars = "\t",
-						NewLineChars = Console.Out.NewLine,
-						OmitXmlDeclaration = false,
-						WriteEndDocumentOnClose = true
-					};
-
-					using XmlWriter w = XmlWriter.Create(f, Settings);
-					if (string.IsNullOrEmpty(XsltPath))
-					{
-						i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
-						if (i > 0)
-						{
-							s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
-							if (File.Exists(s))
-								XsltPath = s;
-						}
+						s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
+						if (File.Exists(s))
+							XsltPath = s;
 					}
-
-					Database.Analyze(w, XsltPath, ProgramDataFolder, Export);
 				}
+
+				Database.Analyze(w, XsltPath, ProgramDataFolder, Export);
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

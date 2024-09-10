@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.ExStat
 {
@@ -33,8 +34,8 @@ namespace Waher.Utility.ExStat
 		{
 			FileStream FileOutput = null;
 			XmlWriter Output = null;
-			List<string> Paths = new List<string>();
-			List<string> ComparisonPaths = new List<string>();
+			List<string> Paths = new();
+			List<string> ComparisonPaths = new();
 			string XmlFileName = null;
 			bool Subfolders = false;
 			bool Help = false;
@@ -89,24 +90,24 @@ namespace Waher.Utility.ExStat
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Searches through exception log files in a folder, counting exceptions,");
-					Console.Out.WriteLine("genering an XML file with some basic statistics.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-p PATH               Path to start the search. If not provided,");
-					Console.Out.WriteLine("                      and no comparison paths are provided, the");
-					Console.Out.WriteLine("                      current path will be used, with *.* as search");
-					Console.Out.WriteLine("                      pattern. Can be used multiple times to search");
-					Console.Out.WriteLine("                      through multiple paths, or use multiple search");
-					Console.Out.WriteLine("                      patterns.");
-					Console.Out.WriteLine("-c PATH               Compares XML files output by ExStat. Only");
-					Console.Out.WriteLine("                      exceptions common in all files will be output.");
-					Console.Out.WriteLine("-x FILENAME           Export findings to an XML file.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding if Byte-order-marks not available.");
-					Console.Out.WriteLine("                      Default=UTF-8");
-					Console.Out.WriteLine("-s                    Include subfolders in search.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Searches through exception log files in a folder, counting exceptions,");
+					ConsoleOut.WriteLine("genering an XML file with some basic statistics.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-p PATH               Path to start the search. If not provided,");
+					ConsoleOut.WriteLine("                      and no comparison paths are provided, the");
+					ConsoleOut.WriteLine("                      current path will be used, with *.* as search");
+					ConsoleOut.WriteLine("                      pattern. Can be used multiple times to search");
+					ConsoleOut.WriteLine("                      through multiple paths, or use multiple search");
+					ConsoleOut.WriteLine("                      patterns.");
+					ConsoleOut.WriteLine("-c PATH               Compares XML files output by ExStat. Only");
+					ConsoleOut.WriteLine("                      exceptions common in all files will be output.");
+					ConsoleOut.WriteLine("-x FILENAME           Export findings to an XML file.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding if Byte-order-marks not available.");
+					ConsoleOut.WriteLine("                      Default=UTF-8");
+					ConsoleOut.WriteLine("-s                    Include subfolders in search.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -118,7 +119,7 @@ namespace Waher.Utility.ExStat
 				if (string.IsNullOrEmpty(XmlFileName))
 					throw new Exception("Missing output file name.");
 
-				XmlWriterSettings Settings = new XmlWriterSettings()
+				XmlWriterSettings Settings = new()
 				{
 					CloseOutput = true,
 					ConformanceLevel = ConformanceLevel.Document,
@@ -139,8 +140,8 @@ namespace Waher.Utility.ExStat
 				Output.WriteStartDocument();
 				Output.WriteStartElement("Statistics", "http://waher.se/schema/ExStat.xsd");
 
-				Dictionary<string, bool> FileProcessed = new Dictionary<string, bool>();
-				Statistics Statistics = new Statistics();
+				Dictionary<string, bool> FileProcessed = new();
+				Statistics Statistics = new();
 
 				foreach (string Path0 in Paths)
 				{
@@ -171,7 +172,7 @@ namespace Waher.Utility.ExStat
 
 						FileProcessed[FileName] = true;
 
-						Console.Out.WriteLine(FileName + "...");
+						ConsoleOut.WriteLine(FileName + "...");
 
 						try
 						{
@@ -238,7 +239,7 @@ namespace Waher.Utility.ExStat
 						}
 						catch (Exception ex)
 						{
-							Console.Out.WriteLine(ex.Message);
+							ConsoleOut.WriteLine(ex.Message);
 						}
 					}
 				}
@@ -271,16 +272,16 @@ namespace Waher.Utility.ExStat
 
 						FileProcessed[FileName] = true;
 
-						Console.Out.WriteLine(FileName + "...");
+						ConsoleOut.WriteLine(FileName + "...");
 
 						try
 						{
-							XmlDocument Doc = new XmlDocument();
+							XmlDocument Doc = new();
 							Doc.Load(FileName);
 
 							foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 							{
-								if (!(N is XmlElement E))
+								if (N is not XmlElement E)
 									continue;
 
 								switch (E.LocalName)
@@ -288,7 +289,7 @@ namespace Waher.Utility.ExStat
 									case "PerType":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											string Type = XML.Attribute(E2, "type");
@@ -296,7 +297,7 @@ namespace Waher.Utility.ExStat
 
 											foreach (XmlNode N3 in E2.ChildNodes)
 											{
-												if (!(N3 is XmlElement E3))
+												if (N3 is not XmlElement E3)
 													continue;
 
 												switch (E3.LocalName)
@@ -304,7 +305,7 @@ namespace Waher.Utility.ExStat
 													case "PerMessage":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string Message = E4["Value"]?.InnerText;
@@ -318,7 +319,7 @@ namespace Waher.Utility.ExStat
 													case "PerSource":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string StackTrace = E4["Value"]?.InnerText;
@@ -339,7 +340,7 @@ namespace Waher.Utility.ExStat
 									case "PerMessage":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											string Message = XML.Attribute(E2, "message");
@@ -347,7 +348,7 @@ namespace Waher.Utility.ExStat
 
 											foreach (XmlNode N3 in E2.ChildNodes)
 											{
-												if (!(N3 is XmlElement E3))
+												if (N3 is not XmlElement E3)
 													continue;
 
 												switch (E3.LocalName)
@@ -355,7 +356,7 @@ namespace Waher.Utility.ExStat
 													case "PerType":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string Type = E4["Value"]?.InnerText;
@@ -369,7 +370,7 @@ namespace Waher.Utility.ExStat
 													case "PerSource":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string StackTrace = E4["Value"]?.InnerText;
@@ -390,7 +391,7 @@ namespace Waher.Utility.ExStat
 									case "PerSource":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											string StackTrace = null;
@@ -398,7 +399,7 @@ namespace Waher.Utility.ExStat
 
 											foreach (XmlNode N3 in E2.ChildNodes)
 											{
-												if (!(N3 is XmlElement E3))
+												if (N3 is not XmlElement E3)
 													continue;
 
 												switch (E3.LocalName)
@@ -410,7 +411,7 @@ namespace Waher.Utility.ExStat
 													case "PerType":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string Type = E4["Value"]?.InnerText;
@@ -424,7 +425,7 @@ namespace Waher.Utility.ExStat
 													case "PerMessage":
 														foreach (XmlNode N4 in E3.ChildNodes)
 														{
-															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+															if (N4 is not XmlElement E4 || E4.LocalName != "Stat")
 																continue;
 
 															string Message = E4["Value"]?.InnerText;
@@ -445,7 +446,7 @@ namespace Waher.Utility.ExStat
 									case "PerHour":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											string TP = XML.Attribute(E2, "hour");
@@ -461,7 +462,7 @@ namespace Waher.Utility.ExStat
 									case "PerDay":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											DateTime Day = XML.Attribute(E2, "day", DateTime.MinValue);
@@ -474,7 +475,7 @@ namespace Waher.Utility.ExStat
 									case "PerMonth":
 										foreach (XmlNode N2 in E.ChildNodes)
 										{
-											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+											if (N2 is not XmlElement E2 || E2.LocalName != "Stat")
 												continue;
 
 											string TP = XML.Attribute(E2, "month");
@@ -494,7 +495,7 @@ namespace Waher.Utility.ExStat
 						}
 						catch (Exception ex)
 						{
-							Console.Out.WriteLine(ex.Message);
+							ConsoleOut.WriteLine(ex.Message);
 						}
 
 						Statistics.RemoveUntouched();
@@ -516,7 +517,7 @@ namespace Waher.Utility.ExStat
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 			finally
@@ -564,7 +565,7 @@ namespace Waher.Utility.ExStat
 				else
 					Output.WriteAttributeString(AttributeName, s);
 
-				if (!(Rec.Value.SubHistograms is null))
+				if (Rec.Value.SubHistograms is not null)
 					Export(Output, Rec.Value.SubHistograms, SubElementNames);
 
 				Output.WriteEndElement();
@@ -592,7 +593,7 @@ namespace Waher.Utility.ExStat
 				Output.WriteAttributeString(AttributeName, Rec.Key.ToString(DateTimeFormat));
 				Output.WriteAttributeString("count", Rec.Value.Count.ToString());
 
-				if (!(Rec.Value.SubHistograms is null))
+				if (Rec.Value.SubHistograms is not null)
 					Export(Output, Rec.Value.SubHistograms, SubElementNames);
 
 				Output.WriteEndElement();
@@ -626,8 +627,8 @@ namespace Waher.Utility.ExStat
 				return;
 
 			DateTime Day = Time.Date;
-			DateTime Month = new DateTime(Day.Year, Day.Month, 1);
-			DateTime Hour = new DateTime(Time.Year, Time.Month, Time.Day, Time.Hour, 0, 0);
+			DateTime Month = new(Day.Year, Day.Month, 1);
+			DateTime Hour = new(Time.Year, Time.Month, Time.Day, Time.Hour, 0, 0);
 
 			i = j;
 			j = s.IndexOf("   at", i);

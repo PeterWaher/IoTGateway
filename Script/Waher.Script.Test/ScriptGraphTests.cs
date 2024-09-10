@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 using Waher.Script.Graphs;
 using Waher.Script.Xml;
 
@@ -12,24 +12,24 @@ namespace Waher.Script.Test
 	{
 		private async Task Test(string Script, string FileName)
 		{
-			Variables v = new Variables();
+			Variables v = new();
 
-			Expression Exp = new Expression(Script);
+			Expression Exp = new(Script);
 			Graph Result = await Exp.EvaluateAsync(v) as Graph;
 
 			if (Result is null)
 				Assert.Fail("Expected graph.");
 
-			GraphSettings Settings = new GraphSettings();
+			GraphSettings Settings = new();
 			PixelInformation Pixels = Result.CreatePixels(Settings);
 			
 			this.Save(Pixels, FileName);
 
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine();
-			Exp.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 		}
 
 		private void Save(PixelInformation Pixels, string FileName)

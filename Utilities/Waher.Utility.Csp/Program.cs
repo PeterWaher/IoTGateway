@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using Waher.Runtime.Console;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -31,22 +32,22 @@ namespace Waher.Utility.Csp
 					switch (s.ToLower())
 					{
 						case "-?":
-							Console.Out.WriteLine("Command-line arguments:");
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("-?     Shows this help.");
-							Console.Out.WriteLine("-key NAME     Provides a name of a key.");
-							Console.Out.WriteLine("-size SIZE    Provides a key size of the currently named key.");
-							Console.Out.WriteLine("-currentuser  Uses the current user key store.");
-							Console.Out.WriteLine("-cu           Same as -currentuser.");
-							Console.Out.WriteLine("-machine      Uses the current machine key store.");
-							Console.Out.WriteLine("-m            Same as -machine.");
-							Console.Out.WriteLine("-default      Uses the default key store.");
-							Console.Out.WriteLine("-d            Same as -default.");
-							Console.Out.WriteLine("-ephemeral    Used for creating an ephemeral key.");
-							Console.Out.WriteLine("-e            Same as -ephemeral.");
-							Console.Out.WriteLine("-create       Creates a key with the given name and size.");
-							Console.Out.WriteLine("-delete       Deletes the currently named key.");
-							Console.Out.WriteLine("-get          Gets the currently named key.");
+							ConsoleOut.WriteLine("Command-line arguments:");
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("-?     Shows this help.");
+							ConsoleOut.WriteLine("-key NAME     Provides a name of a key.");
+							ConsoleOut.WriteLine("-size SIZE    Provides a key size of the currently named key.");
+							ConsoleOut.WriteLine("-currentuser  Uses the current user key store.");
+							ConsoleOut.WriteLine("-cu           Same as -currentuser.");
+							ConsoleOut.WriteLine("-machine      Uses the current machine key store.");
+							ConsoleOut.WriteLine("-m            Same as -machine.");
+							ConsoleOut.WriteLine("-default      Uses the default key store.");
+							ConsoleOut.WriteLine("-d            Same as -default.");
+							ConsoleOut.WriteLine("-ephemeral    Used for creating an ephemeral key.");
+							ConsoleOut.WriteLine("-e            Same as -ephemeral.");
+							ConsoleOut.WriteLine("-create       Creates a key with the given name and size.");
+							ConsoleOut.WriteLine("-delete       Deletes the currently named key.");
+							ConsoleOut.WriteLine("-get          Gets the currently named key.");
 							break;
 
 						case "-currentuser":
@@ -95,7 +96,7 @@ namespace Waher.Utility.Csp
 
 							using (RSACryptoServiceProvider RSA = new(KeySize, Csp))
 							{
-								Console.Out.WriteLine("Key created.");
+								ConsoleOut.WriteLine("Key created.");
 							}
 							break;
 
@@ -112,7 +113,7 @@ namespace Waher.Utility.Csp
 								RSA.Clear();
 							}
 
-							Console.Out.WriteLine("Key deleted.");
+							ConsoleOut.WriteLine("Key deleted.");
 							break;
 
 						case "-get":
@@ -126,17 +127,17 @@ namespace Waher.Utility.Csp
 							{
 								Parameters = RSA.ExportParameters(true);
 
-								Console.Out.WriteLine("Public:");
-								Console.Out.WriteLine("n: " + Convert.ToBase64String(Parameters.Modulus));
-								Console.Out.WriteLine("e: " + Convert.ToBase64String(Parameters.Exponent));
+								ConsoleOut.WriteLine("Public:");
+								ConsoleOut.WriteLine("n: " + Convert.ToBase64String(Parameters.Modulus));
+								ConsoleOut.WriteLine("e: " + Convert.ToBase64String(Parameters.Exponent));
 
-								Console.Out.WriteLine("Private:");
-								Console.Out.WriteLine("p: " + Convert.ToBase64String(Parameters.P));
-								Console.Out.WriteLine("q: " + Convert.ToBase64String(Parameters.Q));
-								Console.Out.WriteLine("d: " + Convert.ToBase64String(Parameters.D));
-								Console.Out.WriteLine("dP: " + Convert.ToBase64String(Parameters.DP));
-								Console.Out.WriteLine("dQ: " + Convert.ToBase64String(Parameters.DQ));
-								Console.Out.WriteLine("qinv: " + Convert.ToBase64String(Parameters.InverseQ));
+								ConsoleOut.WriteLine("Private:");
+								ConsoleOut.WriteLine("p: " + Convert.ToBase64String(Parameters.P));
+								ConsoleOut.WriteLine("q: " + Convert.ToBase64String(Parameters.Q));
+								ConsoleOut.WriteLine("d: " + Convert.ToBase64String(Parameters.D));
+								ConsoleOut.WriteLine("dP: " + Convert.ToBase64String(Parameters.DP));
+								ConsoleOut.WriteLine("dQ: " + Convert.ToBase64String(Parameters.DQ));
+								ConsoleOut.WriteLine("qinv: " + Convert.ToBase64String(Parameters.InverseQ));
 							}
 							break;
 
@@ -144,11 +145,10 @@ namespace Waher.Utility.Csp
 							throw new Exception("Unrecognized switch: " + s);
 					}
 				}
-
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 			}
 		}
 	}

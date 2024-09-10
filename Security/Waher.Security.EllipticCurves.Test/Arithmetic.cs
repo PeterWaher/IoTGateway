@@ -1,8 +1,7 @@
-using System;
-using System.Globalization;
-using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Security.SHA3;
+using System;
+using System.Numerics;
+using Waher.Runtime.Console;
 
 namespace Waher.Security.EllipticCurves.Test
 {
@@ -108,12 +107,12 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_04_ScalarMultiplication_NIST_P256()
         {
-            this.TestScalarMultiplication(new NistP256());
+			TestScalarMultiplication(new NistP256());
         }
 
-        private void TestScalarMultiplication(PrimeFieldCurve C)
+        private static void TestScalarMultiplication(PrimeFieldCurve C)
         {
-            Random Rnd = new Random();
+            Random Rnd = new();
 
             int k1 = Rnd.Next(1000, 2000);
             int k2 = Rnd.Next(1000, 2000);
@@ -146,17 +145,17 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_05_Sqrt_83_Mod_673()
         {
-            CalcSqrt(83, 673);
+			CalcSqrt(83, 673);
         }
 
         [TestMethod]
         public void Test_06_Sqrt_Minus_486664_Mod_P()
         {
-            Curve25519 C = new Curve25519();
-            CalcSqrt(-486664, C.Prime);
+            Curve25519 C = new();
+			CalcSqrt(-486664, C.Prime);
         }
 
-        private void CalcSqrt(BigInteger N, BigInteger p)
+        private static void CalcSqrt(BigInteger N, BigInteger p)
         {
             BigInteger x = ModulusP.SqrtModP(N, p);
             BigInteger N1 = BigInteger.Remainder(x * x, p);
@@ -189,7 +188,7 @@ namespace Waher.Security.EllipticCurves.Test
             PointOnCurve UV = C.BasePoint;
             PointOnCurve XY = C.ToXY(UV);
 
-            Edwards448 C2 = new Edwards448();
+            Edwards448 C2 = new();
             PointOnCurve XY4 = C2.ScalarMultiplication(4, C2.BasePoint, true);  // 4-isogeny
 
             Assert.AreEqual(XY4.X, XY.X);
@@ -228,17 +227,17 @@ namespace Waher.Security.EllipticCurves.Test
             NBin[0] &= 248;
             NBin[31] &= 127;
             NBin[31] |= 64;
-            BigInteger N0 = new BigInteger(NBin);
+            BigInteger N0 = new(NBin);
             BigInteger N = BigInteger.Parse("31029842492115040904895560451863089656472772604678260265531221036453811406496");
             Assert.AreEqual(N, N0);
 
             byte[] UBin = Hashes.StringToBinary("e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c");
-            BigInteger U0 = new BigInteger(UBin);
+            BigInteger U0 = new(UBin);
             BigInteger U = BigInteger.Parse("34426434033919594451155107781188821651316167215306631574996226621102155684838");
             Assert.AreEqual(U, U0);
 
             byte[] NUBin = Hashes.StringToBinary("c3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552");
-            BigInteger NU0 = new BigInteger(NUBin);
+            BigInteger NU0 = new(NUBin);
             MontgomeryCurve C = new Curve25519();
             BigInteger NU = C.ScalarMultiplication(N, U);
 
@@ -252,18 +251,18 @@ namespace Waher.Security.EllipticCurves.Test
             A[0] &= 248;
             A[31] &= 127;
             A[31] |= 64;
-            BigInteger N0 = new BigInteger(A);
+            BigInteger N0 = new(A);
             BigInteger N = BigInteger.Parse("35156891815674817266734212754503633747128614016119564763269015315466259359304");
             Assert.AreEqual(N, N0);
 
             A = Hashes.StringToBinary("e5210f12786811d3f4b7959d0538ae2c31dbe7106fc03c3efc4cd549c715a493");
             A[31] &= 127;
-            BigInteger U0 = new BigInteger(A);
+            BigInteger U0 = new(A);
             BigInteger U = BigInteger.Parse("8883857351183929894090759386610649319417338800022198945255395922347792736741");
             Assert.AreEqual(U, U0);
 
             A = Hashes.StringToBinary("95cbde9476e8907d7aade45cb4b873f88b595a68799fa152e6f8f7647aac7957");
-            BigInteger NU0 = new BigInteger(A);
+            BigInteger NU0 = new(A);
             MontgomeryCurve C = new Curve25519();
             BigInteger NU = C.ScalarMultiplication(N, U);
 
@@ -273,23 +272,23 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_12_X25519_TestVector_3_1()
         {
-            this.X25519_TestVector_3(1, "422c8e7a6227d7bca1350b3e2bb7279f7897b87bb6854b783c60e80311ae3079");
+			X25519_TestVector_3(1, "422c8e7a6227d7bca1350b3e2bb7279f7897b87bb6854b783c60e80311ae3079");
         }
 
         [TestMethod]
         public void Test_13_X25519_TestVector_3_1000()
         {
-            this.X25519_TestVector_3(1000, "684cf59ba83309552800ef566f2f4d3c1c3887c49360e3875f2eb94d99532c51");
+			X25519_TestVector_3(1000, "684cf59ba83309552800ef566f2f4d3c1c3887c49360e3875f2eb94d99532c51");
         }
 
         [TestMethod]
         [Ignore]
         public void Test_14_X25519_TestVector_3_1000000()
         {
-            this.X25519_TestVector_3(1000000, "7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424");
+			X25519_TestVector_3(1000000, "7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424");
         }
 
-        private void X25519_TestVector_3(int i, string HexResult)
+        private static void X25519_TestVector_3(int i, string HexResult)
         {
             MontgomeryCurve C = new Curve25519();
             BigInteger N = 9;
@@ -313,7 +312,7 @@ namespace Waher.Security.EllipticCurves.Test
             }
 
             byte[] A = Hashes.StringToBinary(HexResult);
-            BigInteger NU0 = new BigInteger(A);
+            BigInteger NU0 = new(A);
 
             Assert.AreEqual(NU0, NU);
         }
@@ -322,13 +321,13 @@ namespace Waher.Security.EllipticCurves.Test
         public void Test_15_X25519_ECDH()
         {
             byte[] A = Hashes.StringToBinary("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
-            Curve25519 Alice = new Curve25519(A);
+            Curve25519 Alice = new(A);
 
             Assert.AreEqual("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
                 Hashes.BinaryToString(Alice.PublicKey));
 
             A = Hashes.StringToBinary("5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb");
-            Curve25519 Bob = new Curve25519(A);
+            Curve25519 Bob = new(A);
 
             Assert.AreEqual("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
                 Hashes.BinaryToString(Bob.PublicKey));
@@ -358,19 +357,19 @@ namespace Waher.Security.EllipticCurves.Test
             A[0] &= 252;
             A[55] |= 128;
             Array.Resize(ref A, 57);
-            BigInteger N0 = new BigInteger(A);
+            BigInteger N0 = new(A);
             BigInteger N = BigInteger.Parse("599189175373896402783756016145213256157230856085026129926891459468622403380588640249457727683869421921443004045221642549886377526240828");
             Assert.AreEqual(N, N0);
 
             A = Hashes.StringToBinary("06fce640fa3487bfda5f6cf2d5263f8aad88334cbd07437f020f08f9814dc031ddbdc38c19c6da2583fa5429db94ada18aa7a7fb4ef8a086");
             Array.Resize(ref A, 57);
-            BigInteger U0 = new BigInteger(A);
+            BigInteger U0 = new(A);
             BigInteger U = BigInteger.Parse("382239910814107330116229961234899377031416365240571325148346555922438025162094455820962429142971339584360034337310079791515452463053830");
             Assert.AreEqual(U, U0);
 
             A = Hashes.StringToBinary("ce3e4ff95a60dc6697da1db1d85e6afbdf79b50a2412d7546d5f239fe14fbaadeb445fc66a01b0779d98223961111e21766282f73dd96b6f");
             Array.Resize(ref A, 57);
-            BigInteger NU0 = new BigInteger(A);
+            BigInteger NU0 = new(A);
             MontgomeryCurve C = new Curve448();
             BigInteger NU = C.ScalarMultiplication(N, U);
 
@@ -384,19 +383,19 @@ namespace Waher.Security.EllipticCurves.Test
             A[0] &= 252;
             A[55] |= 128;
             Array.Resize(ref A, 57);
-            BigInteger N0 = new BigInteger(A);
+            BigInteger N0 = new(A);
             BigInteger N = BigInteger.Parse("633254335906970592779259481534862372382525155252028961056404001332122152890562527156973881968934311400345568203929409663925541994577184");
             Assert.AreEqual(N, N0);
 
             A = Hashes.StringToBinary("0fbcc2f993cd56d3305b0b7d9e55d4c1a8fb5dbb52f8e9a1e9b6201b165d015894e56c4d3570bee52fe205e28a78b91cdfbde71ce8d157db");
             Array.Resize(ref A, 57);
-            BigInteger U0 = new BigInteger(A);
+            BigInteger U0 = new(A);
             BigInteger U = BigInteger.Parse("622761797758325444462922068431234180649590390024811299761625153767228042600197997696167956134770744996690267634159427999832340166786063");
             Assert.AreEqual(U, U0);
 
             A = Hashes.StringToBinary("884a02576239ff7a2f2f63b2db6a9ff37047ac13568e1e30fe63c4a7ad1b3ee3a5700df34321d62077e63633c575c1c954514e99da7c179d");
             Array.Resize(ref A, 57);
-            BigInteger NU0 = new BigInteger(A);
+            BigInteger NU0 = new(A);
             MontgomeryCurve C = new Curve448();
             BigInteger NU = C.ScalarMultiplication(N, U);
 
@@ -406,23 +405,23 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_18_X448_TestVector_3_1()
         {
-            this.X448_TestVector_3(1, "3f482c8a9f19b01e6c46ee9711d9dc14fd4bf67af30765c2ae2b846a4d23a8cd0db897086239492caf350b51f833868b9bc2b3bca9cf4113");
+			X448_TestVector_3(1, "3f482c8a9f19b01e6c46ee9711d9dc14fd4bf67af30765c2ae2b846a4d23a8cd0db897086239492caf350b51f833868b9bc2b3bca9cf4113");
         }
 
         [TestMethod]
         public void Test_19_X448_TestVector_3_1000()
         {
-            this.X448_TestVector_3(1000, "aa3b4749d55b9daf1e5b00288826c467274ce3ebbdd5c17b975e09d4af6c67cf10d087202db88286e2b79fceea3ec353ef54faa26e219f38");
+			X448_TestVector_3(1000, "aa3b4749d55b9daf1e5b00288826c467274ce3ebbdd5c17b975e09d4af6c67cf10d087202db88286e2b79fceea3ec353ef54faa26e219f38");
         }
 
         [TestMethod]
         [Ignore]
         public void Test_20_X448_TestVector_3_1000000()
         {
-            this.X448_TestVector_3(1000000, "077f453681caca3693198420bbe515cae0002472519b3e67661a7e89cab94695c8f4bcd66e61b9b9c946da8d524de3d69bd9d9d66b997e37");
+			X448_TestVector_3(1000000, "077f453681caca3693198420bbe515cae0002472519b3e67661a7e89cab94695c8f4bcd66e61b9b9c946da8d524de3d69bd9d9d66b997e37");
         }
 
-        private void X448_TestVector_3(int i, string HexResult)
+        private static void X448_TestVector_3(int i, string HexResult)
         {
             MontgomeryCurve C = new Curve448();
             BigInteger N = 5;
@@ -445,7 +444,7 @@ namespace Waher.Security.EllipticCurves.Test
             }
 
             byte[] A = Hashes.StringToBinary(HexResult);
-            BigInteger NU0 = new BigInteger(A);
+            BigInteger NU0 = new(A);
 
             Assert.AreEqual(NU0, NU);
         }
@@ -454,13 +453,13 @@ namespace Waher.Security.EllipticCurves.Test
         public void Test_21_X448_ECDH()
         {
             byte[] A = Hashes.StringToBinary("9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b");
-            Curve448 Alice = new Curve448(A);
+            Curve448 Alice = new(A);
 
             Assert.AreEqual("9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa000",
                 Hashes.BinaryToString(Alice.PublicKey));
 
             A = Hashes.StringToBinary("1c306a7ac2a0e2e0990b294470cba339e6453772b075811d8fad0d1d6927c120bb5ee8972b0d3e21374c9c921b09d1b0366f10b65173992d");
-            Curve448 Bob = new Curve448(A);
+            Curve448 Bob = new(A);
 
             Assert.AreEqual("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609",
                 Hashes.BinaryToString(Bob.PublicKey));
@@ -485,10 +484,10 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_22_TwinCurves_25519()
         {
-            this.EdwardsTwinTest<Edwards25519>(new Curve25519(), 1);
+			EdwardsTwinTest<Edwards25519>(new Curve25519(), 1);
         }
 
-        protected void EdwardsTwinTest<CurveType>(MontgomeryCurve C1, int Isogeny)
+        protected static void EdwardsTwinTest<CurveType>(MontgomeryCurve C1, int Isogeny)
             where CurveType : EdwardsCurveBase
         {
             int Ok = 0;
@@ -499,7 +498,7 @@ namespace Waher.Security.EllipticCurves.Test
             {
                 try
                 {
-                    Console.Out.WriteLine(i);
+                    ConsoleOut.WriteLine(i);
 
                     CurveType C2 = C1.Pair as CurveType;
 
@@ -528,41 +527,41 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_23_TwinCurves_448()
         {
-            this.EdwardsTwinTest<Edwards448>(new Curve448(), 4);
+			EdwardsTwinTest<Edwards448>(new Curve448(), 4);
         }
 
         [TestMethod]
         public void Test_25_ScalarMultiplication_Edwards_25519()
         {
-            this.TestScalarMultiplication(new Edwards25519());
+			TestScalarMultiplication(new Edwards25519());
         }
 
         [TestMethod]
         public void Test_26_ScalarMultiplication_Edwards_448()
         {
-            this.TestScalarMultiplication(new Edwards448());
+			TestScalarMultiplication(new Edwards448());
         }
 
         [TestMethod]
         public void Test_27_Sqrt_156324()
         {
-            Curve448 C = new Curve448();
-            CalcSqrt(156324, C.Prime);
+            Curve448 C = new();
+			CalcSqrt(156324, C.Prime);
         }
 
         [TestMethod]
         public void Test_28_Ed25519_EncodeDecode()
         {
-            this.TestEncoding(new Edwards25519());
+			TestEncoding(new Edwards25519());
         }
 
         [TestMethod]
         public void Test_29_Ed448_EncodeDecode()
         {
-            this.TestEncoding(new Edwards448());
+			TestEncoding(new Edwards448());
         }
 
-        private void TestEncoding(EdwardsCurveBase Curve)
+        private static void TestEncoding(EdwardsCurveBase Curve)
         {
             int i;
             int NrErrors = 0;

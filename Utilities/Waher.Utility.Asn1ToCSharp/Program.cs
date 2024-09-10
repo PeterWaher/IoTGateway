@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Content.Asn1;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.Asn1ToCSharp
 {
@@ -38,9 +39,9 @@ namespace Waher.Utility.Asn1ToCSharp
 		{
 			try
 			{
-				CSharpExportSettings Settings = new CSharpExportSettings(string.Empty, EncodingSchemes.None);
-				List<string> ImportFolders = new List<string>();
-				Dictionary<string, bool> ExportedModules = new Dictionary<string, bool>();
+				CSharpExportSettings Settings = new(string.Empty, EncodingSchemes.None);
+				List<string> ImportFolders = new();
+				Dictionary<string, bool> ExportedModules = new();
 				SearchOption SearchOption = SearchOption.TopDirectoryOnly;
 				string OutputFolder = null;
 				string s;
@@ -116,7 +117,7 @@ namespace Waher.Utility.Asn1ToCSharp
 
 							s = args[i++];
 
-							List<string> InputFiles = new List<string>();
+							List<string> InputFiles = new();
 
 							if (File.Exists(s))
 								InputFiles.Add(s);
@@ -131,16 +132,16 @@ namespace Waher.Utility.Asn1ToCSharp
 
 							foreach (string FileName in InputFiles)
 							{
-								Console.Out.WriteLine("Loading " + FileName + "...");
+								ConsoleOut.WriteLine("Loading " + FileName + "...");
 
 								Asn1Document Doc = Asn1Document.FromFile(FileName, ImportFolders.ToArray()).Result;
 
-								Console.Out.WriteLine("Generating C#...");
+								ConsoleOut.WriteLine("Generating C#...");
 
 								string CSharp = Doc.ExportCSharp(Settings);
 								string OutputFileName = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(FileName), "cs"));
 
-								Console.Out.WriteLine("Exporting " + OutputFileName + "...");
+								ConsoleOut.WriteLine("Exporting " + OutputFileName + "...");
 
 								File.WriteAllText(OutputFileName, CSharp, Encoding.UTF8);
 
@@ -152,7 +153,7 @@ namespace Waher.Utility.Asn1ToCSharp
 									CSharp = Settings.GetCode(ImportedModule);
 									OutputFileName = Path.Combine(OutputFolder, Path.ChangeExtension(ImportedModule, "cs"));
 									
-									Console.Out.WriteLine("Exporting " + OutputFileName + "...");
+									ConsoleOut.WriteLine("Exporting " + OutputFileName + "...");
 
 									File.WriteAllText(OutputFileName, CSharp, Encoding.UTF8);
 
@@ -163,30 +164,30 @@ namespace Waher.Utility.Asn1ToCSharp
 							break;
 
 						case "-?":
-							Console.Out.WriteLine("Creates C# files from definitions made in ASN.1 files.");
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("Command line switches:");
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("-BER                  Adds support for BER enconding.");
-							Console.Out.WriteLine("-CER                  Adds support for CER enconding.");
-							Console.Out.WriteLine("-DER                  Adds support for DER enconding.");
-							Console.Out.WriteLine("-n NAMESPACE          Defines a base namespace. Can be");
-							Console.Out.WriteLine("                      used multiple times, to place code");
-							Console.Out.WriteLine("                      in different namespaces.");
-							Console.Out.WriteLine("-o FOLDER             Path to folder where C# files will be");
-							Console.Out.WriteLine("                      stored. Can be used multiple times");
-							Console.Out.WriteLine("                      in one call, to place different files");
-							Console.Out.WriteLine("                      in different output folders.");
-							Console.Out.WriteLine("-f IMPORT_FOLDER      Path to a folder where import files");
-							Console.Out.WriteLine("                      may be stored. Can be used multiple");
-							Console.Out.WriteLine("                      times to define different folders.");
-							Console.Out.WriteLine("-t                    Only load files from top input");
-							Console.Out.WriteLine("                      folder(s).");
-							Console.Out.WriteLine("-r                    Load files recursively from input");
-							Console.Out.WriteLine("                      folder(s) and their subfolders.");
-							Console.Out.WriteLine("-i PATTERN            Search pattern for ASN.1 files, or");
-							Console.Out.WriteLine("                      single ASN.1 file to convert to C#.");
-							Console.Out.WriteLine("-?                    Help.");
+							ConsoleOut.WriteLine("Creates C# files from definitions made in ASN.1 files.");
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("Command line switches:");
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("-BER                  Adds support for BER enconding.");
+							ConsoleOut.WriteLine("-CER                  Adds support for CER enconding.");
+							ConsoleOut.WriteLine("-DER                  Adds support for DER enconding.");
+							ConsoleOut.WriteLine("-n NAMESPACE          Defines a base namespace. Can be");
+							ConsoleOut.WriteLine("                      used multiple times, to place code");
+							ConsoleOut.WriteLine("                      in different namespaces.");
+							ConsoleOut.WriteLine("-o FOLDER             Path to folder where C# files will be");
+							ConsoleOut.WriteLine("                      stored. Can be used multiple times");
+							ConsoleOut.WriteLine("                      in one call, to place different files");
+							ConsoleOut.WriteLine("                      in different output folders.");
+							ConsoleOut.WriteLine("-f IMPORT_FOLDER      Path to a folder where import files");
+							ConsoleOut.WriteLine("                      may be stored. Can be used multiple");
+							ConsoleOut.WriteLine("                      times to define different folders.");
+							ConsoleOut.WriteLine("-t                    Only load files from top input");
+							ConsoleOut.WriteLine("                      folder(s).");
+							ConsoleOut.WriteLine("-r                    Load files recursively from input");
+							ConsoleOut.WriteLine("                      folder(s) and their subfolders.");
+							ConsoleOut.WriteLine("-i PATTERN            Search pattern for ASN.1 files, or");
+							ConsoleOut.WriteLine("                      single ASN.1 file to convert to C#.");
+							ConsoleOut.WriteLine("-?                    Help.");
 							break;
 
 						default:
@@ -198,7 +199,7 @@ namespace Waher.Utility.Asn1ToCSharp
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

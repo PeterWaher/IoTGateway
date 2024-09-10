@@ -1,11 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Xml;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -17,8 +17,9 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
-using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Console;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -40,10 +41,10 @@ namespace Waher.Service.PcSensor
 			{
 				Console.ForegroundColor = ConsoleColor.White;
 
-				Console.Out.WriteLine("Welcome to the PC Sensor application.");
-				Console.Out.WriteLine(new string('-', 79));
-				Console.Out.WriteLine("This application will publish performace couters as sensor values.");
-				Console.Out.WriteLine("Values will be published over XMPP using the interface defined by the Neuro-Foundation.");
+				ConsoleOut.WriteLine("Welcome to the PC Sensor application.");
+				ConsoleOut.WriteLine(new string('-', 79));
+				ConsoleOut.WriteLine("This application will publish performace couters as sensor values.");
+				ConsoleOut.WriteLine("Values will be published over XMPP using the interface defined by the Neuro-Foundation.");
 
 				Log.RegisterAlertExceptionType(true,
 					typeof(OutOfMemoryException),
@@ -340,7 +341,7 @@ namespace Waher.Service.PcSensor
 			catch (Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 			}
 			finally
 			{

@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.FullTextSearch.Test.Classes;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Test
@@ -106,7 +107,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			IPersistentDictionary Index = await Database.GetDictionary(IndexCollection);
 
 			foreach (string Key in Index.Keys)
-				Console.Out.WriteLine(Key);
+				ConsoleOut.WriteLine(Key);
 		}
 
 		[TestMethod]

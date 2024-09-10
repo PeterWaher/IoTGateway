@@ -1,5 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using Waher.Runtime.Console;
 using Waher.Script.Statistics;
 using Waher.Script.Statistics.Functions;
 
@@ -29,8 +30,8 @@ namespace Waher.Script.Test
 			int N, i;
 			double n, d, q, q0 = 0;
 
-			Console.Out.WriteLine(DateTime.Now.ToString());
-			Console.Out.WriteLine("Γ(" + a + "," + x + "):");
+			ConsoleOut.WriteLine(DateTime.Now.ToString());
+			ConsoleOut.WriteLine("Γ(" + a + "," + x + "):");
 
 			for (N = 1; N < 100; N++)
 			{
@@ -46,7 +47,7 @@ namespace Waher.Script.Test
 				d = 1 + x - a + q;
 				q = n / d;
 
-				Console.Out.WriteLine(N + ", " + q + ", " + (q - q0));
+				ConsoleOut.WriteLine(N + ", " + q + ", " + (q - q0));
 				q0 = q;
 			}
 		}

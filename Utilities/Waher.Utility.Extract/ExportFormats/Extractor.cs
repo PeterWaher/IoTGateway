@@ -10,6 +10,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.Extract.ExportFormats
 {
@@ -94,7 +95,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public async Task StartDatabase()
 		{
-			Console.Out.WriteLine("Processing database section.");
+			ConsoleOut.WriteLine("Processing database section.");
 
 			if (this.database)
 			{
@@ -125,7 +126,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public async Task StartLedger()
 		{
-			Console.Out.WriteLine("Processing ledger section.");
+			ConsoleOut.WriteLine("Processing ledger section.");
 
 			if (this.ledger)
 			{
@@ -156,7 +157,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public async Task StartCollection(string CollectionName)
 		{
-			Console.Out.WriteLine(CollectionName + "...");
+			ConsoleOut.WriteLine(CollectionName + "...");
 
 			this.inCollection = true;
 			this.exportCollection = (this.collections?.ContainsKey(CollectionName) ?? true) && this.output is not null;
@@ -592,7 +593,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public Task StartFiles()
 		{
-			Console.Out.WriteLine("Processing files section.");
+			ConsoleOut.WriteLine("Processing files section.");
 
 			if (this.files)
 			{
@@ -613,7 +614,7 @@ namespace Waher.Utility.Extract.ExportFormats
 			if (Path.IsPathRooted(FileName))
 				throw new Exception("Absolute path names not allowed: " + FileName);
 
-			Console.Out.WriteLine(FileName);
+			ConsoleOut.WriteLine(FileName);
 			FileName = Path.Combine(this.filesFolder, FileName);
 
 			string Folder = Path.GetDirectoryName(FileName);

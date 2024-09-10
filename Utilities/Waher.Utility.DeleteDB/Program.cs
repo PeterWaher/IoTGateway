@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using Waher.Runtime.Console;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -62,16 +63,16 @@ namespace Waher.Utility.DeleteDB
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Tool that helps you delete an object database created by the");
-					Console.Out.WriteLine("Waher.Persistence.Files or Waher.Persistence.FilesLW libraries,");
-					Console.Out.WriteLine("such as the IoT Gateway database, including any cryptographic keys");
-					Console.Out.WriteLine("stored in the CSP.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
-					Console.Out.WriteLine("-e                    If encryption is used by the database.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Tool that helps you delete an object database created by the");
+					ConsoleOut.WriteLine("Waher.Persistence.Files or Waher.Persistence.FilesLW libraries,");
+					ConsoleOut.WriteLine("such as the IoT Gateway database, including any cryptographic keys");
+					ConsoleOut.WriteLine("stored in the CSP.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
+					ConsoleOut.WriteLine("-e                    If encryption is used by the database.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -83,7 +84,7 @@ namespace Waher.Utility.DeleteDB
 
 				string[] Files = Directory.GetFiles(ProgramDataFolder, "*.*", SearchOption.AllDirectories);
 
-				Console.Out.WriteLine(Files.Length + " file(s) will be deleted by this operation. Do you wish to continue? [y/n]");
+				ConsoleOut.WriteLine(Files.Length + " file(s) will be deleted by this operation. Do you wish to continue? [y/n]");
 				string Input = Console.In.ReadLine();
 				int NrDeleted = 0;
 				
@@ -91,7 +92,7 @@ namespace Waher.Utility.DeleteDB
 				{
 					foreach (string File in Files)
 					{
-						Console.Out.WriteLine("Deleting file " + File);
+						ConsoleOut.WriteLine("Deleting file " + File);
 
 						if (Encryption)
 						{
@@ -110,7 +111,7 @@ namespace Waher.Utility.DeleteDB
 							}
 							catch (CryptographicException ex)
 							{
-								Console.Out.WriteLine("Unable to delete cryptographic key: " + ex.Message);
+								ConsoleOut.WriteLine("Unable to delete cryptographic key: " + ex.Message);
 								continue;
 							}
 						}
@@ -121,21 +122,21 @@ namespace Waher.Utility.DeleteDB
 						}
 						catch (Exception ex)
 						{
-							Console.Out.WriteLine("Unable to delete file: " + ex.Message);
+							ConsoleOut.WriteLine("Unable to delete file: " + ex.Message);
 							continue;
 						}
 
 						NrDeleted++;
 					}
 
-					Console.Out.WriteLine(NrDeleted + " file(s) deleted.");
+					ConsoleOut.WriteLine(NrDeleted + " file(s) deleted.");
 				}
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

@@ -1,14 +1,15 @@
-﻿using System;
-using System.Numerics;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Numerics;
+using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Runtime.Console;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Units;
-using System.Threading.Tasks;
 using Waher.Script.Xml;
-using Waher.Content;
 
 namespace Waher.Script.Test
 {
@@ -78,9 +79,9 @@ namespace Waher.Script.Test
 
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine();
-			Exp.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 		}
 
 		public static void AssertEqual(object Expected, object Result, string Script)

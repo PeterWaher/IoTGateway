@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Utility.Sign
@@ -90,7 +91,7 @@ namespace Waher.Utility.Sign
 									if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2ECurrent)
 									{
 										if (Output is null)
-											Console.Out.WriteLine(Endpoint2.LocalName);
+											ConsoleOut.WriteLine(Endpoint2.LocalName);
 										else
 											Output.WriteElementString("Cipher", Namespace, Endpoint2.LocalName);
 									}
@@ -107,7 +108,7 @@ namespace Waher.Utility.Sign
                                 throw new Exception("No cipher has been selected.");
 
                             if (Output is null)
-                                Console.Out.WriteLine("Public Key: " + Endpoint.PublicKeyBase64);
+                                ConsoleOut.WriteLine("Public Key: " + Endpoint.PublicKeyBase64);
                             else
                                 Output.WriteElementString("PublicKey", Namespace, Endpoint.PublicKeyBase64);
 
@@ -130,7 +131,7 @@ namespace Waher.Utility.Sign
                                 break;
 
                             if (Output is null)
-                                Console.Out.WriteLine("Private Key: " + s);
+                                ConsoleOut.WriteLine("Private Key: " + s);
                             else
                                 Output.WriteElementString("PrivateKey", Namespace, s);
 
@@ -239,7 +240,7 @@ namespace Waher.Utility.Sign
                                 s = Convert.ToBase64String(Bin);
 
                                 if (Output is null)
-                                    Console.Out.WriteLine("Signature: " + s);
+                                    ConsoleOut.WriteLine("Signature: " + s);
                                 else
                                 {
                                     Output.WriteStartElement("Signature");
@@ -276,7 +277,7 @@ namespace Waher.Utility.Sign
                             bool Valid = Endpoint.Verify(Bin, Bin2);
 
                             if (Output is null)
-                                Console.Out.WriteLine("Valid: " + Valid.ToString());
+                                ConsoleOut.WriteLine("Valid: " + Valid.ToString());
                             else
                             {
                                 Output.WriteStartElement("Valid");
@@ -301,35 +302,35 @@ namespace Waher.Utility.Sign
 
                 if (Help || c == 0)
                 {
-                    Console.Out.WriteLine("Signs files using an asymmetric cipher.");
-                    Console.Out.WriteLine();
-                    Console.Out.WriteLine("Command line switches:");
-                    Console.Out.WriteLine();
-                    Console.Out.WriteLine("-c NAME                Creates a new cipher object with random keys,");
-                    Console.Out.WriteLine("                       given the name of the cipher.");
-                    Console.Out.WriteLine("-l                     Lists supported cipher names.");
-                    Console.Out.WriteLine("-keys                  Exports keys of selected cipher object.");
-                    Console.Out.WriteLine("-pub KEY               Creates a new cipher object of the same type as");
-                    Console.Out.WriteLine("                       the current one, using a public key. Such a");
-                    Console.Out.WriteLine("                       cipher object can be used for validating");
-                    Console.Out.WriteLine("                       signatures.");
-                    Console.Out.WriteLine("-priv KEY              Creates a new cipher object of the same type as");
-                    Console.Out.WriteLine("                       the current one, using a private key. Such a");
-                    Console.Out.WriteLine("                       cipher can be used to create signatures.");
-                    Console.Out.WriteLine("-o FILENAME            Directs output to the XML file FILENAME.");
-                    Console.Out.WriteLine("-s FILENAME            Signs a file with the given filename.");
-                    Console.Out.WriteLine("                       FILENAME can contain wildcards. This will");
-                    Console.Out.WriteLine("                       generate one signature per file.");
-                    Console.Out.WriteLine("-r                     If recursive search for files is to be used.");
-                    Console.Out.WriteLine("-v FILENAME SIGNATURE  Validates a signature for the selected file.");
-                    Console.Out.WriteLine("-?                     Help.");
+                    ConsoleOut.WriteLine("Signs files using an asymmetric cipher.");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("Command line switches:");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("-c NAME                Creates a new cipher object with random keys,");
+                    ConsoleOut.WriteLine("                       given the name of the cipher.");
+                    ConsoleOut.WriteLine("-l                     Lists supported cipher names.");
+                    ConsoleOut.WriteLine("-keys                  Exports keys of selected cipher object.");
+                    ConsoleOut.WriteLine("-pub KEY               Creates a new cipher object of the same type as");
+                    ConsoleOut.WriteLine("                       the current one, using a public key. Such a");
+                    ConsoleOut.WriteLine("                       cipher object can be used for validating");
+                    ConsoleOut.WriteLine("                       signatures.");
+                    ConsoleOut.WriteLine("-priv KEY              Creates a new cipher object of the same type as");
+                    ConsoleOut.WriteLine("                       the current one, using a private key. Such a");
+                    ConsoleOut.WriteLine("                       cipher can be used to create signatures.");
+                    ConsoleOut.WriteLine("-o FILENAME            Directs output to the XML file FILENAME.");
+                    ConsoleOut.WriteLine("-s FILENAME            Signs a file with the given filename.");
+                    ConsoleOut.WriteLine("                       FILENAME can contain wildcards. This will");
+                    ConsoleOut.WriteLine("                       generate one signature per file.");
+                    ConsoleOut.WriteLine("-r                     If recursive search for files is to be used.");
+                    ConsoleOut.WriteLine("-v FILENAME SIGNATURE  Validates a signature for the selected file.");
+                    ConsoleOut.WriteLine("-?                     Help.");
                 }
 
                 return 0;
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.Message);
+                ConsoleOut.WriteLine(ex.Message);
                 return -1;
             }
             finally

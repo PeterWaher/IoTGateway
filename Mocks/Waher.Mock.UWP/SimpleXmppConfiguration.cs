@@ -338,14 +338,14 @@ namespace Waher.Mock
 					{
 						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						ConsoleOut.Write("XMPP Server: ");
-						Credentials.Host = Console.In.ReadLine();
+						Credentials.Host = ConsoleIn.ReadLine();
 						if (string.IsNullOrEmpty(Credentials.Host))
 							Credentials.Host = Default;
 
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Host + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -362,7 +362,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Port Number: ");
-							s = Console.In.ReadLine();
+							s = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(s))
 								s = Default;
 						}
@@ -373,7 +373,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Port.ToString() + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -392,7 +392,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Account: ");
-							Credentials.Account = Console.In.ReadLine();
+							Credentials.Account = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.Account))
 								Credentials.Account = Default;
 						}
@@ -401,7 +401,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Account + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -420,7 +420,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Password: ");
-							Credentials.Password = Console.In.ReadLine();
+							Credentials.Password = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.Password))
 								Credentials.Password = Default;
 						}
@@ -429,7 +429,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Password + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -446,7 +446,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						ConsoleOut.Write("Trust server [y/n]? ");
 
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						Credentials.TrustServer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 					}
 					while (!Credentials.TrustServer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
@@ -459,7 +459,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						ConsoleOut.Write("Create account [y/n]? ");
 
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						Credentials.AllowRegistration = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 					}
 					while (!Credentials.AllowRegistration && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
@@ -480,14 +480,14 @@ namespace Waher.Mock
 						{
 							ConsoleOut.ForegroundColor = ConsoleColor.White;
 							ConsoleOut.Write("API Key: ");
-							Credentials.FormSignatureKey = Console.In.ReadLine();
+							Credentials.FormSignatureKey = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.FormSignatureKey))
 								Credentials.FormSignatureKey = Default;
 
 							ConsoleOut.ForegroundColor = ConsoleColor.Green;
 							ConsoleOut.WriteLine();
 							ConsoleOut.WriteLine("You've selected to use '" + Credentials.FormSignatureKey + "'. Is this correct? [y/n]");
-							s = Console.In.ReadLine();
+							s = ConsoleIn.ReadLine();
 							ConsoleOut.WriteLine();
 						}
 						while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -507,14 +507,14 @@ namespace Waher.Mock
 							{
 								ConsoleOut.ForegroundColor = ConsoleColor.White;
 								ConsoleOut.Write("Secret: ");
-								Credentials.FormSignatureSecret = Console.In.ReadLine();
+								Credentials.FormSignatureSecret = ConsoleIn.ReadLine();
 								if (string.IsNullOrEmpty(Credentials.FormSignatureSecret))
 									Credentials.FormSignatureSecret = Default;
 
 								ConsoleOut.ForegroundColor = ConsoleColor.Green;
 								ConsoleOut.WriteLine();
 								ConsoleOut.WriteLine("You've selected to use '" + Credentials.FormSignatureSecret + "'. Is this correct? [y/n]");
-								s = Console.In.ReadLine();
+								s = ConsoleIn.ReadLine();
 								ConsoleOut.WriteLine();
 							}
 							while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -626,7 +626,7 @@ namespace Waher.Mock
 				{
 					ConsoleOut.ForegroundColor = ConsoleColor.White;
 					ConsoleOut.Write("Thing Registry: ");
-					Credentials.ThingRegistry = Console.In.ReadLine();
+					Credentials.ThingRegistry = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.ThingRegistry))
 						Credentials.ThingRegistry = Default;
 
@@ -636,7 +636,7 @@ namespace Waher.Mock
 						ConsoleOut.WriteLine("You've selected to not use a thing registry. Is this correct? [y/n]");
 					else
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.ThingRegistry + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -655,7 +655,7 @@ namespace Waher.Mock
 				{
 					ConsoleOut.ForegroundColor = ConsoleColor.White;
 					ConsoleOut.Write("Provisioning Server: ");
-					Credentials.Provisioning = Console.In.ReadLine();
+					Credentials.Provisioning = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.Provisioning))
 						Credentials.Provisioning = Default;
 
@@ -665,7 +665,7 @@ namespace Waher.Mock
 						ConsoleOut.WriteLine("You've selected to not use a provisioning server. Is this correct? [y/n]");
 					else
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Provisioning + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -683,7 +683,7 @@ namespace Waher.Mock
 				{
 					ConsoleOut.ForegroundColor = ConsoleColor.White;
 					ConsoleOut.Write("Event Log: ");
-					Credentials.Events = Console.In.ReadLine();
+					Credentials.Events = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.Events))
 						Credentials.Events = Default;
 
@@ -693,7 +693,7 @@ namespace Waher.Mock
 						ConsoleOut.WriteLine("You've selected to not use an event log. Is this correct? [y/n]");
 					else
 						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Events + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -708,7 +708,7 @@ namespace Waher.Mock
 					ConsoleOut.ForegroundColor = ConsoleColor.White;
 					ConsoleOut.Write("Sniffer [y/n]? ");
 
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					Credentials.Sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 				}
 				while (!Credentials.Sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));

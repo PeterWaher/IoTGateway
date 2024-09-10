@@ -252,14 +252,14 @@ namespace Waher.Mock
 					{
 						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						ConsoleOut.Write("XMPP Server: ");
-						Config.host = Console.In.ReadLine();
+						Config.host = ConsoleIn.ReadLine();
 						if (string.IsNullOrEmpty(Config.host))
 							Config.host = Default;
 
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Config.host + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -275,7 +275,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Port Number: ");
-							s = Console.In.ReadLine();
+							s = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(s))
 								s = Default;
 						}
@@ -284,7 +284,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Config.port.ToString() + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -302,7 +302,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Component: ");
-							Config.component = Console.In.ReadLine();
+							Config.component = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Config.component))
 								Config.component = Default;
 						}
@@ -311,7 +311,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Config.component + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -330,7 +330,7 @@ namespace Waher.Mock
 						do
 						{
 							ConsoleOut.Write("Secret: ");
-							Config.secret = Console.In.ReadLine();
+							Config.secret = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Config.secret))
 								Config.secret = Default;
 						}
@@ -339,7 +339,7 @@ namespace Waher.Mock
 						ConsoleOut.ForegroundColor = ConsoleColor.Green;
 						ConsoleOut.WriteLine();
 						ConsoleOut.WriteLine("You've selected to use '" + Config.secret + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
@@ -401,7 +401,7 @@ namespace Waher.Mock
 					ConsoleOut.ForegroundColor = ConsoleColor.White;
 					ConsoleOut.Write("Sniffer [y/n]? ");
 
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					Config.sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 				}
 				while (!Config.sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));

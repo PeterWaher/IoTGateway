@@ -85,7 +85,7 @@ namespace Waher.Utility.DeleteDB
 				string[] Files = Directory.GetFiles(ProgramDataFolder, "*.*", SearchOption.AllDirectories);
 
 				ConsoleOut.WriteLine(Files.Length + " file(s) will be deleted by this operation. Do you wish to continue? [y/n]");
-				string Input = Console.In.ReadLine();
+				string Input = ConsoleIn.ReadLine();
 				int NrDeleted = 0;
 				
 				if (Input.ToLower().StartsWith("y"))

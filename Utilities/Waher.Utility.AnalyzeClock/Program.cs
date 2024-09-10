@@ -314,7 +314,7 @@ namespace Waher.Utility.AnalyzeClock
 							return Task.CompletedTask;
 						};
 
-						Console.WriteLine("Requesting presence subscription to " + Jid);
+						ConsoleOut.WriteLine("Requesting presence subscription to " + Jid);
 
 						Client.RequestPresenceSubscription(Jid);
 
@@ -322,7 +322,7 @@ namespace Waher.Utility.AnalyzeClock
 						if (i == 1)
 							throw new Exception("Unable to obtain presence subscription.");
 
-						Console.WriteLine("Presence subscription obtained.");
+						ConsoleOut.WriteLine("Presence subscription obtained.");
 					}
 				}
 

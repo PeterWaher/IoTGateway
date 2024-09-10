@@ -8,30 +8,30 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main(string[] _)
 		{
 			try
 			{
 				Types.Initialize(typeof(ClusterEndpoint).Assembly, typeof(Program).Assembly);
 
-				Console.WriteLine("Welcome to the cluster sandbox.");
-				Console.WriteLine();
-				Console.Write("Multicast address (default=239.255.0.0): ");
-				string s = Console.In.ReadLine();
+				ConsoleOut.WriteLine("Welcome to the cluster sandbox.");
+				ConsoleOut.WriteLine();
+				ConsoleOut.Write("Multicast address (default=239.255.0.0): ");
+				string s = ConsoleIn.ReadLine();
 				if (string.IsNullOrEmpty(s))
 					s = "239.255.0.0";
 
 				IPAddress Address = IPAddress.Parse(s);
 
-				Console.Write("Port (default=12345): ");
-				s = Console.In.ReadLine();
+				ConsoleOut.Write("Port (default=12345): ");
+				s = ConsoleIn.ReadLine();
 				if (string.IsNullOrEmpty(s))
 					s = "12345";
 
 				int Port = int.Parse(s);
 
-				Console.Write("Secret: ");
-				s = Console.In.ReadLine();
+				ConsoleOut.Write("Secret: ");
+				s = ConsoleIn.ReadLine();
 
 				Dictionary<string, bool> Locked = new();
 				Dictionary<IPEndPoint, string> Names = new();
@@ -91,7 +91,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 					}
 				};
 
-				ConsoleKeyInfo KeyInfo = Console.ReadKey(true);
+				ConsoleKeyInfo KeyInfo = ConsoleIn.ReadKey(true);
 				while (KeyInfo.Key != ConsoleKey.Escape)
 				{
 					char ch = KeyInfo.KeyChar;
@@ -125,7 +125,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 						}
 					}
 
-					KeyInfo = Console.ReadKey(true);
+					KeyInfo = ConsoleIn.ReadKey(true);
 				}
 			}
 			catch (Exception ex)

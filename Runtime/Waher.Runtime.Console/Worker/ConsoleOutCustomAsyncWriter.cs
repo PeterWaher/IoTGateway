@@ -9,8 +9,6 @@ namespace Waher.Runtime.Console.Worker
 	public class ConsoleOutCustomAsyncWriter : ConsoleCustomWriter
 	{
 		private readonly CustomAsyncWriter writer;
-		private readonly ConsoleColor? foregroundColor;
-		private readonly ConsoleColor? backgroundColor;
 
 		/// <summary>
 		/// Performs custom writing

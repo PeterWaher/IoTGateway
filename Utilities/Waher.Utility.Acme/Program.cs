@@ -645,7 +645,7 @@ namespace Waher.Utility.Acme
                                 do
                                 {
                                     ConsoleOut.Write("Challenge to acknowledge: ");
-                                    s = Console.In.ReadLine();
+                                    s = await ConsoleIn.ReadLineAsync();
                                 }
                                 while (!int.TryParse(s, out Index) || Index <= 0 || Index > NrChallenges);
 

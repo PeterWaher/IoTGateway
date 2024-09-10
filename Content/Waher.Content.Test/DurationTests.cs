@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 
 namespace Waher.Content.Test
 {
@@ -93,10 +94,10 @@ namespace Waher.Content.Test
 				}
 				catch (Exception)
 				{
-					Console.Out.WriteLine(i.ToString());
-					Console.Out.WriteLine(XML.Encode(TP1));
-					Console.Out.WriteLine(XML.Encode(TP2));
-					Console.Out.WriteLine(Diff.ToString());
+					ConsoleOut.WriteLine(i.ToString());
+					ConsoleOut.WriteLine(XML.Encode(TP1));
+					ConsoleOut.WriteLine(XML.Encode(TP2));
+					ConsoleOut.WriteLine(Diff.ToString());
 
 					Assert.Fail("Error. See console output.");
 				}

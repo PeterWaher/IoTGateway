@@ -88,7 +88,6 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            //this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
             this.client2.OnConnectionError += this.Client_OnConnectionError2;
 			this.client2.OnError += this.Client_OnError2;
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
@@ -99,8 +98,6 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.Connect();
 
 			this.WaitConnected2(5000);
-
-            //this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
         }
 
         public virtual void PrepareClient1(XmppClient Client)

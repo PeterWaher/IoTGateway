@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Rss.Test
@@ -54,7 +55,7 @@ namespace Waher.Content.Rss.Test
 			Assert.IsTrue(Doc.Channels.Length > 0);
 
 			foreach (RssWarning Warning in Doc.Warnings)
-				Console.Out.WriteLine(Warning.Message);
+				ConsoleOut.WriteLine(Warning.Message);
 
 			foreach (RssChannel Channel in Doc.Channels)
 			{

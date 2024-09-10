@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content.Binary;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HttpFileUpload;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -140,8 +141,8 @@ namespace Waher.Networking.XMPP.Test
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }), 5000);
 
-			Console.Out.WriteLine("JID: " + this.httpUpload.FileUploadJid);
-			Console.Out.WriteLine("Max File Size: " + this.httpUpload.MaxFileSize.ToString());
+			ConsoleOut.WriteLine("JID: " + this.httpUpload.FileUploadJid);
+			ConsoleOut.WriteLine("Max File Size: " + this.httpUpload.MaxFileSize.ToString());
 		}
 
 		[TestMethod]
@@ -173,14 +174,14 @@ namespace Waher.Networking.XMPP.Test
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }), 5000);
 
-			Console.Out.WriteLine("GET URL:" + e.GetUrl);
-			Console.Out.WriteLine("PUT URL:" + e.PutUrl);
-			Console.Out.WriteLine("PUT Headers:");
+			ConsoleOut.WriteLine("GET URL:" + e.GetUrl);
+			ConsoleOut.WriteLine("PUT URL:" + e.PutUrl);
+			ConsoleOut.WriteLine("PUT Headers:");
 
 			if (e.PutHeaders is not null)
 			{
 				foreach (KeyValuePair<string, string> Header in e.PutHeaders)
-					Console.Out.WriteLine(Header.Key + ": " + Header.Value);
+					ConsoleOut.WriteLine(Header.Key + ": " + Header.Value);
 			}
 		}
 

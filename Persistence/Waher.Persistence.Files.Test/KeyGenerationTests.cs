@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -94,10 +94,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 			RSAParameters Parameters = rsa.ExportParameters(true);
 
-			Console.Out.WriteLine("Size: " + Size.ToString());
-			Console.Out.WriteLine("Time: " + Ms.ToString("F2") + " ms");
-			Console.Out.WriteLine("P Len: " + Parameters.P.Length.ToString());
-			Console.Out.WriteLine("Q Len: " + Parameters.Q.Length.ToString());
+			ConsoleOut.WriteLine("Size: " + Size.ToString());
+			ConsoleOut.WriteLine("Time: " + Ms.ToString("F2") + " ms");
+			ConsoleOut.WriteLine("P Len: " + Parameters.P.Length.ToString());
+			ConsoleOut.WriteLine("Q Len: " + Parameters.Q.Length.ToString());
 		}
 	}
 }

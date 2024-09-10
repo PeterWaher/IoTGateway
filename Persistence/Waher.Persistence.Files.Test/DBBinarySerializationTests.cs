@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 
 #if !LW
 namespace Waher.Persistence.Files.Test
@@ -33,7 +34,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void BinSerialization_Test_01_Serialization()
 		{
-			ISerializer Serializer = new DebugSerializer(new BinarySerializer(string.Empty, Encoding.UTF8), Console.Out);
+			ISerializer Serializer = new DebugSerializer(new BinarySerializer(string.Empty, Encoding.UTF8), ConsoleOut.Writer);
 
 			Serializer.Write(true);
 			Serializer.Write(false);
@@ -115,7 +116,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Serializer.Write(FlagsEnum.Option2 | FlagsEnum.Option4);
 
 			byte[] Data = Serializer.GetSerialization();
-			IDeserializer Deserializer = new DebugDeserializer(new BinaryDeserializer(string.Empty, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Deserializer = new DebugDeserializer(new BinaryDeserializer(string.Empty, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			AssertEx.Same(true, Deserializer.ReadBoolean());
 			AssertEx.Same(false, Deserializer.ReadBoolean());

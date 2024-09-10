@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -73,15 +73,15 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
+			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (!(this.file is null))
+			if (this.file is not null)
 			{
 				this.file.Dispose();
 				this.file = null;
 			}
 
-			if (!(this.provider is null))
+			if (this.provider is not null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
@@ -91,18 +91,18 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_01_Set()
 		{
-			await Test_Set(100);
+			await this.Test_Set(100);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_02_Set_BLOB()
 		{
-			await Test_Set(100000);
+			await this.Test_Set(100000);
 		}
 
 		private async Task Test_Set(int MaxLen)
 		{
-			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			byte[] ByteArray = GetBytes(MaxLen, 0);
 			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			this.file["Key1"] = "Value1";
@@ -125,7 +125,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(this.file["Key6"], ByteArray);
 		}
 
-		private byte[] GetBytes(int NrBytes, int Offset)
+		private static byte[] GetBytes(int NrBytes, int Offset)
 		{
 			byte[] Result = new byte[NrBytes];
 			int i;
@@ -139,18 +139,18 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_03_Add()
 		{
-			await Test_Add(100);
+			await this.Test_Add(100);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_04_Add_BLOB()
 		{
-			await Test_Add(100000);
+			await this.Test_Add(100000);
 		}
 
 		private async Task Test_Add(int MaxLen)
 		{
-			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			byte[] ByteArray = GetBytes(MaxLen, 0);
 			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			await this.file.AddAsync("Key1", "Value1");
@@ -176,19 +176,19 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_05_Reset()
 		{
-			await Test_Reset(100);
+			await this.Test_Reset(100);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_06_Reset_BLOB()
 		{
-			await Test_Reset(100000);
+			await this.Test_Reset(100000);
 		}
 
 		private async Task Test_Reset(int MaxLen)
 		{
-			byte[] ByteArray1 = this.GetBytes(MaxLen, 0);
-			byte[] ByteArray2 = this.GetBytes(MaxLen, MaxLen);
+			byte[] ByteArray1 = GetBytes(MaxLen, 0);
+			byte[] ByteArray2 = GetBytes(MaxLen, MaxLen);
 			Simple Obj1 = DBFilesBTreeTests.CreateSimple(MaxLen);
 			Simple Obj2 = DBFilesBTreeTests.CreateSimple(MaxLen);
 
@@ -265,7 +265,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task Test_Remove(int MaxLen)
 		{
-			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			byte[] ByteArray = GetBytes(MaxLen, 0);
 			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			await this.file.AddAsync("Key1", "Value1");
@@ -341,7 +341,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task Test_CopyTo(int MaxLen)
 		{
-			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			byte[] ByteArray = GetBytes(MaxLen, 0);
 			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			this.file["Key1"] = "Value1";
@@ -490,12 +490,12 @@ namespace Waher.Persistence.FilesLW.Test
 			int i;
 
 			for (i = 1; i <= 10000; i++)
-				this.file["Key" + i.ToString()] = this.GetBytes(10000, i);
+				this.file["Key" + i.ToString()] = GetBytes(10000, i);
 
 			Assert.AreEqual(10000, this.file.Count);
 
 			for (i = 1; i <= 10000; i++)
-				AssertEx.Same(this.file["Key" + i.ToString()], this.GetBytes(10000, i));
+				AssertEx.Same(this.file["Key" + i.ToString()], GetBytes(10000, i));
 		}
 
 		[TestMethod]
@@ -520,7 +520,7 @@ namespace Waher.Persistence.FilesLW.Test
 			int i;
 
 			for (i = 1; i <= 10000; i++)
-				this.file["Key" + (i & 1023).ToString()] = Last[i & 1023] = this.GetBytes(10000, i);
+				this.file["Key" + (i & 1023).ToString()] = Last[i & 1023] = GetBytes(10000, i);
 
 			Assert.AreEqual(1024, this.file.Count);
 
@@ -532,7 +532,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[Ignore]
 		public void DBFiles_StringDictionary_19_100000_Random()
 		{
-			Random Rnd = new Random();
+			Random Rnd = new();
 			byte[][] Last = new byte[1024][];
 			byte[] Value;
 			string Key;

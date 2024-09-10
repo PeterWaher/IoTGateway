@@ -6,7 +6,7 @@ namespace Waher.Runtime.Console.Worker
 	/// <summary>
 	/// Performs custom writing
 	/// </summary>
-	public class ConsoleOutCustomWriter : ConsoleCustomWriter
+	public class ConsoleErrorCustomWriter : ConsoleCustomWriter
 	{
 		private readonly CustomWriter writer;
 
@@ -16,8 +16,8 @@ namespace Waher.Runtime.Console.Worker
 		/// <param name="Writer">Custom writer.</param>
 		/// <param name="ForegroundColor">Optional Foreground Color to use.</param>
 		/// <param name="BackgroundColor">Optional Background Color to use.</param>
-		public ConsoleOutCustomWriter(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
-			: base(ForegroundColor, BackgroundColor) 
+		public ConsoleErrorCustomWriter(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
+			: base(ForegroundColor, BackgroundColor)
 		{
 			this.writer = Writer;
 		}
@@ -27,7 +27,7 @@ namespace Waher.Runtime.Console.Worker
 		/// </summary>
 		protected override Task DoWrite()
 		{
-			this.writer(System.Console.Out);
+			this.writer(System.Console.Error);
 			return Task.CompletedTask;
 		}
 	}

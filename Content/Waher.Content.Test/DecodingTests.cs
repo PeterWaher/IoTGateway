@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Dsn;
 using Waher.Content.Html;
 using Waher.Content.Images;
 using Waher.Content.Multipart;
 using Waher.Content.Test.Encodings;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 
 namespace Waher.Content.Test
 {
@@ -29,7 +30,7 @@ namespace Waher.Content.Test
 			Encoding.RegisterProvider(new CodePages());
 		}
 
-		private async Task<object> DecodeAsync(string FileName)
+		private static async Task<object> DecodeAsync(string FileName)
 		{
 			byte[] Data = await Resources.ReadAllBytesAsync("Data\\" + FileName + ".bin");
 			string ContentType = await Resources.ReadAllTextAsync("Data\\" + FileName + ".txt");
@@ -40,7 +41,7 @@ namespace Waher.Content.Test
 		[TestMethod]
 		public async Task Test_01_Multipart_RelatedContent()
 		{
-			object Decoded = await this.DecodeAsync("6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59");
+			object Decoded = await DecodeAsync("6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59");
 
 			RelatedContent RelatedContent = Decoded as RelatedContent;
 			Assert.IsNotNull(RelatedContent);
@@ -54,19 +55,19 @@ namespace Waher.Content.Test
 			Assert.AreEqual(2, Alternatives.Content.Length);
 			string PlainText = Alternatives.Content[0].Decoded as string;
 			Assert.IsNotNull(PlainText);
-			Console.Out.WriteLine(PlainText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(PlainText);
+			ConsoleOut.WriteLine();
 
 			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
 			Assert.IsNotNull(Html);
-			Console.Out.WriteLine(Html.HtmlText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Html.HtmlText);
+			ConsoleOut.WriteLine();
 		}
 
 		[TestMethod]
 		public async Task Test_02_Multipart_MixedContent()
 		{
-			object Decoded = await this.DecodeAsync("0b9e5696-c32a-4418-a246-babb188e5beb");
+			object Decoded = await DecodeAsync("0b9e5696-c32a-4418-a246-babb188e5beb");
 
 			MixedContent MixedContent = Decoded as MixedContent;
 			Assert.IsNotNull(MixedContent);
@@ -84,29 +85,29 @@ namespace Waher.Content.Test
 			Assert.AreEqual(2, Alternatives.Content.Length);
 			string PlainText = Alternatives.Content[0].Decoded as string;
 			Assert.IsNotNull(PlainText);
-			Console.Out.WriteLine(PlainText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(PlainText);
+			ConsoleOut.WriteLine();
 
 			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
 			Assert.IsNotNull(Html);
-			Console.Out.WriteLine(Html.HtmlText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Html.HtmlText);
+			ConsoleOut.WriteLine();
 
 			string Attachment1 = MixedContent.Content[1].Decoded as string;
 			Assert.IsNotNull(Attachment1);
-			Console.Out.WriteLine(Attachment1);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Attachment1);
+			ConsoleOut.WriteLine();
 
 			XmlDocument Attachment2 = MixedContent.Content[2].Decoded as XmlDocument;
 			Assert.IsNotNull(Attachment2);
-			Console.Out.WriteLine(Attachment2.OuterXml);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Attachment2.OuterXml);
+			ConsoleOut.WriteLine();
 		}
 
 		[TestMethod]
 		public async Task Test_03_Delivery_Status_Notification()
 		{
-			object Decoded = await this.DecodeAsync("015dd6dd-ed9f-4139-995b-513f7464dd6f");
+			object Decoded = await DecodeAsync("015dd6dd-ed9f-4139-995b-513f7464dd6f");
 
 			MixedContent MixedContent = Decoded as MixedContent;
 			Assert.IsNotNull(MixedContent);
@@ -114,13 +115,13 @@ namespace Waher.Content.Test
 
 			string HumanReadable = MixedContent.Content[0].Decoded as string;
 			Assert.IsNotNull(HumanReadable);
-			Console.Out.WriteLine(HumanReadable);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(HumanReadable);
+			ConsoleOut.WriteLine();
 
 			DeliveryStatus Dsn = MixedContent.Content[1].Decoded as DeliveryStatus;
 			Assert.IsNotNull(Dsn);
-			Console.Out.WriteLine(Dsn.Text);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Dsn.Text);
+			ConsoleOut.WriteLine();
 
 			Assert.AreEqual("s554.loopia.se", Dsn.PerMessage.ReportingMta);
 			Assert.AreEqual("dns", Dsn.PerMessage.ReportingMtaType);
@@ -146,7 +147,7 @@ namespace Waher.Content.Test
 		[TestMethod]
 		public async Task Test_04_BoundaryAtEnd()
 		{
-			object Decoded = await this.DecodeAsync("1773459c-3649-4bb4-a33c-a15651665e92");
+			object Decoded = await DecodeAsync("1773459c-3649-4bb4-a33c-a15651665e92");
 
 			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
 			Assert.IsNotNull(Alternatives);
@@ -154,19 +155,19 @@ namespace Waher.Content.Test
 			Assert.AreEqual(2, Alternatives.Content.Length);
 			string PlainText = Alternatives.Content[0].Decoded as string;
 			Assert.IsNotNull(PlainText);
-			Console.Out.WriteLine(PlainText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(PlainText);
+			ConsoleOut.WriteLine();
 
 			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
 			Assert.IsNotNull(Html);
-			Console.Out.WriteLine(Html.HtmlText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Html.HtmlText);
+			ConsoleOut.WriteLine();
 		}
 
 		[TestMethod]
 		public async Task Test_05_Windows1252()
 		{
-			object Decoded = await this.DecodeAsync("84784fa7-51a3-46e4-b8c8-38570416acab");
+			object Decoded = await DecodeAsync("84784fa7-51a3-46e4-b8c8-38570416acab");
 
 			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
 			Assert.IsNotNull(Alternatives);
@@ -174,13 +175,13 @@ namespace Waher.Content.Test
 			Assert.AreEqual(2, Alternatives.Content.Length);
 			string PlainText = Alternatives.Content[0].Decoded as string;
 			Assert.IsNotNull(PlainText);
-			Console.Out.WriteLine(PlainText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(PlainText);
+			ConsoleOut.WriteLine();
 
 			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
 			Assert.IsNotNull(Html);
-			Console.Out.WriteLine(Html.HtmlText);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(Html.HtmlText);
+			ConsoleOut.WriteLine();
 		}
 
 	}

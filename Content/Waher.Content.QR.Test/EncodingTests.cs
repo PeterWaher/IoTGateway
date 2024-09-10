@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
+using System;
+using System.Collections.Generic;
 using Waher.Content.Images;
 using Waher.Content.QR.Encoding;
+using Waher.Runtime.Console;
 
 namespace Waher.Content.QR.Test
 {
@@ -83,7 +84,7 @@ namespace Waher.Content.QR.Test
 		public void Test_03_GF256Px_1()
 		{
 			byte[] Expected = new byte[] { 1, 1 };
-			ReedSolomonEC EC = new ReedSolomonEC(1);
+			ReedSolomonEC EC = new(1);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
 		}
@@ -92,7 +93,7 @@ namespace Waher.Content.QR.Test
 		public void Test_04_GF256Px_2()
 		{
 			byte[] Expected = new byte[] { 1, 3, 2 };
-			ReedSolomonEC EC = new ReedSolomonEC(2);
+			ReedSolomonEC EC = new(2);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
 		}
@@ -101,7 +102,7 @@ namespace Waher.Content.QR.Test
 		public void Test_05_GF256Px_3()
 		{
 			byte[] Expected = new byte[] { 1, 7, 14, 8 };
-			ReedSolomonEC EC = new ReedSolomonEC(3);
+			ReedSolomonEC EC = new(3);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
 		}
@@ -120,7 +121,7 @@ namespace Waher.Content.QR.Test
 				GF256.PowerOf2Table[102],
 				GF256.PowerOf2Table[21]
 			};
-			ReedSolomonEC EC = new ReedSolomonEC(7);
+			ReedSolomonEC EC = new(7);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
 		}
@@ -162,7 +163,7 @@ namespace Waher.Content.QR.Test
 				GF256.PowerOf2Table[192],
 				GF256.PowerOf2Table[180]
 			};
-			ReedSolomonEC EC = new ReedSolomonEC(30);
+			ReedSolomonEC EC = new(30);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
 		}
@@ -170,7 +171,7 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_08_EC_Code()
 		{
-			ReedSolomonEC EC = new ReedSolomonEC(10);
+			ReedSolomonEC EC = new(10);
 			byte[] Code = EC.GenerateCorrectionCode(new byte[] { 32, 91, 11, 120, 209, 114, 220, 77, 67, 64, 236, 17, 236, 17, 236, 17 });
 			byte[] Expected = new byte[] { 196, 35, 39, 119, 235, 215, 231, 226, 93, 23 };
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(Code));
@@ -283,13 +284,13 @@ namespace Waher.Content.QR.Test
 			};
 			QrMatrix Matrix = this.encoder.GenerateMatrix(5, CorrectionLevel.Q, Message, true);
 
-			Console.Out.WriteLine(Matrix.ToFullBlockText());
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine(Matrix.ToHalfBlockText());
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine(Matrix.ToQuarterBlockText());
+			ConsoleOut.WriteLine(Matrix.ToFullBlockText());
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine(Matrix.ToHalfBlockText());
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine(Matrix.ToQuarterBlockText());
 		}
 
 		private static class PenaltyMatrix
@@ -357,62 +358,62 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_15_Penalty_HorizontalBands()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(88, M.PenaltyHorizontalBands());
 		}
 
 		[TestMethod]
 		public void Test_16_Penalty_VerticalBands()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(92, M.PenaltyVerticalBands());
 		}
 
 		[TestMethod]
 		public void Test_17_Penalty_Blocks()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(90, M.PenaltyBlocks());
 		}
 
 		[TestMethod]
 		public void Test_18_Penalty_HorizontalFinderPattern()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(40, M.PenaltyHorizontalFinderPattern());
 		}
 
 		[TestMethod]
 		public void Test_19_Penalty_VerticalFinderPattern()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(40, M.PenaltyVerticalFinderPattern());
 		}
 
 		[TestMethod]
 		public void Test_20_Penalty_Balance()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(0, M.PenaltyBalance());
 		}
 
 		[TestMethod]
 		public void Test_21_Penalty_Total()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			Assert.AreEqual(350, M.Penalty());
 		}
 
 		[TestMethod]
 		public void Test_22_Penalty_Total_Mask0()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			string s1 = M.ToFullBlockText();
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask0);
 			string s2 = M.ToFullBlockText();
 			Assert.AreEqual(s1, s2);
-			Console.Out.WriteLine(s2);
+			ConsoleOut.WriteLine(s2);
 			Assert.AreEqual(350, M.Penalty());
 		}
 
@@ -420,10 +421,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_23_Penalty_Total_Mask1()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask1);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(421, M.Penalty());
 		}
 
@@ -431,10 +432,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_24_Penalty_Total_Mask2()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask2);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(507, M.Penalty());
 		}
 
@@ -442,10 +443,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_25_Penalty_Total_Mask3()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask3);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(443, M.Penalty());
 		}
 
@@ -453,10 +454,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_26_Penalty_Total_Mask4()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask4);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(553, M.Penalty());
 		}
 
@@ -464,10 +465,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_27_Penalty_Total_Mask5()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask5);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(547, M.Penalty());
 		}
 
@@ -475,10 +476,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_28_Penalty_Total_Mask6()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask6);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(357, M.Penalty());
 		}
 
@@ -486,10 +487,10 @@ namespace Waher.Content.QR.Test
 		[Ignore]
 		public void Test_29_Penalty_Total_Mask7()
 		{
-			QrMatrix M = new QrMatrix((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
+			QrMatrix M = new((DotType[,])PenaltyMatrix.M.Clone(), (bool[,])PenaltyMask.M.Clone());
 			M.ApplyMask(QrMatrix.Mask0);
 			M.ApplyMask(QrMatrix.Mask7);
-			Console.Out.WriteLine(M.ToFullBlockText());
+			ConsoleOut.WriteLine(M.ToFullBlockText());
 			Assert.AreEqual(520, M.Penalty());
 		}
 
@@ -516,7 +517,7 @@ namespace Waher.Content.QR.Test
 			CorrectionLevel Level = CorrectionLevel.Q;
 			string Message = "HELLO WORLD";
 			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
-			Console.Out.WriteLine(M.ToHalfBlockText());
+			ConsoleOut.WriteLine(M.ToHalfBlockText());
 		}
 
 		[TestMethod]
@@ -525,7 +526,7 @@ namespace Waher.Content.QR.Test
 			CorrectionLevel Level = CorrectionLevel.H;
 			string Message = "edaler:id=8747cf73-85be-4db1-9117-a77a36f401fb;fi=27c6d6f2-568c-c07c-040e-dd8dd1fcf047@legal.cybercity.online;ti=27f4887a-ce90-ab4b-a033-cff1090fed0e@legal.sb.br.fi.tagroot.io;am=2;cu=SEK;cr=2021-03-29T13:08:31.770Z;ex=2021-04-01;em=w92rYkprOiCyOTZSDO4FEgKas5ct95EyCPBz6SxF/RA=;ep=O+yaNu5XWk37vyAxqVyCAyLo//cCDwLCoSjegX2BSkIcQJEFbjo0CM8exKN5DV/sbzZ8QnLHc1AA;s=VaM03Ulinilj9psaeyGqkHJhrvZ7EfDeq+KiJZe79VyGGTT8h+wu47ll/DaqAyCQMDLwpf60DtaA06EvTz5RgO8l8b576L92h974Q9nNnj9vjx4Dqe7uib8bKHJM4sOU5yP1s8cKRFAyRZeRbr2LgAcA";
 			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
-			Console.Out.WriteLine(M.ToHalfBlockText());
+			ConsoleOut.WriteLine(M.ToHalfBlockText());
 		}
 
 		[TestMethod]

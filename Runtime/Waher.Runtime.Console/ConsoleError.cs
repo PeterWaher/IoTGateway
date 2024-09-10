@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console.Worker;
@@ -7,37 +6,25 @@ using Waher.Runtime.Console.Worker;
 namespace Waher.Runtime.Console
 {
 	/// <summary>
-	/// Delegate for custom writers.
-	/// </summary>
-	/// <param name="Output">Where output should be written.</param>
-	public delegate void CustomWriter(TextWriter Output);
-
-	/// <summary>
-	/// Delegate for asynchronous custom writers.
-	/// </summary>
-	/// <param name="Output">Where output should be written.</param>
-	public delegate Task CustomAsyncWriter(TextWriter Output);
-
-	/// <summary>
-	/// Serializes output to <see cref="Console.Out"/>, and assures modules are not dead-locked in case the Console gets locked by
+	/// Serializes output to <see cref="Console.Error"/>, and assures modules are not dead-locked in case the Console gets locked by
 	/// the user.
 	/// </summary>
-	public static class ConsoleOut
+	public static class ConsoleError
 	{
 		/// <summary>
 		/// The character encoding in which the output is written.
 		/// </summary>
-		public static Encoding Encoding => System.Console.Out.Encoding;
+		public static Encoding Encoding => System.Console.Error.Encoding;
 
 		/// <summary>
 		/// Gets an object that controls formatting.
 		/// </summary>
-		public static IFormatProvider FormatProvider => System.Console.Out.FormatProvider;
+		public static IFormatProvider FormatProvider => System.Console.Error.FormatProvider;
 
 		/// <summary>
 		/// The line terminator string for the current TextWriter.
 		/// </summary>
-		public static string NewLine => System.Console.Out.NewLine;
+		public static string NewLine => System.Console.Error.NewLine;
 
 		/// <summary>
 		/// Queues a value to be written to the console output.
@@ -46,7 +33,7 @@ namespace Waher.Runtime.Console
 		public static void Write(string value)
 		{
 			if (!string.IsNullOrEmpty(value))
-				ConsoleWorker.Queue(new ConsoleOutWriteString(value));
+				ConsoleWorker.Queue(new ConsoleErrorWriteString(value));
 		}
 
 		/// <summary>
@@ -66,7 +53,7 @@ namespace Waher.Runtime.Console
 		/// <param name="BackgroundColor">Optional Background Color to use.</param>
 		public static void Write(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
 		{
-			ConsoleWorker.Queue(new ConsoleOutCustomWriter(Writer, ForegroundColor, BackgroundColor));
+			ConsoleWorker.Queue(new ConsoleErrorCustomWriter(Writer, ForegroundColor, BackgroundColor));
 		}
 
 		/// <summary>
@@ -222,7 +209,7 @@ namespace Waher.Runtime.Console
 		{
 			if (!string.IsNullOrEmpty(value))
 			{
-				WorkItem Item = new ConsoleOutWriteString(value.ToString());
+				WorkItem Item = new ConsoleErrorWriteString(value.ToString());
 
 				if (!await ConsoleWorker.Queue(Item))
 					return;
@@ -275,7 +262,7 @@ namespace Waher.Runtime.Console
 		/// <param name="BackgroundColor">Optional Background Color to use.</param>
 		public static async Task WriteAsync(CustomAsyncWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
 		{
-			WorkItem Item = new ConsoleOutCustomAsyncWriter(Writer, ForegroundColor, BackgroundColor);
+			WorkItem Item = new ConsoleErrorCustomAsyncWriter(Writer, ForegroundColor, BackgroundColor);
 
 			if (!await ConsoleWorker.Queue(Item))
 				return;
@@ -298,7 +285,7 @@ namespace Waher.Runtime.Console
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string value)
 		{
-			ConsoleWorker.Queue(new ConsoleOutWriteLineString(value));
+			ConsoleWorker.Queue(new ConsoleErrorWriteLineString(value));
 		}
 
 		/// <summary>
@@ -452,7 +439,7 @@ namespace Waher.Runtime.Console
 		/// <param name="value">Value to be written.</param>
 		public static async Task WriteLineAsync(string value)
 		{
-			WorkItem Item = new ConsoleOutWriteLineString(value ?? string.Empty);
+			WorkItem Item = new ConsoleErrorWriteLineString(value ?? string.Empty);
 
 			if (!await ConsoleWorker.Queue(Item))
 				return;
@@ -502,68 +489,6 @@ namespace Waher.Runtime.Console
 		public static void Beep()
 		{
 			ConsoleWorker.Queue(new ConsoleBeep());
-		}
-
-		/// <summary>
-		/// Provides a <see cref="TextWriter"/> instance, that writes to <see cref="ConsoleOut"/>.
-		/// </summary>
-		public static TextWriter Writer
-		{
-			get => new ConsoleOutTextWriter();
-		}
-
-		/// <summary>
-		/// Text writer that writes to <see cref="ConsoleOut"/>
-		/// </summary>
-		private class ConsoleOutTextWriter : TextWriter
-		{
-			public ConsoleOutTextWriter()
-			{
-			}
-
-			public override Encoding Encoding => ConsoleOut.Encoding;
-			public override void Write(char value) => ConsoleOut.Write(value);
-			public override void Write(ulong value) => ConsoleOut.Write(value);
-			public override void Write(uint value) => ConsoleOut.Write(value);
-			public override void Write(string format, params object[] arg) => ConsoleOut.Write(format, arg);
-			public override void Write(string format, object arg0, object arg1, object arg2) => ConsoleOut.Write(format, arg0, arg1, arg2);
-			public override void Write(string format, object arg0, object arg1) => ConsoleOut.Write(format, arg0, arg1);
-			public override void Write(string format, object arg0) => ConsoleOut.Write(format, arg0);
-			public override void Write(string value) => ConsoleOut.Write(value);
-			public override void Write(float value) => ConsoleOut.Write(value);
-			public override void Write(long value) => ConsoleOut.Write(value);
-			public override void Write(int value) => ConsoleOut.Write(value);
-			public override void Write(double value) => ConsoleOut.Write(value);
-			public override void Write(decimal value) => ConsoleOut.Write(value);
-			public override void Write(char[] buffer, int index, int count) => ConsoleOut.Write(buffer, index, count);
-			public override void Write(char[] buffer) => ConsoleOut.Write(buffer);
-			public override void Write(bool value) => ConsoleOut.Write(value);
-			public override void Write(object value) => ConsoleOut.Write(value);
-			public override Task WriteAsync(string value) => ConsoleOut.WriteAsync(value);
-			public override Task WriteAsync(char[] buffer, int index, int count) => ConsoleOut.WriteAsync(buffer, index, count);
-			public override Task WriteAsync(char value) => ConsoleOut.WriteAsync(value);
-			public override void WriteLine() => ConsoleOut.WriteLine();
-			public override void WriteLine(ulong value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(uint value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(string format, params object[] arg) => ConsoleOut.WriteLine(format, arg);
-			public override void WriteLine(string format, object arg0, object arg1, object arg2) => ConsoleOut.WriteLine(format, arg0, arg1, arg2);
-			public override void WriteLine(string format, object arg0, object arg1) => ConsoleOut.WriteLine(format, arg0, arg1);
-			public override void WriteLine(string value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(float value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(string format, object arg0) => ConsoleOut.WriteLine(format, arg0);
-			public override void WriteLine(long value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(int value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(double value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(decimal value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(char[] buffer, int index, int count) => ConsoleOut.WriteLine(buffer, index, count);
-			public override void WriteLine(char[] buffer) => ConsoleOut.WriteLine(buffer);
-			public override void WriteLine(char value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(object value) => ConsoleOut.WriteLine(value);
-			public override void WriteLine(bool value) => ConsoleOut.WriteLine(value);
-			public override Task WriteLineAsync() => ConsoleOut.WriteLineAsync();
-			public override Task WriteLineAsync(char value) => ConsoleOut.WriteLineAsync(value);
-			public override Task WriteLineAsync(char[] buffer, int index, int count) => ConsoleOut.WriteLineAsync(buffer, index, count);
-			public override Task WriteLineAsync(string value) => ConsoleOut.WriteLineAsync(value);
 		}
 	}
 }

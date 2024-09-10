@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Test.Classes;
+using Waher.Runtime.Console;
 
 namespace Waher.Persistence.Files.Test
 {
@@ -47,7 +46,7 @@ namespace Waher.Persistence.Files.Test
 		public async Task PersistenceTests_02_FindAll()
 		{
 			foreach (StringFields Obj in await Database.Find<StringFields>())
-				Console.Out.WriteLine(Obj.ToString());
+				ConsoleOut.WriteLine(Obj.ToString());
 		}
 
 

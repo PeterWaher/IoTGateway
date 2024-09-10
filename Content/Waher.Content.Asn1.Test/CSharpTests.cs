@@ -1,13 +1,14 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 namespace Waher.Content.Asn1.Test
 {
@@ -18,9 +19,9 @@ namespace Waher.Content.Asn1.Test
 		{
 			string BaseNamespace = "Test";
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
-			CSharpExportSettings Settings = new CSharpExportSettings(BaseNamespace, EncodingSchemes.All);
+			CSharpExportSettings Settings = new(BaseNamespace, EncodingSchemes.All);
 			string CSharp = Doc.ExportCSharp(Settings);
-			List<SyntaxTree> Modules = new List<SyntaxTree>() { CSharpSyntaxTree.ParseText(CSharp) };
+			List<SyntaxTree> Modules = new() { CSharpSyntaxTree.ParseText(CSharp) };
 
 			foreach (string ImportedModule in Settings.Modules)
 			{
@@ -28,7 +29,7 @@ namespace Waher.Content.Asn1.Test
 				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
 			}
 
-			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			Dictionary<string, bool> Dependencies = new()
 			{
 				{ GetLocation(typeof(object)), true },
 				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
@@ -39,7 +40,7 @@ namespace Waher.Content.Asn1.Test
 				{ GetLocation(typeof(Asn1Document)), true }
 			};
 
-			List<MetadataReference> References = new List<MetadataReference>();
+			List<MetadataReference> References = new();
 
 			foreach (string Location in Dependencies.Keys)
 			{
@@ -51,14 +52,14 @@ namespace Waher.Content.Asn1.Test
 				BaseNamespace, Modules.ToArray(), References, 
 				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-			MemoryStream Output = new MemoryStream();
-			MemoryStream PdbOutput = new MemoryStream();
+			MemoryStream Output = new();
+			MemoryStream PdbOutput = new();
 
 			EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
 
 			if (!CompilerResults.Success)
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new();
 
 				foreach (Diagnostic Error in CompilerResults.Diagnostics)
 				{
@@ -87,7 +88,7 @@ namespace Waher.Content.Asn1.Test
 				throw new Exception(sb.ToString());
 			}
 
-			Console.Out.WriteLine(CSharp);
+			ConsoleOut.WriteLine(CSharp);
 
 			return CSharp;
 		}

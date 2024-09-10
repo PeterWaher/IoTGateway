@@ -4,7 +4,7 @@
 	/// Delegate for custom event filters.
 	/// </summary>
 	/// <param name="Event"></param>
-	/// <returns></returns>
+	/// <returns>If the event is allowed.</returns>
 	public delegate bool CustomEventFilterDelegate(Event Event);
 
 	/// <summary>

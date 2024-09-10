@@ -1546,8 +1546,19 @@ namespace Waher.Script
 						{
 							case "IS":
 								this.pos += 2;
-								Right = this.AssertRightOperandNotNull(this.ParseComparison());
-								Left = new Is(Left, Right, Start, this.pos - Start, this);
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() == "NOT")
+								{
+									this.pos += 3;
+									Right = this.AssertRightOperandNotNull(this.ParseComparison());
+									Left = new IsNot(Left, Right, Start, this.pos - Start, this);
+								}
+								else
+								{
+									Right = this.AssertRightOperandNotNull(this.ParseComparison());
+									Left = new Is(Left, Right, Start, this.pos - Start, this);
+								}
 								continue;
 
 							case "INHERITS":
@@ -3290,7 +3301,7 @@ namespace Waher.Script
 		/// Tries to get a constant value, given its name.
 		/// </summary>
 		/// <param name="Name">Name</param>
-		/// <param name="Variables">Current set of cariables.</param>
+		/// <param name="Variables">Current set of variables. Can be null.</param>
 		/// <param name="ValueElement">If found, constant value will be placed here.</param>
 		/// <returns>If a constant with the given name was found.</returns>
 		public static bool TryGetConstant(string Name, Variables Variables, out IElement ValueElement)
@@ -3308,7 +3319,7 @@ namespace Waher.Script
 				return false;
 			}
 
-			ValueElement = Constant.GetValueElement(Variables);
+			ValueElement = Constant.GetValueElement(Variables ?? new Variables());
 			return !(ValueElement is null);
 		}
 

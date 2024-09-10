@@ -1,18 +1,18 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP;
-using Waher.Networking.Sniffers;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
-using Waher.Security.JWT;
 using Waher.Security.JWS;
+using Waher.Security.JWT;
 
 namespace Waher.WebService.Tesseract.Test
 {
@@ -20,7 +20,7 @@ namespace Waher.WebService.Tesseract.Test
 	public class TesseractTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(TesseractTests).Assembly,
 				typeof(InternetContent).Assembly,
@@ -62,7 +62,7 @@ namespace Waher.WebService.Tesseract.Test
 				string Text = await Api.PerformOcr(Bin, ContentType, Mode, Language);
 
 				Assert.IsFalse(string.IsNullOrEmpty(Text), "Unable to perform OCR.");
-				Console.Out.WriteLine(Text);
+				ConsoleOut.WriteLine(Text);
 			}
 			finally
 			{
@@ -118,7 +118,7 @@ namespace Waher.WebService.Tesseract.Test
 
 				Assert.IsNotNull(Text, "Unexpected response.");
 
-				Console.Out.WriteLine(Text);
+				ConsoleOut.WriteLine(Text);
 			}
 			finally
 			{

@@ -8,7 +8,7 @@ namespace Waher.Persistence.Serialization
 	/// <summary>
 	/// Generic object. Contains a sequence of properties.
 	/// </summary>
-	[ArchivingTime("ArchivingTime")]
+	[ArchivingTime(nameof(ArchivingTime))]
 	public sealed class GenericObject : ICollection<KeyValuePair<string, object>>
 	{
 		private IEnumerable<KeyValuePair<string, object>> properties = new LinkedList<KeyValuePair<string, object>>();

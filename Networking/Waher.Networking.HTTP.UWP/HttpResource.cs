@@ -248,6 +248,35 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Gets the session ID used for a request.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		/// <param name="Response">Response object.</param>
+		/// <returns>Session ID</returns>
+		public static string GetSessionId(HttpRequest Request, HttpResponse Response)
+		{
+			HttpFieldCookie Cookie = Request.Header.Cookie;
+			string HttpSessionID;
+
+			if (!(Cookie is null) && !string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
+				return HttpSessionID;
+
+			if (!(Response.Cookies is null))
+			{
+				foreach (Cookie SetCookie in Response.Cookies)
+				{
+					if (SetCookie.Name == HttpResource.HttpSessionID)
+						return SetCookie.Value;
+				}
+			}
+
+			HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+			Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
+
+			return HttpSessionID;
+		}
+
+		/// <summary>
 		/// Executes a method on the resource. The default behaviour is to call the corresponding execution methods defined in the specialized
 		/// interfaces <see cref="IHttpGetMethod"/>, <see cref="IHttpPostMethod"/>, <see cref="IHttpPutMethod"/> and <see cref="IHttpDeleteMethod"/>
 		/// if they are defined for the resource.
@@ -263,17 +292,11 @@ namespace Waher.Networking.HTTP
 
 			if (this.UserSessions)
 			{
-				HttpFieldCookie Cookie;
 				string HttpSessionID;
 
 				if (Request.Session is null)
 				{
-					if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
-					{
-						HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-						Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
-					}
-
+					HttpSessionID = GetSessionId(Request, Response);
 					Request.Session = Server.GetSession(HttpSessionID);
 				}
 				else if (Request.tempSession)

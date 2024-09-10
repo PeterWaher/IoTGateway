@@ -1,17 +1,19 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
+using Waher.Persistence.Serialization;
+using Waher.Content;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Script;
-using Waher.Content;
 using Waher.Security;
+
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -48,7 +50,7 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const int BlocksInCache = 10000;
 		internal const int ObjectsToEnumerate = 1000;
 
-		protected static Random gen = new Random();
+		protected static readonly Random gen = new();
 		protected ObjectBTreeFile file;
 		protected FilesProvider provider;
 		protected DateTime start;
@@ -76,9 +78,9 @@ namespace Waher.Persistence.FilesLW.Test
 			DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 			this.file = await this.provider.GetFile(CollectionName);
 			this.start = DateTime.Now;
@@ -153,9 +155,9 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
+			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (!(this.provider is null))
+			if (this.provider is not null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
@@ -170,7 +172,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		internal static Simple CreateSimple(int MaxStringLength)
 		{
-			Simple Result = new Simple()
+			Simple Result = new()
 			{
 				Boolean1 = gen.Next(2) == 1,
 				Boolean2 = gen.Next(2) == 1,
@@ -235,7 +237,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		internal static Default CreateDefault(int MaxStringLength)
 		{
-			Default Result = new Default()
+			Default Result = new()
 			{
 				Boolean1 = gen.Next(2) == 1,
 				Boolean2 = gen.Next(2) == 1,
@@ -296,7 +298,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 		}
 
 		[TestMethod]
@@ -308,8 +310,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			try
 			{
-				List<Simple> Objects = new List<Simple>();
-				List<Guid> ObjectIds = new List<Guid>();
+				List<Simple> Objects = new();
+				List<Guid> ObjectIds = new();
 				int i, c = 0;
 
 				Simple Obj = CreateSimple(this.MaxStringLength);
@@ -343,8 +345,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 					DBFilesObjectSerializationTests.AssertEqual(Obj, Obj2);
 
-					//Console.Out.Write(Stat.NrObjects.ToString() + " ");
-					Console.Out.Write(c.ToString() + " ");
+					//ConsoleOut.Write(Stat.NrObjects.ToString() + " ");
+					ConsoleOut.Write(c.ToString() + " ");
 				}
 			}
 			catch (Exception ex)
@@ -387,52 +389,52 @@ namespace Waher.Persistence.FilesLW.Test
 
 			if (WriteStat)
 			{
-				Console.Out.WriteLine("Block Size: " + Statistics.BlockSize.ToString());
-				Console.Out.WriteLine("#Blocks: " + Statistics.NrBlocks.ToString());
-				Console.Out.WriteLine("#BLOB Blocks: " + Statistics.NrBlobBlocks.ToString());
-				Console.Out.WriteLine("#Bytes used: " + Statistics.NrBytesUsed.ToString());
-				Console.Out.WriteLine("#Bytes unused: " + Statistics.NrBytesUnused.ToString());
-				Console.Out.WriteLine("#Bytes total: " + Statistics.NrBytesTotal.ToString());
-				Console.Out.WriteLine("#BLOB Bytes used: " + Statistics.NrBlobBytesUsed.ToString());
-				Console.Out.WriteLine("#BLOB Bytes unused: " + Statistics.NrBlobBytesUnused.ToString());
-				Console.Out.WriteLine("#BLOB Bytes total: " + Statistics.NrBlobBytesTotal.ToString());
-				Console.Out.WriteLine("#Block loads: " + Statistics.NrBlockLoads.ToString());
-				Console.Out.WriteLine("#Cache loads: " + Statistics.NrCacheLoads.ToString());
-				Console.Out.WriteLine("#Block saves: " + Statistics.NrBlockSaves.ToString());
-				Console.Out.WriteLine("#BLOB Block loads: " + Statistics.NrBlobBlockLoads.ToString());
-				Console.Out.WriteLine("#BLOB Block saves: " + Statistics.NrBlobBlockSaves.ToString());
-				Console.Out.WriteLine("#Objects: " + Statistics.NrObjects.ToString());
-				Console.Out.WriteLine("Smallest object: " + Statistics.MinObjectSize.ToString());
-				Console.Out.WriteLine("Largest object: " + Statistics.MaxObjectSize.ToString());
-				Console.Out.WriteLine("Average object: " + Statistics.AverageObjectSize.ToString("F1"));
-				Console.Out.WriteLine("Usage: " + Statistics.Usage.ToString("F2") + " %");
-				Console.Out.WriteLine("Min(Depth): " + Statistics.MinDepth.ToString());
-				Console.Out.WriteLine("Max(Depth): " + Statistics.MaxDepth.ToString());
-				Console.Out.WriteLine("Min(Objects/Block): " + Statistics.MinObjectsPerBlock.ToString());
-				Console.Out.WriteLine("Max(Objects/Block): " + Statistics.MaxObjectsPerBlock.ToString());
-				Console.Out.WriteLine("Avg(Objects/Block): " + Statistics.AverageObjectsPerBlock.ToString("F1"));
-				Console.Out.WriteLine("Min(Bytes Used/Block): " + Statistics.MinBytesUsedPerBlock.ToString());
-				Console.Out.WriteLine("Max(Bytes Used/Block): " + Statistics.MaxBytesUsedPerBlock.ToString());
-				Console.Out.WriteLine("Avg(Bytes Used/Block): " + Statistics.AverageBytesUsedPerBlock.ToString("F1"));
-				Console.Out.WriteLine("Is Corrupt: " + Statistics.IsCorrupt.ToString());
-				Console.Out.WriteLine("Is Balanced: " + Statistics.IsBalanced.ToString());
-				Console.Out.WriteLine("Has Comments: " + Statistics.HasComments.ToString());
+				ConsoleOut.WriteLine("Block Size: " + Statistics.BlockSize.ToString());
+				ConsoleOut.WriteLine("#Blocks: " + Statistics.NrBlocks.ToString());
+				ConsoleOut.WriteLine("#BLOB Blocks: " + Statistics.NrBlobBlocks.ToString());
+				ConsoleOut.WriteLine("#Bytes used: " + Statistics.NrBytesUsed.ToString());
+				ConsoleOut.WriteLine("#Bytes unused: " + Statistics.NrBytesUnused.ToString());
+				ConsoleOut.WriteLine("#Bytes total: " + Statistics.NrBytesTotal.ToString());
+				ConsoleOut.WriteLine("#BLOB Bytes used: " + Statistics.NrBlobBytesUsed.ToString());
+				ConsoleOut.WriteLine("#BLOB Bytes unused: " + Statistics.NrBlobBytesUnused.ToString());
+				ConsoleOut.WriteLine("#BLOB Bytes total: " + Statistics.NrBlobBytesTotal.ToString());
+				ConsoleOut.WriteLine("#Block loads: " + Statistics.NrBlockLoads.ToString());
+				ConsoleOut.WriteLine("#Cache loads: " + Statistics.NrCacheLoads.ToString());
+				ConsoleOut.WriteLine("#Block saves: " + Statistics.NrBlockSaves.ToString());
+				ConsoleOut.WriteLine("#BLOB Block loads: " + Statistics.NrBlobBlockLoads.ToString());
+				ConsoleOut.WriteLine("#BLOB Block saves: " + Statistics.NrBlobBlockSaves.ToString());
+				ConsoleOut.WriteLine("#Objects: " + Statistics.NrObjects.ToString());
+				ConsoleOut.WriteLine("Smallest object: " + Statistics.MinObjectSize.ToString());
+				ConsoleOut.WriteLine("Largest object: " + Statistics.MaxObjectSize.ToString());
+				ConsoleOut.WriteLine("Average object: " + Statistics.AverageObjectSize.ToString("F1"));
+				ConsoleOut.WriteLine("Usage: " + Statistics.Usage.ToString("F2") + " %");
+				ConsoleOut.WriteLine("Min(Depth): " + Statistics.MinDepth.ToString());
+				ConsoleOut.WriteLine("Max(Depth): " + Statistics.MaxDepth.ToString());
+				ConsoleOut.WriteLine("Min(Objects/Block): " + Statistics.MinObjectsPerBlock.ToString());
+				ConsoleOut.WriteLine("Max(Objects/Block): " + Statistics.MaxObjectsPerBlock.ToString());
+				ConsoleOut.WriteLine("Avg(Objects/Block): " + Statistics.AverageObjectsPerBlock.ToString("F1"));
+				ConsoleOut.WriteLine("Min(Bytes Used/Block): " + Statistics.MinBytesUsedPerBlock.ToString());
+				ConsoleOut.WriteLine("Max(Bytes Used/Block): " + Statistics.MaxBytesUsedPerBlock.ToString());
+				ConsoleOut.WriteLine("Avg(Bytes Used/Block): " + Statistics.AverageBytesUsedPerBlock.ToString("F1"));
+				ConsoleOut.WriteLine("Is Corrupt: " + Statistics.IsCorrupt.ToString());
+				ConsoleOut.WriteLine("Is Balanced: " + Statistics.IsBalanced.ToString());
+				ConsoleOut.WriteLine("Has Comments: " + Statistics.HasComments.ToString());
 			}
 
 			if (Statistics.HasComments)
 			{
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine();
 				foreach (string Comment in Statistics.Comments)
-					Console.Out.WriteLine(Comment);
+					ConsoleOut.WriteLine(Comment);
 			}
 
 			try
 			{
 				if (Statistics.IsCorrupt || !Statistics.IsBalanced)
 				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(await ExportXML(File, "Data\\BTreeError.xml", true));
-					Console.Out.WriteLine();
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine(await ExportXML(File, "Data\\BTreeError.xml", true));
+					ConsoleOut.WriteLine();
 
 					Assert.IsFalse(Statistics.IsCorrupt, "Database is corrupt.");
 					Assert.IsTrue(Statistics.IsBalanced, "Database is unbalanced.");
@@ -456,10 +458,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private static async Task SaveLastObject(FilesProvider Provider, object LastObjectAdded)
 		{
-			if (!(LastObjectAdded is null))
+			if (LastObjectAdded is not null)
 			{
 				IObjectSerializer Serializer = await Provider.GetObjectSerializer(LastObjectAdded.GetType());
-				BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
+				BinarySerializer Writer = new(CollectionName, Encoding.UTF8);
 				await Serializer.Serialize(Writer, false, false, LastObjectAdded, null);
 				byte[] Bin = Writer.GetSerialization();
 				File.WriteAllBytes(ObjFileName, Bin);
@@ -583,9 +585,9 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (AssertIndividually)
 				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(i.ToString() + " objects:");
-					Console.Out.WriteLine(new string('-', 80));
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine(i.ToString() + " objects:");
+					ConsoleOut.WriteLine(new string('-', 80));
 
 					await AssertConsistent(this.file, this.provider, i, Objects[i - 1], true);
 				}
@@ -617,26 +619,26 @@ namespace Waher.Persistence.FilesLW.Test
 			if (!AssertIndividually)
 				await AssertConsistent(this.file, this.provider, NrObjects, null, true);
 
-			if (!(Stat is null))
+			if (Stat is not null)
 			{
-				Variables v = new Variables()
+				Variables v = new()
 				{
 					{ "Stat", Stat.ToArray() },
 					{ "ms", Milliseconds.ToArray() },
 					{ "StepSize", LogStatisticsEvery.Value }
 				};
 
-				Expression Exp = new Expression("[ms,Stat.BlockSize,Stat.NrBlocks,Stat.NrBytesUsed,Stat.NrBytesUnused,Stat.NrBytesTotal," +
+				Expression Exp = new("[ms,Stat.BlockSize,Stat.NrBlocks,Stat.NrBytesUsed,Stat.NrBytesUnused,Stat.NrBytesTotal," +
 					"Stat.Usage,Stat.NrObjects,Stat.MinObjectSize,Stat.MaxObjectSize,Stat.AverageObjectSize,Stat.MinDepth,Stat.MaxDepth," +
 					"Stat.NrBlockLoads,Stat.NrCacheLoads,Stat.NrBlockSaves,Stat.MinObjectsPerBlock,Stat.MaxObjectsPerBlock," +
 					"Stat.AverageObjectsPerBlock,Stat.MinBytesUsedPerBlock,Stat.MaxBytesUsedPerBlock,Stat.AverageBytesUsedPerBlock]T");
 
-				Console.Out.WriteLine("ms, BlockSize, NrBlocks, NrBytesUsed, NrBytesUnused, NrBytesTotal, " +
+				ConsoleOut.WriteLine("ms, BlockSize, NrBlocks, NrBytesUsed, NrBytesUnused, NrBytesTotal, " +
 					"Usage, NrObjects, MinObjectSize, MaxObjectSize, AverageObjectSize, MinDepth, MaxDepth, " +
 					"NrBlockLoads, NrCacheLoads, NrBlockSaves,Min(Obj/Block),Max(Obj/Block),Avg(Obj/Block)," +
 					"Min(UsedBytes/Block),Max(UsedBytes/Block),Avg(UsedBytes/Block)");
-				Console.Out.WriteLine(new string('-', 80));
-				Console.Out.WriteLine((await Exp.EvaluateAsync(v)).ToString());
+				ConsoleOut.WriteLine(new string('-', 80));
+				ConsoleOut.WriteLine((await Exp.EvaluateAsync(v)).ToString());
 			}
 		}
 
@@ -713,7 +715,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			Console.Out.WriteLine((await this.file.CountAsync).ToString());
+			ConsoleOut.WriteLine((await this.file.CountAsync).ToString());
 		}
 
 		[TestMethod]
@@ -877,7 +879,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
 		{
-			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
+			SortedDictionary<Guid, Simple> Result = new();
 
 			await this.provider.StartBulk();
 
@@ -903,7 +905,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Objects.Values.CopyTo(Ordered, 0);
 			Guid? Prev;
 			Simple Obj;
-			Random gen = new Random();
+			Random gen = new();
 			int i, j;
 
 			for (i = 0; i < c; i++)
@@ -1060,19 +1062,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			DBFilesObjectSerializationTests.AssertEqual(Obj, Obj2);
 
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
 
 			Simple Obj3 = CreateSimple(this.MaxStringLength);
 			Obj3.ObjectId = ObjectId;
 			await this.file.UpdateObject(Obj3, false, null);
 
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
 
 			Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			DBFilesObjectSerializationTests.AssertEqual(Obj3, Obj2);
 
 			await AssertConsistent(this.file, this.provider, null, null, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 		}
 
 		[TestMethod]
@@ -1108,7 +1110,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			//await AssertConsistent(this.file, this.provider, null, null, true);
-			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBeforeUpdates.xml"));
+			//ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeBeforeUpdates.xml"));
 
 			for (i = 0; i < c; i++)
 			{
@@ -1124,7 +1126,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			await AssertConsistent(this.file, this.provider, null, null, true);
-			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
+			//ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
 
 			for (i = 0; i < c; i++)
 			{
@@ -1177,7 +1179,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task DBFiles_BTree_Test_DeleteObjects(int c, int BulkSize, bool CheckForEachObject)
 		{
-			Random Gen = new Random();
+			Random Gen = new();
 			Simple[] Objects = new Simple[c];
 			Simple Obj;
 			int i;
@@ -1237,10 +1239,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 						File.WriteAllText(BlockSizeFileName, this.BlockSize.ToString());
 
-						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
-						Console.Out.WriteLine(Obj.ObjectId);
+						ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
+						ConsoleOut.WriteLine(Obj.ObjectId);
 						await this.file.DeleteObject(Obj, false, null);
-						//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
+						//ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 						await AssertConsistent(this.file, this.provider, null, null, true);
 
 						for (i = 0; i < c; i++)
@@ -1251,8 +1253,8 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 					catch (Exception ex)
 					{
-						if (!(this.file is null))
-							Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml", false));
+						if (this.file is not null)
+							ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml", false));
 
 						ExceptionDispatchInfo.Capture(ex).Throw();
 					}
@@ -1280,7 +1282,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_37_BinaryLifeCycle()
 		{
-			DockerBlob Obj = new DockerBlob()
+			DockerBlob Obj = new()
 			{
 				AccountName = "Some user",
 				FileName = "Some file"
@@ -1290,14 +1292,14 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 
 			Obj.Function = HashFunction.SHA256;
 			Obj.Digest = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes("Hello World."));
 
 			await this.file.UpdateObject(Obj, false, null);
 
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
 
 			DockerBlob Obj2 = await this.file.LoadObject<DockerBlob>(ObjectId);
 
@@ -1308,7 +1310,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
 			await AssertConsistent(this.file, this.provider, null, null, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
+			ConsoleOut.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 
 		}
 

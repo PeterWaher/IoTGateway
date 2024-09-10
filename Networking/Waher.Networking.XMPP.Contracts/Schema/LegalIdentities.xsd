@@ -351,6 +351,13 @@
 			<xs:documentation>Expect an empty response on success.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>Identifier of the legal identity hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
@@ -395,6 +402,11 @@
 						<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
 			</xs:sequence>
 			<xs:attribute name='pid' type='xs:string' use='required'>
 				<xs:annotation>
@@ -421,6 +433,13 @@
 			<xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>Identifier of the legal identity referred to by the petition.</xs:documentation>
@@ -456,6 +475,11 @@
 						<xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:annotation>
+						<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
 			</xs:sequence>
 			<xs:attribute name='pid' type='xs:string' use='required'>
 				<xs:annotation>

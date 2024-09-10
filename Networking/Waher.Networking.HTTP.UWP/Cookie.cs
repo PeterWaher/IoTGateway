@@ -267,7 +267,7 @@ namespace Waher.Networking.HTTP
 		/// Tries to get another property value previously added using <see cref="AddProperty(string, string)"/>.
 		/// </summary>
 		/// <param name="Name">Name of property.</param>
-		/// <param name="Value">Value of property, if found, null otherwise..</param>
+		/// <param name="Value">Value of property, if found, null otherwise.</param>
 		/// <returns>If the property was found.</returns>
 		public bool TryGetProperty(string Name, out string Value)
 		{

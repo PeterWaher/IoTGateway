@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Persistence.MongoDB;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -35,7 +33,7 @@ namespace Waher.Persistence.MongoDB.Test
 		[TestMethod]
 		public async Task Test_02_Insert()
 		{
-			ThingReference Node = new ThingReference("Node1");
+			ThingReference Node = new("Node1");
 			await Database.Insert(Node);
 		}
 
@@ -48,7 +46,7 @@ namespace Waher.Persistence.MongoDB.Test
 		[TestMethod]
 		public async Task Test_04_InsertManyDifferent()
 		{
-			ThingReference Ref = new ThingReference("Node1");
+			ThingReference Ref = new("Node1");
 			DateTime TP = DateTime.Now;
 
 			await Database.Insert(
@@ -66,7 +64,7 @@ namespace Waher.Persistence.MongoDB.Test
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>();
 
 			foreach (ThingReference ThingReference in ThingReferences)
-				Console.Out.WriteLine(ThingReference.ToString());
+				ConsoleOut.WriteLine(ThingReference.ToString());
 		}
 
 		[TestMethod]
@@ -75,7 +73,7 @@ namespace Waher.Persistence.MongoDB.Test
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
 
 			foreach (ThingReference ThingReference in ThingReferences)
-				Console.Out.WriteLine(ThingReference.ToString());
+				ConsoleOut.WriteLine(ThingReference.ToString());
 		}
 
 		[TestMethod]
@@ -84,7 +82,7 @@ namespace Waher.Persistence.MongoDB.Test
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
 
 			foreach (ThingReference ThingReference in ThingReferences)
-				Console.Out.WriteLine(ThingReference.ToString());
+				ConsoleOut.WriteLine(ThingReference.ToString());
 		}
 
 		[TestMethod]
@@ -93,7 +91,7 @@ namespace Waher.Persistence.MongoDB.Test
 			IEnumerable<Field> Fields = await Database.Find<Field>();
 
 			foreach (Field Field in Fields)
-				Console.Out.WriteLine(Field.ToString());
+				ConsoleOut.WriteLine(Field.ToString());
 		}
 
 		[TestMethod]
@@ -109,7 +107,7 @@ namespace Waher.Persistence.MongoDB.Test
 			ThingReferences = await Database.Find<ThingReference>();
 
 			foreach (ThingReference ThingReference in ThingReferences)
-				Console.Out.WriteLine(ThingReference.ToString());
+				ConsoleOut.WriteLine(ThingReference.ToString());
 		}
 
 		[TestMethod]

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Script;
-using System.Threading.Tasks;
+using Waher.Runtime.Console;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -26,10 +26,10 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedMarkdown = await Doc.GenerateMarkdown(true);
 
-			Console.Out.WriteLine(GeneratedMarkdown);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedMarkdown);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedMarkdown, "Generated Markdown does not match expected Markdown.");
 		}

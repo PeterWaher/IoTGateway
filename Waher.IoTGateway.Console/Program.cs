@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.CallStack;
 
@@ -59,27 +60,27 @@ namespace Waher.IoTGateway.Console
                     }
                 }
 
-                System.Console.ForegroundColor = ConsoleColor.White;
+                ConsoleOut.ForegroundColor = ConsoleColor.White;
 
-				System.Console.Out.WriteLine("Welcome to the Internet of Things Gateway server application.");
-				System.Console.Out.WriteLine(new string('-', 79));
-				System.Console.Out.WriteLine("This server application will help you manage IoT devices and");
-				System.Console.Out.WriteLine("create dynamic content that you can publish on the Internet.");
-				System.Console.Out.WriteLine("It also provides programming interfaces (API) which allow you");
-				System.Console.Out.WriteLine("to dynamically and securely interact with the devices and the");
-				System.Console.Out.WriteLine("content you publish.");
+				ConsoleOut.WriteLine("Welcome to the Internet of Things Gateway server application.");
+				ConsoleOut.WriteLine(new string('-', 79));
+				ConsoleOut.WriteLine("This server application will help you manage IoT devices and");
+				ConsoleOut.WriteLine("create dynamic content that you can publish on the Internet.");
+				ConsoleOut.WriteLine("It also provides programming interfaces (API) which allow you");
+				ConsoleOut.WriteLine("to dynamically and securely interact with the devices and the");
+				ConsoleOut.WriteLine("content you publish.");
 
                 if (Error || Help)
                 {
                     Log.Informational("Displaying help.");
 
-                    System.Console.Out.WriteLine();
-                    System.Console.Out.WriteLine("Command line switches:");
-                    System.Console.Out.WriteLine();
-                    System.Console.Out.WriteLine("-?                   Brings this help.");
-                    System.Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
-                    System.Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
-                    System.Console.Out.WriteLine("                     are given separate instance names.");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("Command line switches:");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("-?                   Brings this help.");
+                    ConsoleOut.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
+                    ConsoleOut.WriteLine("                     instances of the IoT Gateway can execute, provided they");
+                    ConsoleOut.WriteLine("                     are given separate instance names.");
 
                     return;
                 }
@@ -174,8 +175,8 @@ namespace Waher.IoTGateway.Console
 
 				if (!Gateway.Start(true, true, InstanceName).Result)
 				{
-					System.Console.Out.WriteLine();
-					System.Console.Out.WriteLine("Gateway being started in another process.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Gateway being started in another process.");
 					return;
 				}
 

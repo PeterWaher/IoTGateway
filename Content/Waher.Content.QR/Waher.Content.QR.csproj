@@ -5,7 +5,9 @@
     <Description>The library contains a light-weight managed encoder of QR codes. It can generate both text-based output (using block characters) for display on text devices, as well as images and color-coded codes. Contains methods for customization of QR-codes, including controlling color and shape of dots, overlaying of images, and procedural coloring.</Description>
     <Authors>Peter Waher</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Copyright>Copyright © Waher Data AB 2021-2024. All rights reserved.</Copyright>

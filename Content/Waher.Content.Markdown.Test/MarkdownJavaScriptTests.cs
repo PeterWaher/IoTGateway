@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.JavaScript;
+using Waher.Runtime.Console;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -41,10 +42,10 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedJavaScript = await Doc.GenerateJavaScript();
 
-			Console.Out.WriteLine(GeneratedJavaScript);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedJavaScript);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			ExpectedJavaScript = ExpectedJavaScript.Replace("\\r\\n", "\\n").Replace("\\r", "\\n");
 			GeneratedJavaScript = GeneratedJavaScript.Replace("\\r\\n", "\\n").Replace("\\r", "\\n");
@@ -64,18 +65,18 @@ namespace Waher.Content.Markdown.Test
 
 				string JsonEncoded = Parsed.RunTest("return CreateHTML();");
 
-				Console.Out.WriteLine("JSON Returned after executing JavaScript:");
-				Console.Out.WriteLine();
-				Console.Out.WriteLine(JsonEncoded);
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine("JSON Returned after executing JavaScript:");
+				ConsoleOut.WriteLine();
+				ConsoleOut.WriteLine(JsonEncoded);
+				ConsoleOut.WriteLine();
 
 				object Decoded = JSON.Parse(JsonEncoded);
 				if (Decoded is not string GeneratedHtml)
 					throw new Exception("Expected a string result returned from the JavaScript");
 
-				Console.Out.WriteLine("Generated HTML by executing JavaScript:");
-				Console.Out.WriteLine();
-				Console.Out.WriteLine(GeneratedHtml);
+				ConsoleOut.WriteLine("Generated HTML by executing JavaScript:");
+				ConsoleOut.WriteLine();
+				ConsoleOut.WriteLine(GeneratedHtml);
 
 				int i = ExpectedHtml.IndexOf(HtmlStartTag);
 				if (i > 0)

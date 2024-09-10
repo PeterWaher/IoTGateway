@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 using Waher.Script.Xml;
 
 namespace Waher.Script.Test
@@ -11,8 +11,8 @@ namespace Waher.Script.Test
 	{
 		private async Task Test(string Script, string ExpectedOutput)
 		{
-			Variables v = new Variables();
-			Expression Exp = new Expression(Script);
+			Variables v = new();
+			Expression Exp = new(Script);
 			object Result = await Exp.EvaluateAsync(v);
 
 			if (Result is XmlDocument Xml)
@@ -24,9 +24,9 @@ namespace Waher.Script.Test
 	
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine();
-			Exp.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 		}
 
 		[TestMethod]

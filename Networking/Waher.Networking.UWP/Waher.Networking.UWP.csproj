@@ -166,6 +166,14 @@
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
+      <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
+      <Name>Waher.Runtime.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj">
+      <Project>{1adfb1fd-e9fc-41e0-a3d4-d0db91adcd59}</Project>
+      <Name>Waher.Runtime.Queue</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj">
       <Project>{47f772fe-c923-4f5c-83b5-a4bef962ae15}</Project>
       <Name>Waher.Runtime.Threading</Name>

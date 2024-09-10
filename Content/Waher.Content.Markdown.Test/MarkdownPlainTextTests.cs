@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content.Images;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Images;
+using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.Latex;
+using Waher.Content.Markdown.Wpf;
+using Waher.Content.Markdown.Xamarin;
+using Waher.Content.Markdown.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Script;
 using Waher.Script.Graphs;
-using Waher.Content.Markdown.Contracts;
-using Waher.Content.Markdown.Latex;
-using Waher.Content.Markdown.Xml;
-using Waher.Content.Markdown.Wpf;
-using Waher.Content.Markdown.Xamarin;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -69,10 +69,10 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedText = await Doc.GeneratePlainText();
 
-			Console.Out.WriteLine(GeneratedText);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedText);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedText, "Generated Plain Text does not match expected Plain Text.");
 		}

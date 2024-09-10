@@ -75,6 +75,14 @@ namespace Waher.Things.Queries
 		private bool isAborted = false;
 		private bool isDone = false;
 		private int seqNr = 0;
+		private int nrSectionsBegun = 0;
+		private int nrSectionsEnded = 0;
+		private int nrTablesStarted = 0;
+		private int nrTablesCompleted = 0;
+		private int nrObjectsReported = 0;
+		private int nrMessagesReported = 0;
+		private int nrRecordsReported = 0;
+		private bool hasTitle = false;
 
 		/// <summary>
 		/// Class handling the reception of data from a query.
@@ -137,6 +145,69 @@ namespace Waher.Things.Queries
 		/// Curernt sequence number counter.
 		/// </summary>
 		public int SequenceNumber => this.seqNr;
+
+		/// <summary>
+		/// Number of sectios begun.
+		/// </summary>
+		public int NrSectionsBegun => this.nrSectionsBegun;
+
+		/// <summary>
+		/// Number of sectios ended.
+		/// </summary>
+		public int NrSectionsEnded => this.nrSectionsEnded;
+
+		/// <summary>
+		/// Number of tables started.
+		/// </summary>
+		public int NrTablesStarted => this.nrTablesStarted;
+
+		/// <summary>
+		/// Number of tables compeleted.
+		/// </summary>
+		public int NrTablesCompleted => this.nrTablesCompleted;
+
+		/// <summary>
+		/// Number of objects reported.
+		/// </summary>
+		public int NrObjectsReported => this.nrObjectsReported;
+
+		/// <summary>
+		/// Number of messages reported.
+		/// </summary>
+		public int NrMessagesReported => this.nrMessagesReported;
+
+		/// <summary>
+		/// Number of records reported.
+		/// </summary>
+		public int NrRecordsReported => this.nrRecordsReported;
+
+		/// <summary>
+		/// Number of items (total) reported.
+		/// </summary>
+		public int NrTotalItemsReported
+		{
+			get
+			{
+				int Result = this.nrSectionsBegun;
+				Result += this.nrSectionsEnded;
+				Result += this.NrTablesStarted;
+				Result += this.nrTablesCompleted;
+				Result += this.nrObjectsReported;
+				Result += this.nrMessagesReported;
+				Result += this.nrRecordsReported;
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// If a title has been set
+		/// </summary>
+		public bool HasTitle => this.hasTitle;
+
+		/// <summary>
+		/// If anything has been reported.
+		/// </summary>
+		public bool HasReported => this.NrTotalItemsReported > 0;
 
 		/// <summary>
 		/// Gets the next sequence number.
@@ -257,11 +328,13 @@ namespace Waher.Things.Queries
 		/// <param name="Columns">Columns.</param>
 		public Task NewTable(string TableId, string TableName, params Column[] Columns)
 		{
+			this.nrTablesStarted++;
 			return this.Raise(this.OnNewTable, new QueryNewTableEventArgs(this, TableId, TableName, Columns));
 		}
 
 		internal Task NewTable(QueryNewTableEventArgs e)
 		{
+			this.nrTablesStarted++;
 			return this.Raise(this.OnNewTable, e);
 		}
 
@@ -292,11 +365,13 @@ namespace Waher.Things.Queries
 		/// <param name="Records">New records.</param>
 		public Task NewRecords(string TableId, params Record[] Records)
 		{
+			this.nrRecordsReported += Records.Length;
 			return this.Raise(this.OnNewRecords, new QueryNewRecordsEventArgs(this, TableId, Records));
 		}
 
 		internal Task NewRecords(QueryNewRecordsEventArgs e)
 		{
+			this.nrRecordsReported += e.Records.Length;
 			return this.Raise(this.OnNewRecords, e);
 		}
 
@@ -326,11 +401,13 @@ namespace Waher.Things.Queries
 		/// <param name="TableId">ID of table.</param>
 		public Task TableDone(string TableId)
 		{
+			this.nrTablesCompleted++;
 			return this.Raise(this.OnTableDone, new QueryTableEventArgs(this, TableId));
 		}
 
 		internal Task TableDone(QueryTableEventArgs e)
 		{
+			this.nrTablesCompleted++;
 			return this.Raise(this.OnTableDone, e);
 		}
 
@@ -360,11 +437,13 @@ namespace Waher.Things.Queries
 		/// <param name="Object">Object</param>
 		public Task NewObject(object Object)
 		{
+			this.nrObjectsReported++;
 			return this.Raise(this.OnNewObject, new QueryObjectEventArgs(this, Object));
 		}
 
 		internal Task NewObject(QueryObjectEventArgs e)
 		{
+			this.nrObjectsReported++;
 			return this.Raise(this.OnNewObject, e);
 		}
 
@@ -416,11 +495,13 @@ namespace Waher.Things.Queries
 		/// <param name="Body">Event message body.</param>
 		public Task LogMessage(QueryEventType Type, QueryEventLevel Level, string Body)
 		{
+			this.nrMessagesReported++;
 			return this.Raise(this.OnMessage, new QueryMessageEventArgs(this, Type, Level, Body));
 		}
 
 		internal Task LogMessage(QueryMessageEventArgs e)
 		{
+			this.nrMessagesReported++;
 			return this.Raise(this.OnMessage, e);
 		}
 
@@ -450,11 +531,13 @@ namespace Waher.Things.Queries
 		/// <param name="Title">Title.</param>
 		public Task SetTitle(string Title)
 		{
+			this.hasTitle = true;
 			return this.Raise(this.OnTitle, new QueryTitleEventArgs(this, Title));
 		}
 
 		internal Task SetTitle(QueryTitleEventArgs e)
 		{
+			this.hasTitle = true;
 			return this.Raise(this.OnTitle, e);
 		}
 
@@ -519,11 +602,13 @@ namespace Waher.Things.Queries
 		/// <param name="Header">Section Title.</param>
 		public Task BeginSection(string Header)
 		{
+			this.nrSectionsBegun++;
 			return this.Raise(this.OnBeginSection, new QueryTitleEventArgs(this, Header));
 		}
 
 		internal Task BeginSection(QueryTitleEventArgs e)
 		{
+			this.nrSectionsBegun++;
 			return this.Raise(this.OnBeginSection, e);
 		}
 
@@ -538,11 +623,13 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public Task EndSection()
 		{
+			this.nrSectionsEnded++;
 			return this.Raise(this.OnEndSection, new QueryEventArgs(this), true);
 		}
 
 		internal Task EndSection(QueryEventArgs e)
 		{
+			this.nrSectionsEnded++;
 			return this.Raise(this.OnEndSection, e, true);
 		}
 

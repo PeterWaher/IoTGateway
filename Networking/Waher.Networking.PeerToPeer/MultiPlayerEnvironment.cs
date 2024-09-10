@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Net;
 using Waher.Events;
 using Waher.Networking.MQTT;
+#if LineListener
+using Waher.Runtime.Console;
+#endif
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -229,7 +232,7 @@ namespace Waher.Networking.PeerToPeer
 				await this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 
 #if LineListener
-				Console.Out.WriteLine("Tx: HELLO(" + this.localPlayer.ToString() + ")");
+				ConsoleOut.WriteLine("Tx: HELLO(" + this.localPlayer.ToString() + ")");
 #endif
 			}
 		}
@@ -299,7 +302,7 @@ namespace Waher.Networking.PeerToPeer
 						break;
 
 #if LineListener
-					Console.Out.WriteLine("Rx: HELLO(" + Player.ToString() + ")");
+					ConsoleOut.WriteLine("Rx: HELLO(" + Player.ToString() + ")");
 #endif
 					IPEndPoint ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
@@ -336,7 +339,7 @@ namespace Waher.Networking.PeerToPeer
 						break;
 
 #if LineListener
-					Console.Out.Write("Rx: INTERCONNECT(" + Player.ToString());
+					ConsoleOut.Write("Rx: INTERCONNECT(" + Player.ToString());
 #endif
 					int Index = 0;
 					int i, c;
@@ -353,7 +356,7 @@ namespace Waher.Networking.PeerToPeer
 						if (Player is null)
 						{
 #if LineListener
-							Console.Out.Write("," + this.localPlayer.ToString());
+							ConsoleOut.Write("," + this.localPlayer.ToString());
 #endif
 							this.localPlayer.Index = Index++;
 							LocalPlayerIncluded = true;
@@ -361,7 +364,7 @@ namespace Waher.Networking.PeerToPeer
 						else
 						{
 #if LineListener
-							Console.Out.Write("," + Player.ToString());
+							ConsoleOut.Write("," + Player.ToString());
 #endif
 							Player.Index = Index++;
 							Players.AddLast(Player);
@@ -369,7 +372,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 
 #if LineListener
-					Console.Out.WriteLine(")");
+					ConsoleOut.WriteLine(")");
 #endif
 					if (!LocalPlayerIncluded)
 						break;
@@ -416,7 +419,7 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 #if LineListener
-						Console.Out.WriteLine("Rx: BYE(" + Player.ToString() + ")");
+						ConsoleOut.WriteLine("Rx: BYE(" + Player.ToString() + ")");
 #endif
 						ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
@@ -459,7 +462,7 @@ namespace Waher.Networking.PeerToPeer
 			IPEndPoint Endpoint = (IPEndPoint)Peer.Tcp.Client.Client.RemoteEndPoint;
 
 #if LineListener
-			Console.Out.WriteLine("Receiving connection from " + Endpoint.ToString());
+			ConsoleOut.WriteLine("Receiving connection from " + Endpoint.ToString());
 #endif
 
 			lock (this.remotePlayersByEndpoint)
@@ -770,7 +773,7 @@ namespace Waher.Networking.PeerToPeer
 			this.Serialize(this.localPlayer, Output);
 
 #if LineListener
-			Console.Out.Write("Tx: INTERCONNECT(" + this.localPlayer.ToString());
+			ConsoleOut.Write("Tx: INTERCONNECT(" + this.localPlayer.ToString());
 #endif
 			lock (this.remotePlayersByEndpoint)
 			{
@@ -782,7 +785,7 @@ namespace Waher.Networking.PeerToPeer
 					this.Serialize(Player, Output);
 
 #if LineListener
-					Console.Out.Write("," + Player.ToString());
+					ConsoleOut.Write("," + Player.ToString());
 #endif
 				}
 			}
@@ -791,7 +794,7 @@ namespace Waher.Networking.PeerToPeer
 			this.mqttConnection.OnPublished += this.MqttConnection_OnPublished;
 
 #if LineListener
-			Console.Out.WriteLine(")");
+			ConsoleOut.WriteLine(")");
 #endif
 			await this.StartConnecting();
 		}
@@ -799,7 +802,7 @@ namespace Waher.Networking.PeerToPeer
 		private async Task StartConnecting()
 		{
 #if LineListener
-			Console.Out.WriteLine("Current player has index " + this.localPlayer.Index.ToString());
+			ConsoleOut.WriteLine("Current player has index " + this.localPlayer.Index.ToString());
 #endif
 			if (this.remotePlayers.Length == 0)
 				await this.SetState(MultiPlayerState.Ready);
@@ -810,7 +813,7 @@ namespace Waher.Networking.PeerToPeer
 					if (Player.Index < this.localPlayer.Index)
 					{
 #if LineListener
-						Console.Out.WriteLine("Connecting to " + Player.ToString() + " (index " + Player.Index.ToString() + ")");
+						ConsoleOut.WriteLine("Connecting to " + Player.ToString() + " (index " + Player.Index.ToString() + ")");
 #endif
 						PeerConnection Connection = await this.p2pNetwork.ConnectToPeer(Player.PublicEndpoint);
 
@@ -823,7 +826,7 @@ namespace Waher.Networking.PeerToPeer
 					else
 					{
 #if LineListener
-						Console.Out.WriteLine("Waiting for connection from " + Player.ToString() + " (index " + Player.Index.ToString() + ")");
+						ConsoleOut.WriteLine("Waiting for connection from " + Player.ToString() + " (index " + Player.Index.ToString() + ")");
 #endif
 					}
 				}
@@ -1098,7 +1101,7 @@ namespace Waher.Networking.PeerToPeer
 					this.mqttConnection.OnPublished += this.MqttConnection_OnPublished;
 
 #if LineListener
-					Console.Out.WriteLine("Tx: BYE(" + this.localPlayer.ToString() + ")");
+					ConsoleOut.WriteLine("Tx: BYE(" + this.localPlayer.ToString() + ")");
 #endif
 				}
 				else

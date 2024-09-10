@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
@@ -188,30 +188,30 @@ namespace Waher.Utility.Translate
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Translates resource strings from one language to another. It uses an internal");
-					Console.Out.WriteLine("database to check for updates, and performs translations only of new or");
-					Console.Out.WriteLine("updated strings accordingly.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder where intermediate");
-					Console.Out.WriteLine("                      information about translations are kept.");
-					Console.Out.WriteLine("-e                    If encryption is used by the database.");
-					Console.Out.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-rf REFERENCE_FILE    Reference resource file, containing the reference");
-					Console.Out.WriteLine("                      language strings");
-					Console.Out.WriteLine("-rl REF_LANGUAGE      Reference language code.");
-					Console.Out.WriteLine("-tl TO_LANGUAGE       Language code to translate to.");
-					Console.Out.WriteLine("-tf TO_FILE           Resource file of translation. If it exists, will be used");
-					Console.Out.WriteLine("                      to update the reference database of manual translations.");
-					Console.Out.WriteLine("-df DIFF_FILE         Resource file containing translated strings only.");
-					Console.Out.WriteLine("-ns NAMESPACE         Optional namespace. If not provided, the language to");
-					Console.Out.WriteLine("                      translate to will be used.");
-					Console.Out.WriteLine("-tk TRANSLATION_KEY   Microsoft Translator Key. Will be stored in the database");
-					Console.Out.WriteLine("                      if provided, for reference. If not provided, value in");
-					Console.Out.WriteLine("                      database will be used.");
+					ConsoleOut.WriteLine("Translates resource strings from one language to another. It uses an internal");
+					ConsoleOut.WriteLine("database to check for updates, and performs translations only of new or");
+					ConsoleOut.WriteLine("updated strings accordingly.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder where intermediate");
+					ConsoleOut.WriteLine("                      information about translations are kept.");
+					ConsoleOut.WriteLine("-e                    If encryption is used by the database.");
+					ConsoleOut.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
+					ConsoleOut.WriteLine("-rf REFERENCE_FILE    Reference resource file, containing the reference");
+					ConsoleOut.WriteLine("                      language strings");
+					ConsoleOut.WriteLine("-rl REF_LANGUAGE      Reference language code.");
+					ConsoleOut.WriteLine("-tl TO_LANGUAGE       Language code to translate to.");
+					ConsoleOut.WriteLine("-tf TO_FILE           Resource file of translation. If it exists, will be used");
+					ConsoleOut.WriteLine("                      to update the reference database of manual translations.");
+					ConsoleOut.WriteLine("-df DIFF_FILE         Resource file containing translated strings only.");
+					ConsoleOut.WriteLine("-ns NAMESPACE         Optional namespace. If not provided, the language to");
+					ConsoleOut.WriteLine("                      translate to will be used.");
+					ConsoleOut.WriteLine("-tk TRANSLATION_KEY   Microsoft Translator Key. Will be stored in the database");
+					ConsoleOut.WriteLine("                      if provided, for reference. If not provided, value in");
+					ConsoleOut.WriteLine("                      database will be used.");
 					return 0;
 				}
 
@@ -241,232 +241,224 @@ namespace Waher.Utility.Translate
 					typeof(InternetContent).Assembly,
 					typeof(ObjectSerializer).Assembly);
 
-				using (FilesProvider FilesProvider = FilesProvider.CreateAsync(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 3600000, Encryption, false).Result)
+				using FilesProvider FilesProvider = FilesProvider.CreateAsync(ProgramDataFolder, "Default", BlockSize, 10000, BlobBlockSize, Encoding, 3600000, Encryption, false).Result;
+
+				Database.Register(FilesProvider);
+
+				if (string.IsNullOrEmpty(TranslationKey))
 				{
-					Database.Register(FilesProvider);
-
+					TranslationKey = RuntimeSettings.Get("Translation.Key", string.Empty);
 					if (string.IsNullOrEmpty(TranslationKey))
+						throw new Exception("No translation key provided, and no translation key found in database.");
+				}
+				else
+					RuntimeSettings.Set("Translation.Key", TranslationKey);
+
+				XmlDocument From = new()
+				{
+					PreserveWhitespace = true
+				};
+				From.Load(ReferenceFileName);
+
+				if (From.DocumentElement is null || From.DocumentElement.LocalName != "root")
+					throw new Exception("Reference file does not point to a resource file.");
+
+				Language FromLanguage = Translator.GetLanguageAsync(ReferenceLanguage).Result
+					?? Translator.CreateLanguageAsync(ReferenceLanguage, ReferenceLanguage, null, 0, 0).Result;
+
+				Language ToLanguage = Translator.GetLanguageAsync(TranslationLanguage).Result
+					?? Translator.CreateLanguageAsync(TranslationLanguage, TranslationLanguage, null, 0, 0).Result;
+
+				Namespace FromNamespace = FromLanguage.GetNamespaceAsync(Namespace).Result
+					?? FromLanguage.CreateNamespaceAsync(Namespace).Result;
+
+				Namespace ToNamespace = ToLanguage.GetNamespaceAsync(Namespace).Result
+					?? ToLanguage.CreateNamespaceAsync(Namespace).Result;
+
+				List<TranslationItem> ToTranslate = new();
+				List<string> StringIds = new();
+				XmlComment FromComment = null;
+				XmlElement FromSchema = null;
+				List<KeyValuePair<string, string>> Headers = new();
+
+				foreach (XmlNode N in From.DocumentElement.ChildNodes)
+				{
+					if (N is XmlComment Comment)
+						FromComment = Comment;
+					else if (N is XmlElement E)
 					{
-						TranslationKey = RuntimeSettings.Get("Translation.Key", string.Empty);
-						if (string.IsNullOrEmpty(TranslationKey))
-							throw new Exception("No translation key provided, and no translation key found in database.");
-					}
-					else
-						RuntimeSettings.Set("Translation.Key", TranslationKey);
-
-					XmlDocument From = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					From.Load(ReferenceFileName);
-
-					if (From.DocumentElement is null || From.DocumentElement.LocalName != "root")
-						throw new Exception("Reference file does not point to a resource file.");
-
-					Language FromLanguage = Translator.GetLanguageAsync(ReferenceLanguage).Result;
-					if (FromLanguage is null)
-						FromLanguage = Translator.CreateLanguageAsync(ReferenceLanguage, ReferenceLanguage, null, 0, 0).Result;
-
-					Language ToLanguage = Translator.GetLanguageAsync(TranslationLanguage).Result;
-					if (ToLanguage is null)
-						ToLanguage = Translator.CreateLanguageAsync(TranslationLanguage, TranslationLanguage, null, 0, 0).Result;
-
-					Namespace FromNamespace = FromLanguage.GetNamespaceAsync(Namespace).Result;
-					if (FromNamespace is null)
-						FromNamespace = FromLanguage.CreateNamespaceAsync(Namespace).Result;
-
-					Namespace ToNamespace = ToLanguage.GetNamespaceAsync(Namespace).Result;
-					if (ToNamespace is null)
-						ToNamespace = ToLanguage.CreateNamespaceAsync(Namespace).Result;
-
-					List<TranslationItem> ToTranslate = new List<TranslationItem>();
-					List<string> StringIds = new List<string>();
-					XmlComment FromComment = null;
-					XmlElement FromSchema = null;
-					List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>();
-
-					foreach (XmlNode N in From.DocumentElement.ChildNodes)
-					{
-						if (N is XmlComment Comment)
-							FromComment = Comment;
-						else if (N is XmlElement E)
+						switch (E.LocalName)
 						{
-							switch (E.LocalName)
-							{
-								case "schema":
-									FromSchema = E;
-									break;
+							case "schema":
+								FromSchema = E;
+								break;
 
-								case "resheader":
-									string Name = E.GetAttribute("name");
-									string Value = E["value"]?.InnerText ?? string.Empty;
+							case "resheader":
+								string Name = E.GetAttribute("name");
+								string Value = E["value"]?.InnerText ?? string.Empty;
 
-									Headers.Add(new KeyValuePair<string, string>(Name, Value));
-									break;
+								Headers.Add(new KeyValuePair<string, string>(Name, Value));
+								break;
 
-								case "data":
-									Name = E.GetAttribute("name");
-									Value = E["value"]?.InnerText ?? string.Empty;
-									bool NewString = false;
+							case "data":
+								Name = E.GetAttribute("name");
+								Value = E["value"]?.InnerText ?? string.Empty;
+								bool NewString = false;
 
-									StringIds.Add(Name);
+								StringIds.Add(Name);
 
-									LanguageString FromString = FromNamespace.GetStringAsync(Name).Result;
-									if (FromString is null || FromString.Value != Value)
-									{
-										NewString = true;
-										FromString = FromNamespace.CreateStringAsync(Name, Value, TranslationLevel.HumanTranslated).Result;
-									}
+								LanguageString FromString = FromNamespace.GetStringAsync(Name).Result;
+								if (FromString is null || FromString.Value != Value)
+								{
+									NewString = true;
+									FromString = FromNamespace.CreateStringAsync(Name, Value, TranslationLevel.HumanTranslated).Result;
+								}
 
-									LanguageString ToString = ToNamespace.GetStringAsync(Name).Result;
-									if (!(ToString is null) && ToString.Level > TranslationLevel.Untranslated && !NewString)
-										continue;
+								LanguageString ToString = ToNamespace.GetStringAsync(Name).Result;
+								if (ToString is not null && ToString.Level > TranslationLevel.Untranslated && !NewString)
+									continue;
 
-									ToTranslate.Add(new TranslationItem()
-									{
-										From = FromString,
-										To = ToString
-									});
-									break;
-							}
+								ToTranslate.Add(new TranslationItem()
+								{
+									From = FromString,
+									To = ToString
+								});
+								break;
 						}
 					}
+				}
 
-					c = ToTranslate.Count;
-					if (c == 0)
-						Console.Out.WriteLine("Strings up-to-date. No translation necessary.");
-					else
+				c = ToTranslate.Count;
+				if (c == 0)
+					ConsoleOut.WriteLine("Strings up-to-date. No translation necessary.");
+				else
+				{
+					ConsoleOut.WriteLine("Translating " + c.ToString() + " strings.");
+
+					List<Dictionary<string, object>> Req = new();
+
+					foreach (TranslationItem Item in ToTranslate)
+						Req.Add(new Dictionary<string, object>() { { "Text", Item.From.Value } });
+
+					StringBuilder Url = new();
+
+					Url.Append("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=");
+					Url.Append(ReferenceLanguage);
+					Url.Append("&to=");
+					Url.Append(TranslationLanguage);
+
+					object Resp = InternetContent.PostAsync(new Uri(Url.ToString()), Req.ToArray(),
+						new KeyValuePair<string, string>("Ocp-Apim-Subscription-Key", TranslationKey)).Result;
+
+					if (Resp is not Array A)
+						throw new Exception("Unexpected reponse returned.");
+
+					List<string> Response = new();
+
+					foreach (object Item in A)
 					{
-						Console.Out.WriteLine("Translating " + c.ToString() + " strings.");
-
-						List<Dictionary<string, object>> Req = new List<Dictionary<string, object>>();
-
-						foreach (TranslationItem Item in ToTranslate)
-							Req.Add(new Dictionary<string, object>() { { "Text", Item.From.Value } });
-
-						StringBuilder Url = new StringBuilder();
-
-						Url.Append("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=");
-						Url.Append(ReferenceLanguage);
-						Url.Append("&to=");
-						Url.Append(TranslationLanguage);
-
-						object Resp = InternetContent.PostAsync(new Uri(Url.ToString()), Req.ToArray(),
-							new KeyValuePair<string, string>("Ocp-Apim-Subscription-Key", TranslationKey)).Result;
-
-						if (!(Resp is Array A))
+						if (Item is not Dictionary<string, object> TypedItem ||
+							!TypedItem.TryGetValue("translations", out object Obj) ||
+							Obj is not Array A2 ||
+							A2.Length != 1 ||
+							A2.GetValue(0) is not Dictionary<string, object> Translation ||
+							!Translation.TryGetValue("text", out object Obj2) ||
+							Obj2 is not string TranslatedText)
+						{
 							throw new Exception("Unexpected reponse returned.");
-
-						List<string> Response = new List<string>();
-
-						foreach (object Item in A)
-						{
-							if (!(Item is Dictionary<string, object> TypedItem) ||
-								!TypedItem.TryGetValue("translations", out object Obj) ||
-								!(Obj is Array A2) ||
-								A2.Length != 1 ||
-								!(A2.GetValue(0) is Dictionary<string, object> Translation) ||
-								!Translation.TryGetValue("text", out object Obj2) ||
-								!(Obj2 is string TranslatedText))
-							{
-								throw new Exception("Unexpected reponse returned.");
-							}
-
-							Response.Add(TranslatedText);
 						}
 
-						if (Response.Count != c)
-							throw new Exception("Unexpected number of translated strings returned.");
-
-						Console.Out.WriteLine(c.ToString() + " strings translated.");
-
-						for (i = 0; i < c; i++)
-						{
-							TranslationItem Item = ToTranslate[i];
-
-							if (Item.To is null)
-								Item.To = ToNamespace.CreateStringAsync(Item.From.Id, Response[i], TranslationLevel.MachineTranslated).Result;
-							else
-							{
-								Item.To.Value = Response[i];
-								Item.To.Level = TranslationLevel.MachineTranslated;
-
-								Database.Update(Item.To).Wait();
-							}
-						}
+						Response.Add(TranslatedText);
 					}
 
-					XmlWriterSettings Settings = new XmlWriterSettings()
+					if (Response.Count != c)
+						throw new Exception("Unexpected number of translated strings returned.");
+
+					ConsoleOut.WriteLine(c.ToString() + " strings translated.");
+
+					for (i = 0; i < c; i++)
 					{
-						CloseOutput = true,
-						ConformanceLevel = ConformanceLevel.Document,
-						Encoding = Encoding.UTF8,
-						Indent = true,
-						IndentChars = "  ",
-						NewLineChars = Environment.NewLine,
-						NewLineHandling = NewLineHandling.Replace
-					};
+						TranslationItem Item = ToTranslate[i];
 
-					using (XmlWriter Output = XmlWriter.Create(ToFileName, Settings))
+						if (Item.To is null)
+							Item.To = ToNamespace.CreateStringAsync(Item.From.Id, Response[i], TranslationLevel.MachineTranslated).Result;
+						else
+						{
+							Item.To.Value = Response[i];
+							Item.To.Level = TranslationLevel.MachineTranslated;
+
+							Database.Update(Item.To).Wait();
+						}
+					}
+				}
+
+				XmlWriterSettings Settings = new()
+				{
+					CloseOutput = true,
+					ConformanceLevel = ConformanceLevel.Document,
+					Encoding = Encoding.UTF8,
+					Indent = true,
+					IndentChars = "  ",
+					NewLineChars = Environment.NewLine,
+					NewLineHandling = NewLineHandling.Replace
+				};
+
+				using (XmlWriter Output = XmlWriter.Create(ToFileName, Settings))
+				{
+					Output.WriteStartDocument();
+					Output.WriteStartElement("root");
+
+					FromComment?.WriteTo(Output);
+					FromSchema?.WriteTo(Output);
+
+					foreach (KeyValuePair<string, string> P in Headers)
 					{
-						Output.WriteStartDocument();
-						Output.WriteStartElement("root");
-
-						if (!(FromComment is null))
-							FromComment.WriteTo(Output);
-
-						if (!(FromSchema is null))
-							FromSchema.WriteTo(Output);
-
-						foreach (KeyValuePair<string, string> P in Headers)
-						{
-							Output.WriteStartElement("resheader");
-							Output.WriteAttributeString("name", P.Key);
-							Output.WriteElementString("value", P.Value);
-							Output.WriteEndElement();
-						}
-
-						foreach (string StringId in StringIds)
-						{
-							LanguageString String = ToNamespace.GetStringAsync(StringId).Result;
-
-							Output.WriteStartElement("data");
-							Output.WriteAttributeString("name", StringId);
-							Output.WriteAttributeString("xml", "space", string.Empty, "preserve");
-							Output.WriteElementString("value", String.Value ?? string.Empty);
-							Output.WriteEndElement();
-						}
-
+						Output.WriteStartElement("resheader");
+						Output.WriteAttributeString("name", P.Key);
+						Output.WriteElementString("value", P.Value);
 						Output.WriteEndElement();
-						Output.WriteEndDocument();
 					}
 
-					if (!string.IsNullOrEmpty(DiffFileName))
+					foreach (string StringId in StringIds)
 					{
-						using XmlWriter Output = XmlWriter.Create(DiffFileName, Settings);
+						LanguageString String = ToNamespace.GetStringAsync(StringId).Result;
 
-						Output.WriteStartDocument();
-						Output.WriteStartElement("root");
-
-						foreach (TranslationItem Item in ToTranslate)
-						{
-							Output.WriteStartElement("data");
-							Output.WriteAttributeString("name", Item.To.Id);
-							Output.WriteAttributeString("xml", "space", string.Empty, "preserve");
-							Output.WriteElementString("value", Item.To.Value);
-							Output.WriteEndElement();
-						}
-
+						Output.WriteStartElement("data");
+						Output.WriteAttributeString("name", StringId);
+						Output.WriteAttributeString("xml", "space", string.Empty, "preserve");
+						Output.WriteElementString("value", String.Value ?? string.Empty);
 						Output.WriteEndElement();
-						Output.WriteEndDocument();
 					}
+
+					Output.WriteEndElement();
+					Output.WriteEndDocument();
+				}
+
+				if (!string.IsNullOrEmpty(DiffFileName))
+				{
+					using XmlWriter Output = XmlWriter.Create(DiffFileName, Settings);
+
+					Output.WriteStartDocument();
+					Output.WriteStartElement("root");
+
+					foreach (TranslationItem Item in ToTranslate)
+					{
+						Output.WriteStartElement("data");
+						Output.WriteAttributeString("name", Item.To.Id);
+						Output.WriteAttributeString("xml", "space", string.Empty, "preserve");
+						Output.WriteElementString("value", Item.To.Value);
+						Output.WriteEndElement();
+					}
+
+					Output.WriteEndElement();
+					Output.WriteEndDocument();
 				}
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

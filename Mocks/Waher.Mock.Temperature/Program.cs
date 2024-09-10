@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
-using Waher.Things;
-using Waher.Things.SensorData;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Interoperability;
-using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Console;
+using Waher.Things;
+using Waher.Things.SensorData;
 
 namespace Waher.Mock.Temperature
 {
@@ -34,13 +35,13 @@ namespace Waher.Mock.Temperature
 		{
 			try
 			{
-				Console.ForegroundColor = ConsoleColor.White;
+				ConsoleOut.ForegroundColor = ConsoleColor.White;
 
-				Console.Out.WriteLine("Welcome to the Mock Temperature sensor application.");
-				Console.Out.WriteLine(new string('-', 79));
-				Console.Out.WriteLine("This application will simulate an outside temperature sensor.");
-				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the Neuro-Foundation IoT extensions.");
-				Console.Out.WriteLine("You can also chat with the sensor.");
+				ConsoleOut.WriteLine("Welcome to the Mock Temperature sensor application.");
+				ConsoleOut.WriteLine(new string('-', 79));
+				ConsoleOut.WriteLine("This application will simulate an outside temperature sensor.");
+				ConsoleOut.WriteLine("Values will be published over XMPP using the interface defined in the Neuro-Foundation IoT extensions.");
+				ConsoleOut.WriteLine("You can also chat with the sensor.");
 
 				Log.RegisterAlertExceptionType(true,
 					typeof(OutOfMemoryException),
@@ -375,8 +376,8 @@ namespace Waher.Mock.Temperature
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.ForegroundColor = ConsoleColor.Red;
+				ConsoleOut.WriteLine(ex.Message);
 			}
 			finally
 			{

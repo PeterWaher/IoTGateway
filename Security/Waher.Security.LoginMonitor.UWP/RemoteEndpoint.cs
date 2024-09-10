@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Security.LoginMonitor
@@ -10,7 +11,7 @@ namespace Waher.Security.LoginMonitor
 	/// </summary>
 	[CollectionName("RemoteEndpoints")]
 	[TypeName(TypeNameSerialization.None)]
-	[ArchivingTime("ArchiveDays")]
+	[ArchivingTime(nameof(ArchiveDays))]
 	[Index("Endpoint", "Created")]
 	[Index("Blocked", "Endpoint", "Created")]
 	public class RemoteEndpoint
@@ -25,6 +26,7 @@ namespace Waher.Security.LoginMonitor
 		private string country = string.Empty;
 		private string code = string.Empty;
 		private string flag = string.Empty;
+		private CaseInsensitiveString domain = string.Empty;
 		private bool blocked = false;
 		private int[] state = null;
 		private DateTime[] timestamps = null;
@@ -173,6 +175,16 @@ namespace Waher.Security.LoginMonitor
 		{
 			get => this.flag;
 			set => this.flag = value;
+		}
+
+		/// <summary>
+		/// Domain where record originated.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public CaseInsensitiveString Domain
+		{
+			get => this.domain;
+			set => this.domain = value;
 		}
 
 		/// <summary>

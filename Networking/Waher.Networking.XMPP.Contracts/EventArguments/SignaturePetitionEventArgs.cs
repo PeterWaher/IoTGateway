@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Xml;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -21,6 +22,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly string purpose;
 		private readonly byte[] content;
 		private readonly string clientEndpoint;
+		private readonly XmlElement context;
 
 		/// <summary>
 		/// Event arguments for legal identity petitions
@@ -33,8 +35,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
 		/// <param name="Content">Content to sign.</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
+		/// <param name="Context">Any machine-readable context XML element available in the petition.</param>
 		public SignaturePetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorFullJid,
-			string SignatoryIdentityId, string PetitionId, string Purpose, byte[] Content, string ClientEndpoint)
+			string SignatoryIdentityId, string PetitionId, string Purpose, byte[] Content, string ClientEndpoint, XmlElement Context)
 			: base(e)
 		{
 			this.requestorIdentity = RequestorIdentity;
@@ -44,6 +47,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.purpose = Purpose;
 			this.content = Content;
 			this.clientEndpoint = ClientEndpoint;
+			this.context = Context;
 		}
 
 		/// <summary>
@@ -80,5 +84,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Remote endpoint of remote party client.
 		/// </summary>
 		public string ClientEndpoint => this.clientEndpoint;
+
+		/// <summary>
+		/// Any machine-readable context XML element available in the petition.
+		/// </summary>
+		public XmlElement Context => this.context;
 	}
 }

@@ -313,7 +313,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Vector element.</returns>
 		public override IElement GetElement(int Index)
 		{
-			if (Index < 0 || Index >= this.elements.Count)
+			if (Index < 0 || Index >= this.dimension)
 				throw new ScriptException("Index out of bounds.");
 
 			IElement[] V = this.Values;

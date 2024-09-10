@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

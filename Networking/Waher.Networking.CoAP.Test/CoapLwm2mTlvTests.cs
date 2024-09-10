@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Networking.LWM2M.ContentFormats;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.CoAP.Test
 {
@@ -327,7 +328,7 @@ namespace Waher.Networking.CoAP.Test
 			Assert.IsNotNull(Records);
 
 			foreach (TlvRecord Record in Records)
-				Console.Out.WriteLine(Record.ToString());
+				ConsoleOut.WriteLine(Record.ToString());
 		}
 
 	}

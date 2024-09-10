@@ -14,6 +14,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.SHA3;
 using static System.Environment;
@@ -241,45 +242,45 @@ namespace Waher.Utility.Install
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("-m MANIFEST_FILE     Points to a manifest file describing the files in the module.");
-					Console.Out.WriteLine("                     If multiple manifest files are referened, they are processed");
-					Console.Out.WriteLine("                     in the order they are listed.");
-					Console.Out.WriteLine("-p PACKAGE_FILE      If provided together with a manifest file, files will be");
-					Console.Out.WriteLine("                     packed into a package file that can be easily distributed,");
-					Console.Out.WriteLine("                     instead of being installed on the local machine.");
-					Console.Out.WriteLine("                     If a manifest file is not specified, the package file will");
-					Console.Out.WriteLine("                     be used instead.");
-					Console.Out.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder. Required if");
-					Console.Out.WriteLine("                     installing a module.");
-					Console.Out.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway. Required");
-					Console.Out.WriteLine("                     if installing a module.");
-					Console.Out.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
-					Console.Out.WriteLine("                     encryption is based on the local package file name and the");
-					Console.Out.WriteLine("                     KEY parameter, if provided. You cannot rename a package file.");
-					Console.Out.WriteLine("-x CATEGORY          If working with manifest files, excludes a category from");
-					Console.Out.WriteLine("                     processing. Categories are case-insensitive.");
-					Console.Out.WriteLine("-dk DOCKER_FILE      If provided together with one or more manifest files, a Docker");
-					Console.Out.WriteLine("                     file will be generated. the -d switch specifies a folder within");
-					Console.Out.WriteLine("                     the Docker image where content files will be copied. The -s");
-					Console.Out.WriteLine("                     switch specifies a full path of the server executable within");
-					Console.Out.WriteLine("                     the Docker image.");
-					Console.Out.WriteLine("-v                   Verbose mode.");
-					Console.Out.WriteLine("-i                   Install. This the default. Switch not required.");
-					Console.Out.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
-					Console.Out.WriteLine("-r                   Remove files. Add this switch if you want files removed during");
-					Console.Out.WriteLine("                     uninstallation. Default is to not remove files.");
-					Console.Out.WriteLine("-n INSTANCE          Name of instance. Default is the empty string. Parallel instances");
-					Console.Out.WriteLine("                     of the IoT Gateway can execute, provided they are given separate");
-					Console.Out.WriteLine("                     instance names. This property is used in conjunction with the -w");
-					Console.Out.WriteLine("                     property.");
-					Console.Out.WriteLine("-w MILLISECONDS      Waits for the Gateway to stop executing before performing the");
-					Console.Out.WriteLine("                     operation. If the gateway does not stop within this period of");
-					Console.Out.WriteLine("                     time, the operation fails. (Default=60000)");
-					Console.Out.WriteLine("-co                  If only content (content only) should be installed.");
-					Console.Out.WriteLine("-?                   Help.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
-					Console.Out.WriteLine("      one operation.");
+					ConsoleOut.WriteLine("-m MANIFEST_FILE     Points to a manifest file describing the files in the module.");
+					ConsoleOut.WriteLine("                     If multiple manifest files are referened, they are processed");
+					ConsoleOut.WriteLine("                     in the order they are listed.");
+					ConsoleOut.WriteLine("-p PACKAGE_FILE      If provided together with a manifest file, files will be");
+					ConsoleOut.WriteLine("                     packed into a package file that can be easily distributed,");
+					ConsoleOut.WriteLine("                     instead of being installed on the local machine.");
+					ConsoleOut.WriteLine("                     If a manifest file is not specified, the package file will");
+					ConsoleOut.WriteLine("                     be used instead.");
+					ConsoleOut.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder. Required if");
+					ConsoleOut.WriteLine("                     installing a module.");
+					ConsoleOut.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway. Required");
+					ConsoleOut.WriteLine("                     if installing a module.");
+					ConsoleOut.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
+					ConsoleOut.WriteLine("                     encryption is based on the local package file name and the");
+					ConsoleOut.WriteLine("                     KEY parameter, if provided. You cannot rename a package file.");
+					ConsoleOut.WriteLine("-x CATEGORY          If working with manifest files, excludes a category from");
+					ConsoleOut.WriteLine("                     processing. Categories are case-insensitive.");
+					ConsoleOut.WriteLine("-dk DOCKER_FILE      If provided together with one or more manifest files, a Docker");
+					ConsoleOut.WriteLine("                     file will be generated. the -d switch specifies a folder within");
+					ConsoleOut.WriteLine("                     the Docker image where content files will be copied. The -s");
+					ConsoleOut.WriteLine("                     switch specifies a full path of the server executable within");
+					ConsoleOut.WriteLine("                     the Docker image.");
+					ConsoleOut.WriteLine("-v                   Verbose mode.");
+					ConsoleOut.WriteLine("-i                   Install. This the default. Switch not required.");
+					ConsoleOut.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
+					ConsoleOut.WriteLine("-r                   Remove files. Add this switch if you want files removed during");
+					ConsoleOut.WriteLine("                     uninstallation. Default is to not remove files.");
+					ConsoleOut.WriteLine("-n INSTANCE          Name of instance. Default is the empty string. Parallel instances");
+					ConsoleOut.WriteLine("                     of the IoT Gateway can execute, provided they are given separate");
+					ConsoleOut.WriteLine("                     instance names. This property is used in conjunction with the -w");
+					ConsoleOut.WriteLine("                     property.");
+					ConsoleOut.WriteLine("-w MILLISECONDS      Waits for the Gateway to stop executing before performing the");
+					ConsoleOut.WriteLine("                     operation. If the gateway does not stop within this period of");
+					ConsoleOut.WriteLine("                     time, the operation fails. (Default=60000)");
+					ConsoleOut.WriteLine("-co                  If only content (content only) should be installed.");
+					ConsoleOut.WriteLine("-?                   Help.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
+					ConsoleOut.WriteLine("      one operation.");
 					return 0;
 				}
 
@@ -301,7 +302,7 @@ namespace Waher.Utility.Install
 						if (Timeout.HasValue && !ContentOnly)
 						{
 							if (Verbose)
-								Console.Out.WriteLine("Making sure server is closed...");
+								ConsoleOut.WriteLine("Making sure server is closed...");
 
 							GatewayRunning = new Mutex(false, "Waher.IoTGateway.Running" + Suffix);
 							if (!GatewayRunning.WaitOne(Timeout.Value))
@@ -316,7 +317,7 @@ namespace Waher.Utility.Install
 							StartingServerLocked = true;
 
 							if (Verbose)
-								Console.Out.WriteLine("Server is closed. Proceeding...");
+								ConsoleOut.WriteLine("Server is closed. Proceeding...");
 						}
 
 						if (Packages.First is not null)
@@ -394,7 +395,7 @@ namespace Waher.Utility.Install
 			{
 				Log.Exception(ex);
 
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 			finally

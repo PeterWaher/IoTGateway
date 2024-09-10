@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.Xml;
+using Waher.Runtime.Console;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -28,21 +28,21 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedXml = await Doc.ExportXml();
 
-			Console.Out.WriteLine(GeneratedXml);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedXml);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXml, "Generated XML does not match expected XML.");
 
 			MarkdownStatistics Statistics = Doc.GetStatistics();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine(JSON.Encode(Statistics, true));
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine(JSON.Encode(Statistics, true));
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 		}
 
 		[TestMethod]

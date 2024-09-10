@@ -1,14 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Reflection;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Search;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -18,16 +13,16 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Search_Test_01_FindSearchForms()
 		{
-			string[] JIDs = SearchJIDs();
+			string[] JIDs = this.SearchJIDs();
 
 			foreach (string JID in JIDs)
-				Console.Out.WriteLine(JID);
+				ConsoleOut.WriteLine(JID);
 		}
 
 		private string[] SearchJIDs()
 		{
 			this.ConnectClients();
-			List<string> SupportsSearch = new List<string>();
+			List<string> SupportsSearch = new();
 
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
 			if (e.Features.ContainsKey(XmppClient.NamespaceSearch))
@@ -47,49 +42,49 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void Search_Test_02_GetSearchForms()
 		{
-			string[] JIDs = SearchJIDs();
+			string[] JIDs = this.SearchJIDs();
 
 			foreach (string JID in JIDs)
 			{
 				SearchFormEventArgs e = this.client1.SearchForm(JID, 10000);
-				this.Print(e);
+				Print(e);
 			}
 		}
 
-		private void Print(SearchFormEventArgs e)
+		private static void Print(SearchFormEventArgs e)
 		{
-			Console.Out.WriteLine("Instructions:" + e.Instructions);
-			Console.Out.WriteLine("First Name:" + e.FirstName);
-			Console.Out.WriteLine("Last Name:" + e.LastName);
-			Console.Out.WriteLine("Nick Name:" + e.NickName);
-			Console.Out.WriteLine("EMail:" + e.EMail);
+			ConsoleOut.WriteLine("Instructions:" + e.Instructions);
+			ConsoleOut.WriteLine("First Name:" + e.FirstName);
+			ConsoleOut.WriteLine("Last Name:" + e.LastName);
+			ConsoleOut.WriteLine("Nick Name:" + e.NickName);
+			ConsoleOut.WriteLine("EMail:" + e.EMail);
 
-			if (!(e.SearchForm is null))
+			if (e.SearchForm is not null)
 			{
 				foreach (Field Field in e.SearchForm.Fields)
-					Console.Out.WriteLine(Field.Var + ": " + Field.ValueString + " (" + Field.GetType().Name + ")");
+					ConsoleOut.WriteLine(Field.Var + ": " + Field.ValueString + " (" + Field.GetType().Name + ")");
 			}
 		}
 
 		[TestMethod]
 		public void Search_Test_03_DoSearch()
 		{
-			string[] JIDs = SearchJIDs();
+			string[] JIDs = this.SearchJIDs();
 
 			foreach (string JID in JIDs)
 			{
 				SearchFormEventArgs e = this.client1.SearchForm(JID, 10000);
 				SearchResultEventArgs e2 = e.Search(10000);
-				this.Print(e2);
+				Print(e2);
 			}
 		}
 
-		private void Print(SearchResultEventArgs e)
+		private static void Print(SearchResultEventArgs e)
 		{
 			foreach (Dictionary<string, string> Record in e.Records)
 			{
 				foreach (KeyValuePair<string, string> P in Record)
-					Console.Out.WriteLine(P.Key + "=" + P.Value);
+					ConsoleOut.WriteLine(P.Key + "=" + P.Value);
 			}
 		}
 

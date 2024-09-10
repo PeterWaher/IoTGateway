@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 
@@ -288,15 +288,15 @@ namespace Waher.Runtime.Text.Test
 		[DataRow("Port: https \t Tipo: Exploits \t Fecha: 29/11/2023 \t Hora: 17:20:26 \t IP: 10.0.3.15", https, "Exploits", "2023-11-29T17:20:26", "10.0.3.15")]
 		public async Task Test_02_NetworkRecords(string Input, double Port, string Type, string XmlTimestamp, string Endpoint)
 		{
-			Console.Out.WriteLine("Input:");
-			Console.Out.WriteLine(Input);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine("Input:");
+			ConsoleOut.WriteLine(Input);
+			ConsoleOut.WriteLine();
 
 			Assert.IsTrue(networkRecordMaps.TryMap(Input, out string Harmonized));
 
-			Console.Out.WriteLine("Harmonized:");
-			Console.Out.WriteLine(Harmonized);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine("Harmonized:");
+			ConsoleOut.WriteLine(Harmonized);
+			ConsoleOut.WriteLine();
 
 			object Obj = await Expression.EvalAsync(Harmonized);
 			Dictionary<string, IElement> Record = Obj as Dictionary<string, IElement>;

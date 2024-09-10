@@ -73,6 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\Waher.Content.Dsn\Waher.Content.Dsn.csproj" />
     <ProjectReference Include="..\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />

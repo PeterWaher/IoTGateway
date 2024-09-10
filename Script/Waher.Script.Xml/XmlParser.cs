@@ -197,7 +197,8 @@ namespace Waher.Script.Xml
 
 								Parser.SkipChars(2);
 
-								Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
+								if (!(Node is null))
+									Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
 								break;
 
 							case "<(":

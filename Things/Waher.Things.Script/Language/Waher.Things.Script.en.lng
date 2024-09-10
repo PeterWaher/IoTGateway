@@ -95,10 +95,10 @@
 			<String id="91">Script that gets evaluated when then query is executed.</String>
 			<String id="92">Script that is evaluated when query is executed. Use the &quot;this&quot; variable to refer to the script node publishing the query. The &quot;Query&quot; variable will contain the current state of the query, while the &quot;Language&quot; variable contains the selected language.</String>
 			<String id="93">Script Query</String>
-			<String id="94"></String>
-			<String id="95"></String>
-			<String id="96"></String>
-			<String id="97"></String>
+			<String id="94">Query Result</String>
+			<String id="95">Executing Query...</String>
+			<String id="96">Processing Result...</String>
+			<String id="97">Result Set</String>
 			<String id="98"></String>
 			<String id="99"></String>
 			<String id="100"></String>

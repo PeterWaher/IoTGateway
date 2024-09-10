@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -38,7 +39,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (!(this.provider is null))
+			if (this.provider is not null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
@@ -49,7 +50,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_Provider_01_ByReference()
 		{
-			ByReference Obj = new ByReference()
+			ByReference Obj = new()
 			{
 				Default = DBFilesBTreeTests.CreateDefault(100),
 				Simple = DBFilesBTreeTests.CreateSimple(100)
@@ -59,7 +60,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ObjectBTreeFile File = await this.provider.GetFile("Default");
 			await DBFilesBTreeTests.AssertConsistent(File, this.provider, 3, Obj, true);
-			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(File, "Data\\BTree.xml", false));
+			ConsoleOut.WriteLine(await DBFilesBTreeTests.ExportXML(File, "Data\\BTree.xml", false));
 
 			Assert.AreNotEqual(Guid.Empty, Obj.ObjectId);
 			Assert.AreNotEqual(Guid.Empty, Obj.Default.ObjectId);

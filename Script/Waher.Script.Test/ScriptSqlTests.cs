@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
@@ -110,10 +111,10 @@ namespace Waher.Script.Test
 
 		private async Task Test(string Script, object[][] ExpectedOutput)
 		{
-			Variables v = new Variables();
-			Expression Exp = new Expression(Script);
+			Variables v = new();
+			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
-			Console.Out.WriteLine(Expression.ToString(Obj));
+			ConsoleOut.WriteLine(Expression.ToString(Obj));
 			
 			ObjectMatrix M = Obj as ObjectMatrix;
 			int NrRows, RowIndex;
@@ -136,9 +137,9 @@ namespace Waher.Script.Test
 	
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine();
-			Exp.ToXml(Console.Out);
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
 		}
 
 		#region SELECT

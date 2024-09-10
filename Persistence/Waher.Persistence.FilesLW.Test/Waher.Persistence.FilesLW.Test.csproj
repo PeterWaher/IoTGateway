@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj" />

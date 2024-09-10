@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Waher.Content;
 using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Runtime.Console;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.Test
@@ -65,19 +65,19 @@ namespace Waher.Networking.HTTP.Test
 
 			if (Output)
 			{
-				Console.Out.WriteLine("Input: " + Data.Length + " bytes");
-				Console.Out.WriteLine("Output: " + Compressed.Length + " bytes");
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine("Input: " + Data.Length + " bytes");
+				ConsoleOut.WriteLine("Output: " + Compressed.Length + " bytes");
+				ConsoleOut.WriteLine();
 			}
 
 			Profiler.Stop();
 
 			if (Output)
 			{
-				Console.Out.WriteLine();
-				Console.Out.WriteLine("```uml");
-				Console.Out.WriteLine(Profiler.ExportPlantUml(TimeUnit.MilliSeconds));
-				Console.Out.WriteLine("```");
+				ConsoleOut.WriteLine();
+				ConsoleOut.WriteLine("```uml");
+				ConsoleOut.WriteLine(Profiler.ExportPlantUml(TimeUnit.MilliSeconds));
+				ConsoleOut.WriteLine("```");
 			}
 		}
 
@@ -109,8 +109,8 @@ namespace Waher.Networking.HTTP.Test
 
 			await Test<T>(FileNames[0], false, Watch, false);  // To remove JIT times
 
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine(":=[");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine(":=[");
 
 			int i, c = FileNames.Length;
 
@@ -135,37 +135,37 @@ namespace Waher.Networking.HTTP.Test
 				}
 			}
 
-			Console.Out.WriteLine("];");
+			ConsoleOut.WriteLine("];");
 
-			Console.Out.Write(VariableName);
-			Console.Out.Write("Size:=scatter2d(");
-			Console.Out.Write(VariableName);
-			Console.Out.Write("[0,],");
-			Console.Out.Write(VariableName);
-			Console.Out.Write("[1,],\"");
-			Console.Out.Write(Color);
-			Console.Out.WriteLine("\");");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Size.LabelX:='File (Bytes)';");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Size.LabelY:='Compressed (Bytes)';");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Size.Title:='Size';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("Size:=scatter2d(");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("[0,],");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("[1,],\"");
+			ConsoleOut.Write(Color);
+			ConsoleOut.WriteLine("\");");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Size.LabelX:='File (Bytes)';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Size.LabelY:='Compressed (Bytes)';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Size.Title:='Size';");
 
-			Console.Out.Write(VariableName);
-			Console.Out.Write("Time:=scatter2d(");
-			Console.Out.Write(VariableName);
-			Console.Out.Write("[0,],");
-			Console.Out.Write(VariableName);
-			Console.Out.Write("[2,],\"");
-			Console.Out.Write(Color);
-			Console.Out.WriteLine("\");");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Time.LabelX:='File (Bytes)';");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Time.LabelY:='Time (ms)';");
-			Console.Out.Write(VariableName);
-			Console.Out.WriteLine("Time.Title:='Time';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("Time:=scatter2d(");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("[0,],");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.Write("[2,],\"");
+			ConsoleOut.Write(Color);
+			ConsoleOut.WriteLine("\");");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Time.LabelX:='File (Bytes)';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Time.LabelY:='Time (ms)';");
+			ConsoleOut.Write(VariableName);
+			ConsoleOut.WriteLine("Time.Title:='Time';");
 		}
 
 		private static async Task Test<T>(string FilePath, bool Output, Stopwatch Watch, bool Last)
@@ -188,20 +188,20 @@ namespace Waher.Networking.HTTP.Test
 
 			if (Output)
 			{
-				Console.Out.Write("\t[");
-				Console.Out.Write(Data.Length);
-				Console.Out.Write(',');
-				Console.Out.Write(Compressed.Length);
-				Console.Out.Write(',');
-				Console.Out.Write(CommonTypes.Encode(TicksPerMs));
-				Console.Out.Write(",\"");
-				Console.Out.Write(JSON.Encode(FilePath));
-				Console.Out.Write("\"]");
+				ConsoleOut.Write("\t[");
+				ConsoleOut.Write(Data.Length);
+				ConsoleOut.Write(',');
+				ConsoleOut.Write(Compressed.Length);
+				ConsoleOut.Write(',');
+				ConsoleOut.Write(CommonTypes.Encode(TicksPerMs));
+				ConsoleOut.Write(",\"");
+				ConsoleOut.Write(JSON.Encode(FilePath));
+				ConsoleOut.Write("\"]");
 
 				if (!Last)
-					Console.Out.Write(',');
+					ConsoleOut.Write(',');
 
-				Console.Out.WriteLine();
+				ConsoleOut.WriteLine();
 			}
 		}
 

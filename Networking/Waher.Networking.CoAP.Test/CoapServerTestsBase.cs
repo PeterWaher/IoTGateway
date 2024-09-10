@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.Sniffers;
+using Waher.Runtime.Console;
 using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Test
@@ -321,7 +322,7 @@ namespace Waher.Networking.CoAP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
 			Assert.IsNotNull(Result);
 
-			Console.Out.WriteLine(Result.ToString());
+			ConsoleOut.WriteLine(Result.ToString());
 
 			return Result;
 		}
@@ -340,7 +341,7 @@ namespace Waher.Networking.CoAP.Test
 				{
 					Token = e.Message.Token;
 					Result = await e.Message.DecodeAsync();
-					Console.Out.WriteLine(Result.ToString());
+					ConsoleOut.WriteLine(Result.ToString());
 
 					Count++;
 					if (Count == 3)
@@ -382,7 +383,7 @@ namespace Waher.Networking.CoAP.Test
 				{
 					object Result = await e.Message.DecodeAsync();
 					if (Result is not null)
-						Console.Out.WriteLine(Result.ToString());
+						ConsoleOut.WriteLine(Result.ToString());
 
 					Done.Set();
 				}
@@ -404,7 +405,7 @@ namespace Waher.Networking.CoAP.Test
 				{
 					object Result = await e.Message.DecodeAsync();
 					if (Result is not null)
-						Console.Out.WriteLine(Result.ToString());
+						ConsoleOut.WriteLine(Result.ToString());
 
 					Done.Set();
 				}
@@ -426,7 +427,7 @@ namespace Waher.Networking.CoAP.Test
 				{
 					object Result = await e.Message.DecodeAsync();
 					if (Result is not null)
-						Console.Out.WriteLine(Result.ToString());
+						ConsoleOut.WriteLine(Result.ToString());
 
 					Done.Set();
 				}

@@ -112,6 +112,10 @@
       <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
+      <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
+      <Name>Waher.Runtime.Console</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>

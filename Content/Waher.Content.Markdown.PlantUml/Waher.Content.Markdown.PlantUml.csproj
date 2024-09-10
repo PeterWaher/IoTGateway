@@ -3,7 +3,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Peter Waher</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>The library extends the capabilities of the Markdown engine defined in Waher.Content.Markdown. It allows for real-time inclusion and generation of PlantUML (https://plantuml.com/) diagrams, if the software is installed on the system. Example: https://waher.se/Markdown.md#umlWithPlantuml</Description>

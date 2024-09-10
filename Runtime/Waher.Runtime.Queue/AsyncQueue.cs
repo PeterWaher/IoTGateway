@@ -13,7 +13,7 @@ namespace Waher.Runtime.Queue
 	public class AsyncQueue<T> : IDisposable
 		where T : class
 	{
-		private readonly LinkedList<T> queue = new LinkedList<T>();
+		private readonly LinkedList<Item> queue = new LinkedList<Item>();
 		private readonly LinkedList<TaskCompletionSource<T>> subscribers = new LinkedList<TaskCompletionSource<T>>();
 		private readonly TaskCompletionSource<bool> terminatedTask = new TaskCompletionSource<bool>();
 		private readonly object synchObj = new object();
@@ -28,6 +28,17 @@ namespace Waher.Runtime.Queue
 		/// </summary>
 		public AsyncQueue()
 		{
+		}
+
+		private class Item
+		{
+			internal T Value { get; }
+			internal TaskCompletionSource<bool> Processed = new TaskCompletionSource<bool>();
+
+			internal Item(T Value)
+			{
+				this.Value = Value;
+			}
 		}
 
 		/// <summary>
@@ -62,27 +73,30 @@ namespace Waher.Runtime.Queue
 		/// Adds an item last to the queue.
 		/// </summary>
 		/// <param name="Item">Item to add.</param>
-		public void Add(T Item)
+		/// <returns>If item was forwarded for processing (true), or discarded (false).</returns>
+		public Task<bool> Add(T Item)
 		{
-			this.Add(Item, false);
+			return this.Add(Item, false);
 		}
 
 		/// <summary>
 		/// Adds an item last to the queue.
 		/// </summary>
 		/// <param name="Item">Item to add.</param>
-		public void AddLast(T Item)
+		/// <returns>If item was forwarded for processing (true), or discarded (false).</returns>
+		public Task<bool> AddLast(T Item)
 		{
-			this.Add(Item, false);
+			return this.Add(Item, false);
 		}
 
 		/// <summary>
 		/// Adds an item first to the queue.
 		/// </summary>
 		/// <param name="Item">Item to add.</param>
-		public void AddFirst(T Item)
+		/// <returns>If item was forwarded for processing (true), or discarded (false).</returns>
+		public Task<bool> AddFirst(T Item)
 		{
-			this.Add(Item, true);
+			return this.Add(Item, true);
 		}
 
 		/// <summary>
@@ -90,7 +104,8 @@ namespace Waher.Runtime.Queue
 		/// </summary>
 		/// <param name="Item">Item to add.</param>
 		/// <param name="First">If item is to be added first in the queue.</param>
-		public void Add(T Item, bool First)
+		/// <returns>If item was forwarded for processing (true), or discarded (false).</returns>
+		public Task<bool> Add(T Item, bool First)
 		{
 			lock (this.synchObj)
 			{
@@ -99,12 +114,16 @@ namespace Waher.Runtime.Queue
 
 				if (this.subscribers.First is null)
 				{
+					Item Record = new Item(Item);
+
 					if (First)
-						this.queue.AddFirst(Item);
+						this.queue.AddFirst(Record);
 					else
-						this.queue.AddLast(Item);
+						this.queue.AddLast(Record);
 
 					this.countItems++;
+
+					return Record.Processed.Task;
 				}
 				else
 				{
@@ -112,6 +131,8 @@ namespace Waher.Runtime.Queue
 					this.subscribers.RemoveFirst();
 					this.countSubscribers--;
 					Waiter.TrySetResult(Item);
+
+					return Task.FromResult(true);
 				}
 			}
 		}
@@ -123,7 +144,7 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed.</returns>
 		public Task<T> Wait()
 		{
-			T Item;
+			Item Record;
 
 			lock (this.synchObj)
 			{
@@ -139,20 +160,22 @@ namespace Waher.Runtime.Queue
 				}
 				else
 				{
-					Item = this.queue.First.Value;
+					Record = this.queue.First.Value;
 					this.queue.RemoveFirst();
 					this.countItems--;
+
+					Record.Processed.TrySetResult(true);
 
 					if (this.terminated && this.queue.First is null)
 						this.disposed = true;
 					else
-						return Task.FromResult(Item);
+						return Task.FromResult(Record.Value);
 				}
 			}
 
 			this.RaiseDisposed();
 			
-			return Task.FromResult(Item);
+			return Task.FromResult(Record.Value);
 		}
 
 		/// <summary>
@@ -188,12 +211,15 @@ namespace Waher.Runtime.Queue
 				}
 				else
 				{
-					Item = this.queue.First.Value;
+					Item Record = this.queue.First.Value;
+					Item = Record.Value;
 
 					if (Remove)
 					{
 						this.queue.RemoveFirst();
 						this.countItems--;
+
+						Record.Processed.TrySetResult(true);
 
 						if (this.terminated && this.queue.First is null)
 							this.disposed = true;
@@ -222,6 +248,9 @@ namespace Waher.Runtime.Queue
 				this.disposed = true;
 				this.terminated = true;
 
+				foreach (Item Record in this.queue)
+					Record.Processed.TrySetResult(false);
+
 				this.queue.Clear();
 				this.countItems = 0;
 
@@ -249,6 +278,12 @@ namespace Waher.Runtime.Queue
 				if (this.queue.First is null)
 				{
 					this.disposed = true;
+
+					foreach (Item Record in this.queue)
+						Record.Processed.TrySetResult(false);
+
+					this.queue.Clear();
+					this.countItems = 0;
 
 					foreach (TaskCompletionSource<T> Task in this.subscribers)
 						Task.TrySetResult(null);

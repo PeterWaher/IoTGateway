@@ -71,106 +71,9 @@ namespace Waher.Events.XMPP
 						string TagName = XML.Attribute(E2, "name");
 						string TagValue = XML.Attribute(E2, "value");
 						string TagType = XML.Attribute(E2, "type");
-						object TagValueParsed = TagValue;
 
-						switch (TagType)
-						{
-							case "xs:anyURI":
-								Uri URI;
-								if (Uri.TryCreate(TagValue, UriKind.Absolute, out URI))
-									TagValueParsed = URI;
-								break;
-
-							case "xs:boolean":
-								bool b;
-								if (CommonTypes.TryParse(TagValue, out b))
-									TagValueParsed = b;
-								break;
-
-							case "xs:unsignedByte":
-								byte ui8;
-								if (byte.TryParse(TagValue, out ui8))
-									TagValueParsed = ui8;
-								break;
-
-							case "xs:short":
-								short i16;
-								if (short.TryParse(TagValue, out i16))
-									TagValueParsed = i16;
-								break;
-
-							case "xs:int":
-								int i32;
-								if (int.TryParse(TagValue, out i32))
-									TagValueParsed = i32;
-								break;
-
-							case "xs:long":
-								long i64;
-								if (long.TryParse(TagValue, out i64))
-									TagValueParsed = i64;
-								break;
-
-							case "xs:byte":
-								sbyte i8;
-								if (sbyte.TryParse(TagValue, out i8))
-									TagValueParsed = i8;
-								break;
-
-							case "xs:unsignedShort":
-								ushort ui16;
-								if (ushort.TryParse(TagValue, out ui16))
-									TagValueParsed = ui16;
-								break;
-
-							case "xs:unsignedInt":
-								uint ui32;
-								if (uint.TryParse(TagValue, out ui32))
-									TagValueParsed = ui32;
-								break;
-
-							case "xs:unsignedLong":
-								ulong ui64;
-								if (ulong.TryParse(TagValue, out ui64))
-									TagValueParsed = ui64;
-								break;
-
-							case "xs:decimal":
-								decimal d;
-								if (CommonTypes.TryParse(TagValue, out d))
-									TagValueParsed = d;
-								break;
-
-							case "xs:double":
-								double d2;
-								if (CommonTypes.TryParse(TagValue, out d2))
-									TagValueParsed = d2;
-								break;
-
-							case "xs:float":
-								float f;
-								if (CommonTypes.TryParse(TagValue, out f))
-									TagValueParsed = f;
-								break;
-
-							case "xs:time":
-								TimeSpan TS;
-								if (TimeSpan.TryParse(TagValue, out TS))
-									TagValueParsed = TS;
-								break;
-
-							case "xs:date":
-							case "xs:dateTime":
-								DateTime DT;
-								if (XML.TryParse(TagValue, out DT))
-									TagValueParsed = DT;
-								break;
-
-							case "xs:string":
-							case "xs:language":
-							default:
-								break;
-						}
+						if (!TryParse(TagValue, TagType, out object TagValueParsed))
+							TagValueParsed = TagValue;
 
 						Tags.Add(new KeyValuePair<string, object>(TagName, TagValueParsed));
 						break;
@@ -186,7 +89,7 @@ namespace Waher.Events.XMPP
 
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
 			EventEventHandlerAsync h = this.OnEvent;
-			
+
 			if (h is null)
 				Log.Event(Event);
 			else
@@ -207,6 +110,212 @@ namespace Waher.Events.XMPP
 		/// to <see cref="Log"/>.
 		/// </summary>
 		public event EventEventHandlerAsync OnEvent = null;
+
+		/// <summary>
+		/// Tries to parse a simple value.
+		/// </summary>
+		/// <param name="Value">String-representation of value.</param>
+		/// <param name="Type">Type</param>
+		/// <param name="ParsedValue">Parsed value.</param>
+		/// <returns>If able to parse value.</returns>
+		public static bool TryParse(string Value, string Type, out object ParsedValue)
+		{
+			switch (Type)
+			{
+				case "xs:anyURI":
+					Uri URI;
+					if (Uri.TryCreate(Value, UriKind.Absolute, out URI))
+					{
+						ParsedValue = URI;
+						return true;
+					}
+					break;
+
+				case "xs:boolean":
+					bool b;
+					if (CommonTypes.TryParse(Value, out b))
+					{
+						ParsedValue = b;
+						return true;
+					}
+					break;
+
+				case "xs:unsignedByte":
+					byte ui8;
+					if (byte.TryParse(Value, out ui8))
+					{
+						ParsedValue = ui8;
+						return true;
+					}
+					break;
+
+				case "xs:short":
+					short i16;
+					if (short.TryParse(Value, out i16))
+					{
+						ParsedValue = i16;
+						return true;
+					}
+					break;
+
+				case "xs:int":
+					int i32;
+					if (int.TryParse(Value, out i32))
+					{
+						ParsedValue = i32;
+						return true;
+					}
+					break;
+
+				case "xs:long":
+					long i64;
+					if (long.TryParse(Value, out i64))
+					{
+						ParsedValue = i64;
+						return true;
+					}
+					break;
+
+				case "xs:byte":
+					sbyte i8;
+					if (sbyte.TryParse(Value, out i8))
+					{
+						ParsedValue = i8;
+						return true;
+					}
+					break;
+
+				case "xs:unsignedShort":
+					ushort ui16;
+					if (ushort.TryParse(Value, out ui16))
+					{
+						ParsedValue = ui16;
+						return true;
+					}
+					break;
+
+				case "xs:unsignedInt":
+					uint ui32;
+					if (uint.TryParse(Value, out ui32))
+					{
+						ParsedValue = ui32;
+						return true;
+					}
+					break;
+
+				case "xs:unsignedLong":
+					ulong ui64;
+					if (ulong.TryParse(Value, out ui64))
+					{
+						ParsedValue = ui64;
+						return true;
+					}
+					break;
+
+				case "xs:decimal":
+					decimal d;
+					if (CommonTypes.TryParse(Value, out d))
+					{
+						ParsedValue = d;
+						return true;
+					}
+					break;
+
+				case "xs:double":
+					double d2;
+					if (CommonTypes.TryParse(Value, out d2))
+					{
+						ParsedValue = d2;
+						return true;
+					}
+					break;
+
+				case "xs:float":
+					float f;
+					if (CommonTypes.TryParse(Value, out f))
+					{
+						ParsedValue = f;
+						return true;
+					}
+					break;
+
+				case "xs:time":
+					TimeSpan TS;
+					if (TimeSpan.TryParse(Value, out TS))
+					{
+						ParsedValue = TS;
+						return true;
+					}
+					break;
+
+				case "xs:date":
+				case "xs:dateTime":
+					DateTime DT;
+					if (XML.TryParse(Value, out DT))
+					{
+						ParsedValue = DT;
+						return true;
+					}
+					break;
+
+				case "xs:string":
+				case "xs:language":
+				default:
+					ParsedValue = Value;
+					return true;
+			}
+
+			ParsedValue = Value;
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to get the type of a parsed value.
+		/// </summary>
+		/// <param name="Value">Parsed value.</param>
+		/// <param name="Type">Type</param>
+		/// <returns>If able to get the type.</returns>
+		public static bool TryGetType(object Value, out string Type)
+		{
+			if (Value is null)
+				Type = null;
+			else if (Value is bool)
+				Type = "xs:boolean";
+			else if (Value is byte)
+				Type = "xs:unsignedByte";
+			else if (Value is short)
+				Type = "xs:short";
+			else if (Value is int)
+				Type = "xs:int";
+			else if (Value is long)
+				Type = "xs:long";
+			else if (Value is sbyte)
+				Type = "xs:byte";
+			else if (Value is ushort)
+				Type = "xs:unsignedShort";
+			else if (Value is uint)
+				Type = "xs:unsignedInt";
+			else if (Value is ulong)
+				Type = "xs:unsignedLong";
+			else if (Value is decimal)
+				Type = "xs:decimal";
+			else if (Value is double)
+				Type = "xs:double";
+			else if (Value is float)
+				Type = "xs:float";
+			else if (Value is TimeSpan)
+				Type = "xs:time";
+			else if (Value is DateTime)
+				Type = "xs:dateTime";
+			else if (Value is string)
+				Type = "xs:string";
+			else if (Value is Uri)
+				Type = "xs:anyURI";
+			else
+				Type = null;
+			
+			return !(Type is null);
+		}
 
 	}
 }

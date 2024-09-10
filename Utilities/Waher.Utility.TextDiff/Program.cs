@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Waher.Content;
+using Waher.Runtime.Console;
 using Waher.Runtime.Text;
 
 namespace Waher.Utility.TextDiff
@@ -86,17 +87,17 @@ namespace Waher.Utility.TextDiff
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Compares two text files and outputs the differences between them.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-f FROM_FILE     File name of XML file.");
-					Console.Out.WriteLine("-t TO_FILE       XSLT transform to use.");
-					Console.Out.WriteLine("-o OUTPUT_FILE   File name of output file.");
-					Console.Out.WriteLine("                 If no output file is provided, output will be");
-					Console.Out.WriteLine("                 made to the console.");
-					Console.Out.WriteLine("-enc ENCODING    Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-?               Help.");
+					ConsoleOut.WriteLine("Compares two text files and outputs the differences between them.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-f FROM_FILE     File name of XML file.");
+					ConsoleOut.WriteLine("-t TO_FILE       XSLT transform to use.");
+					ConsoleOut.WriteLine("-o OUTPUT_FILE   File name of output file.");
+					ConsoleOut.WriteLine("                 If no output file is provided, output will be");
+					ConsoleOut.WriteLine("                 made to the console.");
+					ConsoleOut.WriteLine("-enc ENCODING    Text encoding. Default=UTF-8");
+					ConsoleOut.WriteLine("-?               Help.");
 					return 0;
 				}
 
@@ -118,7 +119,7 @@ namespace Waher.Utility.TextDiff
 
 				if (string.IsNullOrEmpty(OutputFileName))
 				{
-					Output = Console.Out;
+					Output = ConsoleOut.Writer;
 					DisposeOutput = false;
 				}
 				else
@@ -208,7 +209,7 @@ namespace Waher.Utility.TextDiff
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

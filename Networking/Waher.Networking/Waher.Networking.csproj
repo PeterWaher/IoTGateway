@@ -3,7 +3,9 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Peter Waher</Authors>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, simplified communication libraries for text and/or binary protocols, etc., as well as classes for building client and server applications.</Description>
@@ -14,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.2.6</AssemblyVersion>
-    <FileVersion>2.2.6</FileVersion>
-    <Version>2.2.6</Version>
+    <AssemblyVersion>2.2.7</AssemblyVersion>
+    <FileVersion>2.2.7</FileVersion>
+    <Version>2.2.7</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking\</UpgradeBackupLocation>
@@ -47,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
   </ItemGroup>
 </Project>

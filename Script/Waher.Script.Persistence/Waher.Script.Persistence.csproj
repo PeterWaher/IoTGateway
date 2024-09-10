@@ -2,7 +2,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Description>Contains script extensions for the persistence layer. Allows for searching for, creating, updating and deleting objects in the object database from script. Includes support for SQL queries against the object database persistence layer, and SPARQL queries for semantic-web queries using graph notation, linked data and graph databases.

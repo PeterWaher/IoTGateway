@@ -24,45 +24,52 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(1)]
 		public async Task Test_01_FtsCollection_1()
 		{
-			Assert.AreEqual(true, await this.Test("FtsCollection('TestIndex','Test')"));
+			Assert.AreEqual(true, await Test("FtsCollection('TestIndex','Test')"));
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		public async Task Test_02_FtsCollection_2()
 		{
-			Assert.AreEqual(false, await this.Test("FtsCollection('TestIndex','Test')"));
+			Assert.AreEqual(false, await Test("FtsCollection('TestIndex','Test')"));
 		}
 
 		[TestMethod]
+		[Priority(3)]
 		public async Task Test_03_AddFtsProperties_1()
 		{
-			Assert.AreEqual(true, await this.Test("AddFtsProperties('Test',[Parse('\"Hello World nr \"+Str(P1)'),(Obj)->Obj.P2,'P3','P4'])"));
+			Assert.AreEqual(true, await Test("AddFtsProperties('Test',[Parse('\"Hello World nr \"+Str(P1)'),(Obj)->Obj.P2,'P3','P4'])"));
 		}
 
 		[TestMethod]
+		[Priority(4)]
 		public async Task Test_04_AddFtsProperties_2()
 		{
-			Assert.AreEqual(false, await this.Test("AddFtsProperties('Test',[Parse('\"Hello World nr \"+Str(P1)'),(Obj)->Obj.P2,'P3','P4'])"));
+			Assert.AreEqual(false, await Test("AddFtsProperties('Test',[Parse('\"Hello World nr \"+Str(P1)'),(Obj)->Obj.P2,'P3','P4'])"));
 		}
 
 		[TestMethod]
+		[Priority(5)]
 		public async Task Test_05_RemoveFtsProperties_1()
 		{
-			Assert.AreEqual(true, await this.Test("RemoveFtsProperties('Test',['P4'])"));
+			Assert.AreEqual(true, await Test("RemoveFtsProperties('Test',['P4'])"));
 		}
 
 		[TestMethod]
+		[Priority(6)]
 		public async Task Test_06_RemoveFtsProperties_2()
 		{
-			Assert.AreEqual(false, await this.Test("RemoveFtsProperties('Test',['P4'])"));
+			Assert.AreEqual(false, await Test("RemoveFtsProperties('Test',['P4'])"));
 		}
 
 		[TestMethod]
+		[Priority(7)]
 		public async Task Test_07_GetFtsProperties_1()
 		{
-			object Obj = await this.Test("GetFtsProperties('Test')");
+			object Obj = await Test("GetFtsProperties('Test')");
 			PropertyDefinition Def;
 			Array Properties;
 
@@ -86,9 +93,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(8)]
 		public async Task Test_08_GetFtsProperties_2()
 		{
-			object Obj = await this.Test("GetFtsProperties()");
+			object Obj = await Test("GetFtsProperties()");
 			Dictionary<string, IElement> ByCollection;
 			PropertyDefinition Def;
 			Array Properties;
@@ -118,9 +126,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(9)]
 		public async Task Test_09_GetFtsCollections_1()
 		{
-			object Obj = await this.Test("GetFtsCollections('TestIndex')");
+			object Obj = await Test("GetFtsCollections('TestIndex')");
 			Array Collections;
 
 			Assert.IsNotNull(Collections = Obj as Array);
@@ -129,9 +138,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(10)]
 		public async Task Test_10_GetFtsCollections_2()
 		{
-			object Obj = await this.Test("GetFtsCollections()");
+			object Obj = await Test("GetFtsCollections()");
 			Dictionary<string, IElement> ByCollection;
 			Array Collections;
 
@@ -146,9 +156,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(11)]
 		public async Task Test_11_Insert_Search_1()
 		{
-			object Obj = await this.Test("insert into Test object {'P1':1,'P2':'Kilroy was here.','P3':'Pelé contains an accent.','P4':'Fitzroy also'};Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy +\"Hello World 1\" +Pele',false)");
+			object Obj = await Test("insert into Test object {'P1':1,'P2':'Kilroy was here.','P3':'Pelé contains an accent.','P4':'Fitzroy also'};Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy +\"Hello World 1\" +Pele',false)");
 			Array ResultSet;
 
 			Assert.IsNotNull(ResultSet = Obj as Array);
@@ -156,9 +167,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(12)]
 		public async Task Test_12_Reindex_Search_1()
 		{
-			object Obj = await this.Test("insert into Test object {'P1':1,'P2':'Kilroy was here.','P3':'Pelé contains an accent.','P4':'Fitzroy also'};Sleep(1000);ReindexFts('TestIndex');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy +\"Hello World 1\" +Pele',false)");
+			object Obj = await Test("insert into Test object {'P1':1,'P2':'Kilroy was here.','P3':'Pelé contains an accent.','P4':'Fitzroy also'};Sleep(1000);ReindexFts('TestIndex');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy +\"Hello World 1\" +Pele',false)");
 			Array ResultSet;
 
 			Assert.IsNotNull(ResultSet = Obj as Array);
@@ -166,9 +178,10 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(13)]
 		public async Task Test_13_FtsFolder_Search_1()
 		{
-			object Obj = await this.Test("FtsFolder('TestIndex','Files',true);Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			object Obj = await Test("FtsFolder('TestIndex','Files',true);Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
 			Array ResultSet;
 
 			Assert.IsNotNull(ResultSet = Obj as Array);
@@ -176,24 +189,25 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		[Priority(14)]
 		public async Task Test_14_FtsFile_Search_1()
 		{
-			object Obj = await this.Test("Search('TestIndex','+Kilroy -Fitzroy',false)");
+			object Obj = await Test("Search('TestIndex','+Kilroy -Fitzroy',false)");
 			Array ResultSet;
 
 			Assert.IsNotNull(ResultSet = Obj as Array);
 			int c = ResultSet.Length;
 
-			Obj = await this.Test("FtsFile('TestIndex','File/1.txt');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Obj = await Test("FtsFile('TestIndex','File/1.txt');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
 			Assert.IsNotNull(ResultSet = Obj as Array);
 
 			Assert.AreEqual(c + 1, ResultSet.Length);
 		}
 
-		private async Task<object> Test(string Script)
+		private static async Task<object> Test(string Script)
 		{
-			Variables v = new Variables();
-			Expression Exp = new Expression(Script);
+			Variables v = new();
+			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
 
 			return Obj;

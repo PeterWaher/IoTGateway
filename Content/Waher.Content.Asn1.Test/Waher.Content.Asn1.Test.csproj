@@ -85,6 +85,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\Waher.Content.Asn1\Waher.Content.Asn1.csproj" />
   </ItemGroup>
 

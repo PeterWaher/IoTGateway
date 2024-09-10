@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\Waher.Content.QR\Waher.Content.QR.csproj" />
   </ItemGroup>

@@ -9,6 +9,7 @@ using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 
@@ -46,7 +47,7 @@ namespace Waher.Networking.Modbus.Test
 			filesProvider?.Dispose();
 			filesProvider = null;
 
-			if (!(consoleEventSink is null))
+			if (consoleEventSink is not null)
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;
@@ -85,7 +86,7 @@ namespace Waher.Networking.Modbus.Test
 			int i = 0;
 
 			foreach (ushort Word in Words)
-				Console.Out.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
+				ConsoleOut.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
 		}
 
 		[TestMethod]
@@ -99,7 +100,7 @@ namespace Waher.Networking.Modbus.Test
 			int c = Coils.Length;
 
 			for (i = 0; i < c; i++)
-				Console.Out.WriteLine(i.ToString() + ": " + Coils[i].ToString());
+				ConsoleOut.WriteLine(i.ToString() + ": " + Coils[i].ToString());
 		}
 
 		[TestMethod]
@@ -113,7 +114,7 @@ namespace Waher.Networking.Modbus.Test
 			int c = Coils.Length;
 
 			for (i = 0; i < c; i++)
-				Console.Out.WriteLine(i.ToString() + ": " + Coils[i].ToString());
+				ConsoleOut.WriteLine(i.ToString() + ": " + Coils[i].ToString());
 		}
 
 		[TestMethod]
@@ -126,7 +127,7 @@ namespace Waher.Networking.Modbus.Test
 			int i = 0;
 
 			foreach (ushort Word in Words)
-				Console.Out.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
+				ConsoleOut.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
 		}
 
 	}

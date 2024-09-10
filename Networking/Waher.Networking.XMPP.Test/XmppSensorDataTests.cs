@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP.Sensor;
 using Waher.Content;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Console;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -79,7 +80,7 @@ namespace Waher.Networking.XMPP.Test
 				SensorDataClientRequest Request = this.sensorClient.RequestReadout(this.client2.FullJID, FieldType.All);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -97,7 +98,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000), "Readout not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 			}
 			finally
 			{
@@ -119,7 +120,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -140,7 +141,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 			}
 			finally
 			{
@@ -166,7 +167,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -194,7 +195,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 
 				Done.Reset();
 
@@ -205,7 +206,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 			}
 			finally
 			{
@@ -231,7 +232,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -259,7 +260,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 			}
 			finally
 			{
@@ -285,7 +286,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -313,7 +314,7 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
-					Console.Out.WriteLine(Field.ToString());
+					ConsoleOut.WriteLine(Field.ToString());
 			}
 			finally
 			{
@@ -339,7 +340,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
@@ -403,7 +404,7 @@ namespace Waher.Networking.XMPP.Test
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
-					Console.Out.WriteLine(NewState.ToString());
+					ConsoleOut.WriteLine(NewState.ToString());
 					return Task.CompletedTask;
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>

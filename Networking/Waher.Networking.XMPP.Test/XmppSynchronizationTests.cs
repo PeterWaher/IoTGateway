@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Runtime.Console;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Test
@@ -61,8 +62,8 @@ namespace Waher.Networking.XMPP.Test
 			double LatencyMsHf = e.LatencyHF.Value * 1e3 / e.HfFrequency;
 			double DifferenceMsHf = e.ClockDifferenceHF.Value * 1e3 / e.HfFrequency;
 
-			Console.Out.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
-			Console.Out.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t" +
+			ConsoleOut.WriteLine("Latency (ms)\tDifference (ms)\tLatency (HF)\tDifference (HF)");
+			ConsoleOut.WriteLine(LatencyMs.ToString() + "\t" + DifferenceMs.ToString() + "\t" +
 				LatencyMsHf.ToString() + "\t" + DifferenceMsHf.ToString());
 		}
 
@@ -162,8 +163,8 @@ namespace Waher.Networking.XMPP.Test
 				}
 				catch (Exception ex)
 				{
-					Console.Out.WriteLine(ex.Message);
-					Console.Out.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+					ConsoleOut.WriteLine(ex.Message);
+					ConsoleOut.WriteLine(Log.CleanStackTrace(ex.StackTrace));
 					Error.Set();
 				}
 			};

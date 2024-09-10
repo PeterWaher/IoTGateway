@@ -1,5 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.DNS.Test
@@ -43,7 +43,7 @@ namespace Waher.Networking.DNS.Test
 		public void Test_01_DNS_Server_Addresses()
 		{
 			foreach (IPAddress Address in DnsResolver.DnsServerAddresses)
-				Console.Out.WriteLine(Address.ToString());
+				ConsoleOut.WriteLine(Address.ToString());
 		}
 
 		[TestMethod]
@@ -51,7 +51,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("google.com");
 			foreach (IPAddress Address in Addresses)
-				Console.Out.WriteLine(Address);
+				ConsoleOut.WriteLine(Address);
 		}
 
 		[TestMethod]
@@ -59,7 +59,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP6Addresses("google.com");
 			foreach (IPAddress Address in Addresses)
-				Console.Out.WriteLine(Address);
+				ConsoleOut.WriteLine(Address);
 		}
 
 		[TestMethod]
@@ -68,32 +68,32 @@ namespace Waher.Networking.DNS.Test
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("dettanamnfinnsinte.se");
 			foreach (IPAddress Address in Addresses)
-				Console.Out.WriteLine(Address);
+				ConsoleOut.WriteLine(Address);
 		}
 
 		[TestMethod]
 		public async Task Test_05_Resolve_Mail_Exchange()
 		{
-			await this.TestExchange("hotmail.com");
+			await TestExchange("hotmail.com");
 		}
 
-		private async Task TestExchange(string Domain)
+		private static async Task TestExchange(string Domain)
 		{
 			string[] ExchangeHosts = await DnsResolver.LookupMailExchange(Domain);
 			foreach (string ExchangeHost in ExchangeHosts)
 			{
-				Console.Out.WriteLine(ExchangeHost);
+				ConsoleOut.WriteLine(ExchangeHost);
 
 				IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses(ExchangeHost);
 				foreach (IPAddress Address in Addresses)
-					Console.Out.WriteLine(Address);
+					ConsoleOut.WriteLine(Address);
 			}
 		}
 
 		[TestMethod]
 		public async Task Test_06_Resolve_Mail_Exchange_2()
 		{
-			await this.TestExchange("gmail.com");
+			await TestExchange("gmail.com");
 		}
 
 		[TestMethod]
@@ -101,7 +101,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("172.217.21.174"));
 			foreach (string DomainName in DomainNames)
-				Console.Out.WriteLine(DomainName);
+				ConsoleOut.WriteLine(DomainName);
 		}
 
 		[TestMethod]
@@ -109,28 +109,28 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("2a00:1450:400f:80a::200e"));
 			foreach (string DomainName in DomainNames)
-				Console.Out.WriteLine(DomainName);
+				ConsoleOut.WriteLine(DomainName);
 		}
 
 		[TestMethod]
 		public async Task Test_09_Resolve_Service_Endpoint()
 		{
 			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("jabber.org", "xmpp-client", "tcp");
-			Console.Out.WriteLine(Endpoint.ToString());
+			ConsoleOut.WriteLine(Endpoint.ToString());
 		}
 
 		[TestMethod]
 		public async Task Test_10_Resolve_Service_Endpoint_2()
 		{
 			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-client", "tcp");
-			Console.Out.WriteLine(Endpoint.ToString());
+			ConsoleOut.WriteLine(Endpoint.ToString());
 		}
 
 		[TestMethod]
 		public async Task Test_11_Resolve_Service_Endpoint_3()
 		{
 			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-server", "tcp");
-			Console.Out.WriteLine(Endpoint.ToString());
+			ConsoleOut.WriteLine(Endpoint.ToString());
 		}
 
 		[TestMethod]
@@ -138,7 +138,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			SRV[] Endpoints = await DnsResolver.LookupServiceEndpoints("jabber.org", "xmpp-client", "tcp");
 			foreach (SRV SRV in Endpoints)
-				Console.Out.WriteLine(SRV.ToString());
+				ConsoleOut.WriteLine(SRV.ToString());
 		}
 
 		[TestMethod]
@@ -146,26 +146,26 @@ namespace Waher.Networking.DNS.Test
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("bücher.com");
 			foreach (IPAddress Address in Addresses)
-				Console.Out.WriteLine(Address);
+				ConsoleOut.WriteLine(Address);
 		}
 
 		[TestMethod]
 		public async Task Test_14_Resolve_Mail_Exchange_3()
 		{
-			await this.TestExchange("waher.se");
+			await TestExchange("waher.se");
 		}
 
 		[TestMethod]
 		public async Task Test_15_Resolve_Mail_Exchange_4()
 		{
-			await this.TestExchange("cybercity.online");
+			await TestExchange("cybercity.online");
 		}
 
 		[TestMethod]
 		[Ignore]
 		public async Task Test_16_Resolve_Mail_Exchange_5()
 		{
-			await this.TestExchange("littlesister.se");
+			await TestExchange("littlesister.se");
 		}
 
 		[TestMethod]
@@ -183,7 +183,7 @@ namespace Waher.Networking.DNS.Test
 			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("179.49.7.95"), "zen.spamhaus.org");
 			Assert.IsNotNull(Reasons);
 			foreach (string Reason in Reasons)
-				Console.Out.WriteLine(Reason);
+				ConsoleOut.WriteLine(Reason);
 		}
 
 		[TestMethod]
@@ -191,7 +191,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("90.224.165.60"));
 			foreach (string DomainName in DomainNames)
-				Console.Out.WriteLine(DomainName);
+				ConsoleOut.WriteLine(DomainName);
 		}
 
 		[TestMethod]
@@ -199,7 +199,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] Text = await DnsResolver.LookupText("hotmail.com");
 			foreach (string Row in Text)
-				Console.Out.WriteLine(Row);
+				ConsoleOut.WriteLine(Row);
 		}
 
 		[TestMethod]
@@ -207,7 +207,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] Text = await DnsResolver.LookupText("waher.se");
 			foreach (string Row in Text)
-				Console.Out.WriteLine(Row);
+				ConsoleOut.WriteLine(Row);
 		}
 
 		[TestMethod]
@@ -215,7 +215,7 @@ namespace Waher.Networking.DNS.Test
 		{
 			string[] Text = await DnsResolver.LookupText("cybercity.online");
 			foreach (string Row in Text)
-				Console.Out.WriteLine(Row);
+				ConsoleOut.WriteLine(Row);
 		}
 
 		[TestMethod]
@@ -224,19 +224,19 @@ namespace Waher.Networking.DNS.Test
 			DnsResponse Response;
 
 			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.A, QCLASS.IN);
-			Console.Out.WriteLine(Response.ToString());
+			ConsoleOut.WriteLine(Response.ToString());
 
 			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.MX, QCLASS.IN);
-			Console.Out.WriteLine(Response.ToString());
+			ConsoleOut.WriteLine(Response.ToString());
 
 			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.TXT, QCLASS.IN);
-			Console.Out.WriteLine(Response.ToString());
+			ConsoleOut.WriteLine(Response.ToString());
 
 			Response = await DnsResolver.Query("_xmpp-client._tcp.lab.tagroot.io", QTYPE.SRV, QCLASS.IN);
-			Console.Out.WriteLine(Response.ToString());
+			ConsoleOut.WriteLine(Response.ToString());
 
 			Response = await DnsResolver.Query("_xmpp-server._tcp.lab.tagroot.io", QTYPE.SRV, QCLASS.IN);
-			Console.Out.WriteLine(Response.ToString());
+			ConsoleOut.WriteLine(Response.ToString());
 		}
 	}
 }

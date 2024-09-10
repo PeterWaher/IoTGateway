@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.P2P.SOCKS5;
-using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -31,9 +26,9 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(30000), "Search not complete.");
 			Assert.IsTrue(Proxy.HasProxy, "No SOCKS5 proxy found.");
 
-			Console.Out.WriteLine("JID: " + Proxy.JID);
-			Console.Out.WriteLine("Port: " + Proxy.Port.ToString());
-			Console.Out.WriteLine("Host: " + Proxy.Host);
+			ConsoleOut.WriteLine("JID: " + Proxy.JID);
+			ConsoleOut.WriteLine("Port: " + Proxy.Port.ToString());
+			ConsoleOut.WriteLine("Host: " + Proxy.Host);
 		}
 
 		[TestMethod]
@@ -72,7 +67,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error = new(false);
 			ManualResetEvent Done = new(false);
 			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
-				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			Client.OnStateChange += (sender, e) =>
 			{
@@ -213,9 +208,9 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Searching for SOCKS5 proxy.");
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Searching for SOCKS5 proxy.");
+			ConsoleOut.WriteLine();
 
 			ManualResetEvent Done1 = new(false);
 			Socks5Proxy Proxy1 = new(this.client1);
@@ -247,9 +242,9 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Closed1 = new(false);
 			ManualResetEvent Closed2 = new(false);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Start of session initiation.");
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Start of session initiation.");
+			ConsoleOut.WriteLine();
 
 			Proxy2.OnOpen += (sender, e) =>
 			{

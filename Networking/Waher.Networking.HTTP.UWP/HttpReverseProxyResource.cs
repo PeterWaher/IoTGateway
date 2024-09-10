@@ -54,7 +54,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Timeout">Timeout threshold.</param>
 		/// <param name="UseProxySession">If the proxy resource should add a session requirement
 		/// as well. This allows the proxy resource to forward user infomration to underlying
-		/// services, etc.. (Default=false)</param>
+		/// services, etc. (Default=false)</param>
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
 			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession)
 			: base(ResourceName)
@@ -282,17 +282,11 @@ namespace Waher.Networking.HTTP
 
 				if (this.useSession)
 				{
-					HttpFieldCookie Cookie = Request.Header.Cookie;
 					string HttpSessionID;
 
 					if (Session is null)
 					{
-						if (Cookie is null || string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
-						{
-							HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-							Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
-						}
-
+						HttpSessionID = GetSessionId(Request, Response);
 						Request.Session = Session = Server.GetSession(HttpSessionID);
 					}
 					else if (Request.tempSession)
@@ -386,9 +380,9 @@ namespace Waher.Networking.HTTP
 								case "Cookie":
 									foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Field.Value))
 									{
-										if (this.useSession && P.Key == HttpResource.HttpSessionID && !(Session is null))
+										if (this.useSession && P.Key == HttpSessionID && !(Session is null))
 										{
-											if (Session.TryGetVariable(HttpResource.SpacePrefixedHttpSessionID, out Variable v) &&
+											if (Session.TryGetVariable(SpacePrefixedHttpSessionID, out Variable v) &&
 												v.ValueObject is Cookie ProxyCookie)
 											{
 												Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(ProxyCookie.Name, ProxyCookie.Value));
@@ -505,8 +499,8 @@ namespace Waher.Networking.HTTP
 											if (Cookie is null)
 												continue;
 
-											if (Cookie.Name == HttpResource.HttpSessionID)
-												Session[HttpResource.SpacePrefixedHttpSessionID] = Cookie;
+											if (Cookie.Name == HttpSessionID)
+												Session[SpacePrefixedHttpSessionID] = Cookie;
 											else
 												Response.SetCookie(Cookie);
 										}

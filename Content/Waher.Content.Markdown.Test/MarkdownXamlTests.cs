@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.Wpf;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -29,10 +29,10 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedXaml = await Doc.GenerateXAML(XML.WriterSettings(true, true));
 
-			Console.Out.WriteLine(GeneratedXaml);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedXaml);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XAML does not match expected XAML.");
 		}

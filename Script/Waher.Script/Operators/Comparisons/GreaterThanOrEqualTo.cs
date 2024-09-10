@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -62,24 +61,39 @@ namespace Waher.Script.Operators.Comparisons
 				i = S.Compare(LeftConstant.Constant, CheckAgainst);
 				if (i >= 0)
 					return this.right.PatternMatch(CheckAgainst, AlreadyFound);
+				else
+					return PatternMatchResult.NoMatch;
 			}
-			else if (this.right is ConstantElement RightConstant)
+
+			if (this.right is ConstantElement RightConstant)
 			{
 				i = S.Compare(CheckAgainst, RightConstant.Constant);
 				if (i >= 0)
 					return this.left.PatternMatch(CheckAgainst, AlreadyFound);
+				else
+					return PatternMatchResult.NoMatch;
 			}
-			else if (this.left is VariableReference LeftReference && AlreadyFound.TryGetValue(LeftReference.VariableName, out IElement LeftValue))
+
+			if (this.left is VariableReference LeftReference &&
+				(AlreadyFound.TryGetValue(LeftReference.VariableName, out IElement Value) ||
+				Expression.TryGetConstant(LeftReference.VariableName, null, out Value)))
 			{
-				i = S.Compare(LeftValue, CheckAgainst);
+				i = S.Compare(Value, CheckAgainst);
 				if (i >= 0)
 					return this.right.PatternMatch(CheckAgainst, AlreadyFound);
+				else
+					return PatternMatchResult.NoMatch;
 			}
-			else if (this.right is VariableReference RightReference && AlreadyFound.TryGetValue(RightReference.VariableName, out IElement RightValue))
+
+			if (this.right is VariableReference RightReference &&
+				(AlreadyFound.TryGetValue(RightReference.VariableName, out Value) ||
+				Expression.TryGetConstant(RightReference.VariableName, null, out Value)))
 			{
-				i = S.Compare(CheckAgainst, RightValue);
+				i = S.Compare(CheckAgainst, Value);
 				if (i >= 0)
 					return this.left.PatternMatch(CheckAgainst, AlreadyFound);
+				else
+					return PatternMatchResult.NoMatch;
 			}
 
 			return PatternMatchResult.NoMatch;

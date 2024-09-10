@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
   </ItemGroup>

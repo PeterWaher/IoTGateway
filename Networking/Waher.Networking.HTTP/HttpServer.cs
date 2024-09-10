@@ -1752,7 +1752,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Creates a new collection of variables, that contains access to the global set of variables..
+		/// Creates a new collection of variables, that contains access to the global set of variables.
 		/// </summary>
 		/// <returns>Variables collection.</returns>
 		public static Variables CreateVariables()

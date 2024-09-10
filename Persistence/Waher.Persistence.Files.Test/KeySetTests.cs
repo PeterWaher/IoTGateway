@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Console;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -81,7 +81,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			if (DoUpdate)
 			{
-				Console.Out.WriteLine("Updating");
+				ConsoleOut.WriteLine("Updating");
 
 				for (i = 0; i < c; i++)
 				{
@@ -93,7 +93,7 @@ namespace Waher.Persistence.FilesLW.Test
 				rsa.ImportParameters(Parameters);
 			}
 			else
-				Console.Out.WriteLine("Already updated.");
+				ConsoleOut.WriteLine("Already updated.");
 		}
 	}
 }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.MQTT.Test
 {
@@ -71,7 +71,7 @@ namespace Waher.Networking.MQTT.Test
 
 			this.client.OnContentReceived += (sender, e) =>
 			{
-				Console.Out.WriteLine(e.Topic + ": " + System.Text.Encoding.UTF8.GetString(e.Data));
+				ConsoleOut.WriteLine(e.Topic + ": " + System.Text.Encoding.UTF8.GetString(e.Data));
 
 				if (++Count == 10)
 					Done.Set();

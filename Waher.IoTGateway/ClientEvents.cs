@@ -14,6 +14,7 @@ using Waher.Runtime.Cache;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Operators.Comparisons;
 using Waher.Security;
 
 namespace Waher.IoTGateway
@@ -157,7 +158,7 @@ namespace Waher.IoTGateway
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException("Expected X-TabID header.");
 
-			TabQueue Queue = Register(Request, null, Location, TabID);
+			TabQueue Queue = Register(Request, Response, null, Location, TabID);
 			StringBuilder Json = null;
 
 			SetTransparentCorsHeaders(this, Request, Response);
@@ -205,7 +206,7 @@ namespace Waher.IoTGateway
 				timeoutByTabID[TabID] = Queue;
 		}
 
-		private static TabQueue Register(HttpRequest Request, WebSocket Socket, string Location, string TabID)
+		private static TabQueue Register(HttpRequest Request, HttpResponse Response, WebSocket Socket, string Location, string TabID)
 		{
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
@@ -244,8 +245,7 @@ namespace Waher.IoTGateway
 			}
 			else
 			{
-				HttpFieldCookie Cookie = Request.Header.Cookie;
-				string HttpSessionID = Cookie is null ? string.Empty : Cookie[HttpResource.HttpSessionID];
+				string HttpSessionID = GetSessionId(Request, Response);
 
 				TabQueue Queue2 = new TabQueue(TabID, HttpSessionID, Session)
 				{
@@ -373,7 +373,7 @@ namespace Waher.IoTGateway
 
 		internal static async Task RegisterWebSocket(WebSocket Socket, string Location, string TabID)
 		{
-			TabQueue Queue = Register(Socket.HttpRequest, Socket, Location, TabID);
+			TabQueue Queue = Register(Socket.HttpRequest, Socket.HttpResponse, Socket, Location, TabID);
 			LinkedList<string> ToSend = null;
 
 			if (!await Queue.SyncObj.TryBeginWrite(10000))

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Waher.Content.Xsl;
 #endif
 using Waher.Networking.XMPP;
+using Waher.Runtime.Console;
 
 namespace Waher.Mock
 {
@@ -197,19 +198,19 @@ namespace Waher.Mock
 
 					Component.OnStateChanged += (sender, NewState) =>
 					{
-						Console.Out.WriteLine(NewState.ToString());
+						ConsoleOut.WriteLine(NewState.ToString());
 
 						switch (NewState)
 						{
 							case XmppState.Connected:
-								Console.ForegroundColor = ConsoleColor.Green;
-								Console.Out.WriteLine("Connection successful.");
+								ConsoleOut.ForegroundColor = ConsoleColor.Green;
+								ConsoleOut.WriteLine("Connection successful.");
 								Connected.Set();
 								break;
 
 							case XmppState.Error:
-								Console.ForegroundColor = ConsoleColor.Red;
-								Console.Out.WriteLine("Connection failed. Please update connection information.");
+								ConsoleOut.ForegroundColor = ConsoleColor.Red;
+								ConsoleOut.WriteLine("Connection failed. Please update connection information.");
 								Failure.Set();
 								break;
 						}
@@ -231,121 +232,121 @@ namespace Waher.Mock
 						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 #else
-				ConsoleColor FgBak = Console.ForegroundColor;
+				ConsoleColor FgBak = ConsoleOut.ForegroundColor;
 				string s;
 				string Default;
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
 
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("To setup a connection with the XMPP component, please answer the following");
-					Console.Out.WriteLine("questions:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("To setup a connection with the XMPP component, please answer the following");
+					ConsoleOut.WriteLine("questions:");
 
 					Default = Config.host;
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("What XMPP server do you want to use? Press ENTER to use " + Default);
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("What XMPP server do you want to use? Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
-						Console.Out.Write("XMPP Server: ");
-						Config.host = Console.In.ReadLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.Write("XMPP Server: ");
+						Config.host = ConsoleIn.ReadLine();
 						if (string.IsNullOrEmpty(Config.host))
 							Config.host = Default;
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.host + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Config.host + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Config.port.ToString();
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What port do you want to connect to? Press ENTER to use " + Default);
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What port do you want to connect to? Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 
 						do
 						{
-							Console.Out.Write("Port Number: ");
-							s = Console.In.ReadLine();
+							ConsoleOut.Write("Port Number: ");
+							s = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(s))
 								s = Default;
 						}
 						while (!int.TryParse(s, out Config.port) || Config.port < 1 || Config.port > 65535);
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.port.ToString() + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Config.port.ToString() + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Config.component;
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What component to you want to connect to?");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What component to you want to connect to?");
 
 					if (!string.IsNullOrEmpty(Default))
-						Console.Out.WriteLine("Press ENTER to use " + Default);
+						ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						do
 						{
-							Console.Out.Write("Component: ");
-							Config.component = Console.In.ReadLine();
+							ConsoleOut.Write("Component: ");
+							Config.component = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Config.component))
 								Config.component = Default;
 						}
 						while (string.IsNullOrEmpty(Config.component));
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.component + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Config.component + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Config.secret;
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What secret goes with the component? Remember that the configuration will,");
-					Console.Out.WriteLine("be stored in a simple text file along with the application.");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What secret goes with the component? Remember that the configuration will,");
+					ConsoleOut.WriteLine("be stored in a simple text file along with the application.");
 
 					if (!string.IsNullOrEmpty(Default))
-						Console.Out.WriteLine("Press ENTER to use " + Default);
+						ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						do
 						{
-							Console.Out.Write("Secret: ");
-							Config.secret = Console.In.ReadLine();
+							ConsoleOut.Write("Secret: ");
+							Config.secret = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Config.secret))
 								Config.secret = Default;
 						}
 						while (string.IsNullOrEmpty(Config.secret));
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Config.secret + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Config.secret + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("I will now try to connect to the server to see if the information");
-					Console.Out.WriteLine("provided is correct.");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("I will now try to connect to the server to see if the information");
+					ConsoleOut.WriteLine("provided is correct.");
 
 					using (XmppComponent Component = new XmppComponent(Config.host, Config.port, Config.component, Config.secret,
 						"collaboration", "test", "Test Component"))
@@ -355,19 +356,19 @@ namespace Waher.Mock
 
 						Component.OnStateChanged += (sender, NewState) =>
 						{
-							Console.Out.WriteLine(NewState.ToString());
+							ConsoleOut.WriteLine(NewState.ToString());
 
 							switch (NewState)
 							{
 								case XmppState.Connected:
-									Console.ForegroundColor = ConsoleColor.Green;
-									Console.Out.WriteLine("Connection successful.");
+									ConsoleOut.ForegroundColor = ConsoleColor.Green;
+									ConsoleOut.WriteLine("Connection successful.");
 									Connected.Set();
 									break;
 
 								case XmppState.Error:
-									Console.ForegroundColor = ConsoleColor.Red;
-									Console.Out.WriteLine("Connection failed. Please update connection information.");
+									ConsoleOut.ForegroundColor = ConsoleColor.Red;
+									ConsoleOut.WriteLine("Connection failed. Please update connection information.");
 									Failure.Set();
 									break;
 							}
@@ -390,23 +391,23 @@ namespace Waher.Mock
 				}
 				while (!Ok);
 
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.Out.WriteLine("Do you want to use a sniffer? If you use a sniffer, XMPP network");
-				Console.Out.WriteLine("communication will be Output to the console in real-time. This can");
-				Console.Out.WriteLine("come in handy when debugging network communication.");
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.WriteLine("Do you want to use a sniffer? If you use a sniffer, XMPP network");
+				ConsoleOut.WriteLine("communication will be Output to the console in real-time. This can");
+				ConsoleOut.WriteLine("come in handy when debugging network communication.");
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.Out.Write("Sniffer [y/n]? ");
+					ConsoleOut.ForegroundColor = ConsoleColor.White;
+					ConsoleOut.Write("Sniffer [y/n]? ");
 
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					Config.sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 				}
 				while (!Config.sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
 
-				Console.Out.WriteLine();
-				Console.ForegroundColor = FgBak;
+				ConsoleOut.WriteLine();
+				ConsoleOut.ForegroundColor = FgBak;
 #endif
 				Config.Save(FileName);
 

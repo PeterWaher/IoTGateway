@@ -5,6 +5,7 @@ using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 
@@ -109,19 +110,19 @@ namespace Waher.Utility.RunScript
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Allows you to execute script.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-i SCRIPT_FILE        Points to the script file to execute.");
-					Console.Out.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
-					Console.Out.WriteLine("                      If specified, a connection to a files");
-					Console.Out.WriteLine("                      object database (Waher.Persistence.Files)");
-					Console.Out.WriteLine("                      will be established.");
-					Console.Out.WriteLine("-e                    If encryption is used by the database.");
-					Console.Out.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Allows you to execute script.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-i SCRIPT_FILE        Points to the script file to execute.");
+					ConsoleOut.WriteLine("-d APP_DATA_FOLDER    Points to the application data folder.");
+					ConsoleOut.WriteLine("                      If specified, a connection to a files");
+					ConsoleOut.WriteLine("                      object database (Waher.Persistence.Files)");
+					ConsoleOut.WriteLine("                      will be established.");
+					ConsoleOut.WriteLine("-e                    If encryption is used by the database.");
+					ConsoleOut.WriteLine("-bs BLOCK_SIZE        Block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-bbs BLOB_BLOCK_SIZE  BLOB block size, in bytes. Default=8192.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -153,7 +154,7 @@ namespace Waher.Utility.RunScript
 					typeof(Script.Xml.XmlOutput).Assembly);
 
 				string Script = File.ReadAllText(ScriptFile);
-				Expression Parsed = new Expression(Script);
+				Expression Parsed = new(Script);
 				
 				Log.Register(new Events.Console.ConsoleEventSink());
 
@@ -169,27 +170,27 @@ namespace Waher.Utility.RunScript
 					FilesProvider.Start().Wait();
 				}
 
-				Variables Variables = new Variables()
+				Variables Variables = new()
 				{
-					ConsoleOut = Console.Out
+					ConsoleOut = ConsoleOut.Writer
 				};
 
 				object Result = Parsed.EvaluateAsync(Variables).Result;
 
-				Console.Out.WriteLine(Expression.ToString(Result));
+				ConsoleOut.WriteLine(Expression.ToString(Result));
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 			finally
 			{
 				Log.Terminate();
 
-				if (!(FilesProvider is null))
+				if (FilesProvider is not null)
 				{
 					FilesProvider.Stop().Wait();
 					FilesProvider?.Dispose();

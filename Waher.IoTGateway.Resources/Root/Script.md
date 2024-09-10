@@ -348,37 +348,37 @@ Would return:
 
 Suffix-operators are written after the operand to which they are applied. The following table lists available suffix operators:
 
-| Operator      | Description                                 | Example      |
-|:-------------:|:--------------------------------------------|:------------:|
-| `.`           | Member operator                             | `obj.Member` |
-| `(` List `)`  | Function evaluation                         | `f(a,b,c)`   |
-| `[]`          | To vector, if not already                   | `a[]`        |
-| `[Index]`     | Vector index operator                       | `v[i]`       |
-| `[X,Y]`       | Matrix index operator                       | `M[x,y]`     |
-| `[X,]`        | Matrix colum vector operator                | `M[x,]`      |
-| `[,Y]`        | Matrix row vector operator                  | `M[,y]`      |
-| `[,]`         | To matrix, if not already                   | `a[,]`       |
-| `{}`          | To set, if not already                      | `a{}`        |
-| `++`          | Post-Increment                              | `a++`        |
-| `--`          | Post-Decrement                              | `a--`        |
-| `%`           | Percent                                     | `10%`        |
-| `‰`           | Per thousand                                | `20‰`        |
-| `%0`          | Per thousand                                | `20%0`       |
-| `‱`          | Per ten thousand                            | `30‱`       |
-| `‰0`          | Per ten thousand                            | `30‰0`       |
-| `%00`         | Per ten thousand                            | `30%00`      |
-| `°`           | Degrees to radians                          | `sin(100°)`  |
-| `'`           | Default differentiation (prim)              | `f'(x)`      |
-| `′`           | Default differentiation (prim)              | `f′(x)`      |
-| `"`           | Default second-order differentiation (bis)  | `f"(x)`      |
-| `″`           | Default second-order differentiation (bis)  | `f″(x)`      |
-| `‴`           | Default third-order differentiation         | `f‴(x)`      |
-| `T`           | Transposed matrix                           | `M T`        |
-| `H`           | Conjugate Transposed matrix                 | `M H`        |
-| `†`           | Conjugate Transposed matrix                 | `M†`         |
-| `!`           | Faculty                                     | `n!`         |
-| `!!`          | Semi-Faculty                                | `n!!`        |
-| Physical unit | Defines a physical quantity.                | `10 m/s`     |
+| Operator      | Description                                 | Example                |
+|:-------------:|:--------------------------------------------|:----------------------:|
+| `.`           | Member operator                             | `obj.Member`           |
+| `(` List `)`  | Function evaluation                         | `f(a,b,c)`             |
+| `[]`          | To vector, or Array, if not already         | `a[]`, `System.Byte[]` |
+| `[Index]`     | Vector index operator                       | `v[i]`                 |
+| `[X,Y]`       | Matrix index operator                       | `M[x,y]`               |
+| `[X,]`        | Matrix colum vector operator                | `M[x,]`                |
+| `[,Y]`        | Matrix row vector operator                  | `M[,y]`                |
+| `[,]`         | To matrix, if not already                   | `a[,]`                 |
+| `{}`          | To set, if not already                      | `a{}`                  |
+| `++`          | Post-Increment                              | `a++`                  |
+| `--`          | Post-Decrement                              | `a--`                  |
+| `%`           | Percent                                     | `10%`                  |
+| `‰`           | Per thousand                                | `20‰`                  |
+| `%0`          | Per thousand                                | `20%0`                 |
+| `‱`          | Per ten thousand                            | `30‱`                |
+| `‰0`          | Per ten thousand                            | `30‰0`                 |
+| `%00`         | Per ten thousand                            | `30%00`                |
+| `°`           | Degrees to radians                          | `sin(100°)`            |
+| `'`           | Default differentiation (prim)              | `f'(x)`                |
+| `′`           | Default differentiation (prim)              | `f′(x)`                |
+| `"`           | Default second-order differentiation (bis)  | `f"(x)`                |
+| `″`           | Default second-order differentiation (bis)  | `f″(x)`                |
+| `‴`           | Default third-order differentiation         | `f‴(x)`                |
+| `T`           | Transposed matrix                           | `M T`                  |
+| `H`           | Conjugate Transposed matrix                 | `M H`                  |
+| `†`           | Conjugate Transposed matrix                 | `M†`                   |
+| `!`           | Faculty                                     | `n!`                   |
+| `!!`          | Semi-Faculty                                | `n!!`                  |
+| Physical unit | Defines a physical quantity.                | `10 m/s`               |
 
 Some suffix operators can be prefixed by a `?` character, to include a *null check* of the operand. If the operand is `null`, the operator
 is not evaluated, and `null` is returned. The following table lists null-checked suffix operators:
@@ -583,6 +583,7 @@ There are various different membership operators. All have the same [order of pr
 |:----------:|:----------------------------------|:------------------:|
 | `AS`       | The `AS` operator makes sure the left operand is of the same type as the right operand. The result is **null** if they are not, or the same value as the left operand if they are.           | `Value as Type`           |
 | `IS`       | The `IS` operator checks if the left operand is of the same type as the right operand. | `Value is Type` |
+| `IS NOT`   | The `IS NOT` operator checks if the left operand is not of the same type as the right operand. | `Value is not Type` |
 | `INHERITS` | The `INHERITS` operator checks if the left operand inherits the type defined by the right operand. | `Value inherits Type` |
 | `IN`       | The `IN` operator checks if the left operand is a member of the right operand. | `Value in Set` |
 | `MATCHES`  | The `MATCHES` operator checks if the left operand matches the construct of the right operand using [pattern matching](#assignmentPatternMatching), and return `true` of the left operand matches the right, and `false` otherwise. If there's a match, any implicit variables are set accordingly. | `v matches [a,b,c]` |
@@ -1115,27 +1116,28 @@ The following functions generate transformation matrices:
 
 The following functions are useful to control the runtime execution of the script:
 
-| Function                 | Description                                                                                                                                                                                                                                | In Pattern Matching                                    | Example |
-|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|---------|
-| `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments.                                                    |                                                        | `Create(System.String,'-',80)` |
-| `Delete(x)`              | Alias for `Destroy(x)`.                                                                                                                                                                                                                    |                                                        | `Delete(x)` |
-| `Destroy(x)`             | Destroys the value `x`. If the function references a variable, the variable is also removed.                                                                                                                                               |                                                        | `Destroy(x)` |
-| `Error(Msg)`             | Throws an error/exception.                                                                                                                                                                                                                 |                                                        | `Error('Something went wrong.')` |
-| `Exception(Msg)`         | Alias for `Error(Msg)`.                                                                                                                                                                                                                    |                                                        | `Exception('Something went wrong.')` |
-| `Exists(f)`              | Checks if the expression defined by `f` is valid or not.                                                                                                                                                                                   |                                                        | `Exists(x)` |
-| `Fields(x)`              | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values.                                                                                       |                                                        | `Properties(Ans)` |
-| `Methods(x)`             | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. |                                                        | `Methods(Ans)` |
-| `Names(x)`               | If `x` is an enumeration type or value, `Names(x)` returns the list of recognized enumeration value of the corresponding enumeration type.                                                                                                 |                                                        | `Names(Ans)` |
-| `Optional(f)`            | Declares `f` as optional. Useful in pattern matching.                                                                                                                                                                                      | Any variables in `f` are assigned null if not defined. | `Optional(x)` |
-| `Preview(x)`             | Reports a preview of the result back to the caller, if subscribed for such.                                                                                                                                                                |                                                        | `Preview(x)` |
-| `Print(Msg)`             | Prints a message to the current console output (which is defined in the variables collection).                                                                                                                                             |                                                        | `Print(x)` |
-| `PrintLine(Msg)`         | Prints a message followed by a newline to the current console output.                                                                                                                                                                      |                                                        | `PrintLine(x)` |
-| `PrintLn(Msg)`           | Alias for `PrintLine(Msg)`.                                                                                                                                                                                                                |                                                        | `PrintLine(x)` |
-| `Properties(x)`          | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values.                                                                         |                                                        | `Properties(Ans)` |
-| `Remove(Var)`            | Removes the varable `Var` without destroying its contents.                                                                                                                                                                                 |                                                        | `Remove(x)` |
-| `Remove(Obj.Property)`   | Removes the property `Property` from an object, without destroying its contents. Returns if the named property was found and removed.                                                                                                      |                                                        | `Remove(x.A)` |
-| `Required(f)`            | Makes sure `f` is defined. If not, an exception is thrown. Can be used in pattern matching.                                                                                                                                                | Asserts `f` is defined (and not null).                 | `Required(x)` |
-| `Return(x)`              | Returns from the current function scope with the value `x`.                                                                                                                                                                                |                                                        | `return(Result)` |
+| Function                      | Description                                                                                                                                                                                                                                | In Pattern Matching                                    | Example |
+|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|---------|
+| `Create(Type[,ArgList])`      | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments.                                                    |                                                        | `Create(System.String,'-',80)` |
+| `CreateType(Type[,TypeList])` | Creates a concrete type from a generic type `Type` together with a list of types in `TypeList` forming the basis for the concretization of the generic type.                                                                               |                                                        | `CreateType(System.Array,System.Byte)` |
+| `Delete(x)`                   | Alias for `Destroy(x)`.                                                                                                                                                                                                                    |                                                        | `Delete(x)` |
+| `Destroy(x)`                  | Destroys the value `x`. If the function references a variable, the variable is also removed.                                                                                                                                               |                                                        | `Destroy(x)` |
+| `Error(Msg)`                  | Throws an error/exception.                                                                                                                                                                                                                 |                                                        | `Error('Something went wrong.')` |
+| `Exception(Msg)`              | Alias for `Error(Msg)`.                                                                                                                                                                                                                    |                                                        | `Exception('Something went wrong.')` |
+| `Exists(f)`                   | Checks if the expression defined by `f` is valid or not.                                                                                                                                                                                   |                                                        | `Exists(x)` |
+| `Fields(x)`                   | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values.                                                                                       |                                                        | `Properties(Ans)` |
+| `Methods(x)`                  | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. |                                                        | `Methods(Ans)` |
+| `Names(x)`                    | If `x` is an enumeration type or value, `Names(x)` returns the list of recognized enumeration value of the corresponding enumeration type.                                                                                                 |                                                        | `Names(Ans)` |
+| `Optional(f)`                 | Declares `f` as optional. Useful in pattern matching.                                                                                                                                                                                      | Any variables in `f` are assigned null if not defined. | `Optional(x)` |
+| `Preview(x)`                  | Reports a preview of the result back to the caller, if subscribed for such.                                                                                                                                                                |                                                        | `Preview(x)` |
+| `Print(Msg)`                  | Prints a message to the current console output (which is defined in the variables collection).                                                                                                                                             |                                                        | `Print(x)` |
+| `PrintLine(Msg)`              | Prints a message followed by a newline to the current console output.                                                                                                                                                                      |                                                        | `PrintLine(x)` |
+| `PrintLn(Msg)`                | Alias for `PrintLine(Msg)`.                                                                                                                                                                                                                |                                                        | `PrintLine(x)` |
+| `Properties(x)`               | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values.                                                                         |                                                        | `Properties(Ans)` |
+| `Remove(Var)`                 | Removes the varable `Var` without destroying its contents.                                                                                                                                                                                 |                                                        | `Remove(x)` |
+| `Remove(Obj.Property)`        | Removes the property `Property` from an object, without destroying its contents. Returns if the named property was found and removed.                                                                                                      |                                                        | `Remove(x.A)` |
+| `Required(f)`                 | Makes sure `f` is defined. If not, an exception is thrown. Can be used in pattern matching.                                                                                                                                                | Asserts `f` is defined (and not null).                 | `Required(x)` |
+| `Return(x)`                   | Returns from the current function scope with the value `x`.                                                                                                                                                                                |                                                        | `return(Result)` |
 
 ### Logging Functions
 
@@ -2464,11 +2466,11 @@ library) or the Neuron^TM.
 
 ##### Functions related to local services
 
-| Function                                                               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Example                                                            |
-|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| `ConfigurationPage(Title,LocalResource[,Privileges])`                  | Defines a configuration page to display in the admin portal. Typically called as part of the setup and configuration phase of a configurable content-only module.                                                                                                                                                                                                                                                                                                                                                                     | `ConfigurationPage("Settings","/Svc/Cnf.md","Admin.Svc.Settings")` | 
-| `IpLocale(IP)`                                                         | Looks up locale information about an IP address.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `IpLocale("1.2.3.4")`                                              |
-| `QuickLoginServiceId(Request)`                                         | Generates a Quick-Login service ID, from an HTTP Request object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `QuickLoginServiceId(Request)`                                     |
+| Function                                              | Description                                                                                                                                                                    | Example                                                            |
+|-------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `ConfigurationPage(Title,LocalResource[,Privileges])` | Defines a configuration page to display in the admin portal. Typically called as part of the setup and configuration phase of a configurable content-only module.              | `ConfigurationPage("Settings","/Svc/Cnf.md","Admin.Svc.Settings")` | 
+| `IpLocale(IP)`                                        | Looks up locale information about an IP address.                                                                                                                               | `IpLocale("1.2.3.4")`                                              |
+| `QuickLoginServiceId(Request[,AgentApiTimeout])`      | Generates a Quick-Login service ID, from an HTTP Request object. If the quick-login should generate an Agent API login at the same time, a timeout in seconds can be provided. | `QuickLoginServiceId(Request)`                                     |
 
 ##### E-mail related functions
 
@@ -2562,6 +2564,15 @@ about the script functions referenced in this section is available in the [Neuro
 | `BuyEDalerService(Definition)`   | Creates a script-based service for buying eDaler(R).  |
 | `PaymentService(Definition)`     | Creates a script-based service for payments.          |
 | `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
+
+#### Sending SMS (available in TAG.Service.GatewayApi.package)
+
+The following functions are available on systems with the `TAG.Service.GatewayApi.package` installed. A more detailed description
+about the script functions referenced in this section is available in the [GatewayApiSms repository](https://github.com/Trust-Anchor-Group/GatewayApiSms).
+
+| Function                                       | Description                                           |
+|------------------------------------------------|-------------------------------------------------------|
+| `SendGatewayApiSms(Sender,Message,Recipients)` | Sends an SMS (if service is configured correctly). `Recipients` can be a phone number or vector of phone numbers. |
 
 #### OpenAI Extensions (available in TAG.XmppOpenAIBridge.package)
 

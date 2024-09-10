@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Binary;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.ACME;
 using Waher.Security.PKCS;
@@ -89,8 +90,8 @@ namespace Waher.Utility.Acme
 
         static void Main(string[] args)
         {
-            ConsoleColor FgColorBak = Console.ForegroundColor;
-            ConsoleColor BgColorBak = Console.BackgroundColor;
+            ConsoleColor FgColorBak = ConsoleOut.ForegroundColor;
+            ConsoleColor BgColorBak = ConsoleOut.BackgroundColor;
             int i = 0;
             int c = args.Length;
             string s;
@@ -309,55 +310,55 @@ namespace Waher.Utility.Acme
 
                 if (help || c == 0)
                 {
-                    Console.Out.WriteLine("Helps you create certificates using the Automatic Certificate");
-                    Console.Out.WriteLine("Management Environment (ACME) v2 protocol.");
-                    Console.Out.WriteLine();
-                    Console.Out.WriteLine("Command line switches:");
-                    Console.Out.WriteLine();
-                    Console.Out.WriteLine("-dir URI              URI to the ACME directory resource to use.");
-                    Console.Out.WriteLine("                      If not provided, the default Let's Encrypt");
-                    Console.Out.WriteLine("                      ACME v2 directory will be used:");
-                    Console.Out.WriteLine("                      https://acme-v02.api.letsencrypt.org/directory");
-                    Console.Out.WriteLine("-le                   Uses the Let's Encrypt ACME v2 directory:");
-                    Console.Out.WriteLine("                      https://acme-v02.api.letsencrypt.org/directory");
-                    Console.Out.WriteLine("-let                  Uses the Let's Encrypt ACME v2 staging directory:");
-                    Console.Out.WriteLine("                      https://acme-staging-v02.api.letsencrypt.org/directory");
-                    Console.Out.WriteLine("-ce EMAIL             Adds EMAIL to the list of contact e-mail addresses");
-                    Console.Out.WriteLine("                      when creating an account. Can be used multiple");
-                    Console.Out.WriteLine("                      times. The first e-mail address will also be");
-                    Console.Out.WriteLine("                      encoded into the certificate request.");
-                    Console.Out.WriteLine("-cu URI               Adds URI to the list of contact URIs when creating");
-                    Console.Out.WriteLine("                      an account. Can be used multiple times.");
-                    Console.Out.WriteLine("-a                    You agree to the terms of service agreement. This");
-                    Console.Out.WriteLine("                      might be required if you want to be able to create");
-                    Console.Out.WriteLine("                      an account.");
-                    Console.Out.WriteLine("-nk                   Generates a new account key.");
-                    Console.Out.WriteLine("-dns DOMAIN           Adds DOMAIN to the list of domain names when creating");
-                    Console.Out.WriteLine("                      an order for a new certificate. Can be used multiple");
-                    Console.Out.WriteLine("                      times. The first DOMAIN will be used as the common name");
-                    Console.Out.WriteLine("                      for the certificate request. The following domain names");
-                    Console.Out.WriteLine("                      will be used as altenative names.");
-                    Console.Out.WriteLine("-nb TIMESTAMP         Generated certificate will not be valid before");
-                    Console.Out.WriteLine("                      TIMESTAMP.");
-                    Console.Out.WriteLine("-na TIMESTAMP         Generated certificate will not be valid after");
-                    Console.Out.WriteLine("                      TIMESTAMP.");
-                    Console.Out.WriteLine("-http ROOTFOLDER      Allows the application to respond to HTTP challenges");
-                    Console.Out.WriteLine("                      by storing temporary files under the corresponding ACME");
-                    Console.Out.WriteLine("                      challenge response folder /.well-known/acme-challenge");
-                    Console.Out.WriteLine("-pi MS                Polling Interval, in milliseconds. Default value is");
-                    Console.Out.WriteLine("                      5000.");
-                    Console.Out.WriteLine("-ks BITS              Certificate key size, in bits. Default is 4096.");
-                    Console.Out.WriteLine("-c COUNTRY            Country name (C) in the certificate request.");
-                    Console.Out.WriteLine("-l LOCALITY           Locality name (L) in the certificate request.");
-                    Console.Out.WriteLine("-st STATEORPROVINCE   State or Province name (ST) in the certificate request.");
-                    Console.Out.WriteLine("-o ORGANIZATION       Organization name (O) in the certificate request.");
-                    Console.Out.WriteLine("-ou ORGUNIT           Organizational unit name (OU) in the certificate request.");
-                    Console.Out.WriteLine("-f FILENAME           Output filename of the certificate, without file");
-                    Console.Out.WriteLine("                      extension.");
-                    Console.Out.WriteLine("-pwd PASSWORD         Password to protect the private key in the generated");
-                    Console.Out.WriteLine("                      certificate.");
-                    Console.Out.WriteLine("-v                    Verbose mode.");
-                    Console.Out.WriteLine("-?                    Help.");
+                    ConsoleOut.WriteLine("Helps you create certificates using the Automatic Certificate");
+                    ConsoleOut.WriteLine("Management Environment (ACME) v2 protocol.");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("Command line switches:");
+                    ConsoleOut.WriteLine();
+                    ConsoleOut.WriteLine("-dir URI              URI to the ACME directory resource to use.");
+                    ConsoleOut.WriteLine("                      If not provided, the default Let's Encrypt");
+                    ConsoleOut.WriteLine("                      ACME v2 directory will be used:");
+                    ConsoleOut.WriteLine("                      https://acme-v02.api.letsencrypt.org/directory");
+                    ConsoleOut.WriteLine("-le                   Uses the Let's Encrypt ACME v2 directory:");
+                    ConsoleOut.WriteLine("                      https://acme-v02.api.letsencrypt.org/directory");
+                    ConsoleOut.WriteLine("-let                  Uses the Let's Encrypt ACME v2 staging directory:");
+                    ConsoleOut.WriteLine("                      https://acme-staging-v02.api.letsencrypt.org/directory");
+                    ConsoleOut.WriteLine("-ce EMAIL             Adds EMAIL to the list of contact e-mail addresses");
+                    ConsoleOut.WriteLine("                      when creating an account. Can be used multiple");
+                    ConsoleOut.WriteLine("                      times. The first e-mail address will also be");
+                    ConsoleOut.WriteLine("                      encoded into the certificate request.");
+                    ConsoleOut.WriteLine("-cu URI               Adds URI to the list of contact URIs when creating");
+                    ConsoleOut.WriteLine("                      an account. Can be used multiple times.");
+                    ConsoleOut.WriteLine("-a                    You agree to the terms of service agreement. This");
+                    ConsoleOut.WriteLine("                      might be required if you want to be able to create");
+                    ConsoleOut.WriteLine("                      an account.");
+                    ConsoleOut.WriteLine("-nk                   Generates a new account key.");
+                    ConsoleOut.WriteLine("-dns DOMAIN           Adds DOMAIN to the list of domain names when creating");
+                    ConsoleOut.WriteLine("                      an order for a new certificate. Can be used multiple");
+                    ConsoleOut.WriteLine("                      times. The first DOMAIN will be used as the common name");
+                    ConsoleOut.WriteLine("                      for the certificate request. The following domain names");
+                    ConsoleOut.WriteLine("                      will be used as altenative names.");
+                    ConsoleOut.WriteLine("-nb TIMESTAMP         Generated certificate will not be valid before");
+                    ConsoleOut.WriteLine("                      TIMESTAMP.");
+                    ConsoleOut.WriteLine("-na TIMESTAMP         Generated certificate will not be valid after");
+                    ConsoleOut.WriteLine("                      TIMESTAMP.");
+                    ConsoleOut.WriteLine("-http ROOTFOLDER      Allows the application to respond to HTTP challenges");
+                    ConsoleOut.WriteLine("                      by storing temporary files under the corresponding ACME");
+                    ConsoleOut.WriteLine("                      challenge response folder /.well-known/acme-challenge");
+                    ConsoleOut.WriteLine("-pi MS                Polling Interval, in milliseconds. Default value is");
+                    ConsoleOut.WriteLine("                      5000.");
+                    ConsoleOut.WriteLine("-ks BITS              Certificate key size, in bits. Default is 4096.");
+                    ConsoleOut.WriteLine("-c COUNTRY            Country name (C) in the certificate request.");
+                    ConsoleOut.WriteLine("-l LOCALITY           Locality name (L) in the certificate request.");
+                    ConsoleOut.WriteLine("-st STATEORPROVINCE   State or Province name (ST) in the certificate request.");
+                    ConsoleOut.WriteLine("-o ORGANIZATION       Organization name (O) in the certificate request.");
+                    ConsoleOut.WriteLine("-ou ORGUNIT           Organizational unit name (OU) in the certificate request.");
+                    ConsoleOut.WriteLine("-f FILENAME           Output filename of the certificate, without file");
+                    ConsoleOut.WriteLine("                      extension.");
+                    ConsoleOut.WriteLine("-pwd PASSWORD         Password to protect the private key in the generated");
+                    ConsoleOut.WriteLine("                      certificate.");
+                    ConsoleOut.WriteLine("-v                    Verbose mode.");
+                    ConsoleOut.WriteLine("-?                    Help.");
                     return;
                 }
 
@@ -403,12 +404,12 @@ namespace Waher.Utility.Acme
                 if (verbose)
                     LogError(ex.Message);
                 else
-                    Console.Out.WriteLine(ex.Message);
+                    ConsoleOut.WriteLine(ex.Message);
             }
             finally
             {
-                Console.ForegroundColor = FgColorBak;
-                Console.BackgroundColor = BgColorBak;
+                ConsoleOut.ForegroundColor = FgColorBak;
+				ConsoleOut.BackgroundColor = BgColorBak;
             }
         }
 
@@ -613,10 +614,10 @@ namespace Waher.Utility.Acme
                                     }
                                     else if (!verbose)
                                     {
-                                        Console.Out.WriteLine(Index.ToString() + ") HTTP challenge.");
-                                        Console.Out.WriteLine("Resource: " + HttpChallenge.ResourceName);
-                                        Console.Out.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
-                                        Console.Out.WriteLine("Content-Type: " + BinaryCodec.DefaultContentType);
+                                        ConsoleOut.WriteLine(Index.ToString() + ") HTTP challenge.");
+                                        ConsoleOut.WriteLine("Resource: " + HttpChallenge.ResourceName);
+                                        ConsoleOut.WriteLine("Response: " + HttpChallenge.KeyAuthorization);
+                                        ConsoleOut.WriteLine("Content-Type: " + BinaryCodec.DefaultContentType);
                                     }
                                 }
                                 else if (Challenge is AcmeDnsChallenge DnsChallenge)
@@ -627,24 +628,24 @@ namespace Waher.Utility.Acme
 
                                     if (!verbose)
                                     {
-                                        Console.Out.WriteLine(Index.ToString() + ") DNS challenge.");
-                                        Console.Out.WriteLine("Domain: " + DnsChallenge.ValidationDomainNamePrefix + Authorization.Value);
-                                        Console.Out.WriteLine("TXT Record: " + DnsChallenge.KeyAuthorization);
+                                        ConsoleOut.WriteLine(Index.ToString() + ") DNS challenge.");
+                                        ConsoleOut.WriteLine("Domain: " + DnsChallenge.ValidationDomainNamePrefix + Authorization.Value);
+                                        ConsoleOut.WriteLine("TXT Record: " + DnsChallenge.KeyAuthorization);
                                     }
                                 }
                             }
 
                             if (Manual)
                             {
-                                Console.Out.WriteLine();
-                                Console.Out.WriteLine("No automated method found to respond to any of the authorization challenges. " +
+                                ConsoleOut.WriteLine();
+                                ConsoleOut.WriteLine("No automated method found to respond to any of the authorization challenges. " +
                                     "You can respond to a challenge manually. After configuring the corresponding " +
                                     "resource, enter the number of the corresponding challenge and press ENTER to acknowledge it.");
 
                                 do
                                 {
-                                    Console.Out.Write("Challenge to acknowledge: ");
-                                    s = Console.In.ReadLine();
+                                    ConsoleOut.Write("Challenge to acknowledge: ");
+                                    s = await ConsoleIn.ReadLineAsync();
                                 }
                                 while (!int.TryParse(s, out Index) || Index <= 0 || Index > NrChallenges);
 
@@ -914,7 +915,7 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
+				ConsoleOut.ForegroundColor = ConsoleColor.Green;
                 Log(Message, Tags);
             }
         }
@@ -923,7 +924,7 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
                 Log(Message, Tags);
             }
         }
@@ -932,20 +933,20 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+				ConsoleOut.ForegroundColor = ConsoleColor.Red;
                 Log(Message, Tags);
             }
         }
 
         private static void Log(string Message, params KeyValuePair<string, object>[] Tags)
         {
-            Console.Out.WriteLine(Message);
+            ConsoleOut.WriteLine(Message);
 
             foreach (KeyValuePair<string, object> Tag in Tags)
             {
-                Console.Out.Write('\t');
-                Console.Out.Write(Tag.Key);
-                Console.Out.Write(": ");
+                ConsoleOut.Write('\t');
+                ConsoleOut.Write(Tag.Key);
+                ConsoleOut.Write(": ");
 
                 if (Tag.Value is Array A)
                 {
@@ -956,15 +957,15 @@ namespace Waher.Utility.Acme
                         if (First)
                             First = false;
                         else
-                            Console.Out.Write(", ");
+                            ConsoleOut.Write(", ");
 
-                        Console.Out.Write(Item?.ToString());
+                        ConsoleOut.Write(Item?.ToString());
                     }
                 }
                 else
-                    Console.Out.Write(Tag.Value?.ToString());
+                    ConsoleOut.Write(Tag.Value?.ToString());
 
-                Console.Out.WriteLine();
+                ConsoleOut.WriteLine();
             }
         }
 

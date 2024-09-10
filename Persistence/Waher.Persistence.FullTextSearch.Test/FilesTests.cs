@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Keywords;
+using Waher.Runtime.Console;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
@@ -43,11 +43,11 @@ namespace Waher.Persistence.FullTextSearch.Test
 			{
 				FolderIndexationStatistics Stat = await Search.IndexFolder("Files", "Files", true);
 
-				Console.Out.WriteLine("NrAdded: " + Stat.NrAdded.ToString());
-				Console.Out.WriteLine("NrUpdated: " + Stat.NrUpdated.ToString());
-				Console.Out.WriteLine("NrDeleted: " + Stat.NrDeleted.ToString());
-				Console.Out.WriteLine("NrFiles: " + Stat.NrFiles.ToString());
-				Console.Out.WriteLine("TotalChanges: " + Stat.TotalChanges.ToString());
+				ConsoleOut.WriteLine("NrAdded: " + Stat.NrAdded.ToString());
+				ConsoleOut.WriteLine("NrUpdated: " + Stat.NrUpdated.ToString());
+				ConsoleOut.WriteLine("NrDeleted: " + Stat.NrDeleted.ToString());
+				ConsoleOut.WriteLine("NrFiles: " + Stat.NrFiles.ToString());
+				ConsoleOut.WriteLine("TotalChanges: " + Stat.TotalChanges.ToString());
 
 				Count = Stat.TotalChanges;
 				if (Count == NrProcessed)
@@ -69,7 +69,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		{
 			bool Result = await Search.IndexFile("Files", "Files/1/1.txt");
 
-			Console.Out.WriteLine(Result.ToString());
+			ConsoleOut.WriteLine(Result.ToString());
 		}
 
 		[TestMethod]

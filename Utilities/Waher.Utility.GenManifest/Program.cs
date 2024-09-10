@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Console;
 using static System.Environment;
 
 namespace Waher.Utility.GenManifest
@@ -200,53 +200,53 @@ namespace Waher.Utility.GenManifest
 
 					foreach (KeyValuePair<string, string> P in Mappings)
 					{
-						Console.Out.Write(P.Key);
-						Console.Out.Write(':');
-						Console.Out.Write(new string(' ', MaxLen - P.Key.Length));
-						Console.Out.WriteLine(P.Value);
+						ConsoleOut.Write(P.Key);
+						ConsoleOut.Write(':');
+						ConsoleOut.Write(new string(' ', MaxLen - P.Key.Length));
+						ConsoleOut.WriteLine(P.Value);
 					}
 				}
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Generates a manifest file from contents in one or more file");
-					Console.Out.WriteLine("folders.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-a FOLDER             Adding folder of assembly files. This switch");
-					Console.Out.WriteLine("                      can be used multiple times. Folder is not");
-					Console.Out.WriteLine("                      processed recursively.");
-					Console.Out.WriteLine("-c FOLDER             Adding folder of content files. This switch");
-					Console.Out.WriteLine("                      can be used multiple times. Folder is processed");
-					Console.Out.WriteLine("                      recursively.");
-					Console.Out.WriteLine("-p SPECIALFOLDER      Adding folder of external program data files.");
-					Console.Out.WriteLine("   NAME FOLDER        The program data files will be copied to a");
-					Console.Out.WriteLine("                      folder named NAME under the operating system");
-					Console.Out.WriteLine("                      special folder SPECIALFOLDER. The folder FOLDER");
-					Console.Out.WriteLine("                      is processed recursively. Possible values of");
-					Console.Out.WriteLine("                      SPECIALFOLDER are: Desktop, Programs, MyDocuments, ");
-					Console.Out.WriteLine("                      Personal, Favorites, Startup, Recent, SendTo, ");
-					Console.Out.WriteLine("                      StartMenu, MyMusic, MyVideos, DesktopDirectory, ");
-					Console.Out.WriteLine("                      MyComputer, NetworkShortcuts, Fonts, Templates, ");
-					Console.Out.WriteLine("                      CommonStartMenu, CommonPrograms, CommonStartup, ");
-					Console.Out.WriteLine("                      CommonDesktopDirectory, ApplicationData, ");
-					Console.Out.WriteLine("                      PrinterShortcuts, LocalApplicationData, ");
-					Console.Out.WriteLine("                      InternetCache, Cookies, History, ");
-					Console.Out.WriteLine("                      CommonApplicationData, Windows, System, ");
-					Console.Out.WriteLine("                      ProgramFiles, MyPictures, UserProfile, SystemX86, ");
-					Console.Out.WriteLine("                      ProgramFilesX86, CommonProgramFiles, ");
-					Console.Out.WriteLine("                      CommonProgramFilesX86, CommonTemplates, ");
-					Console.Out.WriteLine("                      CommonDocuments, CommonAdminTools, AdminTools, ");
-					Console.Out.WriteLine("                      CommonMusic, CommonPictures, CommonVideos, ");
-					Console.Out.WriteLine("                      Resources, LocalizedResources, CommonOemLinks, ");
-					Console.Out.WriteLine("                      CDBurning.");
-					Console.Out.WriteLine("-o FILENAME           File name of output manifest file.");
-					Console.Out.WriteLine("-ef FOLDER            Exclude folders with the given name.");
-					Console.Out.WriteLine("-ex EXTENSION         Exclude files with the given extension.");
-					Console.Out.WriteLine("-l                    Lists available special folders, and to what");
-					Console.Out.WriteLine("                      folders on the computer they are mapped to.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Generates a manifest file from contents in one or more file");
+					ConsoleOut.WriteLine("folders.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-a FOLDER             Adding folder of assembly files. This switch");
+					ConsoleOut.WriteLine("                      can be used multiple times. Folder is not");
+					ConsoleOut.WriteLine("                      processed recursively.");
+					ConsoleOut.WriteLine("-c FOLDER             Adding folder of content files. This switch");
+					ConsoleOut.WriteLine("                      can be used multiple times. Folder is processed");
+					ConsoleOut.WriteLine("                      recursively.");
+					ConsoleOut.WriteLine("-p SPECIALFOLDER      Adding folder of external program data files.");
+					ConsoleOut.WriteLine("   NAME FOLDER        The program data files will be copied to a");
+					ConsoleOut.WriteLine("                      folder named NAME under the operating system");
+					ConsoleOut.WriteLine("                      special folder SPECIALFOLDER. The folder FOLDER");
+					ConsoleOut.WriteLine("                      is processed recursively. Possible values of");
+					ConsoleOut.WriteLine("                      SPECIALFOLDER are: Desktop, Programs, MyDocuments, ");
+					ConsoleOut.WriteLine("                      Personal, Favorites, Startup, Recent, SendTo, ");
+					ConsoleOut.WriteLine("                      StartMenu, MyMusic, MyVideos, DesktopDirectory, ");
+					ConsoleOut.WriteLine("                      MyComputer, NetworkShortcuts, Fonts, Templates, ");
+					ConsoleOut.WriteLine("                      CommonStartMenu, CommonPrograms, CommonStartup, ");
+					ConsoleOut.WriteLine("                      CommonDesktopDirectory, ApplicationData, ");
+					ConsoleOut.WriteLine("                      PrinterShortcuts, LocalApplicationData, ");
+					ConsoleOut.WriteLine("                      InternetCache, Cookies, History, ");
+					ConsoleOut.WriteLine("                      CommonApplicationData, Windows, System, ");
+					ConsoleOut.WriteLine("                      ProgramFiles, MyPictures, UserProfile, SystemX86, ");
+					ConsoleOut.WriteLine("                      ProgramFilesX86, CommonProgramFiles, ");
+					ConsoleOut.WriteLine("                      CommonProgramFilesX86, CommonTemplates, ");
+					ConsoleOut.WriteLine("                      CommonDocuments, CommonAdminTools, AdminTools, ");
+					ConsoleOut.WriteLine("                      CommonMusic, CommonPictures, CommonVideos, ");
+					ConsoleOut.WriteLine("                      Resources, LocalizedResources, CommonOemLinks, ");
+					ConsoleOut.WriteLine("                      CDBurning.");
+					ConsoleOut.WriteLine("-o FILENAME           File name of output manifest file.");
+					ConsoleOut.WriteLine("-ef FOLDER            Exclude folders with the given name.");
+					ConsoleOut.WriteLine("-ex EXTENSION         Exclude files with the given extension.");
+					ConsoleOut.WriteLine("-l                    Lists available special folders, and to what");
+					ConsoleOut.WriteLine("                      folders on the computer they are mapped to.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -316,7 +316,7 @@ namespace Waher.Utility.GenManifest
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

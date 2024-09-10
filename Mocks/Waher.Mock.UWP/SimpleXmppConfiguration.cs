@@ -8,15 +8,14 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.QR;
+using Waher.Content.QR.Encoding;
 using Waher.Content.Xml;
 #if !WINDOWS_UWP
 using Waher.Content.Xsl;
 #endif
-using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
-using System.Collections.Generic;
-using Waher.Content.QR.Encoding;
+using Waher.Runtime.Console;
 
 namespace Waher.Mock
 {
@@ -319,51 +318,51 @@ namespace Waher.Mock
 						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 #else
-				ConsoleColor FgBak = Console.ForegroundColor;
+				ConsoleColor FgBak = ConsoleOut.ForegroundColor;
 				string s;
 				string Default;
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
 
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("To setup a connection to the XMPP network, please answer the following");
-					Console.Out.WriteLine("questions:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("To setup a connection to the XMPP network, please answer the following");
+					ConsoleOut.WriteLine("questions:");
 
 					Default = Credentials.Host;
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("What XMPP server do you want to use? Press ENTER to use " + Default);
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("What XMPP server do you want to use? Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
-						Console.Out.Write("XMPP Server: ");
-						Credentials.Host = Console.In.ReadLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.Write("XMPP Server: ");
+						Credentials.Host = ConsoleIn.ReadLine();
 						if (string.IsNullOrEmpty(Credentials.Host))
 							Credentials.Host = Default;
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Host + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Host + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Credentials.Port.ToString();
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What port do you want to connect to? Press ENTER to use " + Default);
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What port do you want to connect to? Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						int Port;
 
 						do
 						{
-							Console.Out.Write("Port Number: ");
-							s = Console.In.ReadLine();
+							ConsoleOut.Write("Port Number: ");
+							s = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(s))
 								s = Default;
 						}
@@ -371,160 +370,160 @@ namespace Waher.Mock
 
 						Credentials.Port = Port;
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Port.ToString() + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Port.ToString() + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Credentials.Account;
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What account to you want to connect with? If the account does not exist,");
-					Console.Out.WriteLine("but the server supports In-band registration, the account will be created.");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What account to you want to connect with? If the account does not exist,");
+					ConsoleOut.WriteLine("but the server supports In-band registration, the account will be created.");
 
 					if (!string.IsNullOrEmpty(Default))
-						Console.Out.WriteLine("Press ENTER to use " + Default);
+						ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						do
 						{
-							Console.Out.Write("Account: ");
-							Credentials.Account = Console.In.ReadLine();
+							ConsoleOut.Write("Account: ");
+							Credentials.Account = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.Account))
 								Credentials.Account = Default;
 						}
 						while (string.IsNullOrEmpty(Credentials.Account));
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Account + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Account + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 					Default = Credentials.Password;
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("What password goes with the account? Remember that the configuration will,");
-					Console.Out.Write("be stored in a simple text file along with the application. ");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("What password goes with the account? Remember that the configuration will,");
+					ConsoleOut.Write("be stored in a simple text file along with the application. ");
 
 					if (!string.IsNullOrEmpty(Default))
-						Console.Out.WriteLine("Press ENTER to use " + Default);
+						ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
 						do
 						{
-							Console.Out.Write("Password: ");
-							Credentials.Password = Console.In.ReadLine();
+							ConsoleOut.Write("Password: ");
+							Credentials.Password = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.Password))
 								Credentials.Password = Default;
 						}
 						while (string.IsNullOrEmpty(Credentials.Password));
 
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Password + "'. Is this correct? [y/n]");
-						s = Console.In.ReadLine();
-						Console.Out.WriteLine();
+						ConsoleOut.ForegroundColor = ConsoleColor.Green;
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Password + "'. Is this correct? [y/n]");
+						s = ConsoleIn.ReadLine();
+						ConsoleOut.WriteLine();
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("Do you want to trust the server? It's better not to trust the server.");
-					Console.Out.WriteLine("This will force the server certificate to be validated, and the server");
-					Console.Out.WriteLine("trusted only if the certificate is valid. If there's a valid problem with");
-					Console.Out.WriteLine("the server certificate however, you might need to trust the server to");
-					Console.Out.WriteLine("be able to proceed.");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("Do you want to trust the server? It's better not to trust the server.");
+					ConsoleOut.WriteLine("This will force the server certificate to be validated, and the server");
+					ConsoleOut.WriteLine("trusted only if the certificate is valid. If there's a valid problem with");
+					ConsoleOut.WriteLine("the server certificate however, you might need to trust the server to");
+					ConsoleOut.WriteLine("be able to proceed.");
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
-						Console.Out.Write("Trust server [y/n]? ");
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.Write("Trust server [y/n]? ");
 
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						Credentials.TrustServer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 					}
 					while (!Credentials.TrustServer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
 
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("Do you want to create an account on the server?");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("Do you want to create an account on the server?");
 
 					do
 					{
-						Console.ForegroundColor = ConsoleColor.White;
-						Console.Out.Write("Create account [y/n]? ");
+						ConsoleOut.ForegroundColor = ConsoleColor.White;
+						ConsoleOut.Write("Create account [y/n]? ");
 
-						s = Console.In.ReadLine();
+						s = ConsoleIn.ReadLine();
 						Credentials.AllowRegistration = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 					}
 					while (!Credentials.AllowRegistration && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
 
 					if (Credentials.AllowRegistration)
 					{
-						Console.ForegroundColor = ConsoleColor.Yellow;
+						ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
 
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("Some servers require an API key to allow account creation.");
-						Console.Out.WriteLine("If so, please enter an API key below.");
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("Some servers require an API key to allow account creation.");
+						ConsoleOut.WriteLine("If so, please enter an API key below.");
 
 						Default = Credentials.FormSignatureKey;
-						Console.Out.WriteLine();
-						Console.Out.WriteLine("What API Key do you want to use? Press ENTER to use " + Default);
+						ConsoleOut.WriteLine();
+						ConsoleOut.WriteLine("What API Key do you want to use? Press ENTER to use " + Default);
 
 						do
 						{
-							Console.ForegroundColor = ConsoleColor.White;
-							Console.Out.Write("API Key: ");
-							Credentials.FormSignatureKey = Console.In.ReadLine();
+							ConsoleOut.ForegroundColor = ConsoleColor.White;
+							ConsoleOut.Write("API Key: ");
+							Credentials.FormSignatureKey = ConsoleIn.ReadLine();
 							if (string.IsNullOrEmpty(Credentials.FormSignatureKey))
 								Credentials.FormSignatureKey = Default;
 
-							Console.ForegroundColor = ConsoleColor.Green;
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("You've selected to use '" + Credentials.FormSignatureKey + "'. Is this correct? [y/n]");
-							s = Console.In.ReadLine();
-							Console.Out.WriteLine();
+							ConsoleOut.ForegroundColor = ConsoleColor.Green;
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("You've selected to use '" + Credentials.FormSignatureKey + "'. Is this correct? [y/n]");
+							s = ConsoleIn.ReadLine();
+							ConsoleOut.WriteLine();
 						}
 						while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 						if (!string.IsNullOrEmpty(Credentials.FormSignatureKey))
 						{
-							Console.ForegroundColor = ConsoleColor.Yellow;
+							ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
 
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("Please provide the corresponding secret below.");
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("Please provide the corresponding secret below.");
 
 							Default = Credentials.FormSignatureSecret;
-							Console.Out.WriteLine();
-							Console.Out.WriteLine("What secret belongs to the API key? Press ENTER to use " + Default);
+							ConsoleOut.WriteLine();
+							ConsoleOut.WriteLine("What secret belongs to the API key? Press ENTER to use " + Default);
 
 							do
 							{
-								Console.ForegroundColor = ConsoleColor.White;
-								Console.Out.Write("Secret: ");
-								Credentials.FormSignatureSecret = Console.In.ReadLine();
+								ConsoleOut.ForegroundColor = ConsoleColor.White;
+								ConsoleOut.Write("Secret: ");
+								Credentials.FormSignatureSecret = ConsoleIn.ReadLine();
 								if (string.IsNullOrEmpty(Credentials.FormSignatureSecret))
 									Credentials.FormSignatureSecret = Default;
 
-								Console.ForegroundColor = ConsoleColor.Green;
-								Console.Out.WriteLine();
-								Console.Out.WriteLine("You've selected to use '" + Credentials.FormSignatureSecret + "'. Is this correct? [y/n]");
-								s = Console.In.ReadLine();
-								Console.Out.WriteLine();
+								ConsoleOut.ForegroundColor = ConsoleColor.Green;
+								ConsoleOut.WriteLine();
+								ConsoleOut.WriteLine("You've selected to use '" + Credentials.FormSignatureSecret + "'. Is this correct? [y/n]");
+								s = ConsoleIn.ReadLine();
+								ConsoleOut.WriteLine();
 							}
 							while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 						}
 					}
 
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.Out.WriteLine("I will now try to connect to the server to see if the information");
-					Console.Out.WriteLine("provided is correct.");
+					ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+					ConsoleOut.WriteLine("I will now try to connect to the server to see if the information");
+					ConsoleOut.WriteLine("provided is correct.");
 
 					using (XmppClient Client = new XmppClient(Credentials, "en", AppAssembly))
 					{
@@ -535,13 +534,13 @@ namespace Waher.Mock
 
 						Client.OnStateChanged += (sender, NewState) =>
 						{
-							Console.Out.WriteLine(NewState.ToString());
+							ConsoleOut.WriteLine(NewState.ToString());
 
 							switch (NewState)
 							{
 								case XmppState.Connected:
-									Console.ForegroundColor = ConsoleColor.Green;
-									Console.Out.WriteLine("Connection successful.");
+									ConsoleOut.ForegroundColor = ConsoleColor.Green;
+									ConsoleOut.WriteLine("Connection successful.");
 									Credentials.Password = Client.PasswordHash;
 									Credentials.PasswordType = Client.PasswordHashMethod;
 									Credentials.AllowRegistration = false;
@@ -551,8 +550,8 @@ namespace Waher.Mock
 									break;
 
 								case XmppState.Error:
-									Console.ForegroundColor = ConsoleColor.Red;
-									Console.Out.WriteLine("Connection failed. Please update connection information.");
+									ConsoleOut.ForegroundColor = ConsoleColor.Red;
+									ConsoleOut.WriteLine("Connection failed. Please update connection information.");
 									Failure.Set();
 									break;
 							}
@@ -574,19 +573,19 @@ namespace Waher.Mock
 
 						if (Ok)
 						{
-							Console.ForegroundColor = ConsoleColor.Yellow;
-							Console.Out.WriteLine("Checking server capabilities.");
+							ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+							ConsoleOut.WriteLine("Checking server capabilities.");
 
 							ServiceItemsDiscoveryEventArgs e = Client.ServiceItemsDiscovery(Client.Domain, 10000);
 
 							foreach (Item Item in e.Items)
 							{
-								Console.Out.WriteLine("Checking " + Item.JID + ".");
+								ConsoleOut.WriteLine("Checking " + Item.JID + ".");
 								ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
 
 								if (e2.Features.ContainsKey("urn:nf:iot:disco:1.0") && string.IsNullOrEmpty(Credentials.ThingRegistry))
 								{
-									Console.Out.WriteLine("Thing registry found.");
+									ConsoleOut.WriteLine("Thing registry found.");
 									Credentials.ThingRegistry = Item.JID;
 								}
 								else
@@ -594,7 +593,7 @@ namespace Waher.Mock
 
 								if (e2.Features.ContainsKey("urn:nf:iot:prov:d:1.0") && string.IsNullOrEmpty(Credentials.Provisioning))
 								{
-									Console.Out.WriteLine("Provisioning server found.");
+									ConsoleOut.WriteLine("Provisioning server found.");
 									Credentials.Provisioning = Item.JID;
 								}
 								else
@@ -602,7 +601,7 @@ namespace Waher.Mock
 
 								if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Credentials.Events))
 								{
-									Console.Out.WriteLine("Event log found.");
+									ConsoleOut.WriteLine("Event log found.");
 									Credentials.Events = Item.JID;
 								}
 								else
@@ -615,107 +614,107 @@ namespace Waher.Mock
 				while (!Ok);
 
 				Default = Credentials.ThingRegistry;
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.Out.WriteLine("What thing registry do you want to use? The use of a thing registry is optional.");
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.WriteLine("What thing registry do you want to use? The use of a thing registry is optional.");
 
 				if (string.IsNullOrEmpty(Default))
-					Console.Out.WriteLine("Press ENTER to not use a thing registry.");
+					ConsoleOut.WriteLine("Press ENTER to not use a thing registry.");
 				else
-					Console.Out.WriteLine("Press ENTER to use " + Default);
+					ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.Out.Write("Thing Registry: ");
-					Credentials.ThingRegistry = Console.In.ReadLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.White;
+					ConsoleOut.Write("Thing Registry: ");
+					Credentials.ThingRegistry = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.ThingRegistry))
 						Credentials.ThingRegistry = Default;
 
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Out.WriteLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.Green;
+					ConsoleOut.WriteLine();
 					if (string.IsNullOrEmpty(Credentials.ThingRegistry))
-						Console.Out.WriteLine("You've selected to not use a thing registry. Is this correct? [y/n]");
+						ConsoleOut.WriteLine("You've selected to not use a thing registry. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Credentials.ThingRegistry + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
-					Console.Out.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.ThingRegistry + "'. Is this correct? [y/n]");
+					s = ConsoleIn.ReadLine();
+					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 				Default = Credentials.Provisioning;
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.Out.WriteLine("What provisioning server do you want to use? The use of a provisioning server");
-				Console.Out.WriteLine("is optional.");
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.WriteLine("What provisioning server do you want to use? The use of a provisioning server");
+				ConsoleOut.WriteLine("is optional.");
 
 				if (string.IsNullOrEmpty(Default))
-					Console.Out.WriteLine("Press ENTER to not use a provisioning server.");
+					ConsoleOut.WriteLine("Press ENTER to not use a provisioning server.");
 				else
-					Console.Out.WriteLine("Press ENTER to use " + Default);
+					ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.Out.Write("Provisioning Server: ");
-					Credentials.Provisioning = Console.In.ReadLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.White;
+					ConsoleOut.Write("Provisioning Server: ");
+					Credentials.Provisioning = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.Provisioning))
 						Credentials.Provisioning = Default;
 
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Out.WriteLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.Green;
+					ConsoleOut.WriteLine();
 					if (string.IsNullOrEmpty(Credentials.Provisioning))
-						Console.Out.WriteLine("You've selected to not use a provisioning server. Is this correct? [y/n]");
+						ConsoleOut.WriteLine("You've selected to not use a provisioning server. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Provisioning + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
-					Console.Out.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Provisioning + "'. Is this correct? [y/n]");
+					s = ConsoleIn.ReadLine();
+					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
 				Default = Credentials.Events;
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.Out.WriteLine("What event log do you want to use? The use of a event logs is optional.");
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.WriteLine("What event log do you want to use? The use of a event logs is optional.");
 
 				if (string.IsNullOrEmpty(Default))
-					Console.Out.WriteLine("Press ENTER to not use an event log.");
+					ConsoleOut.WriteLine("Press ENTER to not use an event log.");
 				else
-					Console.Out.WriteLine("Press ENTER to use " + Default);
+					ConsoleOut.WriteLine("Press ENTER to use " + Default);
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.Out.Write("Event Log: ");
-					Credentials.Events = Console.In.ReadLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.White;
+					ConsoleOut.Write("Event Log: ");
+					Credentials.Events = ConsoleIn.ReadLine();
 					if (string.IsNullOrEmpty(Credentials.Events))
 						Credentials.Events = Default;
 
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Out.WriteLine();
+					ConsoleOut.ForegroundColor = ConsoleColor.Green;
+					ConsoleOut.WriteLine();
 					if (string.IsNullOrEmpty(Credentials.Events))
-						Console.Out.WriteLine("You've selected to not use an event log. Is this correct? [y/n]");
+						ConsoleOut.WriteLine("You've selected to not use an event log. Is this correct? [y/n]");
 					else
-						Console.Out.WriteLine("You've selected to use '" + Credentials.Events + "'. Is this correct? [y/n]");
-					s = Console.In.ReadLine();
-					Console.Out.WriteLine();
+						ConsoleOut.WriteLine("You've selected to use '" + Credentials.Events + "'. Is this correct? [y/n]");
+					s = ConsoleIn.ReadLine();
+					ConsoleOut.WriteLine();
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.Out.WriteLine("Do you want to use a sniffer? If you use a sniffer, XMPP network");
-				Console.Out.WriteLine("communication will be Output to the console in real-time. This can");
-				Console.Out.WriteLine("come in handy when debugging network communication.");
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.WriteLine("Do you want to use a sniffer? If you use a sniffer, XMPP network");
+				ConsoleOut.WriteLine("communication will be Output to the console in real-time. This can");
+				ConsoleOut.WriteLine("come in handy when debugging network communication.");
 
 				do
 				{
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.Out.Write("Sniffer [y/n]? ");
+					ConsoleOut.ForegroundColor = ConsoleColor.White;
+					ConsoleOut.Write("Sniffer [y/n]? ");
 
-					s = Console.In.ReadLine();
+					s = ConsoleIn.ReadLine();
 					Credentials.Sniffer = s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
 				}
 				while (!Credentials.Sniffer && !s.StartsWith("n", StringComparison.InvariantCultureIgnoreCase));
 
-				Console.Out.WriteLine();
-				Console.ForegroundColor = FgBak;
+				ConsoleOut.WriteLine();
+				ConsoleOut.ForegroundColor = FgBak;
 #endif
 				SaveSimpleXmppConfiguration(FileName, Credentials);
 
@@ -854,7 +853,7 @@ namespace Waher.Mock
 		{
 			using (QrEncoder Encoder = new QrEncoder())
 			{
-				ConsoleColor Bak = Console.BackgroundColor;
+				ConsoleColor Bak = ConsoleOut.BackgroundColor;
 				QrMatrix M = Encoder.GenerateMatrix(CorrectionLevel.M, URI);
 				bool Pixel;
 				int w = M.Size;
@@ -872,20 +871,20 @@ namespace Waher.Mock
 
 						if (Pixel)
 						{
-							Console.BackgroundColor = ConsoleColor.Black;
-							Console.Out.Write("  ");
+							ConsoleOut.BackgroundColor = ConsoleColor.Black;
+							ConsoleOut.Write("  ");
 						}
 						else
 						{
-							Console.BackgroundColor = ConsoleColor.White;
-							Console.Out.Write("  ");
+							ConsoleOut.BackgroundColor = ConsoleColor.White;
+							ConsoleOut.Write("  ");
 						}
 					}
 
-					Console.Out.WriteLine();
+					ConsoleOut.WriteLine();
 				}
 
-				Console.BackgroundColor = Bak;
+				ConsoleOut.BackgroundColor = Bak;
 			}
 		}
 

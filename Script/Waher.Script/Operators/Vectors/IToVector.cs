@@ -10,7 +10,7 @@ namespace Waher.Script.Operators.Vectors
 		/// <summary>
 		/// Converts the object to a vector.
 		/// </summary>
-		/// <returns>Matrix.</returns>
-		IVector ToVector();
+		/// <returns>Vector.</returns>
+		IElement ToVector();
 	}
 }

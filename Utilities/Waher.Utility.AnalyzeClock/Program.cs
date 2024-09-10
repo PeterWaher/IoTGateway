@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.AnalyzeClock
 {
@@ -201,32 +202,32 @@ namespace Waher.Utility.AnalyzeClock
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Analyzes the difference between the clock on the local machine with the clock on");
-					Console.Out.WriteLine("another machine, connected to the XMPP network, and compatible with the Neuro-Foundation");
-					Console.Out.WriteLine("interfaces.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-h HOST               XMPP Server host name.");
-					Console.Out.WriteLine("-p PORT               XMPP Port number, if different from 5222");
-					Console.Out.WriteLine("-a ACCOUNT            XMPP Account name to use when connecting to the server.");
-					Console.Out.WriteLine("-pwd PASSWORD         PASSWORD to use when authenticating with the server.");
-					Console.Out.WriteLine("-j JID                JID of clock source to monitor.");
-					Console.Out.WriteLine("-i INTERVAL           Interval (in milliseconds) used to check clocks.");
-					Console.Out.WriteLine("                      Default=5000.");
-					Console.Out.WriteLine("-r RECORDS            Number of measurements to collect.");
-					Console.Out.WriteLine("-n HISTORY            Number of records in history. Averages are calculated");
-					Console.Out.WriteLine("                      on records in this history. Default=100");
-					Console.Out.WriteLine("-w WINDOW             Filter window size. The window is used to detect");
-					Console.Out.WriteLine("                      and eliminate bad measurements. Default=16");
-					Console.Out.WriteLine("-s SPIKE_POS          Spike position. Where spikes are detected, in");
-					Console.Out.WriteLine("                      window. Default=6");
-					Console.Out.WriteLine("-sw SPIKE_WIDTH       Spike width. Number of measurements in a row that can");
-					Console.Out.WriteLine("                      constitute a spike. Default=3");
-					Console.Out.WriteLine("-o OUTPUT_FILE        File name of report file.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
-					Console.Out.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Analyzes the difference between the clock on the local machine with the clock on");
+					ConsoleOut.WriteLine("another machine, connected to the XMPP network, and compatible with the Neuro-Foundation");
+					ConsoleOut.WriteLine("interfaces.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-h HOST               XMPP Server host name.");
+					ConsoleOut.WriteLine("-p PORT               XMPP Port number, if different from 5222");
+					ConsoleOut.WriteLine("-a ACCOUNT            XMPP Account name to use when connecting to the server.");
+					ConsoleOut.WriteLine("-pwd PASSWORD         PASSWORD to use when authenticating with the server.");
+					ConsoleOut.WriteLine("-j JID                JID of clock source to monitor.");
+					ConsoleOut.WriteLine("-i INTERVAL           Interval (in milliseconds) used to check clocks.");
+					ConsoleOut.WriteLine("                      Default=5000.");
+					ConsoleOut.WriteLine("-r RECORDS            Number of measurements to collect.");
+					ConsoleOut.WriteLine("-n HISTORY            Number of records in history. Averages are calculated");
+					ConsoleOut.WriteLine("                      on records in this history. Default=100");
+					ConsoleOut.WriteLine("-w WINDOW             Filter window size. The window is used to detect");
+					ConsoleOut.WriteLine("                      and eliminate bad measurements. Default=16");
+					ConsoleOut.WriteLine("-s SPIKE_POS          Spike position. Where spikes are detected, in");
+					ConsoleOut.WriteLine("                      window. Default=6");
+					ConsoleOut.WriteLine("-sw SPIKE_WIDTH       Spike width. Number of measurements in a row that can");
+					ConsoleOut.WriteLine("                      constitute a spike. Default=3");
+					ConsoleOut.WriteLine("-o OUTPUT_FILE        File name of report file.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding. Default=UTF-8");
+					ConsoleOut.WriteLine("-t TRANSFORM_FILE     XSLT transform to use.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
@@ -248,7 +249,7 @@ namespace Waher.Utility.AnalyzeClock
 				if (string.IsNullOrEmpty(OutputFileName))
 					throw new Exception("No output filename specified.");
 
-				XmppCredentials Credentials = new XmppCredentials()
+				XmppCredentials Credentials = new()
 				{
 					Host = Host,
 					Port = Port,
@@ -263,223 +264,221 @@ namespace Waher.Utility.AnalyzeClock
 					AllowRegistration = false
 				};
 
-				using (XmppClient Client = new XmppClient(Credentials, "en", typeof(Program).Assembly))
+				using XmppClient Client = new(Credentials, "en", typeof(Program).Assembly);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
+
+				Client.OnStateChanged += (sender, NewState) =>
 				{
-					ManualResetEvent Done = new ManualResetEvent(false);
-					ManualResetEvent Error = new ManualResetEvent(false);
-
-					Client.OnStateChanged += (sender, NewState) =>
+					switch (NewState)
 					{
-						switch (NewState)
+						case XmppState.Connected:
+							Done.Set();
+							break;
+
+						case XmppState.Error:
+						case XmppState.Offline:
+							Error.Set();
+							break;
+					}
+
+					return Task.CompletedTask;
+				};
+
+				Client.Connect();
+
+				i = WaitHandle.WaitAny(new WaitHandle[] { Done, Error });
+				if (i == 1)
+					throw new Exception("Unable to connect to broker.");
+
+				if (Jid.Contains('@') && !Jid.Contains('/'))
+				{
+					RosterItem Contact = Client.GetRosterItem(Jid);
+					if (Contact is null || (Contact.State != SubscriptionState.Both && Contact.State != SubscriptionState.To))
+					{
+						Done.Reset();
+
+						Client.OnPresenceSubscribed += (sender, e) =>
 						{
-							case XmppState.Connected:
+							if (string.Compare(e.FromBareJID, Jid, true) == 0)
 								Done.Set();
-								break;
 
-							case XmppState.Error:
-							case XmppState.Offline:
-								Error.Set();
-								break;
-						}
-
-						return Task.CompletedTask;
-					};
-
-					Client.Connect();
-
-					i = WaitHandle.WaitAny(new WaitHandle[] { Done, Error });
-					if (i == 1)
-						throw new Exception("Unable to connect to broker.");
-
-					if (Jid.Contains("@") && !Jid.Contains("/"))
-					{
-						RosterItem Contact = Client.GetRosterItem(Jid);
-						if (Contact is null || (Contact.State != SubscriptionState.Both && Contact.State != SubscriptionState.To))
-						{
-							Done.Reset();
-
-							Client.OnPresenceSubscribed += (sender, e) =>
-							{
-								if (string.Compare(e.FromBareJID, Jid, true) == 0)
-									Done.Set();
-
-								return Task.CompletedTask;
-							};
-
-							Client.OnPresenceUnsubscribed += (sender, e) =>
-							{
-								if (string.Compare(e.FromBareJID, Jid, true) == 0)
-									Error.Set();
-
-								return Task.CompletedTask;
-							};
-
-							Console.WriteLine("Requesting presence subscription to " + Jid);
-
-							Client.RequestPresenceSubscription(Jid);
-
-							i = WaitHandle.WaitAny(new WaitHandle[] { Done, Error });
-							if (i == 1)
-								throw new Exception("Unable to obtain presence subscription.");
-
-							Console.WriteLine("Presence subscription obtained.");
-						}
-					}
-
-					ManualResetEvent Done2 = new ManualResetEvent(false);
-
-					using StreamWriter f = File.CreateText(OutputFileName);
-					XmlWriterSettings Settings = new XmlWriterSettings()
-					{
-						Encoding = Encoding,
-						Indent = true,
-						IndentChars = "\t",
-						NewLineChars = Console.Out.NewLine,
-						OmitXmlDeclaration = false,
-						WriteEndDocumentOnClose = true
-					};
-
-					XmlWriter w = XmlWriter.Create(f, Settings);
-
-					w.WriteStartDocument();
-
-					if (!string.IsNullOrEmpty(XsltPath))
-					{
-						if (File.Exists(XsltPath))
-						{
-							try
-							{
-								byte[] XsltBin = File.ReadAllBytes(XsltPath);
-
-								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
-									Convert.ToBase64String(XsltBin) + "\"");
-							}
-							catch (Exception)
-							{
-								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
-							}
-						}
-						else
-							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
-					}
-
-					w.WriteStartElement("ClockStatistics", "http://waher.se/Schema/Networking/ClockStatistics.xsd");
-
-					w.WriteStartElement("Parameters");
-					w.WriteAttributeString("clientJid", Client.BareJID);
-					w.WriteAttributeString("sourceJid", Jid);
-					w.WriteAttributeString("records", Records.ToString());
-					w.WriteAttributeString("interval", Interval.ToString());
-					w.WriteAttributeString("history", History.ToString());
-					w.WriteAttributeString("window", Window.ToString());
-					w.WriteAttributeString("spikePos", SpikePos.ToString());
-					w.WriteAttributeString("spikeWidth", SpikeWidth.ToString());
-					w.WriteAttributeString("hfFreq", System.Diagnostics.Stopwatch.Frequency.ToString());
-					w.WriteEndElement();
-
-					w.WriteStartElement("Samples");
-
-					using (SynchronizationClient SynchClient = new SynchronizationClient(Client))
-					{
-						SynchClient.OnUpdated += (sender, e) =>
-						{
-							DateTime TP = DateTime.Now;
-							double? StdDev;
-
-							w.WriteStartElement("Sample");
-							w.WriteAttributeString("timestamp", XML.Encode(TP));
-
-							if (SynchClient.RawLatency100Ns.HasValue)
-								w.WriteAttributeString("rawLatencyMs", CommonTypes.Encode(SynchClient.RawLatency100Ns.Value * 1e-4));
-
-							if (SynchClient.LatencySpikeRemoved.HasValue)
-								w.WriteAttributeString("spikeLatencyRemoved", CommonTypes.Encode(SynchClient.LatencySpikeRemoved.Value));
-
-							if (SynchClient.RawClockDifference100Ns.HasValue)
-								w.WriteAttributeString("rawDifferenceMs", CommonTypes.Encode(SynchClient.RawClockDifference100Ns.Value * 1e-4));
-
-							if (SynchClient.ClockDifferenceSpikeRemoved.HasValue)
-								w.WriteAttributeString("spikeDifferenceRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceSpikeRemoved.Value));
-
-							if (SynchClient.FilteredLatency100Ns.HasValue)
-								w.WriteAttributeString("filteredLatencyMs", CommonTypes.Encode(SynchClient.FilteredLatency100Ns.Value * 1e-4));
-
-							if (SynchClient.FilteredClockDifference100Ns.HasValue)
-								w.WriteAttributeString("filteredDifferenceMs", CommonTypes.Encode(SynchClient.FilteredClockDifference100Ns.Value * 1e-4));
-
-							if (SynchClient.AvgLatency100Ns.HasValue)
-								w.WriteAttributeString("avgLatencyMs", CommonTypes.Encode(SynchClient.AvgLatency100Ns.Value * 1e-4));
-
-							if (SynchClient.AvgClockDifference100Ns.HasValue)
-								w.WriteAttributeString("avgDifferenceMs", CommonTypes.Encode(SynchClient.AvgClockDifference100Ns.Value * 1e-4));
-
-							StdDev = SynchClient.CalcStdDevLatency100Ns();
-							if (StdDev.HasValue)
-								w.WriteAttributeString("stdDevLatencyMs", CommonTypes.Encode(StdDev.Value * 1e-4));
-
-							StdDev = SynchClient.CalcStdDevClockDifference100Ns();
-							if (StdDev.HasValue)
-								w.WriteAttributeString("stdDevDifferenceMs", CommonTypes.Encode(StdDev.Value * 1e-4));
-
-							if (SynchClient.RawLatencyHf.HasValue)
-								w.WriteAttributeString("rawLatencyHf", SynchClient.RawLatencyHf.Value.ToString());
-
-							if (SynchClient.LatencyHfSpikeRemoved.HasValue)
-								w.WriteAttributeString("spikeLatencyHfRemoved", CommonTypes.Encode(SynchClient.LatencyHfSpikeRemoved.Value));
-
-							if (SynchClient.RawClockDifferenceHf.HasValue)
-								w.WriteAttributeString("rawDifferenceHf", SynchClient.RawClockDifferenceHf.Value.ToString());
-
-							if (SynchClient.ClockDifferenceHfSpikeRemoved.HasValue)
-								w.WriteAttributeString("spikeDifferenceHfRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceHfSpikeRemoved.Value));
-
-							if (SynchClient.FilteredLatencyHf.HasValue)
-								w.WriteAttributeString("filteredLatencyHf", SynchClient.FilteredLatencyHf.ToString());
-
-							if (SynchClient.FilteredClockDifferenceHf.HasValue)
-								w.WriteAttributeString("filteredDifferenceHf", SynchClient.FilteredClockDifferenceHf.ToString());
-
-							if (SynchClient.AvgLatencyHf.HasValue)
-								w.WriteAttributeString("avgLatencyHf", SynchClient.AvgLatencyHf.ToString());
-
-							if (SynchClient.AvgClockDifferenceHf.HasValue)
-								w.WriteAttributeString("avgDifferenceHf", SynchClient.AvgClockDifferenceHf.ToString());
-
-							StdDev = SynchClient.CalcStdDevLatencyHf();
-							if (StdDev.HasValue)
-								w.WriteAttributeString("stdDevLatencyHf", CommonTypes.Encode(StdDev.Value));
-
-							StdDev = SynchClient.CalcStdDevClockDifferenceHf();
-							if (StdDev.HasValue)
-								w.WriteAttributeString("stdDevDifferenceHf", CommonTypes.Encode(StdDev.Value));
-
-							w.WriteEndElement();
-
-							Console.Out.Write(".");
-
-							if (--Records <= 0)
-								Done2.Set();
+							return Task.CompletedTask;
 						};
 
-						SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
+						Client.OnPresenceUnsubscribed += (sender, e) =>
+						{
+							if (string.Compare(e.FromBareJID, Jid, true) == 0)
+								Error.Set();
 
-						Done2.WaitOne();
+							return Task.CompletedTask;
+						};
+
+						ConsoleOut.WriteLine("Requesting presence subscription to " + Jid);
+
+						Client.RequestPresenceSubscription(Jid);
+
+						i = WaitHandle.WaitAny(new WaitHandle[] { Done, Error });
+						if (i == 1)
+							throw new Exception("Unable to obtain presence subscription.");
+
+						ConsoleOut.WriteLine("Presence subscription obtained.");
 					}
-
-					w.WriteEndElement();
-					w.WriteEndElement();
-					w.WriteEndDocument();
-
-					w.Flush();
-
-					Console.Out.WriteLine();
 				}
+
+				ManualResetEvent Done2 = new(false);
+
+				using StreamWriter f = File.CreateText(OutputFileName);
+				XmlWriterSettings Settings = new()
+				{
+					Encoding = Encoding,
+					Indent = true,
+					IndentChars = "\t",
+					NewLineChars = ConsoleOut.NewLine,
+					OmitXmlDeclaration = false,
+					WriteEndDocumentOnClose = true
+				};
+
+				XmlWriter w = XmlWriter.Create(f, Settings);
+
+				w.WriteStartDocument();
+
+				if (!string.IsNullOrEmpty(XsltPath))
+				{
+					if (File.Exists(XsltPath))
+					{
+						try
+						{
+							byte[] XsltBin = File.ReadAllBytes(XsltPath);
+
+							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
+								Convert.ToBase64String(XsltBin) + "\"");
+						}
+						catch (Exception)
+						{
+							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+						}
+					}
+					else
+						w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+				}
+
+				w.WriteStartElement("ClockStatistics", "http://waher.se/Schema/Networking/ClockStatistics.xsd");
+
+				w.WriteStartElement("Parameters");
+				w.WriteAttributeString("clientJid", Client.BareJID);
+				w.WriteAttributeString("sourceJid", Jid);
+				w.WriteAttributeString("records", Records.ToString());
+				w.WriteAttributeString("interval", Interval.ToString());
+				w.WriteAttributeString("history", History.ToString());
+				w.WriteAttributeString("window", Window.ToString());
+				w.WriteAttributeString("spikePos", SpikePos.ToString());
+				w.WriteAttributeString("spikeWidth", SpikeWidth.ToString());
+				w.WriteAttributeString("hfFreq", System.Diagnostics.Stopwatch.Frequency.ToString());
+				w.WriteEndElement();
+
+				w.WriteStartElement("Samples");
+
+				using (SynchronizationClient SynchClient = new(Client))
+				{
+					SynchClient.OnUpdated += (sender, e) =>
+					{
+						DateTime TP = DateTime.Now;
+						double? StdDev;
+
+						w.WriteStartElement("Sample");
+						w.WriteAttributeString("timestamp", XML.Encode(TP));
+
+						if (SynchClient.RawLatency100Ns.HasValue)
+							w.WriteAttributeString("rawLatencyMs", CommonTypes.Encode(SynchClient.RawLatency100Ns.Value * 1e-4));
+
+						if (SynchClient.LatencySpikeRemoved.HasValue)
+							w.WriteAttributeString("spikeLatencyRemoved", CommonTypes.Encode(SynchClient.LatencySpikeRemoved.Value));
+
+						if (SynchClient.RawClockDifference100Ns.HasValue)
+							w.WriteAttributeString("rawDifferenceMs", CommonTypes.Encode(SynchClient.RawClockDifference100Ns.Value * 1e-4));
+
+						if (SynchClient.ClockDifferenceSpikeRemoved.HasValue)
+							w.WriteAttributeString("spikeDifferenceRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceSpikeRemoved.Value));
+
+						if (SynchClient.FilteredLatency100Ns.HasValue)
+							w.WriteAttributeString("filteredLatencyMs", CommonTypes.Encode(SynchClient.FilteredLatency100Ns.Value * 1e-4));
+
+						if (SynchClient.FilteredClockDifference100Ns.HasValue)
+							w.WriteAttributeString("filteredDifferenceMs", CommonTypes.Encode(SynchClient.FilteredClockDifference100Ns.Value * 1e-4));
+
+						if (SynchClient.AvgLatency100Ns.HasValue)
+							w.WriteAttributeString("avgLatencyMs", CommonTypes.Encode(SynchClient.AvgLatency100Ns.Value * 1e-4));
+
+						if (SynchClient.AvgClockDifference100Ns.HasValue)
+							w.WriteAttributeString("avgDifferenceMs", CommonTypes.Encode(SynchClient.AvgClockDifference100Ns.Value * 1e-4));
+
+						StdDev = SynchClient.CalcStdDevLatency100Ns();
+						if (StdDev.HasValue)
+							w.WriteAttributeString("stdDevLatencyMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
+						StdDev = SynchClient.CalcStdDevClockDifference100Ns();
+						if (StdDev.HasValue)
+							w.WriteAttributeString("stdDevDifferenceMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
+						if (SynchClient.RawLatencyHf.HasValue)
+							w.WriteAttributeString("rawLatencyHf", SynchClient.RawLatencyHf.Value.ToString());
+
+						if (SynchClient.LatencyHfSpikeRemoved.HasValue)
+							w.WriteAttributeString("spikeLatencyHfRemoved", CommonTypes.Encode(SynchClient.LatencyHfSpikeRemoved.Value));
+
+						if (SynchClient.RawClockDifferenceHf.HasValue)
+							w.WriteAttributeString("rawDifferenceHf", SynchClient.RawClockDifferenceHf.Value.ToString());
+
+						if (SynchClient.ClockDifferenceHfSpikeRemoved.HasValue)
+							w.WriteAttributeString("spikeDifferenceHfRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceHfSpikeRemoved.Value));
+
+						if (SynchClient.FilteredLatencyHf.HasValue)
+							w.WriteAttributeString("filteredLatencyHf", SynchClient.FilteredLatencyHf.ToString());
+
+						if (SynchClient.FilteredClockDifferenceHf.HasValue)
+							w.WriteAttributeString("filteredDifferenceHf", SynchClient.FilteredClockDifferenceHf.ToString());
+
+						if (SynchClient.AvgLatencyHf.HasValue)
+							w.WriteAttributeString("avgLatencyHf", SynchClient.AvgLatencyHf.ToString());
+
+						if (SynchClient.AvgClockDifferenceHf.HasValue)
+							w.WriteAttributeString("avgDifferenceHf", SynchClient.AvgClockDifferenceHf.ToString());
+
+						StdDev = SynchClient.CalcStdDevLatencyHf();
+						if (StdDev.HasValue)
+							w.WriteAttributeString("stdDevLatencyHf", CommonTypes.Encode(StdDev.Value));
+
+						StdDev = SynchClient.CalcStdDevClockDifferenceHf();
+						if (StdDev.HasValue)
+							w.WriteAttributeString("stdDevDifferenceHf", CommonTypes.Encode(StdDev.Value));
+
+						w.WriteEndElement();
+
+						ConsoleOut.Write(".");
+
+						if (--Records <= 0)
+							Done2.Set();
+					};
+
+					SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
+
+					Done2.WaitOne();
+				}
+
+				w.WriteEndElement();
+				w.WriteEndElement();
+				w.WriteEndDocument();
+
+				w.Flush();
+
+				ConsoleOut.WriteLine();
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 		}

@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content.Xml;
-using Waher.Runtime.Inventory;
 using Waher.Content.Html.Elements;
+using Waher.Content.Xml;
+using Waher.Runtime.Console;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Html.Test
 {
@@ -85,11 +85,11 @@ namespace Waher.Content.Html.Test
 			if (Doc.Meta is not null)
 			{
 				foreach (Meta Meta in Doc.Meta)
-					Console.Out.WriteLine(Meta.OuterHtml);
+					ConsoleOut.WriteLine(Meta.OuterHtml);
 			}
 
 			XmlWriterSettings Settings = XML.WriterSettings(true, true);
-			using XmlWriter Output = XmlWriter.Create(Console.Out, Settings);
+			using XmlWriter Output = XmlWriter.Create(ConsoleOut.Writer, Settings);
 			
 			Doc.Export(Output);
 			Output.Flush();

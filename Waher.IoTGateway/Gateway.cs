@@ -18,6 +18,7 @@ using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Html;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Layout2D;
@@ -31,6 +32,7 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Files;
+using Waher.Events.Filter;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.IoTGateway.Events;
@@ -59,9 +61,10 @@ using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
-using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
+using Waher.Runtime.Language;
+using Waher.Runtime.Profiling;
 using Waher.Runtime.ServiceRegistration;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Threading;
@@ -80,8 +83,6 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
-using Waher.Content.Images;
-using Waher.Events.Filter;
 
 namespace Waher.IoTGateway
 {
@@ -278,7 +279,9 @@ namespace Waher.IoTGateway
 				appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
 
-				Log.Register(new EventFilter("Alert Filter", new AlertNotifier("Alert Notifier"), EventType.Alert));
+				Log.Register(new EventFilter("Alert Filter", new AlertNotifier("Alert Notifier"), EventType.Alert,
+					new CustomEventFilterDelegate((Event) => string.IsNullOrEmpty(Event.Facility))));
+
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
@@ -934,6 +937,7 @@ namespace Waher.IoTGateway
 				while (ReloadConfigurations);
 
 				configuring = false;
+				loginAuditor.Domain = DomainConfiguration.Instance.Domain;
 
 				if (!(webServer is null))
 				{
@@ -1431,7 +1435,31 @@ namespace Waher.IoTGateway
 			if (string.IsNullOrEmpty(webServer?.ResourceOverride))
 				throw new TemporaryRedirectException("/");
 
-			string Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+			string Markdown;
+
+			try
+			{
+				Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+			}
+			catch (Exception)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.AppendLine("Title: Starting");
+				sb.AppendLine("Description: The starting page will be displayed while the service is being started.");
+				sb.AppendLine("Cache-Control: max-age=0, no-cache, no-store");
+				sb.AppendLine("Refresh: 2");
+				sb.AppendLine();
+				sb.AppendLine("============================================================================================================================================");
+				sb.AppendLine();
+				sb.AppendLine("Starting Service");
+				sb.AppendLine("====================");
+				sb.AppendLine();
+				sb.AppendLine("Please wait while the service is being started. This page will update automatically.");
+
+				Markdown = sb.ToString();
+			}
+
 			Variables v = Request.Session ?? new Variables();
 			MarkdownSettings Settings = new MarkdownSettings(emoji1_24x24, true, v);
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
@@ -2604,228 +2632,269 @@ namespace Waher.IoTGateway
 		/// <param name="Request">Web request</param>
 		public static void CheckLocalLogin(HttpRequest Request)
 		{
-			string RemoteEndpoint = Request.RemoteEndPoint;
-			string From;
-			int i;
-			bool DoLog = false;
+			Profiler Profiler = new Profiler();
+			Profiler.Start();
 
-			if (Request.Header.TryGetQueryParameter("debug", out string s) && CommonTypes.TryParse(s, out bool b))
-				DoLog = b;
+			ProfilerThread Thread = Profiler.CreateThread("Check Local Login", ProfilerThreadType.Sequential);
 
-			if (Request.Session is null)
-			{
-				if (DoLog)
-					Log.Debug("No local login: No session.");
-
-				return;
-			}
-
-			if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
-				From = "/";
-
-			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
-			{
-				LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
-					string.Empty, Request.RemoteEndPoint, "Web");
-
-				Login.DoLogin(Request, From);
-				return;
-			}
-
-			if (DoLog)
-				Log.Debug("Checking for local login from: " + RemoteEndpoint);
-
-			i = RemoteEndpoint.LastIndexOf(':');
-			if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out int Port))
-			{
-				if (DoLog)
-					Log.Debug("Invalid port number: " + RemoteEndpoint);
-
-				return;
-			}
-
-			if (!IPAddress.TryParse(RemoteEndpoint.Substring(0, i), out IPAddress Address))
-			{
-				if (DoLog)
-					Log.Debug("Invalid IP Address: " + RemoteEndpoint);
-
-				return;
-			}
-
-			if (!IsLocalCall(Address, Request, DoLog))
-			{
-				if (DoLog)
-					Log.Debug("Request not local: " + RemoteEndpoint);
-
-				return;
-			}
-
-#if !MONO
-			if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
-#endif
-			{
-				LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-				Login.DoLogin(Request, From);
-				return;
-			}
-
-#if !MONO
+			Thread.Start();
 			try
 			{
-				string FileName;
-				string Arguments;
-				bool WaitForExit;
+				Thread.NewState("Checks");
 
-				switch (Environment.OSVersion.Platform)
+				string RemoteEndpoint = Request.RemoteEndPoint;
+				string From;
+				int i;
+				bool DoLog = false;
+
+				if (Request.Header.TryGetQueryParameter("debug", out string s) && CommonTypes.TryParse(s, out bool b))
+					DoLog = b;
+
+				if (Request.Session is null)
 				{
-					case PlatformID.Win32S:
-        			case PlatformID.Win32Windows:
-        			case PlatformID.Win32NT:
-        			case PlatformID.WinCE:
-						FileName = "netstat.exe";
-						Arguments = "-a -n -o";
-						WaitForExit = false;
-						break;
+					if (DoLog)
+						Log.Debug("No local login: No session.");
 
-					case PlatformID.Unix:
-					case PlatformID.MacOSX:
-						FileName = "netstat";
-						Arguments = "-anv -p tcp";
-						WaitForExit = true;
-						break;
-
-					default:
-						if (DoLog)
-							Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
-
-						return;
+					return;
 				}
 
-				using (Process Proc = new Process())
+				if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
+					From = "/";
+
+				if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 				{
-					ProcessStartInfo StartInfo = new ProcessStartInfo()
-					{
-						FileName = FileName,
-						Arguments = Arguments,
-						WindowStyle = ProcessWindowStyle.Hidden,
-						UseShellExecute = false,
-						RedirectStandardInput = true,
-						RedirectStandardOutput = true,
-						RedirectStandardError = true
-					};
+					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
+						string.Empty, Request.RemoteEndPoint, "Web");
 
-					Proc.StartInfo = StartInfo;
-					Proc.Start();
+					Login.DoLogin(Request, From);
+					return;
+				}
 
-					if (WaitForExit)
+				if (DoLog)
+					Log.Debug("Checking for local login from: " + RemoteEndpoint);
+
+				i = RemoteEndpoint.LastIndexOf(':');
+				if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out int Port))
+				{
+					if (DoLog)
+						Log.Debug("Invalid port number: " + RemoteEndpoint);
+
+					return;
+				}
+
+				if (!IPAddress.TryParse(RemoteEndpoint.Substring(0, i), out IPAddress Address))
+				{
+					if (DoLog)
+						Log.Debug("Invalid IP Address: " + RemoteEndpoint);
+
+					return;
+				}
+
+				if (!IsLocalCall(Address, Request, DoLog))
+				{
+					if (DoLog)
+						Log.Debug("Request not local: " + RemoteEndpoint);
+
+					return;
+				}
+
+#if !MONO
+				if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
+#endif
+				{
+					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+					Login.DoLogin(Request, From);
+					return;
+				}
+
+#if !MONO
+				try
+				{
+					string FileName;
+					string Arguments;
+					bool WaitForExit;
+
+					switch (Environment.OSVersion.Platform)
 					{
-						Proc.WaitForExit(5000);
-						if (!Proc.HasExited)
+						case PlatformID.Win32S:
+						case PlatformID.Win32Windows:
+						case PlatformID.Win32NT:
+						case PlatformID.WinCE:
+							FileName = "netstat.exe";
+							Arguments = "-a -n -o";
+							WaitForExit = false;
+
+							Thread.NewState("netstat.exe");
+							break;
+
+						case PlatformID.Unix:
+						case PlatformID.MacOSX:
+							FileName = "netstat";
+							Arguments = "-anv -p tcp";
+							WaitForExit = true;
+							
+							Thread.NewState("netstat");
+							break;
+
+						default:
+							if (DoLog)
+								Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+
 							return;
 					}
 
-					string Output = Proc.StandardOutput.ReadToEnd();
-					if (DoLog)
-						Log.Debug("Netstat output:\r\n\r\n" + Output);
-
-					if (Proc.ExitCode != 0)
+					using (Process Proc = new Process())
 					{
-						if (DoLog)
-							Log.Debug("Netstat exit code: " + Proc.ExitCode.ToString());
-
-						return;
-					}
-
-					string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
-
-					foreach (string Row in Rows)
-					{
-						string[] Tokens = Regex.Split(Row, @"\s+");
-
-						switch (Environment.OSVersion.Platform)
+						ProcessStartInfo StartInfo = new ProcessStartInfo()
 						{
-							case PlatformID.Win32S:
-							case PlatformID.Win32Windows:
-							case PlatformID.Win32NT:
-							case PlatformID.WinCE:
-								if (Tokens.Length < 6)
-									break;
+							FileName = FileName,
+							Arguments = Arguments,
+							WindowStyle = ProcessWindowStyle.Hidden,
+							UseShellExecute = false,
+							RedirectStandardInput = true,
+							RedirectStandardOutput = true,
+							RedirectStandardError = true
+						};
 
-								if (Tokens[1] != "TCP")
-									break;
+						DateTime Start = DateTime.Now;
+						
+						Proc.StartInfo = StartInfo;
+						Proc.Start();
 
-								if (!SameEndpoint(Tokens[2], RemoteEndpoint))
-									break;
-
-								if (Tokens[4] != "ESTABLISHED")
-									break;
-
-								if (!int.TryParse(Tokens[5], out int PID))
-									break;
-
-								Process P = Process.GetProcessById(PID);
-								int CurrentSession = WTSGetActiveConsoleSessionId();
-
-								if (P.SessionId == CurrentSession)
-								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									Login.DoLogin(Request, From);
-									return;
-								}
-								break;
-
-							case PlatformID.Unix:
-							case PlatformID.MacOSX:
-								if (Tokens.Length < 9)
-									break;
-
-								if (Tokens[0] != "tcp4" && Tokens[0] != "tcp6")
-									break;
-
-								if (!SameEndpoint(Tokens[4], RemoteEndpoint))
-									break;
-
-								if (Tokens[5] != "ESTABLISHED")
-									break;
-
-								if (!int.TryParse(Tokens[8], out PID))
-									break;
-
-								P = Process.GetProcessById(PID);
-								CurrentSession = Process.GetCurrentProcess().SessionId;
-
-								if (P.SessionId == CurrentSession)
-								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									Login.DoLogin(Request, From);
-									return;
-								}
-								break;
-
-							default:
-								if (DoLog)
-									Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
-
+						if (WaitForExit)
+						{
+							Proc.WaitForExit(5000);
+							if (!Proc.HasExited)
 								return;
+						}
+
+						string Output = Proc.StandardOutput.ReadToEnd();
+						DateTime Return = DateTime.Now;
+
+						Thread.Interval(Start, Return, "Shell");
+
+						if (DoLog)
+							Log.Debug("Netstat output:\r\n\r\n" + Output);
+
+						if (Proc.ExitCode != 0)
+						{
+							Thread.Exception(new Exception("Exit code: " + Proc.ExitCode.ToString()));
+
+							if (DoLog)
+								Log.Debug("Netstat exit code: " + Proc.ExitCode.ToString());
+
+							return;
+						}
+
+						string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+
+						foreach (string Row in Rows)
+						{
+							string[] Tokens = Regex.Split(Row, @"\s+");
+
+							switch (Environment.OSVersion.Platform)
+							{
+								case PlatformID.Win32S:
+								case PlatformID.Win32Windows:
+								case PlatformID.Win32NT:
+								case PlatformID.WinCE:
+									if (Tokens.Length < 6)
+										break;
+
+									if (Tokens[1] != "TCP")
+										break;
+
+									if (!SameEndpoint(Tokens[2], RemoteEndpoint))
+										break;
+
+									if (Tokens[4] != "ESTABLISHED")
+										break;
+
+									if (!int.TryParse(Tokens[5], out int PID))
+										break;
+
+									Process P = Process.GetProcessById(PID);
+									int CurrentSession = WTSGetActiveConsoleSessionId();
+
+									if (P.SessionId == CurrentSession)
+									{
+										LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+										Login.DoLogin(Request, From);
+										return;
+									}
+									break;
+
+								case PlatformID.Unix:
+								case PlatformID.MacOSX:
+									if (Tokens.Length < 9)
+										break;
+
+									if (Tokens[0] != "tcp4" && Tokens[0] != "tcp6")
+										break;
+
+									if (!SameEndpoint(Tokens[4], RemoteEndpoint))
+										break;
+
+									if (Tokens[5] != "ESTABLISHED")
+										break;
+
+									if (!int.TryParse(Tokens[8], out PID))
+										break;
+
+									P = Process.GetProcessById(PID);
+									CurrentSession = Process.GetCurrentProcess().SessionId;
+
+									if (P.SessionId == CurrentSession)
+									{
+										LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+										Login.DoLogin(Request, From);
+										return;
+									}
+									break;
+
+								default:
+									if (DoLog)
+										Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+
+									return;
+							}
 						}
 					}
 				}
-			}
-			catch (HttpException ex)
-			{
-				if (DoLog)
-					Log.Exception(ex);
+				catch (HttpException ex)
+				{
+					Thread.Exception(ex);
 
-				ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-			catch (Exception ex)
-			{
-				if (DoLog)
-					Log.Exception(ex);
+					if (DoLog)
+						Log.Exception(ex);
 
-				return;
-			}
+					ExceptionDispatchInfo.Capture(ex).Throw();
+				}
+				catch (Exception ex)
+				{
+					Thread.Exception(ex);
+
+					if (DoLog)
+						Log.Exception(ex);
+
+					return;
+				}
 #endif
+			}
+			finally
+			{
+				Thread.Stop();
+				Profiler.Stop();
+
+				double TotalSeconds = Profiler.ElapsedSeconds;
+
+				if (TotalSeconds >= 1.0)
+				{
+					string Uml = Profiler.ExportPlantUml(TimeUnit.MilliSeconds);
+
+					Log.Debug("Long local login check.\r\n\r\n```uml\r\n" + Uml + "\r\n```");
+				}
+			}
 		}
 
 		private static bool SameEndpoint(string EP1, string EP2)

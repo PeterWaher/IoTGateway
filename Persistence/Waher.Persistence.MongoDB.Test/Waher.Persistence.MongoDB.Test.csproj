@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />

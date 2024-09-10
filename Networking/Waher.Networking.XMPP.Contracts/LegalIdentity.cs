@@ -393,8 +393,6 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(Convert.ToBase64String(this.clientPubKey));
 					Xml.Append("\" size=\"");
 					Xml.Append(this.clientKeyName.Substring(3));
-					Xml.Append("\" xmlns=\"");
-					Xml.Append(this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:"));
 				}
 				else
 				{
@@ -402,10 +400,10 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(this.clientKeyName);
 					Xml.Append(" pub=\"");
 					Xml.Append(Convert.ToBase64String(this.clientPubKey));
-					Xml.Append("\" xmlns=\"");
-					Xml.Append(this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:"));
 				}
 
+				Xml.Append("\" xmlns=\"");
+				Xml.Append(this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:"));
 				Xml.Append("\"/></clientPublicKey>");
 			}
 

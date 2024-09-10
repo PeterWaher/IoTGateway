@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Waher.Content;
+using Waher.Runtime.Console;
 
 namespace Waher.Utility.RegEx
 {
@@ -54,7 +55,7 @@ namespace Waher.Utility.RegEx
 			XmlWriter Output = null;
 			Encoding Encoding = Encoding.Default;
 			RegexOptions Options = RegexOptions.Compiled;
-			List<string> Paths = new List<string>();
+			List<string> Paths = new();
 			string Expression = null;
 			string ReplaceExpression = null;
 			string XmlFileName = null;
@@ -171,39 +172,39 @@ namespace Waher.Utility.RegEx
 
 				if (Help || c == 0)
 				{
-					Console.Out.WriteLine("Searches through one or multiple files using a regular expression.");
-					Console.Out.WriteLine("Resulting matches can be printed or exported. They can also optionally");
-					Console.Out.WriteLine("be replaced.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-p PATH               Path to start the search. If not provided, the");
-					Console.Out.WriteLine("                      current path will be used, with *.* as search");
-					Console.Out.WriteLine("                      pattern. Can be used multiple times to search");
-					Console.Out.WriteLine("                      through multiple paths, or use multiple search");
-					Console.Out.WriteLine("                      patterns.");
-					Console.Out.WriteLine("-f REGEX              Regular expression to use for finding matches.");
-					Console.Out.WriteLine("-r REPLACE            If used, will be used to replace found matches.");
-					Console.Out.WriteLine("-x FILENAME           Export findings to an XML file.");
-					Console.Out.WriteLine("-enc ENCODING         Text encoding if Byte-order-marks not available.");
-					Console.Out.WriteLine("                      Default=UTF-8");
-					Console.Out.WriteLine("-s                    Include subfolders in search.");
-					Console.Out.WriteLine("-o                    Print findings on the standard output.");
-					Console.Out.WriteLine("-ci                   Culture invariant search.");
-					Console.Out.WriteLine("-ecma                 Use ECMA script.");
-					Console.Out.WriteLine("-ic                   Ignore case.");
-					Console.Out.WriteLine("-iw                   Ignore pattern whitespace.");
-					Console.Out.WriteLine("-m                    Multi-line matching");
-					Console.Out.WriteLine("-n                    Single-line matching");
-					Console.Out.WriteLine("-t                    Test Mode. Files are not updated.");
-					Console.Out.WriteLine("-?                    Help.");
+					ConsoleOut.WriteLine("Searches through one or multiple files using a regular expression.");
+					ConsoleOut.WriteLine("Resulting matches can be printed or exported. They can also optionally");
+					ConsoleOut.WriteLine("be replaced.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-p PATH               Path to start the search. If not provided, the");
+					ConsoleOut.WriteLine("                      current path will be used, with *.* as search");
+					ConsoleOut.WriteLine("                      pattern. Can be used multiple times to search");
+					ConsoleOut.WriteLine("                      through multiple paths, or use multiple search");
+					ConsoleOut.WriteLine("                      patterns.");
+					ConsoleOut.WriteLine("-f REGEX              Regular expression to use for finding matches.");
+					ConsoleOut.WriteLine("-r REPLACE            If used, will be used to replace found matches.");
+					ConsoleOut.WriteLine("-x FILENAME           Export findings to an XML file.");
+					ConsoleOut.WriteLine("-enc ENCODING         Text encoding if Byte-order-marks not available.");
+					ConsoleOut.WriteLine("                      Default=UTF-8");
+					ConsoleOut.WriteLine("-s                    Include subfolders in search.");
+					ConsoleOut.WriteLine("-o                    Print findings on the standard output.");
+					ConsoleOut.WriteLine("-ci                   Culture invariant search.");
+					ConsoleOut.WriteLine("-ecma                 Use ECMA script.");
+					ConsoleOut.WriteLine("-ic                   Ignore case.");
+					ConsoleOut.WriteLine("-iw                   Ignore pattern whitespace.");
+					ConsoleOut.WriteLine("-m                    Multi-line matching");
+					ConsoleOut.WriteLine("-n                    Single-line matching");
+					ConsoleOut.WriteLine("-t                    Test Mode. Files are not updated.");
+					ConsoleOut.WriteLine("-?                    Help.");
 					return 0;
 				}
 
 				if (string.IsNullOrEmpty(Expression))
 					throw new Exception("No regular expression specified.");
 
-				Regex Regex = new Regex(Expression, Options);
+				Regex Regex = new(Expression, Options);
 				string SearchPattern;
 
 				if (Paths.Count == 0)
@@ -211,7 +212,7 @@ namespace Waher.Utility.RegEx
 
 				if (!string.IsNullOrEmpty(XmlFileName))
 				{
-					XmlWriterSettings Settings = new XmlWriterSettings()
+					XmlWriterSettings Settings = new()
 					{
 						CloseOutput = true,
 						ConformanceLevel = ConformanceLevel.Document,
@@ -233,10 +234,10 @@ namespace Waher.Utility.RegEx
 				Output?.WriteStartElement("Search", "http://waher.se/schema/RegExMatches.xsd");
 				Output?.WriteStartElement("Files");
 
-				Dictionary<string, bool> FileProcessed = new Dictionary<string, bool>();
-				Dictionary<string, bool> FileMatches = new Dictionary<string, bool>();
-				Dictionary<string, bool> FileUpdates = new Dictionary<string, bool>();
-				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new SortedDictionary<string, SortedDictionary<string, int>>();
+				Dictionary<string, bool> FileProcessed = new();
+				Dictionary<string, bool> FileMatches = new();
+				Dictionary<string, bool> FileUpdates = new();
+				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new();
 
 				foreach (string Path0 in Paths)
 				{
@@ -280,9 +281,9 @@ namespace Waher.Utility.RegEx
 
 							if (Print)
 							{
-								Console.Out.WriteLine("File: " + FileName);
-								Console.Out.WriteLine(new string('-', Math.Max(20, FileName.Length + 10)));
-								Console.Out.WriteLine("Matches: " + c.ToString());
+								ConsoleOut.WriteLine("File: " + FileName);
+								ConsoleOut.WriteLine(new string('-', Math.Max(20, FileName.Length + 10)));
+								ConsoleOut.WriteLine("Matches: " + c.ToString());
 							}
 
 							foreach (Match M in Matches)
@@ -293,7 +294,7 @@ namespace Waher.Utility.RegEx
 								Output?.WriteAttributeString("value", M.Value);
 
 								if (Print)
-									Console.Out.WriteLine("Pos " + M.Index.ToString() + ": " + M.Value);
+									ConsoleOut.WriteLine("Pos " + M.Index.ToString() + ": " + M.Value);
 
 								if (!string.IsNullOrEmpty(ReplaceExpression))
 								{
@@ -306,7 +307,7 @@ namespace Waher.Utility.RegEx
 									Output?.WriteAttributeString("replacedWith", ReplaceWith);
 
 									if (Print)
-										Console.Out.WriteLine("Replaced with: " + ReplaceWith);
+										ConsoleOut.WriteLine("Replaced with: " + ReplaceWith);
 								}
 
 								foreach (Group G in M.Groups)
@@ -320,7 +321,7 @@ namespace Waher.Utility.RegEx
 									Output?.WriteEndElement();
 
 									if (Print)
-										Console.Out.WriteLine(G.Name + ": " + G.Value);
+										ConsoleOut.WriteLine(G.Name + ": " + G.Value);
 
 									if (!GroupCount.TryGetValue(G.Name, out SortedDictionary<string, int> Counts))
 									{
@@ -340,7 +341,7 @@ namespace Waher.Utility.RegEx
 							Output?.WriteEndElement();
 
 							if (Print)
-								Console.Out.WriteLine();
+								ConsoleOut.WriteLine();
 
 							if (!string.IsNullOrEmpty(ReplaceExpression) && Text2 != Text)
 							{
@@ -362,8 +363,8 @@ namespace Waher.Utility.RegEx
 
 				if (Print)
 				{
-					Console.Out.WriteLine("Files processed: " + FileProcessed.Count.ToString());
-					Console.Out.WriteLine("Files matched: " + FileMatches.Count.ToString());
+					ConsoleOut.WriteLine("Files processed: " + FileProcessed.Count.ToString());
+					ConsoleOut.WriteLine("Files matched: " + FileMatches.Count.ToString());
 				}
 
 				foreach (KeyValuePair<string, SortedDictionary<string, int>> GroupStat in GroupCount)
@@ -372,7 +373,7 @@ namespace Waher.Utility.RegEx
 					Output?.WriteAttributeString("name", GroupStat.Key);
 
 					if (Print)
-						Console.Out.WriteLine(GroupStat.Key + ":");
+						ConsoleOut.WriteLine(GroupStat.Key + ":");
 
 					foreach (KeyValuePair<string, int> Rec in GroupStat.Value)
 					{
@@ -382,7 +383,7 @@ namespace Waher.Utility.RegEx
 						Output?.WriteEndElement();
 
 						if (Print)
-							Console.Out.WriteLine("\t" + Rec.Key + ": " + Rec.Value.ToString());
+							ConsoleOut.WriteLine("\t" + Rec.Key + ": " + Rec.Value.ToString());
 					}
 
 					Output?.WriteEndElement();
@@ -395,7 +396,7 @@ namespace Waher.Utility.RegEx
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
 			finally

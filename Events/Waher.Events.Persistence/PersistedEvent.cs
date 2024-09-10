@@ -8,7 +8,7 @@ namespace Waher.Events.Persistence
 	/// </summary>
 	[CollectionName("EventLog")]
 	[TypeName(TypeNameSerialization.None)]
-	[ArchivingTime("ArchiveDays")]
+	[ArchivingTime(nameof(ArchiveDays))]
 	[Index("Timestamp")]
 	[Index("Object", "Timestamp")]
 	[Index("Actor", "Timestamp")]

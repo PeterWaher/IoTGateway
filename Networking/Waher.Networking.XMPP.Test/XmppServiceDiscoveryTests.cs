@@ -1,12 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -20,7 +14,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
-				this.Print(e);
+				Print(e);
 			}
 			finally
 			{
@@ -28,19 +22,19 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		private void Print(ServiceDiscoveryEventArgs e)
+		private static void Print(ServiceDiscoveryEventArgs e)
 		{
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Identities:");
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Identities:");
 
 			foreach (Identity Identity in e.Identities)
-				Console.Out.WriteLine(Identity.ToString());
+				ConsoleOut.WriteLine(Identity.ToString());
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Features:");
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Features:");
 
 			foreach (string Feature in e.Features.Keys)
-				Console.Out.WriteLine(Feature);
+				ConsoleOut.WriteLine(Feature);
 		}
 
 		[TestMethod]
@@ -50,7 +44,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.BareJID, 10000);
-				this.Print(e);
+				Print(e);
 			}
 			finally
 			{
@@ -65,7 +59,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.FullJID, 10000);
-				this.Print(e);
+				Print(e);
 			}
 			finally
 			{
@@ -80,7 +74,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
-				this.Print(e);
+				Print(e);
 			}
 			finally
 			{
@@ -88,13 +82,13 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		private void Print(ServiceItemsDiscoveryEventArgs e)
+		private static void Print(ServiceItemsDiscoveryEventArgs e)
 		{
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Items:");
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Items:");
 
 			foreach (Item Item in e.Items)
-				Console.Out.WriteLine(Item.ToString());
+				ConsoleOut.WriteLine(Item.ToString());
 		}
 
 		[TestMethod]
@@ -109,11 +103,11 @@ namespace Waher.Networking.XMPP.Test
 				{
 					ServiceDiscoveryEventArgs e2 = this.client1.ServiceDiscovery(Item.JID, 10000);
 
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(Item.ToString());
-					Console.Out.WriteLine(new string('=', 80));
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine(Item.ToString());
+					ConsoleOut.WriteLine(new string('=', 80));
 
-					this.Print(e2);
+					Print(e2);
 				}
 			}
 			finally
@@ -129,7 +123,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client2.BareJID, 10000);
-				this.Print(e);
+				Print(e);
 			}
 			finally
 			{

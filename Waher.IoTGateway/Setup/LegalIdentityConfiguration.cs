@@ -1257,9 +1257,9 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Latest approved Legal Identity ID.
+		/// Latest approved Legal Identity.
 		/// </summary>
-		public static string LatestApprovedLegalIdentityId
+		public static LegalIdentity LatestApprovedLegalIdentity
 		{
 			get
 			{
@@ -1274,7 +1274,18 @@ namespace Waher.IoTGateway.Setup
 						Latest = Identity;
 				}
 
-				return Latest?.Id;
+				return Latest;
+			}
+		}
+
+		/// <summary>
+		/// Latest approved Legal Identity ID.
+		/// </summary>
+		public static string LatestApprovedLegalIdentityId
+		{
+			get
+			{
+				return LatestApprovedLegalIdentity?.Id;
 			}
 		}
 
@@ -1288,15 +1299,7 @@ namespace Waher.IoTGateway.Setup
 				if (!HasApprovedLegalIdentities)
 					return DateTime.MinValue;
 
-				LegalIdentity Latest = null;
-
-				foreach (LegalIdentity Identity in approvedIdentities)
-				{
-					if (Latest is null || Identity.Created > Latest.Created)
-						Latest = Identity;
-				}
-
-				return Latest?.To ?? DateTime.MinValue;
+				return LatestApprovedLegalIdentity?.To ?? DateTime.MinValue;
 			}
 		}
 
@@ -1384,7 +1387,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.ScheduleEvent((P) =>
 				{
-					LegalIdentityPetitionResponseEventArgs e = new LegalIdentityPetitionResponseEventArgs(null, null, (string)P, false, string.Empty);
+					LegalIdentityPetitionResponseEventArgs e = new LegalIdentityPetitionResponseEventArgs(null, null, (string)P, false, string.Empty, null);
 					this.ContractsClient_PetitionedIdentityResponseReceived(Gateway.ContractsClient, e);
 				}, DateTime.Now.Add(Timeout), PetitionId);
 			}
@@ -1456,7 +1459,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.ScheduleEvent((P) =>
 				{
-					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false, string.Empty);
+					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false, string.Empty, null);
 					this.ContractsClient_PetitionedContractResponseReceived(Gateway.ContractsClient, e);
 				}, DateTime.Now.Add(Timeout), PetitionId);
 			}

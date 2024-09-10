@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Threading.Tasks;
-using Waher.Content.Xml;
 using Waher.Content.Markdown.Contracts;
+using Waher.Content.Xml;
+using Waher.Runtime.Console;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -21,10 +21,10 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedXaml = await Doc.GenerateSmartContractXml(XML.WriterSettings(true, true));
 
-			Console.Out.WriteLine(GeneratedXaml);
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine(GeneratedXaml);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XML does not match expected XML.");
 		}

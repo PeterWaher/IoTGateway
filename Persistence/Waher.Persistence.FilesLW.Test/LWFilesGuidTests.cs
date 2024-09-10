@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using Waher.Persistence.Files.Storage;
+using Waher.Runtime.Console;
 
 #if !LW
 namespace Waher.Persistence.Files.Test
@@ -19,7 +16,7 @@ namespace Waher.Persistence.FilesLW.Test
 		private static SequentialGuidGenerator gen;
 
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static void ClassInitialize(TestContext _)
 		{
 			gen = new SequentialGuidGenerator();
 		}
@@ -27,7 +24,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (!(gen is null))
+			if (gen is not null)
 			{
 				gen.Dispose();
 				gen = null;
@@ -37,7 +34,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_Guid_Test_01_Generate1()
 		{
-			Console.Out.WriteLine(gen.CreateGuid().ToString());
+			ConsoleOut.WriteLine(gen.CreateGuid().ToString());
 		}
 
 		[TestMethod]
@@ -47,12 +44,12 @@ namespace Waher.Persistence.FilesLW.Test
 			int i;
 
 			Prev = gen.CreateGuid();
-			Console.Out.WriteLine(Prev.ToString());
+			ConsoleOut.WriteLine(Prev.ToString());
 
 			for (i = 1; i < 100; i++)
 			{
 				Next = gen.CreateGuid();
-				Console.Out.WriteLine(Next.ToString());
+				ConsoleOut.WriteLine(Next.ToString());
 
 				AssertEx.Less(Prev, Next);
 
@@ -82,30 +79,30 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Guid[] Guids = new Guid[]
 			{
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 }),
-				new Guid(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 }),
+				new(new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }),
 			};
 
 			Guid[] Guids2 = (Guid[])Guids.Clone();
 			Array.Sort<Guid>(Guids2);
 
 			foreach (Guid Guid in Guids2)
-				Console.Out.WriteLine(Array.IndexOf(Guids, Guid));
+				ConsoleOut.WriteLine(Array.IndexOf(Guids, Guid));
 		}
 	}
 }

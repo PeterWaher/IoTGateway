@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Provides tools for securing access to methods and properties in code, by limiting access to them to a given set of callers. This prevents unintentional leaks of information through code running in the same process.</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>

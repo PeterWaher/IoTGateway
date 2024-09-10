@@ -1,12 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.SoftwareVersion;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -18,15 +12,15 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.Domain, 10000);
-			this.Print(e);
+			Print(e);
 		}
 
-		private void Print(SoftwareVersionEventArgs e)
+		private static void Print(SoftwareVersionEventArgs e)
 		{
-			Console.Out.WriteLine();
-			Console.Out.WriteLine("Name: " + e.Name);
-			Console.Out.WriteLine("Version: " + e.Version);
-			Console.Out.WriteLine("OS: " + e.OS);
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine("Name: " + e.Name);
+			ConsoleOut.WriteLine("Version: " + e.Version);
+			ConsoleOut.WriteLine("OS: " + e.OS);
 		}
 
 		[TestMethod]
@@ -34,7 +28,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.FullJID, 10000);
-			this.Print(e);
+			Print(e);
 		}
 
 	}

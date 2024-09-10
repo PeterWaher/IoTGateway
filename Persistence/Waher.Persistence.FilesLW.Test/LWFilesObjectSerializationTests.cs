@@ -1,15 +1,17 @@
-﻿using System;
+﻿using IdApp.Test.Serialization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence.Serialization;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects;
-using IdApp.Test.Serialization;
 using Waher.Content;
 using Waher.Events;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Console;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 using Waher.Security;
+
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -51,7 +53,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_01_SimpleObject()
 		{
-			Simple Obj = new Simple()
+			Simple Obj = new()
 			{
 				Boolean1 = true,
 				Boolean2 = false,
@@ -128,27 +130,27 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("CIString", Obj));
 			AssertEx.Same(Obj.CIString, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Simple Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -158,13 +160,13 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		internal static void AssertEqual(Simple Obj, Simple Obj2)
@@ -222,32 +224,32 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
 		}
 
-		private void WriteData(byte[] Data)
+		private static void WriteData(byte[] Data)
 		{
 			int i, c = Data.Length;
 
 			for (i = 0; i < c; i++)
 			{
 				if ((i & 15) == 0)
-					Console.Out.WriteLine();
+					ConsoleOut.WriteLine();
 				else
-					Console.Out.Write(' ');
+					ConsoleOut.Write(' ');
 
-				Console.Out.Write(Data[i].ToString("x2"));
+				ConsoleOut.Write(Data[i].ToString("x2"));
 			}
 		}
 
-		private void AssertBinaryLength(byte[] Data, IDeserializer Reader)
+		private static void AssertBinaryLength(byte[] Data, IDeserializer Reader)
 		{
 			Reader.Restart(Data, 0);
 
 			Reader.ReadGuid();
 			ulong Len = Reader.ReadVariableLengthUInt64();
 
-			AssertEx.Same(Data.Length - 16 - this.VariableULongLen(Len), Len);
+			AssertEx.Same(Data.Length - 16 - VariableULongLen(Len), Len);
 		}
 
-		private int VariableULongLen(ulong Len)
+		private static int VariableULongLen(ulong Len)
 		{
 			int NrBytes = 0;
 
@@ -264,7 +266,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_02_Nullable1()
 		{
-			Classes.Nullable Obj = new Classes.Nullable()
+			Classes.Nullable Obj = new()
 			{
 				Boolean1 = true,
 				Byte = 15,
@@ -323,22 +325,22 @@ namespace Waher.Persistence.FilesLW.Test
 			Value = await S.TryGetFieldValue("FlagsEnum", Obj);
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -368,16 +370,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(Classes.Nullable Obj, Classes.Nullable Obj2)
+		private static void AssertEqual(Classes.Nullable Obj, Classes.Nullable Obj2)
 		{
 			AssertEx.Same(Obj.Boolean1, Obj2.Boolean1);
 			AssertEx.Same(Obj.Boolean2, Obj2.Boolean2);
@@ -404,7 +406,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_03_Nullable2()
 		{
-			Classes.Nullable Obj = new Classes.Nullable()
+			Classes.Nullable Obj = new()
 			{
 				Boolean2 = false,
 				Short = -1234,
@@ -462,22 +464,22 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -507,19 +509,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_04_Default1()
 		{
-			Default Obj = new Default()
+			Default Obj = new()
 			{
 				Short = -1234,
 				Long = -345456456456456345,
@@ -577,22 +579,22 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Default Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -623,13 +625,13 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		internal static void AssertEqual(Default Obj, Default Obj2)
@@ -660,7 +662,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_05_Default2()
 		{
-			Default Obj = new Default()
+			Default Obj = new()
 			{
 				Boolean1 = false,
 				Boolean2 = true,
@@ -720,22 +722,22 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Default Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -766,19 +768,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_06_SimpleArrays()
 		{
-			SimpleArrays Obj = new SimpleArrays()
+			SimpleArrays Obj = new()
 			{
 				Boolean = new bool[] { true, false },
 				Byte = new byte[] { 1, 2, 3 },
@@ -803,22 +805,22 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(SimpleArrays));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			SimpleArrays Obj2 = (SimpleArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -848,16 +850,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (SimpleArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(SimpleArrays Obj, SimpleArrays Obj2)
+		private static void AssertEqual(SimpleArrays Obj, SimpleArrays Obj2)
 		{
 			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
 			AssertEx.Same(Obj.Byte, Obj2.Byte);
@@ -884,7 +886,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_07_NullableArrays()
 		{
-			NullableArrays Obj = new NullableArrays()
+			NullableArrays Obj = new()
 			{
 				Boolean = new bool?[] { true, null, false },
 				Byte = new byte?[] { 1, null, 3 },
@@ -908,22 +910,22 @@ namespace Waher.Persistence.FilesLW.Test
 
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NullableArrays));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			NullableArrays Obj2 = (NullableArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -951,16 +953,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (NullableArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(NullableArrays Obj, NullableArrays Obj2)
+		private static void AssertEqual(NullableArrays Obj, NullableArrays Obj2)
 		{
 			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
 			AssertEx.Same(Obj.Byte, Obj2.Byte);
@@ -985,9 +987,9 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_08_Embedded()
 		{
-			Container Obj = new Container()
+			Container Obj = new()
 			{
-				Embedded = new Embedded()
+				Embedded = new()
 				{
 					Byte = 10,
 					Short = 1000,
@@ -996,19 +998,19 @@ namespace Waher.Persistence.FilesLW.Test
 				EmbeddedNull = null,
 				MultipleEmbedded = new Embedded[]
 				{
-					new Embedded()
+					new()
 					{
 						Byte = 20,
 						Short = 2000,
 						Int = 20000000
 					},
-					new Embedded()
+					new()
 					{
 						Byte = 30,
 						Short = 3000,
 						Int = 30000000
 					},
-					new Embedded()
+					new()
 					{
 						Byte = 40,
 						Short = 4000,
@@ -1017,14 +1019,14 @@ namespace Waher.Persistence.FilesLW.Test
 				},
 				MultipleEmbeddedNullable = new Embedded[]
 				{
-					new Embedded()
+					new()
 					{
 						Byte = 20,
 						Short = 2000,
 						Int = 20000000
 					},
 					null,
-					new Embedded()
+					new()
 					{
 						Byte = 40,
 						Short = 4000,
@@ -1037,24 +1039,24 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Container));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			Container Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -1085,16 +1087,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(Container Obj, Container Obj2)
+		private static void AssertEqual(Container Obj, Container Obj2)
 		{
 			AssertEx.Same(Obj.Embedded.Byte, Obj2.Embedded.Byte);
 			AssertEx.Same(Obj.Embedded.Short, Obj2.Embedded.Short);
@@ -1122,7 +1124,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_09_ObjectIdString()
 		{
-			ObjectIdString Obj = new ObjectIdString()
+			ObjectIdString Obj = new()
 			{
 				Value = 0x12345678
 			};
@@ -1130,24 +1132,24 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(string.IsNullOrEmpty(Obj.ObjectId));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdString));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(string.IsNullOrEmpty(Obj.ObjectId));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			ObjectIdString Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -1159,16 +1161,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(ObjectIdString Obj, ObjectIdString Obj2)
+		private static void AssertEqual(ObjectIdString Obj, ObjectIdString Obj2)
 		{
 			AssertEx.Same(Obj.Value, Obj2.Value);
 			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
@@ -1177,7 +1179,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_10_ObjectIdByteArray()
 		{
-			ObjectIdByteArray Obj = new ObjectIdByteArray()
+			ObjectIdByteArray Obj = new()
 			{
 				Value = 0x12345678
 			};
@@ -1185,24 +1187,24 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNull(Obj.ObjectId);
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdByteArray));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsNotNull(Obj.ObjectId);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			ObjectIdByteArray Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -1214,16 +1216,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(ObjectIdByteArray Obj, ObjectIdByteArray Obj2)
+		private static void AssertEqual(ObjectIdByteArray Obj, ObjectIdByteArray Obj2)
 		{
 			AssertEx.Same(Obj.Value, Obj2.Value);
 			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
@@ -1232,13 +1234,13 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_11_LocalTypeName()
 		{
-			LocalNameSubclass1 Obj1 = new LocalNameSubclass1()
+			LocalNameSubclass1 Obj1 = new()
 			{
 				Name = "Obj1",
 				Value = 0x12345678
 			};
 
-			LocalNameSubclass2 Obj2 = new LocalNameSubclass2()
+			LocalNameSubclass2 Obj2 = new()
 			{
 				Name = "Obj2",
 				Value = "Hello"
@@ -1250,8 +1252,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S1 = await provider.GetObjectSerializer(typeof(LocalNameSubclass1));
 			IObjectSerializer S2 = await provider.GetObjectSerializer(typeof(LocalNameSubclass2));
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(LocalNameBase));
-			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
-			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S1.Serialize(Writer1, false, false, Obj1, null);
 			await S2.Serialize(Writer2, false, false, Obj2, null);
@@ -1261,24 +1263,24 @@ namespace Waher.Persistence.FilesLW.Test
 
 			byte[] Data1 = Writer1.GetSerialization();
 			byte[] Data2 = Writer2.GetSerialization();
-			this.WriteData(Data1);
-			this.WriteData(Data2);
+			WriteData(Data1);
+			WriteData(Data2);
 
-			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
-			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
+			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), ConsoleOut.Writer);
+			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), ConsoleOut.Writer);
 
 			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj1, Obj12);
-			this.AssertEqual(Obj2, Obj22);
+			AssertEqual(Obj1, Obj12);
+			AssertEqual(Obj2, Obj22);
 
-			this.AssertBinaryLength(Data1, Reader1);
-			this.AssertBinaryLength(Data2, Reader2);
+			AssertBinaryLength(Data1, Reader1);
+			AssertBinaryLength(Data2, Reader2);
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj1 = (GenericObject)await GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			GenericObject GenObj2 = (GenericObject)await GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1297,28 +1299,28 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
-			this.WriteData(Data1);
-			this.WriteData(Data2);
+			WriteData(Data1);
+			WriteData(Data2);
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
 			Obj12 = (LocalNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			Obj22 = (LocalNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj1, Obj12);
-			this.AssertEqual(Obj2, Obj22);
-			this.AssertBinaryLength(Data1, Reader1);
-			this.AssertBinaryLength(Data2, Reader2);
+			AssertEqual(Obj1, Obj12);
+			AssertEqual(Obj2, Obj22);
+			AssertBinaryLength(Data1, Reader1);
+			AssertBinaryLength(Data2, Reader2);
 		}
 
-		private void AssertEqual(LocalNameSubclass1 Obj, LocalNameSubclass1 Obj2)
+		private static void AssertEqual(LocalNameSubclass1 Obj, LocalNameSubclass1 Obj2)
 		{
 			AssertEx.Same(Obj.Name, Obj2.Name);
 			AssertEx.Same(Obj.Value, Obj2.Value);
 			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		private void AssertEqual(LocalNameSubclass2 Obj, LocalNameSubclass2 Obj2)
+		private static void AssertEqual(LocalNameSubclass2 Obj, LocalNameSubclass2 Obj2)
 		{
 			AssertEx.Same(Obj.Name, Obj2.Name);
 			AssertEx.Same(Obj.Value, Obj2.Value);
@@ -1328,13 +1330,13 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_12_FullTypeName()
 		{
-			FullNameSubclass1 Obj1 = new FullNameSubclass1()
+			FullNameSubclass1 Obj1 = new()
 			{
 				Name = "Obj1",
 				Value = 0x12345678
 			};
 
-			FullNameSubclass2 Obj2 = new FullNameSubclass2()
+			FullNameSubclass2 Obj2 = new()
 			{
 				Name = "Obj2",
 				Value = "Hello"
@@ -1346,8 +1348,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S1 = await provider.GetObjectSerializer(typeof(FullNameSubclass1));
 			IObjectSerializer S2 = await provider.GetObjectSerializer(typeof(FullNameSubclass2));
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(FullNameBase));
-			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
-			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S1.Serialize(Writer1, false, false, Obj1, null);
 			await S2.Serialize(Writer2, false, false, Obj2, null);
@@ -1357,24 +1359,24 @@ namespace Waher.Persistence.FilesLW.Test
 
 			byte[] Data1 = Writer1.GetSerialization();
 			byte[] Data2 = Writer2.GetSerialization();
-			this.WriteData(Data1);
-			this.WriteData(Data2);
+			WriteData(Data1);
+			WriteData(Data2);
 
-			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
-			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
+			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), ConsoleOut.Writer);
+			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), ConsoleOut.Writer);
 
 			FullNameSubclass1 Obj12 = (FullNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			FullNameSubclass2 Obj22 = (FullNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj1, Obj12);
-			this.AssertEqual(Obj2, Obj22);
+			AssertEqual(Obj1, Obj12);
+			AssertEqual(Obj2, Obj22);
 
-			this.AssertBinaryLength(Data1, Reader1);
-			this.AssertBinaryLength(Data2, Reader2);
+			AssertBinaryLength(Data1, Reader1);
+			AssertBinaryLength(Data2, Reader2);
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj1 = (GenericObject)await GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			GenericObject GenObj2 = (GenericObject)await GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1393,28 +1395,28 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
-			this.WriteData(Data1);
-			this.WriteData(Data2);
+			WriteData(Data1);
+			WriteData(Data2);
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
 			Obj12 = (FullNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			Obj22 = (FullNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj1, Obj12);
-			this.AssertEqual(Obj2, Obj22);
-			this.AssertBinaryLength(Data1, Reader1);
-			this.AssertBinaryLength(Data2, Reader2);
+			AssertEqual(Obj1, Obj12);
+			AssertEqual(Obj2, Obj22);
+			AssertBinaryLength(Data1, Reader1);
+			AssertBinaryLength(Data2, Reader2);
 		}
 
-		private void AssertEqual(FullNameSubclass1 Obj, FullNameSubclass1 Obj2)
+		private static void AssertEqual(FullNameSubclass1 Obj, FullNameSubclass1 Obj2)
 		{
 			AssertEx.Same(Obj.Name, Obj2.Name);
 			AssertEx.Same(Obj.Value, Obj2.Value);
 			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		private void AssertEqual(FullNameSubclass2 Obj, FullNameSubclass2 Obj2)
+		private static void AssertEqual(FullNameSubclass2 Obj, FullNameSubclass2 Obj2)
 		{
 			AssertEx.Same(Obj.Name, Obj2.Name);
 			AssertEx.Same(Obj.Value, Obj2.Value);
@@ -1424,7 +1426,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_13_CollectionTest()
 		{
-			CollectionTest Obj = new CollectionTest()
+			CollectionTest Obj = new()
 			{
 				S1 = "Today, there will be a lot of ☀.",
 				S2 = "Hello world.",
@@ -1432,22 +1434,22 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(CollectionTest));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			CollectionTest Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Test");
@@ -1460,16 +1462,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(CollectionTest Obj, CollectionTest Obj2)
+		private static void AssertEqual(CollectionTest Obj, CollectionTest Obj2)
 		{
 			AssertEx.Same(Obj.S1, Obj2.S1);
 			AssertEx.Same(Obj.S2, Obj2.S2);
@@ -1479,7 +1481,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_14_ArraysOfArrays()
 		{
-			ArraysOfArrays Obj = new ArraysOfArrays()
+			ArraysOfArrays Obj = new()
 			{
 				Boolean = new bool[][] { new bool[] { true, false }, new bool[] { false, true } },
 				Byte = new byte[][] { new byte[] { 1, 2, 3 }, new byte[] { 2, 3, 4 } },
@@ -1504,22 +1506,22 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ArraysOfArrays));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			ArraysOfArrays Obj2 = (ArraysOfArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
@@ -1549,19 +1551,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (ArraysOfArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_15_ObsoleteMethod()
 		{
-			ObsoleteMethod Obj = new ObsoleteMethod()
+			ObsoleteMethod Obj = new()
 			{
 				Boolean1 = true,
 				Boolean2 = false,
@@ -1638,24 +1640,24 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("CIString", Obj));
 			AssertEx.Same(Obj.CIString, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			ObsoleteMethod Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -1665,16 +1667,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
+		private static void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
 		{
 			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
 			AssertEx.Same(Obj.Byte, Obj2.Byte);
@@ -1701,7 +1703,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_16_GenObject1()
 		{
-			GenObj1 Obj = new GenObj1()
+			GenObj1 Obj = new()
 			{
 				EmbeddedObj = new GenericObject(string.Empty, string.Empty, Guid.Empty,
 					new KeyValuePair<string, object>("A", 10),
@@ -1711,19 +1713,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj1));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			GenObj1 Obj2 = (GenObj1)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1738,7 +1740,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_17_GenObject2()
 		{
-			GenObj2 Obj = new GenObj2()
+			GenObj2 Obj = new()
 			{
 				EmbeddedObj = new Dictionary<string, object>()
 				{
@@ -1750,19 +1752,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj2));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			GenObj2 Obj2 = (GenObj2)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1776,7 +1778,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_18_GenObject3()
 		{
-			GenObj3 Obj = new GenObj3()
+			GenObj3 Obj = new()
 			{
 				EmbeddedObj = new Dictionary<string, IElement>()
 				{
@@ -1788,19 +1790,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj3));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			GenObj3 Obj2 = (GenObj3)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1814,31 +1816,31 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_19_GenObject4()
 		{
-			GenObj4 Obj = new GenObj4()
+			GenObj4 Obj = new()
 			{
 				EmbeddedObj = new KeyValuePair<string, object>[]
 				{
-					new KeyValuePair<string, object>("A", 10),
-					new KeyValuePair<string, object>("B", "Hello")
+					new("A", 10),
+					new("B", "Hello")
 				}
 			};
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj4));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			GenObj4 Obj2 = (GenObj4)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1867,31 +1869,31 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_20_GenObject5()
 		{
-			GenObj5 Obj = new GenObj5()
+			GenObj5 Obj = new()
 			{
 				EmbeddedObj = new KeyValuePair<string, IElement>[]
 				{
-					new KeyValuePair<string, IElement>("A", new DoubleNumber(10)),
-					new KeyValuePair<string, IElement>("B", new StringValue("Hello"))
+					new("A", new DoubleNumber(10)),
+					new("B", new StringValue("Hello"))
 				}
 			};
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj5));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			GenObj5 Obj2 = (GenObj5)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1920,7 +1922,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_21_Structs()
 		{
-			Structs Obj = new Structs()
+			Structs Obj = new()
 			{
 				Duration = new Content.Duration(true, 1, 2, 3, 4, 5, 6)
 			};
@@ -1928,19 +1930,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Structs));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 			Structs Obj2 = (Structs)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -1957,7 +1959,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_22_VarLimits_Min()
 		{
-			VarLenIntegers Obj = new VarLenIntegers()
+			VarLenIntegers Obj = new()
 			{
 				Short = GeneratedObjectSerializerBase.Int16VarSizeMinLimit + 1,
 				Int = GeneratedObjectSerializerBase.Int32VarSizeMinLimit + 1,
@@ -1983,27 +1985,27 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -2013,19 +2015,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_23_VarLimits_Max()
 		{
-			VarLenIntegers Obj = new VarLenIntegers()
+			VarLenIntegers Obj = new()
 			{
 				Short = GeneratedObjectSerializerBase.Int16VarSizeMaxLimit - 1,
 				Int = GeneratedObjectSerializerBase.Int32VarSizeMaxLimit - 1,
@@ -2051,27 +2053,27 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -2081,19 +2083,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_24_FixedLimits_Min()
 		{
-			VarLenIntegers Obj = new VarLenIntegers()
+			VarLenIntegers Obj = new()
 			{
 				Short = GeneratedObjectSerializerBase.Int16VarSizeMinLimit,
 				Int = GeneratedObjectSerializerBase.Int32VarSizeMinLimit,
@@ -2119,27 +2121,27 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -2149,19 +2151,19 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_25_FixedLimits_Max()
 		{
-			VarLenIntegers Obj = new VarLenIntegers()
+			VarLenIntegers Obj = new()
 			{
 				Short = GeneratedObjectSerializerBase.Int16VarSizeMaxLimit,
 				Int = GeneratedObjectSerializerBase.Int32VarSizeMaxLimit,
@@ -2187,27 +2189,27 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
 
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -2217,13 +2219,13 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		internal static void AssertEqual(VarLenIntegers Obj, VarLenIntegers Obj2)
@@ -2252,29 +2254,29 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_26_Nested()
 		{
-			NestedClass Obj = this.CreateNestedTestClass();
+			NestedClass Obj = CreateNestedTestClass();
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NestedClass));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			NestedClass Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
@@ -2284,16 +2286,16 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
-		private NestedClass CreateNestedTestClass()
+		private static NestedClass CreateNestedTestClass()
 		{
 			return new NestedClass()
 			{
@@ -2431,7 +2433,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_27_Binary()
 		{
-			DockerBlob Obj = new DockerBlob()
+			DockerBlob Obj = new()
 			{
 				ObjectId = Guid.NewGuid().ToString(),
 				Function = HashFunction.SHA256,
@@ -2447,17 +2449,17 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			ObjectSerializer S = (ObjectSerializer)await provider.GetObjectSerializer(typeof(DockerBlob));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			DockerBlob Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2467,10 +2469,10 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
@@ -2484,7 +2486,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
@@ -2495,13 +2497,13 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_28_BinaryNull()
 		{
-			DockerBlob Obj = new DockerBlob()
+			DockerBlob Obj = new()
 			{
 				ObjectId = Guid.NewGuid().ToString(),
 				FileName = "Some file",
@@ -2509,17 +2511,17 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			ObjectSerializer S = (ObjectSerializer)await provider.GetObjectSerializer(typeof(DockerBlob));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), Console.Out);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), ConsoleOut.Writer);
 
 			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
-			Console.Out.WriteLine();
-			Console.Out.WriteLine();
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
 
 			DockerBlob Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2529,10 +2531,10 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
-			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObjectSerializer GS = new(provider);
 			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
@@ -2546,7 +2548,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
-			this.WriteData(Data);
+			WriteData(Data);
 
 			Reader.Restart(Data, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
@@ -2557,7 +2559,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			this.AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data, Reader);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

@@ -2,7 +2,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Contains a 3D-canvas with platform independent software 3D-rendering and drawing primitives, as well as script extensions for 3D-graphs. Includes support for Z-buffer, Phong Shading, Transparency, oversamling &amp; antialiasing.
 
 Script Syntax:

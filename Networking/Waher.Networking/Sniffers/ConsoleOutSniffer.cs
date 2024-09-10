@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console;
-using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
@@ -44,7 +43,7 @@ namespace Waher.Networking.Sniffers
 	}
 
 	/// <summary>
-	/// Outputs sniffed data to <see cref="Console.Out"/>, serualized by <see cref="ConsoleOut"/>.
+	/// Outputs sniffed data to the Console Output, serialized by <see cref="ConsoleOut"/>.
 	/// </summary>
 	public class ConsoleOutSniffer : SnifferBase, IDisposable
 	{
@@ -52,10 +51,10 @@ namespace Waher.Networking.Sniffers
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly LineEnding lineEndingMethod;
 		private bool consoleWidthWorks = true;
-		private readonly MultiReadSingleWriteObject syncObj = new MultiReadSingleWriteObject();
+		private bool includeTimestamp = false;
 
 		/// <summary>
-		/// Outputs sniffed data to <see cref="Console.Out"/>.
+		/// Outputs sniffed data to the Console Output, serialized by <see cref="ConsoleOut"/>.
 		/// </summary>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
 		/// <param name="LineEndingMethod">Line ending method.</param>
@@ -67,13 +66,23 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// If timestamps should be included in the output. (Default is false.)
+		/// </summary>
+		public bool IncludeTimestamp
+		{
+			get => this.includeTimestamp;
+			set => this.includeTimestamp = value;
+		}
+
+		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			return this.Output(Timestamp, Text, ConsoleColor.Black, ConsoleColor.White);
+			this.Output(Timestamp, Text, ConsoleColor.Black, ConsoleColor.White);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -83,7 +92,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			return this.Output(Timestamp, Text, ConsoleColor.White, ConsoleColor.DarkBlue);
+			this.Output(Timestamp, Text, ConsoleColor.White, ConsoleColor.DarkBlue);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -106,7 +116,7 @@ namespace Waher.Networking.Sniffers
 			return this.BinaryOutput(Timestamp, Data, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
-		private async Task BinaryOutput(DateTime Timestamp, byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
+		private Task BinaryOutput(DateTime Timestamp, byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
 		{
 			switch (this.binaryPresentationMethod)
 			{
@@ -124,23 +134,25 @@ namespace Waher.Networking.Sniffers
 						i = (i + 1) & 31;
 						if (i == 0)
 						{
-							await this.Output(Timestamp, Row.ToString(), Fg, Bg);
+							this.Output(Timestamp, Row.ToString(), Fg, Bg);
 							Row.Clear();
 						}
 					}
 
 					if (i != 0)
-						await this.Output(Timestamp, Row.ToString(), Fg, Bg);
+						this.Output(Timestamp, Row.ToString(), Fg, Bg);
 					break;
 
 				case BinaryPresentationMethod.Base64:
-					await this.Output(Timestamp, Convert.ToBase64String(Data), Fg, Bg);
+					this.Output(Timestamp, Convert.ToBase64String(Data), Fg, Bg);
 					break;
 
 				case BinaryPresentationMethod.ByteCount:
-					await this.Output(Timestamp, "<" + Data.Length.ToString() + " bytes>", Fg, Bg);
+					this.Output(Timestamp, "<" + Data.Length.ToString() + " bytes>", Fg, Bg);
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -150,7 +162,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			return this.Output(Timestamp, Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
+			this.Output(Timestamp, Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -160,7 +173,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			return this.Output(Timestamp, Warning, ConsoleColor.Black, ConsoleColor.Yellow);
+			this.Output(Timestamp, Warning, ConsoleColor.Black, ConsoleColor.Yellow);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -170,7 +184,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task Error(DateTime Timestamp, string Error)
 		{
-			return this.Output(Timestamp, Error, ConsoleColor.Yellow, ConsoleColor.Red);
+			this.Output(Timestamp, Error, ConsoleColor.Yellow, ConsoleColor.Red);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -180,22 +195,20 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			return this.Output(Timestamp, Exception, ConsoleColor.White, ConsoleColor.DarkRed);
+			this.Output(Timestamp, Exception, ConsoleColor.White, ConsoleColor.DarkRed);
+			return Task.CompletedTask;
 		}
 
-		private async Task Output(DateTime _, string s, ConsoleColor Fg, ConsoleColor Bg)
+		private void Output(DateTime Timestamp, string s, ConsoleColor Fg, ConsoleColor Bg)
 		{
-			await this.syncObj.BeginWrite();
-			try
+			ConsoleOut.Write((Output) =>
 			{
+				if (this.includeTimestamp)
+					s = Timestamp.ToString("T") + ": " + s;
+
 				if (this.lineEndingMethod == LineEnding.PadWithSpaces)
 				{
-					ConsoleColor FgBak = Console.ForegroundColor;
-					ConsoleColor BgBak = Console.BackgroundColor;
 					int i, w;
-
-					Console.ForegroundColor = Fg;
-					Console.BackgroundColor = Bg;
 
 					if (this.consoleWidthWorks)
 					{
@@ -234,28 +247,21 @@ namespace Waher.Networking.Sniffers
 								if (i > 0)
 									s += new string(' ', w - i);
 
-								Console.Out.Write(s);
+								Output.Write(s);
 							}
 						}
 						catch (Exception)
 						{
 							this.consoleWidthWorks = false;
-							Console.Out.WriteLine(s);
+							Output.WriteLine(s);
 						}
 					}
 					else
-						Console.Out.WriteLine(s);
-
-					Console.ForegroundColor = Fg;
-					Console.BackgroundColor = Bg;
+						Output.WriteLine(s);
 				}
 				else
-					Console.Out.WriteLine(s);
-			}
-			finally
-			{
-				await this.syncObj.EndWrite();
-			}
+					Output.WriteLine(s);
+			}, Fg, Bg);
 		}
 
 		internal static readonly char[] CRLF = new char[] { '\r', '\n' };
@@ -265,7 +271,6 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Dispose()
 		{
-			this.syncObj.Dispose();
 		}
 	}
 }

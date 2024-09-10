@@ -23,7 +23,7 @@ namespace Waher.Runtime.Console.Worker
 		/// </summary>
 		public override Task Execute()
 		{
-			System.Console.Write(this.value);
+			System.Console.Out.Write(this.value);
 			return Task.CompletedTask;
 		}
 	}

@@ -40,7 +40,7 @@ namespace Waher.Runtime.Console
 		public static string NewLine => System.Console.Out.NewLine;
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(string value)
@@ -50,16 +50,27 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a custom writer to the <see cref="System.Console.Out"/>.
+		/// Queues a custom writer to the console output.
 		/// </summary>
 		/// <param name="Writer">Callback method that will perform the actual writing.</param>
 		public static void Write(CustomWriter Writer)
 		{
-			ConsoleWorker.Queue(new ConsoleOutCustomWriter(Writer));
+			Write(Writer, null, null);
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a custom writer to the console output.
+		/// </summary>
+		/// <param name="Writer">Callback method that will perform the actual writing.</param>
+		/// <param name="ForegroundColor">Optional Foreground Color to use.</param>
+		/// <param name="BackgroundColor">Optional Background Color to use.</param>
+		public static void Write(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
+		{
+			ConsoleWorker.Queue(new ConsoleOutCustomWriter(Writer, ForegroundColor, BackgroundColor));
+		}
+
+		/// <summary>
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(ulong value)
@@ -68,7 +79,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(uint value)
@@ -77,7 +88,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(string format, params object[] arg)
@@ -86,7 +97,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(string format, object arg0, object arg1, object arg2)
@@ -95,7 +106,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(string format, object arg0, object arg1)
@@ -104,7 +115,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(string format, object arg0)
@@ -113,7 +124,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(float value)
@@ -122,7 +133,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(long value)
@@ -131,7 +142,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(int value)
@@ -140,7 +151,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(double value)
@@ -149,7 +160,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(decimal value)
@@ -158,7 +169,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(char[] buffer, int index, int count)
@@ -167,7 +178,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(char[] buffer)
@@ -176,7 +187,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(char value)
@@ -185,7 +196,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(bool value)
@@ -194,7 +205,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void Write(object value)
@@ -204,7 +215,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static async Task WriteAsync(string value)
@@ -221,7 +232,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteAsync(char[] buffer, int index, int count)
@@ -230,7 +241,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteAsync(char[] buffer)
@@ -239,7 +250,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteAsync(char value)
@@ -248,12 +259,23 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a custom writer to the <see cref="System.Console.Out"/>.
+		/// Queues a custom writer to the console output.
 		/// </summary>
 		/// <param name="Writer">Callback method that will perform the actual writing.</param>
-		public static async Task WriteAsync(CustomAsyncWriter Writer)
+		public static Task WriteAsync(CustomAsyncWriter Writer)
 		{
-			WorkItem Item = new ConsoleOutCustomAsyncWriter(Writer);
+			return WriteAsync(Writer, null, null);
+		}
+
+		/// <summary>
+		/// Queues a custom writer to the console output.
+		/// </summary>
+		/// <param name="Writer">Callback method that will perform the actual writing.</param>
+		/// <param name="ForegroundColor">Optional Foreground Color to use.</param>
+		/// <param name="BackgroundColor">Optional Background Color to use.</param>
+		public static async Task WriteAsync(CustomAsyncWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
+		{
+			WorkItem Item = new ConsoleOutCustomAsyncWriter(Writer, ForegroundColor, BackgroundColor);
 
 			if (!await ConsoleWorker.Queue(Item))
 				return;
@@ -262,7 +284,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine()
@@ -271,7 +293,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string value)
@@ -280,7 +302,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(ulong value)
@@ -289,7 +311,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(uint value)
@@ -298,7 +320,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string format, params object[] arg)
@@ -307,7 +329,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string format, object arg0, object arg1, object arg2)
@@ -316,7 +338,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string format, object arg0, object arg1)
@@ -325,7 +347,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(float value)
@@ -334,7 +356,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string format, object arg0)
@@ -343,7 +365,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(long value)
@@ -352,7 +374,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(int value)
@@ -361,7 +383,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(double value)
@@ -370,7 +392,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(decimal value)
@@ -379,7 +401,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(char[] buffer, int index, int count)
@@ -388,7 +410,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(char[] buffer)
@@ -397,7 +419,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(char value)
@@ -406,7 +428,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(object value)
@@ -416,7 +438,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(bool value)
@@ -425,7 +447,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static async Task WriteLineAsync(string value)
@@ -439,7 +461,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteLineAsync()
@@ -448,7 +470,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteLineAsync(char value)
@@ -457,7 +479,7 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteLineAsync(char[] buffer)
@@ -466,12 +488,20 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
-		/// Queues a value to be written to the <see cref="System.Console.Out"/>.
+		/// Queues a value to be written to the console output.
 		/// </summary>
 		/// <param name="value">Value to be written.</param>
 		public static Task WriteLineAsync(char[] buffer, int index, int count)
 		{
 			return WriteLineAsync(new string(buffer, index, count));
+		}
+
+		/// <summary>
+		/// Emits a Beep sounds.
+		/// </summary>
+		public static void Beep()
+		{
+			ConsoleWorker.Queue(new ConsoleBeep());
 		}
 	}
 }

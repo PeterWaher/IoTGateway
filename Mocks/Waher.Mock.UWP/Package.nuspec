@@ -19,8 +19,10 @@
       <dependency id="Waher.Content.Xml" version="2.3.1"/>
       <dependency id="Waher.Events" version="1.2.0"/>
       <dependency id="Waher.Networking.UWP" version="2.2.7"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="3.1.1"/>
-    </dependencies>
+			<dependency id="Waher.Networking.XMPP.UWP" version="3.1.1"/>
+			<dependency id="Waher.Runtime.Console" version="1.0.0"/>
+			<dependency id="Waher.Runtime.Queue" version="1.0.1"/>
+		</dependencies>
   </metadata>
   <files>
     <file src="..\..\Images\Icon_64x64.png" target="Meta" />

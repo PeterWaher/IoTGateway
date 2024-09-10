@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Console;
 
 namespace Waher.Events.Console
 {
@@ -49,235 +50,226 @@ namespace Waher.Events.Console
 		/// <inheritdoc/>
 		public override Task Queue(Event Event)
 		{
-			lock (System.Console.Out)
+			ConsoleColor? ForegroundColor;
+			ConsoleColor? BackgroundColor;
+			int Width = 80;
+			StringBuilder sb = new StringBuilder();
+			bool WriteLine = true;
+			int i;
+
+			if (this.consoleWidthWorks)
 			{
-				StringBuilder sb = new StringBuilder();
-				ConsoleColor FgBak = System.Console.ForegroundColor;
-				ConsoleColor BgBak = System.Console.BackgroundColor;
-				int Width = 80;
-				StringBuilder Output = new StringBuilder();
-				bool WriteLine = true;
-				int i;
-
-				if (this.consoleWidthWorks)
-				{
-					try
-					{
-						Width = System.Console.WindowWidth;
-						WriteLine = Width > 0;
-
-						if (WriteLine)
-						{
-							if (System.Console.CursorLeft > 1)
-								System.Console.Out.WriteLine();
-						}
-						else
-							Width = 80;
-					}
-					catch (Exception)
-					{
-						this.consoleWidthWorks = false;
-					}
-				}
-
 				try
 				{
-					switch (Event.Type)
+					Width = System.Console.WindowWidth;
+					WriteLine = Width > 0;
+
+					if (!WriteLine)
+						Width = 80;
+				}
+				catch (Exception)
+				{
+					this.consoleWidthWorks = false;
+				}
+			}
+
+			switch (Event.Type)
+			{
+				case EventType.Debug:
+					ForegroundColor = ConsoleColor.White;
+					BackgroundColor = ConsoleColor.DarkBlue;
+					break;
+
+				case EventType.Informational:
+					ForegroundColor = ConsoleColor.Green;
+					BackgroundColor = ConsoleColor.Black;
+					break;
+
+				case EventType.Notice:
+					ForegroundColor = ConsoleColor.White;
+					BackgroundColor = ConsoleColor.Black;
+					break;
+
+				case EventType.Warning:
+					ForegroundColor = ConsoleColor.Yellow;
+					BackgroundColor = ConsoleColor.Black;
+					break;
+
+				case EventType.Error:
+					ForegroundColor = ConsoleColor.Red;
+					BackgroundColor = ConsoleColor.Black;
+					break;
+
+				case EventType.Critical:
+					ForegroundColor = ConsoleColor.Yellow;
+					BackgroundColor = ConsoleColor.Red;
+
+					if (this.beep)
+						ConsoleOut.Beep();
+					break;
+
+				case EventType.Alert:
+					ForegroundColor = ConsoleColor.Yellow;
+					BackgroundColor = ConsoleColor.DarkRed;
+
+					if (this.beep)
+						ConsoleOut.Beep();
+					break;
+
+				case EventType.Emergency:
+					ForegroundColor = ConsoleColor.White;
+					BackgroundColor = ConsoleColor.Magenta;
+
+					if (this.beep)
+						ConsoleOut.Beep();
+					break;
+
+				default:
+					ForegroundColor = null;
+					BackgroundColor = null;
+					break;
+			}
+
+			if (!string.IsNullOrEmpty(Event.EventId))
+			{
+				sb.Append(Event.EventId);
+				sb.Append(": ");
+			}
+
+			if (Event.Message.IndexOf('\t') >= 0)
+			{
+				string[] Parts = Event.Message.Split('\t');
+				bool First = true;
+
+				foreach (string Part in Parts)
+				{
+					if (First)
+						First = false;
+					else
 					{
-						case EventType.Debug:
-							System.Console.ForegroundColor = ConsoleColor.White;
-							System.Console.BackgroundColor = ConsoleColor.DarkBlue;
-							break;
-
-						case EventType.Informational:
-							System.Console.ForegroundColor = ConsoleColor.Green;
-							System.Console.BackgroundColor = ConsoleColor.Black;
-							break;
-
-						case EventType.Notice:
-							System.Console.ForegroundColor = ConsoleColor.White;
-							System.Console.BackgroundColor = ConsoleColor.Black;
-							break;
-
-						case EventType.Warning:
-							System.Console.ForegroundColor = ConsoleColor.Yellow;
-							System.Console.BackgroundColor = ConsoleColor.Black;
-							break;
-
-						case EventType.Error:
-							System.Console.ForegroundColor = ConsoleColor.Red;
-							System.Console.BackgroundColor = ConsoleColor.Black;
-							break;
-
-						case EventType.Critical:
-							System.Console.ForegroundColor = ConsoleColor.Yellow;
-							System.Console.BackgroundColor = ConsoleColor.Red;
-
-							if (this.beep)
-								System.Console.Beep();
-							break;
-
-						case EventType.Alert:
-							System.Console.ForegroundColor = ConsoleColor.Yellow;
-							System.Console.BackgroundColor = ConsoleColor.DarkRed;
-
-							if (this.beep)
-								System.Console.Beep();
-							break;
-
-						case EventType.Emergency:
-							System.Console.ForegroundColor = ConsoleColor.White;
-							System.Console.BackgroundColor = ConsoleColor.Magenta;
-
-							if (this.beep)
-								System.Console.Beep();
-							break;
+						i = sb.ToString().Length % TabWidth;
+						sb.Append(new string(' ', TabWidth - i));
 					}
 
-					if (!string.IsNullOrEmpty(Event.EventId))
-					{
-						Output.Append(Event.EventId);
-						Output.Append(": ");
-					}
+					sb.Append(Part);
+				}
+			}
+			else
+				sb.Append(Event.Message);
 
-					if (Event.Message.IndexOf('\t') >= 0)
+			if (WriteLine)
+				sb.AppendLine();
+			else
+			{
+				i = sb.ToString().Length % Width;
+				if (i > 0)
+					sb.Append(new string(' ', Width - i));
+			}
+
+			if (this.includeStackTraces && !string.IsNullOrEmpty(Event.StackTrace))
+			{
+				sb.Append(Event.StackTrace);
+
+				if (WriteLine)
+					sb.AppendLine();
+				else
+				{
+					i = sb.ToString().Length % Width;
+					if (i > 0)
+						sb.Append(new string(' ', Width - i));
+				}
+			}
+
+			sb.Append("  ");
+
+			this.AddTag(sb, Width, "Timestamp", Event.Timestamp.ToString(), true, WriteLine);
+			this.AddTag(sb, Width, "Level", Event.Level.ToString(), false, WriteLine);
+
+			if (!string.IsNullOrEmpty(Event.Object))
+				this.AddTag(sb, Width, "Object", Event.Object, false, WriteLine);
+
+			if (!string.IsNullOrEmpty(Event.Actor))
+				this.AddTag(sb, Width, "Actor", Event.Actor, false, WriteLine);
+
+			if (!string.IsNullOrEmpty(Event.Facility))
+				this.AddTag(sb, Width, "Facility", Event.Facility, false, WriteLine);
+
+			if (!string.IsNullOrEmpty(Event.Module))
+				this.AddTag(sb, Width, "Module", Event.Module, false, WriteLine);
+
+			if (!(Event.Tags is null) && Event.Tags.Length > 0)
+			{
+				foreach (KeyValuePair<string, object> P in Event.Tags)
+				{
+					if (P.Value is Array A)
 					{
-						string[] Parts = Event.Message.Split('\t');
+						StringBuilder sb2 = new StringBuilder();
 						bool First = true;
 
-						foreach (string Part in Parts)
+						foreach (object Item in A)
 						{
 							if (First)
 								First = false;
 							else
-							{
-								i = Output.ToString().Length % TabWidth;
-								Output.Append(new string(' ', TabWidth - i));
-							}
+								sb2.Append(", ");
 
-							Output.Append(Part);
+							sb2.Append(Item.ToString());
 						}
+
+						this.AddTag(sb, Width, P.Key, sb2.ToString(), false, WriteLine);
 					}
 					else
-						Output.Append(Event.Message);
-
-					if (WriteLine)
-						Output.AppendLine();
-					else
-					{
-						i = Output.ToString().Length % Width;
-						if (i > 0)
-							Output.Append(new string(' ', Width - i));
-					}
-
-					if (this.includeStackTraces && !string.IsNullOrEmpty(Event.StackTrace))
-					{
-						Output.Append(Event.StackTrace);
-
-						if (WriteLine)
-							Output.AppendLine();
-						else
-						{
-							i = Output.ToString().Length % Width;
-							if (i > 0)
-								Output.Append(new string(' ', Width - i));
-						}
-					}
-
-					Output.Append("  ");
-
-					this.AddTag(Output, Width, "Timestamp", Event.Timestamp.ToString(), true, WriteLine);
-					this.AddTag(Output, Width, "Level", Event.Level.ToString(), false, WriteLine);
-
-					if (!string.IsNullOrEmpty(Event.Object))
-						this.AddTag(Output, Width, "Object", Event.Object, false, WriteLine);
-
-					if (!string.IsNullOrEmpty(Event.Actor))
-						this.AddTag(Output, Width, "Actor", Event.Actor, false, WriteLine);
-
-					if (!string.IsNullOrEmpty(Event.Facility))
-						this.AddTag(Output, Width, "Facility", Event.Facility, false, WriteLine);
-
-					if (!string.IsNullOrEmpty(Event.Module))
-						this.AddTag(Output, Width, "Module", Event.Module, false, WriteLine);
-
-					if (!(Event.Tags is null) && Event.Tags.Length > 0)
-					{
-						foreach (KeyValuePair<string, object> P in Event.Tags)
-						{
-							if (P.Value is Array A)
-							{
-								StringBuilder sb2 = new StringBuilder();
-								bool First = true;
-
-								foreach (object Item in A)
-								{
-									if (First)
-										First = false;
-									else
-										sb2.Append(", ");
-
-									sb2.Append(Item.ToString());
-								}
-
-								this.AddTag(Output, Width, P.Key, sb2.ToString(), false, WriteLine);
-							}
-							else
-								this.AddTag(Output, Width, P.Key, P.Value, false, WriteLine);
-						}
-					}
-
-					if (WriteLine)
-						Output.AppendLine();
-					else
-					{
-						i = Output.ToString().Length % Width;
-						if (i > 0)
-							Output.Append(new string(' ', Width - i));
-					}
-
-					System.Console.Out.WriteLine(Output.ToString());
-				}
-				finally
-				{
-					System.Console.ForegroundColor = FgBak;
-					System.Console.BackgroundColor = BgBak;
+						this.AddTag(sb, Width, P.Key, P.Value, false, WriteLine);
 				}
 			}
+
+			if (WriteLine)
+				sb.AppendLine();
+			else
+			{
+				i = sb.ToString().Length % Width;
+				if (i > 0)
+					sb.Append(new string(' ', Width - i));
+			}
+
+			ConsoleOut.Write((Output) =>
+			{
+				Output.WriteLine(sb.ToString());
+			}, ForegroundColor, BackgroundColor);
 
 			return Task.CompletedTask;
 		}
 
-		private void AddTag(StringBuilder Output, int Width, string Key, object Value, bool First, bool WriteLine)
+		private void AddTag(StringBuilder sb, int Width, string Key, object Value, bool First, bool WriteLine)
 		{
 			string ValueStr = Value is null ? string.Empty : Value.ToString();
 
 			if (Width > 0)
 			{
-				int i = Output.ToString().Length % Width;
+				int i = sb.ToString().Length % Width;
 
 				if (i + Key.Length + 1 + ValueStr.Length + (First ? 0 : 2) > Width)
 				{
 					if (WriteLine)
 					{
-						Output.AppendLine();
-						Output.Append("  ");
+						sb.AppendLine();
+						sb.Append("  ");
 					}
 					else
-						Output.Append(new string(' ', Width - i + 3));
+						sb.Append(new string(' ', Width - i + 3));
 
 					First = true;
 				}
 			}
 
 			if (!First)
-				Output.Append(", ");
+				sb.Append(", ");
 			else if (Width <= 0)
-				Output.Append(' ');
+				sb.Append(' ');
 
-			Output.Append(Key);
-			Output.Append('=');
-			Output.Append(Value);
+			sb.Append(Key);
+			sb.Append('=');
+			sb.Append(Value);
 		}
 
 	}

@@ -18,6 +18,7 @@ using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.CallStack;
 
@@ -259,30 +260,30 @@ namespace Waher.IoTGateway.Svc
 				{
 					Log.Informational("Displaying help.");
 
-					Console.Out.WriteLine("IoT Gateway Windows Service Application.");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Command line switches:");
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("-?                   Brings this help.");
-					Console.Out.WriteLine("-install             Installs service in operating system");
-					Console.Out.WriteLine("-uninstall           Uninstalls service from operating system.");
-					Console.Out.WriteLine("-displayname Name    Sets the display name of the service. Default is \"IoT ");
-					Console.Out.WriteLine("                     Gateway Service\".");
-					Console.Out.WriteLine("-description Desc    Sets the textual description of the service. Default is ");
-					Console.Out.WriteLine("                     \"Windows Service hosting the Waher IoT Gateway.\".");
-					Console.Out.WriteLine("-start Mode          Sets the default starting mode of the service. Default is ");
-					Console.Out.WriteLine("                     Disabled. Available options are StartOnBoot, ");
-					Console.Out.WriteLine("                     StartOnSystemStart, AutoStart, StartOnDemand and Disabled.");
-					Console.Out.WriteLine("-immediate           If the service should be started immediately.");
-					Console.Out.WriteLine("-console             Run the service as a console application.");
-					Console.Out.WriteLine("-localsystem         Installed service will run using the Local System account.");
-					Console.Out.WriteLine("-localservice        Installed service will run using the Local Service account");
-					Console.Out.WriteLine("                     (default).");
-					Console.Out.WriteLine("-networkservice      Installed service will run using the Network Service");
-					Console.Out.WriteLine("                     account.");
-					Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
-					Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
-					Console.Out.WriteLine("                     are given separate instance names.");
+					ConsoleOut.WriteLine("IoT Gateway Windows Service Application.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Command line switches:");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("-?                   Brings this help.");
+					ConsoleOut.WriteLine("-install             Installs service in operating system");
+					ConsoleOut.WriteLine("-uninstall           Uninstalls service from operating system.");
+					ConsoleOut.WriteLine("-displayname Name    Sets the display name of the service. Default is \"IoT ");
+					ConsoleOut.WriteLine("                     Gateway Service\".");
+					ConsoleOut.WriteLine("-description Desc    Sets the textual description of the service. Default is ");
+					ConsoleOut.WriteLine("                     \"Windows Service hosting the Waher IoT Gateway.\".");
+					ConsoleOut.WriteLine("-start Mode          Sets the default starting mode of the service. Default is ");
+					ConsoleOut.WriteLine("                     Disabled. Available options are StartOnBoot, ");
+					ConsoleOut.WriteLine("                     StartOnSystemStart, AutoStart, StartOnDemand and Disabled.");
+					ConsoleOut.WriteLine("-immediate           If the service should be started immediately.");
+					ConsoleOut.WriteLine("-console             Run the service as a console application.");
+					ConsoleOut.WriteLine("-localsystem         Installed service will run using the Local System account.");
+					ConsoleOut.WriteLine("-localservice        Installed service will run using the Local Service account");
+					ConsoleOut.WriteLine("                     (default).");
+					ConsoleOut.WriteLine("-networkservice      Installed service will run using the Network Service");
+					ConsoleOut.WriteLine("                     account.");
+					ConsoleOut.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
+					ConsoleOut.WriteLine("                     instances of the IoT Gateway can execute, provided they");
+					ConsoleOut.WriteLine("                     are given separate instance names.");
 
 					return -1;
 				}
@@ -302,7 +303,7 @@ namespace Waher.IoTGateway.Svc
 				if (Install && Uninstall)
 				{
 					Log.Error("Conflicting arguments.");
-					Console.Out.Write("Conflicting arguments.");
+					ConsoleOut.Write("Conflicting arguments.");
 					return -1;
 				}
 
@@ -388,7 +389,7 @@ namespace Waher.IoTGateway.Svc
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
-				Console.Out.WriteLine(ex.Message);
+				ConsoleOut.WriteLine(ex.Message);
 				return 1;
 			}
 		}
@@ -421,13 +422,13 @@ namespace Waher.IoTGateway.Svc
 			{
 				Console.ForegroundColor = ConsoleColor.White;
 
-				Console.Out.WriteLine("Welcome to the Internet of Things Gateway server application.");
-				Console.Out.WriteLine(new string('-', 79));
-				Console.Out.WriteLine("This server application will help you manage IoT devices and");
-				Console.Out.WriteLine("create dynamic content that you can publish on the Internet.");
-				Console.Out.WriteLine("It also provides programming interfaces (API) which allow you");
-				Console.Out.WriteLine("to dynamically and securely interact with the devices and the");
-				Console.Out.WriteLine("content you publish.");
+				ConsoleOut.WriteLine("Welcome to the Internet of Things Gateway server application.");
+				ConsoleOut.WriteLine(new string('-', 79));
+				ConsoleOut.WriteLine("This server application will help you manage IoT devices and");
+				ConsoleOut.WriteLine("create dynamic content that you can publish on the Internet.");
+				ConsoleOut.WriteLine("It also provides programming interfaces (API) which allow you");
+				ConsoleOut.WriteLine("to dynamically and securely interact with the devices and the");
+				ConsoleOut.WriteLine("content you publish.");
 
 				Log.Register(new ConsoleEventSink(false));
 
@@ -436,8 +437,8 @@ namespace Waher.IoTGateway.Svc
 
 				if (!Gateway.Start(true, true, instanceName).Result)
 				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Gateway being started in another process.");
+					ConsoleOut.WriteLine();
+					ConsoleOut.WriteLine("Gateway being started in another process.");
 					return;
 				}
 
@@ -545,19 +546,19 @@ namespace Waher.IoTGateway.Svc
 			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
 			{
 				case 0:
-					Console.Out.WriteLine("Service successfully installed. Service start is pending.");
+					ConsoleOut.WriteLine("Service successfully installed. Service start is pending.");
 					break;
 
 				case 1:
-					Console.Out.WriteLine("Service successfully installed and started.");
+					ConsoleOut.WriteLine("Service successfully installed and started.");
 					break;
 
 				case 2:
-					Console.Out.WriteLine("Service registration successfully updated. Service start is pending.");
+					ConsoleOut.WriteLine("Service registration successfully updated. Service start is pending.");
 					break;
 
 				case 3:
-					Console.Out.WriteLine("Service registration successfully updated. Service started.");
+					ConsoleOut.WriteLine("Service registration successfully updated. Service started.");
 					break;
 
 				default:
@@ -570,9 +571,9 @@ namespace Waher.IoTGateway.Svc
 			ServiceInstaller host = new(ServiceName, InstanceName);
 
 			if (host.Uninstall())
-				Console.Out.WriteLine("Service successfully uninstalled.");
+				ConsoleOut.WriteLine("Service successfully uninstalled.");
 			else
-				Console.Out.WriteLine("Service not found. Uninstall not required.");
+				ConsoleOut.WriteLine("Service not found. Uninstall not required.");
 		}
 
 	}

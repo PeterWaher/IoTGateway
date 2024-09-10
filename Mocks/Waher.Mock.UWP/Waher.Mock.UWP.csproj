@@ -147,6 +147,14 @@
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
+      <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
+      <Name>Waher.Runtime.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj">
+      <Project>{1adfb1fd-e9fc-41e0-a3d4-d0db91adcd59}</Project>
+      <Name>Waher.Runtime.Queue</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

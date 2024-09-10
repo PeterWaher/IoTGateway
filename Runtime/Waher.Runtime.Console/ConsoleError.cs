@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console.Worker;
@@ -489,6 +490,68 @@ namespace Waher.Runtime.Console
 		public static void Beep()
 		{
 			ConsoleWorker.Queue(new ConsoleBeep());
+		}
+
+		/// <summary>
+		/// Provides a <see cref="TextWriter"/> instance, that writes to <see cref="ConsoleError"/>.
+		/// </summary>
+		public static TextWriter Writer
+		{
+			get => new ConsoleErrorTextWriter();
+		}
+
+		/// <summary>
+		/// Text writer that writes to <see cref="ConsoleError"/>
+		/// </summary>
+		private class ConsoleErrorTextWriter : TextWriter
+		{
+			public ConsoleErrorTextWriter()
+			{
+			}
+
+			public override Encoding Encoding => ConsoleError.Encoding;
+			public override void Write(char value) => ConsoleError.Write(value);
+			public override void Write(ulong value) => ConsoleError.Write(value);
+			public override void Write(uint value) => ConsoleError.Write(value);
+			public override void Write(string format, params object[] arg) => ConsoleError.Write(format, arg);
+			public override void Write(string format, object arg0, object arg1, object arg2) => ConsoleError.Write(format, arg0, arg1, arg2);
+			public override void Write(string format, object arg0, object arg1) => ConsoleError.Write(format, arg0, arg1);
+			public override void Write(string format, object arg0) => ConsoleError.Write(format, arg0);
+			public override void Write(string value) => ConsoleError.Write(value);
+			public override void Write(float value) => ConsoleError.Write(value);
+			public override void Write(long value) => ConsoleError.Write(value);
+			public override void Write(int value) => ConsoleError.Write(value);
+			public override void Write(double value) => ConsoleError.Write(value);
+			public override void Write(decimal value) => ConsoleError.Write(value);
+			public override void Write(char[] buffer, int index, int count) => ConsoleError.Write(buffer, index, count);
+			public override void Write(char[] buffer) => ConsoleError.Write(buffer);
+			public override void Write(bool value) => ConsoleError.Write(value);
+			public override void Write(object value) => ConsoleError.Write(value);
+			public override Task WriteAsync(string value) => ConsoleError.WriteAsync(value);
+			public override Task WriteAsync(char[] buffer, int index, int count) => ConsoleError.WriteAsync(buffer, index, count);
+			public override Task WriteAsync(char value) => ConsoleError.WriteAsync(value);
+			public override void WriteLine() => ConsoleError.WriteLine();
+			public override void WriteLine(ulong value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(uint value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(string format, params object[] arg) => ConsoleError.WriteLine(format, arg);
+			public override void WriteLine(string format, object arg0, object arg1, object arg2) => ConsoleError.WriteLine(format, arg0, arg1, arg2);
+			public override void WriteLine(string format, object arg0, object arg1) => ConsoleError.WriteLine(format, arg0, arg1);
+			public override void WriteLine(string value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(float value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(string format, object arg0) => ConsoleError.WriteLine(format, arg0);
+			public override void WriteLine(long value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(int value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(double value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(decimal value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(char[] buffer, int index, int count) => ConsoleError.WriteLine(buffer, index, count);
+			public override void WriteLine(char[] buffer) => ConsoleError.WriteLine(buffer);
+			public override void WriteLine(char value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(object value) => ConsoleError.WriteLine(value);
+			public override void WriteLine(bool value) => ConsoleError.WriteLine(value);
+			public override Task WriteLineAsync() => ConsoleError.WriteLineAsync();
+			public override Task WriteLineAsync(char value) => ConsoleError.WriteLineAsync(value);
+			public override Task WriteLineAsync(char[] buffer, int index, int count) => ConsoleError.WriteLineAsync(buffer, index, count);
+			public override Task WriteLineAsync(string value) => ConsoleError.WriteLineAsync(value);
 		}
 	}
 }

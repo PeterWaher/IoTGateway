@@ -90,8 +90,8 @@ namespace Waher.Utility.Acme
 
         static void Main(string[] args)
         {
-            ConsoleColor FgColorBak = Console.ForegroundColor;
-            ConsoleColor BgColorBak = Console.BackgroundColor;
+            ConsoleColor FgColorBak = ConsoleOut.ForegroundColor;
+            ConsoleColor BgColorBak = ConsoleOut.BackgroundColor;
             int i = 0;
             int c = args.Length;
             string s;
@@ -408,8 +408,8 @@ namespace Waher.Utility.Acme
             }
             finally
             {
-                Console.ForegroundColor = FgColorBak;
-                Console.BackgroundColor = BgColorBak;
+                ConsoleOut.ForegroundColor = FgColorBak;
+				ConsoleOut.BackgroundColor = BgColorBak;
             }
         }
 
@@ -915,7 +915,7 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
+				ConsoleOut.ForegroundColor = ConsoleColor.Green;
                 Log(Message, Tags);
             }
         }
@@ -924,7 +924,7 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
+				ConsoleOut.ForegroundColor = ConsoleColor.Yellow;
                 Log(Message, Tags);
             }
         }
@@ -933,7 +933,7 @@ namespace Waher.Utility.Acme
         {
             if (verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+				ConsoleOut.ForegroundColor = ConsoleColor.Red;
                 Log(Message, Tags);
             }
         }

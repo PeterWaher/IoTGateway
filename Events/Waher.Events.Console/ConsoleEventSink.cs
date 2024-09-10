@@ -61,7 +61,7 @@ namespace Waher.Events.Console
 			{
 				try
 				{
-					Width = System.Console.WindowWidth;
+					Width = ConsoleOut.WindowWidth;
 					WriteLine = Width > 0;
 
 					if (!WriteLine)

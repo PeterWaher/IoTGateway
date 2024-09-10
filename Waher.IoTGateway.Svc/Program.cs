@@ -420,7 +420,7 @@ namespace Waher.IoTGateway.Svc
 		{
 			try
 			{
-				Console.ForegroundColor = ConsoleColor.White;
+				ConsoleOut.ForegroundColor = ConsoleColor.White;
 
 				ConsoleOut.WriteLine("Welcome to the Internet of Things Gateway server application.");
 				ConsoleOut.WriteLine(new string('-', 79));

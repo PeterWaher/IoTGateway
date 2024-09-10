@@ -35,7 +35,7 @@ namespace Waher.Mock.Temperature
 		{
 			try
 			{
-				Console.ForegroundColor = ConsoleColor.White;
+				ConsoleOut.ForegroundColor = ConsoleColor.White;
 
 				ConsoleOut.WriteLine("Welcome to the Mock Temperature sensor application.");
 				ConsoleOut.WriteLine(new string('-', 79));
@@ -376,7 +376,7 @@ namespace Waher.Mock.Temperature
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
+				ConsoleOut.ForegroundColor = ConsoleColor.Red;
 				ConsoleOut.WriteLine(ex.Message);
 			}
 			finally

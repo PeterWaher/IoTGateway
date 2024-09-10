@@ -214,7 +214,7 @@ namespace Waher.Networking.Sniffers
 					{
 						try
 						{
-							w = Console.WindowWidth;
+							w = ConsoleOut.WindowWidth;
 
 							foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
 							{
@@ -232,7 +232,7 @@ namespace Waher.Networking.Sniffers
 											First = false;
 										else
 										{
-											i = Console.CursorLeft % TabWidth;
+											i = ConsoleOut.CursorLeft % TabWidth;
 											sb.Append(new string(' ', TabWidth - i));
 										}
 

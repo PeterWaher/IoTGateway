@@ -24,6 +24,9 @@ namespace Waher.Runtime.Console
 	/// </summary>
 	public static class ConsoleOut
 	{
+		private static ConsoleColor foregroundColor = System.Console.ForegroundColor;
+		private static ConsoleColor backgroundColor = System.Console.BackgroundColor;
+
 		/// <summary>
 		/// The character encoding in which the output is written.
 		/// </summary>
@@ -38,6 +41,67 @@ namespace Waher.Runtime.Console
 		/// The line terminator string for the current TextWriter.
 		/// </summary>
 		public static string NewLine => System.Console.Out.NewLine;
+
+		/// <summary>
+		/// Width of window.
+		/// </summary>
+		public static int WindowWidth => System.Console.WindowWidth;
+
+		/// <summary>
+		/// Left edge of window.
+		/// </summary>
+		public static int WindowLeft => System.Console.WindowLeft;
+
+		/// <summary>
+		/// Top edge of window.
+		/// </summary>
+		public static int WindowTop => System.Console.WindowTop;
+
+		/// <summary>
+		/// Height of window.
+		/// </summary>
+		public static int WindowHeight => System.Console.WindowHeight;
+
+		/// <summary>
+		/// Left position of cursor.
+		/// </summary>
+		public static int CursorLeft => System.Console.CursorLeft;
+
+		/// <summary>
+		/// Top position of cursor.
+		/// </summary>
+		public static int CursorTop => System.Console.CursorTop;
+
+		/// <summary>
+		/// Size of cursor.
+		/// </summary>
+		public static int CursorSize => System.Console.CursorSize;
+
+		/// <summary>
+		/// Console foreground color.
+		/// </summary>
+		public static ConsoleColor ForegroundColor
+		{
+			get => foregroundColor;
+			set
+			{
+				foregroundColor = value;
+				ConsoleWorker.Queue(new ConsoleForegroundColor(value));
+			}
+		}
+
+		/// <summary>
+		/// Console background color.
+		/// </summary>
+		public static ConsoleColor BackgroundColor
+		{
+			get => backgroundColor;
+			set
+			{
+				backgroundColor = value;
+				ConsoleWorker.Queue(new ConsoleBackgroundColor(value));
+			}
+		}
 
 		/// <summary>
 		/// Queues a value to be written to the console output.

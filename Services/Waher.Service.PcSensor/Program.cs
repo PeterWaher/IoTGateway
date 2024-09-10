@@ -39,7 +39,7 @@ namespace Waher.Service.PcSensor
 		{
 			try
 			{
-				Console.ForegroundColor = ConsoleColor.White;
+				ConsoleOut.ForegroundColor = ConsoleColor.White;
 
 				ConsoleOut.WriteLine("Welcome to the PC Sensor application.");
 				ConsoleOut.WriteLine(new string('-', 79));
@@ -340,7 +340,7 @@ namespace Waher.Service.PcSensor
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
+				ConsoleOut.ForegroundColor = ConsoleColor.Red;
 				ConsoleOut.WriteLine(ex.Message);
 			}
 			finally

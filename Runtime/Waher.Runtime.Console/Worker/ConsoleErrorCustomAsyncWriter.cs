@@ -27,7 +27,7 @@ namespace Waher.Runtime.Console.Worker
 		/// </summary>
 		protected override Task DoWrite()
 		{
-			return this.writer(System.Console.Out);
+			return this.writer(System.Console.Error);
 		}
 	}
 }

@@ -150,6 +150,10 @@ namespace Waher.Utility.Csp
 			{
 				ConsoleOut.WriteLine(ex.Message);
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 	}
 }

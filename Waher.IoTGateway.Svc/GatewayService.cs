@@ -11,6 +11,7 @@ using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.Persistence;
+using Waher.Runtime.Console;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 

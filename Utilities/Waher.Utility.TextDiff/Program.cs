@@ -212,6 +212,10 @@ namespace Waher.Utility.TextDiff
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 
 		private static string ReadTextFile(string FileName, Encoding DefaultEncoding)

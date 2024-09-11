@@ -319,6 +319,10 @@ namespace Waher.Utility.GenManifest
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 
 		private static bool IgnoreFile(Dictionary<string, bool> ExtensionsToIgnore, Dictionary<string, bool> FoldersToIgnore,

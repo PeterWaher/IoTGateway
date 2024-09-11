@@ -5,6 +5,7 @@ using System.Xml.Xsl;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Utility.GetEmojiCatalog
@@ -33,7 +34,7 @@ namespace Waher.Utility.GetEmojiCatalog
 				{
 					Log.Informational("Downloading table.");
 
-					WebClient Client = new WebClient();
+					WebClient Client = new();
 					Client.DownloadFile("http://unicodey.com/emoji-data/table.htm", "table.htm");
 
 					Log.Informational("Loading table");
@@ -75,6 +76,7 @@ namespace Waher.Utility.GetEmojiCatalog
 			}
 			finally
 			{
+				ConsoleOut.Flush(true);
 				Log.Terminate();
 			}
 		}

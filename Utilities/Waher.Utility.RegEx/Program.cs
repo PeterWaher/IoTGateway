@@ -310,7 +310,7 @@ namespace Waher.Utility.RegEx
 										ConsoleOut.WriteLine("Replaced with: " + ReplaceWith);
 								}
 
-								foreach (Group G in M.Groups)
+								foreach (Group G in (IList<Group>)M.Groups)
 								{
 									if (int.TryParse(G.Name, out i))
 										continue;
@@ -405,6 +405,8 @@ namespace Waher.Utility.RegEx
 				Output?.Close();
 				Output?.Dispose();
 				FileOutput?.Dispose();
+
+				ConsoleOut.Flush(true);
 			}
 		}
 	}

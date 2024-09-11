@@ -132,6 +132,10 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 			{
 				ConsoleOut.WriteLine(ex.Message);
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 	}
 }

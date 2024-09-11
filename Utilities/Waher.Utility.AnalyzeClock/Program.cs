@@ -481,6 +481,10 @@ namespace Waher.Utility.AnalyzeClock
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 	}
 }

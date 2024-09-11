@@ -400,6 +400,7 @@ namespace Waher.Utility.Install
 			}
 			finally
 			{
+				ConsoleOut.Flush(true);
 				Log.Terminate();
 			}
 		}

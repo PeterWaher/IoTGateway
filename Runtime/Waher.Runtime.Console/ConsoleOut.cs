@@ -569,6 +569,50 @@ namespace Waher.Runtime.Console
 		}
 
 		/// <summary>
+		/// Clears all buffers for the current writer and causes any buffered data to be
+		/// written to the underlying device.
+		/// </summary>
+		public static void Flush()
+		{
+			Flush(false);
+		}
+
+		/// <summary>
+		/// Clears all buffers for the current writer and causes any buffered data to be
+		/// written to the underlying device.
+		/// </summary>
+		/// <param name="Terminate">If console serialization should be terminated.</param>
+		public static void Flush(bool Terminate)
+		{
+			FlushAsync(Terminate).Wait();
+		}
+
+		/// <summary>
+		/// Asynchronously clears all buffers for the current writer and causes any buffered
+		/// data to be written to the underlying device.
+		/// </summary>
+		/// <returns>A task that represents the asynchronous flush operation.</returns>
+		public static Task FlushAsync()
+		{
+			return FlushAsync(false);
+		}
+
+		/// <summary>
+		/// Asynchronously clears all buffers for the current writer and causes any buffered
+		/// data to be written to the underlying device.
+		/// </summary>
+		/// <returns>A task that represents the asynchronous flush operation.</returns>
+		public static async Task FlushAsync(bool Terminate)
+		{
+			if (!ConsoleWorker.Terminating)
+			{
+				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+				if (await ConsoleWorker.Queue(new ConsoleFlush(Terminate, Result)))
+					await Result.Task;
+			}
+		}
+
+		/// <summary>
 		/// Provides a <see cref="TextWriter"/> instance, that writes to <see cref="ConsoleOut"/>.
 		/// </summary>
 		public static TextWriter Writer
@@ -586,6 +630,8 @@ namespace Waher.Runtime.Console
 			}
 
 			public override Encoding Encoding => ConsoleOut.Encoding;
+			public override void Flush() => ConsoleOut.Flush();
+			public override Task FlushAsync() => ConsoleOut.FlushAsync();
 			public override void Write(char value) => ConsoleOut.Write(value);
 			public override void Write(ulong value) => ConsoleOut.Write(value);
 			public override void Write(uint value) => ConsoleOut.Write(value);

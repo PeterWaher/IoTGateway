@@ -372,7 +372,7 @@ namespace Waher.Utility.Acme
                     keySize = 4096;
 
                 if (verbose)
-                    Console.BackgroundColor = ConsoleColor.Black;
+                    ConsoleOut.BackgroundColor = ConsoleColor.Black;
 
                 if (fileName is null)
                     throw new Exception("File name not provided.");
@@ -410,6 +410,7 @@ namespace Waher.Utility.Acme
             {
                 ConsoleOut.ForegroundColor = FgColorBak;
 				ConsoleOut.BackgroundColor = BgColorBak;
+                ConsoleOut.Flush(true);
             }
         }
 

@@ -22,10 +22,15 @@ namespace Waher.Runtime.Console.Worker
 
 		private static void Log_Terminating(object sender, System.EventArgs e)
 		{
+			Terminate();
+			Log.Terminating -= Log_Terminating;
+		}
+
+		internal static void Terminate()
+		{
 			terminating = true;
 			queue?.Dispose();
 			queue = null;
-			Log.Terminating -= Log_Terminating;
 		}
 
 		/// <summary>
@@ -60,7 +65,7 @@ namespace Waher.Runtime.Console.Worker
 			{
 				WorkItem Item;
 
-				while (!((Item = await queue.Wait()) is null))
+				while (!((Item = await (queue?.Wait() ?? Task.FromResult<WorkItem>(null))) is null))
 				{
 					try
 					{
@@ -91,7 +96,6 @@ namespace Waher.Runtime.Console.Worker
 			}
 			finally
 			{
-				terminating = false;
 				terminated = true;
 			}
 		}

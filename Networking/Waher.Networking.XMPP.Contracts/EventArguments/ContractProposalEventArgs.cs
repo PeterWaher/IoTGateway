@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -18,6 +18,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly string contractId;
 		private readonly string role;
 		private readonly string message;
+		private readonly byte[] key;
+		private readonly SymmetricCipherAlgorithms keyAlgorithm;
 
 		/// <summary>
 		/// Event arguments for smart contract petitions
@@ -26,12 +28,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of proposed contract.</param>
 		/// <param name="Role">Proposed role in proposed contract.</param>
 		/// <param name="Message">Optional message to present to recipient.</param>
-		public ContractProposalEventArgs(MessageEventArgs e, string ContractId, string Role, string Message)
+		public ContractProposalEventArgs(MessageEventArgs e, string ContractId, string Role, string Message,
+			byte[] Key, SymmetricCipherAlgorithms KeyAlgorithm)
 			: base(e)
 		{
 			this.contractId = ContractId;
 			this.role = Role;
 			this.message = Message;
+			this.key = Key;
+			this.keyAlgorithm = KeyAlgorithm;
 		}
 
 		/// <summary>
@@ -48,5 +53,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Optional message to present to recipient.
 		/// </summary>
 		public string MessageText => this.message;
+
+		/// <summary>
+		/// If the proposed contract uses a shared secret.
+		/// </summary>
+		public bool HasSharedSecret => !(this.key is null);
+
+		/// <summary>
+		/// Shared secret used to decrypt confidential parameters.
+		/// </summary>
+		public byte[] Key => this.key;
+
+		/// <summary>
+		/// Encryption algorithm to encrypt and decrypt confidential parameters.
+		/// </summary>
+		public SymmetricCipherAlgorithms KeyAlgorithm => this.keyAlgorithm;
 	}
 }

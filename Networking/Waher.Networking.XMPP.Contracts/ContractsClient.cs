@@ -30,7 +30,7 @@ using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
 using Waher.Networking.XMPP.HttpFileUpload;
-using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -101,11 +101,13 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity localKeys;
+		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
 		private bool keySettingsPrefixLocked = false;
+		private bool localKeysForE2e = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
@@ -124,7 +126,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
 		public ContractsClient(XmppClient Client, string ComponentAddress)
-			: this(Client, ComponentAddress, (object[])null)
+			: this(Client, ComponentAddress, null)
 		{
 		}
 
@@ -371,8 +373,14 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Thread?.NewState("Sec");
 
-				this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
+				this.localKeys?.Dispose();
+				this.localKeys = null;
+
+				this.localKeys = new EndpointSecurity(this.localKeysForE2e ? this.client : null, 128, Keys.ToArray());
 				this.keysTimestamp = Timestamp.Value;
+
+				if (this.localKeysForE2e)
+					this.localE2eEndpoint = this.localKeys;
 
 				if (DisposeEndpoints)
 				{
@@ -665,6 +673,35 @@ namespace Waher.Networking.XMPP.Contracts
 			this.keySettingsPrefixLocked = Locked;
 		}
 
+		/// <summary>
+		/// Defines if End-to-End encryption should use the keys used by the contracts client to perform signatures.
+		/// </summary>
+		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
+		public async Task EnableE2eEncryption(bool UseLocalKeys)
+		{
+			bool Reload = !(this.localKeys is null);
+
+			this.localKeysForE2e = UseLocalKeys;
+
+			if (Reload)
+				await this.LoadKeys(true);
+		}
+
+		/// <summary>
+		/// Enables End-to-End encryption with a separate set of keys.
+		/// </summary>
+		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
+		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint)
+		{
+			bool Reload = !(this.localKeys is null);
+
+			this.localKeysForE2e = false;
+			this.localE2eEndpoint = E2eEndpoint;
+
+			if (Reload)
+				await this.LoadKeys(true);
+		}
+
 		#endregion
 
 		#region Security
@@ -865,6 +902,9 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.GetMatchingLocalKey(this.componentAddress, Callback, State);
 		}
 
+		/// <summary>
+		/// Endpoint used for identity and contract signatures.
+		/// </summary>
 		private EndpointSecurity LocalEndpoint
 		{
 			get
@@ -873,6 +913,20 @@ namespace Waher.Networking.XMPP.Contracts
 					throw new InvalidOperationException("Local keys not loaded or generated.");
 
 				return this.localKeys;
+			}
+		}
+
+		/// <summary>
+		/// Endpoint used for End-to-End encryption.
+		/// </summary>
+		public EndpointSecurity LocalE2eEndpoint
+		{
+			get
+			{
+				if (this.localE2eEndpoint is null)
+					throw new InvalidOperationException("End-to-End Encryption not enabled or Local keys not loaded or generated.");
+
+				return this.localE2eEndpoint;
 			}
 		}
 
@@ -4459,6 +4513,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Message">Optional message included in message.</param>
 		public void SendContractProposal(string ContractId, string Role, string To, string Message)
 		{
+			this.SendContractProposal(ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+		}
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient.
+		/// </summary>
+		/// <param name="ContractId">ID of proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		/// <param name="Message">Optional message included in message.</param>
+		/// <param name="Key">Key used to protect confidential parameters in contract.</param>
+		/// <param name="KeyAlgorithm">Key algorithm used to protect confidential parameters in contract.</param>
+		public void SendContractProposal(string ContractId, string Role, string To, string Message, byte[] Key,
+			SymmetricCipherAlgorithms KeyAlgorithm)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<contractProposal xmlns=\"");
@@ -4474,9 +4543,65 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append(XML.Encode(Message));
 			}
 
-			Xml.Append("\"/>");
+			Xml.Append('"');
 
-			this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			if (Key is null)
+			{
+				Xml.Append("/>");
+
+				if (this.localE2eEndpoint is null)
+				{
+					this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+						string.Empty, string.Empty);
+				}
+				else
+				{
+					this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+						string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+				}
+			}
+			else
+			{
+				Xml.Append("><sharedSecret key=\"");
+				Xml.Append(Convert.ToBase64String(Key));
+				Xml.Append("\" algorithm=\"");
+
+				switch (KeyAlgorithm)
+				{
+					case SymmetricCipherAlgorithms.Aes256:
+						Xml.Append("aes");
+						break;
+
+					case SymmetricCipherAlgorithms.ChaCha20:
+						Xml.Append("cha");
+						break;
+
+					case SymmetricCipherAlgorithms.AeadChaCha20Poly1305:
+						Xml.Append("acp");
+						break;
+
+					default:
+						throw new ArgumentException("Algorithm not recognized.", nameof(KeyAlgorithm));
+				}
+
+				Xml.Append("\"/></contractProposal>");
+
+				if (this.localE2eEndpoint is null)
+					throw new InvalidOperationException("End-to-End encryption not enabled.");
+
+				if (XmppClient.GetBareJID(To) == To)
+				{
+					RosterItem Item = this.client[To]
+						?? throw new ArgumentException("Recipient not in roster.", nameof(To));
+
+					To = Item.LastPresenceFullJid;
+					if (string.IsNullOrEmpty(To))
+						throw new ArgumentException("Recipient not online.", nameof(To));
+				}
+
+				this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.AssertE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+					string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+			}
 		}
 
 		private async Task ContractProposalMessageHandler(object Sender, MessageEventArgs e)
@@ -4487,10 +4612,55 @@ namespace Waher.Networking.XMPP.Contracts
 				string ContractId = XML.Attribute(e.Content, "contractId");
 				string Role = XML.Attribute(e.Content, "role");
 				string Message = XML.Attribute(e.Content, "message");
+				byte[] Key = null;
+				SymmetricCipherAlgorithms KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "sharedSecret" && E.NamespaceURI == e.Content.NamespaceURI)
+					{
+						if (!e.UsesE2eEncryption)
+						{
+							this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
+							return;
+						}
+
+						try
+						{
+							Key = Convert.FromBase64String(XML.Attribute(E, "key"));
+						}
+						catch (Exception)
+						{
+							this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
+							return;
+						}
+
+						string Cipher = XML.Attribute(E, "algorithm");
+
+						switch (Cipher)
+						{
+							case "aes":
+								KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+								break;
+
+							case "cha":
+								KeyAlgorithm = SymmetricCipherAlgorithms.ChaCha20;
+								break;
+
+							case "acp":
+								KeyAlgorithm = SymmetricCipherAlgorithms.AeadChaCha20Poly1305;
+								break;
+
+							default:
+								this.client.Error("Unrecognized key algorithm. Message discarded.");
+								return;
+						}
+					}
+				}
 
 				try
 				{
-					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message));
+					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message, Key, KeyAlgorithm));
 				}
 				catch (Exception ex)
 				{

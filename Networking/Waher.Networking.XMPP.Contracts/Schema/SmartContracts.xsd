@@ -2422,6 +2422,56 @@
 			<xs:documentation>Can be sent in a normal message stanza directly to the indended recipient.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='sharedSecret' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>
+							<xs:annotation>
+								<xs:documentation>Shared secrets are used to encrypt and decrypt confidential parameters in the contract.</xs:documentation>
+								<xs:documentation>If using confidential parameters, make sure to send proposals using End-to-End Encrypted messages.</xs:documentation>
+							</xs:annotation>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='key' type='xs:base64Binary' use='required'>
+							<xs:annotation>
+								<xs:documentation>Key used for encryption and decryption.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='algorithm' use='required'>
+							<xs:annotation>
+								<xs:documentation>Algorithm used for encryption and decryption.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base='xs:string'>
+									<xs:enumeration value='aes'>
+										<xs:annotation>
+											<xs:documentation>AES-256 encryption of string representation of parameter value, UTF-8 encoded, using Cipher Block Chaining (CBC) and PKCS#7 padding.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 16 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value='cha'>
+										<xs:annotation>
+											<xs:documentation>ChaCha20 encryption of string representation of parameter value, UTF-8 encoded, starting with block counter 1.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value='acp'>
+										<xs:annotation>
+											<xs:documentation>AEAD-ChaCha20-Poly1305 authenticated encryption with associated data of string representation of parameter value, UTF-8 encoded.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+											<xs:documentation>The Associated Data (AD) used in the AEAD algorithm is the UTF-8 encoding of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='contractId' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The ID of the proposed contract.</xs:documentation>

@@ -2129,5 +2129,35 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return e.Value;
 		}
+
+		/// <summary>
+		/// Protects transient values, by generating GUIDs for those that lack GUIDs.
+		/// </summary>
+		public void ProtectTransientParameters()
+		{
+			if (this.parameters is null)
+				return;
+
+			foreach (Parameter P in this.parameters)
+			{
+				if (P.Protection == ProtectionLevel.Transient && P.ProtectedValue is null)
+					P.ProtectedValue = Guid.NewGuid().ToByteArray();
+			}
+		}
+
+		/// <summary>
+		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
+		/// </summary>
+		public void ProtectEncryptedParameters(EncryptValueMethod Algorithm)
+		{
+			if (this.parameters is null)
+				return;
+
+			foreach (Parameter P in this.parameters)
+			{
+				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
+					P.ProtectedValue = Algorithm(P.StringValue);
+			}
+		}
 	}
 }

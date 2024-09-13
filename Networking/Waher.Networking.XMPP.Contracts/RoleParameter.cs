@@ -16,14 +16,14 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private string role = string.Empty;
 		private string property = string.Empty;
-		private string value = string.Empty;
+		private string @value = string.Empty;
 		private int index = 0;
 		private bool required = false;
 
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Name of role the parameter references.
@@ -64,7 +64,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Role parameter value.
 		/// </summary>
-		public string Value => this.value;
+		public string Value => this.@value;
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value ?? string.Empty;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
+		}
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -138,7 +151,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 		}
 
 		/// <summary>
@@ -148,7 +161,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.value = Value?.ToString() ?? string.Empty;
+			this.@value = Value?.ToString() ?? string.Empty;
 			this.ProtectedValue = null;
 		}
 

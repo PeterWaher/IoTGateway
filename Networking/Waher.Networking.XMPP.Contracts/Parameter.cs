@@ -11,6 +11,20 @@ using Waher.Script;
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
+	/// Encrypts a parameter value.
+	/// </summary>
+	/// <param name="ClearText">Clear-text string representation of value.</param>
+	/// <returns>Cipher text.</returns>
+	public delegate byte[] EncryptValueMethod(string ClearText);
+
+	/// <summary>
+	/// Decrypts an encrypted parameter value.
+	/// </summary>
+	/// <param name="CipherText">Cipher text.</param>
+	/// <returns>Clear text string representation of value.</returns>
+	public delegate string DecryptValueMethod(byte[] CipherText);
+
+	/// <summary>
 	/// Abstract base class for contractual parameters
 	/// </summary>
 	public abstract class Parameter : LocalizableDescription
@@ -104,6 +118,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Parameter value.
 		/// </summary>
 		public abstract object ObjectValue { get; }
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public abstract string StringValue
+		{
+			get;
+			set;
+		}
 
 		/// <summary>
 		/// After <see cref="IsParameterValid(Variables)"/> or <see cref="IsParameterValid(Variables, ContractsClient)"/> has been

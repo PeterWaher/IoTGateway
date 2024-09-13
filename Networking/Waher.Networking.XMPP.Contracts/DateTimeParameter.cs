@@ -14,6 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 	public class DateTimeParameter : RangeParameter<DateTime>
 	{
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? XML.Encode(this.Value.Value, false) : string.Empty;
+			set
+			{
+				if (XML.TryParse(value, out DateTime TP))
+					this.Value = TP;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

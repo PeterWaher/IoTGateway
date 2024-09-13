@@ -14,6 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 	public class DurationParameter : RangeParameter<Duration>
 	{
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? this.Value.Value.ToString() : string.Empty;
+			set
+			{
+				if (Duration.TryParse(value, out Duration D))
+					this.Value = D;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

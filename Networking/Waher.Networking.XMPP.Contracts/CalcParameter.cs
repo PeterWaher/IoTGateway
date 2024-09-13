@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Script;
@@ -18,6 +19,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Parameter value.
 		/// </summary>
 		public override object ObjectValue => this.value;
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.@value?.ToString() ?? string.Empty;
+			set => this.@value = value;
+		}
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.

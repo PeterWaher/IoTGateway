@@ -30,6 +30,21 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? CommonTypes.Encode(this.Value.Value) : string.Empty;
+			set
+			{
+				if (CommonTypes.TryParse(value, out bool b))
+					this.Value = b;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
 		/// Parameter value.
 		/// </summary>
 		public override object ObjectValue => this.@value;

@@ -14,6 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 	public class NumericalParameter : RangeParameter<decimal>
 	{
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? CommonTypes.Encode(this.Value.Value) : string.Empty;
+			set
+			{
+				if (CommonTypes.TryParse(value, out decimal d))
+					this.Value = d;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

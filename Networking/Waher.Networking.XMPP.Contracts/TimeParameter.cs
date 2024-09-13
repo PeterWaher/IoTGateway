@@ -14,6 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 	public class TimeParameter : RangeParameter<TimeSpan>
 	{
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? this.Value.Value.ToString() : string.Empty;
+			set
+			{
+				if (TimeSpan.TryParse(value, out TimeSpan TS))
+					this.Value = TS;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

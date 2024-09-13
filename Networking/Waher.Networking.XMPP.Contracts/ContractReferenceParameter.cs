@@ -32,6 +32,15 @@ namespace Waher.Networking.XMPP.Contracts
 		public override object ObjectValue => this.@value;
 
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value?.Value ?? string.Empty;
+			set => this.Value = value;
+		}
+
+		/// <summary>
 		/// Human-readable label to be shown in stead of a reference, in contract text, in different languages.
 		/// </summary>
 		public Label[] Labels

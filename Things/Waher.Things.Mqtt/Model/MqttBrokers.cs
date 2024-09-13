@@ -40,7 +40,8 @@ namespace Waher.Things.Mqtt.Model
 		/// TODO
 		/// </summary>
 		public static MqttBroker GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, bool TrustServer,
-			string UserName, string Password, string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
+			string UserName, string Password, string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, 
+			MqttQualityOfService WillQoS)
 		{
 			MqttBroker Broker;
 
@@ -57,7 +58,8 @@ namespace Waher.Things.Mqtt.Model
 			}
 			else
 			{
-				Broker = new MqttBroker(Node, Host, Port, Tls, TrustServer, UserName, Password, WillTopic, WillData, WillRetain, WillQoS);
+				Broker = new MqttBroker(Node, Host, Port, Tls, TrustServer, UserName, Password, ConnectionSubscription,
+					WillTopic, WillData, WillRetain, WillQoS);
 
 				lock (brokers)
 				{

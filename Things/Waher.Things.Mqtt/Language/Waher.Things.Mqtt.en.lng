@@ -47,8 +47,8 @@
 			<String id="43">HEX</String>
 			<String id="44">Trust Server</String>
 			<String id="45">If the remote server certificate should be trusted even if it is not valid.</String>
-			<String id="46"></String>
-			<String id="47"></String>
+			<String id="46">Connection Subscription:</String>
+			<String id="47">Subscription topic executed when connecting. Empty means no subscription will be performed.</String>
 			<String id="48"></String>
 			<String id="49"></String>
 			<String id="50"></String>

@@ -493,7 +493,7 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					default:
-						if (Attr.Prefix == "xmlns" || Attr.NamespaceURI== "http://www.w3.org/2001/XMLSchema-instance")
+						if (Attr.Prefix == "xmlns" || Attr.NamespaceURI == "http://www.w3.org/2001/XMLSchema-instance")
 							break;
 						else if (ExceptionIfError)
 							throw new Exception("Invalid attribute: " + Attr.Name);
@@ -892,7 +892,7 @@ namespace Waher.Networking.XMPP.Contracts
 									else
 										return null;
 								}
-	
+
 								Parameters.Add(P2);
 							}
 						}
@@ -905,7 +905,7 @@ namespace Waher.Networking.XMPP.Contracts
 								return null;
 						}
 						break;
-							
+
 					case "humanReadableText":
 						Text = HumanReadableText.Parse(E);
 						if (Text is null)
@@ -1324,15 +1324,8 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.clientSignatures is null || this.serverSignature is null)
 				return false;
 
-			switch (this.state)
-			{
-				case ContractState.Proposed:
-				case ContractState.Obsoleted:
-				case ContractState.Deleted:
-				case ContractState.Rejected:
-				case ContractState.Failed:
-					return false;
-			}
+			if (this.state != ContractState.Signed)
+				return false;
 
 			if (!(this.roles is null))
 			{
@@ -1375,7 +1368,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Dictionary<CaseInsensitiveString, ClientSignature> UnmatchedSignatures = new Dictionary<CaseInsensitiveString, ClientSignature>();
 
 					foreach (ClientSignature Signature in this.clientSignatures)
-						UnmatchedSignatures[Signature.LegalId] = Signature;
+						UnmatchedSignatures[Signature.Role + "|" + Signature.LegalId] = Signature;
 
 					foreach (Part Part in this.parts)
 					{
@@ -1386,7 +1379,7 @@ namespace Waher.Networking.XMPP.Contracts
 							if (string.Compare(Signature.LegalId, Part.LegalId, true) == 0 &&
 								string.Compare(Signature.Role, Part.Role, true) == 0)
 							{
-								UnmatchedSignatures.Remove(Signature.LegalId);
+								UnmatchedSignatures.Remove(Signature.Role + "|" + Signature.LegalId);
 								Found = true;
 								break;
 							}
@@ -1418,7 +1411,7 @@ namespace Waher.Networking.XMPP.Contracts
 								if (await Client.CanSignAs(Part.LegalId, Signature.LegalId))
 								{
 									Found = true;
-									UnmatchedSignatures.Remove(Signature.LegalId);
+									UnmatchedSignatures.Remove(Signature.Role + "|" + Signature.LegalId);
 									break;
 								}
 							}

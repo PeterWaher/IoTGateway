@@ -2148,6 +2148,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
 		/// </summary>
+		/// <param name="Algorithm">Algorithm to use for protecting values.</param>
 		public void ProtectEncryptedParameters(EncryptValueMethod Algorithm)
 		{
 			if (this.parameters is null)
@@ -2157,6 +2158,32 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
 					P.ProtectedValue = Algorithm(P.StringValue);
+			}
+		}
+
+		/// <summary>
+		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
+		/// </summary>
+		/// <param name="Algorithm">Algorithm to use for unprotecting values.</param>
+		/// <returns>If protected values where unprotected successfully.</returns>
+		public bool UnprotectEncryptedParameters(DecryptValueMethod Algorithm)
+		{
+			if (this.parameters is null)
+				return true;
+
+			try
+			{
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Encrypted && !(P.ProtectedValue is null))
+						P.StringValue = Algorithm(P.ProtectedValue);
+				}
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
 			}
 		}
 	}

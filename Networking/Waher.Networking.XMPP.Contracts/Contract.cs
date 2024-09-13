@@ -10,7 +10,9 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Persistence;
 using Waher.Script;
+using Waher.Script.Objects;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -1315,8 +1317,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Checks if a contract is legally binding.
 		/// </summary>
 		/// <param name="CheckCurrentTime">If the current time should be checked as well.</param>
+		/// <param name="Client">Contracts Client performing validation of signatures.</param>
 		/// <returns>If the contract is legally binding.</returns>
-		public bool IsLegallyBinding(bool CheckCurrentTime)
+		public async Task<bool> IsLegallyBinding(bool CheckCurrentTime, ContractsClient Client)
 		{
 			if (this.clientSignatures is null || this.serverSignature is null)
 				return false;
@@ -1331,45 +1334,19 @@ namespace Waher.Networking.XMPP.Contracts
 					return false;
 			}
 
-			switch (this.partsMode)
-			{
-				case ContractParts.TemplateOnly:
-					return false;
-
-				case ContractParts.ExplicitlyDefined:
-					if (this.parts is null)
-						return false;
-
-					foreach (Part Part in this.parts)
-					{
-						bool Found = false;
-
-						foreach (ClientSignature Signature in this.clientSignatures)
-						{
-							if (string.Compare(Signature.LegalId, Part.LegalId, true) == 0 &&
-								string.Compare(Signature.Role, Part.Role, true) == 0)
-							{
-								Found = true;
-								break;
-							}
-						}
-
-						if (!Found)
-							return false;
-					}
-					break;
-			}
-
 			if (!(this.roles is null))
 			{
 				foreach (Role Role in this.roles)
 				{
 					int Count = 0;
 
-					foreach (ClientSignature Signature in this.clientSignatures)
+					if (!(this.clientSignatures is null))
 					{
-						if (string.Compare(Signature.Role, Role.Name, true) == 0)
-							Count++;
+						foreach (ClientSignature Signature in this.clientSignatures)
+						{
+							if (string.Compare(Signature.Role, Role.Name, true) == 0)
+								Count++;
+						}
 					}
 
 					if (Count < Role.MinCount || Count > Role.MaxCount)
@@ -1383,6 +1360,77 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (Now < this.from || Now > this.to)
 					return false;
+			}
+
+			switch (this.partsMode)
+			{
+				case ContractParts.TemplateOnly:
+					return false;
+
+				case ContractParts.ExplicitlyDefined:
+					if (this.parts is null)
+						return false;
+
+					LinkedList<Part> MissingParts = null;
+					Dictionary<CaseInsensitiveString, ClientSignature> UnmatchedSignatures = new Dictionary<CaseInsensitiveString, ClientSignature>();
+
+					foreach (ClientSignature Signature in this.clientSignatures)
+						UnmatchedSignatures[Signature.LegalId] = Signature;
+
+					foreach (Part Part in this.parts)
+					{
+						bool Found = false;
+
+						foreach (ClientSignature Signature in UnmatchedSignatures.Values)
+						{
+							if (string.Compare(Signature.LegalId, Part.LegalId, true) == 0 &&
+								string.Compare(Signature.Role, Part.Role, true) == 0)
+							{
+								UnmatchedSignatures.Remove(Signature.LegalId);
+								Found = true;
+								break;
+							}
+						}
+
+						if (!Found)
+						{
+							if (MissingParts is null)
+								MissingParts = new LinkedList<Part>();
+
+							MissingParts.AddLast(Part);
+						}
+					}
+
+					if (!(MissingParts is null))
+					{
+						foreach (Part Part in MissingParts)
+						{
+							bool Found = false;
+
+							foreach (ClientSignature Signature in UnmatchedSignatures.Values)
+							{
+								if (Signature.Role != Part.Role)
+									continue;
+
+								if (Client is null)
+									return false;
+
+								if (await Client.CanSignAs(Part.LegalId, Signature.LegalId))
+								{
+									Found = true;
+									UnmatchedSignatures.Remove(Signature.LegalId);
+									break;
+								}
+							}
+
+							if (!Found)
+								return false;
+						}
+
+						if (UnmatchedSignatures.Count > 0)
+							return false;
+					}
+					break;
 			}
 
 			return true;

@@ -4031,7 +4031,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (!Contract.IsLegallyBinding(false))
+			if (!await Contract.IsLegallyBinding(false, this))
 			{
 				await this.ReturnStatus(ContractStatus.NotLegallyBinding, Callback, State);
 				return;
@@ -4487,6 +4487,45 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 
 			return await Result.Task;
+		}
+
+		#endregion
+
+		#region Can Sign As
+
+		/// <summary>
+		/// Checks if an identity can sign for another reference identity (i.e. the old might have been obsoleted and/or
+		/// compromized, and the signatory ID is a new ID for the same account and person).
+		/// </summary>
+		/// <param name="ReferenceId">Reference ID</param>
+		/// <param name="SignatoryId">ID used for signature</param>
+		/// <returns>If the Signatory ID can be used to sign for the reference ID.</returns>
+		public Task<bool> CanSignAs(CaseInsensitiveString ReferenceId, CaseInsensitiveString SignatoryId)
+		{
+			string ReferenceDomain = XmppClient.GetDomain(ReferenceId);
+			string SignatoryDomain = XmppClient.GetDomain(SignatoryId);
+
+			if (ReferenceDomain != SignatoryDomain)
+				return Task.FromResult(false);
+
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canSignAs xmlns='");
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
+			Xml.Append("' referenceId='");
+			Xml.Append(XML.Encode(ReferenceId));
+			Xml.Append("' signatoryId='");
+			Xml.Append(XML.Encode(SignatoryId));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(ReferenceDomain, Xml.ToString(), (_, e) =>
+			{
+				Result.TrySetResult(e.Ok);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
 		}
 
 		#endregion

@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private ParameterErrorReason? errorReason = null;
 		private string errorText = null;
 		private Expression parsed = null;
-		private bool transient = false;
+		private ProtectionLevel protection = ProtectionLevel.Normal;
 
 		/// <summary>
 		/// Parameter name
@@ -54,12 +54,12 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// If parameter is transient (i.e. only available in transit, and not persisted)
+		/// Level of confidentiality of the information provided by the parameter.
 		/// </summary>
-		public bool Transient
+		public ProtectionLevel Protection
 		{
-			get => this.transient;
-			set => this.transient = value;
+			get => this.protection;
+			set => this.protection = value;
 		}
 
 		/// <summary>
@@ -223,7 +223,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.guide = XML.Attribute(Xml, "guide");
 			this.exp = XML.Attribute(Xml, "exp");
-			this.transient = XML.Attribute(Xml, "transient", false);
+			this.protection = XML.Attribute(Xml, "protection", ProtectionLevel.Normal);
 			this.parsed = null;
 
 			List<HumanReadableText> Descriptions = new List<HumanReadableText>();

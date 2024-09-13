@@ -98,8 +98,11 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
+				if (this.Protection != ProtectionLevel.Normal)
+				{
+					Xml.Append("\" protection=\"");
+					Xml.Append(this.Protection.ToString());
+				}
 
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
 					Xml.Append("\"/>");

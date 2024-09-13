@@ -28,6 +28,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of proposed contract.</param>
 		/// <param name="Role">Proposed role in proposed contract.</param>
 		/// <param name="Message">Optional message to present to recipient.</param>
+		/// <param name="Key">Shared secret used to decrypt confidential parameters.</param>
+		/// <param name="KeyAlgorithm">Encryption algorithm to encrypt and decrypt confidential parameters.</param>
 		public ContractProposalEventArgs(MessageEventArgs e, string ContractId, string Role, string Message,
 			byte[] Key, SymmetricCipherAlgorithms KeyAlgorithm)
 			: base(e)

@@ -402,17 +402,52 @@
 				<xs:documentation>Optional script expression validating the parameter.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name='transient' type='xs:boolean' use='optional' default='false'>
+		<xs:attribute name='protection' type='ProtectionLevel' use='optional'>
 			<xs:annotation>
-				<xs:documentation>If parameter is transient or not.</xs:documentation>
-				<xs:documentation>A transient parameter is sent out-of-scope of the signature.</xs:documentation>
-				<xs:documentation>Instead, a GUID is used as a parameter value.</xs:documentation>
-				<xs:documentation>This GUID can be used to peers to validate the signature of the contract.</xs:documentation>
-				<xs:documentation>Transient parameters can be used to protect the privacy or secrecy of certain information, such as credit card information, voting, etc.</xs:documentation>
-				<xs:documentation>Transient parameter values are only available in-transit, and must not be persisted.</xs:documentation>
+				<xs:documentation>Level of confidentiality of the information provided by the parameter.</xs:documentation>
+				<xs:documentation>If attribute is not provided, parameter value is treated as a normal parameter value.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
+
+	<xs:simpleType name='ProtectionLevel'>
+		<xs:annotation>
+			<xs:documentation>Defines different Information Protection Levels.</xs:documentation>
+			<xs:documentation>If no protection level is defined, values will be stored in the clear.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Obfuscated'>
+				<xs:annotation>
+					<xs:documentation>Value is encrypted on the broker.</xs:documentation>
+					<xs:documentation>Broker administrators are assumed to have access to keys.</xs:documentation>
+					<xs:documentation>Obfuscated parameter values are not available in logs.</xs:documentation>
+					<xs:documentation>Obfuscated parameter values are persisted in encrypted form.</xs:documentation>
+					<xs:documentation>Obfuscated parameters are transmitted in the clear.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Encrypted'>
+				<xs:annotation>
+					<xs:documentation>The creator of a contract creates keys for the encryption and decryption of encrypted parameter values.</xs:documentation>
+					<xs:documentation>The creator is responsible for sharing the keys with the other parts of the contract, using end-to-end encrypted communication.</xs:documentation>
+					<xs:documentation>Only the parts who have received the shared secret can access the values of encrypted parameters.</xs:documentation>
+					<xs:documentation>Encrypted parameter values are not available in logs.</xs:documentation>
+					<xs:documentation>Obfuscated parameter values are persisted in encrypted form.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Transient'>
+				<xs:annotation>
+					<xs:documentation>A transient parameter is sent out-of-scope of the signature.</xs:documentation>
+					<xs:documentation>Instead, a GUID is used as a parameter value.</xs:documentation>
+					<xs:documentation>This GUID can be used to peers to validate the signature of the contract.</xs:documentation>
+					<xs:documentation>Transient parameters can be used to protect the privacy or secrecy of certain information, such as credit card information, voting, etc.</xs:documentation>
+					<xs:documentation>Transient parameter values are only available in-transit, and must not be persisted.</xs:documentation>
+					<xs:documentation>Transient parameter values are not transmitted to other parts of the contract, and cannot be displayed in human-readable text.</xs:documentation>
+					<xs:documentation>Transient parameter values are not available in logs.</xs:documentation>
+					<xs:documentation>Transient parameter values are not persisted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:complexType name='StringParameter'>
 		<xs:annotation>

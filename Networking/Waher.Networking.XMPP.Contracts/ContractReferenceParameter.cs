@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Human-readable label to be shown in stead of a reference, in contract text, in different languages.
@@ -45,8 +45,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public CaseInsensitiveString Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set => this.@value = value;
 		}
 
 		/// <summary>
@@ -118,10 +118,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<contractReferenceParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (!CaseInsensitiveString.IsNullOrEmpty(this.value))
+			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value))
 			{
 				Xml.Append("\" value=\"");
-				Xml.Append(XML.Encode(this.value.Value));
+				Xml.Append(XML.Encode(this.@value.Value));
 			}
 
 			if (UsingTemplate)
@@ -170,11 +170,14 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(XML.Encode(this.creatorRole.Normalize(NormalizationForm.FormC)));
 				}
 
+				if (this.Protection != ProtectionLevel.Normal)
+				{
+					Xml.Append("\" protection=\"");
+					Xml.Append(this.Protection.ToString());
+				}
+
 				if (this.Required)
 					Xml.Append("\" required=\"true");
-
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
 
 				if ((!(this.Descriptions is null) && this.Descriptions.Length > 0) ||
 					(!(this.labels is null) && this.labels.Length > 0))
@@ -211,7 +214,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.ErrorReason = null;
 			this.ErrorText = null;
 
-			if (CaseInsensitiveString.IsNullOrEmpty(this.value))
+			if (CaseInsensitiveString.IsNullOrEmpty(this.@value))
 			{
 				if (this.required)
 				{
@@ -222,7 +225,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return true;
 			}
 
-			if (!XmppClient.BareJidRegEx.IsMatch(this.value))
+			if (!XmppClient.BareJidRegEx.IsMatch(this.@value))
 			{
 				this.ErrorReason = ParameterErrorReason.InvalidReference;
 				return false;
@@ -232,11 +235,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.reference is null || this.reference.ContractId != this.value)
+					if (this.reference is null || this.reference.ContractId != this.@value)
 					{
 						this.reference = null;
 						this.referenceStatus = null;
-						this.reference = await Client.GetContractAsync(this.value);
+						this.reference = await Client.GetContractAsync(this.@value);
 					}
 
 					if (this.reference is null)
@@ -323,7 +326,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.value = Value.ToString();
+			this.@value = Value.ToString();
 		}
 
 		/// <summary>
@@ -385,7 +388,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.labels = Labels.ToArray();
 
-			this.value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
+			this.@value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
 			this.required = XML.Attribute(Xml, "required", false);
 			this.localName = Xml.HasAttribute("localName") ? XML.Attribute(Xml, "localName") : null;
 			this.@namespace = Xml.HasAttribute("namespace") ? XML.Attribute(Xml, "namespace") : null;

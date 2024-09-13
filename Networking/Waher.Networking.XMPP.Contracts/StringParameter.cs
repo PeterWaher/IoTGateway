@@ -31,10 +31,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string Value
 		{
-			get => this.value;
+			get => this.@value;
 			set
 			{
-				this.value = value;
+				this.@value = value;
 				this.match = null;
 			}
 		}
@@ -110,7 +110,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -122,10 +122,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<stringParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (!(this.value is null))
+			if (!(this.@value is null))
 			{
 				Xml.Append("\" value=\"");
-				Xml.Append(XML.Encode(this.value));
+				Xml.Append(XML.Encode(this.@value));
 			}
 
 			if (UsingTemplate)
@@ -178,8 +178,11 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(this.maxLength.Value.ToString());
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
+				if (this.Protection != ProtectionLevel.Normal)
+				{
+					Xml.Append("\" protection=\"");
+					Xml.Append(this.Protection.ToString());
+				}
 
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
 					Xml.Append("\"/>");
@@ -205,7 +208,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			int i;
 
-			if (this.value is null)
+			if (this.@value is null)
 			{
 				this.ErrorReason = ParameterErrorReason.LacksValue;
 				this.ErrorText = null;
@@ -215,7 +218,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(this.min is null))
 			{
-				i = string.Compare(this.value, this.min);
+				i = string.Compare(this.@value, this.min);
 
 				if (i < 0 || (i == 0 && !this.minIncluded))
 				{
@@ -228,7 +231,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(this.max is null))
 			{
-				i = string.Compare(this.value, this.max);
+				i = string.Compare(this.@value, this.max);
 
 				if (i > 0 || (i == 0 && !this.maxIncluded))
 				{
@@ -239,7 +242,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			if (this.minLength.HasValue && this.value.Length < this.minLength.Value)
+			if (this.minLength.HasValue && this.@value.Length < this.minLength.Value)
 			{
 				this.ErrorReason = ParameterErrorReason.TooShort;
 				this.ErrorText = null;
@@ -247,7 +250,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return Task.FromResult(false);
 			}
 
-			if (this.maxLength.HasValue && this.value.Length > this.maxLength.Value)
+			if (this.maxLength.HasValue && this.@value.Length > this.maxLength.Value)
 			{
 				this.ErrorReason = ParameterErrorReason.TooLong;
 				this.ErrorText = null;
@@ -263,9 +266,9 @@ namespace Waher.Networking.XMPP.Contracts
 						this.parsed = new Regex(this.regEx, RegexOptions.Singleline);
 
 					if (this.match is null)
-						this.match = this.parsed.Match(this.value);
+						this.match = this.parsed.Match(this.@value);
 
-					if (!this.match.Success || this.match.Index > 0 || this.match.Length < this.value.Length)
+					if (!this.match.Success || this.match.Index > 0 || this.match.Length < this.@value.Length)
 					{
 						this.ErrorReason = ParameterErrorReason.RegularExpressionRejection;
 						this.ErrorText = null;
@@ -288,9 +291,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 
-			if (!string.IsNullOrEmpty(this.regEx) && !(this.value is null))
+			if (!string.IsNullOrEmpty(this.regEx) && !(this.@value is null))
 			{
 				try
 				{
@@ -298,9 +301,9 @@ namespace Waher.Networking.XMPP.Contracts
 						this.parsed = new Regex(this.regEx, RegexOptions.Singleline);
 
 					if (this.match is null)
-						this.match = this.parsed.Match(this.value);
+						this.match = this.parsed.Match(this.@value);
 
-					if (this.match.Success && this.match.Index == 0 && this.match.Length == this.value.Length)
+					if (this.match.Success && this.match.Index == 0 && this.match.Length == this.@value.Length)
 					{
 						foreach (string Name in this.parsed.GetGroupNames())
 						{
@@ -338,7 +341,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.value = Value.ToString();
+			this.@value = Value.ToString();
 			this.match = null;
 		}
 
@@ -378,7 +381,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!await base.Import(Xml))
 				return false;
 
-			this.value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
+			this.@value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
 			this.regEx = XML.Attribute(Xml, "regEx");
 			this.min = Xml.HasAttribute("min") ? XML.Attribute(Xml, "min") : null;
 			this.minIncluded = XML.Attribute(Xml, "minIncluded", true);

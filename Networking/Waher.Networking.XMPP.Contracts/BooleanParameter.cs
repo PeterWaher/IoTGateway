@@ -14,21 +14,21 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class BooleanParameter : Parameter
 	{
-		private bool? value;
+		private bool? @value;
 
 		/// <summary>
 		/// Parameter value
 		/// </summary>
 		public bool? Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set => this.@value = value;
 		}
 
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -40,10 +40,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<booleanParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (this.value.HasValue)
+			if (this.@value.HasValue)
 			{
 				Xml.Append("\" value=\"");
-				Xml.Append(CommonTypes.Encode(this.value.Value));
+				Xml.Append(CommonTypes.Encode(this.@value.Value));
 			}
 
 			if (UsingTemplate)
@@ -62,8 +62,11 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
+				if (this.Protection != ProtectionLevel.Normal)
+				{
+					Xml.Append("\" protection=\"");
+					Xml.Append(this.Protection.ToString());
+				}
 
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
 					Xml.Append("\"/>");
@@ -87,7 +90,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
-			if (!this.value.HasValue)
+			if (!this.@value.HasValue)
 			{
 				this.ErrorReason = ParameterErrorReason.LacksValue;
 				this.ErrorText = null;
@@ -104,7 +107,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 		}
 
 		/// <summary>
@@ -115,9 +118,9 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			if (Value is bool b)
-				this.value = b;
+				this.@value = b;
 			else if (Value is string s && CommonTypes.TryParse(s, out b))
-				this.value = b;
+				this.@value = b;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
 		}

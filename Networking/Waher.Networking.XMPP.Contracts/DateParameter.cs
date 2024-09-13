@@ -29,6 +29,11 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("\" value=\"");
 				Xml.Append(XML.Encode(this.Value.Value, true));
 			}
+			else if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append("\" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+			}
 
 			if (UsingTemplate)
 				Xml.Append("\"/>");

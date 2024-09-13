@@ -408,6 +408,13 @@
 				<xs:documentation>If attribute is not provided, parameter value is treated as a normal parameter value.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name='protected' type='xs:base64Binary' use='optional'>
+			<xs:annotation>
+				<xs:documentation>This attribute replaces the value attribute, if the parameter protection level is Encrypted or Transient.</xs:documentation>
+				<xs:documentation>For Transient parameters, this value will contain the base64-encoded binary representation of a GUID.</xs:documentation>
+				<xs:documentation>For Encrypted parameters, the value will contain the base64-encoded encryption of the parameter value.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:simpleType name='ProtectionLevel'>

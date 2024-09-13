@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Persistence.Attributes;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -17,8 +18,9 @@ namespace Waher.Networking.XMPP.Contracts
 		private string name;
 		private string guide = string.Empty;
 		private string exp = string.Empty;
-		private ParameterErrorReason? errorReason = null;
+		private byte[] protectedValue = null;
 		private string errorText = null;
+		private ParameterErrorReason? errorReason = null;
 		private Expression parsed = null;
 		private ProtectionLevel protection = ProtectionLevel.Normal;
 
@@ -63,12 +65,45 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Protected value, in case <see cref="Protection"/> is not equal to <see cref="ProtectionLevel.Normal"/>.
+		/// </summary>
+		[DefaultValueNull]
+		public byte[] ProtectedValue
+		{
+			get => this.protectedValue;
+			set => this.protectedValue = value;
+		}
+
+		/// <summary>
+		/// If the value can be serialized in the clear.
+		/// </summary>
+		public bool CanSerializeValue
+		{
+			get
+			{
+				return
+					!(this.ObjectValue is null) &&
+					(this.protection == ProtectionLevel.Normal || this.protection == ProtectionLevel.Obfuscated);
+			}
+		}
+
+		/// <summary>
+		/// If the protected value van be serialized.
+		/// </summary>
+		public bool CanSerializeProtectedValue
+		{
+			get
+			{
+				return
+					!(this.protectedValue is null) &&
+					(this.protection == ProtectionLevel.Encrypted || this.protection == ProtectionLevel.Transient);
+			}
+		}
+
+		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public abstract object ObjectValue
-		{
-			get;
-		}
+		public abstract object ObjectValue { get; }
 
 		/// <summary>
 		/// After <see cref="IsParameterValid(Variables)"/> or <see cref="IsParameterValid(Variables, ContractsClient)"/> has been
@@ -225,6 +260,20 @@ namespace Waher.Networking.XMPP.Contracts
 			this.exp = XML.Attribute(Xml, "exp");
 			this.protection = XML.Attribute(Xml, "protection", ProtectionLevel.Normal);
 			this.parsed = null;
+
+			if (Xml.HasAttribute("protected"))
+			{
+				try
+				{
+					this.protectedValue = Convert.FromBase64String(XML.Attribute(Xml, "protected"));
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+			else
+				this.protectedValue = null;
 
 			List<HumanReadableText> Descriptions = new List<HumanReadableText>();
 

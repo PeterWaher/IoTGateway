@@ -12,7 +12,6 @@ using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Persistence;
 using Waher.Script;
-using Waher.Script.Objects;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -336,6 +335,66 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.canActAsTemplate;
 			set => this.canActAsTemplate = value;
+		}
+
+		/// <summary>
+		/// If contract has parameters that are obfuscated (i.e. encrypted and decrypted on server-side).
+		/// </summary>
+		public bool HasObfuscatedParameters
+		{
+			get
+			{
+				if (this.parameters is null)
+					return false;
+
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Obfuscated)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// If contract has parameters that require encryption and decryption.
+		/// </summary>
+		public bool HasEncryptedParameters
+		{
+			get
+			{
+				if (this.parameters is null)
+					return false;
+
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Encrypted)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// If contract has parameters that are transient.
+		/// </summary>
+		public bool HasTransientParameters
+		{
+			get
+			{
+				if (this.parameters is null)
+					return false;
+
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Transient)
+						return true;
+				}
+
+				return false;
+			}
 		}
 
 		/// <summary>

@@ -46,7 +46,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public CaseInsensitiveString Value
 		{
 			get => this.@value;
-			set => this.@value = value;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
 		}
 
 		/// <summary>
@@ -122,6 +126,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(XML.Encode(this.@value.Value));
+			}
+			else if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append("\" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
 			}
 
 			if (UsingTemplate)
@@ -326,7 +335,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.@value = Value.ToString();
+			this.Value = Value.ToString();
 		}
 
 		/// <summary>

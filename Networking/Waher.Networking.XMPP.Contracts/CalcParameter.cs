@@ -90,6 +90,7 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						this.value = Result;
 
+					this.ProtectedValue = null;
 					this.ErrorReason = null;
 					this.ErrorText = null;
 
@@ -101,6 +102,7 @@ namespace Waher.Networking.XMPP.Contracts
 					this.ErrorText = ex.Message;
 
 					this.value = null;
+					this.ProtectedValue = null;
 					return false;
 				}
 			}

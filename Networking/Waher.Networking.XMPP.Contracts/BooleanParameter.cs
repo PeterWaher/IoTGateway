@@ -22,7 +22,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public bool? Value
 		{
 			get => this.@value;
-			set => this.@value = value;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
 		}
 
 		/// <summary>
@@ -44,6 +48,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(CommonTypes.Encode(this.@value.Value));
+			}
+			else if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append("\" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
 			}
 
 			if (UsingTemplate)
@@ -118,9 +127,9 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			if (Value is bool b)
-				this.@value = b;
+				this.Value = b;
 			else if (Value is string s && CommonTypes.TryParse(s, out b))
-				this.@value = b;
+				this.Value = b;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
 		}

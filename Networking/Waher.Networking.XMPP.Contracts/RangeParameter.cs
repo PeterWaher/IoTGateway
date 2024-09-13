@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Contracts
 	public abstract class RangeParameter<T> : Parameter
 		where T : struct, IComparable<T>
 	{
-		private T? value;
+		private T? @value;
 		private T? min = null;
 		private T? max = null;
 		private bool minIncluded = true;
@@ -21,8 +21,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public T? Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
 		}
 
 		/// <summary>
@@ -64,7 +68,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Populates a variable collection with the value of the parameter.
@@ -72,7 +76,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 		}
 
 		/// <summary>

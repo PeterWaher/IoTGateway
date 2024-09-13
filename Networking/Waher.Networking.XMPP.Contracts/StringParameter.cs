@@ -36,6 +36,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				this.@value = value;
 				this.match = null;
+				this.ProtectedValue = null;
 			}
 		}
 
@@ -122,10 +123,15 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<stringParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (!(this.@value is null))
+			if (!(this.@value is null) && this.CanSerializeValue)
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(XML.Encode(this.@value));
+			}
+			else if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append("\" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
 			}
 
 			if (UsingTemplate)
@@ -341,8 +347,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.@value = Value.ToString();
-			this.match = null;
+			this.Value = Value.ToString();
 		}
 
 		/// <summary>

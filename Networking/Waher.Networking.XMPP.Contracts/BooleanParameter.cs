@@ -50,6 +50,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public override object ObjectValue => this.@value;
 
 		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "booleanParameter";
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

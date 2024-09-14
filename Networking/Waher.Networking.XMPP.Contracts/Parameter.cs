@@ -11,20 +11,6 @@ using Waher.Script;
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
-	/// Encrypts a parameter value.
-	/// </summary>
-	/// <param name="ClearText">Clear-text string representation of value.</param>
-	/// <returns>Cipher text.</returns>
-	public delegate byte[] EncryptValueMethod(string ClearText);
-
-	/// <summary>
-	/// Decrypts an encrypted parameter value.
-	/// </summary>
-	/// <param name="CipherText">Cipher text.</param>
-	/// <returns>Clear text string representation of value.</returns>
-	public delegate string DecryptValueMethod(byte[] CipherText);
-
-	/// <summary>
 	/// Abstract base class for contractual parameters
 	/// </summary>
 	public abstract class Parameter : LocalizableDescription
@@ -148,6 +134,11 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.errorText;
 			protected set => this.errorText = value;
 		}
+
+		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public abstract string ParameterType { get; }
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.

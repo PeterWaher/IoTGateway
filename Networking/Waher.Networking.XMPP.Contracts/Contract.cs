@@ -27,6 +27,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string forMachinesNamespace = null;
 		private string @namespace = ContractsClient.NamespaceSmartContractsCurrent;
 		private byte[] contentSchemaDigest = null;
+		private byte[] nonce = null;
 		private XmlElement forMachines = null;
 		private Role[] roles = null;
 		private Part[] parts = null;
@@ -338,6 +339,15 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// An optional nonce value that is used when encrypting protected parameter values.
+		/// </summary>
+		public byte[] Nonce
+		{
+			get => this.nonce;
+			set => this.nonce = value;
+		}
+
+		/// <summary>
 		/// If contract has parameters that are obfuscated (i.e. encrypted and decrypted on server-side).
 		/// </summary>
 		public bool HasObfuscatedParameters
@@ -480,6 +490,22 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					case "id":
 						Result.contractId = Attr.Value;
+						break;
+
+					case "nonce":
+						if (ExceptionIfError)
+							Result.nonce = Convert.FromBase64String(Attr.Value);
+						else
+						{
+							try
+							{
+								Result.nonce = Convert.FromBase64String(Attr.Value);
+							}
+							catch (Exception)
+							{
+								return null;
+							}
+						}
 						break;
 
 					case "visibility":
@@ -1519,6 +1545,13 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append('"');
 			}
 
+			if (!(this.nonce is null) && this.nonce.Length > 0)
+			{
+				Xml.Append(" nonce=\"");
+				Xml.Append(Convert.ToBase64String(this.nonce));
+				Xml.Append('"');
+			}
+
 			if (this.signAfter.HasValue)
 			{
 				Xml.Append(" signAfter=\"");
@@ -2148,35 +2181,50 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
 		/// </summary>
+		/// <param name="CreatorJid">Bare JID of creator of contract.</param>
 		/// <param name="Algorithm">Algorithm to use for protecting values.</param>
-		public void ProtectEncryptedParameters(EncryptValueMethod Algorithm)
+		public void EncryptEncryptedParameters(string CreatorJid, IParameterEncryptionAlgorithm Algorithm)
 		{
 			if (this.parameters is null)
 				return;
 
-			foreach (Parameter P in this.parameters)
+			if (this.nonce is null)
+				this.nonce = Guid.NewGuid().ToByteArray();
+
+			string Nonce = Convert.ToBase64String(this.nonce);
+			uint i, c = (uint)this.parameters.Length;
+
+			for (i = 0; i < c; i++)
 			{
+				Parameter P = this.parameters[i];
+
 				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
-					P.ProtectedValue = Algorithm(P.StringValue);
+					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.StringValue);
 			}
 		}
 
 		/// <summary>
 		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
 		/// </summary>
+		/// <param name="CreatorJid">Bare JID of creator of contract.</param>
 		/// <param name="Algorithm">Algorithm to use for unprotecting values.</param>
 		/// <returns>If protected values where unprotected successfully.</returns>
-		public bool UnprotectEncryptedParameters(DecryptValueMethod Algorithm)
+		public bool DecryptEncryptedParameters(string CreatorJid, IParameterEncryptionAlgorithm Algorithm)
 		{
 			if (this.parameters is null)
 				return true;
 
 			try
 			{
-				foreach (Parameter P in this.parameters)
+				string Nonce = this.nonce is null ? string.Empty : Convert.ToBase64String(this.nonce);
+				uint i, c = (uint)this.parameters.Length;
+
+				for (i = 0; i < c; i++)
 				{
+					Parameter P = this.parameters[i];
+
 					if (P.Protection == ProtectionLevel.Encrypted && !(P.ProtectedValue is null))
-						P.StringValue = Algorithm(P.ProtectedValue);
+						P.StringValue = Algorithm.Decrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.ProtectedValue);
 				}
 
 				return true;

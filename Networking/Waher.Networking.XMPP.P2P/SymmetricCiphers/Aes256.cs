@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
 		/// A new key must be generated before the counter wraps.</param>
 		/// <returns>Initiation vector.</returns>
-		protected override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
+		public override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
 		{
 			byte[] IV = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(Id + Type + From + To));
 			Array.Resize(ref IV, 16);

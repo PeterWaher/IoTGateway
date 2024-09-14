@@ -96,6 +96,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public const string NamespaceOnboarding = "http://waher.se/schema/Onboarding/v1.xsd";
 
 		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
+		private static readonly string ContractKeySettings = typeof(ContractsClient).Namespace + ".Contracts.";
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
@@ -106,6 +107,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
+		private string contractKeySettingsPrefix;
 		private bool keySettingsPrefixLocked = false;
 		private bool localKeysForE2e = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
@@ -195,6 +197,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.aes.Padding = PaddingMode.None;
 
 			this.keySettingsPrefix = KeySettings;
+			this.contractKeySettingsPrefix = ContractKeySettings;
 		}
 
 		/// <summary>
@@ -543,6 +546,21 @@ namespace Waher.Networking.XMPP.Contracts
 				Output.WriteEndElement();
 			}
 
+			Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				string Name = Setting.Key.Substring(this.contractKeySettingsPrefix.Length);
+
+				if (Setting.Value is string s)
+				{
+					Output.WriteStartElement("C");
+					Output.WriteAttributeString("n", Name);
+					Output.WriteAttributeString("v", s);
+					Output.WriteEndElement();
+				}
+			}
+
 			Output.WriteEndElement();
 		}
 
@@ -603,6 +621,13 @@ namespace Waher.Networking.XMPP.Contracts
 						DateTime DateTimeValue = XML.Attribute(E, "v", DateTime.MinValue);
 
 						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Name, DateTimeValue);
+						break;
+
+					case "C":
+						Name = XML.Attribute(E, "n");
+						StringValue = XML.Attribute(E, "v");
+
+						await RuntimeSettings.SetAsync(this.contractKeySettingsPrefix + Name, StringValue);
 						break;
 
 					case "State":
@@ -666,9 +691,15 @@ namespace Waher.Networking.XMPP.Contracts
 				throw new InvalidOperationException("Key settings instance is locked.");
 
 			if (string.IsNullOrEmpty(InstanceName))
+			{
 				this.keySettingsPrefix = KeySettings;
+				this.contractKeySettingsPrefix = ContractKeySettings;
+			}
 			else
+			{
 				this.keySettingsPrefix = InstanceName + "." + KeySettings;
+				this.contractKeySettingsPrefix = InstanceName + "." + ContractKeySettings;
+			}
 
 			this.keySettingsPrefixLocked = Locked;
 		}
@@ -4699,6 +4730,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 				try
 				{
+					if (!(Key is null))
+						await this.SaveContractSharedSecret(ContractId, e.FromBareJID, Key, KeyAlgorithm, true);
+
 					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message, Key, KeyAlgorithm));
 				}
 				catch (Exception ex)
@@ -4706,6 +4740,55 @@ namespace Waher.Networking.XMPP.Contracts
 					Log.Exception(ex);
 				}
 			}
+		}
+
+		internal async Task<bool> SaveContractSharedSecret(string ContractId, string CreatorJid, byte[] Key,
+			SymmetricCipherAlgorithms KeyAlgorithm, bool OnlyIfNew)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+
+			if (OnlyIfNew)
+			{
+				string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					return false;
+			}
+
+			string Value = KeyAlgorithm.ToString() + "|" + CreatorJid + "|" + Convert.ToBase64String(Key);
+
+			await RuntimeSettings.SetAsync(Name, Value);
+
+			return true;
+		}
+
+		internal async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadContractSharedSecret(string ContractId)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+			string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+
+			if (string.IsNullOrEmpty(s))
+				return null;
+
+			string[] Parts = s.Split('|');
+			if (Parts.Length != 3)
+				return null;
+
+			if (Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
+				return null;
+
+			string CreatorJid = Parts[1];
+			byte[] Key;
+
+			try
+			{
+				Key = Convert.FromBase64String(Parts[2]);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+
+			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid, Key);
 		}
 
 		/// <summary>

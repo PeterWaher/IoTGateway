@@ -57,6 +57,15 @@
 								<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
+							<xs:annotation>
+								<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
+								<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
+								<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
+								<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
+								<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 						<xs:attributeGroup ref='visibilityAndDuration'>
 							<xs:annotation>
 								<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
@@ -2471,6 +2480,10 @@
 							<xs:annotation>
 								<xs:documentation>Shared secrets are used to encrypt and decrypt confidential parameters in the contract.</xs:documentation>
 								<xs:documentation>If using confidential parameters, make sure to send proposals using End-to-End Encrypted messages.</xs:documentation>
+								<xs:documentation>The recipient of a contract proposal will assume the sender bare JID represents the bare JID of the creator.</xs:documentation>
+								<xs:documentation>This fact is used when decrypting encrypted parameters in the contract.</xs:documentation>
+								<xs:documentation>If a third party forwards a contract proposal containing encrypted parameters, the recipient will not be able to decrypt the parameter values.</xs:documentation>
+								<xs:documentation>Only the creator of a contract can send contract proposals if the contract contains encrypted parameters.</xs:documentation>
 							</xs:annotation>
 						</xs:documentation>
 					</xs:annotation>
@@ -2483,6 +2496,9 @@
 						<xs:attribute name='algorithm' use='required'>
 							<xs:annotation>
 								<xs:documentation>Algorithm used for encryption and decryption.</xs:documentation>
+								<xs:documentation>The same symmetric ciphers as are available for End-to-End encryption (E2EE) can be used.</xs:documentation>
+								<xs:documentation>Algorithms requiring an IV, use the same IV algorithms as for E2EE, replacing id with parameter name, type with XML local name of parameter type, from with Bare JID of creator, to with the base64-encoded contract nonce and counter with the zero-based parameter index.</xs:documentation>
+								<xs:documentation>Algorithms requiring associated data, calculate it as the UTF-8 encoding of the parameter name.</xs:documentation>
 							</xs:annotation>
 							<xs:simpleType>
 								<xs:restriction base='xs:string'>

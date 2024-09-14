@@ -122,6 +122,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public Contract Reference => this.reference;
 
 		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "contractReferenceParameter";
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>

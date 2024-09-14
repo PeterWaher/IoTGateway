@@ -81,9 +81,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				return
-					!(this.ObjectValue is null) &&
-					(this.protection == ProtectionLevel.Normal || this.protection == ProtectionLevel.Obfuscated);
+				return !(this.ObjectValue is null) && this.protection == ProtectionLevel.Normal;
 			}
 		}
 

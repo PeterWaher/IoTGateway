@@ -348,26 +348,6 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// If contract has parameters that are obfuscated (i.e. encrypted and decrypted on server-side).
-		/// </summary>
-		public bool HasObfuscatedParameters
-		{
-			get
-			{
-				if (this.parameters is null)
-					return false;
-
-				foreach (Parameter P in this.parameters)
-				{
-					if (P.Protection == ProtectionLevel.Obfuscated)
-						return true;
-				}
-
-				return false;
-			}
-		}
-
-		/// <summary>
 		/// If contract has parameters that require encryption and decryption.
 		/// </summary>
 		public bool HasEncryptedParameters

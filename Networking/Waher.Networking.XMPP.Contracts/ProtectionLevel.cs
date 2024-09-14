@@ -11,12 +11,6 @@
 		Normal,
 
 		/// <summary>
-		/// Obfuscated parameter values are encrypted on the broker and
-		/// transmitted in the clear.
-		/// </summary>
-		Obfuscated,
-
-		/// <summary>
 		/// The creator of a contract creates keys for the encryption and decryption 
 		/// of encrypted parameter values. The creator is responsible for sharing the 
 		/// keys with the other parts of the contract, using end-to-end encrypted 

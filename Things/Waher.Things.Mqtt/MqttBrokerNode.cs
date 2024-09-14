@@ -180,7 +180,8 @@ namespace Waher.Things.Mqtt
 			get
 			{
 				string PrevKey = this.brokerKey;
-				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password);
+				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password, 
+					this.connectionSubscription);
 
 				if (PrevKey != this.brokerKey && !string.IsNullOrEmpty(PrevKey))
 					MqttBrokers.DestroyBroker(PrevKey);

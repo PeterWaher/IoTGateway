@@ -21,8 +21,9 @@ namespace Waher.Things.Mqtt.Model
 		/// <param name="TrustServer">If server certificate should be automatically trusted.</param>
 		/// <param name="UserName">User name</param>
 		/// <param name="Password">Password</param>
-		/// <returns></returns>
-		public static string GetKey(string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password)
+		/// <param name="ConnectionSubscription">Connection subscription</param>
+		/// <returns>Key</returns>
+		public static string GetKey(string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password, string ConnectionSubscription)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -32,6 +33,7 @@ namespace Waher.Things.Mqtt.Model
 			sb.AppendLine(TrustServer.ToString());
 			sb.AppendLine(UserName);
 			sb.AppendLine(Password);
+			sb.AppendLine(ConnectionSubscription);
 
 			return Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 		}

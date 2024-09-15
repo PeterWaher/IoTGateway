@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<dateParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (this.Value.HasValue)
+			if (this.Value.HasValue && this.CanSerializeValue)
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(XML.Encode(this.Value.Value, true));

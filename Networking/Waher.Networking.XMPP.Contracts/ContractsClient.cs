@@ -31,6 +31,7 @@ using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Content.Html.Elements;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -2536,6 +2537,23 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 
+			if (Contract.HasTransientParameters)
+			{
+				Xml.Append("<transient>");
+
+				foreach (Parameter Parameter in Contract.Parameters)
+				{
+					if (Parameter.Protection == ProtectionLevel.Transient)
+					{
+						Parameter.Protection = ProtectionLevel.Normal;
+						Parameter.Serialize(Xml, true);
+						Parameter.Protection = ProtectionLevel.Transient;
+					}
+				}
+
+				Xml.Append("</transient>");
+			}
+
 			Xml.Append("</createContract>");
 
 			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
@@ -2656,7 +2674,7 @@ namespace Waher.Networking.XMPP.Contracts
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
 			this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode,
-				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2681,7 +2699,65 @@ namespace Waher.Networking.XMPP.Contracts
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
+			this. CreateContract(Address, TemplateId, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
+				SignBefore, CanActAsTemplate, null, Callback, State);
+		}
+
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Nonce">An optional nonce value that is used when encrypting protected parameter values.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, byte[] Nonce, SmartContractEventHandler Callback, object State)
+		{
+			this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode,
+				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Nonce, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Nonce">An optional nonce value that is used when encrypting protected parameter values.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, byte[] Nonce, SmartContractEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
+
+			if (Nonce is null)
+				Nonce = Guid.NewGuid().ToByteArray();
 
 			Xml.Append("<createContract xmlns=\"");
 			Xml.Append(NamespaceSmartContractsCurrent);
@@ -2695,6 +2771,8 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Duration.ToString());
 			Xml.Append("\" id=\"");
 			Xml.Append(XML.Encode(TemplateId));
+			Xml.Append("\" nonce=\"");
+			Xml.Append(Convert.ToBase64String(Nonce));
 			Xml.Append('"');
 
 			if (SignAfter.HasValue && SignAfter > DateTime.MinValue)
@@ -2742,17 +2820,48 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
+			LinkedList<Parameter> TransientParameters = new LinkedList<Parameter>();
+
 			if (!(Parameters is null) && Parameters.Length > 0)
 			{
 				Xml.Append("<parameters>");
 
 				foreach (Parameter Parameter in Parameters)
+				{
+					if (Parameter.Protection == ProtectionLevel.Transient)
+					{
+						if (Parameter.ProtectedValue is null)
+							Parameter.ProtectedValue = Guid.NewGuid().ToByteArray();
+
+						if (TransientParameters is null)
+							TransientParameters = new LinkedList<Parameter>();
+
+						TransientParameters.AddLast(Parameter);
+					}
+
 					Parameter.Serialize(Xml, true);
+				}
 
 				Xml.Append("</parameters>");
 			}
 
-			Xml.Append("</template></createContract>");
+			Xml.Append("</template>");
+
+			if (!(TransientParameters is null))
+			{
+				Xml.Append("<transient>");
+
+				foreach (Parameter Parameter in TransientParameters)
+				{
+					Parameter.Protection = ProtectionLevel.Normal;
+					Parameter.Serialize(Xml, true);
+					Parameter.Protection = ProtectionLevel.Transient;
+				}
+
+				Xml.Append("</transient>");
+			}
+
+			Xml.Append("</createContract>");
 
 			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
@@ -2778,7 +2887,7 @@ namespace Waher.Networking.XMPP.Contracts
 			DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			return this.CreateContractAsync(this.componentAddress, TemplateId, Parts, Parameters, Visibility,
-				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, null);
 		}
 
 		/// <summary>
@@ -2802,10 +2911,62 @@ namespace Waher.Networking.XMPP.Contracts
 			ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional,
 			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
+			return this.CreateContractAsync(Address, TemplateId, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
+				SignBefore, CanActAsTemplate, null);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Nonce">An optional nonce value that is used when encrypting protected parameter values.</param>
+		/// <returns>Contract.</returns>
+		public Task<Contract> CreateContractAsync(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, byte[] Nonce)
+		{
+			return this.CreateContractAsync(this.componentAddress, TemplateId, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Nonce);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Nonce">An optional nonce value that is used when encrypting protected parameter values.</param>
+		/// <returns>Contract.</returns>
+		public Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
+			ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional,
+			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate, byte[] Nonce)
+		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
 			this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
-				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Nonce, (sender, e) =>
 				{
 					if (e.Ok)
 						Result.SetResult(e.Contract);
@@ -3176,6 +3337,8 @@ namespace Waher.Networking.XMPP.Contracts
 			StringBuilder Xml = new StringBuilder();
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			Log.Debug("```\r\n" + Xml.ToString() + "\r\n```");  // TODO: Remove.
 
 			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (sender, e) =>
 			{

@@ -1785,7 +1785,10 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!(this.parameters is null))
 			{
 				foreach (Parameter P in this.parameters)
-					Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue ?? string.Empty));
+				{
+					if (P.Protection == ProtectionLevel.Normal)
+						Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue ?? string.Empty));
+				}
 			}
 
 			return Response.ToArray();

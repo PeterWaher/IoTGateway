@@ -22,58 +22,61 @@
 			<xs:documentation>XML Schemas can either be registered with the Trust Provider out-of-band, or downloaded by the Trust Provider automatically, if accessible through the namespace URI, if it's using a downloadable URI scheme. The XML Schema must not contain processing instructions.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:choice minOccurs='1' maxOccurs='1'>
-				<xs:element ref='contract'>
-					<xs:annotation>
-						<xs:documentation>The contract the legal identity of the client wants to create.</xs:documentation>
-						<xs:documentation>Note: A contract has to be reviewed and approved by the Trust Provider before the contract can be signed. The review-process is performed out-of-band.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='template'>
-					<xs:annotation>
-						<xs:documentation>By referencing a reviewed and approved contract instead of creating an absolutely new one, the legal identity can skip the review and approval steps otherwise required when creating a new contract.</xs:documentation>
-						<xs:documentation>Note: The client must be authorized to access the referenced contract, in order to be able to create new contracts based on the referenced one.</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+			<xs:sequence>
+				<xs:choice minOccurs='1' maxOccurs='1'>
+					<xs:element ref='contract'>
+						<xs:annotation>
+							<xs:documentation>The contract the legal identity of the client wants to create.</xs:documentation>
+							<xs:documentation>Note: A contract has to be reviewed and approved by the Trust Provider before the contract can be signed. The review-process is performed out-of-band.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name='template'>
+						<xs:annotation>
+							<xs:documentation>By referencing a reviewed and approved contract instead of creating an absolutely new one, the legal identity can skip the review and approval steps otherwise required when creating a new contract.</xs:documentation>
+							<xs:documentation>Note: The client must be authorized to access the referenced contract, in order to be able to create new contracts based on the referenced one.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+									<xs:annotation>
+										<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+									<xs:annotation>
+										<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
+										<xs:documentation>Array must not contain parameters not available in the referenced contract.</xs:documentation>
+										<xs:documentation>Prameters available in the referenced contract will be used as-is, if not available in this sequence, or overwritten by the present parameters, if available.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name='id' type='xs:string' use='required'>
 								<xs:annotation>
-									<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+									<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
+									<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete, Rejected or Failed must result in a failure.</xs:documentation>
+									<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
+									<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
 								</xs:annotation>
-							</xs:element>
-							<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+							</xs:attribute>
+							<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
 								<xs:annotation>
-									<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
-									<xs:documentation>Array must not contain parameters not available in the referenced contract.</xs:documentation>
-									<xs:documentation>Prameters available in the referenced contract will be used as-is, if not available in this sequence, or overwritten by the present parameters, if available.</xs:documentation>
+									<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
+									<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
+									<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
+									<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
+									<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
 								</xs:annotation>
-							</xs:element>
-						</xs:sequence>
-						<xs:attribute name='id' type='xs:string' use='required'>
-							<xs:annotation>
-								<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
-								<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete, Rejected or Failed must result in a failure.</xs:documentation>
-								<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
-								<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
-							<xs:annotation>
-								<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
-								<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
-								<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
-								<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
-								<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attributeGroup ref='visibilityAndDuration'>
-							<xs:annotation>
-								<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
-							</xs:annotation>
-						</xs:attributeGroup>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
+							</xs:attribute>
+							<xs:attributeGroup ref='visibilityAndDuration'>
+								<xs:annotation>
+									<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
+								</xs:annotation>
+							</xs:attributeGroup>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:element ref='transient' minOccurs='0' maxOccurs='1'/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
@@ -318,14 +321,31 @@
 					<xs:documentation>A client must not include an identifier when it creates a contract on the Trust Provider.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
+				<xs:annotation>
+					<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
+					<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
+					<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
+					<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
+					<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='parameters'>
+	<xs:element name='parameters' type='Parameters'>
 		<xs:annotation>
 			<xs:documentation>Defines a set of parameters of a contract.</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
+	</xs:element>
+
+	<xs:element name='transient' type='Parameters'>
+		<xs:annotation>
+			<xs:documentation>Defines a set of transient parameter values.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:complexType name='Parameters'>
 			<xs:choice minOccurs='1' maxOccurs='unbounded'>
 				<xs:element name='stringParameter' type='StringParameter'>
 					<xs:annotation>
@@ -378,8 +398,7 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
-		</xs:complexType>
-	</xs:element>
+	</xs:complexType>
 
 	<xs:complexType name='Parameter' abstract='true'>
 		<xs:annotation>

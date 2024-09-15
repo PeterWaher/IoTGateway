@@ -64,7 +64,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<booleanParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (this.@value.HasValue)
+			if (this.@value.HasValue && this.CanSerializeValue)
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(CommonTypes.Encode(this.@value.Value));

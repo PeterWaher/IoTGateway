@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("<contractReferenceParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
-			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value))
+			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value) && this.CanSerializeValue)
 			{
 				Xml.Append("\" value=\"");
 				Xml.Append(XML.Encode(this.@value.Value));

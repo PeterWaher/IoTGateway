@@ -3338,7 +3338,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			Log.Debug("```\r\n" + Xml.ToString() + "\r\n```");  // TODO: Remove.
+			//Log.Debug("Client side\r\n\r\n```\r\n" + Xml.ToString() + "\r\n```");
 
 			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (sender, e) =>
 			{

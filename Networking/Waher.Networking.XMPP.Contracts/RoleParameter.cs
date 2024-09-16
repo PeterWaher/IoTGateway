@@ -208,17 +208,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override async Task<bool> Import(XmlElement Xml)
+		public override Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			this.Role = XML.Attribute(Xml, "role");
 			this.Index = XML.Attribute(Xml, "index", 0);
 			this.Property = XML.Attribute(Xml, "property");
 			this.Required = XML.Attribute(Xml, "required", false);
 
-			return true;
+			return base.Import(Xml);
 		}
 
 	}

@@ -395,9 +395,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If import was successful.</returns>
 		public override async Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			List<Label> Labels = new List<Label>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
@@ -435,7 +432,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.provider = Xml.HasAttribute("provider") ? XML.Attribute(Xml, "provider") : null;
 			this.creatorRole = Xml.HasAttribute("creatorRole") ? XML.Attribute(Xml, "creatorRole") : null;
 
-			return true;
+			return await base.Import(Xml);
 		}
 
 		/// <summary>

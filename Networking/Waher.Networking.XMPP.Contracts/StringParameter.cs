@@ -410,11 +410,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override async Task<bool> Import(XmlElement Xml)
+		public override Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			this.@value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
 			this.regEx = XML.Attribute(Xml, "regEx");
 			this.min = Xml.HasAttribute("min") ? XML.Attribute(Xml, "min") : null;
@@ -424,7 +421,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.minLength = Xml.HasAttribute("minLength") ? XML.Attribute(Xml, "minLength", 0) : (int?)null;
 			this.maxLength = Xml.HasAttribute("maxLength") ? XML.Attribute(Xml, "maxLength", 0) : (int?)null;
 
-			return true;
+			return base.Import(Xml);
 		}
 
 	}

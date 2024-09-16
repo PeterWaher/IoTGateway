@@ -68,13 +68,13 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="Xml">XML Output.</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			Xml.Append("<cell header='");
-			Xml.Append(CommonTypes.Encode(this.Header));
-			Xml.Append("' colSpan='");
-			Xml.Append(this.ColumnSpan.ToString());
-			Xml.Append("' alignment='");
+			Xml.Append("<cell alignment=\"");
 			Xml.Append(this.Alignment.ToString());
-			Xml.Append("'>");
+			Xml.Append("\" colSpan=\"");
+			Xml.Append(this.ColumnSpan.ToString());
+			Xml.Append("\" header=\"");
+			Xml.Append(CommonTypes.Encode(this.Header));
+			Xml.Append("\">");
 
 			HumanReadableElement[] Elements = (HumanReadableElement[])this.InlineElements ?? this.BlockElements;
 

@@ -133,97 +133,113 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<contractReferenceParameter name=\"");
-			Xml.Append(XML.Encode(this.Name));
+			Xml.Append("<contractReferenceParameter");
 
-			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value) && this.CanSerializeValue)
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" value=\"");
-				Xml.Append(XML.Encode(this.@value.Value));
-			}
-			else if (this.CanSerializeProtectedValue)
-			{
-				Xml.Append("\" protected=\"");
-				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
-			}
-
-			if (UsingTemplate)
-				Xml.Append("\"/>");
-			else
-			{
-				if (!string.IsNullOrEmpty(this.Guide))
+				if (!string.IsNullOrEmpty(this.creatorRole))
 				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append(" creatorRole=\"");
+					Xml.Append(XML.Encode(this.creatorRole.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.localName))
 				{
-					Xml.Append("\" localName=\"");
+					Xml.Append(" localName=\"");
 					Xml.Append(XML.Encode(this.localName.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+			}
 
-				if (!string.IsNullOrEmpty(this.@namespace))
-				{
-					Xml.Append("\" namespace=\"");
-					Xml.Append(XML.Encode(this.@namespace.Normalize(NormalizationForm.FormC)));
-				}
+			Xml.Append(" name=\"");
+			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
 
-				if (!string.IsNullOrEmpty(this.templateId))
+			if (!UsingTemplate && !string.IsNullOrEmpty(this.@namespace))
+			{
+				Xml.Append(" namespace=\"");
+				Xml.Append(XML.Encode(this.@namespace.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+			}
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate)
+			{
+				if (this.Protection != ProtectionLevel.Normal)
 				{
-					Xml.Append("\" templateId=\"");
-					Xml.Append(XML.Encode(this.templateId.Normalize(NormalizationForm.FormC)));
+					Xml.Append(" protection=\"");
+					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.provider))
 				{
-					Xml.Append("\" provider=\"");
+					Xml.Append(" provider=\"");
 					Xml.Append(XML.Encode(this.provider.Normalize(NormalizationForm.FormC)));
-				}
-
-				if (!string.IsNullOrEmpty(this.creatorRole))
-				{
-					Xml.Append("\" creatorRole=\"");
-					Xml.Append(XML.Encode(this.creatorRole.Normalize(NormalizationForm.FormC)));
-				}
-
-				if (this.Protection != ProtectionLevel.Normal)
-				{
-					Xml.Append("\" protection=\"");
-					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
 				if (this.Required)
-					Xml.Append("\" required=\"true");
+					Xml.Append(" required=\"true\"");
 
-				if ((!(this.Descriptions is null) && this.Descriptions.Length > 0) ||
-					(!(this.labels is null) && this.labels.Length > 0))
+				if (!string.IsNullOrEmpty(this.templateId))
 				{
-					Xml.Append("\">");
-
-					if (!(this.Descriptions is null))
-					{
-						foreach (HumanReadableText Description in this.Descriptions)
-							Description.Serialize(Xml, "description", null);
-					}
-
-					if (!(this.labels is null))
-					{
-						foreach (Label Label in this.labels)
-							Label.Serialize(Xml);
-					}
-
-					Xml.Append("</contractReferenceParameter>");
+					Xml.Append(" templateId=\"");
+					Xml.Append(XML.Encode(this.templateId.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
-				else
-					Xml.Append("\"/>");
 			}
+
+			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value) && this.CanSerializeValue)
+			{
+				Xml.Append(" value=\"");
+				Xml.Append(XML.Encode(this.@value.Value));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate &&
+				((!(this.Descriptions is null) && this.Descriptions.Length > 0) ||
+				(!(this.labels is null) && this.labels.Length > 0)))
+			{
+				Xml.Append('>');
+
+				if (!(this.Descriptions is null))
+				{
+					foreach (HumanReadableText Description in this.Descriptions)
+						Description.Serialize(Xml, "description", null);
+				}
+
+				if (!(this.labels is null))
+				{
+					foreach (Label Label in this.labels)
+						Label.Serialize(Xml);
+				}
+
+				Xml.Append("</contractReferenceParameter>");
+			}
+			else
+				Xml.Append("/>");
 		}
 
 		/// <summary>

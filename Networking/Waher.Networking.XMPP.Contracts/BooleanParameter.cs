@@ -61,53 +61,60 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<booleanParameter name=\"");
+			Xml.Append("<booleanParameter");
+
+			if (!UsingTemplate)
+			{
+				if (!string.IsNullOrEmpty(this.Expression))
+				{
+					Xml.Append(" exp=\"");
+					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+			}
+
+			Xml.Append(" name=\"");
 			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate && this.Protection != ProtectionLevel.Normal)
+			{
+				Xml.Append(" protection=\"");
+				Xml.Append(this.Protection.ToString());
+				Xml.Append('"');
+			}
 
 			if (this.@value.HasValue && this.CanSerializeValue)
 			{
-				Xml.Append("\" value=\"");
+				Xml.Append(" value=\"");
 				Xml.Append(CommonTypes.Encode(this.@value.Value));
-			}
-			else if (this.CanSerializeProtectedValue)
-			{
-				Xml.Append("\" protected=\"");
-				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
 			}
 
-			if (UsingTemplate)
-				Xml.Append("\"/>");
+			if (UsingTemplate || this.Descriptions is null || this.Descriptions.Length == 0)
+				Xml.Append("/>");
 			else
 			{
-				if (!string.IsNullOrEmpty(this.Guide))
-				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-				}
+				Xml.Append('>');
 
-				if (!string.IsNullOrEmpty(this.Expression))
-				{
-					Xml.Append("\" exp=\"");
-					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
-				}
+				foreach (HumanReadableText Description in this.Descriptions)
+					Description.Serialize(Xml, "description", null);
 
-				if (this.Protection != ProtectionLevel.Normal)
-				{
-					Xml.Append("\" protection=\"");
-					Xml.Append(this.Protection.ToString());
-				}
-
-				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
-				else
-				{
-					Xml.Append("\">");
-
-					foreach (HumanReadableText Description in this.Descriptions)
-						Description.Serialize(Xml, "description", null);
-
-					Xml.Append("</booleanParameter>");
-				}
+				Xml.Append("</booleanParameter>");
 			}
 		}
 

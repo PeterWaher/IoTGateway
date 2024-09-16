@@ -1294,6 +1294,26 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Normalizes XML.
+		/// </summary>
+		/// <param name="Xml">XML string</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(string Xml)
+		{
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+			Doc.LoadXml(Xml);
+
+			StringBuilder sb = new StringBuilder();
+
+			NormalizeXml(Doc.DocumentElement, sb, string.Empty);
+
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Normalizes an XML element.
 		/// </summary>
 		/// <param name="Xml">XML element to normalize</param>
@@ -1343,6 +1363,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			bool HasContent = false;
+			XmlWhitespace SpaceContent = null;
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -1366,10 +1387,23 @@ namespace Waher.Networking.XMPP.Contracts
 
 					Output.Append(XML.Encode(N.InnerText.Normalize(NormalizationForm.FormC)));
 				}
+				else if (N is XmlWhitespace Space)
+					SpaceContent = Space;
 			}
 
 			if (HasContent)
 			{
+				Output.Append("</");
+				Output.Append(TagName);
+				Output.Append('>');
+			}
+			else if (!(SpaceContent is null))
+			{
+				Output.Append('>');
+
+				foreach (char _ in SpaceContent.InnerText)
+					Output.Append(' ');
+
 				Output.Append("</");
 				Output.Append(TagName);
 				Output.Append('>');
@@ -1568,16 +1602,17 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				foreach (Role Role in this.roles)
 				{
-					Xml.Append("<role maxCount=\"");
+					Xml.Append("<role");
+
+					if (Role.CanRevoke)
+						Xml.Append(" canRevoke=\"true\"");
+
+					Xml.Append(" maxCount=\"");
 					Xml.Append(Role.MaxCount.ToString());
 					Xml.Append("\" minCount=\"");
 					Xml.Append(Role.MinCount.ToString());
 					Xml.Append("\" name=\"");
 					Xml.Append(XML.Encode(Role.Name));
-
-					if (Role.CanRevoke)
-						Xml.Append("\" canRevoke=\"true");
-
 					Xml.Append("\">");
 
 					foreach (HumanReadableText Description in Role.Descriptions)

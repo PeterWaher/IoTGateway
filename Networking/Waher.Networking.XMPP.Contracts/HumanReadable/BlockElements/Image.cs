@@ -110,13 +110,13 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="Xml">XML Output.</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			Xml.Append("<imageStandalone contentType='");
+			Xml.Append("<imageStandalone contentType=\"");
 			Xml.Append(XML.Encode(this.contentType));
-			Xml.Append("' width='");
-			Xml.Append(this.width.ToString());
-			Xml.Append("' height='");
+			Xml.Append("\" height=\"");
 			Xml.Append(this.height.ToString());
-			Xml.Append("'><binary>");
+			Xml.Append("\" width=\"");
+			Xml.Append(this.width.ToString());
+			Xml.Append("\"><binary>");
 
 			if (!(this.data is null))
 				Xml.Append(Convert.ToBase64String(this.data));

@@ -93,40 +93,53 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			if (!UsingTemplate)
 			{
-				Xml.Append("<roleParameter name=\"");
-				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" role=\"");
-				Xml.Append(XML.Encode(this.role.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" index=\"");
-				Xml.Append(this.index.ToString());
-				Xml.Append("\" property=\"");
-				Xml.Append(XML.Encode(this.property.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" required=\"");
-				Xml.Append(CommonTypes.Encode(this.required));
+				Xml.Append("<roleParameter");
 
 				if (!string.IsNullOrEmpty(this.Guide))
 				{
-					Xml.Append("\" guide=\"");
+					Xml.Append(" guide=\"");
 					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+
+				Xml.Append(" index=\"");
+				Xml.Append(this.index.ToString());
+				Xml.Append('"');
+
+				Xml.Append(" name=\"");
+				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+
+				Xml.Append(" property=\"");
+				Xml.Append(XML.Encode(this.property.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
 
 				if (this.Protection != ProtectionLevel.Normal)
 				{
-					Xml.Append("\" protection=\"");
+					Xml.Append(" protection=\"");
 					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
+				if (this.required)
+					Xml.Append(" required=\"true\"");
+
+				Xml.Append(" role=\"");
+				Xml.Append(XML.Encode(this.role.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
+					Xml.Append("/>");
 				else
 				{
-					Xml.Append("\">");
+					Xml.Append('>');
 
 					foreach (HumanReadableText Description in this.Descriptions)
 						Description.Serialize(Xml, "description", null);

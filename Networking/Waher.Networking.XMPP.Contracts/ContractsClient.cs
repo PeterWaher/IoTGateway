@@ -2820,7 +2820,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
-			LinkedList<Parameter> TransientParameters = new LinkedList<Parameter>();
+			LinkedList<Parameter> TransientParameters = null;
 
 			if (!(Parameters is null) && Parameters.Length > 0)
 			{

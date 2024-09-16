@@ -134,87 +134,102 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<stringParameter name=\"");
-			Xml.Append(XML.Encode(this.Name));
+			Xml.Append("<stringParameter");
 
-			if (!(this.@value is null) && this.CanSerializeValue)
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" value=\"");
-				Xml.Append(XML.Encode(this.@value));
-			}
-			else if (this.CanSerializeProtectedValue)
-			{
-				Xml.Append("\" protected=\"");
-				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
-			}
-
-			if (UsingTemplate)
-				Xml.Append("\"/>");
-			else
-			{
-				if (!string.IsNullOrEmpty(this.Guide))
-				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-				}
-
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
-				if (!string.IsNullOrEmpty(this.regEx))
+				if (!string.IsNullOrEmpty(this.Guide))
 				{
-					Xml.Append("\" regEx=\"");
-					Xml.Append(XML.Encode(this.regEx.Normalize(NormalizationForm.FormC)));
-				}
-
-				if (!(this.min is null))
-				{
-					Xml.Append("\" min=\"");
-					Xml.Append(XML.Encode(this.min));
-					Xml.Append("\" minIncluded=\"");
-					Xml.Append(XML.Encode(CommonTypes.Encode(this.minIncluded)));
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!(this.max is null))
 				{
-					Xml.Append("\" max=\"");
+					Xml.Append(" max=\"");
 					Xml.Append(XML.Encode(this.max));
 					Xml.Append("\" maxIncluded=\"");
 					Xml.Append(XML.Encode(CommonTypes.Encode(this.maxIncluded)));
-				}
-
-				if (this.minLength.HasValue)
-				{
-					Xml.Append("\" minLength=\"");
-					Xml.Append(this.minLength.Value.ToString());
+					Xml.Append('"');
 				}
 
 				if (this.maxLength.HasValue)
 				{
-					Xml.Append("\" maxLength=\"");
+					Xml.Append(" maxLength=\"");
 					Xml.Append(this.maxLength.Value.ToString());
+					Xml.Append('"');
 				}
 
+				if (!(this.min is null))
+				{
+					Xml.Append(" min=\"");
+					Xml.Append(XML.Encode(this.min));
+					Xml.Append("\" minIncluded=\"");
+					Xml.Append(XML.Encode(CommonTypes.Encode(this.minIncluded)));
+					Xml.Append('"');
+				}
+
+				if (this.minLength.HasValue)
+				{
+					Xml.Append(" minLength=\"");
+					Xml.Append(this.minLength.Value.ToString());
+					Xml.Append('"');
+				}
+			}
+
+			Xml.Append(" name=\"");
+			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate)
+			{
 				if (this.Protection != ProtectionLevel.Normal)
 				{
-					Xml.Append("\" protection=\"");
+					Xml.Append(" protection=\"");
 					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
-				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
-				else
+				if (!string.IsNullOrEmpty(this.regEx))
 				{
-					Xml.Append("\">");
-
-					foreach (HumanReadableText Description in this.Descriptions)
-						Description.Serialize(Xml, "description", null);
-
-					Xml.Append("</stringParameter>");
+					Xml.Append(" regEx=\"");
+					Xml.Append(XML.Encode(this.regEx.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+			}
+
+			if (!(this.@value is null) && this.CanSerializeValue)
+			{
+				Xml.Append(" value=\"");
+				Xml.Append(XML.Encode(this.@value));
+				Xml.Append('"');
+			}
+
+			if (UsingTemplate || this.Descriptions is null || this.Descriptions.Length == 0)
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append('>');
+
+				foreach (HumanReadableText Description in this.Descriptions)
+					Description.Serialize(Xml, "description", null);
+
+				Xml.Append("</stringParameter>");
 			}
 		}
 

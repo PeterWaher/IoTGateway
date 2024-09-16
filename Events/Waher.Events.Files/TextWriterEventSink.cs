@@ -170,7 +170,10 @@ namespace Waher.Events.Files
 		public virtual void DisposeOutput()
 		{
 			if (this.CanDisposeOutput)
+			{
+				this.output?.Flush();
 				this.output?.Dispose();
+			}
 
 			this.output = null;
 		}

@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.Contracts
 	public class CalcParameter : Parameter
 	{
 		private object value;
-		
+
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
@@ -43,32 +43,38 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			if (!UsingTemplate)
 			{
-				Xml.Append("<calcParameter name=\"");
-				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
-
-				if (!string.IsNullOrEmpty(this.Guide))
-				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-				}
+				Xml.Append("<calcParameter");
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+
+				Xml.Append(" name=\"");
+				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
 
 				if (this.Protection != ProtectionLevel.Normal)
 				{
-					Xml.Append("\" protection=\"");
+					Xml.Append(" protection=\"");
 					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
+					Xml.Append("/>");
 				else
 				{
-					Xml.Append("\">");
+					Xml.Append('>');
 
 					foreach (HumanReadableText Description in this.Descriptions)
 						Description.Serialize(Xml, "description", null);

@@ -291,9 +291,9 @@ namespace Waher.Content.Xml
 				else if (TI.IsEnum)
 					return Encode(Value.ToString());
 				else if (Value is DateTime TP)
-					return XML.Encode(TP);
+					return Encode(TP);
 				else if (Value is DateTimeOffset TPO)
-					return XML.Encode(TPO);
+					return Encode(TPO);
 				else if (Value is int || Value is long || Value is short || Value is byte ||
 					Value is uint || Value is ulong || Value is ushort || Value is sbyte)
 				{
@@ -1301,7 +1301,7 @@ namespace Waher.Content.Xml
 							State.Append('>');
 					}
 
-					State.Append(XML.Encode(N.InnerText));
+					State.Append(Encode(N.InnerText));
 				}
 			}
 
@@ -1370,7 +1370,7 @@ namespace Waher.Content.Xml
 					State.Append(' ');
 					State.Append(Attr.Key);
 					State.Append("=\"");
-					State.Append(XML.Encode(Attr.Value));
+					State.Append(Encode(Attr.Value));
 					State.Append('"');
 				}
 			}

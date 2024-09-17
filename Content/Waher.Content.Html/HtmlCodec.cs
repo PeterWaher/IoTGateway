@@ -19,11 +19,16 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// Default Content-Type for HTML: text/html
+		/// </summary>
+		public const string DefaultContentType = "text/html";
+
+		/// <summary>
 		/// HTML content types.
 		/// </summary>
 		public static readonly string[] HtmlContentTypes = new string[]
 		{
-			"text/html",
+			DefaultContentType,
 			"application/xhtml+xml"
 		};
 
@@ -96,7 +101,7 @@ namespace Waher.Content.Html
 			{
 				case "htm":
 				case "html":
-					ContentType = "text/html";
+					ContentType = DefaultContentType;
 					return true;
 
 				case "xhtml":
@@ -120,7 +125,7 @@ namespace Waher.Content.Html
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/html":
+				case DefaultContentType:
 					FileExtension = "html";
 					return true;
 

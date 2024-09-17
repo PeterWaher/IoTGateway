@@ -22,12 +22,22 @@ namespace Waher.Content.Xml.Text
 		}
 
 		/// <summary>
+		/// Default content type for XML documents.
+		/// </summary>
+		public const string DefaultContentType = "text/xml";
+
+		/// <summary>
+		/// Default content type for XML schema documents.
+		/// </summary>
+		public const string SchemaContentType = "application/xml";
+
+		/// <summary>
 		/// XML content types.
 		/// </summary>
 		public static readonly string[] XmlContentTypes = new string[]
 		{
-			"text/xml",
-			"application/xml"
+			DefaultContentType,
+			SchemaContentType
 		};
 
 		/// <summary>
@@ -118,11 +128,11 @@ namespace Waher.Content.Xml.Text
 			switch (FileExtension.ToLower())
 			{
 				case "xml":
-					ContentType = "text/xml";
+					ContentType = DefaultContentType;
 					return true;
 
 				case "xsd":
-					ContentType = "application/xml";
+					ContentType = SchemaContentType;
 					return true;
 
 				default:
@@ -143,11 +153,11 @@ namespace Waher.Content.Xml.Text
 
 			switch (ContentType.ToLower())
 			{
-				case "text/xml":
+				case DefaultContentType:
 					FileExtension = "xml";
 					return true;
 
-				case "application/xml":
+				case SchemaContentType:
 					FileExtension = "xsd";
 					return true;
 

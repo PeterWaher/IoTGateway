@@ -264,7 +264,7 @@ namespace Waher.Networking.HTTP
 					switch (ContentType)
 					{
 						case PlainTextCodec.DefaultContentType:
-						case "text/csv":
+						case CsvCodec.ContentType:
 						case "text/x-json":
 						case "text/tab-separated-values":
 						case "text/xml":

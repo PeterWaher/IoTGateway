@@ -1,15 +1,16 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Emoji;
+using Waher.Content.Html;
+using Waher.Content.Markdown.Rendering;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
-using System.Threading.Tasks;
-using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown.Web
 {
@@ -44,7 +45,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"text/html",
+					HtmlCodec.DefaultContentType,
 					"application/xhtml+xml"
 				};
 			}

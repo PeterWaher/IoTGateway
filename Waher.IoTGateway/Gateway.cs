@@ -4726,7 +4726,7 @@ namespace Waher.IoTGateway
 			if (Accept is null || Accept.Value == "*/*")
 				return;
 
-			if (Accept.IsAcceptable("text/html"))
+			if (Accept.IsAcceptable(HtmlCodec.DefaultContentType))
 			{
 				string Html = await GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
 
@@ -4757,7 +4757,7 @@ namespace Waher.IoTGateway
 			else
 			{
 				IsText = ContentType.StartsWith(PlainTextCodec.DefaultContentType);
-				IsMarkdown = ContentType.StartsWith("text/markdown");
+				IsMarkdown = ContentType.StartsWith(MarkdownCodec.ContentType);
 				IsEmpty = false;
 			}
 

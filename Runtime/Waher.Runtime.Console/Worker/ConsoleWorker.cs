@@ -17,7 +17,7 @@ namespace Waher.Runtime.Console.Worker
 		static ConsoleWorker()
 		{
 			Log.Terminating += Log_Terminating;
-			PerformWork();
+			Task.Run(() => PerformWork());
 		}
 
 		private static void Log_Terminating(object sender, System.EventArgs e)

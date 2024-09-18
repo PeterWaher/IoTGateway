@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -36,7 +37,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 		{
 			int c = this.AddressSize;
 			byte[] Bin = new byte[c];
-			Data.Read(Bin, 0, c);
+			Data.ReadAll(Bin, 0, c);
 
 			this.address = new IPAddress(Bin);
 		}

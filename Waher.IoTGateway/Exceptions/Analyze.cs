@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Xml;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.IoTGateway.Exceptions
 {
@@ -72,7 +72,7 @@ namespace Waher.IoTGateway.Exceptions
 							Last = 0;
 						}
 
-						NrRead = fs.Read(Buffer, i, BufSize - i);
+						NrRead = fs.TryReadAll(Buffer, i, BufSize - i);
 						if (NrRead <= 0)
 							break;
 

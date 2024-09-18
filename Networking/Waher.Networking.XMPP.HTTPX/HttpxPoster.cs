@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				HttpxClient.Request(FullJid, "POST", LocalUrl, 1.1, Headers2, Data, async (sender, e) =>
+				await HttpxClient.Request(FullJid, "POST", LocalUrl, 1.1, Headers2, Data, async (sender, e) =>
 					{
 						if (e.Ok)
 						{

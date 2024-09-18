@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.WebSockets
@@ -403,7 +404,7 @@ namespace Waher.Networking.HTTP.WebSockets
 										if (this.payloadLen > 2)
 										{
 											byte[] Bin = new byte[this.payloadLen - 2];
-											this.payload.Read(Bin, 0, this.payloadLen - 2);
+											await this.payload.ReadAllAsync(Bin, 0, this.payloadLen - 2);
 											Reason = Encoding.UTF8.GetString(Bin);
 										}
 									}
@@ -454,7 +455,7 @@ namespace Waher.Networking.HTTP.WebSockets
 										else
 										{
 											byte[] Bin = new byte[i];
-											this.payload.Read(Bin, 0, i);
+											await this.payload.ReadAllAsync(Bin, 0, i);
 											string Text = Encoding.UTF8.GetString(Bin);
 											this.RaiseTextReceived(Text);
 										}
@@ -985,7 +986,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				int c = (int)this.payload.Length;
 				Bin = new byte[c];
 				this.payload.Position = 0;
-				this.payload.Read(Bin, 0, c);
+				this.payload.ReadAll(Bin, 0, c);
 			}
 
 			Frame = this.CreateFrame(Bin, WebSocketOpcode.Pong, false);

@@ -19,7 +19,7 @@ namespace Waher.Runtime.Console
 	public delegate Task CustomAsyncWriter(TextWriter Output);
 
 	/// <summary>
-	/// Serializes output to <see cref="Console.Out"/>, and assures modules are not dead-locked in case the Console gets locked by
+	/// Serializes output to <see cref="System.Console.Out"/>, and assures modules are not dead-locked in case the Console gets locked by
 	/// the user.
 	/// </summary>
 	public static class ConsoleOut
@@ -154,7 +154,8 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg">Argument</param>
 		public static void Write(string format, params object[] arg)
 		{
 			Write(string.Format(format, arg));
@@ -163,7 +164,10 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
+		/// <param name="arg1">Argument</param>
+		/// <param name="arg2">Argument</param>
 		public static void Write(string format, object arg0, object arg1, object arg2)
 		{
 			Write(string.Format(format, arg0, arg1, arg2));
@@ -172,7 +176,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
+		/// <param name="arg1">Argument</param>
 		public static void Write(string format, object arg0, object arg1)
 		{
 			Write(string.Format(format, arg0, arg1));
@@ -181,7 +187,8 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
 		public static void Write(string format, object arg0)
 		{
 			Write(string.Format(format, arg0));
@@ -235,7 +242,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
+		/// <param name="index">Starting offset into buffer.</param>
+		/// <param name="count">Number of characters.</param>
 		public static void Write(char[] buffer, int index, int count)
 		{
 			Write(new string(buffer, index, count));
@@ -244,7 +253,7 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
 		public static void Write(char[] buffer)
 		{
 			Write(new string(buffer));
@@ -298,7 +307,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
+		/// <param name="index">Starting offset into buffer.</param>
+		/// <param name="count">Number of characters.</param>
 		public static Task WriteAsync(char[] buffer, int index, int count)
 		{
 			return WriteAsync(new string(buffer, index, count));
@@ -307,7 +318,7 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
 		public static Task WriteAsync(char[] buffer)
 		{
 			return WriteAsync(new string(buffer));
@@ -350,7 +361,6 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
 		public static void WriteLine()
 		{
 			WriteLine(string.Empty);
@@ -386,7 +396,8 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg">Argument</param>
 		public static void WriteLine(string format, params object[] arg)
 		{
 			WriteLine(string.Format(format, arg));
@@ -395,7 +406,10 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
+		/// <param name="arg1">Argument</param>
+		/// <param name="arg2">Argument</param>
 		public static void WriteLine(string format, object arg0, object arg1, object arg2)
 		{
 			WriteLine(string.Format(format, arg0, arg1, arg2));
@@ -404,7 +418,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
+		/// <param name="arg1">Argument</param>
 		public static void WriteLine(string format, object arg0, object arg1)
 		{
 			WriteLine(string.Format(format, arg0, arg1));
@@ -422,7 +438,8 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="format">Value to be written.</param>
+		/// <param name="arg0">Argument</param>
 		public static void WriteLine(string format, object arg0)
 		{
 			WriteLine(string.Format(format, arg0));
@@ -467,7 +484,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
+		/// <param name="index">Starting offset into buffer.</param>
+		/// <param name="count">Number of characters.</param>
 		public static void WriteLine(char[] buffer, int index, int count)
 		{
 			WriteLine(new string(buffer, index, count));
@@ -476,7 +495,7 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
 		public static void WriteLine(char[] buffer)
 		{
 			WriteLine(new string(buffer));
@@ -527,7 +546,6 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
 		public static Task WriteLineAsync()
 		{
 			return WriteLineAsync(string.Empty);
@@ -545,7 +563,7 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
 		public static Task WriteLineAsync(char[] buffer)
 		{
 			return WriteLineAsync(new string(buffer));
@@ -554,7 +572,9 @@ namespace Waher.Runtime.Console
 		/// <summary>
 		/// Queues a value to be written to the console output.
 		/// </summary>
-		/// <param name="value">Value to be written.</param>
+		/// <param name="buffer">Array of characters.</param>
+		/// <param name="index">Starting offset into buffer.</param>
+		/// <param name="count">Number of characters.</param>
 		public static Task WriteLineAsync(char[] buffer, int index, int count)
 		{
 			return WriteLineAsync(new string(buffer, index, count));

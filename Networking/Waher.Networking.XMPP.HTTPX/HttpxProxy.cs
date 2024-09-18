@@ -267,7 +267,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							});
 						}
 						else
-							this.SendRequest(this.httpxClient, e.From, Method, BareJID, LocalUrl, Request, Response);
+							await this.SendRequest(this.httpxClient, e.From, Method, BareJID, LocalUrl, Request, Response);
 
 						return;
 					}
@@ -405,7 +405,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private void SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl,
+		private Task SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl,
 			HttpRequest Request, HttpResponse Response)
 		{
 			LinkedList<HttpField> Headers = new LinkedList<HttpField>();
@@ -468,7 +468,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null,
+			return HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null,
 				this.RequestResponse, this.ResponseData, State);
 		}
 

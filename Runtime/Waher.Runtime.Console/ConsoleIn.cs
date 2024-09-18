@@ -5,7 +5,7 @@ using Waher.Runtime.Console.Worker;
 namespace Waher.Runtime.Console
 {
 	/// <summary>
-	/// Serializes input from <see cref="Console.In"/>, and assures modules are not dead-locked in case the Console gets locked by
+	/// Serializes input from <see cref="System.Console.In"/>, and assures modules are not dead-locked in case the Console gets locked by
 	/// the user.
 	/// </summary>
 	public static class ConsoleIn

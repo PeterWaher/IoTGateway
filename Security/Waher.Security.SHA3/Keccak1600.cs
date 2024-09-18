@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security.SHA3
 {
@@ -106,31 +107,31 @@ namespace Waher.Security.SHA3
         {
             byte[] Data = new byte[200];    // this.byteSize
 
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_0 : A_0), 0, Data, 0, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_1 : A_1), 0, Data, 8, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_2 : A_2), 0, Data, 16, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_3 : A_3), 0, Data, 24, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_4 : A_4), 0, Data, 32, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_5 : A_5), 0, Data, 40, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_6 : A_6), 0, Data, 48, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_7 : A_7), 0, Data, 56, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_8 : A_8), 0, Data, 64, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_9 : A_9), 0, Data, 72, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_10 : A_10), 0, Data, 80, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_11 : A_11), 0, Data, 88, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_12 : A_12), 0, Data, 96, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_13 : A_13), 0, Data, 104, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_14 : A_14), 0, Data, 112, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_15 : A_15), 0, Data, 120, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_16 : A_16), 0, Data, 128, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_17 : A_17), 0, Data, 136, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_18 : A_18), 0, Data, 144, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_19 : A_19), 0, Data, 152, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_20 : A_20), 0, Data, 160, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_21 : A_21), 0, Data, 168, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_22 : A_22), 0, Data, 176, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_23 : A_23), 0, Data, 184, 8);
-            Array.Copy(BitConverter.GetBytes(this.inA2 ? A2_24 : A_24), 0, Data, 192, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_0 : this.A_0), 0, Data, 0, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_1 : this.A_1), 0, Data, 8, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_2 : this.A_2), 0, Data, 16, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_3 : this.A_3), 0, Data, 24, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_4 : this.A_4), 0, Data, 32, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_5 : this.A_5), 0, Data, 40, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_6 : this.A_6), 0, Data, 48, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_7 : this.A_7), 0, Data, 56, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_8 : this.A_8), 0, Data, 64, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_9 : this.A_9), 0, Data, 72, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_10 : this.A_10), 0, Data, 80, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_11 : this.A_11), 0, Data, 88, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_12 : this.A_12), 0, Data, 96, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_13 : this.A_13), 0, Data, 104, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_14 : this.A_14), 0, Data, 112, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_15 : this.A_15), 0, Data, 120, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_16 : this.A_16), 0, Data, 128, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_17 : this.A_17), 0, Data, 136, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_18 : this.A_18), 0, Data, 144, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_19 : this.A_19), 0, Data, 152, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_20 : this.A_20), 0, Data, 160, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_21 : this.A_21), 0, Data, 168, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_22 : this.A_22), 0, Data, 176, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_23 : this.A_23), 0, Data, 184, 8);
+            Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_24 : this.A_24), 0, Data, 192, 8);
 
             return Data;
         }
@@ -220,111 +221,111 @@ namespace Waher.Security.SHA3
                 // Rnd function, as defined in section 3.3 of NIST FIPS 202.
                 // θ function, as defined in section 3.2.1 of NIST FIPS 202.
 
-                C_0 = A_0 ^ A_5 ^ A_10 ^ A_15 ^ A_20;
-                C_1 = A_1 ^ A_6 ^ A_11 ^ A_16 ^ A_21;
-                C_2 = A_2 ^ A_7 ^ A_12 ^ A_17 ^ A_22;
-                C_3 = A_3 ^ A_8 ^ A_13 ^ A_18 ^ A_23;
-                C_4 = A_4 ^ A_9 ^ A_14 ^ A_19 ^ A_24;
+                this.C_0 = this.A_0 ^ this.A_5 ^ this.A_10 ^ this.A_15 ^ this.A_20;
+                this.C_1 = this.A_1 ^ this.A_6 ^ this.A_11 ^ this.A_16 ^ this.A_21;
+                this.C_2 = this.A_2 ^ this.A_7 ^ this.A_12 ^ this.A_17 ^ this.A_22;
+                this.C_3 = this.A_3 ^ this.A_8 ^ this.A_13 ^ this.A_18 ^ this.A_23;
+                this.C_4 = this.A_4 ^ this.A_9 ^ this.A_14 ^ this.A_19 ^ this.A_24;
 
-                v = C_4 ^ ((C_1 << 1) | ((C_1 >> 63) & 1));
-                A_0 ^= v;
-                A_5 ^= v;
-                A_10 ^= v;
-                A_15 ^= v;
-                A_20 ^= v;
+                v = this.C_4 ^ ((this.C_1 << 1) | ((this.C_1 >> 63) & 1));
+                this.A_0 ^= v;
+                this.A_5 ^= v;
+                this.A_10 ^= v;
+                this.A_15 ^= v;
+                this.A_20 ^= v;
 
-                v = C_0 ^ ((C_2 << 1) | ((C_2 >> 63) & 1));
-                A_1 ^= v;
-                A_6 ^= v;
-                A_11 ^= v;
-                A_16 ^= v;
-                A_21 ^= v;
+                v = this.C_0 ^ ((this.C_2 << 1) | ((this.C_2 >> 63) & 1));
+                this.A_1 ^= v;
+                this.A_6 ^= v;
+                this.A_11 ^= v;
+                this.A_16 ^= v;
+				this.A_21 ^= v;
 
-                v = C_1 ^ ((C_3 << 1) | ((C_3 >> 63) & 1));
-                A_2 ^= v;
-                A_7 ^= v;
-                A_12 ^= v;
-                A_17 ^= v;
-                A_22 ^= v;
+                v = this.C_1 ^ ((this.C_3 << 1) | ((this.C_3 >> 63) & 1));
+                this.A_2 ^= v;
+                this.A_7 ^= v;
+                this.A_12 ^= v;
+                this.A_17 ^= v;
+				this.A_22 ^= v;
 
-                v = C_2 ^ ((C_4 << 1) | ((C_4 >> 63) & 1));
-                A_3 ^= v;
-                A_8 ^= v;
-                A_13 ^= v;
-                A_18 ^= v;
-                A_23 ^= v;
+                v = this.C_2 ^ ((this.C_4 << 1) | ((this.C_4 >> 63) & 1));
+                this.A_3 ^= v;
+                this.A_8 ^= v;
+                this.A_13 ^= v;
+                this.A_18 ^= v;
+				this.A_23 ^= v;
 
-                v = C_3 ^ ((C_0 << 1) | ((C_0 >> 63) & 1));
-                A_4 ^= v;
-                A_9 ^= v;
-                A_14 ^= v;
-                A_19 ^= v;
-                A_24 ^= v;
+                v = this.C_3 ^ ((this.C_0 << 1) | ((this.C_0 >> 63) & 1));
+                this.A_4 ^= v;
+                this.A_9 ^= v;
+                this.A_14 ^= v;
+                this.A_19 ^= v;
+				this.A_24 ^= v;
 
                 if (this.reportStates)
                     this.NewState?.Invoke(this, EventArgs.Empty);
 
                 // ρ function, as defined in section 3.2.2 of NIST FIPS 202.
 
-                A_1 = ((v = A_1) << 1) | (v >> 63);
-                A_10 = ((v = A_10) << 3) | (v >> 61);
-                A_7 = ((v = A_7) << 6) | (v >> 58);
-                A_11 = ((v = A_11) << 10) | (v >> 54);
-                A_17 = ((v = A_17) << 15) | (v >> 49);
-                A_18 = ((v = A_18) << 21) | (v >> 43);
-                A_3 = ((v = A_3) << 28) | (v >> 36);
-                A_5 = ((v = A_5) << 36) | (v >> 28);
-                A_16 = ((v = A_16) << 45) | (v >> 19);
-                A_8 = ((v = A_8) << 55) | (v >> 9);
-                A_21 = ((v = A_21) << 2) | (v >> 62);
-                A_24 = ((v = A_24) << 14) | (v >> 50);
-                A_4 = ((v = A_4) << 27) | (v >> 37);
-                A_15 = ((v = A_15) << 41) | (v >> 23);
-                A_23 = ((v = A_23) << 56) | (v >> 8);
-                A_19 = ((v = A_19) << 8) | (v >> 56);
-                A_13 = ((v = A_13) << 25) | (v >> 39);
-                A_12 = ((v = A_12) << 43) | (v >> 21);
-                A_2 = ((v = A_2) << 62) | (v >> 2);
-                A_20 = ((v = A_20) << 18) | (v >> 46);
-                A_14 = ((v = A_14) << 39) | (v >> 25);
-                A_22 = ((v = A_22) << 61) | (v >> 3);
-                A_9 = ((v = A_9) << 20) | (v >> 44);
-                A_6 = ((v = A_6) << 44) | (v >> 20);
+                this.A_1 = ((v = this.A_1) << 1) | (v >> 63);
+                this.A_10 = ((v = this.A_10) << 3) | (v >> 61);
+                this.A_7 = ((v = this.A_7) << 6) | (v >> 58);
+                this.A_11 = ((v = this.A_11) << 10) | (v >> 54);
+                this.A_17 = ((v = this.A_17) << 15) | (v >> 49);
+                this.A_18 = ((v = this.A_18) << 21) | (v >> 43);
+                this.A_3 = ((v = this.A_3) << 28) | (v >> 36);
+                this.A_5 = ((v = this.A_5) << 36) | (v >> 28);
+                this.A_16 = ((v = this.A_16) << 45) | (v >> 19);
+                this.A_8 = ((v = this.A_8) << 55) | (v >> 9);
+                this.A_21 = ((v = this.A_21) << 2) | (v >> 62);
+                this.A_24 = ((v = this.A_24) << 14) | (v >> 50);
+                this.A_4 = ((v = this.A_4) << 27) | (v >> 37);
+                this.A_15 = ((v = this.A_15) << 41) | (v >> 23);
+                this.A_23 = ((v = this.A_23) << 56) | (v >> 8);
+                this.A_19 = ((v = this.A_19) << 8) | (v >> 56);
+                this.A_13 = ((v = this.A_13) << 25) | (v >> 39);
+                this.A_12 = ((v = this.A_12) << 43) | (v >> 21);
+                this.A_2 = ((v = this.A_2) << 62) | (v >> 2);
+                this.A_20 = ((v = this.A_20) << 18) | (v >> 46);
+                this.A_14 = ((v = this.A_14) << 39) | (v >> 25);
+                this.A_22 = ((v = this.A_22) << 61) | (v >> 3);
+                this.A_9 = ((v = this.A_9) << 20) | (v >> 44);
+				this.A_6 = ((v = this.A_6) << 44) | (v >> 20);
 
                 if (this.reportStates)
                     this.NewState?.Invoke(this, EventArgs.Empty);
 
                 // π function, as defined in section 3.2.3 of NIST FIPS 202.
 
-                A2_0 = A_0;
-                A2_5 = A_3;
-                A2_10 = A_1;
-                A2_15 = A_4;
-                A2_20 = A_2;
+                this.A2_0 = this.A_0;
+                this.A2_5 = this.A_3;
+                this.A2_10 = this.A_1;
+                this.A2_15 = this.A_4;
+				this.A2_20 = this.A_2;
 
-                A2_1 = A_6;
-                A2_6 = A_9;
-                A2_11 = A_7;
-                A2_16 = A_5;
-                A2_21 = A_8;
+                this.A2_1 = this.A_6;
+                this.A2_6 = this.A_9;
+                this.A2_11 = this.A_7;
+                this.A2_16 = this.A_5;
+				this.A2_21 = this.A_8;
 
-                A2_2 = A_12;
-                A2_7 = A_10;
-                A2_12 = A_13;
-                A2_17 = A_11;
-                A2_22 = A_14;
+                this.A2_2 = this.A_12;
+                this.A2_7 = this.A_10;
+                this.A2_12 = this.A_13;
+                this.A2_17 = this.A_11;
+				this.A2_22 = this.A_14;
 
-                A2_3 = A_18;
-                A2_8 = A_16;
-                A2_13 = A_19;
-                A2_18 = A_17;
-                A2_23 = A_15;
+                this.A2_3 = this.A_18;
+                this.A2_8 = this.A_16;
+                this.A2_13 = this.A_19;
+                this.A2_18 = this.A_17;
+				this.A2_23 = this.A_15;
 
-                A2_4 = A_24;
-                A2_9 = A_22;
-                A2_14 = A_20;
-                A2_19 = A_23;
-                A2_24 = A_21;
+                this.A2_4 = this.A_24;
+                this.A2_9 = this.A_22;
+                this.A2_14 = this.A_20;
+                this.A2_19 = this.A_23;
+				this.A2_24 = this.A_21;
 
                 if (this.reportStates)
                 {
@@ -334,35 +335,35 @@ namespace Waher.Security.SHA3
 
                 // χ function, as defined in section 3.2.4 of NIST FIPS 202.
 
-                A_0 = A2_0 ^ (A2_2 & ~A2_1);
-                A_5 = A2_5 ^ (A2_7 & ~A2_6);
-                A_10 = A2_10 ^ (A2_12 & ~A2_11);
-                A_15 = A2_15 ^ (A2_17 & ~A2_16);
-                A_20 = A2_20 ^ (A2_22 & ~A2_21);
+                this.A_0 = this.A2_0 ^ (this.A2_2 & ~this.A2_1);
+                this.A_5 = this.A2_5 ^ (this.A2_7 & ~this.A2_6);
+                this.A_10 = this.A2_10 ^ (this.A2_12 & ~this.A2_11);
+                this.A_15 = this.A2_15 ^ (this.A2_17 & ~this.A2_16);
+				this.A_20 = this.A2_20 ^ (this.A2_22 & ~this.A2_21);
 
-                A_1 = A2_1 ^ (A2_3 & ~A2_2);
-                A_6 = A2_6 ^ (A2_8 & ~A2_7);
-                A_11 = A2_11 ^ (A2_13 & ~A2_12);
-                A_16 = A2_16 ^ (A2_18 & ~A2_17);
-                A_21 = A2_21 ^ (A2_23 & ~A2_22);
+                this.A_1 = this.A2_1 ^ (this.A2_3 & ~this.A2_2);
+                this.A_6 = this.A2_6 ^ (this.A2_8 & ~this.A2_7);
+                this.A_11 = this.A2_11 ^ (this.A2_13 & ~this.A2_12);
+                this.A_16 = this.A2_16 ^ (this.A2_18 & ~this.A2_17);
+				this.A_21 = this.A2_21 ^ (this.A2_23 & ~this.A2_22);
 
-                A_2 = A2_2 ^ (A2_4 & ~A2_3);
-                A_7 = A2_7 ^ (A2_9 & ~A2_8);
-                A_12 = A2_12 ^ (A2_14 & ~A2_13);
-                A_17 = A2_17 ^ (A2_19 & ~A2_18);
-                A_22 = A2_22 ^ (A2_24 & ~A2_23);
+                this.A_2 = this.A2_2 ^ (this.A2_4 & ~this.A2_3);
+                this.A_7 = this.A2_7 ^ (this.A2_9 & ~this.A2_8);
+                this.A_12 = this.A2_12 ^ (this.A2_14 & ~this.A2_13);
+                this.A_17 = this.A2_17 ^ (this.A2_19 & ~this.A2_18);
+				this.A_22 = this.A2_22 ^ (this.A2_24 & ~this.A2_23);
 
-                A_3 = A2_3 ^ (A2_0 & ~A2_4);
-                A_8 = A2_8 ^ (A2_5 & ~A2_9);
-                A_13 = A2_13 ^ (A2_10 & ~A2_14);
-                A_18 = A2_18 ^ (A2_15 & ~A2_19);
-                A_23 = A2_23 ^ (A2_20 & ~A2_24);
+                this.A_3 = this.A2_3 ^ (this.A2_0 & ~this.A2_4);
+                this.A_8 = this.A2_8 ^ (this.A2_5 & ~this.A2_9);
+                this.A_13 = this.A2_13 ^ (this.A2_10 & ~this.A2_14);
+                this.A_18 = this.A2_18 ^ (this.A2_15 & ~this.A2_19);
+				this.A_23 = this.A2_23 ^ (this.A2_20 & ~this.A2_24);
 
-                A_4 = A2_4 ^ (A2_1 & ~A2_0);
-                A_9 = A2_9 ^ (A2_6 & ~A2_5);
-                A_14 = A2_14 ^ (A2_11 & ~A2_10);
-                A_19 = A2_19 ^ (A2_16 & ~A2_15);
-                A_24 = A2_24 ^ (A2_21 & ~A2_20);
+                this.A_4 = this.A2_4 ^ (this.A2_1 & ~this.A2_0);
+                this.A_9 = this.A2_9 ^ (this.A2_6 & ~this.A2_5);
+                this.A_14 = this.A2_14 ^ (this.A2_11 & ~this.A2_10);
+                this.A_19 = this.A2_19 ^ (this.A2_16 & ~this.A2_15);
+				this.A_24 = this.A2_24 ^ (this.A2_21 & ~this.A2_20);
 
                 if (this.reportStates)
                 {
@@ -370,9 +371,9 @@ namespace Waher.Security.SHA3
                     this.NewState?.Invoke(this, EventArgs.Empty);
                 }
 
-                // ι function, as defined in section 3.2.5 of NIST FIPS 202.
+				// ι function, as defined in section 3.2.5 of NIST FIPS 202.
 
-                A_0 ^= RC_ir[ir];
+				this.A_0 ^= RC_ir[ir];
 
                 if (this.reportStates)
                     this.NewState?.Invoke(this, EventArgs.Empty);
@@ -392,7 +393,7 @@ namespace Waher.Security.SHA3
 
             int Len = N.Length;
             int m = Len << 3;
-            int nm1 = m / r;
+            int nm1 = m / this.r;
             byte[] S = new byte[200];
             int Pos = 0;
             int i, k;
@@ -418,7 +419,7 @@ namespace Waher.Security.SHA3
             Pos = 0;
             while (true)
             {
-                i = Math.Min(r8, this.dByteSize - Pos);
+                i = Math.Min(this.r8, this.dByteSize - Pos);
                 Array.Copy(S, 0, Z, Pos, i);
                 Pos += i;
 
@@ -440,7 +441,7 @@ namespace Waher.Security.SHA3
 
             long Len = N.Length;
             long m = Len << 3;
-            long nm1 = m / r;
+            long nm1 = m / this.r;
             byte[] S = new byte[200];
             byte[] r8Buf = new byte[this.r8];
             int i, k;
@@ -449,8 +450,7 @@ namespace Waher.Security.SHA3
 
             for (i = 0; i < nm1; i++)
             {
-                if (N.Read(r8Buf, 0, this.r8) != this.r8)
-                    throw new IOException("Unable to read from stream.");
+                N.ReadAll(r8Buf, 0, this.r8);
 
                 for (k = 0; k < this.r8; k++)
                     S[k] ^= r8Buf[k];
@@ -461,8 +461,7 @@ namespace Waher.Security.SHA3
             int Rest = (int)(Len - N.Position);
             if (Len > 0)
             {
-                if (N.Read(r8Buf, 0, Rest) != Rest)
-                    throw new IOException("Unable to read from stream.");
+                N.ReadAll(r8Buf, 0, Rest);
 
                 for (k = 0; k < Rest; k++)
                     S[k] ^= r8Buf[k];
@@ -479,7 +478,7 @@ namespace Waher.Security.SHA3
             int Pos = 0;
             while (true)
             {
-                i = Math.Min(r8, this.dByteSize - Pos);
+                i = Math.Min(this.r8, this.dByteSize - Pos);
                 Array.Copy(S, 0, Z, Pos, i);
                 Pos += i;
 

@@ -14,6 +14,7 @@ namespace Waher.Runtime.Console.Worker
 		/// <summary>
 		/// Reads a key from the console.
 		/// </summary>
+		/// <param name="Intercept">Intercept</param>
 		/// <param name="Result">Where the result will be returned.</param>
 		public ConsoleInReadKey(bool Intercept, TaskCompletionSource<ConsoleKeyInfo> Result)
 		{

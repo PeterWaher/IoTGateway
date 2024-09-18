@@ -14,6 +14,7 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 #if WINDOWS_UWP
@@ -237,7 +238,7 @@ namespace Waher.Networking.HTTP
 					int d = (int)this.headerStream.Position;
 					byte[] Data2 = new byte[d];
 					this.headerStream.Position = 0;
-					this.headerStream.Read(Data2, 0, d);
+					await this.headerStream.ReadAllAsync(Data2, 0, d);
 					this.ReceiveBinary(Data2);
 				}
 

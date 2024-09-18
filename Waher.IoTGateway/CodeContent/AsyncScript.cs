@@ -186,15 +186,20 @@ namespace Waher.IoTGateway.CodeContent
 						sb.Append(Printed);
 
 						MarkdownDocument Doc;
-						
-						if (this.document is null)
-							Doc = await MarkdownDocument.CreateAsync(sb.ToString());
-						else
+
+						if (!(this.document is null))
 							Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
+						else if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
+							v.ValueObject is MarkdownSettings Settings)
+						{
+							Doc = await MarkdownDocument.CreateAsync(sb.ToString(), Settings);
+						}
+						else
+							Doc = await MarkdownDocument.CreateAsync(sb.ToString());
 
 						await Doc.RenderDocument(Renderer);
 					}
-					 
+
 					await Renderer.RenderObject(Result, true, Variables);
 				}
 				catch (Exception ex)

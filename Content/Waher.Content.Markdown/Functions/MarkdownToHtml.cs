@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Waher.Content.Html.Elements;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 

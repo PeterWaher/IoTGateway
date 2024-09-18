@@ -1127,6 +1127,8 @@ namespace Waher.Script.Test
 			await Test("2 km * 10 m", new PhysicalQuantity(20, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
 			await Test("2 km² / 10 m", new PhysicalQuantity(0.2, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
 			await Test("10 m / 2 s", new PhysicalQuantity(5, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
+			await Test("1 m^3 + 150 l", new PhysicalQuantity(1.15, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
+			await Test("150 l + 1 m^3", new PhysicalQuantity(1150, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("l"), 1))));
 
 			await Test("10 km m", new PhysicalQuantity(10000, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
 			await Test("10*sin(pi/6) m", new PhysicalQuantity(10 * Math.Sin(Math.PI / 6), new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));

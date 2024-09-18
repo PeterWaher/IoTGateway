@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Units.BaseQuantities
+﻿namespace Waher.Script.Units.BaseQuantities
 {
 	/// <summary>
 	/// An electric current is a flow of electric charge.
@@ -17,21 +15,12 @@ namespace Waher.Script.Units.BaseQuantities
 		/// <summary>
 		/// Name of base quantity.
 		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return "Current";
-			}
-		}
+		public string Name => "Current";
 
 		/// <summary>
 		/// Reference unit of base quantity.
 		/// </summary>
-		public AtomicUnit ReferenceUnit
-		{
-			get { return referenceUnit; }
-		}
+		public AtomicUnit ReferenceUnit => referenceUnit;
 
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("A");
 
@@ -58,7 +47,7 @@ namespace Waher.Script.Units.BaseQuantities
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
 		public bool ToReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent)
 		{
-			return (BaseUnit == "A");
+			return BaseUnit == "A";
 		}
 
 		/// <summary>
@@ -70,7 +59,7 @@ namespace Waher.Script.Units.BaseQuantities
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
 		public bool FromReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent)
 		{
-			return (BaseUnit == "A");
+			return BaseUnit == "A";
 		}
 
 	}

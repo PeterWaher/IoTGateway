@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Waher.Script.Units.CompoundQuantities
 {
@@ -26,10 +25,7 @@ namespace Waher.Script.Units.CompoundQuantities
 		/// <summary>
 		/// Name of compound quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Energy"; }
-		}
+		public string Name => "Energy";
 
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Units.DerivedQuantities
@@ -21,10 +20,7 @@ namespace Waher.Script.Units.DerivedQuantities
 		/// <summary>
 		/// Name of derived quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Pressure"; }
-		}
+		public string Name => "Pressure";
 
 		/// <summary>
 		/// Derived Units supported.
@@ -49,14 +45,14 @@ namespace Waher.Script.Units.DerivedQuantities
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6894.757, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6.894757, new Unit(Prefix.Kilo,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("atm", new PhysicalQuantity(101352.9279, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("atm", new PhysicalQuantity(101325, new Unit(Prefix.Kilo,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),

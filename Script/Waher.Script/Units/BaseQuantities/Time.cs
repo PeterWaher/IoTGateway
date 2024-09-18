@@ -19,21 +19,12 @@ namespace Waher.Script.Units.BaseQuantities
 		/// <summary>
 		/// Name of base quantity.
 		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return "Time";
-			}
-		}
+		public string Name => "Time";
 
 		/// <summary>
 		/// Reference unit of base quantity.
 		/// </summary>
-		public AtomicUnit ReferenceUnit
-		{
-			get { return referenceUnit; }
-		}
+		public AtomicUnit ReferenceUnit => referenceUnit;
 
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("s");
 

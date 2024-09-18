@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Units.DerivedQuantities
@@ -19,10 +18,7 @@ namespace Waher.Script.Units.DerivedQuantities
 		/// <summary>
 		/// Name of derived quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Frequency"; }
-		}
+		public string Name => "Frequency";
 
 		/// <summary>
 		/// Derived Units supported.
@@ -33,17 +29,17 @@ namespace Waher.Script.Units.DerivedQuantities
 			{
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
-					new KeyValuePair<string, PhysicalQuantity>("Hz", new PhysicalQuantity(1, new Unit(Prefix.Kilo, 
+					new KeyValuePair<string, PhysicalQuantity>("Hz", new PhysicalQuantity(1, new Unit(Prefix.None, 
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("cps", new PhysicalQuantity(1, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("cps", new PhysicalQuantity(1, new Unit(Prefix.None,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("rpm", new PhysicalQuantity(1, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("rpm", new PhysicalQuantity(1, new Unit(Prefix.None,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("min"), -1)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Waher.Script.Units.CompoundQuantities
 {
@@ -20,10 +19,7 @@ namespace Waher.Script.Units.CompoundQuantities
 		/// <summary>
 		/// Name of compound quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Speed"; }
-		}
+		public string Name => "Speed";
 
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.
@@ -45,6 +41,18 @@ namespace Waher.Script.Units.CompoundQuantities
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("ft"), 1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+						}),
+					new KeyValuePair<string, KeyValuePair<AtomicUnit, int>[]>("kph",
+						new KeyValuePair<AtomicUnit, int>[]
+						{
+							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3),
+							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), -1)
+						}),
+					new KeyValuePair<string, KeyValuePair<AtomicUnit, int>[]>("kmph",
+						new KeyValuePair<AtomicUnit, int>[]
+						{
+							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3),
+							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), -1)
 						})
 				};
 			}

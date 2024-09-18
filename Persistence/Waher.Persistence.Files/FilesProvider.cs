@@ -842,7 +842,7 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD2_0
 			}
 			else if (this.rsaFailure)
-				return this.GetKeysUsingSalt(FileName, FileExists);
+				return this.GetKeysUsingSalt(FileName);
 			else
 			{
 				RSACryptoServiceProvider rsa = null;
@@ -874,7 +874,7 @@ namespace Waher.Persistence.Files
 				catch (PlatformNotSupportedException)
 				{
 					this.rsaFailure = true;
-					return this.GetKeysUsingSalt(FileName, FileExists);
+					return this.GetKeysUsingSalt(FileName);
 				}
 				catch (CryptographicException ex)
 				{
@@ -990,7 +990,7 @@ namespace Waher.Persistence.Files
 			return new KeyValuePair<byte[], byte[]>(Key, IV);
 		}
 
-		private KeyValuePair<byte[], byte[]> GetKeysUsingSalt(string FileName, bool FileExists)
+		private KeyValuePair<byte[], byte[]> GetKeysUsingSalt(string FileName)
 		{
 			if (string.IsNullOrEmpty(this.salt))
 			{
@@ -2838,6 +2838,7 @@ namespace Waher.Persistence.Files
 		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			ObjectBTreeFile[] Files = this.Files;
+			IDatabaseExportFilter Filter = Output as IDatabaseExportFilter;
 
 			Thread?.Start();
 			await Output.StartDatabase();
@@ -2846,6 +2847,9 @@ namespace Waher.Persistence.Files
 				foreach (ObjectBTreeFile File in Files)
 				{
 					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
+						continue;
+
+					if (!(Filter is null) && !Filter.CanExportCollection(File.CollectionName))
 						continue;
 
 					Thread?.NewState(File.CollectionName);
@@ -2882,6 +2886,9 @@ namespace Waher.Persistence.Files
 								if (e.CurrentTypeCompatible)
 								{
 									Obj = e.Current;
+
+									if (!(Filter is null) && !Filter.CanExportObject(Obj))
+										continue;
 
 									await Output.StartObject(ObjectIdToString(Obj.ObjectId), Obj.TypeName);
 									try

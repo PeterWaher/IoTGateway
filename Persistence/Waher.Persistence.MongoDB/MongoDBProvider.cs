@@ -1,4 +1,8 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -6,19 +10,14 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using MongoDB.Driver;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using Waher.Persistence.Filters;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.MongoDB.Serialization;
 using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
 using Waher.Persistence.MongoDB.Serialization.ValueTypes;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
-using Waher.Runtime.Profiling;
 using Waher.Runtime.Inventory;
-using System.Text;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -1676,6 +1675,7 @@ namespace Waher.Persistence.MongoDB
 			await Output.StartDatabase();
 			try
 			{
+				IDatabaseExportFilter Filter = Output as IDatabaseExportFilter;
 				ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
 				BsonDeserializationArgs Args = new BsonDeserializationArgs()
 				{
@@ -1685,6 +1685,9 @@ namespace Waher.Persistence.MongoDB
 				foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
 				{
 					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, CollectionName) < 0)
+						continue;
+
+					if (!(Filter is null) && !Filter.CanExportCollection(CollectionName))
 						continue;
 
 					Thread?.NewState(CollectionName);
@@ -1721,6 +1724,9 @@ namespace Waher.Persistence.MongoDB
 
 							if (Object is GenericObject Obj)
 							{
+								if (!(Filter is null) && !Filter.CanExportObject(Obj))
+									continue;
+
 								await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
 								try
 								{

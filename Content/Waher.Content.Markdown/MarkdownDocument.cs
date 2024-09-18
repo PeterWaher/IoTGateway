@@ -48,6 +48,11 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>, IJsonEncodingHint
 	{
+		/// <summary>
+		/// Variable name used for storing Markdown settings.
+		/// </summary>
+		public const string MarkdownSettingsVariableName = " MarkdownSettings ";
+
 		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
 		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
@@ -340,7 +345,7 @@ namespace Waher.Content.Markdown
 								if (!IsDynamic)
 								{
 									IsDynamic = true;
-									Variables.Add(" MarkdownSettings ", Settings);
+									Variables.Add(MarkdownSettingsVariableName, Settings);
 								}
 
 								Exp = new Expression(Script, FileName2);
@@ -388,7 +393,7 @@ namespace Waher.Content.Markdown
 					if (!IsDynamic)
 					{
 						IsDynamic = true;
-						Variables.Add(" MarkdownSettings ", Settings);
+						Variables.Add(MarkdownSettingsVariableName, Settings);
 					}
 
 					HasImplicitPrint = Exp.ContainsImplicitPrint;

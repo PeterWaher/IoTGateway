@@ -82,7 +82,7 @@ namespace Waher.Content.Markdown.Functions
 
 			if (Variables is null)
 				Doc = await MarkdownDocument.CreateAsync(Markdown);
-			else if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) &&
+			else if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
 				v.ValueObject is MarkdownSettings Settings)
 			{
 				Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);

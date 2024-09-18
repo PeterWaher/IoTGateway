@@ -364,7 +364,8 @@ namespace Waher.Content.Markdown.Rendering
 			}
 			else if (Result is MarkdownContent Markdown)
 			{
-				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown, Markdown.Settings ?? new MarkdownSettings());
+				
 				using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Output, this.Document))
 				{
 					await Renderer.RenderDocument(Doc, true);   // Does not call ProcessAsyncTasks()

@@ -109,6 +109,12 @@ namespace Waher.Script.Threading.Functions
 
 			Task.Run(async () =>
 			{
+				void Preview(object sender, PreviewEventArgs e)
+				{
+					Variables.Preview(e.Expression, e.Preview);
+				}
+
+				v.OnPreview += Preview;
 				try
 				{
 					IElement E;
@@ -140,6 +146,8 @@ namespace Waher.Script.Threading.Functions
 					{
 						backgroundProcesses.Remove(Id);
 					}
+
+					v.OnPreview -= Preview;
 				}
 			});
 

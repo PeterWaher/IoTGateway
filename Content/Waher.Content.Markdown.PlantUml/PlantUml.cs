@@ -273,7 +273,7 @@ namespace Waher.Content.Markdown.PlantUml
 				return true;
 			}
 
-			Info.AsyncId = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Info.Title);
+			Info.AsyncId = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Output, Info.Title, Document);
 
 			foreach (KeyValuePair<AsyncMarkdownProcessing, object> P in Document.AsyncTasks)
 			{

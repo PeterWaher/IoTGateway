@@ -57,7 +57,7 @@ namespace Waher.Content.Markdown.Functions
 
 			Argument = "BodyOnly: 1\r\n\r\n" + Argument;
 
-			if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) && v.ValueObject is MarkdownSettings ParentSettings)
+			if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) && v.ValueObject is MarkdownSettings ParentSettings)
 				Doc = await MarkdownDocument.CreateAsync(Argument, ParentSettings);
 			else
 				Doc = await MarkdownDocument.CreateAsync(Argument);

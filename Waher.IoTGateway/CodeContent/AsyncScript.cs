@@ -97,7 +97,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			AsyncState State = new AsyncState()
 			{
-				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title),
+				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title, Document),
 				Script = this.BuildExpression(Rows),
 				Variables = HttpServer.CreateVariables(),
 				ImplicitPrint = new StringBuilder()
@@ -179,13 +179,18 @@ namespace Waher.IoTGateway.CodeContent
 						StringBuilder sb = new StringBuilder();
 						sb.AppendLine("BodyOnly: 1");
 
-						if (this.document.Settings.AllowScriptTag)
+						if (this.document?.Settings.AllowScriptTag ?? false)
 							sb.AppendLine("AllowScriptTag: 1");
 
 						sb.AppendLine();
 						sb.Append(Printed);
 
-						MarkdownDocument Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
+						MarkdownDocument Doc;
+						
+						if (this.document is null)
+							Doc = await MarkdownDocument.CreateAsync(sb.ToString());
+						else
+							Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
 
 						await Doc.RenderDocument(Renderer);
 					}

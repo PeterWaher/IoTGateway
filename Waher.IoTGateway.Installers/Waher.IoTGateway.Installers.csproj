@@ -138,6 +138,7 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\StreamExtensions.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />

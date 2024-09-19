@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
@@ -131,9 +132,9 @@ namespace Waher.Persistence.Files
 					throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
 				if (this.asyncFileIo)
-					NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+					NrRead = await this.file.TryReadAllAsync(Block, 0, this.blockSize);
 				else
-					NrRead = this.file.Read(Block, 0, this.blockSize);
+					NrRead = this.file.TryReadAll(Block, 0, this.blockSize);
 
 				if (this.blockSize != NrRead)
 					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
@@ -189,9 +190,9 @@ namespace Waher.Persistence.Files
 
 			this.file.Position = Position;
 			if (this.asyncFileIo)
-				NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
+				NrRead = await this.file.TryReadAllAsync(Result, 0, NrBytes);
 			else
-				NrRead = this.file.Read(Result, 0, NrBytes);
+				NrRead = this.file.TryReadAll(Result, 0, NrBytes);
 
 			if (NrRead < NrBytes)
 				throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");

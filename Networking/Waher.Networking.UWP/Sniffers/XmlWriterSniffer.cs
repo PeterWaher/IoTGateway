@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Events;
 using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
@@ -306,6 +305,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void DisposeOutput()
 		{
+			this.output?.Flush();
 			this.output?.Dispose();
 			this.output = null;
 		}

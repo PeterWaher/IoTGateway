@@ -15,12 +15,12 @@
     <copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</copyright>
     <tags>UWP IoT GPIO</tags>
     <dependencies>
-      <dependency id="Waher.IoTGateway" version="2.0.0"/>
-      <dependency id="Waher.Networking.XMPP" version="3.1.1"/>
-      <dependency id="Waher.Persistence" version="1.10.1"/>
+      <dependency id="Waher.IoTGateway" version="2.0.1"/>
+      <dependency id="Waher.Networking.XMPP" version="3.2.0"/>
+      <dependency id="Waher.Persistence" version="1.10.2"/>
       <dependency id="Waher.Runtime.Language" version="1.1.4"/>
-      <dependency id="Waher.Things" version="2.0.0"/>
-      <dependency id="Waher.Things.Metering" version="1.2.5"/>
+      <dependency id="Waher.Things" version="2.0.1"/>
+      <dependency id="Waher.Things.Metering" version="1.2.6"/>
     </dependencies>
   </metadata>
   <files>

@@ -8,8 +8,8 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
-    <FileVersion>1.2.1</FileVersion>
+    <AssemblyVersion>1.2.2</AssemblyVersion>
+    <FileVersion>1.2.2</FileVersion>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library that defines an architecture for processing transactions to help protect the integrity of data in asynchronous or distributed environments.</Description>
     <Copyright>Copyright © Waher Data AB 2021-2024. All rights reserved.</Copyright>
@@ -19,7 +19,7 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>transactions runtime</PackageTags>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>0</WarningLevel>

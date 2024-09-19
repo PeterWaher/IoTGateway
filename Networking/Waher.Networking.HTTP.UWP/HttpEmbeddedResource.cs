@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP
 {
@@ -129,7 +130,7 @@ namespace Waher.Networking.HTTP
 				{
 					while (Pos < l)
 					{
-						i = f.Read(Buffer, 0, Size);
+						i = await f.TryReadAllAsync(Buffer, 0, Size);
 						if (i <= 0)
 							throw new Exception("Unexpected end of stream.");
 

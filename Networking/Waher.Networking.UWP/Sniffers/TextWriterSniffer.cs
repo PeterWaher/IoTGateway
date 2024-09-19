@@ -55,7 +55,10 @@ namespace Waher.Networking.Sniffers
 		public virtual void DisposeOutput()
 		{
 			if (this.CanDisposeOutput)
+			{
+				this.output?.Flush();
 				this.output?.Dispose();
+			}
 
 			this.output = null;
 		}

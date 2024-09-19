@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Threading;
 using Waher.Runtime.Temporary;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
@@ -154,7 +155,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 						if (Buf is null || c != Buf.Length)
 							Buf = new byte[c];
 
-						File.Read(Buf, 0, c);
+						await File.ReadAllAsync(Buf, 0, c);
 						NrBytes -= c;
 
 						this.DataReceived(Buf);

@@ -2217,7 +2217,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Parameter P = this.parameters[i];
 
 				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
-					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.StringValue);
+					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.ObjectValue is null ? null : P.StringValue);
 			}
 		}
 

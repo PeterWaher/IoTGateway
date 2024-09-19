@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Script.Functions.Vectors;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -11,26 +12,29 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class ParameterEncryptionAlgorithm : IParameterEncryptionAlgorithm
 	{
+		private readonly ContractsClient client;
 		private readonly SymmetricCipherAlgorithms algorithm;
 		private readonly IE2eSymmetricCipher instance;
 		private readonly byte[] key;
 
-		private ParameterEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm, IE2eSymmetricCipher Instance, byte[] Key)
+		private ParameterEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm, 
+			IE2eSymmetricCipher Instance, byte[] Key, ContractsClient Client)
 		{
 			this.algorithm = Algorithm;
 			this.instance = Instance;
 			this.key = Key;
+			this.client = Client;
 		}
 
 		/// <summary>
 		/// Key used to encrypt parameters.
 		/// </summary>
-		internal byte[] Key => this.key;
+		public byte[] Key => this.key;
 
 		/// <summary>
 		/// Symmetric Cipher Algorithm used to encrypt parameters.
 		/// </summary>
-		internal SymmetricCipherAlgorithms Algorithm => this.algorithm;
+		public SymmetricCipherAlgorithms Algorithm => this.algorithm;
 
 		/// <summary>
 		/// Implements parameter encryption using symmetric ciphers avaialble through <see cref="IE2eSymmetricCipher"/>
@@ -44,8 +48,8 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Implements parameter encryption using symmetric ciphers avaialble through <see cref="IE2eSymmetricCipher"/>
-		/// in the P2P library.
+		/// Creates a object that implements parameter encryption using symmetric ciphers 
+		/// avaialble through <see cref="IE2eSymmetricCipher"/> in the P2P library.
 		/// </summary>
 		/// <param name="ContractId">Optional Contract ID. If not provided, a new key will be generated.</param>
 		/// <param name="DefaultAlgorithm">Default Algorithm to instantiate, if none is defined already.</param>
@@ -68,17 +72,32 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			IE2eSymmetricCipher Instance = E2eSymmetricCipher.Create(DefaultAlgorithm);
+			return await Create(ContractId, DefaultAlgorithm, Client, CreatorJid, Key);
+		}
+
+		/// <summary>
+		/// Creates a object that implements parameter encryption using symmetric ciphers 
+		/// avaialble through <see cref="IE2eSymmetricCipher"/> in the P2P library.
+		/// </summary>
+		/// <param name="ContractId">Optional Contract ID. If not provided, a new key will be generated.</param>
+		/// <param name="Algorithm">Algorithm to instantiate.</param>
+		/// <param name="Client">Client managing keys.</param>
+		/// <param name="CreatorJid">JID of creator of contract.</param>
+		/// <param name="Key">Encryption key to use.</param>
+		public static async Task<ParameterEncryptionAlgorithm> Create(string ContractId, SymmetricCipherAlgorithms Algorithm,
+			ContractsClient Client, string CreatorJid, byte[] Key)
+		{
+			IE2eSymmetricCipher Instance = E2eSymmetricCipher.Create(Algorithm);
 
 			if (Key is null)
 			{
 				Key = Instance.GenerateKey();
 
 				if (!string.IsNullOrEmpty(ContractId))
-					await Client.SaveContractSharedSecret(ContractId, CreatorJid, Key, DefaultAlgorithm, false);
+					await Client.SaveContractSharedSecret(ContractId, CreatorJid, Key, Algorithm, false);
 			}
 
-			return new ParameterEncryptionAlgorithm(DefaultAlgorithm, Instance, Key);
+			return new ParameterEncryptionAlgorithm(Algorithm, Instance, Key, Client);
 		}
 
 		/// <summary>
@@ -91,14 +110,45 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractNonce">Contract Nonce</param>
 		/// <param name="ClearText">Clear-text string representation of value.</param>
 		/// <returns>Cipher text.</returns>
-		public byte[] Encrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, string ContractNonce, 
+		public byte[] Encrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, string ContractNonce,
 			string ClearText)
 		{
-			byte[] Data = Encoding.UTF8.GetBytes(ClearText);
+			byte[] Data;
+
+			if (ClearText is null)
+				Data = new byte[this.client.RandomInteger(1, this.key.Length)];
+			else
+				Data = Encoding.UTF8.GetBytes(ClearText);
+
 			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid, ContractNonce, ParameterIndex);
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 
-			return this.instance.Encrypt(Data, this.key, IV, AssociatedData);
+			Console.Out.WriteLine();
+			Console.Out.Write("Encrypt(");
+			Console.Out.Write(ParameterName);
+			Console.Out.Write(",");
+			Console.Out.Write(ParameterType);
+			Console.Out.Write(",");
+			Console.Out.Write(ParameterIndex);
+			Console.Out.Write(",");
+			Console.Out.Write(CreatorJid);
+			Console.Out.Write(",");
+			Console.Out.Write(ClearText);
+			Console.Out.WriteLine(")");
+
+			Console.Out.Write("Data: ");
+			Console.Out.WriteLine(Convert.ToBase64String(Data));
+			Console.Out.Write("IV: ");
+			Console.Out.WriteLine(Convert.ToBase64String(IV));
+			Console.Out.Write("Associated Data: ");
+			Console.Out.WriteLine(Convert.ToBase64String(AssociatedData));
+
+			byte[] Result = this.instance.Encrypt(Data, this.key, IV, AssociatedData);
+
+			Console.Out.Write("Result: ");
+			Console.Out.WriteLine(Convert.ToBase64String(Result));
+
+			return Result;
 		}
 
 		/// <summary>
@@ -118,7 +168,50 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 			byte[] Data = this.instance.Decrypt(CipherText, this.key, IV, AssociatedData);
 
-			return Encoding.UTF8.GetString(Data);
+			Console.Out.WriteLine();
+			Console.Out.Write("Decrypt(");
+			Console.Out.Write(ParameterName);
+			Console.Out.Write(",");
+			Console.Out.Write(ParameterType);
+			Console.Out.Write(",");
+			Console.Out.Write(ParameterIndex);
+			Console.Out.Write(",");
+			Console.Out.Write(CreatorJid);
+			Console.Out.Write(",");
+			Console.Out.Write(Convert.ToBase64String(CipherText));
+			Console.Out.WriteLine(")");
+
+			Console.Out.Write("Data: ");
+			Console.Out.WriteLine(Convert.ToBase64String(Data));
+			Console.Out.Write("IV: ");
+			Console.Out.WriteLine(Convert.ToBase64String(IV));
+			Console.Out.Write("Associated Data: ");
+			Console.Out.WriteLine(Convert.ToBase64String(AssociatedData));
+
+			string Result = Encoding.UTF8.GetString(Data);
+			bool IsNull = !string.IsNullOrEmpty(Result) && Result[0] == '\0';
+
+			if (IsNull)
+			{
+				int i, c = Result.Length;
+
+				for (i = 1; i < c; i++)
+				{
+					if (Result[i] != '\0')
+					{
+						IsNull = false;
+						break;
+					}
+				}
+
+				if (IsNull)
+					Result = null;
+			}
+
+			Console.Out.Write("Result: ");
+			Console.Out.WriteLine(Result);
+
+			return Result;
 		}
 	}
 }

@@ -60,15 +60,17 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             return IV;
         }
 
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
-        /// <param name="Data">Binary Data</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        /// <returns>Encrypted Data</returns>
-        public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
+		/// <returns>Encrypted Data</returns>
+		public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
+			E2eBufferFillAlgorithm FillAlgorithm)
         {
             Security.ChaChaPoly.ChaCha20 ChaCha20 = new Security.ChaChaPoly.ChaCha20(Key, 1, IV);
             return ChaCha20.EncryptOrDecrypt(Data);
@@ -84,7 +86,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <returns>Decrypted Data</returns>
         public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
         {
-            return this.Encrypt(Data, Key, IV, AssociatedData);
+            return this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Zeroes);
         }
 
         /// <summary>

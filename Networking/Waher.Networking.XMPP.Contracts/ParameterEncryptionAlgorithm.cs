@@ -116,37 +116,14 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Data;
 
 			if (ClearText is null)
-				Data = new byte[this.client.RandomInteger(1, this.key.Length)];
+				Data = new byte[this.key.Length];
 			else
 				Data = Encoding.UTF8.GetBytes(ClearText);
 
 			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid, ContractNonce, ParameterIndex);
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 
-			Console.Out.WriteLine();
-			Console.Out.Write("Encrypt(");
-			Console.Out.Write(ParameterName);
-			Console.Out.Write(",");
-			Console.Out.Write(ParameterType);
-			Console.Out.Write(",");
-			Console.Out.Write(ParameterIndex);
-			Console.Out.Write(",");
-			Console.Out.Write(CreatorJid);
-			Console.Out.Write(",");
-			Console.Out.Write(ClearText);
-			Console.Out.WriteLine(")");
-
-			Console.Out.Write("Data: ");
-			Console.Out.WriteLine(Convert.ToBase64String(Data));
-			Console.Out.Write("IV: ");
-			Console.Out.WriteLine(Convert.ToBase64String(IV));
-			Console.Out.Write("Associated Data: ");
-			Console.Out.WriteLine(Convert.ToBase64String(AssociatedData));
-
-			byte[] Result = this.instance.Encrypt(Data, this.key, IV, AssociatedData);
-
-			Console.Out.Write("Result: ");
-			Console.Out.WriteLine(Convert.ToBase64String(Result));
+			byte[] Result = this.instance.Encrypt(Data, this.key, IV, AssociatedData, E2eBufferFillAlgorithm.Zeroes);
 
 			return Result;
 		}
@@ -168,26 +145,6 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 			byte[] Data = this.instance.Decrypt(CipherText, this.key, IV, AssociatedData);
 
-			Console.Out.WriteLine();
-			Console.Out.Write("Decrypt(");
-			Console.Out.Write(ParameterName);
-			Console.Out.Write(",");
-			Console.Out.Write(ParameterType);
-			Console.Out.Write(",");
-			Console.Out.Write(ParameterIndex);
-			Console.Out.Write(",");
-			Console.Out.Write(CreatorJid);
-			Console.Out.Write(",");
-			Console.Out.Write(Convert.ToBase64String(CipherText));
-			Console.Out.WriteLine(")");
-
-			Console.Out.Write("Data: ");
-			Console.Out.WriteLine(Convert.ToBase64String(Data));
-			Console.Out.Write("IV: ");
-			Console.Out.WriteLine(Convert.ToBase64String(IV));
-			Console.Out.Write("Associated Data: ");
-			Console.Out.WriteLine(Convert.ToBase64String(AssociatedData));
-
 			string Result = Encoding.UTF8.GetString(Data);
 			bool IsNull = !string.IsNullOrEmpty(Result) && Result[0] == '\0';
 
@@ -207,9 +164,6 @@ namespace Waher.Networking.XMPP.Contracts
 				if (IsNull)
 					Result = null;
 			}
-
-			Console.Out.Write("Result: ");
-			Console.Out.WriteLine(Result);
 
 			return Result;
 		}

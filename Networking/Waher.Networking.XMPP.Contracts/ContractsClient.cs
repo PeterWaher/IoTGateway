@@ -3443,11 +3443,21 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task SignContract(string Address, Contract Contract, string Role, bool Transferable,
 			SmartContractEventHandler Callback, object State)
 		{
+			if (Contract.HasEncryptedParameters)
+			{
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> T = await this.TryLoadContractSharedSecret(Contract.ContractId);
+				if (!(T is null))
+				{
+					IParameterEncryptionAlgorithm Algorithm = await ParameterEncryptionAlgorithm.Create(
+						Contract.ContractId, T.Item1, this, T.Item2, T.Item3);
+
+					Contract.EncryptEncryptedParameters(T.Item2, Algorithm);
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
-
-			//Log.Debug("Client side\r\n\r\n```\r\n" + Xml.ToString() + "\r\n```");
 
 			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (sender, e) =>
 			{
@@ -5059,7 +5069,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Parts.Length != 3)
 				return null;
 
-			if (Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
+			if (!Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
 				return null;
 
 			string CreatorJid = Parts[1];

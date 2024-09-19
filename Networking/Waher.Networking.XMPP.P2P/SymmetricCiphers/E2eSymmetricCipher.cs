@@ -96,8 +96,10 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="Key">Encryption Key</param>
 		/// <param name="IV">Initiation Vector</param>
 		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
 		/// <returns>Encrypted Data</returns>
-		public virtual byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		public virtual byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
+			E2eBufferFillAlgorithm FillAlgorithm)
 		{
 			int c = Data.Length;
 			int d = 0;
@@ -132,15 +134,24 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			if (ContentLen < BlockLen)
 			{
-				c = BlockLen - ContentLen;
-				byte[] Bin = new byte[c];
-
-				lock (rnd)
+				switch (FillAlgorithm)
 				{
-					rnd.GetBytes(Bin);
-				}
+					case E2eBufferFillAlgorithm.Random:
+					default:
+						c = BlockLen - ContentLen;
+						byte[] Bin = new byte[c];
 
-				Array.Copy(Bin, 0, Encrypted, ContentLen, c);
+						lock (rnd)
+						{
+							rnd.GetBytes(Bin);
+						}
+
+						Array.Copy(Bin, 0, Encrypted, ContentLen, c);
+						break;
+
+					case E2eBufferFillAlgorithm.Zeroes:
+						break;
+				}
 			}
 
 			return Encrypted;
@@ -320,7 +331,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				c += l + 2;
 			}
 
-			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData);
+			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
 			i = Encrypted.Length;
 			j = 0;
 			c += i;
@@ -809,7 +820,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				Xml.Append(Convert.ToBase64String(EncryptedKey));
 			}
 
-			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData);
+			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
 
 			if (Sender.SupportsSignatures)
 			{

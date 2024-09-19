@@ -6,10 +6,27 @@ using System.Xml;
 
 namespace Waher.Networking.XMPP
 {
-    /// <summary>
-    /// Interface for symmetric ciphers.
-    /// </summary>
-    public interface IE2eSymmetricCipher : IDisposable
+	/// <summary>
+	/// How buffers are filler before E2E Encryption is performed.
+	/// </summary>
+	public enum E2eBufferFillAlgorithm
+	{
+		/// <summary>
+		/// Random bytes are used to fill buffers. Creates different results.
+		/// For ephemeral use.
+		/// </summary>
+		Random,
+
+		/// <summary>
+		/// Zeroes are used to fill buffers. Create deterministic and repetetive results.
+		/// </summary>
+		Zeroes
+	}
+
+	/// <summary>
+	/// Interface for symmetric ciphers.
+	/// </summary>
+	public interface IE2eSymmetricCipher : IDisposable
     {
         /// <summary>
         /// Local name of the symmetric cipher
@@ -151,8 +168,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Key">Encryption Key</param>
 		/// <param name="IV">Initiation Vector</param>
 		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
 		/// <returns>Encrypted Data</returns>
-		byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData);
+		byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData, E2eBufferFillAlgorithm FillAlgorithm);
 
         /// <summary>
         /// Decrypts binary data

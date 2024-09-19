@@ -38,15 +38,17 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             return new AeadChaCha20Poly1305();
         }
 
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
-        /// <param name="Data">Binary Data</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        /// <returns>Encrypted Data</returns>
-        public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
+		/// <returns>Encrypted Data</returns>
+		public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
+			E2eBufferFillAlgorithm FillAlgorithm)
         {
             Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
 

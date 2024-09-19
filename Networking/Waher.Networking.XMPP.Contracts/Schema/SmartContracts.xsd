@@ -457,7 +457,7 @@
 					<xs:documentation>The creator is responsible for sharing the keys with the other parts of the contract, using end-to-end encrypted communication.</xs:documentation>
 					<xs:documentation>Only the parts who have received the shared secret can access the values of encrypted parameters.</xs:documentation>
 					<xs:documentation>Encrypted parameter values are not available in logs.</xs:documentation>
-					<xs:documentation>The XML string representation of the parameter value is the clear text being encrypted. If no parameter value is available (i.e. null value), a string of randomg length with only 0 characters is encrypted.</xs:documentation>
+					<xs:documentation>The XML string representation of the parameter value is the clear text being encrypted. If no parameter value is available (i.e. null value), a string of 0 characters equal in length to the key size is encrypted.</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value='Transient'>

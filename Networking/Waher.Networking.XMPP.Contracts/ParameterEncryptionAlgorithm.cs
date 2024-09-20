@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Script.Functions.Vectors;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -17,7 +18,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly IE2eSymmetricCipher instance;
 		private readonly byte[] key;
 
-		private ParameterEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm, 
+		private ParameterEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm,
 			IE2eSymmetricCipher Instance, byte[] Key, ContractsClient Client)
 		{
 			this.algorithm = Algorithm;
@@ -110,17 +111,53 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractNonce">Contract Nonce</param>
 		/// <param name="ClearText">Clear-text string representation of value.</param>
 		/// <returns>Cipher text.</returns>
-		public byte[] Encrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, string ContractNonce,
+		public byte[] Encrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, byte[] ContractNonce,
 			string ClearText)
 		{
 			byte[] Data;
 
-			if (ClearText is null)
-				Data = new byte[this.key.Length];
-			else
-				Data = Encoding.UTF8.GetBytes(ClearText);
+			Data = new byte[this.key.Length + ContractNonce.Length + 4];
+			int c = this.key.Length;
+			int d = ContractNonce.Length;
 
-			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid, ContractNonce, ParameterIndex);
+			Array.Copy(this.key, 0, Data, 0, c);
+			Array.Copy(ContractNonce, 0, Data, c, d);
+			Array.Copy(BitConverter.GetBytes(ParameterIndex), 0, Data, c + d, 4);
+
+			Data = Hashes.ComputeSHA256Hash(Data);
+
+			int SuffixLength = Data[0];
+
+			if (ClearText is null)
+				Data = new byte[SuffixLength];
+			else
+			{
+				int Prefix = -1;
+				int i, j;
+
+				for (i = 1, c = Data.Length; i < c; i++)
+				{
+					if ((j = Data[i]) != 0)
+					{
+						Prefix = j;
+						break;
+					}
+				}
+
+				if (Prefix < 0)
+					Prefix = 1;
+
+				byte[] Data2 = Encoding.UTF8.GetBytes(ClearText);
+				c = Data2.Length;
+
+				Data = new byte[1 + c + SuffixLength];
+
+				Data[0] = (byte)Prefix;
+				Array.Copy(Data2, 0, Data, 1, c);
+			}
+
+			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid,
+				Convert.ToBase64String(ContractNonce), ParameterIndex);
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 
 			byte[] Result = this.instance.Encrypt(Data, this.key, IV, AssociatedData, E2eBufferFillAlgorithm.Zeroes);
@@ -138,34 +175,22 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractNonce">Contract Nonce</param>
 		/// <param name="CipherText">Cipher text.</param>
 		/// <returns>Clear text string representation of value.</returns>
-		public string Decrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, string ContractNonce,
+		public string Decrypt(string ParameterName, string ParameterType, uint ParameterIndex, string CreatorJid, byte[] ContractNonce,
 			byte[] CipherText)
 		{
-			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid, ContractNonce, ParameterIndex);
+			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid, Convert.ToBase64String(ContractNonce), ParameterIndex);
 			byte[] AssociatedData = Encoding.UTF8.GetBytes(ParameterName);
 			byte[] Data = this.instance.Decrypt(CipherText, this.key, IV, AssociatedData);
 
-			string Result = Encoding.UTF8.GetString(Data);
-			bool IsNull = !string.IsNullOrEmpty(Result) && Result[0] == '\0';
+			if (Data.Length == 0 || Data[0] == 0)
+				return null;
 
-			if (IsNull)
-			{
-				int i, c = Result.Length;
+			int c = Data.Length - 1;
 
-				for (i = 1; i < c; i++)
-				{
-					if (Result[i] != '\0')
-					{
-						IsNull = false;
-						break;
-					}
-				}
+			while (c >= 0 && Data[c] == 0)
+				c--;
 
-				if (IsNull)
-					Result = null;
-			}
-
-			return Result;
+			return Encoding.UTF8.GetString(Data, 1, c);
 		}
 	}
 }

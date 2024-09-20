@@ -2209,7 +2209,6 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.nonce is null)
 				this.nonce = Guid.NewGuid().ToByteArray();
 
-			string Nonce = Convert.ToBase64String(this.nonce);
 			uint i, c = (uint)this.parameters.Length;
 
 			for (i = 0; i < c; i++)
@@ -2217,7 +2216,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Parameter P = this.parameters[i];
 
 				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
-					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.ObjectValue is null ? null : P.StringValue);
+					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, this.nonce, P.ObjectValue is null ? null : P.StringValue);
 			}
 		}
 
@@ -2232,9 +2231,11 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.parameters is null)
 				return true;
 
+			if (this.nonce is null)
+				return false;
+
 			try
 			{
-				string Nonce = this.nonce is null ? string.Empty : Convert.ToBase64String(this.nonce);
 				uint i, c = (uint)this.parameters.Length;
 
 				for (i = 0; i < c; i++)
@@ -2242,7 +2243,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Parameter P = this.parameters[i];
 
 					if (P.Protection == ProtectionLevel.Encrypted && !(P.ProtectedValue is null))
-						P.StringValue = Algorithm.Decrypt(P.Name, P.ParameterType, i, CreatorJid, Nonce, P.ProtectedValue);
+						P.StringValue = Algorithm.Decrypt(P.Name, P.ParameterType, i, CreatorJid, this.nonce, P.ProtectedValue);
 				}
 
 				return true;

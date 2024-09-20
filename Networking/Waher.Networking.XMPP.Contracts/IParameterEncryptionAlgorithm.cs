@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ClearText">Clear-text string representation of value.</param>
 		/// <returns>Cipher text.</returns>
 		byte[] Encrypt(string ParameterName, string ParameterType, uint ParameterIndex, 
-			string CreatorJid, string ContractNonce, string ClearText);
+			string CreatorJid, byte[] ContractNonce, string ClearText);
 
 		/// <summary>
 		/// Decrypts an encrypted parameter value.
@@ -41,6 +41,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CipherText">Cipher text.</param>
 		/// <returns>Clear text string representation of value.</returns>
 		string Decrypt(string ParameterName, string ParameterType, uint ParameterIndex, 
-			string CreatorJid, string ContractNonce, byte[] CipherText);
+			string CreatorJid, byte[] ContractNonce, byte[] CipherText);
 	}
 }

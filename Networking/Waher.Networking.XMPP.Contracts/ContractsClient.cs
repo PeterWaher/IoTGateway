@@ -109,12 +109,14 @@ namespace Waher.Networking.XMPP.Contracts
 		private EndpointSecurity localKeys;
 		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
+		private SymmetricCipherAlgorithms preferredEncryptionAlgorithm = DefaultCipherAlgorithm;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
 		private string contractKeySettingsPrefix;
 		private bool keySettingsPrefixLocked = false;
 		private bool localKeysForE2e = false;
+		private bool preferredEncryptionAlgorithmLocked = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
@@ -289,6 +291,29 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Prefix for contract key runtime settings.
 		/// </summary>
 		public string ContractKeySettingsPrefix => this.contractKeySettingsPrefix;
+
+		/// <summary>
+		/// Preferred Encryption Algorithm
+		/// </summary>
+		public SymmetricCipherAlgorithms PreferredEncryptionAlgorithm => this.preferredEncryptionAlgorithm;
+
+		/// <summary>
+		/// Sets the preferred encryption algorithm.
+		/// </summary>
+		/// <param name="Algorithm">Preferred algorithm.</param>
+		/// <param name="Lock">If the setting should be locked for the rest of the runtime of the application.</param>
+		/// <exception cref="InvalidOperationException">If attempting to change a locked setting.</exception>
+		public void SetPreferredEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm, bool Lock)
+		{
+			if (this.preferredEncryptionAlgorithm == Algorithm)
+				return;
+
+			if (this.preferredEncryptionAlgorithmLocked)
+				throw new InvalidOperationException("Preferred Encryptio Algorithm has been locked.");
+
+			this.preferredEncryptionAlgorithm = Algorithm;
+			this.preferredEncryptionAlgorithmLocked = Lock;
+		}
 
 		/// <summary>
 		/// Loads keys from the underlying persistence layer.
@@ -2646,7 +2671,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			byte[] Nonce = Guid.NewGuid().ToByteArray();
 			string NonceStr = Convert.ToBase64String(Nonce);
-			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? DefaultCipherAlgorithm;
+			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? this.preferredEncryptionAlgorithm;
 
 			if (Contract.HasEncryptedParameters)
 			{
@@ -2718,7 +2743,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						else
 						{
-							Algorithm = DefaultCipherAlgorithm;
+							Algorithm = this.preferredEncryptionAlgorithm;
 							Key = null;
 						}
 					}
@@ -2904,7 +2929,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			byte[] Nonce = Guid.NewGuid().ToByteArray();
 			string NonceStr = Convert.ToBase64String(Nonce);
-			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? DefaultCipherAlgorithm;
+			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? this.preferredEncryptionAlgorithm;
 
 			if (HasEncryptedParameters)
 			{
@@ -2916,7 +2941,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Parameter P = Parameters[i];
 
 					if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
-						P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, this.client.BareJID, NonceStr, P.ObjectValue is null ? null : P.StringValue);
+						P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, this.client.BareJID, Nonce, P.ObjectValue is null ? null : P.StringValue);
 				}
 			}
 			

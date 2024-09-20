@@ -4885,6 +4885,42 @@ namespace Waher.Networking.XMPP.Contracts
 		#region SendContractProposal
 
 		/// <summary>
+		/// Sends a contract proposal to a recipient. If the contract contains encrypted parameters, and End-to-End encryption is
+		/// enabled, the proposal will be sent End-to-End encrypted with the shared secret.
+		/// </summary>
+		/// <param name="Contract">Proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		public Task SendContractProposal(Contract Contract, string Role, string To)
+		{
+			return this.SendContractProposal(Contract, Role, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient. If the contract contains encrypted parameters, and End-to-End encryption is
+		/// enabled, the proposal will be sent End-to-End encrypted with the shared secret.
+		/// </summary>
+		/// <param name="Contract">Proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		/// <param name="Message">Optional message included in message.</param>
+		public async Task SendContractProposal(Contract Contract, string Role, string To, string Message)
+		{
+			if (Contract.HasEncryptedParameters)
+			{
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> T = await this.TryLoadContractSharedSecret(Contract.ContractId);
+
+				if (!(T is null))
+				{
+					this.SendContractProposal(Contract.ContractId, Role, To, Message, T.Item3, T.Item1);
+					return;
+				}
+			}
+				
+			this.SendContractProposal(Contract.ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+		}
+
+		/// <summary>
 		/// Sends a contract proposal to a recipient.
 		/// </summary>
 		/// <param name="ContractId">ID of proposed contract.</param>

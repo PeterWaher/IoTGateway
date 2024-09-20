@@ -188,6 +188,7 @@ namespace Waher.Utility.RunScript
 			}
 			finally
 			{
+				ConsoleOut.Flush(true);
 				Log.Terminate();
 
 				if (FilesProvider is not null)

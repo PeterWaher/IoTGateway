@@ -23,6 +23,7 @@ namespace Waher.Things.Mqtt
 		private string willTopic = string.Empty;
 		private string willData = string.Empty;
 		private string brokerKey = null;
+		private string connectionSubscription = "#";
 		private bool willRetain = false;
 		private bool trustServer = false;
 
@@ -73,6 +74,19 @@ namespace Waher.Things.Mqtt
 		{
 			get => this.password;
 			set => this.password = value;
+		}
+
+		/// <summary>
+		/// Startup subscription
+		/// </summary>
+		[Page(2, "MQTT")]
+		[Header(46, "Connection Subscription:")]
+		[ToolTip(47, "Subscription topic executed when connecting. Empty means no subscription will be performed.")]
+		[DefaultValue("#")]
+		public string ConnectionSubscription
+		{
+			get => this.connectionSubscription;
+			set => this.connectionSubscription = value;
 		}
 
 		/// <summary>
@@ -166,7 +180,8 @@ namespace Waher.Things.Mqtt
 			get
 			{
 				string PrevKey = this.brokerKey;
-				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password);
+				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password, 
+					this.connectionSubscription);
 
 				if (PrevKey != this.brokerKey && !string.IsNullOrEmpty(PrevKey))
 					MqttBrokers.DestroyBroker(PrevKey);
@@ -188,7 +203,7 @@ namespace Waher.Things.Mqtt
 		internal MqttBroker GetBroker()
 		{
 			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.TrustServer, this.userName, this.password,
-				this.willTopic, this.willData, this.willRetain, this.willQoS);
+				this.connectionSubscription, this.willTopic, this.willData, this.willRetain, this.willQoS);
 		}
 
 		/// <summary>

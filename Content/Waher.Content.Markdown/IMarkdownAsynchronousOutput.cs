@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 
 namespace Waher.Content.Markdown
 {
@@ -62,8 +63,9 @@ namespace Waher.Content.Markdown
 		/// <param name="Type">Output type.</param>
 		/// <param name="Output">Output being generated.</param>
 		/// <param name="Title">Title of content.</param>
+		/// <param name="Document">Markdown Document being rendered.</param>
 		/// <returns>ID to report back, when content is completed.</returns>
-		Task<string> GenerateStub(MarkdownOutputType Type, StringBuilder Output, string Title);
+		Task<string> GenerateStub(MarkdownOutputType Type, StringBuilder Output, string Title, MarkdownDocument Document);
 
 		/// <summary>
 		/// Method called when asynchronous result has been generated in a Markdown document.

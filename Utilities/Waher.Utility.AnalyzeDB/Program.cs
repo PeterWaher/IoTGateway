@@ -174,7 +174,7 @@ namespace Waher.Utility.AnalyzeDB
 					i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
 					if (i > 0)
 					{
-						s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
+						s = Path.Combine(ProgramDataFolder[..i], "Transforms", "DbStatXmlToHtml.xslt");
 						if (File.Exists(s))
 							XsltPath = s;
 					}
@@ -188,6 +188,10 @@ namespace Waher.Utility.AnalyzeDB
 			{
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
+			}
+			finally
+			{
+				ConsoleOut.Flush(true);
 			}
 		}
 

@@ -29,7 +29,16 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value?.Value ?? string.Empty;
+			set => this.Value = value;
+		}
 
 		/// <summary>
 		/// Human-readable label to be shown in stead of a reference, in contract text, in different languages.
@@ -45,8 +54,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public CaseInsensitiveString Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
 		}
 
 		/// <summary>
@@ -109,95 +122,124 @@ namespace Waher.Networking.XMPP.Contracts
 		public Contract Reference => this.reference;
 
 		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "contractReferenceParameter";
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<contractReferenceParameter name=\"");
-			Xml.Append(XML.Encode(this.Name));
+			Xml.Append("<contractReferenceParameter");
 
-			if (!CaseInsensitiveString.IsNullOrEmpty(this.value))
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" value=\"");
-				Xml.Append(XML.Encode(this.value.Value));
-			}
-
-			if (UsingTemplate)
-				Xml.Append("\"/>");
-			else
-			{
-				if (!string.IsNullOrEmpty(this.Guide))
+				if (!string.IsNullOrEmpty(this.creatorRole))
 				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append(" creatorRole=\"");
+					Xml.Append(XML.Encode(this.creatorRole.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.localName))
 				{
-					Xml.Append("\" localName=\"");
+					Xml.Append(" localName=\"");
 					Xml.Append(XML.Encode(this.localName.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+			}
 
-				if (!string.IsNullOrEmpty(this.@namespace))
-				{
-					Xml.Append("\" namespace=\"");
-					Xml.Append(XML.Encode(this.@namespace.Normalize(NormalizationForm.FormC)));
-				}
+			Xml.Append(" name=\"");
+			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
 
-				if (!string.IsNullOrEmpty(this.templateId))
+			if (!UsingTemplate && !string.IsNullOrEmpty(this.@namespace))
+			{
+				Xml.Append(" namespace=\"");
+				Xml.Append(XML.Encode(this.@namespace.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+			}
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate)
+			{
+				if (this.Protection != ProtectionLevel.Normal)
 				{
-					Xml.Append("\" templateId=\"");
-					Xml.Append(XML.Encode(this.templateId.Normalize(NormalizationForm.FormC)));
+					Xml.Append(" protection=\"");
+					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.provider))
 				{
-					Xml.Append("\" provider=\"");
+					Xml.Append(" provider=\"");
 					Xml.Append(XML.Encode(this.provider.Normalize(NormalizationForm.FormC)));
-				}
-
-				if (!string.IsNullOrEmpty(this.creatorRole))
-				{
-					Xml.Append("\" creatorRole=\"");
-					Xml.Append(XML.Encode(this.creatorRole.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (this.Required)
-					Xml.Append("\" required=\"true");
+					Xml.Append(" required=\"true\"");
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
-
-				if ((!(this.Descriptions is null) && this.Descriptions.Length > 0) ||
-					(!(this.labels is null) && this.labels.Length > 0))
+				if (!string.IsNullOrEmpty(this.templateId))
 				{
-					Xml.Append("\">");
-
-					if (!(this.Descriptions is null))
-					{
-						foreach (HumanReadableText Description in this.Descriptions)
-							Description.Serialize(Xml, "description", null);
-					}
-
-					if (!(this.labels is null))
-					{
-						foreach (Label Label in this.labels)
-							Label.Serialize(Xml);
-					}
-
-					Xml.Append("</contractReferenceParameter>");
+					Xml.Append(" templateId=\"");
+					Xml.Append(XML.Encode(this.templateId.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
-				else
-					Xml.Append("\"/>");
 			}
+
+			if (!CaseInsensitiveString.IsNullOrEmpty(this.@value) && this.CanSerializeValue)
+			{
+				Xml.Append(" value=\"");
+				Xml.Append(XML.Encode(this.@value.Value));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate &&
+				((!(this.Descriptions is null) && this.Descriptions.Length > 0) ||
+				(!(this.labels is null) && this.labels.Length > 0)))
+			{
+				Xml.Append('>');
+
+				if (!(this.Descriptions is null))
+				{
+					foreach (HumanReadableText Description in this.Descriptions)
+						Description.Serialize(Xml, "description", null);
+				}
+
+				if (!(this.labels is null))
+				{
+					foreach (Label Label in this.labels)
+						Label.Serialize(Xml);
+				}
+
+				Xml.Append("</contractReferenceParameter>");
+			}
+			else
+				Xml.Append("/>");
 		}
 
 		/// <summary>
@@ -211,7 +253,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.ErrorReason = null;
 			this.ErrorText = null;
 
-			if (CaseInsensitiveString.IsNullOrEmpty(this.value))
+			if (CaseInsensitiveString.IsNullOrEmpty(this.@value))
 			{
 				if (this.required)
 				{
@@ -222,7 +264,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return true;
 			}
 
-			if (!XmppClient.BareJidRegEx.IsMatch(this.value))
+			if (!XmppClient.BareJidRegEx.IsMatch(this.@value))
 			{
 				this.ErrorReason = ParameterErrorReason.InvalidReference;
 				return false;
@@ -232,11 +274,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.reference is null || this.reference.ContractId != this.value)
+					if (this.reference is null || this.reference.ContractId != this.@value)
 					{
 						this.reference = null;
 						this.referenceStatus = null;
-						this.reference = await Client.GetContractAsync(this.value);
+						this.reference = await Client.GetContractAsync(this.@value);
 					}
 
 					if (this.reference is null)
@@ -323,7 +365,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.value = Value.ToString();
+			this.Value = Value.ToString();
 		}
 
 		/// <summary>
@@ -353,9 +395,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If import was successful.</returns>
 		public override async Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			List<Label> Labels = new List<Label>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
@@ -385,7 +424,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.labels = Labels.ToArray();
 
-			this.value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
+			this.@value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value") : null;
 			this.required = XML.Attribute(Xml, "required", false);
 			this.localName = Xml.HasAttribute("localName") ? XML.Attribute(Xml, "localName") : null;
 			this.@namespace = Xml.HasAttribute("namespace") ? XML.Attribute(Xml, "namespace") : null;
@@ -393,7 +432,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.provider = Xml.HasAttribute("provider") ? XML.Attribute(Xml, "provider") : null;
 			this.creatorRole = Xml.HasAttribute("creatorRole") ? XML.Attribute(Xml, "creatorRole") : null;
 
-			return true;
+			return await base.Import(Xml);
 		}
 
 		/// <summary>

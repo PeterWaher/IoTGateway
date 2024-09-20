@@ -526,6 +526,8 @@ namespace Waher.Utility.ExStat
 				Output?.Close();
 				Output?.Dispose();
 				FileOutput?.Dispose();
+
+				ConsoleOut.Flush(true);
 			}
 		}
 

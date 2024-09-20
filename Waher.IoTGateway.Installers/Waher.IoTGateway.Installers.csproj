@@ -56,6 +56,7 @@
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryCodec.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
+    <Compile Include=".bak\Waher.Content\Binary\EncodedObject.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
@@ -64,6 +65,7 @@
     <Compile Include=".bak\Waher.Content\IContentHeader.cs" />
     <Compile Include=".bak\Waher.Content\IContentPoster.cs" />
     <Compile Include=".bak\Waher.Content\IContentPutter.cs" />
+    <Compile Include=".bak\Waher.Content\IHostReference.cs" />
     <Compile Include=".bak\Waher.Content\IInternetContent.cs" />
     <Compile Include=".bak\Waher.Content\IResourceMap.cs" />
     <Compile Include=".bak\Waher.Content\Json\IJsonEncoder.cs" />
@@ -136,6 +138,7 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\StreamExtensions.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
@@ -274,6 +277,7 @@
     <Compile Include=".bak\Waher.Script\Operators\CreateMeasurement.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Matrices\IToMatrix.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Membership\Inherits.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Membership\IsNot.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Membership\Matches.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />

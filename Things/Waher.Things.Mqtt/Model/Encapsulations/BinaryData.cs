@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
@@ -48,8 +49,19 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			Request.ReportFields(Last, new Int32Field(ThingReference, this.timestamp, this.Append(Prefix, "#Bytes"), 
-				this.value.Length, FieldType.Momentary, FieldQoS.AutomaticReadout));
+			List<Field> Data = new List<Field>()
+			{
+				new Int32Field(ThingReference, this.timestamp, this.Append(Prefix, "#Bytes"),
+					this.value?.Length ?? 0, FieldType.Momentary, FieldQoS.AutomaticReadout)
+			};
+
+			if (!(this.value is null) && this.value.Length <= 256)
+			{
+				Data.Add(new StringField(ThingReference, this.timestamp, "Raw",
+					Convert.ToBase64String(this.value), FieldType.Momentary, FieldQoS.AutomaticReadout));
+			}
+
+			Request.ReportFields(Last, Data);
 		}
 
 		/// <summary>

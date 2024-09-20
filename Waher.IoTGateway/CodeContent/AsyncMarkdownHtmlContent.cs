@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Functions;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -36,13 +37,14 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Type">Output type.</param>
 		/// <param name="Output">Output being generated.</param>
 		/// <param name="Title">Title of content.</param>
+		/// <param name="Document">Markdown Document being rendered.</param>
 		/// <returns>ID to report back, when content is completed.</returns>
-		public Task<string> GenerateStub(MarkdownOutputType Type, StringBuilder Output, string Title)
+		public async Task<string> GenerateStub(MarkdownOutputType Type, StringBuilder Output, string Title, MarkdownDocument Document)
 		{
 			string Id = Hashes.BinaryToString(Gateway.NextBytes(32));
 
 			if (string.IsNullOrEmpty(Title))
-				Title = "&#8987;";
+				Title = await MarkdownToHtml.ToHtml(":hourglass_flowing_sand:", Document.Settings.Variables);
 			else
 				Title = XML.HtmlValueEncode(Title);
 
@@ -55,7 +57,7 @@ namespace Waher.IoTGateway.CodeContent
 			Output.Append(Id);
 			Output.AppendLine("\");</script>");
 
-			return Task.FromResult(Id);
+			return Id;
 		}
 
 		/// <summary>

@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
 		/// A new key must be generated before the counter wraps.</param>
 		/// <returns>Initiation vector.</returns>
-		protected override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
+		public override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
 		{
 			byte[] IV = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(Id + Type + From + To));
 			Array.Resize(ref IV, 16);
@@ -96,10 +96,12 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="Key">Encryption Key</param>
 		/// <param name="IV">Initiation Vector</param>
 		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
 		/// <returns>Encrypted Data</returns>
-		public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
+			E2eBufferFillAlgorithm FillAlgorithm)
 		{
-			byte[] Encrypted = base.Encrypt(Data, Key, IV, AssociatedData);
+			byte[] Encrypted = base.Encrypt(Data, Key, IV, AssociatedData, FillAlgorithm);
 
 			lock (this.aes)
 			{

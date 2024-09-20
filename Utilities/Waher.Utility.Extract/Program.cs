@@ -226,6 +226,8 @@ namespace Waher.Utility.Extract
 				Extractor?.Dispose();
 				InputFile?.Dispose();
 				KeyFile?.Dispose();
+
+				ConsoleOut.Flush(true);
 			}
 		}
 

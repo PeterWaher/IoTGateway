@@ -139,6 +139,10 @@ namespace Waher.Utility.DeleteDB
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 
 	}

@@ -13,6 +13,7 @@ using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 using Waher.Security;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -200,7 +201,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
-		public void POST(string To, string Resource, Stream DataStream, string ContentType,
+		public Task POST(string To, string Resource, Stream DataStream, string ContentType,
 			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback,
 			object State, params HttpField[] Headers)
 		{
@@ -218,7 +219,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			this.Request(To, "POST", Resource, 1.1, Headers2, DataStream, Callback, DataCallback, State);
+			return this.Request(To, "POST", Resource, 1.1, Headers2, DataStream, Callback, DataCallback, State);
 		}
 
 		/// <summary>
@@ -231,10 +232,10 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
-		public void Request(string To, string Method, string LocalResource, HttpxResponseEventHandler Callback,
+		public Task Request(string To, string Method, string LocalResource, HttpxResponseEventHandler Callback,
 			HttpxResponseDataEventHandler DataCallback, object State, params HttpField[] Headers)
 		{
-			this.Request(To, Method, LocalResource, 1.1, Headers, null, Callback, DataCallback, State);
+			return this.Request(To, Method, LocalResource, 1.1, Headers, null, Callback, DataCallback, State);
 		}
 
 		/// <summary>
@@ -249,7 +250,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="DataCallback">Local resource.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
+		public async Task Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
 			Stream DataStream, HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, object State)
 		{
 			// TODO: Local IP & port for quick P2P response (TLS).
@@ -290,7 +291,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("' jingle='false'>");
 
 			Xml.Append("<headers xmlns='");
-			Xml.Append(HttpxClient.NamespaceHeaders);
+			Xml.Append(NamespaceHeaders);
 			Xml.Append("'>");
 
 			foreach (HttpField HeaderField in Headers)
@@ -313,7 +314,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					byte[] Data = new byte[c];
 
 					DataStream.Position = 0;
-					DataStream.Read(Data, 0, c);
+					await DataStream.ReadAllAsync(Data, 0, c);
 
 					Xml.Append("<data><base64>");
 					Xml.Append(Convert.ToBase64String(Data));
@@ -353,8 +354,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					else
 						i = (int)(Len - Pos);
 
-					if (i != DataStream.Read(Data, 0, i))
-						throw new IOException("Unexpected end of stream.");
+					await DataStream.ReadAllAsync(Data, 0, i);
 
 					Pos += i;
 

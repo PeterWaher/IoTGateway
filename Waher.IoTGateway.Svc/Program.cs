@@ -392,6 +392,10 @@ namespace Waher.IoTGateway.Svc
 				ConsoleOut.WriteLine(ex.Message);
 				return 1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 
 		private static void RunAsService(string ServiceName, string InstanceName)
@@ -493,6 +497,7 @@ namespace Waher.IoTGateway.Svc
 			finally
 			{
 				Gateway.Stop().Wait();
+				ConsoleOut.Flush(true);
 				Log.Terminate();
 			}
 		}

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 
@@ -187,7 +188,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 
 				this.tempStream.Position = this.pos;
-				int NrRead = this.tempStream.Read(Block, i, BlockSize);
+				int NrRead = await this.tempStream.TryReadAllAsync(Block, i, BlockSize);
 				if (NrRead < BlockSize)
 				{
 					await this.Close();

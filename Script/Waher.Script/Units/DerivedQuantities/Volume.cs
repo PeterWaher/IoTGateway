@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Units.DerivedQuantities
@@ -21,10 +20,7 @@ namespace Waher.Script.Units.DerivedQuantities
 		/// <summary>
 		/// Name of derived quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Volume"; }
-		}
+		public string Name => "Volume";
 
 		/// <summary>
 		/// Derived Units supported.
@@ -35,7 +31,7 @@ namespace Waher.Script.Units.DerivedQuantities
 			{
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
-					new KeyValuePair<string, PhysicalQuantity>("l", new PhysicalQuantity(0.001, new Unit(Prefix.None, 
+					new KeyValuePair<string, PhysicalQuantity>("l", new PhysicalQuantity(1, new Unit(Prefix.Milli, 
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3)

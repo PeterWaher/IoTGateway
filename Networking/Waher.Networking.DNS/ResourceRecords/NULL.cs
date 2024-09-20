@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {
@@ -36,7 +37,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 		{
 			int c = (int)(EndPos - Data.Position);
 			this.data = new byte[c];
-			Data.Read(this.data, 0, c);
+			Data.ReadAll(this.data, 0, c);
 		}
 
 		/// <summary>

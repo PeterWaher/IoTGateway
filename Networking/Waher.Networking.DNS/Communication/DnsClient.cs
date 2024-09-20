@@ -473,7 +473,7 @@ namespace Waher.Networking.DNS.Communication
 				{
 					case 0:
 						byte[] Bin = new byte[Len];
-						Data.Read(Bin, 0, Len);
+						Data.ReadAll(Bin, 0, Len);
 
 						s = Encoding.ASCII.GetString(Bin);
 
@@ -519,7 +519,7 @@ namespace Waher.Networking.DNS.Communication
 				return string.Empty;
 
 			byte[] Bin = new byte[Len];
-			Data.Read(Bin, 0, Len);
+			Data.ReadAll(Bin, 0, Len);
 
 			return Encoding.ASCII.GetString(Bin);
 		}

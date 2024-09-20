@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Text;
 using Waher.Content.Xml;
+using Waher.Content.Xml.Text;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
@@ -164,7 +165,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									ms = new MemoryStream();
 
 									if (Header.ContentType is null)
-										Header.Add(new HttpField("Content-Type", "text/xml"));
+										Header.Add(new HttpField("Content-Type", XmlCodec.DefaultContentType));
 
 									Data = Header.ContentType.Encoding.GetBytes(N2.InnerText);
 									ms.Write(Data, 0, Data.Length);

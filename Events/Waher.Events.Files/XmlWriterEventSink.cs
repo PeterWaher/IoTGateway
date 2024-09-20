@@ -181,6 +181,7 @@ namespace Waher.Events.Files
 		/// </summary>
 		public virtual void DisposeOutput()
 		{
+			this.output?.Flush();
 			this.output?.Dispose();
 			this.output = null;
 		}

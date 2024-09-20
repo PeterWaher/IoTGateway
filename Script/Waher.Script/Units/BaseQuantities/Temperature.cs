@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Units.BaseQuantities
+﻿namespace Waher.Script.Units.BaseQuantities
 {
 	/// <summary>
 	/// A temperature is an objective comparative measure of hot or cold.
@@ -17,21 +15,12 @@ namespace Waher.Script.Units.BaseQuantities
 		/// <summary>
 		/// Name of base quantity.
 		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return "Temperature";
-			}
-		}
+		public string Name => "Temperature";
 
 		/// <summary>
 		/// Reference unit of base quantity.
 		/// </summary>
-		public AtomicUnit ReferenceUnit
-		{
-			get { return referenceUnit; }
-		}
+		public AtomicUnit ReferenceUnit => referenceUnit;
 
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("K");
 

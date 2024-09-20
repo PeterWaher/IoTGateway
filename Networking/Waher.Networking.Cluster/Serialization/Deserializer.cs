@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Cluster.Serialization
 {
@@ -86,7 +87,7 @@ namespace Waher.Networking.Cluster.Serialization
 
 			int c = (int)Len;
 			byte[] Bin = new byte[c];
-			this.ms.Read(Bin, 0, c);
+			this.ms.ReadAll(Bin, 0, c);
 
 			return Bin;
 		}
@@ -114,7 +115,7 @@ namespace Waher.Networking.Cluster.Serialization
 
 					int c = (int)Len;
 					byte[] Bin = new byte[c];
-					this.ms.Read(Bin, 0, c);
+					this.ms.ReadAll(Bin, 0, c);
 					return Encoding.UTF8.GetString(Bin);
 			}
 		}
@@ -216,7 +217,7 @@ namespace Waher.Networking.Cluster.Serialization
 		public float ReadSingle()
 		{
 			byte[] Bin = new byte[4];
-			this.ms.Read(Bin, 0, 4);
+			this.ms.ReadAll(Bin, 0, 4);
 			return BitConverter.ToSingle(Bin, 0);
 		}
 
@@ -227,7 +228,7 @@ namespace Waher.Networking.Cluster.Serialization
 		public double ReadDouble()
 		{
 			byte[] Bin = new byte[8];
-			this.ms.Read(Bin, 0, 8);
+			this.ms.ReadAll(Bin, 0, 8);
 			return BitConverter.ToDouble(Bin, 0);
 		}
 
@@ -296,7 +297,7 @@ namespace Waher.Networking.Cluster.Serialization
 		public Guid ReadGuid()
 		{
 			byte[] Bin = new byte[16];
-			this.ms.Read(Bin, 0, 16);
+			this.ms.ReadAll(Bin, 0, 16);
 			return new Guid(Bin);
 		}
 	}

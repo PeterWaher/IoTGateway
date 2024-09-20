@@ -96,7 +96,7 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = true
 			};
 
-			if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) &&
+			if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
 				v.ValueObject is MarkdownSettings ParentSettings)
 			{
 				Settings.AllowScriptTag = ParentSettings.AllowScriptTag;

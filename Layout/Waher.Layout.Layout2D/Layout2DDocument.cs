@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Script;
-using Waher.Runtime.Inventory;
 using Waher.Layout.Layout2D.Events;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model;
-using Waher.Layout.Layout2D.Model.Backgrounds;
-using System.Threading.Tasks;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Content.Xml;
-using Waher.Script.Constants;
+using Waher.Layout.Layout2D.Model.Backgrounds;
+using Waher.Runtime.Inventory;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D
 {
@@ -156,10 +155,7 @@ namespace Waher.Layout.Layout2D
 
 			int c2 = (int)c;
 			byte[] Bin = new byte[c2];
-			int i = Input.Read(Bin, 0, c2);
-
-			if (i != c2)
-				throw new IOException("Unexpected end of file.");
+			Input.ReadAll(Bin, 0, c2);
 
 			string Xml = CommonTypes.GetString(Bin, DefaultEncoding);
 

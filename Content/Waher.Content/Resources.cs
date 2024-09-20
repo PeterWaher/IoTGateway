@@ -82,7 +82,7 @@ namespace Waher.Content
 
 				int Len = (int)f.Length;
 				byte[] Result = new byte[Len];
-				f.Read(Result, 0, Len);
+				f.ReadAll(Result, 0, Len);
 				return Result;
 			}
 		}
@@ -117,7 +117,7 @@ namespace Waher.Content
 
 				int Len = (int)f.Length;
 				byte[] Result = new byte[Len];
-				f.Read(Result, 0, Len);
+				f.ReadAll(Result, 0, Len);
 
 				return CommonTypes.GetString(Result, Encoding.UTF8);
 			}

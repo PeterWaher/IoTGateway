@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Content.Xml;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Asn1
 {
@@ -240,8 +241,7 @@ namespace Waher.Content.Asn1
 			else if ((i & 64) == 0)     // Decimal encoding
 			{
 				byte[] Bin = new byte[c];
-				if (Input.Read(Bin, 0, c) != c)
-					throw new EndOfStreamException();
+				Input.ReadAll(Bin, 0, c);
 
 				string s = CommonTypes.GetString(Bin, Encoding.ASCII).Trim();
 
@@ -313,10 +313,7 @@ namespace Waher.Content.Asn1
 
 				int c = (int)Len;
 				byte[] Bin = new byte[c];
-				int i = Input.Read(Bin, 0, c);
-
-				if (i != c)
-					throw new EndOfStreamException();
+				Input.ReadAll(Bin, 0, c);
 
 				return Bin;
 			}
@@ -359,10 +356,7 @@ namespace Waher.Content.Asn1
 
 				int c = (int)Len;
 				byte[] Bin = new byte[c];
-				int i = Input.Read(Bin, 0, c);
-
-				if (i != c)
-					throw new EndOfStreamException();
+				Input.ReadAll(Bin, 0, c);
 
 				return Bin;
 			}

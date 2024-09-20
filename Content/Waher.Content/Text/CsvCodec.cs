@@ -20,9 +20,14 @@ namespace Waher.Content.Text
 		}
 
 		/// <summary>
+		/// Content-Type for CSV files.
+		/// </summary>
+		public const string ContentType = "text/csv";
+
+		/// <summary>
 		/// CSV content types.
 		/// </summary>
-		public static readonly string[] CsvContentTypes = new string[] { "text/csv" };
+		public static readonly string[] CsvContentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// CSV content types.
@@ -47,7 +52,7 @@ namespace Waher.Content.Text
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == "text/csv")
+			if (ContentType == CsvCodec.ContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -86,7 +91,7 @@ namespace Waher.Content.Text
 		{
 			if (FileExtension.ToLower() == "csv")
 			{
-				ContentType = "text/csv";
+				ContentType = CsvCodec.ContentType;
 				return true;
 			}
 			else
@@ -106,7 +111,7 @@ namespace Waher.Content.Text
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/csv":
+				case CsvCodec.ContentType:
 					FileExtension = "csv";
 					return true;
 
@@ -160,7 +165,7 @@ namespace Waher.Content.Text
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), "text/csv"));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), ContentType));
 		}
 	}
 }

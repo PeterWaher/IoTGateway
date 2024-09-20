@@ -338,6 +338,8 @@ namespace Waher.Utility.Sign
                 Output?.WriteEndElement();
                 Output?.WriteEndDocument();
                 Output?.Dispose();
+
+                ConsoleOut.Flush(true);
             }
         }
     }

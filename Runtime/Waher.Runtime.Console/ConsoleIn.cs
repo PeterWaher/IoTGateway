@@ -5,7 +5,7 @@ using Waher.Runtime.Console.Worker;
 namespace Waher.Runtime.Console
 {
 	/// <summary>
-	/// Serializes input from <see cref="Console.In"/>, and assures modules are not dead-locked in case the Console gets locked by
+	/// Serializes input from <see cref="System.Console.In"/>, and assures modules are not dead-locked in case the Console gets locked by
 	/// the user.
 	/// </summary>
 	public static class ConsoleIn
@@ -29,11 +29,13 @@ namespace Waher.Runtime.Console
 		/// </summary>
 		/// <returns>An integer representing the next character to be read, or -1 if no more characters
 		/// are available or the reader does not support seeking.</returns>
-		public static Task<int> PeekAsync()
+		public static async Task<int> PeekAsync()
 		{
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			ConsoleWorker.Queue(new ConsoleInPeekCharacter(Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInPeekCharacter(Result)))
+				return await Result.Task;
+			else
+				return -1;
 		}
 
 		/// <summary>
@@ -51,11 +53,13 @@ namespace Waher.Runtime.Console
 		/// </summary>
 		/// <returns>The next character from the text reader, or -1 if no more characters are available. 
 		/// The default implementation returns -1.</returns>
-		public static Task<int> ReadAsync()
+		public static async Task<int> ReadAsync()
 		{
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			ConsoleWorker.Queue(new ConsoleInReadCharacter(Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInReadCharacter(Result)))
+				return await Result.Task;
+			else
+				return -1;
 		}
 
 		/// <summary>
@@ -94,13 +98,15 @@ namespace Waher.Runtime.Console
 		/// value can be less than the number of bytes requested if the number of bytes currently
 		/// available is less than the requested number, or it can be 0 (zero) if the end
 		/// of the text has been reached.</returns>
-		public static Task<int> ReadAsync(char[] buffer, int index, int count)
+		public static async Task<int> ReadAsync(char[] buffer, int index, int count)
 		{
 			CheckArguments(buffer, index, count);
 
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			ConsoleWorker.Queue(new ConsoleInRead(buffer, index, count, Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInRead(buffer, index, count, Result)))
+				return await Result.Task;
+			else
+				return 0;
 		}
 
 		private static void CheckArguments(Array buffer, int index, int count)
@@ -155,13 +161,15 @@ namespace Waher.Runtime.Console
 		/// value can be less than the number of bytes requested if the number of bytes currently
 		/// available is less than the requested number, or it can be 0 (zero) if the end
 		/// of the text has been reached.</returns>
-		public static Task<int> ReadBlockAsync(char[] buffer, int index, int count)
+		public static async Task<int> ReadBlockAsync(char[] buffer, int index, int count)
 		{
 			CheckArguments(buffer, index, count);
 
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			ConsoleWorker.Queue(new ConsoleInReadBlock(buffer, index, count, Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInReadBlock(buffer, index, count, Result)))
+				return await Result.Task;
+			else
+				return 0;
 		}
 
 		/// <summary>
@@ -179,11 +187,13 @@ namespace Waher.Runtime.Console
 		/// <returns>A task that represents the asynchronous read operation. The value of the TResult
 		/// parameter contains the next line from the text reader, or is null if all of the
 		/// characters have been read.</returns>
-		public static Task<string> ReadLineAsync()
+		public static async Task<string> ReadLineAsync()
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			ConsoleWorker.Queue(new ConsoleInReadLine(Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInReadLine(Result)))
+				return await Result.Task;
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -204,11 +214,13 @@ namespace Waher.Runtime.Console
 		/// <returns>A task that represents the asynchronous read operation. The value of the TResult
 		/// parameter contains a string with the characters from the current position to
 		/// the end of the text reader.</returns>
-		public static Task<string> ReadToEndAsync()
+		public static async Task<string> ReadToEndAsync()
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			ConsoleWorker.Queue(new ConsoleInReadToEnd(Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInReadToEnd(Result)))
+				return await Result.Task;
+			else
+				return string.Empty;
 		}
 
 		/// <summary>
@@ -242,11 +254,13 @@ namespace Waher.Runtime.Console
 		/// Reads a key press
 		/// </summary>
 		/// <returns>Key information</returns>
-		public static Task<ConsoleKeyInfo> ReadKeyAsync(bool intercept)
+		public static async Task<ConsoleKeyInfo> ReadKeyAsync(bool intercept)
 		{
 			TaskCompletionSource<ConsoleKeyInfo> Result = new TaskCompletionSource<ConsoleKeyInfo>();
-			ConsoleWorker.Queue(new ConsoleInReadKey(intercept, Result));
-			return Result.Task;
+			if (await ConsoleWorker.Queue(new ConsoleInReadKey(intercept, Result)))
+				return await Result.Task;
+			else
+				return new ConsoleKeyInfo();
 		}
 
 	}

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Persistence.Attributes;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -17,10 +18,11 @@ namespace Waher.Networking.XMPP.Contracts
 		private string name;
 		private string guide = string.Empty;
 		private string exp = string.Empty;
-		private ParameterErrorReason? errorReason = null;
+		private byte[] protectedValue = null;
 		private string errorText = null;
+		private ParameterErrorReason? errorReason = null;
 		private Expression parsed = null;
-		private bool transient = false;
+		private ProtectionLevel protection = ProtectionLevel.Normal;
 
 		/// <summary>
 		/// Parameter name
@@ -54,20 +56,60 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// If parameter is transient (i.e. only available in transit, and not persisted)
+		/// Level of confidentiality of the information provided by the parameter.
 		/// </summary>
-		public bool Transient
+		public ProtectionLevel Protection
 		{
-			get => this.transient;
-			set => this.transient = value;
+			get => this.protection;
+			set => this.protection = value;
+		}
+
+		/// <summary>
+		/// Protected value, in case <see cref="Protection"/> is not equal to <see cref="ProtectionLevel.Normal"/>.
+		/// </summary>
+		[DefaultValueNull]
+		public byte[] ProtectedValue
+		{
+			get => this.protectedValue;
+			set => this.protectedValue = value;
+		}
+
+		/// <summary>
+		/// If the value can be serialized in the clear.
+		/// </summary>
+		public bool CanSerializeValue
+		{
+			get
+			{
+				return !(this.ObjectValue is null) && this.protection == ProtectionLevel.Normal;
+			}
+		}
+
+		/// <summary>
+		/// If the protected value van be serialized.
+		/// </summary>
+		public bool CanSerializeProtectedValue
+		{
+			get
+			{
+				return
+					!(this.protectedValue is null) &&
+					(this.protection == ProtectionLevel.Encrypted || this.protection == ProtectionLevel.Transient);
+			}
 		}
 
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public abstract object ObjectValue
+		public abstract object ObjectValue { get; }
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public abstract string StringValue
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
@@ -90,6 +132,11 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.errorText;
 			protected set => this.errorText = value;
 		}
+
+		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public abstract string ParameterType { get; }
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -223,8 +270,22 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.guide = XML.Attribute(Xml, "guide");
 			this.exp = XML.Attribute(Xml, "exp");
-			this.transient = XML.Attribute(Xml, "transient", false);
+			this.protection = XML.Attribute(Xml, "protection", ProtectionLevel.Normal);
 			this.parsed = null;
+
+			if (Xml.HasAttribute("protected"))
+			{
+				try
+				{
+					this.protectedValue = Convert.FromBase64String(XML.Attribute(Xml, "protected"));
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+			else
+				this.protectedValue = null;
 
 			List<HumanReadableText> Descriptions = new List<HumanReadableText>();
 

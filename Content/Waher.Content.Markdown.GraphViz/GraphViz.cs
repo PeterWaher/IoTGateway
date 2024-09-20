@@ -411,7 +411,7 @@ namespace Waher.Content.Markdown.GraphViz
 			else
 				Title = null;
 
-			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title);
+			string Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title, Document);
 
 			Document.QueueAsyncTask(this.ExecuteGraphViz, new AsyncState()
 			{

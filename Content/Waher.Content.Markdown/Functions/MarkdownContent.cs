@@ -40,7 +40,13 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
-			return new ObjectValue(new Markdown.MarkdownContent(Argument));
+			if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
+				v.ValueObject is MarkdownSettings Settings)
+			{
+				return new ObjectValue(new Markdown.MarkdownContent(Argument, Settings));
+			}
+			else
+				return new ObjectValue(new Markdown.MarkdownContent(Argument));
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
+using Waher.Content.Html;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
@@ -307,7 +308,7 @@ namespace Waher.WebService.Script
 				else if (SendProgress)
 				{
 					this.response.SetHeader("X-More", "1");
-					this.response.ContentType = "text/html";
+					this.response.ContentType = HtmlCodec.DefaultContentType;
 					await this.response.Write("<p><font style=\"color:green\"><code>" + new string('.', this.counter) + "</code></font></p>");
 					await this.response.SendResponse();
 					this.response.Dispose();

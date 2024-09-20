@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
@@ -127,7 +128,7 @@ namespace Waher.Networking.XMPP.Contracts
 			TemporaryStream f = new TemporaryStream();
 			await f.WriteAsync(Bin, 0, Bin.Length);
 
-			return new KeyValuePair<string, TemporaryStream>("application/xml", f);
+			return new KeyValuePair<string, TemporaryStream>(XmlCodec.DefaultContentType, f);
 
 		}
 

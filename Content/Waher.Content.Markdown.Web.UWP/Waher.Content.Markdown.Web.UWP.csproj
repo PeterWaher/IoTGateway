@@ -154,6 +154,10 @@
       <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Html\Waher.Content.Html.csproj">
+      <Project>{1a5ce219-e61b-4cf4-91ef-dbcc18a7fbc0}</Project>
+      <Name>Waher.Content.Html</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown.Contracts\Waher.Content.Markdown.Contracts.csproj">
       <Project>{b9d1ef63-3216-45b2-a5d8-aa14b78575d6}</Project>
       <Name>Waher.Content.Markdown.Contracts</Name>

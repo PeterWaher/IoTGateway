@@ -10,6 +10,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Persistence;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -26,6 +27,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string forMachinesNamespace = null;
 		private string @namespace = ContractsClient.NamespaceSmartContractsCurrent;
 		private byte[] contentSchemaDigest = null;
+		private byte[] nonce = null;
 		private XmlElement forMachines = null;
 		private Role[] roles = null;
 		private Part[] parts = null;
@@ -337,6 +339,55 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// An optional nonce value that is used when encrypting protected parameter values.
+		/// </summary>
+		public byte[] Nonce
+		{
+			get => this.nonce;
+			set => this.nonce = value;
+		}
+
+		/// <summary>
+		/// If contract has parameters that require encryption and decryption.
+		/// </summary>
+		public bool HasEncryptedParameters
+		{
+			get
+			{
+				if (this.parameters is null)
+					return false;
+
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Encrypted)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// If contract has parameters that are transient.
+		/// </summary>
+		public bool HasTransientParameters
+		{
+			get
+			{
+				if (this.parameters is null)
+					return false;
+
+				foreach (Parameter P in this.parameters)
+				{
+					if (P.Protection == ProtectionLevel.Transient)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Validates a contract XML Document, and returns the contract definition in it.
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
@@ -421,6 +472,22 @@ namespace Waher.Networking.XMPP.Contracts
 						Result.contractId = Attr.Value;
 						break;
 
+					case "nonce":
+						if (ExceptionIfError)
+							Result.nonce = Convert.FromBase64String(Attr.Value);
+						else
+						{
+							try
+							{
+								Result.nonce = Convert.FromBase64String(Attr.Value);
+							}
+							catch (Exception)
+							{
+								return null;
+							}
+						}
+						break;
+
 					case "visibility":
 						if (Enum.TryParse(Attr.Value, out ContractVisibility Visibility))
 						{
@@ -491,7 +558,7 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					default:
-						if (Attr.Prefix == "xmlns" || Attr.NamespaceURI== "http://www.w3.org/2001/XMLSchema-instance")
+						if (Attr.Prefix == "xmlns" || Attr.NamespaceURI == "http://www.w3.org/2001/XMLSchema-instance")
 							break;
 						else if (ExceptionIfError)
 							throw new Exception("Invalid attribute: " + Attr.Name);
@@ -890,7 +957,7 @@ namespace Waher.Networking.XMPP.Contracts
 									else
 										return null;
 								}
-	
+
 								Parameters.Add(P2);
 							}
 						}
@@ -903,7 +970,7 @@ namespace Waher.Networking.XMPP.Contracts
 								return null;
 						}
 						break;
-							
+
 					case "humanReadableText":
 						Text = HumanReadableText.Parse(E);
 						if (Text is null)
@@ -1227,6 +1294,26 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Normalizes XML.
+		/// </summary>
+		/// <param name="Xml">XML string</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(string Xml)
+		{
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+			Doc.LoadXml(Xml);
+
+			StringBuilder sb = new StringBuilder();
+
+			NormalizeXml(Doc.DocumentElement, sb, string.Empty);
+
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Normalizes an XML element.
 		/// </summary>
 		/// <param name="Xml">XML element to normalize</param>
@@ -1276,6 +1363,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			bool HasContent = false;
+			XmlWhitespace SpaceContent = null;
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
@@ -1299,10 +1387,23 @@ namespace Waher.Networking.XMPP.Contracts
 
 					Output.Append(XML.Encode(N.InnerText.Normalize(NormalizationForm.FormC)));
 				}
+				else if (N is XmlWhitespace Space)
+					SpaceContent = Space;
 			}
 
 			if (HasContent)
 			{
+				Output.Append("</");
+				Output.Append(TagName);
+				Output.Append('>');
+			}
+			else if (!(SpaceContent is null))
+			{
+				Output.Append('>');
+
+				foreach (char _ in SpaceContent.InnerText)
+					Output.Append(' ');
+
 				Output.Append("</");
 				Output.Append(TagName);
 				Output.Append('>');
@@ -1315,50 +1416,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Checks if a contract is legally binding.
 		/// </summary>
 		/// <param name="CheckCurrentTime">If the current time should be checked as well.</param>
+		/// <param name="Client">Contracts Client performing validation of signatures.</param>
 		/// <returns>If the contract is legally binding.</returns>
-		public bool IsLegallyBinding(bool CheckCurrentTime)
+		public async Task<bool> IsLegallyBinding(bool CheckCurrentTime, ContractsClient Client)
 		{
 			if (this.clientSignatures is null || this.serverSignature is null)
 				return false;
 
-			switch (this.state)
-			{
-				case ContractState.Proposed:
-				case ContractState.Obsoleted:
-				case ContractState.Deleted:
-				case ContractState.Rejected:
-				case ContractState.Failed:
-					return false;
-			}
-
-			switch (this.partsMode)
-			{
-				case ContractParts.TemplateOnly:
-					return false;
-
-				case ContractParts.ExplicitlyDefined:
-					if (this.parts is null)
-						return false;
-
-					foreach (Part Part in this.parts)
-					{
-						bool Found = false;
-
-						foreach (ClientSignature Signature in this.clientSignatures)
-						{
-							if (string.Compare(Signature.LegalId, Part.LegalId, true) == 0 &&
-								string.Compare(Signature.Role, Part.Role, true) == 0)
-							{
-								Found = true;
-								break;
-							}
-						}
-
-						if (!Found)
-							return false;
-					}
-					break;
-			}
+			if (this.state != ContractState.Signed)
+				return false;
 
 			if (!(this.roles is null))
 			{
@@ -1366,10 +1432,13 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					int Count = 0;
 
-					foreach (ClientSignature Signature in this.clientSignatures)
+					if (!(this.clientSignatures is null))
 					{
-						if (string.Compare(Signature.Role, Role.Name, true) == 0)
-							Count++;
+						foreach (ClientSignature Signature in this.clientSignatures)
+						{
+							if (string.Compare(Signature.Role, Role.Name, true) == 0)
+								Count++;
+						}
 					}
 
 					if (Count < Role.MinCount || Count > Role.MaxCount)
@@ -1383,6 +1452,77 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (Now < this.from || Now > this.to)
 					return false;
+			}
+
+			switch (this.partsMode)
+			{
+				case ContractParts.TemplateOnly:
+					return false;
+
+				case ContractParts.ExplicitlyDefined:
+					if (this.parts is null)
+						return false;
+
+					LinkedList<Part> MissingParts = null;
+					Dictionary<CaseInsensitiveString, ClientSignature> UnmatchedSignatures = new Dictionary<CaseInsensitiveString, ClientSignature>();
+
+					foreach (ClientSignature Signature in this.clientSignatures)
+						UnmatchedSignatures[Signature.Role + "|" + Signature.LegalId] = Signature;
+
+					foreach (Part Part in this.parts)
+					{
+						bool Found = false;
+
+						foreach (ClientSignature Signature in UnmatchedSignatures.Values)
+						{
+							if (string.Compare(Signature.LegalId, Part.LegalId, true) == 0 &&
+								string.Compare(Signature.Role, Part.Role, true) == 0)
+							{
+								UnmatchedSignatures.Remove(Signature.Role + "|" + Signature.LegalId);
+								Found = true;
+								break;
+							}
+						}
+
+						if (!Found)
+						{
+							if (MissingParts is null)
+								MissingParts = new LinkedList<Part>();
+
+							MissingParts.AddLast(Part);
+						}
+					}
+
+					if (!(MissingParts is null))
+					{
+						foreach (Part Part in MissingParts)
+						{
+							bool Found = false;
+
+							foreach (ClientSignature Signature in UnmatchedSignatures.Values)
+							{
+								if (Signature.Role != Part.Role)
+									continue;
+
+								if (Client is null)
+									return false;
+
+								if (await Client.CanSignAs(Part.LegalId, Signature.LegalId))
+								{
+									Found = true;
+									UnmatchedSignatures.Remove(Signature.Role + "|" + Signature.LegalId);
+									break;
+								}
+							}
+
+							if (!Found)
+								return false;
+						}
+
+						if (UnmatchedSignatures.Count > 0)
+							return false;
+					}
+					break;
 			}
 
 			return true;
@@ -1416,6 +1556,13 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append(" id=\"");
 				Xml.Append(XML.Encode(this.contractId));
+				Xml.Append('"');
+			}
+
+			if (!(this.nonce is null) && this.nonce.Length > 0)
+			{
+				Xml.Append(" nonce=\"");
+				Xml.Append(Convert.ToBase64String(this.nonce));
 				Xml.Append('"');
 			}
 
@@ -1455,16 +1602,17 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				foreach (Role Role in this.roles)
 				{
-					Xml.Append("<role maxCount=\"");
+					Xml.Append("<role");
+
+					if (Role.CanRevoke)
+						Xml.Append(" canRevoke=\"true\"");
+
+					Xml.Append(" maxCount=\"");
 					Xml.Append(Role.MaxCount.ToString());
 					Xml.Append("\" minCount=\"");
 					Xml.Append(Role.MinCount.ToString());
 					Xml.Append("\" name=\"");
 					Xml.Append(XML.Encode(Role.Name));
-
-					if (Role.CanRevoke)
-						Xml.Append("\" canRevoke=\"true");
-
 					Xml.Append("\">");
 
 					foreach (HumanReadableText Description in Role.Descriptions)
@@ -1672,7 +1820,10 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!(this.parameters is null))
 			{
 				foreach (Parameter P in this.parameters)
-					Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue ?? string.Empty));
+				{
+					if (P.Protection == ProtectionLevel.Normal)
+						Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue ?? string.Empty));
+				}
 			}
 
 			return Response.ToArray();
@@ -2028,6 +2179,79 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			return e.Value;
+		}
+
+		/// <summary>
+		/// Protects transient values, by generating GUIDs for those that lack GUIDs.
+		/// </summary>
+		public void ProtectTransientParameters()
+		{
+			if (this.parameters is null)
+				return;
+
+			foreach (Parameter P in this.parameters)
+			{
+				if (P.Protection == ProtectionLevel.Transient && P.ProtectedValue is null)
+					P.ProtectedValue = Guid.NewGuid().ToByteArray();
+			}
+		}
+
+		/// <summary>
+		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
+		/// </summary>
+		/// <param name="CreatorJid">Bare JID of creator of contract.</param>
+		/// <param name="Algorithm">Algorithm to use for protecting values.</param>
+		public void EncryptEncryptedParameters(string CreatorJid, IParameterEncryptionAlgorithm Algorithm)
+		{
+			if (this.parameters is null)
+				return;
+
+			if (this.nonce is null)
+				this.nonce = Guid.NewGuid().ToByteArray();
+
+			uint i, c = (uint)this.parameters.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				Parameter P = this.parameters[i];
+
+				if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
+					P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, CreatorJid, this.nonce, P.ObjectValue is null ? null : P.StringValue);
+			}
+		}
+
+		/// <summary>
+		/// Protects encrypted values, by encrypting the clear text string representations for those that lack encrypted counterparts.
+		/// </summary>
+		/// <param name="CreatorJid">Bare JID of creator of contract.</param>
+		/// <param name="Algorithm">Algorithm to use for unprotecting values.</param>
+		/// <returns>If protected values where unprotected successfully.</returns>
+		public bool DecryptEncryptedParameters(string CreatorJid, IParameterEncryptionAlgorithm Algorithm)
+		{
+			if (this.parameters is null)
+				return true;
+
+			if (this.nonce is null)
+				return false;
+
+			try
+			{
+				uint i, c = (uint)this.parameters.Length;
+
+				for (i = 0; i < c; i++)
+				{
+					Parameter P = this.parameters[i];
+
+					if (P.Protection == ProtectionLevel.Encrypted && !(P.ProtectedValue is null))
+						P.StringValue = Algorithm.Decrypt(P.Name, P.ParameterType, i, CreatorJid, this.nonce, P.ProtectedValue);
+				}
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 	}
 }

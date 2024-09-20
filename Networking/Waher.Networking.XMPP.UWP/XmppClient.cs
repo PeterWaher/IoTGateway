@@ -3454,7 +3454,7 @@ namespace Waher.Networking.XMPP
 					if (!this.allowScramSHA256)
 						return false;
 
-					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(32));
+					string Nonce = Convert.ToBase64String(GetRandomBytes(32));
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
 					byte[] Data = Encoding.UTF8.GetBytes(s);
 
@@ -3467,7 +3467,7 @@ namespace Waher.Networking.XMPP
 					if (!this.allowScramSHA1)
 						return false;
 
-					Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(20));
+					Nonce = Convert.ToBase64String(GetRandomBytes(20));
 					s = "n,,n=" + this.userName + ",r=" + Nonce;
 					Data = Encoding.UTF8.GetBytes(s);
 
@@ -3510,7 +3510,7 @@ namespace Waher.Networking.XMPP
 				if (this.allowScramSHA256 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-256") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-256"))
 				{
-					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(32));
+					string Nonce = Convert.ToBase64String(GetRandomBytes(32));
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
 					byte[] Data = Encoding.UTF8.GetBytes(s);
 
@@ -3522,7 +3522,7 @@ namespace Waher.Networking.XMPP
 				else if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
 				{
-					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(20));
+					string Nonce = Convert.ToBase64String(GetRandomBytes(20));
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
 					byte[] Data = Encoding.UTF8.GetBytes(s);
 
@@ -5927,7 +5927,7 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case QoSLevel.Assured:
-					string MsgId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
+					string MsgId = Hashes.BinaryToString(GetRandomBytes(16));
 
 					Xml.Clear();
 					Xml.Append("<qos:assured xmlns:qos='");

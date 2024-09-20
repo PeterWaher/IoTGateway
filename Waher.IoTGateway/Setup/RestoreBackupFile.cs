@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
@@ -326,8 +327,8 @@ namespace Waher.IoTGateway.Setup
 
 						while ((c = (int)Math.Min(l - File.Position, 65536)) > 0)
 						{
-							File.Read(Buf1, 0, c);
-							f.Read(Buf2, 0, c);
+							await File.ReadAllAsync(Buf1, 0, c);
+							await f.ReadAllAsync(Buf2, 0, c);
 
 							for (i = 0; i < c; i++)
 							{

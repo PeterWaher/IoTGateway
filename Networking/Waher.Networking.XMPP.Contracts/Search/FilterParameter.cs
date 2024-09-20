@@ -38,9 +38,9 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// <param name="Xml">XML output.</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			Xml.Append("<parameter name='");
+			Xml.Append("<parameter name=\"");
 			Xml.Append(XML.Encode(this.name));
-			Xml.Append("'>");
+			Xml.Append("\">");
 
 			foreach (SearchFilterOperand Op in this.Operands)
 			{

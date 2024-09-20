@@ -161,7 +161,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				HttpxClient.Request(FullJid, "DELETE", LocalUrl, 1.1, Headers2, null, async (sender, e) =>
+				await HttpxClient.Request(FullJid, "DELETE", LocalUrl, 1.1, Headers2, null, async (sender, e) =>
 					{
 						if (e.Ok)
 						{

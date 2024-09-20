@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Content.Images.Exif;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Images
 {
@@ -455,7 +456,7 @@ namespace Waher.Content.Images
 					case 0xffe1:    //APP1
 						Buf = new byte[Len];
 
-						if (Image.Read(Buf, 0, Len) != Len)
+						if (Image.TryReadAll(Buf, 0, Len) != Len)
 							return false;
 
 						return TryParse(Buf, out Tags);
@@ -468,7 +469,7 @@ namespace Waher.Content.Images
 							if (Buf is null || Buf.Length < Len)
 								Buf = new byte[Len];
 
-							if (Image.Read(Buf, 0, Len) != Len)
+							if (Image.TryReadAll(Buf, 0, Len) != Len)
 								return false;
 						}
 						break;

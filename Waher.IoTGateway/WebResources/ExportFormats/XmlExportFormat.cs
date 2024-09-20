@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -9,6 +8,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 
 namespace Waher.IoTGateway.WebResources.ExportFormats
 {
@@ -657,7 +657,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				if (Buf is null)
 					Buf = new byte[j];
 
-				await File.ReadAsync(Buf, 0, j);
+				await File.ReadAllAsync(Buf, 0, j);
 
 				this.output.WriteElementString("Chunk", Convert.ToBase64String(Buf, 0, j, Base64FormattingOptions.None));
 				i += j;

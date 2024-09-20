@@ -15,8 +15,10 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
+using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -29,8 +31,6 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
-using Waher.Networking.XMPP.HttpFileUpload;
-using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -56,6 +56,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Current namespace for legal identities.
 		/// </summary>
 		public const string NamespaceLegalIdentitiesCurrent = NamespaceLegalIdentitiesNeuroFoundationV1;
+
+		/// <summary>
+		/// Default cipher name for encrypted parameters, if an algorithm is not explicitly defined.
+		/// </summary>
+		public const SymmetricCipherAlgorithms DefaultCipherAlgorithm = SymmetricCipherAlgorithms.Aes256;
 
 		/// <summary>
 		/// Namespaces supported for legal identities.
@@ -96,16 +101,22 @@ namespace Waher.Networking.XMPP.Contracts
 		public const string NamespaceOnboarding = "http://waher.se/schema/Onboarding/v1.xsd";
 
 		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
+		private static readonly string ContractKeySettings = typeof(ContractsClient).Namespace + ".Contracts.";
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity localKeys;
+		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
+		private SymmetricCipherAlgorithms preferredEncryptionAlgorithm = DefaultCipherAlgorithm;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
+		private string contractKeySettingsPrefix;
 		private bool keySettingsPrefixLocked = false;
+		private bool localKeysForE2e = false;
+		private bool preferredEncryptionAlgorithmLocked = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
@@ -124,7 +135,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
 		public ContractsClient(XmppClient Client, string ComponentAddress)
-			: this(Client, ComponentAddress, (object[])null)
+			: this(Client, ComponentAddress, null)
 		{
 		}
 
@@ -193,6 +204,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.aes.Padding = PaddingMode.None;
 
 			this.keySettingsPrefix = KeySettings;
+			this.contractKeySettingsPrefix = ContractKeySettings;
 		}
 
 		/// <summary>
@@ -269,6 +281,39 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Timestamps of current keys used for signatures.
 		/// </summary>
 		public DateTime KeysTimestamp => this.keysTimestamp;
+
+		/// <summary>
+		/// Prefix for client key runtime settings.
+		/// </summary>
+		public string KeySettingsPrefix => this.keySettingsPrefix;
+
+		/// <summary>
+		/// Prefix for contract key runtime settings.
+		/// </summary>
+		public string ContractKeySettingsPrefix => this.contractKeySettingsPrefix;
+
+		/// <summary>
+		/// Preferred Encryption Algorithm
+		/// </summary>
+		public SymmetricCipherAlgorithms PreferredEncryptionAlgorithm => this.preferredEncryptionAlgorithm;
+
+		/// <summary>
+		/// Sets the preferred encryption algorithm.
+		/// </summary>
+		/// <param name="Algorithm">Preferred algorithm.</param>
+		/// <param name="Lock">If the setting should be locked for the rest of the runtime of the application.</param>
+		/// <exception cref="InvalidOperationException">If attempting to change a locked setting.</exception>
+		public void SetPreferredEncryptionAlgorithm(SymmetricCipherAlgorithms Algorithm, bool Lock)
+		{
+			if (this.preferredEncryptionAlgorithm == Algorithm)
+				return;
+
+			if (this.preferredEncryptionAlgorithmLocked)
+				throw new InvalidOperationException("Preferred Encryptio Algorithm has been locked.");
+
+			this.preferredEncryptionAlgorithm = Algorithm;
+			this.preferredEncryptionAlgorithmLocked = Lock;
+		}
 
 		/// <summary>
 		/// Loads keys from the underlying persistence layer.
@@ -371,8 +416,14 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Thread?.NewState("Sec");
 
-				this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
+				this.localKeys?.Dispose();
+				this.localKeys = null;
+
+				this.localKeys = new EndpointSecurity(this.localKeysForE2e ? this.client : null, 128, Keys.ToArray());
 				this.keysTimestamp = Timestamp.Value;
+
+				if (this.localKeysForE2e)
+					this.localE2eEndpoint = this.localKeys;
 
 				if (DisposeEndpoints)
 				{
@@ -535,6 +586,21 @@ namespace Waher.Networking.XMPP.Contracts
 				Output.WriteEndElement();
 			}
 
+			Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				string Name = Setting.Key.Substring(this.contractKeySettingsPrefix.Length);
+
+				if (Setting.Value is string s)
+				{
+					Output.WriteStartElement("C");
+					Output.WriteAttributeString("n", Name);
+					Output.WriteAttributeString("v", s);
+					Output.WriteEndElement();
+				}
+			}
+
 			Output.WriteEndElement();
 		}
 
@@ -595,6 +661,13 @@ namespace Waher.Networking.XMPP.Contracts
 						DateTime DateTimeValue = XML.Attribute(E, "v", DateTime.MinValue);
 
 						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Name, DateTimeValue);
+						break;
+
+					case "C":
+						Name = XML.Attribute(E, "n");
+						StringValue = XML.Attribute(E, "v");
+
+						await RuntimeSettings.SetAsync(this.contractKeySettingsPrefix + Name, StringValue);
 						break;
 
 					case "State":
@@ -658,11 +731,110 @@ namespace Waher.Networking.XMPP.Contracts
 				throw new InvalidOperationException("Key settings instance is locked.");
 
 			if (string.IsNullOrEmpty(InstanceName))
+			{
 				this.keySettingsPrefix = KeySettings;
+				this.contractKeySettingsPrefix = ContractKeySettings;
+			}
 			else
+			{
 				this.keySettingsPrefix = InstanceName + "." + KeySettings;
+				this.contractKeySettingsPrefix = InstanceName + "." + ContractKeySettings;
+			}
 
 			this.keySettingsPrefixLocked = Locked;
+		}
+
+		/// <summary>
+		/// Defines if End-to-End encryption should use the keys used by the contracts client to perform signatures.
+		/// </summary>
+		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
+		public async Task EnableE2eEncryption(bool UseLocalKeys)
+		{
+			bool Reload = !(this.localKeys is null);
+
+			this.localKeysForE2e = UseLocalKeys;
+
+			if (Reload)
+				await this.LoadKeys(true);
+		}
+
+		/// <summary>
+		/// Enables End-to-End encryption with a separate set of keys.
+		/// </summary>
+		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
+		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint)
+		{
+			bool Reload = !(this.localKeys is null);
+
+			this.localKeysForE2e = false;
+			this.localE2eEndpoint = E2eEndpoint;
+
+			if (Reload)
+				await this.LoadKeys(true);
+		}
+
+		/// <summary>
+		/// Creates an array of random bytes.
+		/// </summary>
+		/// <param name="Nr">Number of bytes.</param>
+		/// <returns>Array of random bytes.</returns>
+		/// <exception cref="ArgumentException">If <paramref name="Nr"/> is negative.</exception>
+		public byte[] RandomBytes(int Nr)
+		{
+			if (Nr < 0)
+				throw new ArgumentException(nameof(Nr));
+
+			byte[] Bytes = new byte[Nr];
+
+			this.rnd.GetBytes(Bytes);
+			
+			return Bytes;
+		}
+
+		/// <summary>
+		/// Creates a random long unsigned integer.
+		/// </summary>
+		/// <returns>Random long integer.</returns>
+		public ulong RandomInteger()
+		{
+			byte[] Bin = this.RandomBytes(8);
+			return BitConverter.ToUInt64(Bin, 0);
+		}
+
+		/// <summary>
+		/// Creates a random long unsigned integer lower than <paramref name="MaxExclusive"/>.
+		/// </summary>
+		/// <param name="MaxExclusive">Result will be below this value,</param>
+		/// <returns>Random long integer.</returns>
+		public ulong RandomInteger(ulong MaxExclusive)
+		{
+			if (MaxExclusive == 0)
+				throw new ArgumentException(nameof(MaxExclusive));
+
+			return this.RandomInteger() % MaxExclusive;
+		}
+
+		/// <summary>
+		/// Creates a random number in a range.
+		/// </summary>
+		/// <param name="MinInclusive">Smallest allowed value (value included).</param>
+		/// <param name="MaxInclusive">Largest allowed value (value included).</param>
+		/// <returns>Randomin integer.</returns>
+		/// <exception cref="ArgumentException">If <paramref name="MaxInclusive"/> is
+		/// smaller than <paramref name="MinInclusive"/>.</exception>
+		public int RandomInteger(int MinInclusive, int MaxInclusive)
+		{
+			if (MaxInclusive < MinInclusive)
+				throw new ArgumentException(nameof(MaxInclusive));
+
+			ulong Diff = (uint)(MaxInclusive - MinInclusive);
+			if (Diff == 0)
+				return MinInclusive;
+
+			int Result = (int)this.RandomInteger(Diff + 1UL);
+			Result += MinInclusive;
+
+			return Result;
 		}
 
 		#endregion
@@ -865,6 +1037,9 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.GetMatchingLocalKey(this.componentAddress, Callback, State);
 		}
 
+		/// <summary>
+		/// Endpoint used for identity and contract signatures.
+		/// </summary>
 		private EndpointSecurity LocalEndpoint
 		{
 			get
@@ -873,6 +1048,20 @@ namespace Waher.Networking.XMPP.Contracts
 					throw new InvalidOperationException("Local keys not loaded or generated.");
 
 				return this.localKeys;
+			}
+		}
+
+		/// <summary>
+		/// Endpoint used for End-to-End encryption.
+		/// </summary>
+		public EndpointSecurity LocalE2eEndpoint
+		{
+			get
+			{
+				if (this.localE2eEndpoint is null)
+					throw new InvalidOperationException("End-to-End Encryption not enabled or Local keys not loaded or generated.");
+
+				return this.localE2eEndpoint;
 			}
 		}
 
@@ -2391,12 +2580,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+		public Task CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
 			SmartContractEventHandler Callback, object State)
 		{
-			this.CreateContract(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode,
+			return this.CreateContract(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode,
 				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
 		}
 
@@ -2420,10 +2609,41 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+		public Task CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
 			SmartContractEventHandler Callback, object State)
+		{
+			return this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters,
+				Visibility, PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
+				SignBefore, CanActAsTemplate, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Algorithm">Algorithm to use for encrypting values.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public async Task CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
+			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			IParameterEncryptionAlgorithm Algorithm, SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2449,11 +2669,40 @@ namespace Waher.Networking.XMPP.Contracts
 				CanActAsTemplate = CanActAsTemplate
 			};
 
+			byte[] Nonce = Guid.NewGuid().ToByteArray();
+			string NonceStr = Convert.ToBase64String(Nonce);
+			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? this.preferredEncryptionAlgorithm;
+
+			if (Contract.HasEncryptedParameters)
+			{
+				if (Algorithm is null)
+					Algorithm = await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
+
+				Contract.EncryptEncryptedParameters(this.client.BareJID, Algorithm);
+			}
+
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
+
+			if (Contract.HasTransientParameters)
+			{
+				Xml.Append("<transient>");
+
+				foreach (Parameter Parameter in Contract.Parameters)
+				{
+					if (Parameter.Protection == ProtectionLevel.Transient)
+					{
+						Parameter.Protection = ProtectionLevel.Normal;
+						Parameter.Serialize(Xml, true);
+						Parameter.Protection = ProtectionLevel.Transient;
+					}
+				}
+
+				Xml.Append("</transient>");
+			}
 
 			Xml.Append("</createContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, Contract.HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
 		}
 
 		private async Task ContractResponse(object Sender, IqResultEventArgs e)
@@ -2463,13 +2712,50 @@ namespace Waher.Networking.XMPP.Contracts
 			Contract Contract = null;
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) &&
-				E.LocalName == "contract")
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract")
 			{
 				ParsedContract Parsed = await Contract.Parse(E, this, false);
 				Contract = Parsed?.Contract;
 				if (Contract is null)
 					e.Ok = false;
+				else if (Contract.HasEncryptedParameters)
+				{
+					string CreatorJid = this.client.BareJID;
+
+					if (P.Length >= 5 &&
+						P[2] is bool HasEncryptedParameters &&
+						HasEncryptedParameters &&
+						P[3] is SymmetricCipherAlgorithms Algorithm &&
+						P[4] is byte[] Key)
+					{
+						await this.SaveContractSharedSecret(Contract.ContractId,
+							CreatorJid, Key, Algorithm, false);
+					}
+					else
+					{
+						Tuple<SymmetricCipherAlgorithms, string, byte[]> T = await this.TryLoadContractSharedSecret(Contract.ContractId);
+
+						if (HasEncryptedParameters = !(T is null))
+						{
+							Algorithm = T.Item1;
+							CreatorJid = T.Item2;
+							Key = T.Item3;
+						}
+						else
+						{
+							Algorithm = this.preferredEncryptionAlgorithm;
+							Key = null;
+						}
+					}
+
+					if (HasEncryptedParameters)
+					{
+						IParameterEncryptionAlgorithm AlgorithmInstance = await ParameterEncryptionAlgorithm.Create(
+							Contract.ContractId, Algorithm, this, CreatorJid, Key);
+
+						Contract.DecryptEncryptedParameters(CreatorJid, AlgorithmInstance);
+					}
+				}
 			}
 			else
 				e.Ok = false;
@@ -2566,12 +2852,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+		public Task CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
-			this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode,
-				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+			return this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2592,12 +2878,73 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+		public Task CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
-			StringBuilder Xml = new StringBuilder();
+			return this. CreateContract(Address, TemplateId, Parts, Parameters, Visibility,
+				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
+				SignBefore, CanActAsTemplate, null, Callback, State);
+		}
 
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Algorithm">Algorithm to use for encrypting values.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public async Task CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, IParameterEncryptionAlgorithm Algorithm,
+			SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+			uint i, c = (uint)(Parameters?.Length ?? 0);
+			bool HasEncryptedParameters = false;
+
+			for (i = 0; i < c; i++)
+			{
+				Parameter P = Parameters[i];
+
+				if (P.Protection == ProtectionLevel.Encrypted)
+				{
+					HasEncryptedParameters = true;
+					break;
+				}
+			}
+
+			byte[] Nonce = Guid.NewGuid().ToByteArray();
+			string NonceStr = Convert.ToBase64String(Nonce);
+			SymmetricCipherAlgorithms EncryptionAlgorithm = Algorithm?.Algorithm ?? this.preferredEncryptionAlgorithm;
+
+			if (HasEncryptedParameters)
+			{
+				if (Algorithm is null)
+					Algorithm = await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
+
+				for (i = 0; i < c; i++)
+				{
+					Parameter P = Parameters[i];
+
+					if (P.Protection == ProtectionLevel.Encrypted && P.ProtectedValue is null)
+						P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, this.client.BareJID, Nonce, P.ObjectValue is null ? null : P.StringValue);
+				}
+			}
+			
 			Xml.Append("<createContract xmlns=\"");
 			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("\"><template archiveOpt=\"");
@@ -2610,6 +2957,8 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Duration.ToString());
 			Xml.Append("\" id=\"");
 			Xml.Append(XML.Encode(TemplateId));
+			Xml.Append("\" nonce=\"");
+			Xml.Append(NonceStr);
 			Xml.Append('"');
 
 			if (SignAfter.HasValue && SignAfter > DateTime.MinValue)
@@ -2657,19 +3006,50 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
+			LinkedList<Parameter> TransientParameters = null;
+
 			if (!(Parameters is null) && Parameters.Length > 0)
 			{
 				Xml.Append("<parameters>");
 
 				foreach (Parameter Parameter in Parameters)
+				{
+					if (Parameter.Protection == ProtectionLevel.Transient)
+					{
+						if (Parameter.ProtectedValue is null)
+							Parameter.ProtectedValue = Guid.NewGuid().ToByteArray();
+
+						if (TransientParameters is null)
+							TransientParameters = new LinkedList<Parameter>();
+
+						TransientParameters.AddLast(Parameter);
+					}
+
 					Parameter.Serialize(Xml, true);
+				}
 
 				Xml.Append("</parameters>");
 			}
 
-			Xml.Append("</template></createContract>");
+			Xml.Append("</template>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			if (!(TransientParameters is null))
+			{
+				Xml.Append("<transient>");
+
+				foreach (Parameter Parameter in TransientParameters)
+				{
+					Parameter.Protection = ProtectionLevel.Normal;
+					Parameter.Serialize(Xml, true);
+					Parameter.Protection = ProtectionLevel.Transient;
+				}
+
+				Xml.Append("</transient>");
+			}
+
+			Xml.Append("</createContract>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
 		}
 
 		/// <summary>
@@ -3088,6 +3468,18 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task SignContract(string Address, Contract Contract, string Role, bool Transferable,
 			SmartContractEventHandler Callback, object State)
 		{
+			if (Contract.HasEncryptedParameters)
+			{
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> T = await this.TryLoadContractSharedSecret(Contract.ContractId);
+				if (!(T is null))
+				{
+					IParameterEncryptionAlgorithm Algorithm = await ParameterEncryptionAlgorithm.Create(
+						Contract.ContractId, T.Item1, this, T.Item2, T.Item3);
+
+					Contract.EncryptEncryptedParameters(T.Item2, Algorithm);
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
@@ -3844,9 +4236,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Contract">Contract to update.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void UpdateContract(Contract Contract, SmartContractEventHandler Callback, object State)
+		public Task UpdateContract(Contract Contract, SmartContractEventHandler Callback, object State)
 		{
-			this.UpdateContract(this.GetTrustProvider(Contract.ContractId), Contract, Callback, State);
+			return this.UpdateContract(this.GetTrustProvider(Contract.ContractId), Contract, Callback, State);
 		}
 
 		/// <summary>
@@ -3856,9 +4248,23 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Contract">Contract to update.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void UpdateContract(string Address, Contract Contract,
+		public async Task UpdateContract(string Address, Contract Contract,
 			SmartContractEventHandler Callback, object State)
 		{
+			if (Contract.HasEncryptedParameters)
+			{
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> KeyInfo = 
+					await this.TryLoadContractSharedSecret(Contract.ContractId);
+
+				if (!(KeyInfo is null))
+				{
+					IParameterEncryptionAlgorithm Algorithm = await ParameterEncryptionAlgorithm.Create(
+						Contract.ContractId, KeyInfo.Item1, this, KeyInfo.Item2, KeyInfo.Item3);
+
+					Contract.EncryptEncryptedParameters(this.client.BareJID, Algorithm);
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<updateContract xmlns='");
@@ -3888,11 +4294,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Contract">Contract to update.</param>
 		/// <returns>Contract</returns>
-		public Task<Contract> UpdateContractAsync(string Address, Contract Contract)
+		public async Task<Contract> UpdateContractAsync(string Address, Contract Contract)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.UpdateContract(Address, Contract, (sender, e) =>
+			await this.UpdateContract(Address, Contract, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -3903,7 +4309,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3977,7 +4383,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (!Contract.IsLegallyBinding(false))
+			if (!await Contract.IsLegallyBinding(false, this))
 			{
 				await this.ReturnStatus(ContractStatus.NotLegallyBinding, Callback, State);
 				return;
@@ -4437,6 +4843,45 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Can Sign As
+
+		/// <summary>
+		/// Checks if an identity can sign for another reference identity (i.e. the old might have been obsoleted and/or
+		/// compromized, and the signatory ID is a new ID for the same account and person).
+		/// </summary>
+		/// <param name="ReferenceId">Reference ID</param>
+		/// <param name="SignatoryId">ID used for signature</param>
+		/// <returns>If the Signatory ID can be used to sign for the reference ID.</returns>
+		public Task<bool> CanSignAs(CaseInsensitiveString ReferenceId, CaseInsensitiveString SignatoryId)
+		{
+			string ReferenceDomain = XmppClient.GetDomain(ReferenceId);
+			string SignatoryDomain = XmppClient.GetDomain(SignatoryId);
+
+			if (ReferenceDomain != SignatoryDomain)
+				return Task.FromResult(false);
+
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canSignAs xmlns='");
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
+			Xml.Append("' referenceId='");
+			Xml.Append(XML.Encode(ReferenceId));
+			Xml.Append("' signatoryId='");
+			Xml.Append(XML.Encode(SignatoryId));
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(ReferenceDomain, Xml.ToString(), (_, e) =>
+			{
+				Result.TrySetResult(e.Ok);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 		#region SendContractProposal
 
 		/// <summary>
@@ -4459,6 +4904,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Message">Optional message included in message.</param>
 		public void SendContractProposal(string ContractId, string Role, string To, string Message)
 		{
+			this.SendContractProposal(ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+		}
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient.
+		/// </summary>
+		/// <param name="ContractId">ID of proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		/// <param name="Message">Optional message included in message.</param>
+		/// <param name="Key">Key used to protect confidential parameters in contract.</param>
+		/// <param name="KeyAlgorithm">Key algorithm used to protect confidential parameters in contract.</param>
+		public void SendContractProposal(string ContractId, string Role, string To, string Message, byte[] Key,
+			SymmetricCipherAlgorithms KeyAlgorithm)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<contractProposal xmlns=\"");
@@ -4474,9 +4934,65 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append(XML.Encode(Message));
 			}
 
-			Xml.Append("\"/>");
+			Xml.Append('"');
 
-			this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			if (Key is null)
+			{
+				Xml.Append("/>");
+
+				if (this.localE2eEndpoint is null)
+				{
+					this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+						string.Empty, string.Empty);
+				}
+				else
+				{
+					this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+						string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+				}
+			}
+			else
+			{
+				Xml.Append("><sharedSecret key=\"");
+				Xml.Append(Convert.ToBase64String(Key));
+				Xml.Append("\" algorithm=\"");
+
+				switch (KeyAlgorithm)
+				{
+					case SymmetricCipherAlgorithms.Aes256:
+						Xml.Append("aes");
+						break;
+
+					case SymmetricCipherAlgorithms.ChaCha20:
+						Xml.Append("cha");
+						break;
+
+					case SymmetricCipherAlgorithms.AeadChaCha20Poly1305:
+						Xml.Append("acp");
+						break;
+
+					default:
+						throw new ArgumentException("Algorithm not recognized.", nameof(KeyAlgorithm));
+				}
+
+				Xml.Append("\"/></contractProposal>");
+
+				if (this.localE2eEndpoint is null)
+					throw new InvalidOperationException("End-to-End encryption not enabled.");
+
+				if (XmppClient.GetBareJID(To) == To)
+				{
+					RosterItem Item = this.client[To]
+						?? throw new ArgumentException("Recipient not in roster.", nameof(To));
+
+					To = Item.LastPresenceFullJid;
+					if (string.IsNullOrEmpty(To))
+						throw new ArgumentException("Recipient not online.", nameof(To));
+				}
+
+				this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.AssertE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+					string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+			}
 		}
 
 		private async Task ContractProposalMessageHandler(object Sender, MessageEventArgs e)
@@ -4487,16 +5003,113 @@ namespace Waher.Networking.XMPP.Contracts
 				string ContractId = XML.Attribute(e.Content, "contractId");
 				string Role = XML.Attribute(e.Content, "role");
 				string Message = XML.Attribute(e.Content, "message");
+				byte[] Key = null;
+				SymmetricCipherAlgorithms KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "sharedSecret" && E.NamespaceURI == e.Content.NamespaceURI)
+					{
+						if (!e.UsesE2eEncryption)
+						{
+							this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
+							return;
+						}
+
+						try
+						{
+							Key = Convert.FromBase64String(XML.Attribute(E, "key"));
+						}
+						catch (Exception)
+						{
+							this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
+							return;
+						}
+
+						string Cipher = XML.Attribute(E, "algorithm");
+
+						switch (Cipher)
+						{
+							case "aes":
+								KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+								break;
+
+							case "cha":
+								KeyAlgorithm = SymmetricCipherAlgorithms.ChaCha20;
+								break;
+
+							case "acp":
+								KeyAlgorithm = SymmetricCipherAlgorithms.AeadChaCha20Poly1305;
+								break;
+
+							default:
+								this.client.Error("Unrecognized key algorithm. Message discarded.");
+								return;
+						}
+					}
+				}
 
 				try
 				{
-					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message));
+					if (!(Key is null))
+						await this.SaveContractSharedSecret(ContractId, e.FromBareJID, Key, KeyAlgorithm, true);
+
+					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message, Key, KeyAlgorithm));
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
 			}
+		}
+
+		internal async Task<bool> SaveContractSharedSecret(string ContractId, string CreatorJid, byte[] Key,
+			SymmetricCipherAlgorithms KeyAlgorithm, bool OnlyIfNew)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+
+			if (OnlyIfNew)
+			{
+				string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+				if (!string.IsNullOrEmpty(s))
+					return false;
+			}
+
+			string Value = KeyAlgorithm.ToString() + "|" + CreatorJid + "|" + Convert.ToBase64String(Key);
+
+			await RuntimeSettings.SetAsync(Name, Value);
+
+			return true;
+		}
+
+		internal async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadContractSharedSecret(string ContractId)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+			string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+
+			if (string.IsNullOrEmpty(s))
+				return null;
+
+			string[] Parts = s.Split('|');
+			if (Parts.Length != 3)
+				return null;
+
+			if (!Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
+				return null;
+
+			string CreatorJid = Parts[1];
+			byte[] Key;
+
+			try
+			{
+				Key = Convert.FromBase64String(Parts[2]);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+
+			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid, Key);
 		}
 
 		/// <summary>
@@ -5196,8 +5809,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose, string ContextXml)
 		{
 			StringBuilder Xml = new StringBuilder();
-			byte[] Nonce = new byte[32];
-			this.rnd.GetBytes(Nonce);
+			byte[] Nonce = this.RandomBytes(32);
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID.ToLower());
@@ -5489,8 +6101,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.contentPerPid[PetitionId] = new KeyValuePair<byte[], bool>(Content, PeerReview);
 
 			StringBuilder Xml = new StringBuilder();
-			byte[] Nonce = new byte[32];
-			this.rnd.GetBytes(Nonce);
+			byte[] Nonce = this.RandomBytes(32);
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			string ContentStr = Convert.ToBase64String(Content);
@@ -5996,8 +6607,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task PetitionContractAsync(string Address, string ContractId, string PetitionId, string Purpose, string ContextXml)
 		{
 			StringBuilder Xml = new StringBuilder();
-			byte[] Nonce = new byte[32];
-			this.rnd.GetBytes(Nonce);
+			byte[] Nonce = this.RandomBytes(32);
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + ContractId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID.ToLower());

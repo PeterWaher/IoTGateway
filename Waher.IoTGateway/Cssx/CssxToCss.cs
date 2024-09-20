@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content;
+using Waher.Content.Html.Css;
 using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.IoTGateway.Setup;
 using Waher.Runtime.Inventory;
@@ -32,7 +31,7 @@ namespace Waher.IoTGateway.Cssx
 		/// <summary>
 		/// Converts content to these content types. 
 		/// </summary>
-		public string[] ToContentTypes => new string[] { "text/css" };
+		public string[] ToContentTypes => new string[] { CssCodec.ContentType };
 
 		/// <summary>
 		/// How well the content is converted.

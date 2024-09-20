@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.Console
 					typeof(UnauthorizedCallstackException));
 
 				Log.Register(new ConsoleEventSink(false));
-				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -230,7 +230,8 @@ namespace Waher.IoTGateway.Console
 			}
 			finally
 			{
-				Gateway.Stop().Wait(30000);		// TODO: Fail-safe approach
+				Gateway.Stop().Wait(30000);     // TODO: Fail-safe approach
+				ConsoleOut.Flush(true);
 				Log.Terminate();
 			}
 		}

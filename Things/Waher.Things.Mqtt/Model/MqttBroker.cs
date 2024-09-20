@@ -26,6 +26,7 @@ namespace Waher.Things.Mqtt.Model
 		private readonly bool trustServer;
 		private readonly string userName;
 		private readonly string password;
+		private readonly string connectionSubscription;
 		private string willTopic;
 		private string willData;
 		private bool willRetain;
@@ -36,7 +37,7 @@ namespace Waher.Things.Mqtt.Model
 		/// TODO
 		/// </summary>
 		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password,
-			string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
+			string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
 			this.node = Node;
 			this.host = Host;
@@ -45,6 +46,7 @@ namespace Waher.Things.Mqtt.Model
 			this.trustServer = TrustServer;
 			this.userName = UserName;
 			this.password = Password;
+			this.connectionSubscription = ConnectionSubscription;
 			this.willTopic = WillTopic;
 			this.willData = WillData;
 			this.willRetain = WillRetain;
@@ -152,7 +154,8 @@ namespace Waher.Things.Mqtt.Model
 						await this.node.RemoveErrorAsync("Offline");
 						await this.node.RemoveErrorAsync("Error");
 
-						await this.mqttClient.SUBSCRIBE("#", MqttQualityOfService.AtLeastOnce);
+						if (!string.IsNullOrEmpty(this.connectionSubscription))
+							await this.mqttClient.SUBSCRIBE(this.connectionSubscription, MqttQualityOfService.AtLeastOnce);
 						break;
 
 					case MqttState.Error:

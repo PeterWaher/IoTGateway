@@ -124,6 +124,10 @@ namespace Waher.Utility.Transform
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 	}
 }

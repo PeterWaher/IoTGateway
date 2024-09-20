@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Content.Xml.Text;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -271,7 +272,7 @@ namespace Waher.Networking.XMPP.BOSH
 					this.xmppClient.TransmitText(s);
 				}
 
-				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
+				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
 				XmlDocument ResponseXml;
 
 				this.bindingInterface.NextPing = DateTime.Now.AddMinutes(1);
@@ -647,7 +648,7 @@ namespace Waher.Networking.XMPP.BOSH
 					if (HasSniffers)
 						this.xmppClient?.TransmitText(s);
 
-					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, "text/xml");
+					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
 
 					this.bindingInterface.NextPing = DateTime.Now.AddSeconds(this.waitSeconds + 5);
 

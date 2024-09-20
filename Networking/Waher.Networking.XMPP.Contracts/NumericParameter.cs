@@ -14,67 +14,104 @@ namespace Waher.Networking.XMPP.Contracts
 	public class NumericalParameter : RangeParameter<decimal>
 	{
 		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? CommonTypes.Encode(this.Value.Value) : string.Empty;
+			set
+			{
+				if (CommonTypes.TryParse(value, out decimal d))
+					this.Value = d;
+				else
+					this.Value = null;
+			}
+		}
+
+		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "numericalParameter";
+
+		/// <summary>
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<numericalParameter name=\"");
-			Xml.Append(XML.Encode(this.Name));
+			Xml.Append("<numericalParameter");
 
-			if (this.Value.HasValue)
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" value=\"");
-				Xml.Append(CommonTypes.Encode(this.Value.Value));
-			}
-
-			if (UsingTemplate)
-				Xml.Append("\"/>");
-			else
-			{
-				if (!string.IsNullOrEmpty(this.Guide))
-				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-				}
-
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
-				if (this.Min.HasValue)
+				if (!string.IsNullOrEmpty(this.Guide))
 				{
-					Xml.Append("\" min=\"");
-					Xml.Append(CommonTypes.Encode(this.Min.Value));
-					Xml.Append("\" minIncluded=\"");
-					Xml.Append(XML.Encode(CommonTypes.Encode(this.MinIncluded)));
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (this.Max.HasValue)
 				{
-					Xml.Append("\" max=\"");
+					Xml.Append(" max=\"");
 					Xml.Append(CommonTypes.Encode(this.Max.Value));
 					Xml.Append("\" maxIncluded=\"");
 					Xml.Append(XML.Encode(CommonTypes.Encode(this.MaxIncluded)));
+					Xml.Append('"');
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
-
-				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
-				else
+				if (this.Min.HasValue)
 				{
-					Xml.Append("\">");
-
-					foreach (HumanReadableText Description in this.Descriptions)
-						Description.Serialize(Xml, "description", null);
-
-					Xml.Append("</numericalParameter>");
+					Xml.Append(" min=\"");
+					Xml.Append(CommonTypes.Encode(this.Min.Value));
+					Xml.Append("\" minIncluded=\"");
+					Xml.Append(XML.Encode(CommonTypes.Encode(this.MinIncluded)));
+					Xml.Append('"');
 				}
+			}
+
+			Xml.Append(" name=\"");
+			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate && this.Protection != ProtectionLevel.Normal)
+			{
+				Xml.Append(" protection=\"");
+				Xml.Append(this.Protection.ToString());
+				Xml.Append('"');
+			}
+
+			if (this.Value.HasValue && this.CanSerializeValue)
+			{
+				Xml.Append(" value=\"");
+				Xml.Append(CommonTypes.Encode(this.Value.Value));
+				Xml.Append('"');
+			}
+
+			if (UsingTemplate || this.Descriptions is null || this.Descriptions.Length == 0)
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append('>');
+
+				foreach (HumanReadableText Description in this.Descriptions)
+					Description.Serialize(Xml, "description", null);
+
+				Xml.Append("</numericalParameter>");
 			}
 		}
 
@@ -155,18 +192,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override async Task<bool> Import(XmlElement Xml)
+		public override Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			this.Value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value", 0.0m) : (decimal?)null;
 			this.Min = Xml.HasAttribute("min") ? XML.Attribute(Xml, "min", 0.0m) : (decimal?)null;
 			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
 			this.Max = Xml.HasAttribute("max") ? XML.Attribute(Xml, "max", 0.0m) : (decimal?)null;
 			this.MaxIncluded = XML.Attribute(Xml, "maxIncluded", true);
 
-			return true;
+			return base.Import(Xml);
 		}
 
 	}

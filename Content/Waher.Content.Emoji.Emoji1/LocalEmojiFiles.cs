@@ -214,7 +214,7 @@ namespace Waher.Content.Emoji.Emoji1
 					if (s.EndsWith("." + ImageCodec.FileExtensionPng))
 						s = s.Substring(0, s.Length - 3) + ImageCodec.FileExtensionSvg;
 
-					return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.ContentTypeSvg, s);
+					return Path.Combine(this.programDataFolder, "Emoji1", ImageCodec.FileExtensionSvg, s);
 			}
 		}
 

@@ -14,21 +14,45 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class BooleanParameter : Parameter
 	{
-		private bool? value;
+		private bool? @value;
 
 		/// <summary>
 		/// Parameter value
 		/// </summary>
 		public bool? Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
+		}
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value.HasValue ? CommonTypes.Encode(this.Value.Value) : string.Empty;
+			set
+			{
+				if (CommonTypes.TryParse(value, out bool b))
+					this.Value = b;
+				else
+					this.Value = null;
+			}
 		}
 
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
+
+		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "booleanParameter";
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -37,45 +61,60 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
 		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<booleanParameter name=\"");
-			Xml.Append(XML.Encode(this.Name));
+			Xml.Append("<booleanParameter");
 
-			if (this.value.HasValue)
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" value=\"");
-				Xml.Append(CommonTypes.Encode(this.value.Value));
-			}
-
-			if (UsingTemplate)
-				Xml.Append("\"/>");
-			else
-			{
-				if (!string.IsNullOrEmpty(this.Guide))
-				{
-					Xml.Append("\" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-				}
-
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
-
-				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
-				else
+				if (!string.IsNullOrEmpty(this.Guide))
 				{
-					Xml.Append("\">");
-
-					foreach (HumanReadableText Description in this.Descriptions)
-						Description.Serialize(Xml, "description", null);
-
-					Xml.Append("</booleanParameter>");
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
+			}
+
+			Xml.Append(" name=\"");
+			Xml.Append(XML.Encode(this.Name));
+			Xml.Append('"');
+
+			if (this.CanSerializeProtectedValue)
+			{
+				Xml.Append(" protected=\"");
+				Xml.Append(Convert.ToBase64String(this.ProtectedValue));
+				Xml.Append('"');
+			}
+
+			if (!UsingTemplate && this.Protection != ProtectionLevel.Normal)
+			{
+				Xml.Append(" protection=\"");
+				Xml.Append(this.Protection.ToString());
+				Xml.Append('"');
+			}
+
+			if (this.@value.HasValue && this.CanSerializeValue)
+			{
+				Xml.Append(" value=\"");
+				Xml.Append(CommonTypes.Encode(this.@value.Value));
+				Xml.Append('"');
+			}
+
+			if (UsingTemplate || this.Descriptions is null || this.Descriptions.Length == 0)
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append('>');
+
+				foreach (HumanReadableText Description in this.Descriptions)
+					Description.Serialize(Xml, "description", null);
+
+				Xml.Append("</booleanParameter>");
 			}
 		}
 
@@ -87,7 +126,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public override Task<bool> IsParameterValid(Variables Variables, ContractsClient Client)
 		{
-			if (!this.value.HasValue)
+			if (!this.@value.HasValue)
 			{
 				this.ErrorReason = ParameterErrorReason.LacksValue;
 				this.ErrorText = null;
@@ -104,7 +143,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 		}
 
 		/// <summary>
@@ -115,9 +154,9 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			if (Value is bool b)
-				this.value = b;
+				this.Value = b;
 			else if (Value is string s && CommonTypes.TryParse(s, out b))
-				this.value = b;
+				this.Value = b;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
 		}
@@ -147,14 +186,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override async Task<bool> Import(XmlElement Xml)
+		public override Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			this.Value = Xml.HasAttribute("value") ? XML.Attribute(Xml, "value", false) : (bool?)null;
-
-			return true;
+			return base.Import(Xml);
 		}
 
 	}

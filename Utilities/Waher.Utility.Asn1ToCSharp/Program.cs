@@ -202,6 +202,10 @@ namespace Waher.Utility.Asn1ToCSharp
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 	}
 }

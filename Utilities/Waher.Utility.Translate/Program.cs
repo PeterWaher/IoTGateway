@@ -461,6 +461,10 @@ namespace Waher.Utility.Translate
 				ConsoleOut.WriteLine(ex.Message);
 				return -1;
 			}
+			finally
+			{
+				ConsoleOut.Flush(true);
+			}
 		}
 
 		private class TranslationItem

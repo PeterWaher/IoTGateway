@@ -9,906 +9,934 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 {
-    /// <summary>
-    /// Abstract base class for symmetric ciphers.
-    /// </summary>
-    public abstract class E2eSymmetricCipher : IE2eSymmetricCipher
-    {
-        /// <summary>
-        /// Random number generator.
-        /// </summary>
-        protected readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+	/// <summary>
+	/// Abstract base class for symmetric ciphers.
+	/// </summary>
+	public abstract class E2eSymmetricCipher : IE2eSymmetricCipher
+	{
+		/// <summary>
+		/// Random number generator.
+		/// </summary>
+		protected readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
-        /// <summary>
-        /// Local name of the E2E symmetric cipher
-        /// </summary>
-        public abstract string LocalName
-        {
-            get;
-        }
+		/// <summary>
+		/// Local name of the E2E symmetric cipher
+		/// </summary>
+		public abstract string LocalName
+		{
+			get;
+		}
 
-        /// <summary>
-        /// Namespace of the E2E symmetric cipher
-        /// </summary>
-        public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
+		/// <summary>
+		/// Namespace of the E2E symmetric cipher
+		/// </summary>
+		public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
 
-        /// <summary>
-        /// If Authenticated Encryption with Associated Data is used
-        /// </summary>
-        public virtual bool AuthenticatedEncryption => false;
+		/// <summary>
+		/// If Authenticated Encryption with Associated Data is used
+		/// </summary>
+		public virtual bool AuthenticatedEncryption => false;
 
-        /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
-        /// </summary>
-        public virtual void Dispose()
-        {
-        }
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public virtual void Dispose()
+		{
+		}
 
-        /// <summary>
-        /// Creates a new symmetric cipher object with the same settings as the current object.
-        /// </summary>
-        /// <returns>New instance</returns>
-        public abstract IE2eSymmetricCipher CreteNew();
+		/// <summary>
+		/// Creates an instance of a symmetric cipher algorithm.
+		/// </summary>
+		/// <param name="Algorithm">Algorithm to create.</param>
+		/// <returns>Algorithm instance.</returns>
+		/// <exception cref="ArgumentException">If algorithm is not recognized.</exception>
+		public static IE2eSymmetricCipher Create(SymmetricCipherAlgorithms Algorithm)
+		{
+			switch (Algorithm)
+			{
+				case SymmetricCipherAlgorithms.Aes256: return new Aes256();
+				case SymmetricCipherAlgorithms.ChaCha20: return new ChaCha20();
+				case SymmetricCipherAlgorithms.AeadChaCha20Poly1305: return new AeadChaCha20Poly1305();
+				default: throw new ArgumentException("Unrecognized algorithm: " + Algorithm.ToString(), nameof(Algorithm));
+			}
+		}
 
-        /// <summary>
-        /// Gets an Initiation Vector from stanza attributes.
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
-        /// A new key must be generated before the counter wraps.</param>
-        /// <returns>Initiation vector.</returns>
-        protected abstract byte[] GetIV(string Id, string Type, string From, string To, uint Counter);
+		/// <summary>
+		/// Creates a new symmetric cipher object with the same settings as the current object.
+		/// </summary>
+		/// <returns>New instance</returns>
+		public abstract IE2eSymmetricCipher CreteNew();
 
-        /// <summary>
-        /// Calculates the minimum size of encrypted data, given the size of the content.
-        /// </summary>
-        /// <param name="ContentLength">Size of content.</param>
-        /// <returns>Minimum size of encrypted data.</returns>
-        protected virtual long GetEncryptedLength(long ContentLength)
-        {
-            return ContentLength;
-        }
+		/// <summary>
+		/// Gets an Initiation Vector from stanza attributes.
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
+		/// A new key must be generated before the counter wraps.</param>
+		/// <returns>Initiation vector.</returns>
+		public abstract byte[] GetIV(string Id, string Type, string From, string To, uint Counter);
 
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
-        /// <param name="Data">Binary Data</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        /// <returns>Encrypted Data</returns>
-        public virtual byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
-        {
-            int c = Data.Length;
-            int d = 0;
-            int i = c;
+		/// <summary>
+		/// Calculates the minimum size of encrypted data, given the size of the content.
+		/// </summary>
+		/// <param name="ContentLength">Size of content.</param>
+		/// <returns>Minimum size of encrypted data.</returns>
+		protected virtual long GetEncryptedLength(long ContentLength)
+		{
+			return ContentLength;
+		}
 
-            do
-            {
-                i >>= 7;
-                d++;
-            }
-            while (i != 0);
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <param name="FillAlgorithm">How encryption buffers shold be filled.</param>
+		/// <returns>Encrypted Data</returns>
+		public virtual byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
+			E2eBufferFillAlgorithm FillAlgorithm)
+		{
+			int c = Data.Length;
+			int d = 0;
+			int i = c;
 
-            int ContentLen = c + d;
-            int BlockLen = (int)this.GetEncryptedLength(ContentLen);
-            byte[] Encrypted = new byte[BlockLen];
-            int j = 0;
+			do
+			{
+				i >>= 7;
+				d++;
+			}
+			while (i != 0);
 
-            i = c;
+			int ContentLen = c + d;
+			int BlockLen = (int)this.GetEncryptedLength(ContentLen);
+			byte[] Encrypted = new byte[BlockLen];
+			int j = 0;
 
-            do
-            {
-                Encrypted[j] = (byte)(i & 127);
-                i >>= 7;
-                if (i != 0)
-                    Encrypted[j] |= 0x80;
+			i = c;
 
-                j++;
-            }
-            while (i != 0);
+			do
+			{
+				Encrypted[j] = (byte)(i & 127);
+				i >>= 7;
+				if (i != 0)
+					Encrypted[j] |= 0x80;
 
-            Array.Copy(Data, 0, Encrypted, j, c);
+				j++;
+			}
+			while (i != 0);
 
-            if (ContentLen < BlockLen)
-            {
-                c = BlockLen - ContentLen;
-                byte[] Bin = new byte[c];
+			Array.Copy(Data, 0, Encrypted, j, c);
 
-                lock (rnd)
-                {
-                    rnd.GetBytes(Bin);
-                }
+			if (ContentLen < BlockLen)
+			{
+				switch (FillAlgorithm)
+				{
+					case E2eBufferFillAlgorithm.Random:
+					default:
+						c = BlockLen - ContentLen;
+						byte[] Bin = new byte[c];
 
-                Array.Copy(Bin, 0, Encrypted, ContentLen, c);
-            }
+						lock (rnd)
+						{
+							rnd.GetBytes(Bin);
+						}
 
-            return Encrypted;
-        }
+						Array.Copy(Bin, 0, Encrypted, ContentLen, c);
+						break;
 
-        /// <summary>
-        /// Decrypts binary data
-        /// </summary>
-        /// <param name="Data">Binary Data</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        /// <returns>Decrypted Data</returns>
-        public virtual byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
-        {
-            int c = 0;
-            int i = 0;
-            int Offset = 0;
-            byte b;
+					case E2eBufferFillAlgorithm.Zeroes:
+						break;
+				}
+			}
 
-            do
-            {
-                b = Data[i++];
+			return Encrypted;
+		}
 
-                c |= (b & 127) << Offset;
-                Offset += 7;
-            }
-            while (b >= 0x80);
+		/// <summary>
+		/// Decrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <returns>Decrypted Data</returns>
+		public virtual byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		{
+			int c = 0;
+			int i = 0;
+			int Offset = 0;
+			byte b;
 
-            if (c < 0 || c + i > Data.Length)
-                return null;
+			do
+			{
+				b = Data[i++];
 
-            byte[] Decrypted = new byte[c];
+				c |= (b & 127) << Offset;
+				Offset += 7;
+			}
+			while (b >= 0x80);
 
-            Array.Copy(Data, i, Decrypted, 0, c);
+			if (c < 0 || c + i > Data.Length)
+				return null;
 
-            return Decrypted;
-        }
+			byte[] Decrypted = new byte[c];
 
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
+			Array.Copy(Data, i, Decrypted, 0, c);
+
+			return Decrypted;
+		}
+
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
 		/// <param name="Encrypted">Encrypted data will be stored here.</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        public virtual async Task Encrypt(Stream Data, Stream Encrypted, byte[] Key, byte[] IV, byte[] AssociatedData)
-        {
-            long c = Data.Length;
-            int d = 0;
-            long i = c;
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		public virtual async Task Encrypt(Stream Data, Stream Encrypted, byte[] Key, byte[] IV, byte[] AssociatedData)
+		{
+			long c = Data.Length;
+			int d = 0;
+			long i = c;
 
-            do
-            {
-                i >>= 7;
-                d++;
-            }
-            while (i != 0);
-
-            long ContentLen = c + d;
-            long BlockLen = this.GetEncryptedLength(ContentLen);
-            byte b;
-
-            i = c;
-
-            do
-            {
-                b = (byte)(i & 127);
-                i >>= 7;
-                if (i != 0)
-                    b |= 0x80;
-
-                Encrypted.WriteByte(b);
-            }
-            while (i != 0);
-
-            await Data.CopyToAsync(Encrypted);
-
-            if (ContentLen < BlockLen)
-            {
-                c = BlockLen - ContentLen;
-                byte[] Bin = new byte[c];
-
-                lock (rnd)
-                {
-                    rnd.GetBytes(Bin);
-                }
-
-                await Encrypted.WriteAsync(Bin, 0, (int)c);
-            }
-        }
-
-        /// <summary>
-        /// Decrypts binary data
-        /// </summary>
-        /// <param name="Data">Binary Data</param>
-        /// <param name="Key">Encryption Key</param>
-        /// <param name="IV">Initiation Vector</param>
-        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
-        /// <returns>Decrypted Data</returns>
-        public virtual async Task<Stream> Decrypt(Stream Data, byte[] Key, byte[] IV, byte[] AssociatedData)
-        {
-            int c = 0;
-            int i;
-            int Offset = 0;
-
-            do
-            {
-                i = Data.ReadByte();
-                if (i < 0)
-                    return null;
-
-                c |= (i & 127) << Offset;
-                Offset += 7;
-            }
-            while (i >= 0x80);
-
-            if (c < 0 || c + Data.Position > Data.Length)
-                return null;
-
-            TemporaryStream Decrypted = new TemporaryStream();
-            try
-            {
-                await Crypto.CopyAsync(Data, Decrypted, c);
-                return Decrypted;
-            }
-            catch (Exception)
+			do
 			{
-                Decrypted.Dispose();
-                return null;
+				i >>= 7;
+				d++;
 			}
-        }
+			while (i != 0);
 
-        /// <summary>
-        /// Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
-        /// </summary>
-        /// <returns>New key</returns>
-        public abstract byte[] GenerateKey();
+			long ContentLen = c + d;
+			long BlockLen = this.GetEncryptedLength(ContentLen);
+			byte b;
 
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
-        /// A new key must be generated before the counter wraps.</param>
-        /// <param name="Data">Binary data to encrypt</param>
-        /// <param name="Sender">Local endpoint performing the encryption.</param>
-        /// <param name="Receiver">Remote endpoint performing the decryption.</param>
-        /// <returns>Encrypted data</returns>
-        public virtual byte[] Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            byte[] Encrypted;
-            byte[] EncryptedKey;
-            byte[] Key;
-            byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-            byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-            byte[] Signature;
-            byte[] Block;
-            int i, j, k, l;
-            int c = 8;
+			i = c;
 
-            if (Sender.SupportsSharedSecrets)
-            {
-                Key = Sender.GetSharedSecret(Receiver);
-                EncryptedKey = null;
-                l = 0;
-            }
-            else
-            {
-                Key = this.GenerateKey();
-                EncryptedKey = Receiver.EncryptSecret(Key);
-                l = EncryptedKey.Length;
-                c += l + 2;
-            }
-
-            Encrypted = this.Encrypt(Data, Key, IV, AssociatedData);
-            i = Encrypted.Length;
-            j = 0;
-            c += i;
-
-            if (Sender.SupportsSignatures)
-            {
-                Signature = Sender.Sign(Data);
-                k = Signature.Length;
-                c += k + 1;
-                if (k >= 128)
-                    c++;
-            }
-            else
-            {
-                k = 0;
-                Signature = null;
-            }
-
-            Block = new byte[c];
-
-            if (k > 0)
+			do
 			{
-                if (k < 128)
-                    Block[j++] = (byte)k;
-                else
-                {
-                    Block[j++] = (byte)(k | 128);
-                    Block[j++] = (byte)(k >> 7);
-                }
-            }
+				b = (byte)(i & 127);
+				i >>= 7;
+				if (i != 0)
+					b |= 0x80;
 
-            if (l > 0)
-            {
-                Block[j++] = (byte)l;
-                Block[j++] = (byte)(l >> 8);
-            }
+				Encrypted.WriteByte(b);
+			}
+			while (i != 0);
 
-            Block[j++] = (byte)i;
-            Block[j++] = (byte)(i >> 8);
-            Block[j++] = (byte)(i >> 16);
-            Block[j++] = (byte)(i >> 24);
+			await Data.CopyToAsync(Encrypted);
 
-            Block[j++] = (byte)Counter;
-            Block[j++] = (byte)(Counter >> 8);
-            Block[j++] = (byte)(Counter >> 16);
-            Block[j++] = (byte)(Counter >> 24);
+			if (ContentLen < BlockLen)
+			{
+				c = BlockLen - ContentLen;
+				byte[] Bin = new byte[c];
 
-            if (k > 0)
-            {
-                Array.Copy(Signature, 0, Block, j, k);
-                j += k;
-            }
-
-            if (l > 0)
-            {
-                Array.Copy(EncryptedKey, 0, Block, j, l);
-                j += l;
-            }
-
-            Array.Copy(Encrypted, 0, Block, j, i);
-
-            return Block;
-        }
-
-        /// <summary>
-        /// Decrypts binary data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Data">Binary data to decrypt</param>
-        /// <param name="Sender">Remote endpoint performing the encryption.</param>
-        /// <param name="Receiver">Local endpoint performing the decryption.</param>
-        /// <returns>Decrypted data, if able, null otherwise.</returns>
-        public virtual byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            if (Data.Length < 8)
-                return null;
-
-            int SignatureLen;
-            int KeyLen;
-            int DataLen;
-            uint Counter;
-            int i = 0;
-
-            if (Receiver.SupportsSignatures)
-            {
-                SignatureLen = Data[i++];
-                if ((SignatureLen & 128) != 0)
-                {
-                    SignatureLen &= 127;
-                    SignatureLen |= Data[i++] << 7;
-                }
-            }
-            else
-                SignatureLen = 0;
-
-            if (Receiver.SupportsSharedSecrets)
-                KeyLen = 0;
-            else
-            {
-                KeyLen = Data[i++];
-                KeyLen |= Data[i++] << 8;
-            }
-
-            if (i + 4 > Data.Length)
-                return null;
-
-            DataLen = Data[i++];
-            DataLen |= Data[i++] << 8;
-            DataLen |= Data[i++] << 16;
-            DataLen |= Data[i++] << 24;
-
-            Counter = Data[i++];
-            Counter |= (uint)(Data[i++] << 8);
-            Counter |= (uint)(Data[i++] << 16);
-            Counter |= (uint)(Data[i++] << 24);
-
-            if (Data.Length != i + SignatureLen + KeyLen + DataLen)
-                return null;
-
-            byte[] Signature = new byte[SignatureLen];
-            byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
-            byte[] Encrypted = new byte[DataLen];
-            byte[] Key;
-
-            Array.Copy(Data, i, Signature, 0, SignatureLen);
-            i += SignatureLen;
-
-            if (KeyLen > 0)
-            {
-                Array.Copy(Data, i, EncryptedKey, 0, KeyLen);
-                i += KeyLen;
-            }
-
-            Array.Copy(Data, i, Encrypted, 0, DataLen);
-
-            if (EncryptedKey is null)
-                Key = Receiver.GetSharedSecret(Sender);
-            else
-                Key = Receiver.DecryptSecret(EncryptedKey);
-
-            byte[] Decrypted;
-            byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-            byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-
-            try
-            {
-                Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
-
-                if (!(Decrypted is null) &&
-                    ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                    (!Sender.SupportsSignatures && SignatureLen == 0)))
-                {
-                    return Decrypted;
-                }
-            }
-            catch (Exception)
-            {
-                // Invalid key
-            }
-
-            if (!(Receiver.Previous is null))
-            {
-                try
-                {
-                    if (EncryptedKey is null)
-                        Key = Receiver.Previous.GetSharedSecret(Sender);
-                    else
-                        Key = Receiver.Previous.DecryptSecret(EncryptedKey);
-
-                    if (!(Key is null))
-                    {
-                        Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
-
-                        if (!(Decrypted is null) &&
-                            ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                            (!Sender.SupportsSignatures && SignatureLen == 0)))
-                        {
-                            return Decrypted;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // Invalid key
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Encrypts binary data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
-        /// A new key must be generated before the counter wraps.</param>
-        /// <param name="Data">Binary data to encrypt</param>
-        /// <param name="Encrypted">Encrypted data will be stored here.</param>
-        /// <param name="Sender">Local endpoint performing the encryption.</param>
-        /// <param name="Receiver">Remote endpoint performing the decryption.</param>
-        public virtual async Task Encrypt(string Id, string Type, string From, string To, uint Counter, Stream Data, Stream Encrypted, IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            using (TemporaryStream TempEncrypted = new TemporaryStream())
-            {
-                byte[] EncryptedKey;
-                byte[] Key;
-                byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-                byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-                byte[] Signature;
-                long i;
-                int k, l;
-
-                if (Sender.SupportsSharedSecrets)
-                {
-                    Key = Sender.GetSharedSecret(Receiver);
-                    EncryptedKey = null;
-                    l = 0;
-                }
-                else
-                {
-                    Key = this.GenerateKey();
-                    EncryptedKey = Receiver.EncryptSecret(Key);
-                    l = EncryptedKey.Length;
-                }
-
-                await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
-                i = TempEncrypted.Length;
-
-                if (i > uint.MaxValue)
-                    throw new NotSupportedException("Too large.");
-
-                if (Sender.SupportsSignatures)
-                {
-                    Data.Position = 0;
-                    Signature = Sender.Sign(Data);
-                    k = Signature.Length;
-                }
-                else
-                {
-                    k = 0;
-                    Signature = null;
-                }
-
-                if (k > 0)
+				lock (rnd)
 				{
-                    if (k < 128)
-                        Encrypted.WriteByte((byte)k);
-                    else
-                    {
-                        Encrypted.WriteByte((byte)(k | 128));
-                        Encrypted.WriteByte((byte)(k >> 7));
-                    }
-                }
+					rnd.GetBytes(Bin);
+				}
 
-                if (l > 0)
-                {
-                    Encrypted.WriteByte((byte)l);
-                    Encrypted.WriteByte((byte)(l >> 8));
-                }
+				await Encrypted.WriteAsync(Bin, 0, (int)c);
+			}
+		}
 
-                Encrypted.WriteByte((byte)i);
-                Encrypted.WriteByte((byte)(i >> 8));
-                Encrypted.WriteByte((byte)(i >> 16));
-                Encrypted.WriteByte((byte)(i >> 24));
+		/// <summary>
+		/// Decrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <returns>Decrypted Data</returns>
+		public virtual async Task<Stream> Decrypt(Stream Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		{
+			int c = 0;
+			int i;
+			int Offset = 0;
 
-                Encrypted.WriteByte((byte)Counter);
-                Encrypted.WriteByte((byte)(Counter >> 8));
-                Encrypted.WriteByte((byte)(Counter >> 16));
-                Encrypted.WriteByte((byte)(Counter >> 24));
+			do
+			{
+				i = Data.ReadByte();
+				if (i < 0)
+					return null;
 
-                if (k > 0)
-                    await Encrypted.WriteAsync(Signature, 0, k);
+				c |= (i & 127) << Offset;
+				Offset += 7;
+			}
+			while (i >= 0x80);
 
-                if (l > 0)
-                    await Encrypted.WriteAsync(EncryptedKey, 0, l);
+			if (c < 0 || c + Data.Position > Data.Length)
+				return null;
 
-                TempEncrypted.Position = 0;
-                await TempEncrypted.CopyToAsync(Encrypted);
-            }
-        }
+			TemporaryStream Decrypted = new TemporaryStream();
+			try
+			{
+				await Crypto.CopyAsync(Data, Decrypted, c);
+				return Decrypted;
+			}
+			catch (Exception)
+			{
+				Decrypted.Dispose();
+				return null;
+			}
+		}
 
-        /// <summary>
-        /// Decrypts binary data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Data">Binary data to decrypt</param>
-        /// <param name="Sender">Remote endpoint performing the encryption.</param>
-        /// <param name="Receiver">Local endpoint performing the decryption.</param>
-        /// <returns>Decrypted data, if able, null otherwise.</returns>
-        public virtual async Task<Stream> Decrypt(string Id, string Type, string From, string To, Stream Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            if (Data.Length < 8)
-                return null;
+		/// <summary>
+		/// Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
+		/// </summary>
+		/// <returns>New key</returns>
+		public abstract byte[] GenerateKey();
 
-            int SignatureLen;
-            int KeyLen;
-            int DataLen;
-            uint Counter;
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
+		/// A new key must be generated before the counter wraps.</param>
+		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="Sender">Local endpoint performing the encryption.</param>
+		/// <param name="Receiver">Remote endpoint performing the decryption.</param>
+		/// <returns>Encrypted data</returns>
+		public virtual byte[] Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			byte[] Encrypted;
+			byte[] EncryptedKey;
+			byte[] Key;
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+			byte[] Signature;
+			byte[] Block;
+			int i, j, k, l;
+			int c = 8;
 
-            if (Receiver.SupportsSignatures)
-            {
-                SignatureLen = Data.ReadByte();
-                if ((SignatureLen & 128) != 0)
-                {
-                    SignatureLen &= 127;
-                    SignatureLen |= Data.ReadByte() << 7;
-                }
-            }
-            else
-                SignatureLen = 0;
+			if (Sender.SupportsSharedSecrets)
+			{
+				Key = Sender.GetSharedSecret(Receiver);
+				EncryptedKey = null;
+				l = 0;
+			}
+			else
+			{
+				Key = this.GenerateKey();
+				EncryptedKey = Receiver.EncryptSecret(Key);
+				l = EncryptedKey.Length;
+				c += l + 2;
+			}
 
-            if (Receiver.SupportsSharedSecrets)
-                KeyLen = 0;
-            else
-            {
-                KeyLen = Data.ReadByte();
-                KeyLen |= Data.ReadByte() << 8;
-            }
+			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
+			i = Encrypted.Length;
+			j = 0;
+			c += i;
 
-            if (Data.Position + 4 > Data.Length)
-                return null;
+			if (Sender.SupportsSignatures)
+			{
+				Signature = Sender.Sign(Data);
+				k = Signature.Length;
+				c += k + 1;
+				if (k >= 128)
+					c++;
+			}
+			else
+			{
+				k = 0;
+				Signature = null;
+			}
 
-            DataLen = Data.ReadByte();
-            DataLen |= Data.ReadByte() << 8;
-            DataLen |= Data.ReadByte() << 16;
-            DataLen |= Data.ReadByte() << 24;
+			Block = new byte[c];
 
-            Counter = (byte)Data.ReadByte();
-            Counter |= (uint)(Data.ReadByte() << 8);
-            Counter |= (uint)(Data.ReadByte() << 16);
-            Counter |= (uint)(Data.ReadByte() << 24);
+			if (k > 0)
+			{
+				if (k < 128)
+					Block[j++] = (byte)k;
+				else
+				{
+					Block[j++] = (byte)(k | 128);
+					Block[j++] = (byte)(k >> 7);
+				}
+			}
 
-            if (Data.Length != Data.Position + SignatureLen + KeyLen + DataLen)
-                return null;
+			if (l > 0)
+			{
+				Block[j++] = (byte)l;
+				Block[j++] = (byte)(l >> 8);
+			}
 
-            byte[] Signature = new byte[SignatureLen];
-            byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
-            byte[] Key;
+			Block[j++] = (byte)i;
+			Block[j++] = (byte)(i >> 8);
+			Block[j++] = (byte)(i >> 16);
+			Block[j++] = (byte)(i >> 24);
 
-            if (await Data.ReadAsync(Signature, 0, SignatureLen) != SignatureLen)
-                return null;
+			Block[j++] = (byte)Counter;
+			Block[j++] = (byte)(Counter >> 8);
+			Block[j++] = (byte)(Counter >> 16);
+			Block[j++] = (byte)(Counter >> 24);
 
-            if (KeyLen > 0)
-            {
-                if (await Data.ReadAsync(EncryptedKey, 0, KeyLen) != KeyLen)
-                    return null;
-            }
+			if (k > 0)
+			{
+				Array.Copy(Signature, 0, Block, j, k);
+				j += k;
+			}
 
-            using (TemporaryStream Encrypted = new TemporaryStream())
-            {
-                await Crypto.CopyAsync(Data, Encrypted, DataLen);
+			if (l > 0)
+			{
+				Array.Copy(EncryptedKey, 0, Block, j, l);
+				j += l;
+			}
 
-                if (EncryptedKey is null)
-                    Key = Receiver.GetSharedSecret(Sender);
-                else
-                    Key = Receiver.DecryptSecret(EncryptedKey);
+			Array.Copy(Encrypted, 0, Block, j, i);
 
-                byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-                byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-                Stream Decrypted = null;
+			return Block;
+		}
 
-                try
-                {
-                    Encrypted.Position = 0;
-                    Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
+		/// <summary>
+		/// Decrypts binary data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Data">Binary data to decrypt</param>
+		/// <param name="Sender">Remote endpoint performing the encryption.</param>
+		/// <param name="Receiver">Local endpoint performing the decryption.</param>
+		/// <returns>Decrypted data, if able, null otherwise.</returns>
+		public virtual byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			if (Data.Length < 8)
+				return null;
 
-                    if (!(Decrypted is null))
-                    {
-                        Decrypted.Position = 0;
+			int SignatureLen;
+			int KeyLen;
+			int DataLen;
+			uint Counter;
+			int i = 0;
 
-                        if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                            (!Sender.SupportsSignatures && SignatureLen == 0))
-                        {
-                            return Decrypted;
-                        }
+			if (Receiver.SupportsSignatures)
+			{
+				SignatureLen = Data[i++];
+				if ((SignatureLen & 128) != 0)
+				{
+					SignatureLen &= 127;
+					SignatureLen |= Data[i++] << 7;
+				}
+			}
+			else
+				SignatureLen = 0;
 
-                        Decrypted.Dispose();
-                        Decrypted = null;
-                    }
-                }
-                catch (Exception)
-                {
-                    // Invalid key
+			if (Receiver.SupportsSharedSecrets)
+				KeyLen = 0;
+			else
+			{
+				KeyLen = Data[i++];
+				KeyLen |= Data[i++] << 8;
+			}
 
-                    Decrypted?.Dispose();
-                    Decrypted = null;
-                }
+			if (i + 4 > Data.Length)
+				return null;
 
-                if (!(Receiver.Previous is null))
-                {
-                    try
-                    {
-                        if (EncryptedKey is null)
-                            Key = Receiver.Previous.GetSharedSecret(Sender);
-                        else
-                            Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+			DataLen = Data[i++];
+			DataLen |= Data[i++] << 8;
+			DataLen |= Data[i++] << 16;
+			DataLen |= Data[i++] << 24;
 
-                        if (!(Key is null))
-                        {
-                            Encrypted.Position = 0;
-                            Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
+			Counter = Data[i++];
+			Counter |= (uint)(Data[i++] << 8);
+			Counter |= (uint)(Data[i++] << 16);
+			Counter |= (uint)(Data[i++] << 24);
 
-                            if (!(Decrypted is null))
-                            {
-                                Decrypted.Position = 0;
+			if (Data.Length != i + SignatureLen + KeyLen + DataLen)
+				return null;
 
-                                if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                                    (!Sender.SupportsSignatures && SignatureLen == 0))
-                                {
-                                    return Decrypted;
-                                }
+			byte[] Signature = new byte[SignatureLen];
+			byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
+			byte[] Encrypted = new byte[DataLen];
+			byte[] Key;
 
-                                Decrypted.Dispose();
-                                Decrypted = null;
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // Invalid key
+			Array.Copy(Data, i, Signature, 0, SignatureLen);
+			i += SignatureLen;
 
-                        Decrypted?.Dispose();
-                        Decrypted = null;
-                    }
-                }
+			if (KeyLen > 0)
+			{
+				Array.Copy(Data, i, EncryptedKey, 0, KeyLen);
+				i += KeyLen;
+			}
 
-                return null;
-            }
-        }
+			Array.Copy(Data, i, Encrypted, 0, DataLen);
+
+			if (EncryptedKey is null)
+				Key = Receiver.GetSharedSecret(Sender);
+			else
+				Key = Receiver.DecryptSecret(EncryptedKey);
+
+			byte[] Decrypted;
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+
+			try
+			{
+				Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
+
+				if (!(Decrypted is null) &&
+					((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+					(!Sender.SupportsSignatures && SignatureLen == 0)))
+				{
+					return Decrypted;
+				}
+			}
+			catch (Exception)
+			{
+				// Invalid key
+			}
+
+			if (!(Receiver.Previous is null))
+			{
+				try
+				{
+					if (EncryptedKey is null)
+						Key = Receiver.Previous.GetSharedSecret(Sender);
+					else
+						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+
+					if (!(Key is null))
+					{
+						Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
+
+						if (!(Decrypted is null) &&
+							((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+							(!Sender.SupportsSignatures && SignatureLen == 0)))
+						{
+							return Decrypted;
+						}
+					}
+				}
+				catch (Exception)
+				{
+					// Invalid key
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Encrypts binary data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
+		/// A new key must be generated before the counter wraps.</param>
+		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="Encrypted">Encrypted data will be stored here.</param>
+		/// <param name="Sender">Local endpoint performing the encryption.</param>
+		/// <param name="Receiver">Remote endpoint performing the decryption.</param>
+		public virtual async Task Encrypt(string Id, string Type, string From, string To, uint Counter, Stream Data, Stream Encrypted, IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			using (TemporaryStream TempEncrypted = new TemporaryStream())
+			{
+				byte[] EncryptedKey;
+				byte[] Key;
+				byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+				byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+				byte[] Signature;
+				long i;
+				int k, l;
+
+				if (Sender.SupportsSharedSecrets)
+				{
+					Key = Sender.GetSharedSecret(Receiver);
+					EncryptedKey = null;
+					l = 0;
+				}
+				else
+				{
+					Key = this.GenerateKey();
+					EncryptedKey = Receiver.EncryptSecret(Key);
+					l = EncryptedKey.Length;
+				}
+
+				await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
+				i = TempEncrypted.Length;
+
+				if (i > uint.MaxValue)
+					throw new NotSupportedException("Too large.");
+
+				if (Sender.SupportsSignatures)
+				{
+					Data.Position = 0;
+					Signature = Sender.Sign(Data);
+					k = Signature.Length;
+				}
+				else
+				{
+					k = 0;
+					Signature = null;
+				}
+
+				if (k > 0)
+				{
+					if (k < 128)
+						Encrypted.WriteByte((byte)k);
+					else
+					{
+						Encrypted.WriteByte((byte)(k | 128));
+						Encrypted.WriteByte((byte)(k >> 7));
+					}
+				}
+
+				if (l > 0)
+				{
+					Encrypted.WriteByte((byte)l);
+					Encrypted.WriteByte((byte)(l >> 8));
+				}
+
+				Encrypted.WriteByte((byte)i);
+				Encrypted.WriteByte((byte)(i >> 8));
+				Encrypted.WriteByte((byte)(i >> 16));
+				Encrypted.WriteByte((byte)(i >> 24));
+
+				Encrypted.WriteByte((byte)Counter);
+				Encrypted.WriteByte((byte)(Counter >> 8));
+				Encrypted.WriteByte((byte)(Counter >> 16));
+				Encrypted.WriteByte((byte)(Counter >> 24));
+
+				if (k > 0)
+					await Encrypted.WriteAsync(Signature, 0, k);
+
+				if (l > 0)
+					await Encrypted.WriteAsync(EncryptedKey, 0, l);
+
+				TempEncrypted.Position = 0;
+				await TempEncrypted.CopyToAsync(Encrypted);
+			}
+		}
+
+		/// <summary>
+		/// Decrypts binary data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Data">Binary data to decrypt</param>
+		/// <param name="Sender">Remote endpoint performing the encryption.</param>
+		/// <param name="Receiver">Local endpoint performing the decryption.</param>
+		/// <returns>Decrypted data, if able, null otherwise.</returns>
+		public virtual async Task<Stream> Decrypt(string Id, string Type, string From, string To, Stream Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			if (Data.Length < 8)
+				return null;
+
+			int SignatureLen;
+			int KeyLen;
+			int DataLen;
+			uint Counter;
+
+			if (Receiver.SupportsSignatures)
+			{
+				SignatureLen = Data.ReadByte();
+				if ((SignatureLen & 128) != 0)
+				{
+					SignatureLen &= 127;
+					SignatureLen |= Data.ReadByte() << 7;
+				}
+			}
+			else
+				SignatureLen = 0;
+
+			if (Receiver.SupportsSharedSecrets)
+				KeyLen = 0;
+			else
+			{
+				KeyLen = Data.ReadByte();
+				KeyLen |= Data.ReadByte() << 8;
+			}
+
+			if (Data.Position + 4 > Data.Length)
+				return null;
+
+			DataLen = Data.ReadByte();
+			DataLen |= Data.ReadByte() << 8;
+			DataLen |= Data.ReadByte() << 16;
+			DataLen |= Data.ReadByte() << 24;
+
+			Counter = (byte)Data.ReadByte();
+			Counter |= (uint)(Data.ReadByte() << 8);
+			Counter |= (uint)(Data.ReadByte() << 16);
+			Counter |= (uint)(Data.ReadByte() << 24);
+
+			if (Data.Length != Data.Position + SignatureLen + KeyLen + DataLen)
+				return null;
+
+			byte[] Signature = new byte[SignatureLen];
+			byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
+			byte[] Key;
+
+			if (await Data.ReadAsync(Signature, 0, SignatureLen) != SignatureLen)
+				return null;
+
+			if (KeyLen > 0)
+			{
+				if (await Data.ReadAsync(EncryptedKey, 0, KeyLen) != KeyLen)
+					return null;
+			}
+
+			using (TemporaryStream Encrypted = new TemporaryStream())
+			{
+				await Crypto.CopyAsync(Data, Encrypted, DataLen);
+
+				if (EncryptedKey is null)
+					Key = Receiver.GetSharedSecret(Sender);
+				else
+					Key = Receiver.DecryptSecret(EncryptedKey);
+
+				byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+				byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+				Stream Decrypted = null;
+
+				try
+				{
+					Encrypted.Position = 0;
+					Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
+
+					if (!(Decrypted is null))
+					{
+						Decrypted.Position = 0;
+
+						if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+							(!Sender.SupportsSignatures && SignatureLen == 0))
+						{
+							return Decrypted;
+						}
+
+						Decrypted.Dispose();
+						Decrypted = null;
+					}
+				}
+				catch (Exception)
+				{
+					// Invalid key
+
+					Decrypted?.Dispose();
+					Decrypted = null;
+				}
+
+				if (!(Receiver.Previous is null))
+				{
+					try
+					{
+						if (EncryptedKey is null)
+							Key = Receiver.Previous.GetSharedSecret(Sender);
+						else
+							Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+
+						if (!(Key is null))
+						{
+							Encrypted.Position = 0;
+							Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
+
+							if (!(Decrypted is null))
+							{
+								Decrypted.Position = 0;
+
+								if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+									(!Sender.SupportsSignatures && SignatureLen == 0))
+								{
+									return Decrypted;
+								}
+
+								Decrypted.Dispose();
+								Decrypted = null;
+							}
+						}
+					}
+					catch (Exception)
+					{
+						// Invalid key
+
+						Decrypted?.Dispose();
+						Decrypted = null;
+					}
+				}
+
+				return null;
+			}
+		}
 
 
-        /// <summary>
-        /// Encrypts Binary data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
-        /// A new key must be generated before the counter wraps.</param>
-        /// <param name="Data">Binary data to encrypt</param>
-        /// <param name="Xml">XML output</param>
-        /// <param name="Sender">Local endpoint performing the encryption.</param>
-        /// <param name="Receiver">Remote endpoint performing the decryption.</param>
-        /// <returns>If encryption was possible</returns>
-        public virtual bool Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data,
-            StringBuilder Xml, IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            byte[] Encrypted;
-            byte[] Key;
-            byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-            byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+		/// <summary>
+		/// Encrypts Binary data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Counter">Counter. Can be reset every time a new key is generated.
+		/// A new key must be generated before the counter wraps.</param>
+		/// <param name="Data">Binary data to encrypt</param>
+		/// <param name="Xml">XML output</param>
+		/// <param name="Sender">Local endpoint performing the encryption.</param>
+		/// <param name="Receiver">Remote endpoint performing the decryption.</param>
+		/// <returns>If encryption was possible</returns>
+		public virtual bool Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data,
+			StringBuilder Xml, IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			byte[] Encrypted;
+			byte[] Key;
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
 
-            Xml.Append('<');
-            Xml.Append(this.LocalName);
-            Xml.Append(" xmlns=\"");
-            Xml.Append(this.Namespace);
-            Xml.Append("\" r=\"");
-            if (Sender.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
-            {
-                Xml.Append(Sender.Namespace);
-                Xml.Append('#');
-            }
-            Xml.Append(Sender.LocalName);
-            Xml.Append("\" c=\"");
-            Xml.Append(Counter.ToString());
+			Xml.Append('<');
+			Xml.Append(this.LocalName);
+			Xml.Append(" xmlns=\"");
+			Xml.Append(this.Namespace);
+			Xml.Append("\" r=\"");
+			if (Sender.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
+			{
+				Xml.Append(Sender.Namespace);
+				Xml.Append('#');
+			}
+			Xml.Append(Sender.LocalName);
+			Xml.Append("\" c=\"");
+			Xml.Append(Counter.ToString());
 
-            if (Sender.SupportsSharedSecrets)
-                Key = Sender.GetSharedSecret(Receiver);
-            else
-            {
-                Key = this.GenerateKey();
+			if (Sender.SupportsSharedSecrets)
+				Key = Sender.GetSharedSecret(Receiver);
+			else
+			{
+				Key = this.GenerateKey();
 
-                byte[] EncryptedKey = Receiver.EncryptSecret(Key);
+				byte[] EncryptedKey = Receiver.EncryptSecret(Key);
 
-                Xml.Append("\" k=\"");
-                Xml.Append(Convert.ToBase64String(EncryptedKey));
-            }
+				Xml.Append("\" k=\"");
+				Xml.Append(Convert.ToBase64String(EncryptedKey));
+			}
 
-            Encrypted = this.Encrypt(Data, Key, IV, AssociatedData);
+			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
 
-            if (Sender.SupportsSignatures)
-            {
-                byte[] Signature = Sender.Sign(Data);
+			if (Sender.SupportsSignatures)
+			{
+				byte[] Signature = Sender.Sign(Data);
 
-                Xml.Append("\" s=\"");
-                Xml.Append(Convert.ToBase64String(Signature));
-            }
+				Xml.Append("\" s=\"");
+				Xml.Append(Convert.ToBase64String(Signature));
+			}
 
-            Xml.Append("\">");
-            Xml.Append(Convert.ToBase64String(Encrypted));
-            Xml.Append("</");
-            Xml.Append(this.LocalName);
-            Xml.Append('>');
+			Xml.Append("\">");
+			Xml.Append(Convert.ToBase64String(Encrypted));
+			Xml.Append("</");
+			Xml.Append(this.LocalName);
+			Xml.Append('>');
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// Decrypts XML data
-        /// </summary>
-        /// <param name="Id">Id attribute</param>
-        /// <param name="Type">Type attribute</param>
-        /// <param name="From">From attribute</param>
-        /// <param name="To">To attribute</param>
-        /// <param name="Xml">XML element with encrypted data.</param>
-        /// <param name="Sender">Remote endpoint performing the encryption.</param>
-        /// <param name="Receiver">Local endpoint performing the decryption.</param>
-        /// <returns>Decrypted XMLs</returns>
-        public virtual string Decrypt(string Id, string Type, string From, string To, XmlElement Xml,
-            IE2eEndpoint Sender, IE2eEndpoint Receiver)
-        {
-            byte[] EncryptedKey = null;
-            byte[] Signature = null;
-            uint? Counter = null;
+		/// <summary>
+		/// Decrypts XML data
+		/// </summary>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="From">From attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">XML element with encrypted data.</param>
+		/// <param name="Sender">Remote endpoint performing the encryption.</param>
+		/// <param name="Receiver">Local endpoint performing the decryption.</param>
+		/// <returns>Decrypted XMLs</returns>
+		public virtual string Decrypt(string Id, string Type, string From, string To, XmlElement Xml,
+			IE2eEndpoint Sender, IE2eEndpoint Receiver)
+		{
+			byte[] EncryptedKey = null;
+			byte[] Signature = null;
+			uint? Counter = null;
 
-            foreach (XmlAttribute Attr in Xml.Attributes)
-            {
-                switch (Attr.Name)
-                {
-                    case "c":
-                        if (!uint.TryParse(Attr.Value, out uint i))
-                            return null;
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "c":
+						if (!uint.TryParse(Attr.Value, out uint i))
+							return null;
 
-                        Counter = i;
-                        break;
+						Counter = i;
+						break;
 
-                    case "s":
-                        Signature = Convert.FromBase64String(Attr.Value);
-                        break;
+					case "s":
+						Signature = Convert.FromBase64String(Attr.Value);
+						break;
 
-                    case "k":
-                        EncryptedKey = Convert.FromBase64String(Attr.Value);
-                        break;
-                }
-            }
+					case "k":
+						EncryptedKey = Convert.FromBase64String(Attr.Value);
+						break;
+				}
+			}
 
-            if (!Counter.HasValue)
-                return null;
+			if (!Counter.HasValue)
+				return null;
 
-            byte[] Encrypted = Convert.FromBase64String(Xml.InnerText);
-            byte[] Decrypted;
-            byte[] Key;
+			byte[] Encrypted = Convert.FromBase64String(Xml.InnerText);
+			byte[] Decrypted;
+			byte[] Key;
 
-            if (EncryptedKey is null)
-                Key = Receiver.GetSharedSecret(Sender);
-            else
-                Key = Receiver.DecryptSecret(EncryptedKey);
+			if (EncryptedKey is null)
+				Key = Receiver.GetSharedSecret(Sender);
+			else
+				Key = Receiver.DecryptSecret(EncryptedKey);
 
-            byte[] IV = this.GetIV(Id, Type, From, To, Counter.Value);
-            byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter.Value);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
 
-            try
-            {
-                Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
+			try
+			{
+				Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                if (!(Decrypted is null) &&
-                    ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                    (!Sender.SupportsSignatures && Signature is null)))
-                {
-                    return Encoding.UTF8.GetString(Decrypted);
-                }
-            }
-            catch (Exception)
-            {
-                // Invalid key
-            }
+				if (!(Decrypted is null) &&
+					((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+					(!Sender.SupportsSignatures && Signature is null)))
+				{
+					return Encoding.UTF8.GetString(Decrypted);
+				}
+			}
+			catch (Exception)
+			{
+				// Invalid key
+			}
 
-            if (!(Receiver.Previous is null))
-            {
-                try
-                {
-                    if (EncryptedKey is null)
-                        Key = Receiver.Previous.GetSharedSecret(Sender);
-                    else
-                        Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+			if (!(Receiver.Previous is null))
+			{
+				try
+				{
+					if (EncryptedKey is null)
+						Key = Receiver.Previous.GetSharedSecret(Sender);
+					else
+						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
 
-                    if (!(Key is null))
-                    {
-                        Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
+					if (!(Key is null))
+					{
+						Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                        if (!(Decrypted is null) &&
-                            ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-                            (!Sender.SupportsSignatures && Signature is null)))
-                        {
-                            return Encoding.UTF8.GetString(Decrypted);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // Invalid key
-                }
-            }
+						if (!(Decrypted is null) &&
+							((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+							(!Sender.SupportsSignatures && Signature is null)))
+						{
+							return Encoding.UTF8.GetString(Decrypted);
+						}
+					}
+				}
+				catch (Exception)
+				{
+					// Invalid key
+				}
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 }

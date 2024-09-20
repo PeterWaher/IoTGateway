@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.MQTT
 {
@@ -54,9 +54,7 @@ namespace Waher.Networking.MQTT
 		public byte[] ReadBytes(int Length)
 		{
 			byte[] Result = new byte[Length];
-			int i = this.ms.Read(Result, 0, Length);
-			if (i < Length)
-				throw new EndOfStreamException();
+			this.ms.ReadAll(Result, 0, Length);
 
 			return Result;
 		}

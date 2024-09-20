@@ -22,49 +22,61 @@
 			<xs:documentation>XML Schemas can either be registered with the Trust Provider out-of-band, or downloaded by the Trust Provider automatically, if accessible through the namespace URI, if it's using a downloadable URI scheme. The XML Schema must not contain processing instructions.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:choice minOccurs='1' maxOccurs='1'>
-				<xs:element ref='contract'>
-					<xs:annotation>
-						<xs:documentation>The contract the legal identity of the client wants to create.</xs:documentation>
-						<xs:documentation>Note: A contract has to be reviewed and approved by the Trust Provider before the contract can be signed. The review-process is performed out-of-band.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='template'>
-					<xs:annotation>
-						<xs:documentation>By referencing a reviewed and approved contract instead of creating an absolutely new one, the legal identity can skip the review and approval steps otherwise required when creating a new contract.</xs:documentation>
-						<xs:documentation>Note: The client must be authorized to access the referenced contract, in order to be able to create new contracts based on the referenced one.</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+			<xs:sequence>
+				<xs:choice minOccurs='1' maxOccurs='1'>
+					<xs:element ref='contract'>
+						<xs:annotation>
+							<xs:documentation>The contract the legal identity of the client wants to create.</xs:documentation>
+							<xs:documentation>Note: A contract has to be reviewed and approved by the Trust Provider before the contract can be signed. The review-process is performed out-of-band.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name='template'>
+						<xs:annotation>
+							<xs:documentation>By referencing a reviewed and approved contract instead of creating an absolutely new one, the legal identity can skip the review and approval steps otherwise required when creating a new contract.</xs:documentation>
+							<xs:documentation>Note: The client must be authorized to access the referenced contract, in order to be able to create new contracts based on the referenced one.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+									<xs:annotation>
+										<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+									<xs:annotation>
+										<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
+										<xs:documentation>Array must not contain parameters not available in the referenced contract.</xs:documentation>
+										<xs:documentation>Prameters available in the referenced contract will be used as-is, if not available in this sequence, or overwritten by the present parameters, if available.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name='id' type='xs:string' use='required'>
 								<xs:annotation>
-									<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+									<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
+									<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete, Rejected or Failed must result in a failure.</xs:documentation>
+									<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
+									<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
 								</xs:annotation>
-							</xs:element>
-							<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+							</xs:attribute>
+							<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
 								<xs:annotation>
-									<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
-									<xs:documentation>Array must not contain parameters not available in the referenced contract.</xs:documentation>
-									<xs:documentation>Prameters available in the referenced contract will be used as-is, if not available in this sequence, or overwritten by the present parameters, if available.</xs:documentation>
+									<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
+									<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
+									<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
+									<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
+									<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
 								</xs:annotation>
-							</xs:element>
-						</xs:sequence>
-						<xs:attribute name='id' type='xs:string' use='required'>
-							<xs:annotation>
-								<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
-								<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete, Rejected or Failed must result in a failure.</xs:documentation>
-								<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
-								<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attributeGroup ref='visibilityAndDuration'>
-							<xs:annotation>
-								<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
-							</xs:annotation>
-						</xs:attributeGroup>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
+							</xs:attribute>
+							<xs:attributeGroup ref='visibilityAndDuration'>
+								<xs:annotation>
+									<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
+								</xs:annotation>
+							</xs:attributeGroup>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:element ref='transient' minOccurs='0' maxOccurs='1'/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
@@ -309,14 +321,31 @@
 					<xs:documentation>A client must not include an identifier when it creates a contract on the Trust Provider.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='nonce' type='xs:base64Binary' use='optional'>
+				<xs:annotation>
+					<xs:documentation>An optional base64-encoded nonce value that is used when encrypting protected parameter values.</xs:documentation>
+					<xs:documentation>The nonce value is not allowed to change once it has been created.</xs:documentation>
+					<xs:documentation>If not set by the creator of the contract, it will remain empty, or undefined.</xs:documentation>
+					<xs:documentation>Attribute is only serialized if a non-empty nonce is available.</xs:documentation>
+					<xs:documentation>A unique nonce ensures that parameter values are encrypted to unique representations in different contracts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='parameters'>
+	<xs:element name='parameters' type='Parameters'>
 		<xs:annotation>
 			<xs:documentation>Defines a set of parameters of a contract.</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
+	</xs:element>
+
+	<xs:element name='transient' type='Parameters'>
+		<xs:annotation>
+			<xs:documentation>Defines a set of transient parameter values.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:complexType name='Parameters'>
 			<xs:choice minOccurs='1' maxOccurs='unbounded'>
 				<xs:element name='stringParameter' type='StringParameter'>
 					<xs:annotation>
@@ -369,8 +398,7 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
-		</xs:complexType>
-	</xs:element>
+	</xs:complexType>
 
 	<xs:complexType name='Parameter' abstract='true'>
 		<xs:annotation>
@@ -402,17 +430,52 @@
 				<xs:documentation>Optional script expression validating the parameter.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name='transient' type='xs:boolean' use='optional' default='false'>
+		<xs:attribute name='protection' type='ProtectionLevel' use='optional'>
 			<xs:annotation>
-				<xs:documentation>If parameter is transient or not.</xs:documentation>
-				<xs:documentation>A transient parameter is sent out-of-scope of the signature.</xs:documentation>
-				<xs:documentation>Instead, a GUID is used as a parameter value.</xs:documentation>
-				<xs:documentation>This GUID can be used to peers to validate the signature of the contract.</xs:documentation>
-				<xs:documentation>Transient parameters can be used to protect the privacy or secrecy of certain information, such as credit card information, voting, etc.</xs:documentation>
-				<xs:documentation>Transient parameter values are only available in-transit, and must not be persisted.</xs:documentation>
+				<xs:documentation>Level of confidentiality of the information provided by the parameter.</xs:documentation>
+				<xs:documentation>If attribute is not provided, parameter value is treated as a normal parameter value.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='protected' type='xs:base64Binary' use='optional'>
+			<xs:annotation>
+				<xs:documentation>This attribute replaces the value attribute, if the parameter protection level is Encrypted or Transient.</xs:documentation>
+				<xs:documentation>For Transient parameters, this value will contain the base64-encoded binary representation of a GUID.</xs:documentation>
+				<xs:documentation>For Encrypted parameters, the value will contain the base64-encoded encryption of the parameter value.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
+
+	<xs:simpleType name='ProtectionLevel'>
+		<xs:annotation>
+			<xs:documentation>Defines different Information Protection Levels.</xs:documentation>
+			<xs:documentation>If no protection level is defined, values will be stored in the clear.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Encrypted'>
+				<xs:annotation>
+					<xs:documentation>The creator of a contract creates keys for the encryption and decryption of encrypted parameter values.</xs:documentation>
+					<xs:documentation>The creator is responsible for sharing the keys with the other parts of the contract, using end-to-end encrypted communication.</xs:documentation>
+					<xs:documentation>Only the parts who have received the shared secret can access the values of encrypted parameters.</xs:documentation>
+					<xs:documentation>Encrypted parameter values are not available in logs.</xs:documentation>
+					<xs:documentation>The UTF-8 encoding of the XML string representation of the parameter value is the clear text, prefixed by a random non-zero byte (see below), and suffixed by a number of code 0 bytes, is being encrypted.</xs:documentation>
+					<xs:documentation>If no parameter value is available (i.e. null value), only a string representing the suffix of code 0 characters is encrypted.</xs:documentation>
+					<xs:documentation>The length of the suffix string is calculated first by computing the SHA-256 hash of the concatenation of the encryption key, contract nonce and 4-byte encoding of the zero-based parameter index. The first byte of the hash is the length of the suffix string. The next non-zero byte in the hash represents the prefix, in case the encrypted string is not null.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Transient'>
+				<xs:annotation>
+					<xs:documentation>A transient parameter is sent out-of-scope of the signature.</xs:documentation>
+					<xs:documentation>Instead, a GUID is used as a parameter value.</xs:documentation>
+					<xs:documentation>This GUID can be used to peers to validate the signature of the contract.</xs:documentation>
+					<xs:documentation>Transient parameters can be used to protect the privacy or secrecy of certain information, such as credit card information, voting, etc.</xs:documentation>
+					<xs:documentation>Transient parameter values are only available in-transit, and must not be persisted.</xs:documentation>
+					<xs:documentation>Transient parameter values are not transmitted to other parts of the contract, and cannot be displayed in human-readable text.</xs:documentation>
+					<xs:documentation>Transient parameter values are not available in logs.</xs:documentation>
+					<xs:documentation>Transient parameter values are not persisted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:complexType name='StringParameter'>
 		<xs:annotation>
@@ -2422,6 +2485,63 @@
 			<xs:documentation>Can be sent in a normal message stanza directly to the indended recipient.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='sharedSecret' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>
+							<xs:annotation>
+								<xs:documentation>Shared secrets are used to encrypt and decrypt confidential parameters in the contract.</xs:documentation>
+								<xs:documentation>If using confidential parameters, make sure to send proposals using End-to-End Encrypted messages.</xs:documentation>
+								<xs:documentation>The recipient of a contract proposal will assume the sender bare JID represents the bare JID of the creator.</xs:documentation>
+								<xs:documentation>This fact is used when decrypting encrypted parameters in the contract.</xs:documentation>
+								<xs:documentation>If a third party forwards a contract proposal containing encrypted parameters, the recipient will not be able to decrypt the parameter values.</xs:documentation>
+								<xs:documentation>Only the creator of a contract can send contract proposals if the contract contains encrypted parameters.</xs:documentation>
+							</xs:annotation>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='key' type='xs:base64Binary' use='required'>
+							<xs:annotation>
+								<xs:documentation>Key used for encryption and decryption.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='algorithm' use='required'>
+							<xs:annotation>
+								<xs:documentation>Algorithm used for encryption and decryption.</xs:documentation>
+								<xs:documentation>The same symmetric ciphers as are available for End-to-End encryption (E2EE) can be used.</xs:documentation>
+								<xs:documentation>Algorithms requiring an IV, use the same IV algorithms as for E2EE, replacing id with parameter name, type with XML local name of parameter type, from with Bare JID of creator, to with the base64-encoded contract nonce and counter with the zero-based parameter index.</xs:documentation>
+								<xs:documentation>Algorithms requiring associated data, calculate it as the UTF-8 encoding of the parameter name.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base='xs:string'>
+									<xs:enumeration value='aes'>
+										<xs:annotation>
+											<xs:documentation>AES-256 encryption of string representation of parameter value, UTF-8 encoded, using Cipher Block Chaining (CBC) and PKCS#7 padding.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 16 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value='cha'>
+										<xs:annotation>
+											<xs:documentation>ChaCha20 encryption of string representation of parameter value, UTF-8 encoded, starting with block counter 1.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value='acp'>
+										<xs:annotation>
+											<xs:documentation>AEAD-ChaCha20-Poly1305 authenticated encryption with associated data of string representation of parameter value, UTF-8 encoded.</xs:documentation>
+											<xs:documentation>Parameter must not be accepted if the decryption fails.</xs:documentation>
+											<xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+											<xs:documentation>The Associated Data (AD) used in the AEAD algorithm is the UTF-8 encoding of the concatenation of the Contract ID and the Parameter Name.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='contractId' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The ID of the proposed contract.</xs:documentation>

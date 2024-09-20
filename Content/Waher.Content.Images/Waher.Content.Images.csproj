@@ -16,10 +16,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>internet content data type encoding decoding images EXIF</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.1.7</AssemblyVersion>
-    <FileVersion>2.1.7</FileVersion>
+    <AssemblyVersion>2.1.8</AssemblyVersion>
+    <FileVersion>2.1.8</FileVersion>
     <PackageIconUrl />
-    <Version>2.1.7</Version>
+    <Version>2.1.8</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Images\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

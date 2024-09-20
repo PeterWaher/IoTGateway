@@ -251,7 +251,7 @@ namespace Waher.Networking.HTTP
 		/// Gets the session ID used for a request.
 		/// </summary>
 		/// <param name="Request">Request object.</param>
-		/// <param name="Response">Response object.</param>
+		/// <param name="Response">Optional Response object.</param>
 		/// <returns>Session ID</returns>
 		public static string GetSessionId(HttpRequest Request, HttpResponse Response)
 		{
@@ -261,7 +261,7 @@ namespace Waher.Networking.HTTP
 			if (!(Cookie is null) && !string.IsNullOrEmpty(HttpSessionID = Cookie[HttpResource.HttpSessionID]))
 				return HttpSessionID;
 
-			if (!(Response.Cookies is null))
+			if (!(Response?.Cookies is null))
 			{
 				foreach (Cookie SetCookie in Response.Cookies)
 				{
@@ -271,7 +271,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-			Response.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
+			Response?.SetCookie(new Cookie(HttpResource.HttpSessionID, HttpSessionID, null, "/", null, false, true));
 
 			return HttpSessionID;
 		}

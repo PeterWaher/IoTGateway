@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Units.DerivedQuantities
@@ -19,10 +18,7 @@ namespace Waher.Script.Units.DerivedQuantities
 		/// <summary>
 		/// Name of derived quantity.
 		/// </summary>
-		public string Name
-		{
-			get { return "Power"; }
-		}
+		public string Name => "Power";
 
 		/// <summary>
 		/// Derived Units supported.

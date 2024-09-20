@@ -16,14 +16,14 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private string role = string.Empty;
 		private string property = string.Empty;
-		private string value = string.Empty;
+		private string @value = string.Empty;
 		private int index = 0;
 		private bool required = false;
 
 		/// <summary>
 		/// Parameter value.
 		/// </summary>
-		public override object ObjectValue => this.value;
+		public override object ObjectValue => this.@value;
 
 		/// <summary>
 		/// Name of role the parameter references.
@@ -64,7 +64,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Role parameter value.
 		/// </summary>
-		public string Value => this.value;
+		public string Value => this.@value;
+
+		/// <summary>
+		/// String representation of value.
+		/// </summary>
+		public override string StringValue
+		{
+			get => this.Value ?? string.Empty;
+			set
+			{
+				this.@value = value;
+				this.ProtectedValue = null;
+			}
+		}
+
+		/// <summary>
+		/// Parameter type name, corresponding to the local name of the parameter element in XML.
+		/// </summary>
+		public override string ParameterType => "roleParameter";
 
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -75,37 +93,53 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			if (!UsingTemplate)
 			{
-				Xml.Append("<roleParameter name=\"");
-				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" role=\"");
-				Xml.Append(XML.Encode(this.role.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" index=\"");
-				Xml.Append(this.index.ToString());
-				Xml.Append("\" property=\"");
-				Xml.Append(XML.Encode(this.property.Normalize(NormalizationForm.FormC)));
-				Xml.Append("\" required=\"");
-				Xml.Append(CommonTypes.Encode(this.required));
+				Xml.Append("<roleParameter");
 
 				if (!string.IsNullOrEmpty(this.Guide))
 				{
-					Xml.Append("\" guide=\"");
+					Xml.Append(" guide=\"");
 					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
-					Xml.Append("\" exp=\"");
+					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
 				}
 
-				if (this.Transient)
-					Xml.Append("\" transient=\"true");
+				Xml.Append(" index=\"");
+				Xml.Append(this.index.ToString());
+				Xml.Append('"');
+
+				Xml.Append(" name=\"");
+				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+
+				Xml.Append(" property=\"");
+				Xml.Append(XML.Encode(this.property.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
+
+				if (this.Protection != ProtectionLevel.Normal)
+				{
+					Xml.Append(" protection=\"");
+					Xml.Append(this.Protection.ToString());
+					Xml.Append('"');
+				}
+
+				if (this.required)
+					Xml.Append(" required=\"true\"");
+
+				Xml.Append(" role=\"");
+				Xml.Append(XML.Encode(this.role.Normalize(NormalizationForm.FormC)));
+				Xml.Append('"');
 
 				if (this.Descriptions is null || this.Descriptions.Length == 0)
-					Xml.Append("\"/>");
+					Xml.Append("/>");
 				else
 				{
-					Xml.Append("\">");
+					Xml.Append('>');
 
 					foreach (HumanReadableText Description in this.Descriptions)
 						Description.Serialize(Xml, "description", null);
@@ -135,7 +169,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			Variables[this.Name] = this.value;
+			Variables[this.Name] = this.@value;
 		}
 
 		/// <summary>
@@ -145,7 +179,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.value = Value?.ToString() ?? string.Empty;
+			this.@value = Value?.ToString() ?? string.Empty;
+			this.ProtectedValue = null;
 		}
 
 		/// <summary>
@@ -173,17 +208,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <returns>If import was successful.</returns>
-		public override async Task<bool> Import(XmlElement Xml)
+		public override Task<bool> Import(XmlElement Xml)
 		{
-			if (!await base.Import(Xml))
-				return false;
-
 			this.Role = XML.Attribute(Xml, "role");
 			this.Index = XML.Attribute(Xml, "index", 0);
 			this.Property = XML.Attribute(Xml, "property");
 			this.Required = XML.Attribute(Xml, "required", false);
 
-			return true;
+			return base.Import(Xml);
 		}
 
 	}

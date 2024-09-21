@@ -386,12 +386,11 @@ namespace Waher.Things.Metering
 
 			foreach (MeteringNode Node in await Database.Find<MeteringNode>())
 			{
-				try
-				{
-					await Database.LoadObject<MeteringNode>(Node.ParentId);
+				if (Node.ParentId == Guid.Empty)
 					continue;
-				}
-				catch (Exception) 
+
+				MeteringNode ParentNode = await Database.TryLoadObject<MeteringNode>(Node.ParentId);
+				if (ParentNode is null)
 				{
 					await Database.Delete(Node);
 					Result++;

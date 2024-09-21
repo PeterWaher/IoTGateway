@@ -394,6 +394,11 @@ namespace Waher.Things.Metering
 				{
 					await Database.Delete(Node);
 					Result++;
+
+					lock (nodes)
+					{
+						nodes.Remove(Node.NodeId);
+					}
 				}
 			}
 		

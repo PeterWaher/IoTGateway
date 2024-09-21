@@ -724,7 +724,7 @@ namespace Waher.Things.Metering
 			// Do nothing by default.
 		}
 
-		private async Task<MeteringNode> LoadParent()
+		internal async Task<MeteringNode> LoadParent()
 		{
 			if (!(this.parent is null))
 				return this.parent;

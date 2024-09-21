@@ -376,5 +376,30 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public static event NewMomentaryValuesHandler OnNewMomentaryValues = null;
 
+		/// <summary>
+		/// Deletes orphaned nodes in the metering topology source.
+		/// </summary>
+		/// <returns>Number of nodes deleted.</returns>
+		public static async Task<int> DeleteOrphans()
+		{
+			int Result = 0;
+
+			foreach (MeteringNode Node in await Database.Find<MeteringNode>())
+			{
+				try
+				{
+					await Database.LoadObject<MeteringNode>(Node.ParentId);
+					continue;
+				}
+				catch (Exception) 
+				{
+					await Database.Delete(Node);
+					Result++;
+				}
+			}
+		
+			return Result;
+		}
+
 	}
 }

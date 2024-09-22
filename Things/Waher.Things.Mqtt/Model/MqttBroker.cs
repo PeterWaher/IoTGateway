@@ -122,7 +122,8 @@ namespace Waher.Things.Mqtt.Model
 		public async Task DataReceived(MqttContent Content)
 		{
 			MqttTopic Topic = await this.GetTopic(Content.Topic, true);
-			Topic?.DataReported(Content);
+			if (!(Topic is null))
+				await Topic.DataReported(Content);
 		}
 
 		/// <summary>
@@ -202,7 +203,8 @@ namespace Waher.Things.Mqtt.Model
 				while (true)
 				{
 					MqttTopic Topic = await this.GetTopic(Content.Topic, true);
-					Topic?.DataReported(Content);
+					if (!(Topic is null))
+						await Topic.DataReported(Content);
 
 					lock (this.queue)
 					{
@@ -242,7 +244,7 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets the Node responsible for managing a Topic
 		/// </summary>
 		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew)
 		{
@@ -260,7 +262,7 @@ namespace Waher.Things.Mqtt.Model
 
 			if (Topic is null)
 			{
-				if (System.Guid.TryParse(Parts[0].Replace('_', '-'), out Guid _))
+				if (Guid.TryParse(Parts[0].Replace('_', '-'), out Guid _))
 					return null;
 
 				if (this.node.HasChildren)

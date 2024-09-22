@@ -117,7 +117,10 @@ namespace Waher.Things.Mqtt
 		public async Task<MqttTopic> GetTopic()
 		{
 			MqttBroker Broker = this.Broker?.GetBroker();
-			return await Broker?.GetTopic(this.FullTopic, false);
+			if (Broker is null)
+				return null;
+			else
+				return await Broker.GetTopic(this.FullTopic, false);
 		}
 
 		/// <summary>

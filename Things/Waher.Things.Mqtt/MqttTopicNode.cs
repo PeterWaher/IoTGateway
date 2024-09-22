@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Persistence.Attributes;
 using Waher.Things.Attributes;
@@ -12,14 +13,14 @@ using Waher.Things.Mqtt.Model;
 namespace Waher.Things.Mqtt
 {
 	/// <summary>
-	/// TODO
+	/// A Metering node representing an MQTT topic
 	/// </summary>
-	public class MqttTopicNode : ProvisionedMeteringNode, ISensor, IActuator
+	public class MqttTopicNode : ProvisionedMeteringNode, ISensor, IActuator, IMqttTopicNode
 	{
 		private string localTopic = string.Empty;
 
 		/// <summary>
-		/// TODO
+		/// A Metering node representing an MQTT topic
 		/// </summary>
 		public MqttTopicNode()
 			: base()
@@ -27,7 +28,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Local Topic segment
 		/// </summary>
 		[Page(2, "MQTT")]
 		[Header(22, "Local Topic:")]
@@ -40,12 +41,12 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Local ID
 		/// </summary>
 		public override string LocalId => this.localTopic;
 
 		/// <summary>
-		/// TODO
+		/// Full topic string.
 		/// </summary>
 		[IgnoreMember]
 		public string FullTopic
@@ -54,11 +55,11 @@ namespace Waher.Things.Mqtt
 			{
 				string Result = this.localTopic;
 
-				MqttTopicNode Loop = this.Parent as MqttTopicNode;
+				IMqttTopicNode Loop = this.Parent as IMqttTopicNode;
 				while (!(Loop is null))
 				{
-					Result = Loop.localTopic + "/" + Result;
-					Loop = Loop.Parent as MqttTopicNode;
+					Result = Loop.LocalTopic + "/" + Result;
+					Loop = Loop.Parent as IMqttTopicNode;
 				}
 
 				return Result;
@@ -92,7 +93,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is MqttTopicNode);
+			return Task.FromResult(Child is IMqttTopicNode);
 		}
 
 		/// <summary>
@@ -100,7 +101,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is MqttTopicNode || Parent is MqttBrokerNode);
+			return Task.FromResult(Parent is IMqttTopicNode || Parent is MqttBrokerNode);
 		}
 
 		/// <summary>
@@ -108,7 +109,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MqttTopicNode), 24, "Topic");
+			return Language.GetStringAsync(typeof(IMqttTopicNode), 24, "Topic");
 		}
 
 		/// <summary>
@@ -142,7 +143,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public async override Task<bool> RemoveAsync(INode Child)
 		{
-			if (Child is MqttTopicNode Topic)
+			if (Child is IMqttTopicNode Topic)
 				(await this.GetTopic())?.Remove(Topic.LocalTopic);
 
 			return await base.RemoveAsync(Child);
@@ -153,7 +154,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
-			return Task.FromResult<ControlParameter[]>(this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0]);
+			return Task.FromResult(this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0]);
 		}
 
 		/// <summary>
@@ -171,5 +172,30 @@ namespace Waher.Things.Mqtt
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
+
+		/// <summary>
+		/// How well the topic node supports an MQTT topic
+		/// </summary>
+		/// <param name="Topic">Topic being processed.</param>
+		/// <returns>How well the node supports a given topic, from the segment index presented.</returns>
+		public virtual Grade Supports(MqttTopicRepresentation Topic)
+		{
+			return Grade.Barely;
+		}
+
+		/// <summary>
+		/// Creates a new node of the same type.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic being processed.</param>
+		/// <returns>New node instance.</returns>
+		public virtual async Task<IMqttTopicNode> CreateNew(MqttTopicRepresentation Topic)
+		{
+			return new MqttTopicNode()
+			{
+				NodeId = await GetUniqueNodeId(Topic.CurrentSegment),
+				LocalTopic = Topic.CurrentSegment
+			};
+		}
+
 	}
 }

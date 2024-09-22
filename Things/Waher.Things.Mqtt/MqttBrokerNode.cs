@@ -81,7 +81,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		[Page(2, "MQTT")]
 		[Header(46, "Connection Subscription:")]
-		[ToolTip(47, "Subscription topic executed when connecting. Empty means no subscription will be performed.")]
+		[ToolTip(47, "Subscription topic executed when connecting. Empty means no subscription will be performed. Multiple subjects can be comma-separated.")]
 		[DefaultValue("#")]
 		public string ConnectionSubscription
 		{
@@ -209,12 +209,12 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public override Task<bool> RemoveAsync(INode Child)
+		public override async Task<bool> RemoveAsync(INode Child)
 		{
 			if (Child is MqttTopicNode Topic)
-				this.GetBroker().Remove(Topic.LocalTopic);
+				await this.GetBroker().Remove(Topic.LocalTopic);
 
-			return base.RemoveAsync(Child);
+			return await base.RemoveAsync(Child);
 		}
 
 		#region ISniffable

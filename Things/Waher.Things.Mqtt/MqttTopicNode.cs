@@ -89,7 +89,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// If the node accepts a given child.
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
@@ -97,7 +97,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// If the node accepts a given parent.
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
@@ -105,7 +105,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Diaplayable type name for node.
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{

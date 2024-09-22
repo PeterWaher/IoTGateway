@@ -45,7 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
+    <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj" />
+    <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
 
 </Project>

@@ -209,12 +209,12 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public override async Task<bool> RemoveAsync(INode Child)
+		public override Task<bool> RemoveAsync(INode Child)
 		{
 			if (Child is MqttTopicNode Topic)
-				await this.GetBroker().Remove(Topic.LocalTopic);
+				this.GetBroker().Remove(Topic.LocalTopic);
 
-			return await base.RemoveAsync(Child);
+			return base.RemoveAsync(Child);
 		}
 
 		#region ISniffable

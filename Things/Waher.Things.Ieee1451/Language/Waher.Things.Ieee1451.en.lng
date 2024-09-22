@@ -2,7 +2,7 @@
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Ieee1451">
-			<String id="1"></String>
+			<String id="1">IEEE 1451.1.6 Root</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -17,7 +17,6 @@ namespace Waher.Things.Mqtt.Model
 	{
 		private static Scheduler scheduler = null;
 		private readonly SortedDictionary<string, MqttTopic> topics = new SortedDictionary<string, MqttTopic>();
-		private readonly SemaphoreSlim topicSemaphore = new SemaphoreSlim(1);
 		private readonly MqttBrokerNode node;
 		private MqttClient mqttClient;
 		private bool connectionOk = false;
@@ -185,25 +184,22 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private async Task MqttClient_OnContentReceived(object Sender, MqttContent Content)
+		private Task MqttClient_OnContentReceived(object Sender, MqttContent Content)
 		{
-			await this.topicSemaphore.WaitAsync();
-			try
+			lock (this.topics)
 			{
 				if (this.processing)
 				{
 					this.queue.AddLast(Content);
-					return;
+					return Task.CompletedTask;
 				}
 				else
 					this.processing = true;
 			}
-			finally
-			{
-				this.topicSemaphore.Release();
-			}
 
 			this.Process(Content);
+
+			return Task.CompletedTask;
 		}
 
 		private readonly LinkedList<MqttContent> queue = new LinkedList<MqttContent>();
@@ -219,8 +215,7 @@ namespace Waher.Things.Mqtt.Model
 					if (!(Topic is null))
 						await Topic.DataReported(Content);
 
-					await this.topicSemaphore.WaitAsync();
-					try
+					lock (this.topics)
 					{
 						if (this.queue.First is null)
 						{
@@ -232,10 +227,6 @@ namespace Waher.Things.Mqtt.Model
 							Content = this.queue.First.Value;
 							this.queue.RemoveFirst();
 						}
-					}
-					finally
-					{
-						this.topicSemaphore.Release();
 					}
 				}
 			}
@@ -270,77 +261,86 @@ namespace Waher.Things.Mqtt.Model
 				return null;
 
 			MqttTopicRepresentation Representation = new MqttTopicRepresentation(TopicString, TopicString.Split('/'), 0);
-			string CurrentSegment = Representation.CurrentSegment;
-			MqttTopic Topic;
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew);
 
-			await this.topicSemaphore.WaitAsync();
-			try
-			{
-				if (!this.topics.TryGetValue(CurrentSegment, out Topic))
-					Topic = null;
-
-				if (Topic is null)
-				{
-					if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
-						return null;
-
-					if (this.node.HasChildren)
-					{
-						foreach (INode Child in await this.node.ChildNodes)
-						{
-							if (Child is IMqttTopicNode Topic2 && Topic2.LocalTopic == CurrentSegment)
-							{
-								Topic = new MqttTopic(Topic2, CurrentSegment, CurrentSegment, null, this);
-								break;
-							}
-						}
-					}
-
-					if (Topic is null)
-					{
-						if (!CreateNew)
-							return null;
-
-						IMqttTopicNode Node = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
-						if (Node is null)
-							return null;
-
-						Node = await Node.CreateNew(Representation);
-						Topic = new MqttTopic(Node, Node.LocalTopic, Node.LocalTopic, null, this);
-
-						await this.node.AddAsync(Node);
-					}
-
-					this.topics[Topic.LocalTopic] = Topic;
-				}
-			}
-			finally
-			{
-				this.topicSemaphore.Release();
-			}
-
-			if (Representation.MoveNext())
+			if (Topic is null)
+				return null;
+			else if (Representation.MoveNext())
 				return await Topic.GetTopic(Representation, CreateNew, this);
 			else
 				return Topic;
+		}
+
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew)
+		{
+			string CurrentSegment = Representation.CurrentSegment;
+			MqttTopic Topic, Topic2;
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic))
+					return Topic;
+			}
+
+			if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+				return null;
+
+			if (this.node.HasChildren)
+			{
+				foreach (INode Child in await this.node.ChildNodes)
+				{
+					if (Child is IMqttTopicNode TopicNode && TopicNode.LocalTopic == CurrentSegment)
+					{
+						lock (this.topics)
+						{
+							if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+								return Topic2;
+							else
+							{
+								Topic = new MqttTopic(TopicNode, CurrentSegment, CurrentSegment, null, this);
+								this.topics[CurrentSegment] = Topic;
+								return Topic;
+							}
+						}
+					}
+				}
+			}
+
+			if (!CreateNew)
+				return null;
+
+			IMqttTopicNode AddNode = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
+			if (AddNode is null)
+				return null;
+
+			AddNode = await AddNode.CreateNew(Representation);
+			Topic = new MqttTopic(AddNode, AddNode.LocalTopic, AddNode.LocalTopic, null, this);
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+					return Topic2;
+				else
+					this.topics[CurrentSegment] = Topic;
+			}
+
+			await this.node.AddAsync(AddNode);
+
+			return Topic;
 		}
 
 		/// <summary>
 		/// Removes a child topic
 		/// </summary>
 		/// <param name="LocalTopic">Local topic name.</param>
-		public async Task<bool> Remove(string LocalTopic)
+		/// <returns>If local topic was found and removed.</returns>
+		public bool Remove(string LocalTopic)
 		{
 			if (!(LocalTopic is null))
 			{
-				await this.topicSemaphore.WaitAsync();
-				try
+				lock (this.topics)
 				{
 					return this.topics.Remove(LocalTopic);
-				}
-				finally
-				{
-					this.topicSemaphore.Release();
 				}
 			}
 			else

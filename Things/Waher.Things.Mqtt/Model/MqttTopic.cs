@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
@@ -8,7 +7,6 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.Metering;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
 
@@ -20,7 +18,6 @@ namespace Waher.Things.Mqtt.Model
 	public class MqttTopic
 	{
 		private readonly SortedDictionary<string, MqttTopic> topics = new SortedDictionary<string, MqttTopic>();
-		private readonly SemaphoreSlim topicSemaphore = new SemaphoreSlim(1);
 		private readonly IMqttTopicNode node;
 		private readonly ThingReference nodeReference;
 		private readonly MqttTopic parent;
@@ -44,7 +41,7 @@ namespace Waher.Things.Mqtt.Model
 			this.broker = Broker;
 
 			this.nodeReference = Node as ThingReference;
-			if (this.nodeReference is null)
+			if (this.nodeReference is null && !(Node is null))
 				this.nodeReference = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
 		}
 
@@ -63,7 +60,7 @@ namespace Waher.Things.Mqtt.Model
 		/// </summary>
 		public string FullTopic => this.fullTopic;
 
-		private async Task<MqttTopic[]> GetChildNodes()
+		private MqttTopic[] GetChildNodes()
 		{
 			if (this.topics is null)
 				return new MqttTopic[0];
@@ -71,15 +68,10 @@ namespace Waher.Things.Mqtt.Model
 			{
 				MqttTopic[] Result;
 
-				await (this.topicSemaphore.WaitAsync());
-				try
+				lock (this.topics)
 				{
 					Result = new MqttTopic[this.topics.Count];
 					this.topics.Values.CopyTo(Result, 0);
-				}
-				finally
-				{
-					this.topicSemaphore.Release();
 				}
 
 				return Result;
@@ -88,59 +80,72 @@ namespace Waher.Things.Mqtt.Model
 
 		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
 		{
-			string CurrentSegment = Representation.CurrentSegment;
-			MqttTopic Topic;
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, Broker);
 
-			await this.topicSemaphore.WaitAsync();
-			try
-			{
-				if (!this.topics.TryGetValue(CurrentSegment, out Topic))
-					Topic = null;
-
-				if (Topic is null)
-				{
-					if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
-						return null;
-
-					if (this.node.HasChildren)
-					{
-						foreach (INode Child in await this.node.ChildNodes)
-						{
-							if (Child is IMqttTopicNode Topic2 && Topic2.LocalTopic == CurrentSegment)
-							{
-								Topic = new MqttTopic(Topic2, Topic2.FullTopic, CurrentSegment, null, Broker);
-								break;
-							}
-						}
-					}
-
-					if (Topic is null)
-					{
-						if (!CreateNew)
-							return null;
-
-						IMqttTopicNode Node = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
-						if (Node is null)
-							return null;
-
-						Node = await Node.CreateNew(Representation);
-						Topic = new MqttTopic(Node, Representation.ProcessedSegments, Node.LocalTopic, null, Broker);
-
-						await this.node.AddAsync(Node);
-					}
-
-					this.topics[Topic.LocalTopic] = Topic;
-				}
-			}
-			finally
-			{
-				this.topicSemaphore.Release();
-			}
-
-			if (Representation.MoveNext())
+			if (Topic is null)
+				return null;
+			else if (Representation.MoveNext())
 				return await Topic.GetTopic(Representation, CreateNew, Broker);
 			else
 				return Topic;
+		}
+
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
+		{
+			string CurrentSegment = Representation.CurrentSegment;
+			MqttTopic Topic, Topic2;
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic))
+					return Topic;
+			}
+
+			if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+				return null;
+
+			if (this.node.HasChildren)
+			{
+				foreach (INode Child in await this.node.ChildNodes)
+				{
+					if (Child is IMqttTopicNode TopicNode && TopicNode.LocalTopic == CurrentSegment)
+					{
+						lock (this.topics)
+						{
+							if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+								return Topic2;
+							else
+							{
+								Topic = new MqttTopic(TopicNode, Representation.ProcessedSegments, CurrentSegment, null, Broker);
+								this.topics[CurrentSegment] = Topic;
+								return Topic;
+							}
+						}
+					}
+				}
+			}
+
+			if (!CreateNew)
+				return null;
+
+			IMqttTopicNode AddNode = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
+			if (AddNode is null)
+				return null;
+
+			AddNode = await AddNode.CreateNew(Representation);
+			Topic = new MqttTopic(AddNode, Representation.ProcessedSegments, AddNode.LocalTopic, null, Broker);
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+					return Topic2;
+				else
+					this.topics[CurrentSegment] = Topic;
+			}
+
+			await this.node.AddAsync(AddNode);
+
+			return Topic;
 		}
 
 		/// <summary>
@@ -272,7 +277,7 @@ namespace Waher.Things.Mqtt.Model
 		{
 			try
 			{
-				MqttTopic[] ChildNodes = await this.GetChildNodes();
+				MqttTopic[] ChildNodes = this.GetChildNodes();
 
 				if (!(ChildNodes is null) && ChildNodes.Length > 0)
 				{
@@ -338,18 +343,14 @@ namespace Waher.Things.Mqtt.Model
 		/// Removes a child topic
 		/// </summary>
 		/// <param name="LocalTopic">Local topic name.</param>
-		public async Task<bool> Remove(string LocalTopic)
+		/// <returns>If local topic was found and removed.</returns>
+		public bool Remove(string LocalTopic)
 		{
 			if (!(LocalTopic is null))
 			{
-				await this.topicSemaphore.WaitAsync();
-				try
+				lock (this.topics)
 				{
 					return this.topics.Remove(LocalTopic);
-				}
-				finally
-				{
-					this.topicSemaphore.Release();
 				}
 			}
 			else

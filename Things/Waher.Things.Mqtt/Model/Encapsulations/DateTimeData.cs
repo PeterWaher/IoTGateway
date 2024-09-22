@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -13,7 +14,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with Date &amp; Time data.
 	/// </summary>
-	public class DateTimeData : Data
+	public class DateTimeData : MqttData
 	{
 		private DateTime value;
 
@@ -27,14 +28,21 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		public override bool DataReported(MqttContent Content)
 		{
-			this.value = DateTime.Parse(CommonTypes.GetString(Content.Data, Encoding.UTF8));
-			this.timestamp = DateTime.Now;
-			this.qos = Content.Header.QualityOfService;
-			this.retain = Content.Header.Retain;
+			if (DateTime.TryParse(Content.DataString, out DateTime Value) || XML.TryParse(Content.DataString, out Value))
+			{
+				this.value = Value;
+				this.Timestamp = DateTime.UtcNow;
+				this.QoS = Content.Header.QualityOfService;
+				this.Retain = Content.Header.Retain;
+
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -52,12 +60,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			if (this.value.TimeOfDay == TimeSpan.Zero)
 			{
-				Request.ReportFields(Last, new DateField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
+				Request.ReportFields(Last, new DateField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
 					this.value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 			}
 			else
 			{
-				Request.ReportFields(Last, new DateTimeField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
+				Request.ReportFields(Last, new DateTimeField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
 					this.value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 			}
 		}
@@ -79,7 +87,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n, v) =>
 					{
 						this.value = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v.ToString()));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v.ToString()));
 						return Task.CompletedTask;
 					})
 			};
@@ -92,5 +100,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			this.Information(Output, this.value.ToString());
 		}
+
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Perfect;
 	}
 }

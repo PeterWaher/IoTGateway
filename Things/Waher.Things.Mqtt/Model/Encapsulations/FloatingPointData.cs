@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -13,7 +14,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with Floating-point data.
 	/// </summary>
-	public class FloatingPointData : Data
+	public class FloatingPointData : MqttData
 	{
 		private double value;
 		private byte nrDecimals;
@@ -29,20 +30,22 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		public override bool DataReported(MqttContent Content)
 		{
-			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
-			if (CommonTypes.TryParse(s, out double x, out this.nrDecimals))
+			if (CommonTypes.TryParse(Content.DataString, out double x, out byte NrDecimals))
 			{
 				this.value = x;
-				this.timestamp = DateTime.Now;
-				this.qos = Content.Header.QualityOfService;
-				this.retain = Content.Header.Retain;
+				this.nrDecimals = NrDecimals;
+				this.Timestamp = DateTime.UtcNow;
+				this.QoS = Content.Header.QualityOfService;
+				this.Retain = Content.Header.Retain;
+
+				return true;
 			}
 			else
-				throw new Exception("Invalid floating-point value.");
+				return false;
 		}
 
 		/// <summary>
@@ -58,7 +61,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			Request.ReportFields(Last, new QuantityField(ThingReference, this.timestamp, this.Append(Prefix, "Value"), 
+			Request.ReportFields(Last, new QuantityField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"), 
 				this.value, this.nrDecimals, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
@@ -79,7 +82,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n, v) =>
 					{
 						this.value = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v, this.nrDecimals)));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v, this.nrDecimals)));
 						return Task.CompletedTask;
 					})
 			};
@@ -92,5 +95,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			this.Information(Output, this.value.ToString());
 		}
+
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Excellent;
 	}
 }

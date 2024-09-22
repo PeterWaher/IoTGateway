@@ -10,13 +10,14 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Things.Mqtt.Model.Encapsulations
 {
 	/// <summary>
 	/// Represents an MQTT topic with XML data.
 	/// </summary>
-	public class XmlData : Data
+	public class XmlData : MqttData
 	{
 		private string xml;
 		private XmlDocument value;
@@ -32,19 +33,30 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		public override bool DataReported(MqttContent Content)
 		{
-			this.value = new XmlDocument()
+			try
 			{
-				PreserveWhitespace = false
-			};
-			this.xml = CommonTypes.GetString(Content.Data, Encoding.UTF8);
-			this.value.LoadXml(this.xml);
-			this.timestamp = DateTime.Now;
-			this.qos = Content.Header.QualityOfService;
-			this.retain = Content.Header.Retain;
+				string s = Content.DataString;
+
+				this.value = new XmlDocument()
+				{
+					PreserveWhitespace = false
+				};
+				this.value.LoadXml(s);
+				this.xml = s;
+				this.Timestamp = DateTime.UtcNow;
+				this.QoS = Content.Header.QualityOfService;
+				this.Retain = Content.Header.Retain;
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -141,30 +153,30 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		private void Add(ThingReference ThingReference, List<Field> Fields, string Name, string Value, ISensorReadout Request)
 		{
 			if (int.TryParse(Value, out int i))
-				this.Add(Fields, new Int32Field(ThingReference, this.timestamp, Name, i, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new Int32Field(ThingReference, this.Timestamp, Name, i, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (long.TryParse(Value, out long l))
-				this.Add(Fields, new Int64Field(ThingReference, this.timestamp, Name, l, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new Int64Field(ThingReference, this.Timestamp, Name, l, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (CommonTypes.TryParse(Value, out bool b))
-				this.Add(Fields, new BooleanField(ThingReference, this.timestamp, Name, b, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new BooleanField(ThingReference, this.Timestamp, Name, b, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (CommonTypes.TryParse(Value, out double d, out byte NrDec))
-				this.Add(Fields, new QuantityField(ThingReference, this.timestamp, Name, d, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new QuantityField(ThingReference, this.Timestamp, Name, d, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (CommonTypes.TryParse(Value, out decimal d2, out NrDec))
-				this.Add(Fields, new QuantityField(ThingReference, this.timestamp, Name, (double)d2, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new QuantityField(ThingReference, this.Timestamp, Name, (double)d2, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (System.TimeSpan.TryParse(Value, out TimeSpan TimeSpan))
-				this.Add(Fields, new TimeField(ThingReference, this.timestamp, Name, TimeSpan, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new TimeField(ThingReference, this.Timestamp, Name, TimeSpan, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (System.DateTime.TryParse(Value, out DateTime DateTime))
 			{
 				if (DateTime.TimeOfDay == TimeSpan.Zero)
-					this.Add(Fields, new DateField(ThingReference, this.timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new DateField(ThingReference, this.Timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 				else
-					this.Add(Fields, new DateTimeField(ThingReference, this.timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new DateTimeField(ThingReference, this.Timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			}
 			else if (CommonTypes.TryParseRfc822(Value, out DateTimeOffset DateTimeOffset))
-				this.Add(Fields, new DateTimeField(ThingReference, this.timestamp, Name, DateTimeOffset.DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new DateTimeField(ThingReference, this.Timestamp, Name, DateTimeOffset.DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (Content.Duration.TryParse(Value, out Duration Duration))
-				this.Add(Fields, new DurationField(ThingReference, this.timestamp, Name, Duration, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new DurationField(ThingReference, this.Timestamp, Name, Duration, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else
-				this.Add(Fields, new StringField(ThingReference, this.timestamp, Name, Value, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new StringField(ThingReference, this.Timestamp, Name, Value, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 		}
 
 		/// <summary>
@@ -190,7 +202,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 						Doc.LoadXml(v);
 						this.value = Doc;
 						this.xml = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v));
 						return Task.CompletedTask;
 					})
 			};
@@ -204,5 +216,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.Information(Output, this.xml);
 		}
 
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Excellent;
 	}
 }

@@ -2,9 +2,9 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -14,7 +14,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with base64-encoded binary data.
 	/// </summary>
-	public class Base64Data : Data
+	public class Base64Data : MqttData
 	{
 		/// <summary>
 		/// TODO
@@ -38,14 +38,29 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		public override bool DataReported(MqttContent Content)
 		{
-			this.value = Convert.FromBase64String(CommonTypes.GetString(Content.Data, Encoding.ASCII));
-			this.timestamp = DateTime.Now;
-			this.qos = Content.Header.QualityOfService;
-			this.retain = Content.Header.Retain;
+			string s = Content.DataString;
+
+			if (RegEx.IsMatch(s))
+			{
+				try
+				{
+					this.value = Convert.FromBase64String(s);
+					this.Timestamp = DateTime.UtcNow;
+					this.QoS = Content.Header.QualityOfService;
+					this.Retain = Content.Header.Retain;
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -61,7 +76,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			Request.ReportFields(Last, new Int32Field(ThingReference, this.timestamp, this.Append(Prefix, "#Bytes"), 
+			Request.ReportFields(Last, new Int32Field(ThingReference, this.Timestamp, this.Append(Prefix, "#Bytes"), 
 				this.value.Length, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
@@ -82,7 +97,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n, v) =>
 					{
 						this.value = Convert.FromBase64String(v);
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v));
 						return Task.CompletedTask;
 					})
 			};
@@ -101,5 +116,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				this.Information(Output, this.value.Length.ToString() + " bytes.");
 		}
 
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Excellent;
 	}
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -13,7 +14,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with boolean data.
 	/// </summary>
-	public class BooleanData : Data
+	public class BooleanData : MqttData
 	{
 		private bool value;
 
@@ -27,20 +28,20 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		public override bool DataReported(MqttContent Content)
 		{
-			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
-			if (CommonTypes.TryParse(s, out bool b))
+			if (CommonTypes.TryParse(Content.DataString, out bool b))
 			{
 				this.value = b;
-				this.timestamp = DateTime.Now;
-				this.qos = Content.Header.QualityOfService;
-				this.retain = Content.Header.Retain;
+				this.Timestamp = DateTime.UtcNow;
+				this.QoS = Content.Header.QualityOfService;
+				this.Retain = Content.Header.Retain;
+				return true;
 			}
 			else
-				throw new Exception("Invalid boolean value.");
+				return false;
 		}
 
 		/// <summary>
@@ -56,7 +57,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			Request.ReportFields(Last, new BooleanField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
+			Request.ReportFields(Last, new BooleanField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
 				this.value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 		}
 
@@ -77,7 +78,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n, v) =>
 					{
 						this.value = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v)));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v)));
 						return Task.CompletedTask;
 					})
 			};
@@ -90,5 +91,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			this.Information(Output, this.value.ToString());
 		}
+
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Perfect;
 	}
 }

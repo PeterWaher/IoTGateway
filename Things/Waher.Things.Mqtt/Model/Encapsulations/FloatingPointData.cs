@@ -22,6 +22,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Floating-point data.
 		/// </summary>
+		public FloatingPointData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with Floating-point data.
+		/// </summary>
 		public FloatingPointData(MqttTopic Topic, double Value, byte NrDecimals)
 			: base(Topic)
 		{

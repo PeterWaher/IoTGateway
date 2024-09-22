@@ -32,6 +32,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with binary data encoded as decimal strings.
 		/// </summary>
+		public HexStringData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with binary data encoded as decimal strings.
+		/// </summary>
 		public HexStringData(MqttTopic Topic, byte[] Value)
 			: base(Topic)
 		{

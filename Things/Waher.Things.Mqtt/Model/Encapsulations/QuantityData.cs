@@ -29,6 +29,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Physical Quantity data.
 		/// </summary>
+		public QuantityData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with Physical Quantity data.
+		/// </summary>
 		public QuantityData(MqttTopic Topic, double Value, byte NrDecimals, string Unit)
 			: base(Topic)
 		{

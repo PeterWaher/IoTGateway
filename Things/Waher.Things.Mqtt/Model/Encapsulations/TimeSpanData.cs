@@ -20,6 +20,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with time span data.
 		/// </summary>
+		public TimeSpanData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with time span data.
+		/// </summary>
 		public TimeSpanData(MqttTopic Topic, TimeSpan Value)
 			: base(Topic)
 		{

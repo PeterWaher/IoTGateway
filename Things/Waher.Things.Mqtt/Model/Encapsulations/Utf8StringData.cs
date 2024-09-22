@@ -20,10 +20,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with string data.
 		/// </summary>
-		public Utf8StringData(MqttTopic Topic, string Value)
-			: base(Topic)
+		public Utf8StringData()
+			: base()
 		{
-			this.value = Value;
 		}
 
 		/// <summary>

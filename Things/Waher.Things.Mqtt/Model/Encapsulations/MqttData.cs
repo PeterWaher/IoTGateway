@@ -16,6 +16,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	public abstract class MqttData : IMqttData
 	{
 		/// <summary>
+		/// Abstract base class for MQTT data encapsulations.
+		/// </summary>
+		public MqttData()
+		{
+		}
+
+		/// <summary>
 		/// Timestamp of data reception.
 		/// </summary>
 		public DateTime Timestamp { get; protected set; } = DateTime.UtcNow;

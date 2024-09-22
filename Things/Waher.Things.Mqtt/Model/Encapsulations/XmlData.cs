@@ -25,6 +25,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with XML data.
 		/// </summary>
+		public XmlData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with XML data.
+		/// </summary>
 		public XmlData(MqttTopic Topic, string Xml, XmlDocument Value)
 			: base(Topic)
 		{

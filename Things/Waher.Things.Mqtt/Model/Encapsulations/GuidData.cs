@@ -20,6 +20,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with GUID data.
 		/// </summary>
+		public GuidData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with GUID data.
+		/// </summary>
 		public GuidData(MqttTopic Topic, Guid Value)
 			: base(Topic)
 		{

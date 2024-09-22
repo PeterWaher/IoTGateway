@@ -24,6 +24,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with JSON-encoded data.
 		/// </summary>
+		public JsonData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with JSON-encoded data.
+		/// </summary>
 		public JsonData(MqttTopic Topic, string Json, object Value)
 			: base(Topic)
 		{

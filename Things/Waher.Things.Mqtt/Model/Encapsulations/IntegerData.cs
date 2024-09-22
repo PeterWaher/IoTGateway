@@ -20,6 +20,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with integer data.
 		/// </summary>
+		public IntegerData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with integer data.
+		/// </summary>
 		public IntegerData(MqttTopic Topic, long Value)
 			: base(Topic)
 		{

@@ -22,6 +22,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Date &amp; Time &amp; Offset data.
 		/// </summary>
+		public DateTimeOffsetData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with Date &amp; Time &amp; Offset data.
+		/// </summary>
 		public DateTimeOffsetData(MqttTopic Topic, DateTimeOffset Value)
 			: base(Topic)
 		{

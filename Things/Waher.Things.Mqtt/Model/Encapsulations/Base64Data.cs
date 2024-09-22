@@ -31,6 +31,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with base64-encoded binary data.
 		/// </summary>
+		public Base64Data()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with base64-encoded binary data.
+		/// </summary>
 		public Base64Data(MqttTopic Topic, byte[] Value)
 			: base(Topic)
 		{

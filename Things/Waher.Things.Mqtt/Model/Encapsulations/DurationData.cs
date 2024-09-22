@@ -21,6 +21,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Duration data.
 		/// </summary>
+		public DurationData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with Duration data.
+		/// </summary>
 		public DurationData(MqttTopic Topic, Duration Value)
 			: base(Topic)
 		{

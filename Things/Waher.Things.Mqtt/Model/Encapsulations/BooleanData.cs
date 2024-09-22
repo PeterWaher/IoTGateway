@@ -21,6 +21,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with boolean data.
 		/// </summary>
+		public BooleanData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with boolean data.
+		/// </summary>
 		public BooleanData(MqttTopic Topic, bool Value)
 			: base(Topic)
 		{

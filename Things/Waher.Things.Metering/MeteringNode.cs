@@ -24,7 +24,7 @@ namespace Waher.Things.Metering
 	[ArchivingTime]
 	[Index("NodeId")]
 	[Index("ParentId", "NodeId")]
-	public abstract class MeteringNode : INode, ILifeCycleManagement
+	public abstract class MeteringNode : IMeteringNode
 	{
 		private Guid objectId = Guid.Empty;
 		private Guid parentId = Guid.Empty;

@@ -115,5 +115,18 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// Default support.
 		/// </summary>
 		public override Grade DefaultSupport => Grade.Barely;
+
+		/// <summary>
+		/// Creates a new instance of the data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Content">MQTT Content</param>
+		/// <returns>New object instance.</returns>
+		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
+		{
+			IMqttData Result = new BinaryData(Topic, default);
+			Result.DataReported(Content);
+			return Result;
+		}
 	}
 }

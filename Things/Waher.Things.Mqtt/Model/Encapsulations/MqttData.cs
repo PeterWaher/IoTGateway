@@ -20,6 +20,16 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public MqttData()
 		{
+			this.Topic = new MqttTopic(null, string.Empty, string.Empty, null, null);
+		}
+
+		/// <summary>
+		/// Abstract base class for MQTT data encapsulations.
+		/// </summary>
+		/// <param name="Topic">Topic node.</param>
+		public MqttData(MqttTopic Topic)
+		{
+			this.Topic = Topic;
 		}
 
 		/// <summary>
@@ -41,15 +51,6 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// If retain flag was set.
 		/// </summary>
 		public bool Retain { get; protected set; }
-
-		/// <summary>
-		/// Abstract base class for MQTT data encapsulations.
-		/// </summary>
-		/// <param name="Topic">Topic node.</param>
-		public MqttData(MqttTopic Topic)
-		{
-			this.Topic = Topic;
-		}
 
 		/// <summary>
 		/// If data can be controlled (written)
@@ -135,5 +136,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// Default support.
 		/// </summary>
 		public abstract Grade DefaultSupport { get; }
+
+		/// <summary>
+		/// Creates a new instance of the data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Content">MQTT Content</param>
+		/// <returns>New object instance.</returns>
+		public abstract IMqttData CreateNew(MqttTopic Topic, MqttContent Content);
 	}
 }

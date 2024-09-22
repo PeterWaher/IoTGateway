@@ -175,13 +175,13 @@ namespace Waher.Things.Mqtt.Model
 					this.data = null;
 
 				if (this.data is null)
-					this.data = this.FindDataType(Content);
+					this.data = this.FindDataType(Content).CreateNew(this, Content);
 
 				await this.SetOk();
 			}
 			catch (Exception)
 			{
-				this.data = this.FindDataType(Content);
+				this.data = this.FindDataType(Content).CreateNew(this, Content);
 			}
 
 			if (this.broker.Client?.HasSniffers ?? false)

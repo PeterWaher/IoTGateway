@@ -74,5 +74,13 @@ namespace Waher.Things.Mqtt.Model
 		/// Gets an array of control parameters
 		/// </summary>
 		ControlParameter[] GetControlParameters();
+
+		/// <summary>
+		/// Creates a new instance of the data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Content">MQTT Content</param>
+		/// <returns>New object instance.</returns>
+		IMqttData CreateNew(MqttTopic Topic, MqttContent Content);
 	}
 }

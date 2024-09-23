@@ -78,7 +78,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public DateTime LastChanged
 		{
-			get { return this.lastChanged; }
+			get => this.lastChanged;
 			internal set
 			{
 				if (this.lastChanged != value)

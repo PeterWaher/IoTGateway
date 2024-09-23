@@ -37,7 +37,7 @@ namespace Waher.Things.DisplayableParameters
 		public TimeSpan Value
 		{
 			get => this.value;
-			set { this.value = TimeSpan.Zero; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

@@ -363,6 +363,10 @@
       <Project>{f247794c-4f29-49ca-a0dd-b6170a1ed5ab}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj">
+      <Project>{84bc1de3-103a-4f8c-a36f-8006e2f7d675}</Project>
+      <Name>Waher.Layout.Layout2D</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
       <Project>{a88f6f6a-0c2f-4a0c-a999-9359ca3570a8}</Project>
       <Name>Waher.Persistence.FilesLW</Name>

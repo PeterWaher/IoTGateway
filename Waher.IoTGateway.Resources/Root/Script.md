@@ -2256,6 +2256,17 @@ The following functions are available in the `Waher.Content.Xsl` library.
 
 [TransformExample]: Prompt.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 
+#### Layout Extensions (Waher.Layout.Layout2D)
+
+The following functions are available in the `Waher.Layout.Layout2D` library.
+
+| Function                                  | Description | Example |
+|-------------------------------------------|-------------|---------|
+| `Layout(Xml)`                             | Creates a bitmapped graph from a layout. The Layout can be an XML Document, XML Element or XML as a string. | `Layout(Xml)`             
+| `Legend(Labels,Colors,FgColor,NrColumns)` | Creates a legend that can be displayed in association with a graph containing multiple series.              | `Legend(Labels,Colors,4)` |
+
+In the following subsections, specialized HTTP Error functions are listed.
+
 #### Web Extensions (Waher.Networking.HTTP\[.UWP\])
 
 Script can be embeded in transformable web content, such as [Markdown documents](/Markdown.md#script). The following functions are 

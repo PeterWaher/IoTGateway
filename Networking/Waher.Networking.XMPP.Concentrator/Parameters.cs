@@ -861,7 +861,9 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (Nullable && string.IsNullOrEmpty(Field.ValueString))
+					bool IsEmpty = string.IsNullOrEmpty(Field.ValueString);
+
+					if (Nullable && IsEmpty)
 						ValueToSet2 = null;
 					else
 					{
@@ -878,6 +880,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (ValidationMethod is null)
 								ValidationMethod = new BasicValidation();
 
+							if (IsEmpty && !Field.Required)
+								continue;
+
 							try
 							{
 								ValueToSet = ValueToSet2 = Enum.Parse(PropertyType, Field.ValueString);
@@ -893,6 +898,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (ValidationMethod is null)
 								ValidationMethod = new BasicValidation();
 
+							if (IsEmpty && !Field.Required)
+								continue;
+
 							if (!CommonTypes.TryParse(Field.ValueString, out bool b))
 							{
 								AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
@@ -907,16 +915,39 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (PropertyType == typeof(string))
 								DataType = StringDataType.Instance;
 							else if (PropertyType == typeof(sbyte))
+							{
 								DataType = ByteDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(short))
+							{
 								DataType = ShortDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(int))
+							{
 								DataType = IntDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(long))
+							{
 								DataType = LongDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(byte))
 							{
 								DataType = ShortDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
 
 								if (ValidationMethod is null)
 									ValidationMethod = new RangeValidation(byte.MinValue.ToString(), byte.MaxValue.ToString());
@@ -925,6 +956,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							{
 								DataType = IntDataType.Instance;
 
+								if (IsEmpty && !Field.Required)
+									continue;
+
 								if (ValidationMethod is null)
 									ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
 							}
@@ -932,12 +966,18 @@ namespace Waher.Networking.XMPP.Concentrator
 							{
 								DataType = LongDataType.Instance;
 
+								if (IsEmpty && !Field.Required)
+									continue;
+
 								if (ValidationMethod is null)
 									ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
 							}
 							else if (PropertyType == typeof(ulong))
 							{
 								DataType = IntegerDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
 
 								if (ValidationMethod is null)
 									ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
@@ -948,23 +988,54 @@ namespace Waher.Networking.XMPP.Concentrator
 									DataType = DateDataType.Instance;
 								else
 									DataType = DateTimeDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
 							}
 							else if (PropertyType == typeof(decimal))
+							{
 								DataType = DecimalDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(double))
+							{
 								DataType = DoubleDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(float))
+							{
 								DataType = DoubleDataType.Instance;    // Use xs:double anyway
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(TimeSpan))
+							{
 								DataType = TimeDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(Uri))
+							{
 								DataType = AnyUriDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
+							}
 							else if (PropertyType == typeof(SKColor))
 							{
 								if (Alpha)
 									DataType = ColorAlphaDataType.Instance;
 								else
 									DataType = ColorDataType.Instance;
+
+								if (IsEmpty && !Field.Required)
+									continue;
 							}
 							else
 								DataType = null;

@@ -23,8 +23,11 @@
     <FileVersion>1.0.4</FileVersion>
     <Version>1.0.4</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Remove="Language\Waher.Things.Modbus.en.lng" />
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>

@@ -23,8 +23,11 @@
     <FileVersion>1.1.3</FileVersion>
     <Version>1.1.3</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Remove="Language\Waher.Things.Xmpp.en.lng" />
   </ItemGroup>
 

@@ -2264,7 +2264,7 @@ The following functions are available in the `Waher.Layout.Layout2D` library.
 
 | Function                                  | Description | Example |
 |-------------------------------------------|-------------|---------|
-| `Layout(Xml)`                             | Creates a bitmapped graph from a layout. The Layout can be an XML Document, XML Element or XML as a string. | `Layout(Xml)`             
+| `Layout(Xml)`                             | Creates a bitmapped graph from a layout. The Layout can be an XML Document, XML Element or XML as a string. | `Layout(Xml)`             |
 | `Legend(Labels,Colors,FgColor,NrColumns)` | Creates a legend that can be displayed in association with a graph containing multiple series.              | `Legend(Labels,Colors,4)` |
 
 In the following subsections, specialized HTTP Error functions are listed.

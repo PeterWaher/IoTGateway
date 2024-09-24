@@ -76,12 +76,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
-			LinkedList<IElement> ReverseOrder = new LinkedList<IElement>();
-
-			foreach (IElement Label in Labels.VectorElements)
-				ReverseOrder.AddFirst(Label);
-
-			return new Graph2D(Variables, (IVector)Labels.Encapsulate(ReverseOrder, this), Values, new VerticalBarsPainter(), false, true, this,
+			return new Graph2D(Variables, Labels, Values, new VerticalBarsPainter(), false, true, this,
 				Color?.AssociatedObjectValue ?? Graph.DefaultColor);
 		}
 	}

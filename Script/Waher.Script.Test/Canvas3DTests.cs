@@ -11,7 +11,7 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class Canvas3DTests
 	{
-		private void Save(Canvas3D Canvas, string FileName)
+		private static void Save(Canvas3D Canvas, string FileName)
 		{
 			if (!Directory.Exists("Canvas3D"))
 				Directory.CreateDirectory("Canvas3D");
@@ -23,7 +23,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_01_Plot()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			int t;
 
 			for (t = 0; t < 1000000; t++)
@@ -31,22 +31,22 @@ namespace Waher.Script.Test
 				double x = t * Math.Sin(t / 10000.0) / 2500.0;
 				double y = t * Math.Cos(t / 20000.0) / 2500.0;
 				double z = t / 5000.0;
-				Vector4 P = new Vector4((float)x, (float)y, (float)z, 1);
+				Vector4 P = new((float)x, (float)y, (float)z, 1);
 				Canvas.Plot(P, SKColors.Red);
 			}
 
-			this.Save(Canvas, "01.png");
+			Save(Canvas, "01.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_02_Line()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
-			this.DrawCurve(Canvas);
-			this.Save(Canvas, "02.png");
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
+			DrawCurve(Canvas);
+			Save(Canvas, "02.png");
 		}
 
-		private void DrawCurve(Canvas3D Canvas)
+		private static void DrawCurve(Canvas3D Canvas)
 		{
 			int t;
 
@@ -55,7 +55,7 @@ namespace Waher.Script.Test
 				double x = t * Math.Sin(t / 100.0) / 25.0;
 				double y = t * Math.Cos(t / 200.0) / 25.0;
 				double z = t / 50.0;
-				Vector4 P = new Vector4((float)x, (float)y, (float)z, 1);
+				Vector4 P = new((float)x, (float)y, (float)z, 1);
 
 				if (t == 0)
 					Canvas.MoveTo(P);
@@ -67,30 +67,30 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_03_Oversampling()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
-			this.DrawCurve(Canvas);
-			this.Save(Canvas, "03.png");
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 3, SKColors.White);
+			DrawCurve(Canvas);
+			Save(Canvas, "03.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_04_Perspective()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawWireframeCube(Canvas);
-			this.Save(Canvas, "04.png");
+			DrawWireframeCube(Canvas);
+			Save(Canvas, "04.png");
 		}
 
-		private void DrawWireframeCube(Canvas3D Canvas)
+		private static void DrawWireframeCube(Canvas3D Canvas)
 		{
-			Vector4 P0 = new Vector4(-500, -500, 1000, 1);
-			Vector4 P1 = new Vector4(-500, -500, 2000, 1);
-			Vector4 P2 = new Vector4(500, -500, 2000, 1);
-			Vector4 P3 = new Vector4(500, -500, 1000, 1);
-			Vector4 P4 = new Vector4(-500, 500, 1000, 1);
-			Vector4 P5 = new Vector4(-500, 500, 2000, 1);
-			Vector4 P6 = new Vector4(500, 500, 2000, 1);
-			Vector4 P7 = new Vector4(500, 500, 1000, 1);
+			Vector4 P0 = new(-500, -500, 1000, 1);
+			Vector4 P1 = new(-500, -500, 2000, 1);
+			Vector4 P2 = new(500, -500, 2000, 1);
+			Vector4 P3 = new(500, -500, 1000, 1);
+			Vector4 P4 = new(-500, 500, 1000, 1);
+			Vector4 P5 = new(-500, 500, 2000, 1);
+			Vector4 P6 = new(500, 500, 2000, 1);
+			Vector4 P7 = new(500, 500, 1000, 1);
 
 			Canvas.PolyLine(new Vector4[] { P0, P1, P2, P3, P0 }, SKColors.Red);
 			Canvas.PolyLine(new Vector4[] { P4, P5, P6, P7, P4 }, SKColors.Red);
@@ -103,22 +103,22 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_05_Polygon()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawCube(Canvas);
-			this.Save(Canvas, "05.png");
+			DrawCube(Canvas);
+			Save(Canvas, "05.png");
 		}
 
-		private void DrawCube(Canvas3D Canvas)
+		private static void DrawCube(Canvas3D Canvas)
 		{
-			Vector4 P0 = new Vector4(-500, -500, 1000, 1);
-			Vector4 P1 = new Vector4(-500, -500, 2000, 1);
-			Vector4 P2 = new Vector4(500, -500, 2000, 1);
-			Vector4 P3 = new Vector4(500, -500, 1000, 1);
-			Vector4 P4 = new Vector4(-500, 500, 1000, 1);
-			Vector4 P5 = new Vector4(-500, 500, 2000, 1);
-			Vector4 P6 = new Vector4(500, 500, 2000, 1);
-			Vector4 P7 = new Vector4(500, 500, 1000, 1);
+			Vector4 P0 = new(-500, -500, 1000, 1);
+			Vector4 P1 = new(-500, -500, 2000, 1);
+			Vector4 P2 = new(500, -500, 2000, 1);
+			Vector4 P3 = new(500, -500, 1000, 1);
+			Vector4 P4 = new(-500, 500, 1000, 1);
+			Vector4 P5 = new(-500, 500, 2000, 1);
+			Vector4 P6 = new(500, 500, 2000, 1);
+			Vector4 P7 = new(500, 500, 1000, 1);
 
 			Canvas.Polygon(new Vector4[] { P0, P1, P2, P3 }, new SKColor(255, 0, 0, 128), true);
 			Canvas.Polygon(new Vector4[] { P4, P5, P6, P7 }, new SKColor(255, 0, 0, 128), true);
@@ -131,81 +131,81 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_06_ZBuffer()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawPlanes(Canvas);
-			this.Save(Canvas, "06.png");
+			DrawPlanes(Canvas);
+			Save(Canvas, "06.png");
 		}
 
-		private void DrawPlanes(Canvas3D Canvas)
+		private static void DrawPlanes(Canvas3D Canvas)
 		{
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, 100, 1000, 1),
-				new Vector4(-500, 100, 2000, 1),
-				new Vector4(500, 100, 2000, 1),
-				new Vector4(500, 100, 1000, 1)
+				new(-500, 100, 1000, 1),
+				new(-500, 100, 2000, 1),
+				new(500, 100, 2000, 1),
+				new(500, 100, 1000, 1)
 			}, SKColors.Red, true);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(100, -500, 1000, 1),
-				new Vector4(100, -500, 2000, 1),
-				new Vector4(100, 500, 2000, 1),
-				new Vector4(100, 500, 1000, 1)
+				new(100, -500, 1000, 1),
+				new(100, -500, 2000, 1),
+				new(100, 500, 2000, 1),
+				new(100, 500, 1000, 1)
 			}, SKColors.Green, true);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, -500, 1500, 1),
-				new Vector4(500, -500, 1500, 1),
-				new Vector4(500, 500, 1500, 1),
-				new Vector4(-500, 500, 1500, 1),
+				new(-500, -500, 1500, 1),
+				new(500, -500, 1500, 1),
+				new(500, 500, 1500, 1),
+				new(-500, 500, 1500, 1),
 			}, new SKColor(0, 0, 255, 64), true);
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_07_Text()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawPlanes(Canvas);
-			Canvas.Text("Hello World!", new Vector4(-400, 50, 1150, 1), "Tahoma", 150, SKColors.BlueViolet);
+			DrawPlanes(Canvas);
+			Canvas.Text("Hello World!", new(-400, 50, 1150, 1), "Tahoma", 150, SKColors.BlueViolet);
 
-			this.Save(Canvas, "07.png");
+			Save(Canvas, "07.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_08_PhongShading_NoOversampling()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawThreePlanes(Canvas, Shader);
-			this.Save(Canvas, "08.png");
+			DrawThreePlanes(Canvas, Shader);
+			Save(Canvas, "08.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_09_PhongShading_Oversampling_2()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 2, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 2, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawThreePlanes(Canvas, Shader);
-			this.Save(Canvas, "09.png");
+			DrawThreePlanes(Canvas, Shader);
+			Save(Canvas, "09.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_10_PhongShading_Oversampling_3()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 3, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			this.DrawThreePlanes(Canvas, Shader);
-			this.Save(Canvas, "10.png");
+			DrawThreePlanes(Canvas, Shader);
+			Save(Canvas, "10.png");
 		}
 
-		private I3DShader GetPhongShader(SKColor Color)
+		private static I3DShader GetPhongShader(SKColor Color)
 		{
 			return new PhongShader(
 				new PhongMaterial(1, 2, 0, 10),
@@ -216,48 +216,48 @@ namespace Waher.Script.Test
 					new Vector3(1000, 1000, 0)));
 		}
 
-		private void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader)
+		private static void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader)
 		{
-			this.DrawThreePlanes(Canvas, Shader, -500, -500, 2000);
+			DrawThreePlanes(Canvas, Shader, -500, -500, 2000);
 		}
 
-		private void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader, float x, float y, float z)
+		private static void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader, float x, float y, float z)
 		{
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, 500, z, 1),
-				new Vector4(500, 500, z, 1),
-				new Vector4(500, -500, z, 1),
-				new Vector4(-500, -500, z, 1)
+				new(-500, 500, z, 1),
+				new(500, 500, z, 1),
+				new(500, -500, z, 1),
+				new(-500, -500, z, 1)
 			}, Shader, true);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(x, 500, 1000, 1),
-				new Vector4(x, 500, 2000, 1),
-				new Vector4(x, -500, 2000, 1),
-				new Vector4(x, -500, 1000, 1)
+				new(x, 500, 1000, 1),
+				new(x, 500, 2000, 1),
+				new(x, -500, 2000, 1),
+				new(x, -500, 1000, 1)
 			}, Shader, true);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, y, 2000, 1),
-				new Vector4(500, y, 2000, 1),
-				new Vector4(500, y, 1000, 1),
-				new Vector4(-500, y, 1000, 1)
+				new(-500, y, 2000, 1),
+				new(500, y, 2000, 1),
+				new(500, y, 1000, 1),
+				new(-500, y, 1000, 1)
 			}, Shader, true);
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_11_Rotate_X()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
-			this.DrawThreePlanes(Canvas, Shader);
+			DrawThreePlanes(Canvas, Shader);
 
-			Shader = this.GetPhongShader(SKColors.Blue);
+			Shader = GetPhongShader(SKColors.Blue);
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateX(30, new Vector3(0, 0, 1500));
@@ -281,19 +281,19 @@ namespace Waher.Script.Test
 			Canvas.RotateX(500, new Vector3(0, 0, 1500));
 			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
-			this.Save(Canvas, "11.png");
+			Save(Canvas, "11.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_12_Rotate_Y()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
-			this.DrawThreePlanes(Canvas, Shader);
+			DrawThreePlanes(Canvas, Shader);
 
-			Shader = this.GetPhongShader(SKColors.Blue);
+			Shader = GetPhongShader(SKColors.Blue);
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateY(30, new Vector3(0, 0, 1500));
@@ -317,19 +317,19 @@ namespace Waher.Script.Test
 			Canvas.RotateY(500, new Vector3(0, 0, 1500));
 			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
-			this.Save(Canvas, "12.png");
+			Save(Canvas, "12.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_13_Rotate_Z()
 		{
-			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			I3DShader Shader = GetPhongShader(SKColors.Red);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
-			this.DrawThreePlanes(Canvas, Shader);
+			DrawThreePlanes(Canvas, Shader);
 
-			Shader = this.GetPhongShader(SKColors.Blue);
+			Shader = GetPhongShader(SKColors.Blue);
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(30, new Vector3(0, 0, 1500));
@@ -353,26 +353,26 @@ namespace Waher.Script.Test
 			Canvas.RotateZ(500, new Vector3(0, 0, 1500));
 			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
-			this.Save(Canvas, "13.png");
+			Save(Canvas, "13.png");
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_14_Ellipsoid()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas3D Canvas = new(new Variables(), 1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 			//Canvas.LookAt(-200, 500, 0, 0, 0, 1500, 0, 1, 0);
 			Canvas.RotateX(30, new Vector3(0, 0, 1500));
 			Canvas.RotateY(45, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(60, new Vector3(0, 0, 1500));
 
-			I3DShader Shader = this.GetPhongShader(SKColors.Orange);
+			I3DShader Shader = GetPhongShader(SKColors.Orange);
 			Canvas.Ellipsoid(0, 0, 1500, 400, 400, 400, 1000, Shader);
 
-			Shader = this.GetPhongShader(new SKColor(0, 0, 255, 64));
-			this.DrawThreePlanes(Canvas, Shader, 0, 0, 1500);
+			Shader = GetPhongShader(new SKColor(0, 0, 255, 64));
+			DrawThreePlanes(Canvas, Shader, 0, 0, 1500);
 
-			this.Save(Canvas, "14.png");
+			Save(Canvas, "14.png");
 		}
 	}
 }

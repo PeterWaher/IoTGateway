@@ -33,6 +33,33 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Copies the graph settings.
+		/// </summary>
+		/// <returns></returns>
+		public GraphSettings Copy()
+		{
+			return new GraphSettings()
+			{
+				backgroundColor = this.backgroundColor,
+				axisColor = this.axisColor,
+				gridColor = this.gridColor,
+				fontName = this.fontName,
+				labelFontSize = this.labelFontSize,
+				axisWidth = this.axisWidth,
+				gridWidth = this.gridWidth,
+				approxNrLabelsX = this.approxNrLabelsX,
+				approxNrLabelsY = this.approxNrLabelsY,
+				width = this.width,
+				height = this.height,
+				marginTop = this.marginTop,
+				marginBottom = this.marginBottom,
+				marginLeft = this.marginLeft,
+				marginRight = this.marginRight,
+				marginLabel = this.marginLabel
+			};
+		}
+
+		/// <summary>
 		/// Width of graph, in pixels. (Default=640 pixels.)
 		/// </summary>
 		public int Width

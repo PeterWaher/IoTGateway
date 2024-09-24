@@ -45,7 +45,7 @@ namespace Waher.Script.Fractals
 			PixelInformation Pixels;
 
 			if (Argument is Graph Graph)
-				Pixels = Graph.CreatePixels(Variables);
+				Pixels = Graph.CreatePixels();
 			else if (Argument is SKImage Image)
 				Pixels = PixelInformation.FromImage(Image);
 			else
@@ -74,7 +74,7 @@ namespace Waher.Script.Fractals
 
 			FractalGraph.Smooth(R, G, B, A, BoundaryR, BoundaryG, BoundaryB, BoundaryA, Width, Height, this, Variables);
 
-			return new GraphBitmap(FractalGraph.ToPixels(R, G, B, A, Width, Height));
+			return new GraphBitmap(Variables, FractalGraph.ToPixels(R, G, B, A, Width, Height));
 		}
 
 		/// <summary>

@@ -103,7 +103,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 3 ? null : Arguments[3];
 			IElement Size = Arguments.Length <= 4 ? null : Arguments[4];
 
-			return new Graph2D(X, Y, new Plot2DHorizontalLinePainter(), false, false, this, Mode.AssociatedObjectValue,
+			return new Graph2D(Variables, X, Y, new Plot2DHorizontalLinePainter(), false, false, this, Mode.AssociatedObjectValue,
 				Color?.AssociatedObjectValue ?? Graph.DefaultColor, Size?.AssociatedObjectValue ?? 2.0);
 		}
 	}

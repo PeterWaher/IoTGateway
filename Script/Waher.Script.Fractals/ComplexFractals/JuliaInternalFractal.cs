@@ -189,7 +189,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 			else
 			{
-				return CalcJulia(rc, ic, r0, i0, dr, Palette, dimx, dimy, this,
+				return CalcJulia(Variables, rc, ic, r0, i0, dr, Palette, dimx, dimy, this,
 					this.FractalZoomScript, new object[] { Palette, dimx, dimy, r0, i0, ColorExpression, fDef });
 			}
 		}
@@ -244,7 +244,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcJulia(double rCenter, double iCenter, double R0, double I0, double rDelta,
+		public static FractalGraph CalcJulia(Variables Variables, double rCenter, double iCenter, double R0, double I0, double rDelta,
 			SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			byte[] reds;
@@ -329,7 +329,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
@@ -487,7 +487,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			Variables.ConsoleOut.WriteLine(Expression.ToString(Counts));
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>

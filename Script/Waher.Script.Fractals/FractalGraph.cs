@@ -34,14 +34,16 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.
 		/// </summary>
-		public FractalGraph()
-			: base()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public FractalGraph(Variables Variables)
+			: base(Variables)
 		{
 		}
 
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="Pixels">Fractal image.</param>
 		/// <param name="r0">Real part of upper left hand corner.</param>
 		/// <param name="i0">Imaginary part of upper left hand corner.</param>
@@ -52,9 +54,9 @@ namespace Waher.Script.Fractals
 		/// <param name="Node">Script node generating the graph.</param>
 		/// <param name="FractalZoomScript">Fractal Zoom Script</param>
 		/// <param name="State">State objects.</param>
-		public FractalGraph(PixelInformation Pixels, double r0, double i0, double r1, double i1, double Size,
+		public FractalGraph(Variables Variables, PixelInformation Pixels, double r0, double i0, double r1, double i1, double Size,
 			bool InvertY, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
-			: base(Pixels)
+			: base(Variables, Pixels)
 		{
 			this.r0 = r0;
 			this.i0 = i0;
@@ -195,7 +197,7 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+							Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(ColorIndex, Width, Height, Palette)));
 
 						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
@@ -352,7 +354,7 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(R, G, B, A, Width, Height)));
+							Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(R, G, B, A, Width, Height)));
 
 						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}

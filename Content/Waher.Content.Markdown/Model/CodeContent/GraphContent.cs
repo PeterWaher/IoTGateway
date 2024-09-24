@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
 			Graph G = await GetGraph(Rows);
-			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
+			return G.CreatePixels();
 		}
 
 		/// <summary>

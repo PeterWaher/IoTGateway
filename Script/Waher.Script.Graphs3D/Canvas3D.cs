@@ -46,7 +46,9 @@ namespace Waher.Script.Graphs3D
 		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
 		/// The center of the canvas is located at origo.
 		/// </summary>
-		public Canvas3D()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public Canvas3D(Variables Variables)
+			: base(Variables)
 		{
 		}
 
@@ -56,13 +58,38 @@ namespace Waher.Script.Graphs3D
 		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
 		/// The center of the canvas is located at origo.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="Width">Width of area, in pixels.</param>
 		/// <param name="Height">Height of area, in pixels.</param>
 		/// <param name="OverSampling">Number of subpixels for each generated pixel.
 		/// Oversampling provides a means to achieve anti-aliasing in the rendered result.</param>
 		/// <param name="BackgroundColor">Background color</param>
-		public Canvas3D(int Width, int Height, int OverSampling, SKColor BackgroundColor)
+		public Canvas3D(Variables Variables, int Width, int Height, int OverSampling, SKColor BackgroundColor)
+			: base(Variables, Width, Height)
 		{
+			this.Init(Width, Height, OverSampling, BackgroundColor);
+		}
+
+		/// <summary>
+		/// 3D drawing area.
+		/// 
+		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
+		/// The center of the canvas is located at origo.
+		/// </summary>
+		/// <param name="Settings">Graph Settings</param>
+		/// <param name="Width">Width of area, in pixels.</param>
+		/// <param name="Height">Height of area, in pixels.</param>
+		/// <param name="OverSampling">Number of subpixels for each generated pixel.
+		/// Oversampling provides a means to achieve anti-aliasing in the rendered result.</param>
+		/// <param name="BackgroundColor">Background color</param>
+		public Canvas3D(GraphSettings Settings, int Width, int Height, int OverSampling, SKColor BackgroundColor)
+			: base(Settings, Width, Height)
+		{
+			this.Init(Width, Height, OverSampling, BackgroundColor);
+		}
+
+		private void Init(int Width, int Height, int OverSampling, SKColor BackgroundColor)
+		{ 
 			if (Width <= 0)
 				throw new ArgumentOutOfRangeException("Width must be a positive integer.", nameof(Width));
 
@@ -421,7 +448,7 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Previous model transformation matrix.</returns>
 		public Matrix4x4 RotateX(float Degrees, object CenterPoint)
 		{
-			return RotateX(Degrees, ToVector3(CenterPoint));
+			return this.RotateX(Degrees, ToVector3(CenterPoint));
 		}
 
 		/// <summary>
@@ -459,7 +486,7 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Previous model transformation matrix.</returns>
 		public Matrix4x4 RotateY(float Degrees, object CenterPoint)
 		{
-			return RotateY(Degrees, ToVector3(CenterPoint));
+			return this.RotateY(Degrees, ToVector3(CenterPoint));
 		}
 
 		/// <summary>
@@ -497,7 +524,7 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Previous model transformation matrix.</returns>
 		public Matrix4x4 RotateZ(float Degrees, object CenterPoint)
 		{
-			return RotateZ(Degrees, ToVector3(CenterPoint));
+			return this.RotateZ(Degrees, ToVector3(CenterPoint));
 		}
 
 		/// <summary>

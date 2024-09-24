@@ -165,7 +165,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
             else
             {
-                return CalcMandelbrot(rc, ic, dr, Palette, dimx, dimy, this, this.FractalZoomScript,
+                return CalcMandelbrot(Variables, rc, ic, dr, Palette, dimx, dimy, this, this.FractalZoomScript,
                     new object[] { Palette, dimx, dimy, ColorExpression, fDef });
             }
         }
@@ -210,9 +210,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
-            SKColor[] Palette, int Width, int Height, ScriptNode Node,
-            FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcMandelbrot(Variables Variables, double rCenter, double iCenter, double rDelta,
+            SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
             double r0, i0, r1, i1;
             double dr, di;
@@ -271,7 +270,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-            return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette), 
+            return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette), 
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
@@ -398,7 +397,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-            return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
+            return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 

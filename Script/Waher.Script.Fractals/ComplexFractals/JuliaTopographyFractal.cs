@@ -189,7 +189,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
             else
             {
-                return CalcJulia(rc, ic, r0, i0, dr, Palette, dimx, dimy, this,
+                return CalcJulia(Variables, rc, ic, r0, i0, dr, Palette, dimx, dimy, this,
                     this.FractalZoomScript, new object[] { Palette, dimx, dimy, r0, i0, ColorExpression, fDef });
             }
         }
@@ -244,9 +244,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcJulia(double rCenter, double iCenter, double R0, double I0, double rDelta,
-            SKColor[] Palette, int Width, int Height, ScriptNode Node, 
-            FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcJulia(Variables Variables, double rCenter, double iCenter, double R0, double I0, double rDelta,
+            SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
             double r0, i0, r1, i1;
             double dr, di;
@@ -305,7 +304,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             int[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-            return new FractalGraph(FractalGraph.ToPixels(Boundary, Width, Height, Palette),
+            return new FractalGraph(Variables, FractalGraph.ToPixels(Boundary, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
@@ -422,8 +421,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             int[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-            return new FractalGraph(FractalGraph.ToPixels(Boundary, Width, Height, Palette),
-                r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+            return new FractalGraph(Variables, FractalGraph.ToPixels(Boundary, Width, Height, Palette), r0, i0, r1, i1, rDelta * 2, 
+                true, Node, FractalZoomScript, State);
         }
 
 		/// <summary>

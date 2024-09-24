@@ -23,23 +23,54 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <summary>
 		/// Canvas graph. Permits custom drawing from scrupt.
 		/// </summary>
-		public CanvasGraph()
-			: base()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public CanvasGraph(Variables Variables)
+			: this(Variables, null, null)
 		{
 		}
 
 		/// <summary>
 		/// Canvas graph. Permits custom drawing from scrupt.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public CanvasGraph(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+			: base(Variables, DefaultWidth, DefaultHeight)
+		{
+			this.width = this.Settings.Width;
+			this.height = this.Settings.Height;
+			this.bgColor = this.Settings.BackgroundColor;
+		}
+
+		/// <summary>
+		/// Canvas graph. Permits custom drawing from scrupt.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="Width">Width, in puxels.</param>
 		/// <param name="Height">Height, in puxels.</param>
 		/// <param name="BackgroundColor">Background color.</param>
 		/// <param name="DefaultColor">Default color.</param>
-		public CanvasGraph(int Width, int Height, SKColor? DefaultColor, SKColor? BackgroundColor)
-			: base()
+		public CanvasGraph(Variables Variables, int Width, int Height, SKColor? DefaultColor, SKColor? BackgroundColor)
+			: this(Variables, Width, Height)
 		{
-			this.width = Width;
-			this.height = Height;
+			this.bgColor = BackgroundColor;
+			this.defaultColor = DefaultColor;
+		}
+
+		/// <summary>
+		/// Canvas graph. Permits custom drawing from scrupt.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="Width">Width, in puxels.</param>
+		/// <param name="Height">Height, in puxels.</param>
+		/// <param name="BackgroundColor">Background color.</param>
+		/// <param name="DefaultColor">Default color.</param>
+		public CanvasGraph(GraphSettings Settings, int Width, int Height, SKColor? DefaultColor, SKColor? BackgroundColor)
+			: base(Settings, Width, Height)
+		{
+			this.width = this.Settings.Width;
+			this.height = this.Settings.Height;
 			this.bgColor = BackgroundColor;
 			this.defaultColor = DefaultColor;
 		}
@@ -89,7 +120,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		{
 			if (Element is CanvasGraph G)
 			{
-				CanvasGraph Result = new CanvasGraph(G.width, G.height, G.bgColor, G.defaultColor);
+				CanvasGraph Result = new CanvasGraph(G.Settings, G.width, G.height, G.bgColor, G.defaultColor);
 
 				foreach (CanvasOperation Op in G.operations)
 					Result.operations.AddLast(Op);
@@ -112,7 +143,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		{
 			if (Element is CanvasGraph G)
 			{
-				CanvasGraph Result = new CanvasGraph(this.width, this.height, this.bgColor, this.defaultColor);
+				CanvasGraph Result = new CanvasGraph(this.Settings, this.width, this.height, this.bgColor, this.defaultColor);
 
 				foreach (CanvasOperation Op in this.operations)
 					Result.operations.AddLast(Op);

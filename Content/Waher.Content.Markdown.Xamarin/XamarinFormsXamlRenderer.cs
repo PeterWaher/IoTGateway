@@ -467,7 +467,7 @@ namespace Waher.Content.Markdown.Xamarin
 
 			if (Result is Graph G)
 			{
-				PixelInformation Pixels = G.CreatePixels(Variables);
+				PixelInformation Pixels = G.CreatePixels();
 				byte[] Bin = Pixels.EncodeAsPng();
 
 				s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);

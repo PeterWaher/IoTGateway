@@ -65,7 +65,7 @@ namespace Waher.Script.Content
 			if (!(Object is PixelInformation Pixels))
 			{
 				if (Object is Graph G)
-					Pixels = G.CreatePixels(new Variables());
+					Pixels = G.CreatePixels();
 				else
 					throw new ArgumentException("Object not PixelInformation or Graph.", nameof(Object));
 			}

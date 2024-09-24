@@ -379,13 +379,12 @@ namespace Waher.WebService.Script
 
 				if (Result is Graph G)
 				{
-					GraphSettings Settings = G.GetSettings(this.variables);
-					PixelInformation Pixels = G.CreatePixels(Settings, out object[] States);
+					PixelInformation Pixels = G.CreatePixels(out object[] States);
 					string Tag = Guid.NewGuid().ToString();
 					Bin = Pixels.EncodeAsPng();
 
 					s = Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+					s = "<figure><img border=\"2\" width=\"" + G.Settings.Width.ToString() + "\" height=\"" + G.Settings.Height.ToString() +
 						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
 
 					if (!(this.request.Session["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))

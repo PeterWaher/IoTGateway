@@ -16,17 +16,41 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Handles bitmap-based graphs.
 		/// </summary>
-		public GraphBitmap()
-			: base()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public GraphBitmap(Variables Variables)
+			: this(Variables, null, null)
 		{
 		}
 
 		/// <summary>
 		/// Handles bitmap-based graphs.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public GraphBitmap(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+			: base(Variables, DefaultWidth, DefaultHeight)
+		{
+		}
+
+		/// <summary>
+		/// Handles bitmap-based graphs.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="Pixels">Pixels</param>
-		public GraphBitmap(PixelInformation Pixels)
-			: base()
+		public GraphBitmap(Variables Variables, PixelInformation Pixels)
+			: base(Variables, Pixels.Width, Pixels.Height)
+		{
+			this.pixels = Pixels;
+		}
+
+		/// <summary>
+		/// Handles bitmap-based graphs.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="Pixels">Pixels</param>
+		public GraphBitmap(GraphSettings Settings, PixelInformation Pixels)
+			: base(Settings, Pixels.Width, Pixels.Height)
 		{
 			this.pixels = Pixels;
 		}
@@ -70,7 +94,7 @@ namespace Waher.Script.Graphs
 
 				using (SKImage Result = Surface.Snapshot())
 				{
-					return new GraphBitmap(PixelInformation.FromImage(Result));
+					return new GraphBitmap(this.Settings, PixelInformation.FromImage(Result));
 				}
 			}
 		}
@@ -114,7 +138,7 @@ namespace Waher.Script.Graphs
 
 				using (SKImage Result = Surface.Snapshot())
 				{
-					return new GraphBitmap(PixelInformation.FromImage(Result));
+					return new GraphBitmap(this.Settings, PixelInformation.FromImage(Result));
 				}
 			}
 		}

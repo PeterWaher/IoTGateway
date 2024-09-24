@@ -390,7 +390,7 @@ namespace Waher.Content.Markdown.Latex
 
 			if (Result is Graph G)
 			{
-				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
+				PixelInformation Pixels = G.CreatePixels(out GraphSettings GraphSettings);
 				byte[] Bin = Pixels.EncodeAsPng();
 				string FileName = await ImageContent.GetTemporaryFile(Bin, ImageCodec.FileExtensionPng);
 

@@ -195,8 +195,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 					if (Result is Graph G)
 					{
-						GraphSettings Settings = G.GetSettings(State.Session);
-						PixelInformation Pixels = G.CreatePixels(Settings);
+						PixelInformation Pixels = G.CreatePixels();
 						this.cid = this.Document.AddContent(Pixels.CreateBitmap());
 						this.Width = Pixels.Width;
 						this.Height = Pixels.Height;

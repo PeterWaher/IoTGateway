@@ -182,7 +182,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
             else
             {
-                return CalcMandelbrot(rc, ic, dr, Palette, dimx, dimy, this, this.FractalZoomScript,
+                return CalcMandelbrot(Variables, rc, ic, dr, Palette, dimx, dimy, this, this.FractalZoomScript,
                     new object[] { Palette, dimx, dimy, ColorExpression, fDef });
             }
         }
@@ -227,9 +227,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
-            SKColor[] Palette, int Width, int Height, ScriptNode Node,
-            FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcMandelbrot(Variables Variables, double rCenter, double iCenter, double rDelta,
+            SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
             byte[] reds;
             byte[] greens;
@@ -312,7 +311,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
@@ -465,7 +464,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>

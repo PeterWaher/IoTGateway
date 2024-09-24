@@ -45,14 +45,36 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Base class for two-dimensional graphs.
 		/// </summary>
-		public Graph2D()
-			: base()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public Graph2D(Variables Variables)
+			: this(Variables, null, null)
 		{
 		}
 
 		/// <summary>
 		/// Base class for two-dimensional graphs.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public Graph2D(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+			: base(Variables, DefaultWidth, DefaultHeight)
+		{
+		}
+
+		/// <summary>
+		/// Base class for two-dimensional graphs.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		public Graph2D(GraphSettings Settings)
+			: base(Settings)
+		{
+		}
+
+		/// <summary>
+		/// Base class for two-dimensional graphs.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="X">X-axis</param>
 		/// <param name="Y">Y-axis</param>
 		/// <param name="Painter">Painter of graph.</param>
@@ -60,9 +82,9 @@ namespace Waher.Script.Graphs
 		/// <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
 		/// <param name="Node">Node creating the graph.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph2D(IVector X, IVector Y, IPainter2D Painter, bool ShowZeroX, bool ShowZeroY,
+		public Graph2D(Variables Variables, IVector X, IVector Y, IPainter2D Painter, bool ShowZeroX, bool ShowZeroY,
 			ScriptNode Node, params object[] Parameters)
-			: base()
+			: base(Variables)
 		{
 			if (X is Interval XI)
 				X = new DoubleVector(XI.GetArray());
@@ -333,7 +355,7 @@ namespace Waher.Script.Graphs
 			if (G.x.First is null)
 				return this;
 
-			Graph2D Result = new Graph2D()
+			Graph2D Result = new Graph2D(this.Settings)
 			{
 				minX = this.minX,
 				maxX = this.maxX,

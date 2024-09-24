@@ -76,7 +76,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(Values, Labels, new HorizontalBarPainter(), true, false, this,
+			return new Graph2D(Variables, Values, Labels, new HorizontalBarPainter(), true, false, this,
 				Color?.AssociatedObjectValue ?? Graph.DefaultColor);
 		}
 	}

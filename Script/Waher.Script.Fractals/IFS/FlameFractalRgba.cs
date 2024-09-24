@@ -571,7 +571,7 @@ namespace Waher.Script.Fractals.IFS
 
                 RunChaosGame(v, Functions, SumWeights, P, Preview, Gamma, Vibrancy, Node);
 
-                return new FractalGraph(P.RenderBitmapRgba(Gamma, Vibrancy, false, SKColors.White), xMin, yMin, xMax, yMax, rDelta,
+                return new FractalGraph(Variables, P.RenderBitmapRgba(Gamma, Vibrancy, false, SKColors.White), xMin, yMin, xMax, yMax, rDelta,
                     false, Node, FractalZoomScript, State);
             }
             else
@@ -607,7 +607,7 @@ namespace Waher.Script.Fractals.IFS
                     for (i = 1; i < NrGames; i++)
                         P[0].Add(P[i]);
 
-                    return new FractalGraph(P[0].RenderBitmapRgba(Gamma, Vibrancy, false, SKColors.White), xMin, yMin, xMax, yMax, rDelta,
+                    return new FractalGraph(Variables, P[0].RenderBitmapRgba(Gamma, Vibrancy, false, SKColors.White), xMin, yMin, xMax, yMax, rDelta,
                         false, Node, FractalZoomScript, State);
                 }
                 catch (ThreadAbortException)
@@ -735,7 +735,7 @@ namespace Waher.Script.Fractals.IFS
 
 							if (Preview)
 							{
-								v.Preview(Node.Expression, new GraphBitmap(P.RenderBitmapRgba(Gamma, Vibrancy, true, SKColors.White)));
+								v.Preview(Node.Expression, new GraphBitmap(v, P.RenderBitmapRgba(Gamma, Vibrancy, true, SKColors.White)));
 
 								Temp2 = DateTime.Now;
 

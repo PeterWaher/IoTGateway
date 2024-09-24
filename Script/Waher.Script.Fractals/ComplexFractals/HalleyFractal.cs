@@ -236,19 +236,19 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             if (!(f is null))
             {
-                return CalcHalley(rc, ic, dr, R, f, fDef, Variables, Palette, dimx, dimy,
+                return CalcHalley(Variables, rc, ic, dr, R, f, fDef, Palette, dimx, dimy,
                    this, this.FractalZoomScript,
                    new object[] { Palette, dimx, dimy, R, fDef, ColorExpression });
             }
             else if (!(CoefficientsZ is null))
             {
-                return CalcHalley(rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
+                return CalcHalley(Variables, rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
                    this, this.FractalZoomScript,
                    new object[] { Palette, dimx, dimy, R, CoefficientsZ, ColorExpression });
             }
             else
             {
-                return CalcHalley(rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
+                return CalcHalley(Variables, rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
                    this, this.FractalZoomScript,
                    new object[] { Palette, dimx, dimy, R, Coefficients, ColorExpression });
             }
@@ -298,9 +298,21 @@ namespace Waher.Script.Fractals.ComplexFractals
         }
 
 		/// <summary>
-		/// TODO
+		/// Calculates a Halley Fractal
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+        /// <param name="rCenter">Real part of center point.</param>
+        /// <param name="iCenter">Imaginary part of center point.</param>
+        /// <param name="rDelta">r delta</param>
+        /// <param name="R">R</param>
+        /// <param name="Coefficients">polynomial coefficients</param>
+        /// <param name="Palette">Palette</param>
+        /// <param name="Width">Width</param>
+        /// <param name="Height">Height</param>
+        /// <param name="Node"></param>
+        /// <param name="FractalZoomScript">Zoom script</param>
+        /// <param name="State">State object</param>
+		public static FractalGraph CalcHalley(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R,
             double[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, 
             FractalZoomScript FractalZoomScript, object State)
         {
@@ -454,13 +466,13 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		public static FractalGraph CalcHalley(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R,
             Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node,
             FractalZoomScript FractalZoomScript, object State)
         {
@@ -646,15 +658,15 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
-            ILambdaExpression f, ScriptNode _, Variables Variables, SKColor[] Palette, int Width, int Height, 
-            ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcHalley(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R,
+            ILambdaExpression f, ScriptNode _, SKColor[] Palette, int Width, int Height, ScriptNode Node, 
+            FractalZoomScript FractalZoomScript, object State)
         {
             byte[] reds;
             byte[] greens;
@@ -814,7 +826,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>

@@ -125,7 +125,7 @@ namespace Waher.Layout.Layout2D.Functions
 			KeyValuePair<SKImage, Map[]> P = await Doc.Render(Settings);
 
 			PixelInformation Pixels = PixelInformation.FromImage(P.Key);
-			GraphBitmap Result = new GraphBitmap(Pixels);
+			GraphBitmap Result = new GraphBitmap(Variables, Pixels);
 
 			return Result;
 		}

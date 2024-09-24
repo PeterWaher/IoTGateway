@@ -166,8 +166,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
                 throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-            return CalcNova(rc, ic, dr, Rr, Ri, pr, pi, Palette, dimx, dimy, 
-                this, this.FractalZoomScript, 
+            return CalcNova(Variables, rc, ic, dr, Rr, Ri, pr, pi, Palette, dimx, dimy, this, this.FractalZoomScript, 
                 new object[] { Palette, dimx, dimy, Rr, Ri, pr, pi, ColorExpression });
         }
 
@@ -228,9 +227,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcNova(double rCenter, double iCenter, double rDelta, double Rr, double Ri,
-            double pr, double pi, SKColor[] Palette, int Width, int Height, ScriptNode Node,
-            FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcNova(Variables Variables, double rCenter, double iCenter, double rDelta, double Rr, double Ri,
+            double pr, double pi, SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
             double r0, i0, r1, i1;
             double dr, di;
@@ -332,7 +330,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-            return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
+            return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 

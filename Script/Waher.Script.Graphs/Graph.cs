@@ -108,6 +108,11 @@ namespace Waher.Script.Graphs
 		public const string GraphHeightVariableName = "GraphHeight";
 
 		/// <summary>
+		/// Variable name for graph label font size
+		/// </summary>
+		public const string GraphLabelFontSizeVariableName = "GraphLabelFontSize";
+
+		/// <summary>
 		/// Default color: Red
 		/// </summary>
 		public static readonly SKColor DefaultColor = SKColors.Red;
@@ -251,7 +256,7 @@ namespace Waher.Script.Graphs
 				Settings.Height = DefaultHeight.Value;
 				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
 				Settings.MarginBottom = Settings.MarginTop;
-				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
+				Settings.LabelFontSize = 12.0 * Math.Min(Settings.Width, Settings.Height) / 480;
 			}
 
 			if (!((Size = this.RecommendedBitmapSize) is null) && Size.Item1 > 0 && Size.Item2 > 0)
@@ -264,15 +269,18 @@ namespace Waher.Script.Graphs
 
 				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
 				Settings.MarginBottom = Settings.MarginTop;
-				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
+				Settings.LabelFontSize = 12.0 * Math.Min(Settings.Width, Settings.Height) / 480;
 			}
 			else
 			{
+				bool SizeChanged = false;
+
 				if (Variables.TryGetVariable(GraphWidthVariableName, out v) && v.ValueObject is double d && d >= 1)
 				{
 					Settings.Width = (int)Math.Round(d);
 					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
 					Settings.MarginRight = Settings.MarginLeft;
+					SizeChanged = true;
 				}
 				else if (!Variables.ContainsVariable(GraphWidthVariableName))
 					Variables[GraphWidthVariableName] = (double)Settings.Width;
@@ -282,10 +290,13 @@ namespace Waher.Script.Graphs
 					Settings.Height = (int)Math.Round(d2);
 					Settings.MarginTop = (int)Math.Round(15 * d2 / 480);
 					Settings.MarginBottom = Settings.MarginTop;
-					Settings.LabelFontSize = 12 * d2 / 480;
+					SizeChanged = true;
 				}
 				else if (!Variables.ContainsVariable(GraphHeightVariableName))
 					Variables[GraphHeightVariableName] = (double)Settings.Height;
+
+				if (SizeChanged)
+					Settings.LabelFontSize = 12 * Math.Min(Settings.Width, Settings.Height) / 480;
 			}
 
 			int i = 0;
@@ -305,6 +316,15 @@ namespace Waher.Script.Graphs
 			if (i == 2)
 				Settings.GridColor = Functions.Colors.Blend.BlendColors(Settings.BackgroundColor, Settings.AxisColor, 0.4);
 
+			if (Variables.TryGetVariable(GraphLabelFontSizeVariableName, out v) && v.ValueObject is double d3 && d3 > 0)
+			{
+				Settings.LabelFontSize = d3;
+				Settings.MarginTop = (int)(15 * Settings.LabelFontSize / 12);
+				Settings.MarginBottom = Settings.MarginTop;
+				Settings.MarginLeft = Settings.MarginTop;
+				Settings.MarginRight = Settings.MarginTop;
+			}
+
 			return Settings;
 		}
 
@@ -321,31 +341,15 @@ namespace Waher.Script.Graphs
 			Tuple<int, int> Size;
 
 			if (DefaultWidth.HasValue)
-			{
 				Settings.Width = DefaultWidth.Value;
-				Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-				Settings.MarginRight = Settings.MarginLeft;
-			}
 
 			if (DefaultHeight.HasValue)
-			{
 				Settings.Height = DefaultHeight.Value;
-				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-				Settings.MarginBottom = Settings.MarginTop;
-				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-			}
 
 			if (!((Size = this.RecommendedBitmapSize) is null) && Size.Item1 > 0 && Size.Item2 > 0)
 			{
 				Settings.Width = Size.Item1;
 				Settings.Height = Size.Item2;
-
-				Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-				Settings.MarginRight = Settings.MarginLeft;
-
-				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-				Settings.MarginBottom = Settings.MarginTop;
-				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
 			}
 
 			return Settings;

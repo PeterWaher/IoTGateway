@@ -1240,12 +1240,14 @@ will return a vector corresponding to the point under the mouse.
 
 The following table lists variables that control graph output:
 
-| Varaible     | Type    | Description                      | Current value              |
-|--------------|---------|----------------------------------|----------------------------|
-| GraphWidth   | Double  | Width of graph, in pixels.       | {try GraphWidth catch ""}  |
-| GraphHeight  | Double  | Height of graph, in pixels.      | {try GraphHeight catch ""} |
-| GraphBgColor | Color   | Background color.                | {try BgColor catch ""}     |
-| GraphFgColor | Color   | Foreground color.                | {try BgColor catch ""}     |
+| Varaible             | Type    | Description                      | Current value                   |
+|----------------------|---------|----------------------------------|---------------------------------|
+| `GraphWidth`         | Double  | Width of graph, in pixels.       | `{{GraphWidth ??? ""}}`         |
+| `GraphHeight`        | Double  | Height of graph, in pixels.      | `{{GraphHeight ??? ""}}`        |
+| `GraphBgColor`       | Color   | Background color.                | `{{GraphBgColor ??? ""}}`       |
+| `GraphFgColor`       | Color   | Foreground color.                | `{{GraphFgColor ??? ""}}`       |
+| `GraphLabelFontSize` | Double  | Label font size.                 | `{{GraphLabelFontSize ??? ""}}` |
+
 
 You can combine graphs using the `+` operator, as long as graph axes are compatible:
 

@@ -6,6 +6,9 @@ using Waher.Networking.XMPP;
 
 namespace Waher.Things.Xmpp.Model
 {
+	/// <summary>
+	/// Represents an XMPP broker.
+	/// </summary>
 	public class XmppBroker : IDisposable
 	{
 		private readonly XmppBrokerNode node;
@@ -19,6 +22,18 @@ namespace Waher.Things.Xmpp.Model
 		private readonly bool trustServer = false;
 		private readonly bool allowInsecureMechanisms = false;
 
+		/// <summary>
+		/// Represents an XMPP broker.
+		/// </summary>
+		/// <param name="Node">XMPP Broker node.</param>
+		/// <param name="Host">Host</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Tls">If TLS should be used</param>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="PasswordMechanism">Password authentication mechanism</param>
+		/// <param name="TrustServer">If server should be trusted</param>
+		/// <param name="AllowInsecureMechanisms">If insecure mechanisms should be permitted.</param>
 		private XmppBroker(XmppBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
 			string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
 		{
@@ -33,6 +48,19 @@ namespace Waher.Things.Xmpp.Model
 			this.allowInsecureMechanisms = AllowInsecureMechanisms;
 		}
 
+		/// <summary>
+		/// Creates an XMPP broker
+		/// </summary>
+		/// <param name="Node">XMPP Broker node.</param>
+		/// <param name="Host">Host</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Tls">If TLS should be used</param>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="PasswordMechanism">Password authentication mechanism</param>
+		/// <param name="TrustServer">If server should be trusted</param>
+		/// <param name="AllowInsecureMechanisms">If insecure mechanisms should be permitted.</param>
+		/// <returns>XMPP broker object instance.</returns>
 		public static async Task<XmppBroker> Create(XmppBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
 			string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
 		{
@@ -115,6 +143,9 @@ namespace Waher.Things.Xmpp.Model
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			Task.Run(() => this.Close());

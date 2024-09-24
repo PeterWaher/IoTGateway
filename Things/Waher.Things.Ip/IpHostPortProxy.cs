@@ -12,6 +12,9 @@ using Waher.Things.Ip.Model;
 
 namespace Waher.Things.Ip
 {
+	/// <summary>
+	/// Node representing a proxy port node.
+	/// </summary>
 	public class IpHostPortProxy : IpHostPort
 	{
 		private int listeningPort = 0;
@@ -139,7 +142,10 @@ namespace Waher.Things.Ip
 
 			return Result;
 		}
-		
+
+		/// <summary>
+		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
+		/// </summary>
 		public override Task DestroyAsync()
 		{
 			if (!string.IsNullOrEmpty(this.proxyKey))
@@ -148,6 +154,9 @@ namespace Waher.Things.Ip
 			return base.DestroyAsync();
 		}
 
+		/// <summary>
+		/// Key identifying node.
+		/// </summary>
 		[IgnoreMember]
 		public string Key
 		{
@@ -163,6 +172,9 @@ namespace Waher.Things.Ip
 			}
 		}
 
+		/// <summary>
+		/// Persists changes to the node, and generates a node updated event.
+		/// </summary>
 		protected override async Task NodeUpdated()
 		{
 			await this.GetProxy();
@@ -178,7 +190,7 @@ namespace Waher.Things.Ip
 		/// Gets names (subject and alternative) encoded in a certificate.
 		/// </summary>
 		/// <param name="Certificate">Ceertificate</param>
-		/// <returns>Encoded names (subject & alternative).</returns>
+		/// <returns>Encoded names (subject and alternative).</returns>
 		public static string[] GetCertificateIdentities(X509Certificate Certificate)
 		{
 			List<string> Domains = new List<string>();

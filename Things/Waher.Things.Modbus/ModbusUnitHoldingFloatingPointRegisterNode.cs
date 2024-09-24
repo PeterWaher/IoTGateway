@@ -212,6 +212,10 @@ namespace Waher.Things.Modbus
 			}
 		}
 
+		/// <summary>
+		/// Gets the field name of the node.
+		/// </summary>
+		/// <returns>Field name</returns>
 		public string GetFieldName()
 		{
 			if (string.IsNullOrEmpty(this.FieldName))

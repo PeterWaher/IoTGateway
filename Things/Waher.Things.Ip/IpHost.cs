@@ -14,6 +14,9 @@ using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Ip
 {
+	/// <summary>
+	/// Node representing an IP Host machine.
+	/// </summary>
 	public class IpHost : ProvisionedMeteringNode, ISensor, IHostReference
 	{
 		private string host = string.Empty;

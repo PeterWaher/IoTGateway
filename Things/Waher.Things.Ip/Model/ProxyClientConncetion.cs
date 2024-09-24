@@ -21,7 +21,6 @@ namespace Waher.Things.Ip.Model
 		/// <param name="Port">Listening port object</param>
 		/// <param name="Incoming">Incoming client connection</param>
 		/// <param name="Outgoing">Outgoing client connection</param>
-		/// <param name="Tls">If TLS is used</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public ProxyClientConncetion(ProxyPort Port, BinaryTcpClient Incoming, BinaryTcpClient Outgoing, ISniffer[] Sniffers)
 			: base(Sniffers)
@@ -30,13 +29,13 @@ namespace Waher.Things.Ip.Model
 			this.incoming = Incoming;
 			this.outgoing = Outgoing;
 
-			this.incoming.OnDisconnected += Incoming_OnDisconnected;
-			this.incoming.OnError += Incoming_OnError;
-			this.incoming.OnReceived += Incoming_OnReceived;
+			this.incoming.OnDisconnected += this.Incoming_OnDisconnected;
+			this.incoming.OnError += this.Incoming_OnError;
+			this.incoming.OnReceived += this.Incoming_OnReceived;
 
-			this.outgoing.OnDisconnected += Outgoing_OnDisconnected;
-			this.outgoing.OnError += Outgoing_OnError;
-			this.outgoing.OnReceived += Outgoing_OnReceived;
+			this.outgoing.OnDisconnected += this.Outgoing_OnDisconnected;
+			this.outgoing.OnError += this.Outgoing_OnError;
+			this.outgoing.OnReceived += this.Outgoing_OnReceived;
 		}
 
 		/// <summary>

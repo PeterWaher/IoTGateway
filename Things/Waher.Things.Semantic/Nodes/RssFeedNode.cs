@@ -18,6 +18,9 @@ using Waher.Things.Virtual;
 
 namespace Waher.Things.Semantic.Nodes
 {
+	/// <summary>
+	/// Node representing an RSS Feed
+	/// </summary>
 	public class RssFeedNode : ProvisionedMeteringNode, ISensor
 	{
 		private string url = string.Empty;

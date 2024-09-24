@@ -46,6 +46,19 @@ namespace Waher.Things.Ip.Model
 			return Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 		}
 
+		/// <summary>
+		/// Gets a TCP/IP proxy node
+		/// </summary>
+		/// <param name="Node">IP Host Port Proxy node.</param>
+		/// <param name="Key">Sort key</param>
+		/// <param name="Host">Remote host</param>
+		/// <param name="Port">Remote port</param>
+		/// <param name="Tls">If TLS should be used</param>
+		/// <param name="TrustServer">If remote server should be trusted</param>
+		/// <param name="ListeningPort">What port to open for listening.</param>
+		/// <param name="AuthorizedAccess">If remote certificate is used to authorize access.</param>
+		/// <param name="RemoteIps">Array of allowed remote IP ranges.</param>
+		/// <returns>Proxy node.</returns>
 		public static async Task<ProxyPort> GetProxy(IpHostPortProxy Node, string Key, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort, 
 			bool AuthorizedAccess, IpCidr[] RemoteIps)
 		{
@@ -79,6 +92,10 @@ namespace Waher.Things.Ip.Model
 			}
 		}
 
+		/// <summary>
+		/// Destroys a proxy node
+		/// </summary>
+		/// <param name="Key">Key of node.</param>
 		public static void DestroyProxy(string Key)
 		{
 			ProxyPort Proxy;

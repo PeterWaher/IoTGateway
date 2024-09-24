@@ -673,6 +673,9 @@ namespace Waher.Things.Files
 			}
 		}
 
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
 		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
 
 		/// <summary>

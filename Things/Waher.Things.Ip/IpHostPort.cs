@@ -14,6 +14,9 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Ip
 {
+	/// <summary>
+	/// Node representing a port on an IP Host machine.
+	/// </summary>
 	public class IpHostPort : IpHost
 	{
 		private int port = 0;

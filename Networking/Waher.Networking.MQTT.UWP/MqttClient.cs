@@ -1120,11 +1120,22 @@ namespace Waher.Networking.MQTT
 		/// <returns>Packet identifier assigned to subscription.</returns>
 		public Task<ushort> SUBSCRIBE(params string[] Topics)
 		{
+			return this.SUBSCRIBE(MqttQualityOfService.ExactlyOnce, Topics);
+		}
+
+		/// <summary>
+		/// Subscribes to information from a set of topics. Topics can include wildcards.
+		/// </summary>
+		/// <param name="QoS">Quality of Service.</param>
+		/// <param name="Topics">Topics</param>
+		/// <returns>Packet identifier assigned to subscription.</returns>
+		public Task<ushort> SUBSCRIBE(MqttQualityOfService QoS, params string[] Topics)
+		{
 			int i, c = Topics.Length;
 			KeyValuePair<string, MqttQualityOfService>[] Topics2 = new KeyValuePair<string, MqttQualityOfService>[c];
 
 			for (i = 0; i < c; i++)
-				Topics2[i] = new KeyValuePair<string, MqttQualityOfService>(Topics[i], MqttQualityOfService.ExactlyOnce);
+				Topics2[i] = new KeyValuePair<string, MqttQualityOfService>(Topics[i], QoS);
 
 			return this.SUBSCRIBE(Topics2);
 		}

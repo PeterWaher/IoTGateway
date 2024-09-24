@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SkiaSharp;
+﻿using SkiaSharp;
 
 namespace Waher.Script.Graphs.Functions.Plots
 {

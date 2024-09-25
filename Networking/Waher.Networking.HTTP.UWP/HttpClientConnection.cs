@@ -210,9 +210,23 @@ namespace Waher.Networking.HTTP
 
 				if (!(this.header.ContentLength is null) && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
-					await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", 
-						"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
+					await this.SendResponse(null, null, new HttpException(413, "Method Not Allowed", "Empty method."), true);
 					return false;
+				}
+
+				if (string.IsNullOrEmpty(this.header.Method))
+				{
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Empty method."), true);
+					return false;
+				}
+
+				foreach (char ch in this.header.Method)
+				{
+					if (!((ch >= 'A' && ch <= 'Z') || ch == '-' || ch == '_'))
+					{
+						await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid method."), true);
+						return false;
+					}
 				}
 
 				if (i + 1 < NrRead)

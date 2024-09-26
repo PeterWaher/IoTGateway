@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -184,6 +183,16 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// Is called when an entry is finished.
 		/// </summary>
 		public abstract Task EndEntry();
+
+		/// <summary>
+		/// Is called when a collection has been cleared.
+		/// </summary>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		public virtual async Task CollectionCleared(DateTimeOffset EntryTimestamp)
+		{
+			await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp);
+			await this.EndEntry();
+		}
 
 		/// <summary>
 		/// Is called when an object is started.

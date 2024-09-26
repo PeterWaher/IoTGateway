@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
-using Waher.Runtime.Settings;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway
 {
@@ -16,11 +16,6 @@ namespace Waher.IoTGateway
 	/// </summary>
 	public static class Export
 	{
-		/// <summary>
-		/// http://waher.se/Schema/Export.xsd
-		/// </summary>
-		public const string ExportNamepace = "http://waher.se/Schema/Export.xsd";
-
 		/// <summary>
 		/// Full path to export folder.
 		/// </summary>

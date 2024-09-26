@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Networking.XMPP;
 using Waher.Persistence.Serialization;
 
 namespace Waher.IoTGateway.WebResources.ExportFormats

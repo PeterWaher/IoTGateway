@@ -455,6 +455,8 @@
 	<Assembly fileName="Waher.Networking.XMPP.WebSocket.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.xml" />
 	<Assembly fileName="Waher.Persistence.dll" />
+	<Assembly fileName="Waher.Persistence.pdb" />
+	<Assembly fileName="Waher.Persistence.xml" />
 	<Assembly fileName="Waher.Persistence.Files.dll" />
 	<Assembly fileName="Waher.Persistence.Files.pdb" />
 	<Assembly fileName="Waher.Persistence.Files.xml" />
@@ -464,10 +466,11 @@
 	<Assembly fileName="Waher.Persistence.MongoDB.dll" />
 	<Assembly fileName="Waher.Persistence.MongoDB.pdb" />
 	<Assembly fileName="Waher.Persistence.MongoDB.xml" />
-	<Assembly fileName="Waher.Persistence.pdb" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.dll" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.pdb" />
-	<Assembly fileName="Waher.Persistence.xml" />
+	<Assembly fileName="Waher.Persistence.XmlLedger.dll" />
+	<Assembly fileName="Waher.Persistence.XmlLedger.pdb" />
+	<Assembly fileName="Waher.Persistence.XmlLedger.xml" />
 	<Assembly fileName="Waher.Runtime.Cache.dll" />
 	<Assembly fileName="Waher.Runtime.Cache.pdb" />
 	<Assembly fileName="Waher.Runtime.Cache.xml" />

@@ -9,7 +9,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence;
-using Waher.Persistence.Serialization;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Console;
 
 namespace Waher.Utility.Extract.ExportFormats
@@ -103,8 +103,8 @@ namespace Waher.Utility.Extract.ExportFormats
 				this.output = XmlWriter.Create(FileName, this.settings);
 
 				await this.output.WriteStartDocumentAsync();
-				await this.output.WriteStartElementAsync(string.Empty, "Export", Program.ExportNamepace);
-				await this.output.WriteStartElementAsync(string.Empty, "Database", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Export", XmlFileLedger.Namespace);
+				await this.output.WriteStartElementAsync(string.Empty, "Database", XmlFileLedger.Namespace);
 			}
 			else
 				this.output = null;
@@ -134,8 +134,8 @@ namespace Waher.Utility.Extract.ExportFormats
 				this.output = XmlWriter.Create(FileName, this.settings);
 
 				await this.output.WriteStartDocumentAsync();
-				await this.output.WriteStartElementAsync(string.Empty, "Export", Program.ExportNamepace);
-				await this.output.WriteStartElementAsync(string.Empty, "Ledger", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Export", XmlFileLedger.Namespace);
+				await this.output.WriteStartElementAsync(string.Empty, "Ledger", XmlFileLedger.Namespace);
 			}
 			else
 				this.output = null;
@@ -164,7 +164,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 			if (this.exportCollection)
 			{
-				await this.output.WriteStartElementAsync(string.Empty, "Collection", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Collection", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "name", string.Empty, CollectionName);
 			}
 		}
@@ -179,7 +179,7 @@ namespace Waher.Utility.Extract.ExportFormats
 		public async Task StartIndex()
 		{
 			if (this.exportCollection)
-				await this.output.WriteStartElementAsync(string.Empty, "Index", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Index", XmlFileLedger.Namespace);
 		}
 
 		public async Task EndIndex()
@@ -192,7 +192,7 @@ namespace Waher.Utility.Extract.ExportFormats
 		{
 			if (this.exportCollection)
 			{
-				await this.output.WriteStartElementAsync(string.Empty, "Field", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Field", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "name", string.Empty, FieldName);
 				await this.output.WriteAttributeStringAsync(string.Empty, "ascending", string.Empty, CommonTypes.Encode(Ascending));
 				await this.output.WriteEndElementAsync();
@@ -203,7 +203,7 @@ namespace Waher.Utility.Extract.ExportFormats
 		{
 			if (this.exportCollection)
 			{
-				await this.output.WriteStartElementAsync(string.Empty, "Block", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Block", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, BlockID);
 			}
 		}
@@ -228,7 +228,7 @@ namespace Waher.Utility.Extract.ExportFormats
 			{
 				if (!this.inMetaData)
 				{
-					await this.output.WriteStartElementAsync(string.Empty, "MetaData", Program.ExportNamepace);
+					await this.output.WriteStartElementAsync(string.Empty, "MetaData", XmlFileLedger.Namespace);
 					this.inMetaData = true;
 				}
 
@@ -240,7 +240,7 @@ namespace Waher.Utility.Extract.ExportFormats
 		{
 			if (this.exportCollection)
 			{
-				await this.output.WriteStartElementAsync(string.Empty, "Obj", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Obj", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, ObjectId);
 				await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, TypeName);
 			}
@@ -264,7 +264,7 @@ namespace Waher.Utility.Extract.ExportFormats
 					this.inMetaData = false;
 				}
 
-				await this.output.WriteStartElementAsync(string.Empty, EntryType.ToString(), Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, EntryType.ToString(), XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, ObjectId);
 				await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, TypeName);
 				await this.output.WriteAttributeStringAsync(string.Empty, "ts", string.Empty, XML.Encode(EntryTimestamp));
@@ -279,303 +279,44 @@ namespace Waher.Utility.Extract.ExportFormats
 				await this.output.WriteEndElementAsync();
 		}
 
-		public async Task ReportProperty(string PropertyName, object PropertyValue)
+		/// <summary>
+		/// Is called when a collection has been cleared.
+		/// </summary>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		public async Task CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
 			if (this.exportCollection)
 			{
-				if (PropertyValue is null)
+				if (this.inMetaData)
 				{
-					await this.output.WriteStartElementAsync(string.Empty, "Null", Program.ExportNamepace);
-					if (PropertyName is not null)
-						await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 					await this.output.WriteEndElementAsync();
+					this.inMetaData = false;
 				}
-				else if (PropertyValue is Enum)
-				{
-					await this.output.WriteStartElementAsync(string.Empty, "En", Program.ExportNamepace);
-					if (PropertyName is not null)
-						await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-					await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-					await this.output.WriteEndElementAsync();
-				}
-				else
-				{
-					switch (Type.GetTypeCode(PropertyValue.GetType()))
-					{
-						case TypeCode.Boolean:
-							await this.output.WriteStartElementAsync(string.Empty, "Bl", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, CommonTypes.Encode((bool)PropertyValue));
-							await this.output.WriteEndElementAsync();
-							break;
 
-						case TypeCode.Byte:
-							await this.output.WriteStartElementAsync(string.Empty, "B", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Char:
-							await this.output.WriteStartElementAsync(string.Empty, "Ch", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.DateTime:
-							await this.output.WriteStartElementAsync(string.Empty, "DT", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, XML.Encode((DateTime)PropertyValue));
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Decimal:
-							await this.output.WriteStartElementAsync(string.Empty, "Dc", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, ToString((decimal)PropertyValue));
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Double:
-							await this.output.WriteStartElementAsync(string.Empty, "Db", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, ToString((double)PropertyValue));
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Int16:
-							await this.output.WriteStartElementAsync(string.Empty, "I2", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Int32:
-							await this.output.WriteStartElementAsync(string.Empty, "I4", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Int64:
-							await this.output.WriteStartElementAsync(string.Empty, "I8", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.SByte:
-							await this.output.WriteStartElementAsync(string.Empty, "I1", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Single:
-							await this.output.WriteStartElementAsync(string.Empty, "Fl", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, ToString((float)PropertyValue));
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.String:
-							string s = PropertyValue.ToString();
-							try
-							{
-								XmlConvert.VerifyXmlChars(s);
-								await this.output.WriteStartElementAsync(string.Empty, "S", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
-								await this.output.WriteEndElementAsync();
-							}
-							catch (XmlException)
-							{
-								byte[] Bin = Encoding.UTF8.GetBytes(s);
-								s = Convert.ToBase64String(Bin);
-								await this.output.WriteStartElementAsync(string.Empty, "S64", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
-								await this.output.WriteEndElementAsync();
-							}
-							break;
-
-						case TypeCode.UInt16:
-							await this.output.WriteStartElementAsync(string.Empty, "U2", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.UInt32:
-							await this.output.WriteStartElementAsync(string.Empty, "U4", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.UInt64:
-							await this.output.WriteStartElementAsync(string.Empty, "U8", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.DBNull:
-						case TypeCode.Empty:
-							await this.output.WriteStartElementAsync(string.Empty, "Null", Program.ExportNamepace);
-							if (PropertyName is not null)
-								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-							await this.output.WriteEndElementAsync();
-							break;
-
-						case TypeCode.Object:
-							if (PropertyValue is TimeSpan)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "TS", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-								await this.output.WriteEndElementAsync();
-							}
-							else if (PropertyValue is DateTimeOffset DTO)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "DTO", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, XML.Encode(DTO));
-								await this.output.WriteEndElementAsync();
-							}
-							else if (PropertyValue is CaseInsensitiveString Cis)
-							{
-								s = Cis.Value;
-								try
-								{
-									XmlConvert.VerifyXmlChars(s);
-									await this.output.WriteStartElementAsync(string.Empty, "CIS", Program.ExportNamepace);
-									if (PropertyName is not null)
-										await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-									await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
-									await this.output.WriteEndElementAsync();
-								}
-								catch (XmlException)
-								{
-									byte[] Bin = Encoding.UTF8.GetBytes(s);
-									s = Convert.ToBase64String(Bin);
-									await this.output.WriteStartElementAsync(string.Empty, "CIS64", Program.ExportNamepace);
-									if (PropertyName is not null)
-										await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-									await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
-									await this.output.WriteEndElementAsync();
-								}
-							}
-							else if (PropertyValue is byte[] Bin)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "Bin", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-
-								byte[] Buf = null;
-								long c = Bin.Length;
-								long i = 0;
-								long d;
-								int j;
-
-								while (i < c)
-								{
-									d = c - i;
-									if (d > 49152)
-										j = 49152;
-									else
-										j = (int)d;
-
-									if (Buf is null)
-									{
-										if (i == 0 && j == c)
-											Buf = Bin;
-										else
-											Buf = new byte[j];
-									}
-
-									if (Buf != Bin)
-										Array.Copy(Bin, i, Buf, 0, j);
-
-									this.output.WriteElementString("Chunk", Convert.ToBase64String(Buf, 0, j, Base64FormattingOptions.None));
-									i += j;
-								}
-
-								await this.output.WriteEndElementAsync();
-							}
-							else if (PropertyValue is Guid)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "ID", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
-								await this.output.WriteEndElementAsync();
-							}
-							else if (PropertyValue is Array A)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "Array", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "elementType", string.Empty, PropertyValue.GetType().GetElementType().FullName);
-
-								foreach (object Obj in A)
-									await this.ReportProperty(null, Obj);
-
-								await this.output.WriteEndElementAsync();
-							}
-							else if (PropertyValue is GenericObject Obj)
-							{
-								await this.output.WriteStartElementAsync(string.Empty, "Obj", Program.ExportNamepace);
-								if (PropertyName is not null)
-									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
-								await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, Obj.TypeName);
-
-								foreach (KeyValuePair<string, object> P in Obj)
-									await this.ReportProperty(P.Key, P.Value);
-
-								await this.output.WriteEndElementAsync();
-							}
-							else
-								throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
-							break;
-
-						default:
-							throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
-					}
-				}
+				await this.output.WriteStartElementAsync(string.Empty, nameof(EntryType.Clear), XmlFileLedger.Namespace);
+				await this.output.WriteAttributeStringAsync(string.Empty, "ts", string.Empty, XML.Encode(EntryTimestamp));
 			}
+		}
+
+		public Task ReportProperty(string PropertyName, object PropertyValue)
+		{
+			if (this.exportCollection)
+				return XmlFileLedger.ReportProperty(this.output, PropertyName, PropertyValue, XmlFileLedger.Namespace);
+			else
+				return Task.CompletedTask;
 		}
 
 		public async Task ReportError(string Message)
 		{
 			if (!this.inCollection || this.exportCollection)
-				await this.output.WriteElementStringAsync(string.Empty, "Error", Program.ExportNamepace, Message);
+				await this.output.WriteElementStringAsync(string.Empty, "Error", XmlFileLedger.Namespace, Message);
 		}
 
 		public async Task ReportException(Exception Exception)
 		{
 			if (!this.inCollection || this.exportCollection)
 			{
-				await this.output.WriteStartElementAsync(string.Empty, "Exception", Program.ExportNamepace);
+				await this.output.WriteStartElementAsync(string.Empty, "Exception", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "message", string.Empty, Exception.Message);
 				this.output.WriteElementString("StackTrace", Log.CleanStackTrace(Exception.StackTrace));
 

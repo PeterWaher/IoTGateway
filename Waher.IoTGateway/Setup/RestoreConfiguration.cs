@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Language;
 using Waher.Runtime.Temporary;
@@ -534,7 +534,7 @@ namespace Waher.IoTGateway.Setup
 			bool FilesStarted = false;
 			bool FirstFile = true;
 
-			if (!r.ReadToFollowing("Export", Export.ExportNamepace))
+			if (!r.ReadToFollowing("Export", XmlFileLedger.Namespace))
 				throw new Exception("Invalid backup XML file.");
 
 			await Import.Start();
@@ -1686,7 +1686,7 @@ namespace Waher.IoTGateway.Setup
 											}
 
 											if (ImportCollection)
-												await Import.EndObject();
+												await Import.EndEntry();
 											break;
 
 										case 3:
@@ -1907,7 +1907,7 @@ namespace Waher.IoTGateway.Setup
 
 			XmlElement KeyAes256 = Doc.DocumentElement;
 			if (KeyAes256.LocalName != "KeyAes256" ||
-				KeyAes256.NamespaceURI != Export.ExportNamepace ||
+				KeyAes256.NamespaceURI != XmlFileLedger.Namespace ||
 				!KeyAes256.HasAttribute("key") ||
 				!KeyAes256.HasAttribute("iv"))
 			{

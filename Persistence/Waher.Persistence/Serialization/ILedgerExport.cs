@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.Serialization
@@ -62,6 +61,12 @@ namespace Waher.Persistence.Serialization
 		/// Is called when an entry is finished.
 		/// </summary>
 		Task EndEntry();
+
+		/// <summary>
+		/// Is called when the collection has been cleared.
+		/// </summary>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		Task CollectionCleared(DateTimeOffset EntryTimestamp);
 
 		/// <summary>
 		/// Is called when a property is reported.

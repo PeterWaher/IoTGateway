@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence;
@@ -465,7 +463,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(TypeName);
 			}
 
-			return Task.FromResult<string>(ObjectId);
+			return Task.FromResult(ObjectId);
 		}
 
 		/// <summary>
@@ -507,7 +505,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(TS.Ticks);
 			}
 
-			return Task.FromResult<string>(ObjectId);
+			return Task.FromResult(ObjectId);
 		}
 
 		/// <summary>

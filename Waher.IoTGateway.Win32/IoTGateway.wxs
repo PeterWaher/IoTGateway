@@ -637,6 +637,7 @@
 							<File Id='Waher.Persistence.FullTextSearch.dll' Name='Waher.Persistence.FullTextSearch.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.FullTextSearch.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.dll' Vital='yes'/>
+							<File Id='Waher.Persistence.XmlLedger.dll' Name='Waher.Persistence.XmlLedger.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Console.dll' Name='Waher.Runtime.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.dll' Vital='yes'/>
@@ -775,6 +776,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.FullTextSearch.dll' Name='Waher.Persistence.FullTextSearch.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.XmlLedger.dll' Name='Waher.Persistence.XmlLedger.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Console.dll' Name='Waher.Runtime.Console.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' On='uninstall'/>
@@ -908,6 +910,7 @@
 							<File Id='Waher.Persistence.FullTextSearch.pdb' Name='Waher.Persistence.FullTextSearch.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.FullTextSearch.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.XmlLedger.pdb' Name='Waher.Persistence.XmlLedger.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Console.pdb' Name='Waher.Runtime.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.pdb' Vital='yes'/>
@@ -1023,6 +1026,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.FullTextSearch.pdb' Name='Waher.Persistence.FullTextSearch.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.XmlLedger.pdb' Name='Waher.Persistence.XmlLedger.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Console.pdb' Name='Waher.Runtime.Console.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' On='uninstall'/>

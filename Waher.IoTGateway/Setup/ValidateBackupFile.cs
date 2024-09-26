@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Persistence;
+using Waher.Persistence.XmlLedger;
 using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
@@ -278,7 +279,7 @@ namespace Waher.IoTGateway.Setup
 			this.typeName = TypeName;
 			this.nrObjects++;
 
-			return Task.FromResult<string>(ObjectId);
+			return Task.FromResult(ObjectId);
 		}
 
 		private string MapObjectId(string ObjectId)
@@ -370,7 +371,7 @@ namespace Waher.IoTGateway.Setup
 			this.typeName = TypeName;
 			this.nrEntries++;
 
-			return Task.FromResult<string>(ObjectId);
+			return Task.FromResult(ObjectId);
 		}
 
 		/// <summary>
@@ -382,6 +383,16 @@ namespace Waher.IoTGateway.Setup
 			this.typeName = null;
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when a collection has been cleared.
+		/// </summary>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		public virtual async Task CollectionCleared(DateTimeOffset EntryTimestamp)
+		{
+			await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp);
+			await this.EndEntry();
 		}
 
 		/// <summary>

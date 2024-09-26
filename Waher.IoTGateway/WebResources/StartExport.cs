@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Content.Markdown;
@@ -16,6 +16,7 @@ using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HttpFileUpload;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Profiling;
 
 namespace Waher.IoTGateway.WebResources
@@ -238,7 +239,7 @@ namespace Waher.IoTGateway.WebResources
 					using (XmlOutput = XmlWriter.Create(Result.FullKeyFileName, XML.WriterSettings(true, false)))
 					{
 						XmlOutput.WriteStartDocument();
-						XmlOutput.WriteStartElement("KeyAes256", Export.ExportNamepace);
+						XmlOutput.WriteStartElement("KeyAes256", XmlFileLedger.Namespace);
 						XmlOutput.WriteAttributeString("key", Convert.ToBase64String(Key));
 						XmlOutput.WriteAttributeString("iv", Convert.ToBase64String(IV));
 						XmlOutput.WriteEndElement();

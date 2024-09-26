@@ -1412,7 +1412,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				if (Result is Graph G)
 				{
-					PixelInformation Pixels = G.CreatePixels(G.GetSettings(Variables, 600, 300));
+					PixelInformation Pixels = G.CreatePixels(G.Settings);
 					await this.ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}

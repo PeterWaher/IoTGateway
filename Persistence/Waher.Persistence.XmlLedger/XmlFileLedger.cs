@@ -15,7 +15,7 @@ using Waher.Runtime.Profiling;
 namespace Waher.Persistence.XmlLedger
 {
 	/// <summary>
-	/// Simple ledger that records anything that happens in the database to XML files in the program data folder
+	/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 	/// </summary>
 	public class XmlFileLedger : ILedgerProvider
 	{
@@ -29,6 +29,7 @@ namespace Waher.Persistence.XmlLedger
 		private StreamWriter file;
 		private DateTime lastEvent = DateTime.MinValue;
 		private XmlWriter output;
+		private TextWriter textOutput;
 		private ILedgerExternalEvents externalEvents;
 		private readonly string fileName;
 		private string lastFileName = null;
@@ -37,7 +38,7 @@ namespace Waher.Persistence.XmlLedger
 		private bool running;
 
 		/// <summary>
-		/// Simple ledger that records anything that happens in the database to XML files in the program data folder
+		/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 		/// </summary>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
@@ -56,7 +57,7 @@ namespace Waher.Persistence.XmlLedger
 		}
 
 		/// <summary>
-		/// Simple ledger that records anything that happens in the database to XML files in the program data folder
+		/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 		/// </summary>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
@@ -77,7 +78,7 @@ namespace Waher.Persistence.XmlLedger
 		}
 
 		/// <summary>
-		/// Simple ledger that records anything that happens in the database to XML files in the program data folder
+		/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 		/// </summary>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
@@ -97,7 +98,7 @@ namespace Waher.Persistence.XmlLedger
 		}
 
 		/// <summary>
-		/// Simple ledger that records anything that happens in the database to XML files in the program data folder
+		/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 		/// </summary>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
@@ -142,6 +143,38 @@ namespace Waher.Persistence.XmlLedger
 				Log.Informational("Creating folder.", FolderName);
 				Directory.CreateDirectory(FolderName);
 			}
+		}
+
+		/// <summary>
+		/// Simple ledger that records anything that happens in the database to a text output stream.
+		/// </summary>
+		/// <param name="Output">Text Output</param>
+		public XmlFileLedger(TextWriter Output)
+		{
+			this.textOutput = Output;
+			this.file = null;
+			this.fileName = null;
+			this.transform = null;
+			this.deleteAfterDays = 0;
+
+			this.settings = new XmlWriterSettings()
+			{
+				CloseOutput = true,
+				ConformanceLevel = ConformanceLevel.Document,
+				Encoding = Encoding.UTF8,
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Replace,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = false,
+				WriteEndDocumentOnClose = true
+			};
+
+			this.output = XmlWriter.Create(this.textOutput, this.settings);
+			this.output.WriteStartDocument();
+			this.output.WriteStartElement("LedgerExport", Namespace);
+			this.output.Flush();
 		}
 
 		/// <summary>
@@ -207,6 +240,9 @@ namespace Waher.Persistence.XmlLedger
 		/// </summary>
 		private async Task BeforeWrite()
 		{
+			if (this.fileName is null)
+				return;
+
 			DateTime TP = DateTime.Now;
 			string s = GetFileName(this.fileName, TP);
 			this.lastEvent = TP;
@@ -311,6 +347,9 @@ namespace Waher.Persistence.XmlLedger
 
 			this.file?.Dispose();
 			this.file = null;
+
+			this.textOutput?.Flush();
+			this.textOutput = null;
 		}
 
 		/// <summary>
@@ -350,6 +389,9 @@ namespace Waher.Persistence.XmlLedger
 
 			if (!(this.file is null))
 				await this.file.FlushAsync();
+
+			if (!(this.textOutput is null))
+				await this.textOutput.FlushAsync();
 		}
 
 		/// <summary>

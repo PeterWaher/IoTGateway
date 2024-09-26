@@ -2617,7 +2617,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -2658,7 +2658,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2697,7 +2697,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -5338,7 +5338,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -5379,7 +5379,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5418,7 +5418,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -8095,7 +8095,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -8136,7 +8136,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8175,7 +8175,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -10825,7 +10825,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -10866,7 +10866,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10905,7 +10905,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -13591,7 +13591,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -13632,7 +13632,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13671,7 +13671,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -16321,7 +16321,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -16362,7 +16362,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16401,7 +16401,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     },
@@ -19087,7 +19087,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Runtime.Inventory": "1.1.6",
+          "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.6.10"
         }
@@ -19128,7 +19128,7 @@
           "Waher.Runtime.Queue": "1.1.0"
         }
       },
-      "Waher.Runtime.Inventory/1.1.6": {
+      "Waher.Runtime.Inventory/1.1.7": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19167,7 +19167,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.2.1",
-          "Waher.Runtime.Inventory": "1.1.6"
+          "Waher.Runtime.Inventory": "1.1.7"
         }
       }
     }
@@ -29058,7 +29058,7 @@
       "path": "../../Runtime/Waher.Runtime.Console/Waher.Runtime.Console.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Console/Waher.Runtime.Console.csproj"
     },
-    "Waher.Runtime.Inventory/1.1.6": {
+    "Waher.Runtime.Inventory/1.1.7": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj"

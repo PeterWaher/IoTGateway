@@ -297,5 +297,104 @@ namespace Waher.Persistence
 			return Provider.Export(Output, CollectionNames, Thread);
 		}
 
+		private static readonly object listeningSynchObj = new object();
+		private static int listeningCounter = 0;
+
+		/// <summary>
+		/// Makes the ledger listen on database events.
+		/// Each call to <see cref="StartListeningToDatabaseEvents"/> must be followed by a call
+		/// to <see cref="StopListeningToDatabaseEvents"/> when listening should stop.
+		/// </summary>
+		public static void StartListeningToDatabaseEvents()
+		{
+			lock (listeningSynchObj)
+			{
+				if (listeningCounter == 0)
+				{
+					Database.ObjectInserted += Database_ObjectInserted;
+					Database.ObjectUpdated += Database_ObjectUpdated;
+					Database.ObjectDeleted += Database_ObjectDeleted;
+					Database.CollectionCleared += Database_CollectionCleared;
+
+					listeningCounter++;
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// Makes the ledger listen on database events.
+		/// Each call to <see cref="StartListeningToDatabaseEvents"/> must be followed by a call
+		/// to <see cref="StopListeningToDatabaseEvents"/> when listening should stop.
+		/// </summary>
+		public static void StopListeningToDatabaseEvents()
+		{
+			lock (listeningSynchObj)
+			{
+				if (listeningCounter > 0)
+				{
+					listeningCounter--;
+
+					if (listeningCounter == 0)
+					{
+						Database.ObjectInserted -= Database_ObjectInserted;
+						Database.ObjectUpdated -= Database_ObjectUpdated;
+						Database.ObjectDeleted -= Database_ObjectDeleted;
+						Database.CollectionCleared -= Database_CollectionCleared;
+					}
+				}
+			}
+		}
+
+		private static async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await NewEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await UpdatedEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await DeletedEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
+		{
+			try
+			{
+				await ClearedCollection(e.Collection);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
 	}
 }

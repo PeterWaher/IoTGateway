@@ -133,7 +133,8 @@ namespace Waher.Persistence.XmlLedger
 				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
-				WriteEndDocumentOnClose = true
+				WriteEndDocumentOnClose = true,
+				Async = true
 			};
 
 			string FolderName = Path.GetDirectoryName(FileName);
@@ -168,7 +169,8 @@ namespace Waher.Persistence.XmlLedger
 				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
-				WriteEndDocumentOnClose = true
+				WriteEndDocumentOnClose = true,
+				Async = true
 			};
 
 			this.output = XmlWriter.Create(this.textOutput, this.settings);
@@ -252,16 +254,20 @@ namespace Waher.Persistence.XmlLedger
 
 			try
 			{
-				this.output?.WriteEndElement();
-				this.output?.WriteEndDocument();
-				this.output?.Flush();
+				if (!(this.output is null))
+				{
+					await this.output.WriteEndElementAsync();
+					await this.output.WriteEndDocumentAsync();
+					await this.output.FlushAsync();
+				}
+
 				this.file?.Dispose();
 			}
 			catch (Exception)
 			{
 				try
 				{
-					this.DisposeOutput();
+					await this.DisposeOutput();
 				}
 				catch (Exception)
 				{
@@ -288,7 +294,7 @@ namespace Waher.Persistence.XmlLedger
 				return;
 			}
 
-			this.output.WriteStartDocument();
+			await this.output.WriteStartDocumentAsync();
 
 			if (!string.IsNullOrEmpty(this.transform))
 			{
@@ -298,20 +304,20 @@ namespace Waher.Persistence.XmlLedger
 					{
 						byte[] XsltBin = await Resources.ReadAllBytesAsync(this.transform);
 
-						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
+						await this.output.WriteProcessingInstructionAsync("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
 							Convert.ToBase64String(XsltBin) + "\"");
 					}
 					catch (Exception)
 					{
-						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
+						await this.output.WriteProcessingInstructionAsync("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
 					}
 				}
 				else
-					this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
+					await this.output.WriteProcessingInstructionAsync("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
 			}
 
-			this.output.WriteStartElement("LedgerExport", Namespace);
-			this.output.Flush();
+			await this.output.WriteStartElementAsync(string.Empty, "LedgerExport", Namespace);
+			await this.output.FlushAsync();
 
 			string FolderName = Path.GetDirectoryName(s);
 			string[] Files = Directory.GetFiles(FolderName, "*.*");
@@ -339,11 +345,14 @@ namespace Waher.Persistence.XmlLedger
 		/// <summary>
 		/// Disposes of the current output.
 		/// </summary>
-		private void DisposeOutput()
+		private async Task DisposeOutput()
 		{
-			this.output?.Flush();
-			this.output?.Dispose();
-			this.output = null;
+			if (!(this.output is null))
+			{
+				await this.output.FlushAsync();
+				this.output.Dispose();
+				this.output = null;
+			}
 
 			this.file?.Dispose();
 			this.file = null;
@@ -370,13 +379,14 @@ namespace Waher.Persistence.XmlLedger
 			{
 				this.running = false;
 
-				this.output?.WriteEndElement();
-				this.output?.WriteEndDocument();
+				if (!(this.output is null))
+				{
+					await this.output.WriteEndElementAsync();
+					await this.output.WriteEndDocumentAsync();
+				}
 			}
 
 			await this.Flush();
-
-			this.DisposeOutput();
 		}
 
 		/// <summary>
@@ -438,24 +448,24 @@ namespace Waher.Persistence.XmlLedger
 
 					if (!(this.output is null))
 					{
-						this.output.WriteStartElement(Method);
-						this.output.WriteAttributeString("timestamp", XML.Encode(Timestamp));
-						this.output.WriteAttributeString("collection", Obj.CollectionName);
-						this.output.WriteAttributeString("type", Obj.TypeName);
-						this.output.WriteAttributeString("id", Obj.ObjectId.ToString());
+						await this.output.WriteStartElementAsync(string.Empty, Method, Namespace);
+						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(Timestamp));
+						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, Obj.CollectionName);
+						await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, Obj.TypeName);
+						await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, Obj.ObjectId.ToString());
 
 						foreach (KeyValuePair<string, object> P in Obj.Properties)
 							await ReportProperty(this.output, P.Key, P.Value, Namespace);
 
-						this.output.WriteEndElement();
-						this.output.Flush();
+						await this.output.WriteEndElementAsync();
+						await this.output.FlushAsync();
 					}
 				}
 				catch (Exception)
 				{
 					try
 					{
-						this.DisposeOutput();
+						await this.DisposeOutput();
 					}
 					catch (Exception)
 					{
@@ -711,7 +721,7 @@ namespace Waher.Persistence.XmlLedger
 								if (Buf != Bin)
 									Array.Copy(Bin, i, Buf, 0, j);
 
-								Output.WriteElementString("Chunk", Convert.ToBase64String(Buf, 0, j));
+								await Output.WriteElementStringAsync(string.Empty, "Chunk", Namespace, Convert.ToBase64String(Buf, 0, j));
 								i += j;
 							}
 
@@ -779,18 +789,18 @@ namespace Waher.Persistence.XmlLedger
 
 					if (!(this.output is null))
 					{
-						this.output.WriteStartElement("Clear");
-						this.output.WriteAttributeString("timestamp", XML.Encode(Timestamp));
-						this.output.WriteAttributeString("collection", Collection);
-						this.output.WriteEndElement();
-						this.output.Flush();
+						await this.output.WriteStartElementAsync(string.Empty, "Clear", Namespace);
+						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(Timestamp));
+						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, Collection);
+						await this.output.WriteEndElementAsync();
+						await this.output.FlushAsync();
 					}
 				}
 				catch (Exception)
 				{
 					try
 					{
-						this.DisposeOutput();
+						await this.DisposeOutput();
 					}
 					catch (Exception)
 					{

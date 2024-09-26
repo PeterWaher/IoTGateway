@@ -357,6 +357,7 @@ The folder also contains the following unit test projects:
 | **Waher.Persistence.FilesLW.Test**        | .NET 6.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
 | **Waher.Persistence.FullTextSearch.Test** | .NET 6.0 | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
 | **Waher.Persistence.MongoDB.Test**        | .NET 6.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| **Waher.Persistence.XmlLedger.Test**      | .NET 8.0 | The [Waher.Persistence.XmlLedger.Test](Persistence/Waher.Persistence.XmlLedger.Test) project contains unit tests for the [Waher.Persistence.XmlLedger](Persistence/Waher.Persistence.XmlLedger) project. |
 
 Runtime
 ----------------------

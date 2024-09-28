@@ -3,7 +3,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Mqtt;
 
-namespace Waher.Things.Ieee1451.Ieee1451._1._6
+namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
 	/// <summary>
 	/// IEEE 1451.1.6 root topic node

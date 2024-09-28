@@ -90,8 +90,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0
 						Length <<= 8;
 						Length |= b;
 
-						TailLength = c - i - Length;
-						if (TailLength < 0)
+						TailLength = c - Length;
+						Length -= i;
+						if (Length < 0 || TailLength < 0)
 							return false;
 
 						Body = new byte[Length];

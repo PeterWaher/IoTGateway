@@ -512,9 +512,14 @@ to form more complex devices, such as concentrators or bridges.
 | **Waher.Things.Script**   | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Script/)   | The [Waher.Things.Script](Things/Waher.Things.Script) project is a class library that publishes nodes that permit you to define sensors and actuators using script. |
 | **Waher.Things.Semantic** | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Semantic/) | The [Waher.Things.Semantic](Things/Waher.Things.Semantic) project is a class library that publishes nodes representing Semantic Web devices. It also makes other non-semantic metering devices available via semantic web interfaces, such as SPARQL queries. |
 | **Waher.Things.Snmp**     | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Snmp/)     | The [Waher.Things.Snmp](Things/Waher.Things.Snmp) project is a class library that publishes nodes representing SNMP devices on the local area network. |
-| **Waher.Things.Test**     | .NET 6.0      |                                                                | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 | **Waher.Things.Virtual**  | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Virtual/)  | The [Waher.Things.Virtual](Things/Waher.Things.Virtual) project is a class library that publishes virtual nodes that can act as placeholders for software that wishes to publish nodes on the network. |
 | **Waher.Things.Xmpp**     | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Xmpp/)     | The [Waher.Things.Xmpp](Things/Waher.Things.Xmpp) project is a class library that publishes nodes for communication with devices over XMPP. |
+
+The folder also contains the following unit test projects:
+
+| Project                   | Type     | Project description |
+|---------------------------|----------|---------------------|
+| **Waher.Things.Test**     | .NET 6.0 | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 
 Utilities
 ----------------------

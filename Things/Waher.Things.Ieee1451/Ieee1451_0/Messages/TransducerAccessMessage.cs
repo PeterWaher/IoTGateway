@@ -1,9 +1,9 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Raw
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Transducer Access Message
 	/// </summary>
-	public class TransducerAccessMessage : RawMessage
+	public class TransducerAccessMessage : Ieee14510Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Transducer Access Message
@@ -26,7 +26,7 @@
 		public TransducerAccessService TransducerAccessService { get; }
 
 		/// <summary>
-		/// Name of <see cref="RawMessage.NetworkServiceId"/>
+		/// Name of <see cref="Ieee14510Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.TransducerAccessService.ToString();
 	}

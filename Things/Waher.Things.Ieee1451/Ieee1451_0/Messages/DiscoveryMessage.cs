@@ -1,9 +1,9 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Raw
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Discovery Message
 	/// </summary>
-	public class DiscoveryMessage : RawMessage
+	public class DiscoveryMessage : Ieee14510Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Discovery Message
@@ -26,7 +26,7 @@
 		public DiscoveryService DiscoveryService { get; }
 
 		/// <summary>
-		/// Name of <see cref="RawMessage.NetworkServiceId"/>
+		/// Name of <see cref="Ieee14510Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.DiscoveryService.ToString();
 	}

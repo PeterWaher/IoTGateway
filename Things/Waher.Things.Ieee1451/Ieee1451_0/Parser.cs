@@ -1,4 +1,4 @@
-﻿using Waher.Things.Ieee1451.Ieee1451_0.Raw;
+﻿using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0
 {
@@ -8,12 +8,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0
 	public static class Parser
 	{
 		/// <summary>
-		/// Tries to parse IEEE 1451.0-encoded data.
+		/// Tries to parse an IEEE 1451.0-encoded data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
-		/// <param name="Message">Raw Message, if parsed</param>
-		/// <returns>If able to parse the raw message.</returns>
-		public static bool TryParseRaw(byte[] Data, out RawMessage Message)
+		/// <param name="Message">Message object, if parsed</param>
+		/// <returns>If able to parse the message.</returns>
+		public static bool TryParseMessage(byte[] Data, out Ieee14510Message Message)
 		{
 			NetworkServiceType NetworkServiceType = 0;
 			MessageType MessageType = 0;

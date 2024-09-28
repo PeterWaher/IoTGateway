@@ -1,9 +1,9 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Raw
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Event Notification Message
 	/// </summary>
-	public class EventNotificationMessage : RawMessage
+	public class EventNotificationMessage : Ieee14510Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Event Notification Message
@@ -26,7 +26,7 @@
 		public EventNotificationService EventNotificationService { get; }
 
 		/// <summary>
-		/// Name of <see cref="RawMessage.NetworkServiceId"/>
+		/// Name of <see cref="Ieee14510Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.EventNotificationService.ToString();
 	}

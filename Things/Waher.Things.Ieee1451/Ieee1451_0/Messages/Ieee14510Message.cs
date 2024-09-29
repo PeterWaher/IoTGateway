@@ -1,17 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Message
 	/// </summary>
-	public abstract class Ieee14510Message
+	public abstract class Ieee14510Message : Ieee14510Binary
 	{
-		private readonly int len;
-		private int pos = 0;
-
 		/// <summary>
 		/// IEEE 1451.0 Message
 		/// </summary>
@@ -22,14 +18,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Tail">Bytes that are received after the body.</param>
 		public Ieee14510Message(NetworkServiceType NetworkServiceType, byte NetworkServiceId,
 			MessageType MessageType, byte[] Body, byte[] Tail)
+			: base(Body)
 		{
 			this.NetworkServiceType = NetworkServiceType;
 			this.NetworkServiceId = NetworkServiceId;
 			this.MessageType = MessageType;
-			this.Body = Body;
 			this.Tail = Tail;
-
-			this.len = this.Body.Length;
 		}
 
 		/// <summary>
@@ -53,234 +47,73 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public MessageType MessageType { get; }
 
 		/// <summary>
-		/// Message Body
-		/// </summary>
-		public byte[] Body { get; }
-
-		/// <summary>
 		/// Bytes that are received after the body.
 		/// </summary>
 		public byte[] Tail { get; }
 
-		private static IOException UnexpectedEndOfData()
+		/// <summary>
+		/// Tries to parse a TEDS from the message.
+		/// </summary>
+		/// <param name="Teds">TEDS object, if successful.</param>
+		/// <returns>If able to parse a TEDS object.</returns>
+		public bool TryParseTeds(out Ieee14510Teds Teds)
 		{
-			throw new IOException("Unexpected end of data.");
+			return this.TryParseTeds(true, out Teds);
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Byte"/>
+		/// Tries to parse a TEDS from the message.
 		/// </summary>
-		/// <returns>Next Value</returns>
-		public byte NextUInt8()
+		/// <param name="CheckChecksum">If checksum should be checked.</param>
+		/// <param name="Teds">TEDS object, if successful.</param>
+		/// <returns>If able to parse a TEDS object.</returns>
+		public bool TryParseTeds(bool CheckChecksum, out Ieee14510Teds Teds)
 		{
-			if (this.pos >= this.len)
-				throw UnexpectedEndOfData();
+			Teds = null;
 
-			return this.Body[this.pos++];
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="UInt16"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public ushort NextUInt16()
-		{
-			if (this.pos + 1 >= this.len)
-				throw UnexpectedEndOfData();
-
-			ushort Result = this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="UInt32"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public uint NextUInt32()
-		{
-			if (this.pos + 3 >= this.len)
-				throw UnexpectedEndOfData();
-
-			uint Result = this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Int32"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public int NextInt32()
-		{
-			if (this.pos + 3 >= this.len)
-				throw UnexpectedEndOfData();
-
-			int Result = this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next UInt48.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public ulong NextUInt48()
-		{
-			if (this.pos + 5 >= this.len)
-				throw UnexpectedEndOfData();
-
-			ulong Result = this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Int64"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public long NextInt64()
-		{
-			if (this.pos + 7 >= this.len)
-				throw UnexpectedEndOfData();
-
-			long Result = this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-			Result <<= 8;
-			Result |= this.Body[this.pos++];
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Single"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public float NextSingle()
-		{
-			if (this.pos + 3 >= this.len)
-				throw UnexpectedEndOfData();
-
-			if (this.Body[this.pos] == 0x7f &&
-				this.Body[this.pos + 1] == 0xff &&
-				this.Body[this.pos + 2] == 0xff &&
-				this.Body[this.pos + 3] == 0xff)
+			try
 			{
-				return float.NaN;
+				int Start = this.Position;
+				uint Len = this.NextUInt32();
+				if (Len < 2)
+					return false;
+
+				Len -= 2;
+				if (Len > int.MaxValue)
+					return false;
+
+				byte[] Data = this.NextUInt8Array((int)Len);
+				ushort CheckSum = 0;
+
+				while (Start < this.Position)
+					CheckSum += this.Body[Start++];
+
+				CheckSum ^= 0xffff;
+
+				ushort CheckSum2 = this.NextUInt16();
+				if (CheckChecksum && CheckSum != CheckSum2)
+					return false;
+
+				Ieee14510Binary TedsBlock = new Ieee14510Binary(Data);
+				List<TedsRecord> Records = new List<TedsRecord>();
+
+				while (!TedsBlock.EOF)
+				{
+					byte Type = TedsBlock.NextUInt8();
+					byte Length = TedsBlock.NextUInt8();    // Number of bytes may vary.
+					byte[] Value = TedsBlock.NextUInt8Array(Length);
+
+					Records.Add(new TedsRecord(Type, Value));
+				}
+
+				Teds = new Ieee14510Teds(Records.ToArray());
+
+				return true;
 			}
-
-			float Result = BitConverter.ToSingle(this.Body, this.pos);
-			this.pos += 4;
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Double"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public double NextDouble()
-		{
-			if (this.pos + 7 >= this.len)
-				throw UnexpectedEndOfData();
-
-			double Result = BitConverter.ToDouble(this.Body, this.pos);
-			this.pos += 8;
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="String"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public string NextString()
-		{
-			if (this.pos >= this.len)
-				throw UnexpectedEndOfData();
-
-			int i = this.pos;
-
-			while (i < this.len && this.Body[i] != 0)
-				i++;
-
-			if (i >= this.len)
-				throw UnexpectedEndOfData();
-
-			string Result = Encoding.UTF8.GetString(this.Body, this.pos, i - this.pos);
-			this.pos = i + 1;
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Boolean"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public bool NextBooean()
-		{
-			if (this.pos >= this.len)
-				throw UnexpectedEndOfData();
-
-			return this.Body[this.pos++] != 0;
-		}
-
-		/// <summary>
-		/// Gets the next <see cref="Ieee1451_0Time"/>.
-		/// </summary>
-		/// <returns>Next Value</returns>
-		public Ieee1451_0Time NextTime()
-		{
-			return new Ieee1451_0Time()
+			catch (Exception)
 			{
-				Seconds = this.NextUInt48(),
-				NanoSeconds = this.NextUInt32()
-			};
-		}
-
-		/// <summary>
-		/// Gets the next time duration, expressed in seconds.
-		/// </summary>
-		/// <returns>Time duration.</returns>
-		public double NextDurationSeconds()
-		{
-			long TimeDuration = this.NextInt64();
-			return TimeDuration * Math.Pow(2, -16) * 1e-9;
+				return false;
+			}
 		}
 	}
 }

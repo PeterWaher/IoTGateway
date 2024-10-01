@@ -822,6 +822,15 @@ function MarkdownEditorKeyDown(Control, Event)
 			}
 		}
 	}
+	else if (!Event.altKey && !Event.ctrlKey && !Event.shiftKey)
+	{
+		switch (Event.keyCode)
+		{
+			case 112:	// F1
+				MarkdownEditorHelp(Control);
+				return false;
+		}
+	}
 
 	return true;
 }
@@ -842,4 +851,10 @@ function InitMarkdownEditorPreview(Control)
 	}, 500);
 
 	Control.setAttribute("data-previewtimer", Timer);
+}
+
+function MarkdownEditorHelp(Control)
+{
+	var Window = window.open("/Markdown.md", "_blank");
+	Window.focus();
 }

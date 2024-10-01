@@ -2,6 +2,12 @@ var EditTimer = null;
 
 function MarkdownKeyDown(Control, Event)
 {
+	InitEditTimer();
+	return MarkdownEditorKeyDown(Control, Event);
+}
+
+function InitEditTimer()
+{
 	if (EditTimer)
 		window.clearTimeout(EditTimer);
 
@@ -48,7 +54,7 @@ function UpdateHtml()
 		{
 			Suffix = Loop.getAttribute("data-suffix");
 			break;
-        }
+		}
 
 		Loop = Loop.nextSibling;
 	}

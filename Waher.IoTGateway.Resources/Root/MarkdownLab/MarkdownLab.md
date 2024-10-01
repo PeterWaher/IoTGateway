@@ -5,6 +5,9 @@ Date: 2021-05-29
 Master: /Master.md
 JavaScript: MarkdownLab.js
 JavaScript: /Events.js
+JavaScript: /MarkdownEditor.js
+JavaScript: /MarkdownEditor.md.js
+CSS: /MarkdownEditor.cssx
 CSS: MarkdownLab.css
 UserVariable: User
 Privilege: Admin.Lab.Markdown
@@ -14,14 +17,14 @@ Login: /Login.md
 <div id="Lab">
 <section id="MarkdownSection">
 <div id="MarkdownDiv">
-Markdown: ([documentation](/Markdown.md))
+![](/MarkdownEditor.md)
 <textarea id="Markdown" autofocus="autofocus" wrap="hard" onkeydown="return MarkdownKeyDown(this,event);"></textarea>
 </div>
 </section>
 
 <section id="HtmlSection">
 
-<button class="posButtonPressed" data-suffix="Html" onclick="FormatButtonClicked(this)">HTML</button>
+<button class="posButtonPressed" data-suffix="Html" onclick="FormatButtonClicked(this)" onchange="InitEditTimer()">HTML</button>
 <button class="posButton" data-suffix="SmartContract" onclick="FormatButtonClicked(this)">Contract</button>
 <button class="posButton" data-suffix="Text" onclick="FormatButtonClicked(this)">Text</button>
 <button class="posButton" data-suffix="XamarinForms" onclick="FormatButtonClicked(this)">Xamarin</button>

@@ -46,5 +46,6 @@ __“”__</button><button type="button" class="MarkdownEditorButton MarkdownEdi
 a.</button><button type="button" class="MarkdownEditorButton MarkdownEditorHashTag" onclick="MarkdownEditorHashTag(this)" title="Hash-tag (#)">
 #</button><span class="MarkdownEditorToolbarSeparator">|</span><button type="button" class="MarkdownEditorButton MarkdownEditorPreview" onclick="MarkdownEditorPreview(this)" title="Preview (ALT+1)">
 👁</button><button type="button" class="MarkdownEditorButton MarkdownEditorPreviewAndEdit" onclick="MarkdownEditorPreviewAndEdit(this)" title="Edit and Preview (ALT+2)">
-⌹</button>
+⌹</button><button type="button" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
+?</button>
 </div>

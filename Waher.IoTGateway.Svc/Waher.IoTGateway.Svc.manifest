@@ -889,6 +889,9 @@
 		<Content fileName='Index.md'/>
 		<Content fileName='Login.md'/>
 		<Content fileName='Markdown.md'/>
+		<Content fileName="MarkdownEditor.cssx"/>
+		<Content fileName="MarkdownEditor.js"/>
+		<Content fileName="MarkdownEditor.md"/>
 		<Content fileName='Master.md'/>
 		<Content fileName='Prompt.js'/>
 		<Content fileName='Prompt.md'/>

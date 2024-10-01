@@ -1,0 +1,272 @@
+﻿.MarkdownEditorToolbar
+{
+	background-color:¤Toolbar:=Blend(BackgroundColor,TextColor,0.05)¤;
+	border:1px solid ¤Dark:=Blend(BackgroundColor,TextColor,0.25)¤;
+	margin-bottom:0;
+}
+
+.MarkdownEditorToolbar + textarea
+{
+	margin-top:0;
+}
+
+.MarkdownEditorButton
+{
+	width:1.5em;
+	height:1.5em;
+	margin:0 1px 0 0;
+	padding:0;
+	background-color:transparent;
+	border:transparent;
+	color:¤TextColor¤;
+}
+
+.MarkdownEditorButton:hover
+{
+	border-top:1px solid ¤Light:=Blend(BackgroundColor,BackgroundColor,0.25)¤;
+	border-left:1px solid ¤Light¤;
+	border-right:1px solid ¤Dark¤;
+	border-bottom:1px solid ¤Dark¤;
+}
+
+.MarkdownEditorButton:active
+{
+	border-top:1px solid ¤Dark¤;
+	border-left:1px solid ¤Dark¤;
+	border-right:1px solid ¤Light¤;
+	border-bottom:1px solid ¤Light¤;
+}
+
+.MarkdownEditorBold
+{
+}
+
+.MarkdownEditorItalic
+{
+}
+
+.MarkdownEditorUnderline
+{
+}
+
+.MarkdownEditorStrikeThrough
+{
+}
+
+.MarkdownEditorSuperscript
+{
+}
+
+.MarkdownEditorSubscript
+{
+}
+
+.MarkdownEditorInsert
+{
+}
+
+.MarkdownEditorDelete
+{
+}
+
+.MarkdownEditorInlineCode
+{
+}
+
+.MarkdownEditorHeader1
+{
+	font-size:1.2em;
+}
+
+.MarkdownEditorHeader2
+{
+	font-size:1.0em;
+}
+
+.MarkdownEditorHeader3
+{
+	font-size:0.9em;
+}
+
+.MarkdownEditorHeader4
+{
+	font-size:0.8em;
+}
+
+.MarkdownEditorHeader5
+{
+	font-size:0.7em;
+}
+
+.MarkdownEditorBulletList
+{
+}
+
+.MarkdownEditorNumberList
+{
+}
+
+.MarkdownEditorDefinitionList
+{
+}
+
+.MarkdownEditorTaskList
+{
+}
+
+.MarkdownEditorTable
+{
+}
+
+.MarkdownEditorTable > table
+{
+	display:none;
+}
+
+.MarkdownEditorTable:hover > table
+{
+	display:block;
+	position:relative;
+	background-color:¤Toolbar¤;
+	border:1px solid ¤Dark¤;
+}
+
+.MarkdownEditorTable:hover > table > thead
+{
+	background-color:¤Toolbar¤;
+}
+
+.MarkdownEditorTable:hover > table > tbody
+{
+	background-color:¤Toolbar¤;
+}
+
+.MarkdownEditorTable:hover > table > tbody > tr
+{
+	background-color:¤Toolbar¤;
+}
+
+.MarkdownEditorTable:hover > table > tbody > tr > td
+{
+	background-color:¤Toolbar¤;
+}
+
+.Rot90
+{
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.Rot90 > div
+{
+	-moz-transform: rotate(-90.0deg);  /* FF3.5+ */
+	-o-transform: rotate(-90.0deg);  /* Opera 10.5 */
+	-webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
+	filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
+	margin-left: -10em;
+	margin-right: -10em;
+	transform: rotate(-90deg);
+}
+
+.MarkdownEditorTableButton
+{
+	margin:0 1px 0 0;
+	padding:0;
+	background-color:transparent;
+	border:1px solid ¤Toolbar¤;
+	color:¤TextColor¤;
+}
+
+.MarkdownEditorTableButton:hover
+{
+	border-top:1px solid ¤Light:=Blend(BackgroundColor,BackgroundColor,0.25)¤;
+	border-left:1px solid ¤Light¤;
+	border-right:1px solid ¤Dark¤;
+	border-bottom:1px solid ¤Dark¤;
+}
+
+.MarkdownEditorTableButton:active
+{
+	border-top:1px solid ¤Dark¤;
+	border-left:1px solid ¤Dark¤;
+	border-right:1px solid ¤Light¤;
+	border-bottom:1px solid ¤Light¤;
+}
+
+.MarkdownEditorQuote
+{
+}
+
+.MarkdownEditorAddedBlock
+{
+}
+
+.MarkdownEditorDeletedBlock
+{
+}
+
+.MarkdownEditorDeletedBlock > del
+{
+	text-decoration:none;
+}
+
+.MarkdownEditorCodeBlock
+{
+}
+
+.MarkdownEditorHorizontalSeparator
+{
+}
+
+.MarkdownEditorLeftAlignment
+{
+}
+
+.MarkdownEditorCenterAlignment
+{
+}
+
+.MarkdownEditorRightAlignment
+{
+}
+
+.MarkdownEditorMarginAlignment
+{
+}
+
+.MarkdownEditorLink
+{
+}
+
+.MarkdownEditorImage
+{
+}
+
+.MarkdownEditorAbbreviation
+{
+}
+
+.MarkdownEditorHashTag
+{
+}
+
+.MarkdownEditorPreview
+{
+}
+
+.MarkdownEditorPreviewAndEdit
+{
+}
+
+.MarkdownEditorToolbarSeparator
+{
+	color:transparent;
+	border-left: 1px solid ¤Dark¤;
+	margin-left: .25em;
+}
+
+.MarkdownPreview
+{
+}

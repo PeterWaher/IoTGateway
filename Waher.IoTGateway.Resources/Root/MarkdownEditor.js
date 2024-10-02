@@ -254,7 +254,7 @@ function StartPreview(Button, ShowEditor)
 		};
 	}
 
-	xhttp.open("POST", "/MarkdownLab/MarkdownLabHtml.md", true);
+	xhttp.open("POST", "/MarkdownLab/MarkdownLabHtml.ws", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.setRequestHeader("Accept", "text/html");
 	xhttp.send(TextArea.value);
@@ -867,6 +867,7 @@ function InitMarkdownEditorPreview(Control)
 
 	Timer = window.setTimeout(function ()
 	{
+		Control.setAttribute("data-previewtimer", "");
 		StartPreview(Control, true);
 	}, 500);
 

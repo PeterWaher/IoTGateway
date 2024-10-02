@@ -195,17 +195,18 @@
     <None Remove="Root\MarkdownLab\MarkdownLab.css" />
     <None Remove="Root\MarkdownLab\MarkdownLab.js" />
     <None Remove="Root\MarkdownLab\MarkdownLab.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabHtml.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabJavaScript.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXArticle.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXBook.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXReport.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXStandalone.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabSmartContract.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabText.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabXamarinForms.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabXaml.md" />
-    <None Remove="Root\MarkdownLab\MarkdownLabXml.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabHtml.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabJavaScript.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXArticle.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXBook.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXReport.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXStandalone.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabMarkdown.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabSmartContract.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabText.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabXamarinForms.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabXaml.ws" />
+    <None Remove="Root\MarkdownLab\MarkdownLabXml.ws" />
     <None Remove="Root\Master.md" />
     <None Remove="Root\PlantUmlLab\Examples\Activity.uml" />
     <None Remove="Root\PlantUmlLab\Examples\Archimate.uml" />
@@ -721,37 +722,40 @@
     <Content Include="Root\MarkdownLab\MarkdownLab.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXStandalone.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabHtml.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXReport.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXStandalone.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXArticle.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXReport.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXBook.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXArticle.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabXamarinForms.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXBook.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabText.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabMarkdown.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabSmartContract.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabXamarinForms.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabJavaScript.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabText.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabXml.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabSmartContract.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabXaml.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabJavaScript.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\MarkdownLab\MarkdownLabHtml.md">
+    <Content Include="Root\MarkdownLab\MarkdownLabXml.ws">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabXaml.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\PlantUmlLab\Examples\Activity.uml">

@@ -43,7 +43,7 @@ function UpdateHtml()
 		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
 			var Code = document.getElementById("Output");
-			Output.innerText = xhttp.responseText;
+			Code.innerText = xhttp.responseText;
 		};
 	}
 

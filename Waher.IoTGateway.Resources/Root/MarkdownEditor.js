@@ -197,13 +197,19 @@ function ClosePreview(TextArea)
 		TextArea.parentNode.removeChild(Prev);
 		TextArea.setAttribute("data-preview", "");
 		TextArea.setAttribute("style", "");
-		AdaptSize(TextArea);
+
+		RaiseOnInput(TextArea);
 	}
 }
 
 function MarkdownEditorPreviewAndEdit(Button)
 {
-	StartPreview(Button, true);
+	var TextArea = GetTextArea(Button, true);
+
+	if (TextArea.getAttribute("data-preview"))
+		TextArea.setAttribute("data-preview", "");
+	else
+		StartPreview(Button, true);
 }
 
 function MarkdownEditorPreview(Button)
@@ -221,7 +227,7 @@ function StartPreview(Button, ShowEditor)
 
 		if (!ShowEditor)
 		{
-			AdaptSize(TextArea);
+			RaiseOnInput(TextArea);
 			return;
 		}
 	}
@@ -254,10 +260,13 @@ function StartPreview(Button, ShowEditor)
 	xhttp.send(TextArea.value);
 }
 
-function GetTextArea(Button)
+function GetTextArea(Button, HidePreview)
 {
 	if (Button.tagName === "TEXTAREA")
 		return Button;
+
+	if (HidePreview === undefined)
+		HidePreview = false;
 
 	var PreviewFound = null;
 	var Parent = GetToolbar(Button).parentNode;
@@ -277,7 +286,7 @@ function GetTextArea(Button)
 	{
 		var Style = window.getComputedStyle(Loop);
 
-		if (Style.display === "none")
+		if (Style.display === "none" || HidePreview)
 		{
 			Parent.removeChild(PreviewFound);
 			Loop.setAttribute("style", "");
@@ -661,13 +670,24 @@ function SetTextAreaValue(TextArea, Value)
 {
 	// TODO: Update TextArea in such a way that intermediate edits are available in undo-list.
 	TextArea.value = Value;
+	RaiseOnInput(TextArea);
+}
 
+function RaiseOnInput(TextArea)
+{
 	try
 	{
-		AdaptSize(TextArea);
+		var Event = new InputEvent('input',
+			{
+				bubbles: true,
+				cancelable: true,
+			});
+
+		TextArea.dispatchEvent(Event);
 	}
 	catch (e)
 	{
+		console.log(e);
 	}
 }
 

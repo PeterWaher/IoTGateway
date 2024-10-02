@@ -6,7 +6,6 @@ Master: /Master.md
 JavaScript: MarkdownLab.js
 JavaScript: /Events.js
 JavaScript: /MarkdownEditor.js
-JavaScript: /MarkdownEditor.md.js
 CSS: /MarkdownEditor.cssx
 CSS: MarkdownLab.css
 UserVariable: User

@@ -253,7 +253,17 @@ namespace Waher.Content
 				{
 					Grade = P.Key;
 					Encoder = P.Value;
-					return !(Encoder is null);
+
+					if (!(Encoder is null))
+						return true;
+
+					if (Object is CustomEncoding)
+					{
+						Encoder = new CustomEncoder();
+						return true;
+					}
+
+					return false;
 				}
 			}
 
@@ -274,7 +284,16 @@ namespace Waher.Content
 				encodersByType[Key] = new KeyValuePair<Grade, IContentEncoder>(Grade, Encoder);
 			}
 
-			return !(Encoder is null);
+			if (!(Encoder is null))
+				return true;
+
+			if (Object is CustomEncoding)
+			{
+				Encoder = new CustomEncoder();
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>

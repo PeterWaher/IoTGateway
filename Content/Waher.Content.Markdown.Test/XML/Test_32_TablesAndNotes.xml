@@ -16,13 +16,13 @@
 			<Column alignment="Left" />
 			<Column alignment="Left" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<HtmlEntity>nbsp</HtmlEntity>
 				</HeaderCell>
 				<Continue />
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="n1">
 						<Footnote key="n1">
 							<Paragraph>
@@ -37,7 +37,7 @@
 						</Footnote>
 					</FootnoteReference>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="n2">
 						<Footnote key="n2">
 							<Paragraph>
@@ -54,7 +54,7 @@
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="n3">
 						<Footnote key="n3">
 							<Paragraph>
@@ -69,7 +69,7 @@
 						</Footnote>
 					</FootnoteReference>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="n4">
 						<Footnote key="n4">
 							<Paragraph>

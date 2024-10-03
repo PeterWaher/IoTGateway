@@ -269,3 +269,120 @@
 		</cell>
 	</row>
 </table>
+<table>
+	<row>
+		<cell alignment="Right" colSpan="3" header="true">
+			<text>Cell alignment table</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>Left</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Center</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Right</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>Left</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>Left</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="true">
+			<text>Left</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Right</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Right</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="true">
+			<text>Right</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Center</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Center</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Center</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Justified</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Justified</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="true">
+			<text>Justified</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Normal</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Normal</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Normal</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Left</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Left</text>
+		</cell>
+		<cell alignment="Left" colSpan="1" header="false">
+			<text>Left</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Right</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Right</text>
+		</cell>
+		<cell alignment="Right" colSpan="1" header="false">
+			<text>Right</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Center</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Center</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Center</text>
+		</cell>
+	</row>
+	<row>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Justified</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Justified</text>
+		</cell>
+		<cell alignment="Center" colSpan="1" header="false">
+			<text>Justified</text>
+		</cell>
+	</row>
+</table>

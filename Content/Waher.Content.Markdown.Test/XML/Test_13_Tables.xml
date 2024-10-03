@@ -10,37 +10,37 @@
 			<Column alignment="Center" />
 			<Column alignment="Right" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<InlineText>First Header</InlineText>
 				</HeaderCell>
-				<HeaderCell>
+				<HeaderCell alignment="Center">
 					<InlineText>Second Header</InlineText>
 				</HeaderCell>
-				<HeaderCell>
+				<HeaderCell alignment="Right">
 					<InlineText>Third Header</InlineText>
 				</HeaderCell>
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>First row</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<InlineText>Data</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Right">
 					<InlineText>Very long data entry</InlineText>
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Second row</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<Strong>
 						<InlineText>Cell</InlineText>
 					</Strong>
 				</Cell>
-				<Cell>
+				<Cell alignment="Right">
 					<Emphasize>
 						<InlineText>Cell</InlineText>
 					</Emphasize>
@@ -52,30 +52,30 @@
 			<Column alignment="Center" />
 			<Column alignment="Right" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<NestedBlock />
 				</HeaderCell>
-				<HeaderCell>
+				<HeaderCell alignment="Center">
 					<InlineText>Grouping</InlineText>
 				</HeaderCell>
 				<Continue />
 			</HeaderRow>
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<InlineText>First Header</InlineText>
 				</HeaderCell>
-				<HeaderCell>
+				<HeaderCell alignment="Center">
 					<InlineText>Second Header</InlineText>
 				</HeaderCell>
-				<HeaderCell>
+				<HeaderCell alignment="Right">
 					<InlineText>Third Header</InlineText>
 				</HeaderCell>
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Content</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<Emphasize>
 						<InlineText>Long Cell</InlineText>
 					</Emphasize>
@@ -83,26 +83,26 @@
 				<Continue />
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Content</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<Strong>
 						<InlineText>Cell</InlineText>
 					</Strong>
 				</Cell>
-				<Cell>
+				<Cell alignment="Right">
 					<InlineText>Cell</InlineText>
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>New section</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<InlineText>More</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Right">
 					<InlineText>Data</InlineText>
 				</Cell>
 			</Row>
@@ -111,37 +111,37 @@
 			<Column alignment="Left" />
 			<Column alignment="Left" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<InlineText>Table with complex cells</InlineText>
 				</HeaderCell>
 				<Continue />
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="e11">
 						<Footnote key="e11">
 							<Table caption="" id="" columns="2">
 								<Column alignment="Left" />
 								<Column alignment="Right" />
 								<HeaderRow>
-									<HeaderCell>
+									<HeaderCell alignment="Left">
 										<InlineText>Info about cell</InlineText>
 									</HeaderCell>
 									<Continue />
 								</HeaderRow>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Row</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>1</InlineText>
 									</Cell>
 								</Row>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Column</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>1</InlineText>
 									</Cell>
 								</Row>
@@ -149,31 +149,31 @@
 						</Footnote>
 					</FootnoteReference>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="e12">
 						<Footnote key="e12">
 							<Table caption="" id="" columns="2">
 								<Column alignment="Left" />
 								<Column alignment="Right" />
 								<HeaderRow>
-									<HeaderCell>
+									<HeaderCell alignment="Left">
 										<InlineText>Info about cell</InlineText>
 									</HeaderCell>
 									<Continue />
 								</HeaderRow>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Row</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>1</InlineText>
 									</Cell>
 								</Row>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Column</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>2</InlineText>
 									</Cell>
 								</Row>
@@ -183,31 +183,31 @@
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="e21">
 						<Footnote key="e21">
 							<Table caption="" id="" columns="2">
 								<Column alignment="Left" />
 								<Column alignment="Right" />
 								<HeaderRow>
-									<HeaderCell>
+									<HeaderCell alignment="Left">
 										<InlineText>Info about cell</InlineText>
 									</HeaderCell>
 									<Continue />
 								</HeaderRow>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Row</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>2</InlineText>
 									</Cell>
 								</Row>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Column</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>1</InlineText>
 									</Cell>
 								</Row>
@@ -215,31 +215,31 @@
 						</Footnote>
 					</FootnoteReference>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<FootnoteReference key="e22">
 						<Footnote key="e22">
 							<Table caption="" id="" columns="2">
 								<Column alignment="Left" />
 								<Column alignment="Right" />
 								<HeaderRow>
-									<HeaderCell>
+									<HeaderCell alignment="Left">
 										<InlineText>Info about cell</InlineText>
 									</HeaderCell>
 									<Continue />
 								</HeaderRow>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Row</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>2</InlineText>
 									</Cell>
 								</Row>
 								<Row>
-									<Cell>
+									<Cell alignment="Left">
 										<InlineText>Column</InlineText>
 									</Cell>
-									<Cell>
+									<Cell alignment="Right">
 										<InlineText>2</InlineText>
 									</Cell>
 								</Row>
@@ -253,13 +253,13 @@
 			<Column alignment="Left" />
 			<Column alignment="Left" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<NestedBlock />
 				</HeaderCell>
 				<Continue />
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<NestedBlock>
 						<InlineText>e</InlineText>
 						<SubScript>
@@ -267,7 +267,7 @@
 						</SubScript>
 					</NestedBlock>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<NestedBlock>
 						<InlineText>e</InlineText>
 						<SubScript>
@@ -277,7 +277,7 @@
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<NestedBlock>
 						<InlineText>e</InlineText>
 						<SubScript>
@@ -285,7 +285,7 @@
 						</SubScript>
 					</NestedBlock>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<NestedBlock>
 						<InlineText>e</InlineText>
 						<SubScript>
@@ -298,22 +298,22 @@
 		<Table caption="" id="" columns="1">
 			<Column alignment="Left" />
 			<HeaderRow>
-				<HeaderCell>
+				<HeaderCell alignment="Left">
 					<InlineText>One-column table</InlineText>
 				</HeaderCell>
 			</HeaderRow>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Row 1</InlineText>
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Row 2</InlineText>
 				</Cell>
 			</Row>
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>Row 3</InlineText>
 				</Cell>
 			</Row>
@@ -323,14 +323,136 @@
 			<Column alignment="Center" />
 			<Column alignment="Left" />
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>No</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<InlineText>headers</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>table</InlineText>
+				</Cell>
+			</Row>
+		</Table>
+		<Table caption="" id="" columns="3">
+			<Column alignment="Left" />
+			<Column alignment="Center" />
+			<Column alignment="Right" />
+			<HeaderRow>
+				<HeaderCell alignment="Left">
+					<InlineText>Cell alignment table</InlineText>
+				</HeaderCell>
+				<Continue />
+				<Continue />
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell alignment="Left">
+					<InlineText>Left</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Center">
+					<InlineText>Center</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Right">
+					<InlineText>Right</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell alignment="Left">
+					<InlineText>Left</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Left">
+					<InlineText>Left</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Left">
+					<InlineText>Left</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell alignment="Right">
+					<InlineText>Right</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Right">
+					<InlineText>Right</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Right">
+					<InlineText>Right</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell alignment="Center">
+					<InlineText>Center</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Center">
+					<InlineText>Center</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Center">
+					<InlineText>Center</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<HeaderRow>
+				<HeaderCell alignment="Center">
+					<InlineText>Justified</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Center">
+					<InlineText>Justified</InlineText>
+				</HeaderCell>
+				<HeaderCell alignment="Center">
+					<InlineText>Justified</InlineText>
+				</HeaderCell>
+			</HeaderRow>
+			<Row>
+				<Cell alignment="Left">
+					<InlineText>Normal</InlineText>
+				</Cell>
+				<Cell alignment="Center">
+					<InlineText>Normal</InlineText>
+				</Cell>
+				<Cell alignment="Right">
+					<InlineText>Normal</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell alignment="Left">
+					<InlineText>Left</InlineText>
+				</Cell>
+				<Cell alignment="Left">
+					<InlineText>Left</InlineText>
+				</Cell>
+				<Cell alignment="Left">
+					<InlineText>Left</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell alignment="Right">
+					<InlineText>Right</InlineText>
+				</Cell>
+				<Cell alignment="Right">
+					<InlineText>Right</InlineText>
+				</Cell>
+				<Cell alignment="Right">
+					<InlineText>Right</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell alignment="Center">
+					<InlineText>Center</InlineText>
+				</Cell>
+				<Cell alignment="Center">
+					<InlineText>Center</InlineText>
+				</Cell>
+				<Cell alignment="Center">
+					<InlineText>Center</InlineText>
+				</Cell>
+			</Row>
+			<Row>
+				<Cell alignment="Center">
+					<InlineText>Justified</InlineText>
+				</Cell>
+				<Cell alignment="Center">
+					<InlineText>Justified</InlineText>
+				</Cell>
+				<Cell alignment="Center">
+					<InlineText>Justified</InlineText>
 				</Cell>
 			</Row>
 		</Table>

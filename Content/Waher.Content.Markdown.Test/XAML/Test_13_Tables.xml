@@ -309,4 +309,117 @@
 			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">table</TextBlock>
 		</Border>
 	</Grid>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Cell alignment table</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="5">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="5">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="5">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="6">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Normal</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="6">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Normal</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="6">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Normal</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="7">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="7">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="7">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Left</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="8">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="8">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="8">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Right</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="9">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="9">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="9">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Center</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="10">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="10">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="10">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Justified</TextBlock>
+		</Border>
+	</Grid>
 </StackPanel>

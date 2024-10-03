@@ -162,7 +162,7 @@ namespace Waher.Content.Semantic
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == TurtleFileExtensions[0])
+			if (string.Compare(FileExtension, TurtleFileExtensions[0], true) == 0)
 			{
 				ContentType = TurtleContentTypes[0];
 				return true;

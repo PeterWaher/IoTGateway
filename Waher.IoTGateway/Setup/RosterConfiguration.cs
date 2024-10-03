@@ -193,7 +193,7 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (e.FromBareJID.ToLower() == Gateway.XmppClient.BareJID.ToLower())
+			if (string.Compare(e.FromBareJID, Gateway.XmppClient.BareJID, true) == 0)
 				return;
 
 			if (this.AcceptSubscriptionRequest(e.FromBareJID))

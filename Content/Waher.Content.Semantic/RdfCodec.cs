@@ -288,7 +288,7 @@ namespace Waher.Content.Semantic
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == RdfFileExtensions[0])
+			if (string.Compare(FileExtension, RdfFileExtensions[0], true) == 0)
 			{
 				ContentType = RdfContentTypes[0];
 				return true;

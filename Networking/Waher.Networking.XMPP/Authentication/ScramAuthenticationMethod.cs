@@ -140,7 +140,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 			foreach (KeyValuePair<string, string> Pair in this.ParseCommaSeparatedParameterList(ResponseString))
 			{
-				if (Pair.Key.ToLower() == "v")
+				if (string.Compare(Pair.Key, "v", true) == 0)
 					return (Pair.Value == this.serverSignature);
 			}
 

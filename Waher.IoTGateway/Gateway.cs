@@ -4822,7 +4822,7 @@ namespace Waher.IoTGateway
 
 							foreach (KeyValuePair<string, string> Field in Fields)
 							{
-								if (Field.Key.ToUpper() == "CHARSET")
+								if (string.Compare(Field.Key, "CHARSET", true) == 0)
 									Encoding = InternetContent.GetEncoding(Field.Value);
 							}
 						}

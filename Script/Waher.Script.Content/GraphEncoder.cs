@@ -81,7 +81,7 @@ namespace Waher.Script.Content
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == ImageCodec.FileExtensionPng)
+			if (string.Compare(FileExtension, ImageCodec.FileExtensionPng, true) == 0)
 			{
 				ContentType = ImageCodec.ContentTypePng;
 				return true;

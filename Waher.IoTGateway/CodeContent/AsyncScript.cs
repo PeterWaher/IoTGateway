@@ -45,7 +45,7 @@ namespace Waher.IoTGateway.CodeContent
 			if (i > 0)
 				Language = Language.Substring(0, i).TrimEnd();
 
-			if (Language.ToLower() == "async")
+			if (string.Compare(Language, "async", true) == 0)
 				return Grade.Excellent;
 			else
 				return Grade.NotAtAll;

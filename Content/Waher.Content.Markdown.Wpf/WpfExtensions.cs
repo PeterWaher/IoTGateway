@@ -64,6 +64,8 @@ namespace Waher.Content.Markdown.Wpf
 		public static async Task GenerateXAML(this MarkdownDocument Document, StringBuilder Output, XmlWriterSettings XmlSettings,
 			XamlSettings XamlSettings)
 		{
+			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
+			
 			using (WpfXamlRenderer Renderer = new WpfXamlRenderer(Output, XmlSettings, XamlSettings))
 			{
 				await Document.RenderDocument(Renderer);
@@ -78,7 +80,10 @@ namespace Waher.Content.Markdown.Wpf
 		/// <param name="XamlSettings">XAML Settings.</param>
 		public static async Task GenerateXAML(this MarkdownDocument Document, StringBuilder Output, XamlSettings XamlSettings)
 		{
-			using (WpfXamlRenderer Renderer = new WpfXamlRenderer(Output, XML.WriterSettings(false, true), XamlSettings))
+			XmlWriterSettings XmlSettings = XML.WriterSettings(false, true);
+			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
+
+			using (WpfXamlRenderer Renderer = new WpfXamlRenderer(Output, XmlSettings, XamlSettings))
 			{
 				await Document.RenderDocument(Renderer);
 			}

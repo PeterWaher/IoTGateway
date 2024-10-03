@@ -89,7 +89,7 @@ namespace Waher.Content.Text
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "csv")
+			if (string.Compare(FileExtension, "csv", true) == 0)
 			{
 				ContentType = CsvCodec.ContentType;
 				return true;

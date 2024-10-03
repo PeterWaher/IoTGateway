@@ -84,7 +84,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "mixed")
+			if (string.Compare(FileExtension, "mixed", true) == 0)
 			{
 				ContentType = MixedCodec.ContentType;
 				return true;

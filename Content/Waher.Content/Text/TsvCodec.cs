@@ -84,7 +84,7 @@ namespace Waher.Content.Text
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "tsv")
+			if (string.Compare(FileExtension, "tsv", true) == 0)
 			{
 				ContentType = "text/tab-separated-values";
 				return true;

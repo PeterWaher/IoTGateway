@@ -40,6 +40,8 @@ namespace Waher.Content.Markdown.Xml
 		/// <param name="Settings">XML Settings.</param>
 		public static async Task ExportXml(this MarkdownDocument Document, StringBuilder Xml, XmlWriterSettings Settings)
 		{
+			Settings.ConformanceLevel = ConformanceLevel.Fragment;
+
 			using (XmlRenderer Renderer = new XmlRenderer(Xml, Settings))
 			{
 				await Document.RenderDocument(Renderer);

@@ -98,7 +98,7 @@ namespace Waher.Security.PKCS.Decoders
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "pem")
+			if (string.Compare(FileExtension, "pem", true) == 0)
 			{
 				ContentType = PemDecoder.ContentType;
 				return true;

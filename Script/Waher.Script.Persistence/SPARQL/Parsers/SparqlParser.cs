@@ -329,7 +329,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					case 'n':
 					case 'N':
-						if (Parser.PeekNextToken().ToUpper() == "NAMED")
+						if (string.Compare(Parser.PeekNextToken(), "NAMED", true) == 0)
 						{
 							Parser.NextToken();
 							if (Parser.NextNonWhitespaceChar() != '<')
@@ -394,7 +394,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{
 				Parser.NextToken();
 
-				if (Parser.NextToken().ToUpper() != "BY")
+				if (string.Compare(Parser.NextToken(), "BY", true) != 0)
 					throw Parser.SyntaxError("Expected BY");
 
 				GroupBy = new List<ScriptNode>();
@@ -1179,7 +1179,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					case 'i':
 					case 'I':
-						if (Parser.PeekNextToken().ToUpper() == "IN")
+						if (string.Compare(Parser.PeekNextToken(), "IN", true) == 0)
 						{
 							Parser.NextToken();
 							Right = this.ParseTerms(Parser, false);
@@ -1191,9 +1191,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					case 'n':
 					case 'N':
-						if (Parser.PeekNextToken().ToUpper() == "NOT")
+						if (string.Compare(Parser.PeekNextToken(), "NOT", true) == 0)
 						{
-							if (Parser.NextToken().ToUpper() != "IN")
+							if (string.Compare(Parser.NextToken(), "IN", true) != 0)
 								throw Parser.SyntaxError("Expected IN");
 
 							Right = this.ParseTerms(Parser, false);

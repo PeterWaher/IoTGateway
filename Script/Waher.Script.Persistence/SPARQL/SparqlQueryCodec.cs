@@ -144,7 +144,7 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == SparqlQueryFileExtensions[0])
+			if (string.Compare(FileExtension, SparqlQueryFileExtensions[0], true) == 0)
 			{
 				ContentType = SparqlQueryContentTypes[0];
 				return true;

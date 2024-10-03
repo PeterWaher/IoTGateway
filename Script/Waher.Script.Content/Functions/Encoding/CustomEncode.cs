@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -51,11 +53,29 @@ namespace Waher.Script.Content.Functions.Encoding
 			{
 				if (Obj is string s)
 				{
-					UTF8Encoding x = new UTF8Encoding(true);
-					Bin = Utf8WithBOM.GetBytes(s);
+					KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType.Trim());
+					string Charset = null;
 
-					if (!ContentType.ToLower().Contains("charset"))
+					foreach (KeyValuePair<string, string> P in Fields)
+					{
+						if (string.Compare(P.Key, "charset", true) == 0)
+						{
+							Charset = P.Value;
+							break;
+						}
+					}
+
+					if (Charset is null)
+					{
+						Bin = Utf8WithBOM.GetBytes(s);
 						ContentType += "; charset=utf-8";
+					}
+					else
+					{
+						System.Text.Encoding Encondig = System.Text.Encoding.GetEncoding(Charset);
+						Bin = Encondig.GetBytes(s);
+
+					}
 				}
 				else
 					throw new ScriptRuntimeException("Expected binary or string content.", this);

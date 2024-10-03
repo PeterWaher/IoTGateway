@@ -334,7 +334,7 @@ namespace Waher.Content.Semantic
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == SparqlResultSetFileExtensions[0])
+			if (string.Compare(FileExtension, SparqlResultSetFileExtensions[0], true) == 0)
 			{
 				ContentType = SparqlResultSetContentTypes[0];
 				return true;

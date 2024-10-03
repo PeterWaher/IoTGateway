@@ -79,7 +79,7 @@ namespace Waher.Security.JWT
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "jwt")
+			if (string.Compare(FileExtension, "jwt", true) == 0)
 			{
 				ContentType = JwtCodec.ContentType;
 				return true;

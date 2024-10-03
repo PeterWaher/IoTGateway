@@ -65,7 +65,18 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Barely : Grade.NotAtAll;
+			TypeInfo TI = ObjectType.GetTypeInfo();
+			if (TI.IsValueType)
+			{
+				MethodInfo MI = ObjectType.GetRuntimeMethod(nameof(ToString), Types.NoTypes);
+				if (MI.DeclaringType != typeof(object))
+					return Grade.NotAtAll;	// Will be encoded by DefaultValueTypeEncoder, encoding the value type as a string.
+			}
+
+			if (!typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(TI))
+				return Grade.Barely;
+
+			return Grade.NotAtAll;
 		}
 	}
 }

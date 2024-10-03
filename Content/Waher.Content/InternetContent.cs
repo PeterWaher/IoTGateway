@@ -588,7 +588,7 @@ namespace Waher.Content
 
 				foreach (KeyValuePair<string, string> Field in Fields)
 				{
-					if (Field.Key.ToUpper() == "CHARSET")
+					if (string.Compare(Field.Key, "CHARSET", true) == 0)
 						Encoding = GetEncoding(Field.Value);
 				}
 			}
@@ -845,7 +845,7 @@ namespace Waher.Content
 
 					foreach (string To in Step.Converter.ToContentTypes)
 					{
-						if (string.Compare(To, ToContentType, true) == 0)
+						if (string.Compare(To, ToContentType, true) == 0 || To == "*")
 						{
 							if (StepGrade > BestGrade || StepGrade == BestGrade && StepDistance < BestDistance)
 							{
@@ -958,7 +958,8 @@ namespace Waher.Content
 
 						foreach (string To in Converter.ToContentTypes)
 						{
-							convertersByStep[From + " -> " + To] = Converter;
+							if (To != "*")
+								convertersByStep[From + " -> " + To] = Converter;
 						}
 					}
 				}

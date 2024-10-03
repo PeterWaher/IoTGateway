@@ -18,7 +18,8 @@ namespace Waher.Content
 		}
 
 		/// <summary>
-		/// Converts content to these content types. 
+		/// Converts content to these content types. Return an array of "*" to signify content can be converted to any
+		/// (or at the time, an unknown) content type.
 		/// </summary>
 		string[] ToContentTypes
 		{

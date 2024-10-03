@@ -183,7 +183,7 @@ namespace Waher.Networking.HTTP
 						IContentConverter Best = null;
 						bool Found;
 
-						foreach (IContentConverter Converter2 in InternetContent.Converters)
+						foreach (IContentConverter Converter2 in Converters)
 						{
 							Found = false;
 
@@ -205,6 +205,12 @@ namespace Waher.Networking.HTTP
 								{
 									BestContentType = ToContentType;
 									BestQuality = Quality;
+									Best = Converter2;
+								}
+								else if (BestQuality == 0 && ToContentType == "*")
+								{
+									BestContentType = ContentType;
+									BestQuality = double.Epsilon;
 									Best = Converter2;
 								}
 							}
@@ -230,13 +236,14 @@ namespace Waher.Networking.HTTP
 
 						List<string> Alternatives = null;
 						string[] Range = Converter.ToContentTypes;
+						bool All = Range.Length == 1 && Range[0] == "*";
 
 						foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
 						{
 							if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
 								continue;
 
-							if (Array.IndexOf(Range, AcceptRecord.Item) >= 0)
+							if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 							{
 								if (Alternatives is null)
 									Alternatives = new List<string>();

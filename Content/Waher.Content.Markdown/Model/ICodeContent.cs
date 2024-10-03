@@ -15,6 +15,11 @@ namespace Waher.Content.Markdown.Model
 		Grade Supports(string Language);
 
 		/// <summary>
+		/// If script is evaluated for this type of code block.
+		/// </summary>
+		bool EvaluatesScript { get; }
+
+		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.
 		/// </summary>
 		/// <param name="Document">Document containing the instance.</param>

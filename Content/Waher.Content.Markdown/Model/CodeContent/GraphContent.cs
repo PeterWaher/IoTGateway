@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
-using Waher.Script;
 using System.Xml;
 using System;
 using Waher.Content.Xml;
@@ -29,6 +28,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			return string.Compare(Language, "graph", true) == 0 ? Grade.Ok : Grade.NotAtAll;
 		}
+
+		/// <summary>
+		/// If script is evaluated for this type of code block.
+		/// </summary>
+		public bool EvaluatesScript => true;
 
 		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.

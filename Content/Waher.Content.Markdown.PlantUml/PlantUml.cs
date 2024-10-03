@@ -245,6 +245,11 @@ namespace Waher.Content.Markdown.PlantUml
 		}
 
 		/// <summary>
+		/// If script is evaluated for this type of code block.
+		/// </summary>
+		public bool EvaluatesScript => false;
+
+		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.
 		/// </summary>
 		/// <param name="Document">Document containing the instance.</param>
@@ -284,7 +289,7 @@ namespace Waher.Content.Markdown.PlantUml
 				}
 			}
 
-			Document.QueueAsyncTask(ExecutePlantUml, new AsyncState(ResultType.Svg, Info));
+			Document.QueueAsyncTask(this.ExecutePlantUml, new AsyncState(ResultType.Svg, Info));
 
 			return true;
 		}

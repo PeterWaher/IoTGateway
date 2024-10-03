@@ -378,6 +378,11 @@ namespace Waher.Content.Markdown.GraphViz
 		}
 
 		/// <summary>
+		/// If script is evaluated for this type of code block.
+		/// </summary>
+		public bool EvaluatesScript => false;
+
+		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.
 		/// </summary>
 		/// <param name="Document">Document containing the instance.</param>

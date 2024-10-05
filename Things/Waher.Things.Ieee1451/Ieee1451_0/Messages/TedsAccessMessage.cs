@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Waher.Runtime.Inventory;
-using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
@@ -12,8 +8,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class TedsAccessMessage : Ieee1451_0Message
 	{
-		private static readonly Dictionary<ClassTypePair, IFieldType> fieldTypes = new Dictionary<ClassTypePair, IFieldType>();
-
 		/// <summary>
 		/// IEEE 1451.0 TEDS Access Message
 		/// </summary>
@@ -85,76 +79,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					return false;
 
 				Ieee1451_0Binary TedsBlock = new Ieee1451_0Binary(Data);
-				List<TedsRecord> Records = new List<TedsRecord>();
-				byte TupleLength = 1;
-				byte Class = 0;
+				ParsingState State = new ParsingState();
 
-				while (!TedsBlock.EOF)
-				{
-					byte Type = TedsBlock.NextUInt8();
-					int Length;
-
-					switch (TupleLength)
-					{
-						case 0:
-							Length = 0;
-							break;
-
-						case 1:
-							Length = TedsBlock.NextUInt8();
-							break;
-
-						case 2:
-							Length = TedsBlock.NextUInt16();
-							break;
-
-						case 3:
-							Length = (int)TedsBlock.NextUInt24();
-							break;
-
-						case 4:
-							uint i = TedsBlock.NextUInt32();
-							if (i > int.MaxValue)
-								throw new IOException("Invalid length: " + i.ToString());
-
-							Length = (int)i;
-							break;
-
-						default:
-							throw new IOException("Invalid tuple length: " + TupleLength.ToString());
-					}
-
-					byte[] RawValue = TedsBlock.NextUInt8Array(Length);
-					ClassTypePair RecordTypeId = new ClassTypePair(Class, Type);
-					IFieldType FieldType;
-
-					lock (fieldTypes)
-					{
-						if (!fieldTypes.TryGetValue(RecordTypeId, out FieldType))
-							FieldType = null;
-					}
-
-					if (FieldType is null)
-					{
-						FieldType = Types.FindBest<IFieldType, ClassTypePair>(RecordTypeId);
-
-						lock (fieldTypes)
-						{
-							fieldTypes[RecordTypeId] = FieldType;
-						}
-					}
-
-					TedsRecord Record = FieldType.Parse(RecordTypeId, new Ieee1451_0Binary(RawValue));
-					if (Record is TedsId TedsId)
-					{
-						Class = TedsId.Class;
-						TupleLength = TedsId.TupleLength;
-					}
-
-					Records.Add(Record);
-				}
-
-				Teds = new Ieee1451_0Teds(ChannelInfo, Records.ToArray());
+				Teds = new Ieee1451_0Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
 
 				return true;
 			}

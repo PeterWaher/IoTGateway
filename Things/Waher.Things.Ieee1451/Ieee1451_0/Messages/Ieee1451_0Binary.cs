@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Waher.Runtime.Inventory;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -9,6 +13,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class Ieee1451_0Binary
 	{
+		private static readonly Dictionary<ClassTypePair, IFieldType> fieldTypes = new Dictionary<ClassTypePair, IFieldType>();
+
 		private readonly int len;
 		private int pos = 0;
 
@@ -633,5 +639,82 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			return this.NextUInt8Array(16);
 		}
 
+		/// <summary>
+		/// Parses a set of TEDS records.
+		/// </summary>
+		/// <returns>Array of records.</returns>
+		/// <exception cref="IOException">If records are not correctly encoded.</exception>
+		public TedsRecord[] ParseTedsRecords(ParsingState State)
+		{
+			List<TedsRecord> Records = new List<TedsRecord>();
+			byte TupleLength = 1;
+
+			while (!this.EOF)
+			{
+				byte Type = this.NextUInt8();
+				int Length;
+
+				switch (TupleLength)
+				{
+					case 0:
+						Length = 0;
+						break;
+
+					case 1:
+						Length = this.NextUInt8();
+						break;
+
+					case 2:
+						Length = this.NextUInt16();
+						break;
+
+					case 3:
+						Length = (int)this.NextUInt24();
+						break;
+
+					case 4:
+						uint i = this.NextUInt32();
+						if (i > int.MaxValue)
+							throw new IOException("Invalid length: " + i.ToString());
+
+						Length = (int)i;
+						break;
+
+					default:
+						throw new IOException("Invalid tuple length: " + TupleLength.ToString());
+				}
+
+				byte[] RawValue = this.NextUInt8Array(Length);
+				ClassTypePair RecordTypeId = new ClassTypePair(State.Class, Type);
+				IFieldType FieldType;
+
+				lock (fieldTypes)
+				{
+					if (!fieldTypes.TryGetValue(RecordTypeId, out FieldType))
+						FieldType = null;
+				}
+
+				if (FieldType is null)
+				{
+					FieldType = Types.FindBest<IFieldType, ClassTypePair>(RecordTypeId);
+
+					lock (fieldTypes)
+					{
+						fieldTypes[RecordTypeId] = FieldType;
+					}
+				}
+
+				TedsRecord Record = FieldType.Parse(RecordTypeId, new Ieee1451_0Binary(RawValue), State);
+				if (Record is TedsId TedsId)
+				{
+					State.Class = TedsId.Class;
+					TupleLength = TedsId.TupleLength;
+				}
+
+				Records.Add(Record);
+			}
+
+			return Records.ToArray();
+		}
 	}
 }

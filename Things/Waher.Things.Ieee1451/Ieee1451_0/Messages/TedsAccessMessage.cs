@@ -36,25 +36,32 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
+		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Teds">TEDS object, if successful.</param>
 		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(out Ieee1451_0Teds Teds)
+		public bool TryParseTeds(out ushort ErrorCode, out Ieee1451_0Teds Teds)
 		{
-			return this.TryParseTeds(true, out Teds);
+			return this.TryParseTeds(true, out ErrorCode, out Teds);
 		}
 
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
 		/// <param name="CheckChecksum">If checksum should be checked.</param>
+		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Teds">TEDS object, if successful.</param>
 		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(bool CheckChecksum, out Ieee1451_0Teds Teds)
+		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Ieee1451_0Teds Teds)
 		{
 			Teds = null;
 
 			try
 			{
+				if (this.MessageType == MessageType.Reply)
+					ErrorCode = this.NextUInt16();
+				else
+					ErrorCode = 0;
+
 				Ieee1451_0ChannelId ChannelInfo = this.NextChannelId();
 				uint TedsOffset = this.NextUInt32();
 				int Start = this.Position;
@@ -87,6 +94,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			}
 			catch (Exception)
 			{
+				ErrorCode = 0xffff;
 				return false;
 			}
 		}

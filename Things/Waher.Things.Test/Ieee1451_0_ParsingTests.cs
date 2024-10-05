@@ -5,7 +5,6 @@ using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
-using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Test
@@ -51,7 +50,8 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
@@ -74,7 +74,8 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
@@ -97,13 +98,37 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
 			Assert.IsTrue(Teds.Records.Length > 0);
 
 			foreach (Field Field in Teds.GetFields(ThingReference.Empty, DateTime.Now))
+				Console.Out.WriteLine(Field.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMzAwLjE1AAAAZwAQtyV1/vM=")]
+		public void Test_05_ParseTransducerSampleData(string Base64Encoded)
+		{
+			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+
+			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
+			Assert.IsNotNull(TransducerAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TransducerAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM, TransducerAccessMessage.TransducerAccessService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, out ushort ErrorCode, out Ieee1451_0TransducerData Data));
+			Assert.AreEqual(0, ErrorCode);
+
+			Assert.IsNotNull(Data.Fields);
+			Assert.IsTrue(Data.Fields.Length > 0);
+
+			foreach (Field Field in Data.Fields)
 				Console.Out.WriteLine(Field.ToString());
 		}
 

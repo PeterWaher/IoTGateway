@@ -6,11 +6,6 @@
 	public class Ieee1451_0AppId
 	{
 		/// <summary>
-		/// Error Code
-		/// </summary>
-		public ushort ErrorCode;
-
-		/// <summary>
 		/// Application ID
 		/// </summary>
 		public byte[] ApplicationId;

@@ -56,7 +56,6 @@
 		{
 			return new Ieee1451_0AppId()
 			{
-				ErrorCode = this.NextUInt16(),
 				ApplicationId = this.NextUuid()
 			};
 		}
@@ -69,7 +68,6 @@
 		{
 			return new Ieee1451_0NcapId()
 			{
-				ErrorCode = this.NextUInt16(),
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid()
 			};
@@ -83,7 +81,6 @@
 		{
 			return new Ieee1451_0TimId()
 			{
-				ErrorCode = this.NextUInt16(),
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid(),
 				TimId = this.NextUuid()
@@ -98,7 +95,6 @@
 		{
 			return new Ieee1451_0ChannelId()
 			{
-				ErrorCode = this.NextUInt16(),
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid(),
 				TimId = this.NextUuid(),

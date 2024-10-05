@@ -7,7 +7,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// <summary>
 	/// IEEE 1451.0 Binary object
 	/// </summary>
-	public class Ieee14510Binary
+	public class Ieee1451_0Binary
 	{
 		private readonly int len;
 		private int pos = 0;
@@ -16,7 +16,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// IEEE 1451.0 Message
 		/// </summary>
 		/// <param name="Body">Binary Body</param>
-		public Ieee14510Binary(byte[] Body)
+		public Ieee1451_0Binary(byte[] Body)
 		{
 			this.Body = Body;
 			this.len = this.Body.Length;
@@ -596,6 +596,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextTime();
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Gets the next <see cref="Guid"/>.
+		/// </summary>
+		/// <returns>GUID</returns>
+		public Guid NextGuid()
+		{
+			return new Guid(this.NextUInt8Array(16));
 		}
 
 	}

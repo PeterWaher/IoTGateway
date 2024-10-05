@@ -3,13 +3,13 @@
 	/// <summary>
 	/// IEEE 1451.0 TEDS
 	/// </summary>
-	public class Ieee14510Teds
+	public class Ieee1451_0Teds
 	{
 		/// <summary>
 		/// IEEE 1451.0 TEDS
 		/// </summary>
 		/// <param name="Records">TLV records available in TEDS</param>
-		public Ieee14510Teds(TedsRecord[] Records)
+		public Ieee1451_0Teds(TedsRecord[] Records)
 		{
 			this.Records = Records;
 		}

@@ -3,7 +3,7 @@
 	/// <summary>
 	/// IEEE 1451.0 Transducer Access Message
 	/// </summary>
-	public class TransducerAccessMessage : Ieee14510Message
+	public class TransducerAccessMessage : Ieee1451_0Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Transducer Access Message
@@ -26,7 +26,7 @@
 		public TransducerAccessService TransducerAccessService { get; }
 
 		/// <summary>
-		/// Name of <see cref="Ieee14510Message.NetworkServiceId"/>
+		/// Name of <see cref="Ieee1451_0Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.TransducerAccessService.ToString();
 	}

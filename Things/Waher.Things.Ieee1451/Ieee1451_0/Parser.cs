@@ -1,4 +1,5 @@
-﻿using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+﻿using System;
+using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0
 {
@@ -13,7 +14,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Message">Message object, if parsed</param>
 		/// <returns>If able to parse the message.</returns>
-		public static bool TryParseMessage(byte[] Data, out Ieee14510Message Message)
+		public static bool TryParseMessage(byte[] Data, out Ieee1451_0Message Message)
 		{
 			NetworkServiceType NetworkServiceType = 0;
 			MessageType MessageType = 0;
@@ -90,13 +91,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0
 						Length <<= 8;
 						Length |= b;
 
-						TailLength = c - Length;
-						Length -= i;
-						if (Length < 0 || TailLength < 0)
+						TailLength = c - i - Length;
+						if (TailLength < 0)
 							return false;
 
 						Body = new byte[Length];
-						Tail = new byte[TailLength];
+						Tail = TailLength == 0 ? Array.Empty<byte>() : new byte[TailLength];
 
 						if (Length > 0)
 							State++;

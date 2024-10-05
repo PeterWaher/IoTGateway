@@ -625,12 +625,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Guid"/>.
+		/// Gets the next UUID.
 		/// </summary>
-		/// <returns>GUID</returns>
-		public Guid NextGuid()
+		/// <returns>UUID</returns>
+		public byte[] NextUuid()
 		{
-			return new Guid(this.NextUInt8Array(16));
+			return this.NextUInt8Array(16);
 		}
 
 	}

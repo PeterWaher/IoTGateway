@@ -12,7 +12,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class TedsAccessMessage : Ieee1451_0Message
 	{
-		private static readonly Dictionary<uint, IFieldType> fieldTypes = new Dictionary<uint, IFieldType>();
+		private static readonly Dictionary<ClassTypePair, IFieldType> fieldTypes = new Dictionary<ClassTypePair, IFieldType>();
 
 		/// <summary>
 		/// IEEE 1451.0 TEDS Access Message
@@ -87,6 +87,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Ieee1451_0Binary TedsBlock = new Ieee1451_0Binary(Data);
 				List<TedsRecord> Records = new List<TedsRecord>();
 				byte TupleLength = 1;
+				byte Class = 0;
 
 				while (!TedsBlock.EOF)
 				{
@@ -124,34 +125,36 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					}
 
 					byte[] RawValue = TedsBlock.NextUInt8Array(Length);
+					ClassTypePair RecordTypeId = new ClassTypePair(Class, Type);
 					IFieldType FieldType;
 
 					lock (fieldTypes)
 					{
-						if (!fieldTypes.TryGetValue(Type, out FieldType))
+						if (!fieldTypes.TryGetValue(RecordTypeId, out FieldType))
 							FieldType = null;
 					}
 
 					if (FieldType is null)
 					{
-						FieldType = Types.FindBest<IFieldType, byte>(Type);
-						if (FieldType is null)
-							FieldType = new TedsRecord();
+						FieldType = Types.FindBest<IFieldType, ClassTypePair>(RecordTypeId);
 
 						lock (fieldTypes)
 						{
-							fieldTypes[Type] = FieldType;
+							fieldTypes[RecordTypeId] = FieldType;
 						}
 					}
 
-					TedsRecord Record = FieldType.Parse(Type, new Ieee1451_0Binary(RawValue));
+					TedsRecord Record = FieldType.Parse(RecordTypeId, new Ieee1451_0Binary(RawValue));
 					if (Record is TedsId TedsId)
+					{
+						Class = TedsId.Class;
 						TupleLength = TedsId.TupleLength;
+					}
 
 					Records.Add(Record);
 				}
 
-				Teds = new Ieee1451_0Teds(Records.ToArray());
+				Teds = new Ieee1451_0Teds(ChannelInfo, Records.ToArray());
 
 				return true;
 			}

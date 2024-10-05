@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// Application identifying information
@@ -15,6 +13,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Application ID
 		/// </summary>
-		public Guid ApplicationId;
+		public byte[] ApplicationId;
 	}
 }

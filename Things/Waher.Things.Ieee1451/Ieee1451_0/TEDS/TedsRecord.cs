@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
@@ -19,6 +20,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		}
 
 		/// <summary>
+		/// This field identifies the TEDS being accessed. The value is the TEDS access 
+		/// code found in Table 72.
+		/// </summary>
+		public byte Class { get; set; }
+
+		/// <summary>
 		/// TEDS Record Type
 		/// </summary>
 		public byte Type { get; set; }
@@ -29,21 +36,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		public byte[] RawValue { get; set; }
 
 		/// <summary>
-		/// Field Type
-		/// </summary>
-		public virtual int FieldType => -1;
-
-		/// <summary>
 		/// Parses a TEDS record.
 		/// </summary>
-		/// <param name="Type">Field Type</param>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
 		/// <param name="RawValue">Raw Value of record</param>
 		/// <returns>Parsed TEDS record.</returns>
-		public virtual TedsRecord Parse(byte Type, Ieee1451_0Binary RawValue)
+		public virtual TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue)
 		{
 			return new TedsRecord()
 			{
-				Type = Type,
+				Class = RecordTypeId.Class,
+				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body
 			};
 		}
@@ -51,11 +54,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		/// <summary>
 		/// How well the class supports a specific TEDS field type.
 		/// </summary>
-		/// <param name="FieldType">TEDS field type.</param>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
 		/// <returns>Suppoer grade.</returns>
-		public virtual Grade Supports(byte FieldType)
+		public virtual Grade Supports(ClassTypePair RecordTypeId)
 		{
-			return Grade.NotAtAll;
+			return Grade.Barely;
 		}
 
 		/// <summary>
@@ -79,8 +82,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		/// <param name="Fields">Parsed fields.</param>
 		public virtual void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
 		{
-			Fields.Add(new StringField(Thing, Timestamp, this.Type.ToString("X2") + ", Raw",
-				Convert.ToBase64String(this.RawValue), SensorData.FieldType.Identity,
+			Fields.Add(new StringField(Thing, Timestamp,
+				this.Class.ToString("X2") + " " + this.Type.ToString("X2") + ", Raw",
+				Convert.ToBase64String(this.RawValue), FieldType.Identity,
 				FieldQoS.AutomaticReadout));
 		}
 

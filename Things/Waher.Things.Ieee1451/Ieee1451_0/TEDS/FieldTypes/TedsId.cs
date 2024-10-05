@@ -34,12 +34,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		public byte FamilySubMember { get; set; }
 
 		/// <summary>
-		/// This field identifies the TEDS being accessed. The value is the TEDS access 
-		/// code found in Table 72.
-		/// </summary>
-		public byte Class { get; set; }
-
-		/// <summary>
 		/// This field identifies the TEDS version. The value is the version number 
 		/// identified in the standard.A value of zero in this field indicates that the 
 		/// TEDS do not conform to any released standard. Table 12 lists the allowable 
@@ -63,24 +57,24 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		/// <summary>
 		/// How well the class supports a specific TEDS field type.
 		/// </summary>
-		/// <param name="FieldType">TEDS field type.</param>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
 		/// <returns>Suppoer grade.</returns>
-		public override Grade Supports(byte FieldType)
+		public override Grade Supports(ClassTypePair RecordTypeId)
 		{
-			return FieldType == 3 ? Grade.Perfect : Grade.NotAtAll;
+			return RecordTypeId.Type == 3 ? Grade.Perfect : Grade.NotAtAll;
 		}
 
 		/// <summary>
 		/// Parses a TEDS record.
 		/// </summary>
-		/// <param name="Type">Field Type</param>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
 		/// <param name="RawValue">Raw Value of record</param>
 		/// <returns>Parsed TEDS record.</returns>
-		public override TedsRecord Parse(byte Type, Ieee1451_0Binary RawValue)
+		public override TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue)
 		{
 			return new TedsId()
 			{
-				Type = Type,
+				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
 				FamilyMember = RawValue.NextUInt8(),
 				FamilySubMember = RawValue.NextUInt8(),
@@ -110,13 +104,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 			}
 
 			Fields.Add(new StringField(Thing, Timestamp, "Family", sb.ToString(),
-				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
+				FieldType.Identity, FieldQoS.AutomaticReadout));
 
 			Fields.Add(new Int32Field(Thing, Timestamp, "Class", this.Class,
-				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
+				FieldType.Identity, FieldQoS.AutomaticReadout));
 
 			Fields.Add(new Int32Field(Thing, Timestamp, "TEDS Version", this.Version,
-				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
+				FieldType.Identity, FieldQoS.AutomaticReadout));
 		}
 	}
 }

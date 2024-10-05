@@ -57,7 +57,7 @@
 			return new Ieee1451_0AppId()
 			{
 				ErrorCode = this.NextUInt16(),
-				ApplicationId = this.NextGuid()
+				ApplicationId = this.NextUuid()
 			};
 		}
 
@@ -70,8 +70,8 @@
 			return new Ieee1451_0NcapId()
 			{
 				ErrorCode = this.NextUInt16(),
-				ApplicationId = this.NextGuid(),
-				NcapId = this.NextGuid()
+				ApplicationId = this.NextUuid(),
+				NcapId = this.NextUuid()
 			};
 		}
 
@@ -84,9 +84,9 @@
 			return new Ieee1451_0TimId()
 			{
 				ErrorCode = this.NextUInt16(),
-				ApplicationId = this.NextGuid(),
-				NcapId = this.NextGuid(),
-				TimId = this.NextGuid()
+				ApplicationId = this.NextUuid(),
+				NcapId = this.NextUuid(),
+				TimId = this.NextUuid()
 			};
 		}
 
@@ -99,9 +99,9 @@
 			return new Ieee1451_0ChannelId()
 			{
 				ErrorCode = this.NextUInt16(),
-				ApplicationId = this.NextGuid(),
-				NcapId = this.NextGuid(),
-				TimId = this.NextGuid(),
+				ApplicationId = this.NextUuid(),
+				NcapId = this.NextUuid(),
+				TimId = this.NextUuid(),
 				ChannelId = this.NextUInt16()
 			};
 		}

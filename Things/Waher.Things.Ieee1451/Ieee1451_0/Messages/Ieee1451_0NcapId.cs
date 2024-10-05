@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// NCAP identifying information
@@ -10,6 +8,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// NCAP ID
 		/// </summary>
-		public Guid NcapId;
+		public byte[] NcapId;
 	}
 }

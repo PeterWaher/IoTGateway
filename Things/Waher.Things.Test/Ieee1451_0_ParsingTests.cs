@@ -40,7 +40,7 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow("AwICAG0AAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAADEDBQD/AQIBBBCGJYoLcvYS1ocH6AVJEdzwCgQ/mZmaCwQ/szMzDARApmZmDQIAAQ3T")]
-		public void Test_02_ParseTEDS(string Base64Encoded)
+		public void Test_02_ParseMetaTEDS(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
 			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
@@ -57,11 +57,31 @@ namespace Waher.Things.Test
 			Assert.IsNotNull(Teds.Records);
 			Assert.IsTrue(Teds.Records.Length > 0);
 
-			foreach (TedsRecord Record in Teds.Records)
-			{
-				foreach (Field Field in Record.GetFields(ThingReference.Empty, DateTime.Now))
-					Console.Out.WriteLine(Field.ToString());
-			}
+			foreach (Field Field in Teds.GetFields(ThingReference.Empty, DateTime.Now))
+				Console.Out.WriteLine(Field.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow("AwICAJoAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAAF4DBQD/AwIBCgEACwEADAsAgICAgICAgoCAgA0EQ2kmZg4EQ8cTMw8EQ4jTMxABABEBARIKKAEBKQEEKgIADhQEQKAAABUEP4AAABcEQ5YAABgEP4AAABkEQKAAABCY")]
+		public void Test_03_ParseTransducerChannelTEDS(string Base64Encoded)
+		{
+			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TedsAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out Ieee1451_0Teds Teds));
+			// TODO: Check CheckSum
+
+			Assert.IsNotNull(Teds.Records);
+			Assert.IsTrue(Teds.Records.Length > 0);
+
+			foreach (Field Field in Teds.GetFields(ThingReference.Empty, DateTime.Now))
+				Console.Out.WriteLine(Field.ToString());
 		}
 
 	}

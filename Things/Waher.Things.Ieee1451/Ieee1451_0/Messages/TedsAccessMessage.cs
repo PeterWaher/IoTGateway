@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Waher.Runtime.Inventory;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -8,6 +12,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class TedsAccessMessage : Ieee1451_0Message
 	{
+		private static readonly Dictionary<uint, IFieldType> fieldTypes = new Dictionary<uint, IFieldType>();
+
 		/// <summary>
 		/// IEEE 1451.0 TEDS Access Message
 		/// </summary>
@@ -16,7 +22,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		public TedsAccessMessage(NetworkServiceType NetworkServiceType, TedsAccessService TedsAccessService, 
+		public TedsAccessMessage(NetworkServiceType NetworkServiceType, TedsAccessService TedsAccessService,
 			MessageType MessageType, byte[] Body, byte[] Tail)
 			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail)
 		{
@@ -56,6 +62,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			try
 			{
 				Ieee1451_0ChannelId ChannelInfo = this.NextChannelId();
+				uint TedsOffset = this.NextUInt32();
 				int Start = this.Position;
 				uint Len = this.NextUInt32();
 				if (Len < 2)
@@ -79,14 +86,69 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 				Ieee1451_0Binary TedsBlock = new Ieee1451_0Binary(Data);
 				List<TedsRecord> Records = new List<TedsRecord>();
+				byte TupleLength = 1;
 
 				while (!TedsBlock.EOF)
 				{
 					byte Type = TedsBlock.NextUInt8();
-					byte Length = TedsBlock.NextUInt8();    // Number of bytes may vary.
-					byte[] Value = TedsBlock.NextUInt8Array(Length);
+					int Length;
 
-					Records.Add(new TedsRecord(Type, Value));
+					switch (TupleLength)
+					{
+						case 0:
+							Length = 0;
+							break;
+
+						case 1:
+							Length = TedsBlock.NextUInt8();
+							break;
+
+						case 2:
+							Length = TedsBlock.NextUInt16();
+							break;
+
+						case 3:
+							Length = (int)TedsBlock.NextUInt24();
+							break;
+
+						case 4:
+							uint i = TedsBlock.NextUInt32();
+							if (i > int.MaxValue)
+								throw new IOException("Invalid length: " + i.ToString());
+
+							Length = (int)i;
+							break;
+
+						default:
+							throw new IOException("Invalid tuple length: " + TupleLength.ToString());
+					}
+
+					byte[] RawValue = TedsBlock.NextUInt8Array(Length);
+					IFieldType FieldType;
+
+					lock (fieldTypes)
+					{
+						if (!fieldTypes.TryGetValue(Type, out FieldType))
+							FieldType = null;
+					}
+
+					if (FieldType is null)
+					{
+						FieldType = Types.FindBest<IFieldType, byte>(Type);
+						if (FieldType is null)
+							FieldType = new TedsRecord();
+
+						lock (fieldTypes)
+						{
+							fieldTypes[Type] = FieldType;
+						}
+					}
+
+					TedsRecord Record = FieldType.Parse(Type, new Ieee1451_0Binary(RawValue));
+					if (Record is TedsId TedsId)
+						TupleLength = TedsId.TupleLength;
+
+					Records.Add(Record);
 				}
 
 				Teds = new Ieee1451_0Teds(Records.ToArray());

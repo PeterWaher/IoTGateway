@@ -1,13 +1,25 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
+using Waher.Things.Ieee1451;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Test
 {
 	[TestClass]
 	public class Ieee1451_0_ParsingTests
 	{
+		[AssemblyInitialize]
+		public static Task AssemblyInitialize(TestContext _)
+		{
+			Types.Initialize(typeof(Ieee1451Parser).Assembly);
+			return Task.CompletedTask;
+		}
+
 		[DataTestMethod]
 		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk4LjE1AAAAZwFGxwD/sRM=")]
 		public void Test_01_ParseMessage(string Base64Encoded)
@@ -47,8 +59,8 @@ namespace Waher.Things.Test
 
 			foreach (TedsRecord Record in Teds.Records)
 			{
-				Console.Out.WriteLine(Record.Type.ToString() + "\t" +
-					Convert.ToBase64String(Record.RawValue));
+				foreach (Field Field in Record.GetFields(ThingReference.Empty, DateTime.Now))
+					Console.Out.WriteLine(Field.ToString());
 			}
 		}
 

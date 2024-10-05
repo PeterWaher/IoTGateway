@@ -99,6 +99,24 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
+		/// Gets the next 24-bit unsigned integer.
+		/// </summary>
+		/// <returns>Next Value</returns>
+		public uint NextUInt24()
+		{
+			if (this.pos + 2 >= this.len)
+				throw UnexpectedEndOfData();
+
+			uint Result = this.Body[this.pos++];
+			Result <<= 8;
+			Result |= this.Body[this.pos++];
+			Result <<= 8;
+			Result |= this.Body[this.pos++];
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Gets the next <see cref="UInt32"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>

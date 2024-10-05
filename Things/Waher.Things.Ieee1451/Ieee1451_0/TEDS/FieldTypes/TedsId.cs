@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.Scalar;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;
 
@@ -98,14 +98,24 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		/// <param name="Fields">Parsed fields.</param>
 		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
 		{
-			Fields.Add(new StringField(Thing, Timestamp, "Family",
-				this.FamilyMember.ToString() + "." + this.FamilySubMember.ToString(),
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("IEEE 1451.");
+			sb.Append(this.FamilyMember.ToString());
+
+			if (this.FamilySubMember != 0xff)
+			{
+				sb.Append('.');
+				sb.Append(this.FamilySubMember.ToString());
+			}
+
+			Fields.Add(new StringField(Thing, Timestamp, "Family", sb.ToString(),
 				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
 
 			Fields.Add(new Int32Field(Thing, Timestamp, "Class", this.Class,
 				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
 
-			Fields.Add(new Int32Field(Thing, Timestamp, "Version", this.Version,
+			Fields.Add(new Int32Field(Thing, Timestamp, "TEDS Version", this.Version,
 				SensorData.FieldType.Identity, FieldQoS.AutomaticReadout));
 		}
 	}

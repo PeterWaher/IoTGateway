@@ -225,7 +225,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				return float.NaN;
 			}
 
-			float Result = BitConverter.ToSingle(this.Body, this.pos);
+			byte[] Temp = new byte[4];
+			Array.Copy(this.Body, this.pos, Temp, 0, 4);
+			Array.Reverse(Temp);
+
+			float Result = BitConverter.ToSingle(Temp, this.pos);
 			this.pos += 4;
 
 			return Result;
@@ -240,7 +244,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			if (this.pos + 7 >= this.len)
 				throw UnexpectedEndOfData();
 
-			double Result = BitConverter.ToDouble(this.Body, this.pos);
+			byte[] Temp = new byte[8];
+			Array.Copy(this.Body, this.pos, Temp, 0, 8);
+			Array.Reverse(Temp);
+
+			double Result = BitConverter.ToDouble(Temp, this.pos);
 			this.pos += 8;
 
 			return Result;

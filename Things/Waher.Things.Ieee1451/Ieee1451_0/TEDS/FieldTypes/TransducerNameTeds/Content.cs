@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Waher.Content;
+using Waher.Runtime.Inventory;
+using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.SensorData;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
+{
+	/// <summary>
+	/// TEDS Content (§6.11.2.3)
+	/// </summary>
+	public class Content : TedsRecord
+	{
+		/// <summary>
+		/// TEDS Content (§6.11.2.3)
+		/// </summary>
+		public Content()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Name, either as text, or base64-encoded binary
+		/// </summary>
+		public string Name { get; set; }
+
+		/// <summary>
+		/// How well the class supports a specific TEDS field type.
+		/// </summary>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
+		/// <returns>Suppoer grade.</returns>
+		public override Grade Supports(ClassTypePair RecordTypeId)
+		{
+			return RecordTypeId.Class == 12 && RecordTypeId.Type == 5 ? Grade.Perfect : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Parses a TEDS record.
+		/// </summary>
+		/// <param name="RecordTypeId">Record Type identifier.</param>
+		/// <param name="RawValue">Raw Value of record</param>
+		/// <param name="State">Current parsing state.</param>
+		/// <returns>Parsed TEDS record.</returns>
+		public override TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue, ParsingState State)
+		{
+			string Name;
+
+			if (State.NameFormatText)
+				Name = Encoding.UTF8.GetString(RawValue.Body);
+			else
+				Name = Convert.ToBase64String(RawValue.Body);
+
+			return new Content()
+			{
+				Class = RecordTypeId.Class,
+				Type = RecordTypeId.Type,
+				RawValue = RawValue.Body,
+				Name = Name
+			};
+		}
+
+		/// <summary>
+		/// Adds fields to a collection of fields.
+		/// </summary>
+		/// <param name="Thing">Thing associated with fields.</param>
+		/// <param name="Timestamp">Timestamp of fields.</param>
+		/// <param name="Fields">Parsed fields.</param>
+		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
+		{
+			Fields.Add(new StringField(Thing, Timestamp, "Name", this.Name,
+				FieldType.Identity, FieldQoS.AutomaticReadout));
+		}
+	}
+}

@@ -22,5 +22,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		/// </summary>
 		public Ieee1451_0SampleDefinition SampleDefinition;
 
+		/// <summary>
+		/// If names are in text format.
+		/// </summary>
+		public bool NameFormatText;
 	}
 }

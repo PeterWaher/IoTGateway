@@ -84,5 +84,28 @@ namespace Waher.Things.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
+		[DataTestMethod]
+		[DataRow("AwICAFQAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAABgDBQD/DAIBBAEABQpUUE0gMzYgVUJJA7w=")]
+		public void Test_04_ParseTransducerNameTEDS(string Base64Encoded)
+		{
+			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TedsAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out Ieee1451_0Teds Teds));
+			// TODO: Check CheckSum
+
+			Assert.IsNotNull(Teds.Records);
+			Assert.IsTrue(Teds.Records.Length > 0);
+
+			foreach (Field Field in Teds.GetFields(ThingReference.Empty, DateTime.Now))
+				Console.Out.WriteLine(Field.ToString());
+		}
+
 	}
 }

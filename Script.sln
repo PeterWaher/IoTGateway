@@ -107,6 +107,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Layout.Layout2D", "La
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Wpf", "Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj", "{8B1F6A35-7653-4120-BE4E-7F993B0496A8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.XmlLedger", "Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj", "{6F31B549-0591-4CA5-890B-4A35EB830282}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +287,10 @@ Global
 		{8B1F6A35-7653-4120-BE4E-7F993B0496A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B1F6A35-7653-4120-BE4E-7F993B0496A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B1F6A35-7653-4120-BE4E-7F993B0496A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F31B549-0591-4CA5-890B-4A35EB830282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F31B549-0591-4CA5-890B-4A35EB830282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F31B549-0591-4CA5-890B-4A35EB830282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F31B549-0591-4CA5-890B-4A35EB830282}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -314,6 +320,7 @@ Global
 		{246CF54A-056C-4011-9037-9D08ABDFB8A9} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 		{84BC1DE3-103A-4F8C-A36F-8006E2F7D675} = {BD25E5A5-A4E7-4EC2-A78D-5DE85A70CDC5}
 		{8B1F6A35-7653-4120-BE4E-7F993B0496A8} = {823D0609-1731-4770-9B1C-305BB49D6133}
+		{6F31B549-0591-4CA5-890B-4A35EB830282} = {0709170C-60A7-4421-8A74-07B7F294A229}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

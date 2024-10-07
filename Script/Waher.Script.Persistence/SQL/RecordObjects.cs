@@ -7,30 +7,31 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators;
+using Waher.Script.Persistence.SQL.Parsers;
 
 namespace Waher.Script.Persistence.SQL
 {
 	/// <summary>
-	/// Executes an INSERT ... OBJECT[S] ... statement against the object database.
+	/// Executes an RECORD ... OBJECT[S] ... statement against the ledger.
 	/// </summary>
-	public class InsertObjects : ScriptNode, IEvaluateAsync
+	public class RecordObjects : ScriptNode, IEvaluateAsync
 	{
+		private readonly RecordOperation operation;
 		private SourceDefinition source;
 		private ElementList objects;
-		private readonly bool lazy;
 
 		/// <summary>
-		/// Executes an INSERT ... OBJECT[S] ... statement against the object database.
+		/// Executes an RECORD ... OBJECT[S] ... statement against the ledger.
 		/// </summary>
 		/// <param name="Source">Source to update objects from.</param>
+		/// <param name="Operation">Ledger event operation.</param>
 		/// <param name="Objects">Objects</param>
-		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public InsertObjects(SourceDefinition Source, ElementList Objects, bool Lazy, int Start, int Length, Expression Expression)
+		public RecordObjects(SourceDefinition Source, RecordOperation Operation,
+			ElementList Objects, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
@@ -38,8 +39,8 @@ namespace Waher.Script.Persistence.SQL
 
 			this.objects = Objects;
 			this.objects?.SetParent(this);
-			
-			this.lazy = Lazy;
+
+			this.operation = Operation;
 		}
 
 		/// <summary>
@@ -67,64 +68,64 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			List<IElement> Result = new List<IElement>();
 			IEnumerable<IElement> Objects;
 			IElement E;
 			long Count = 0;
 			object Item;
 
-			await Database.StartBulk();
-			try
+			foreach (ScriptNode Object in this.objects.Elements)
 			{
-				foreach (ScriptNode Object in this.objects.Elements)
+				E = await Object.EvaluateAsync(Variables);
+				if (E is IVector V)
+					Objects = V.ChildElements;
+				else if (E is ISet S)
+					Objects = S.ChildElements;
+				else
+					Objects = new IElement[] { E };
+
+				foreach (IElement E2 in Objects)
 				{
-					E = await Object.EvaluateAsync(Variables);
-					if (E is IVector V)
-						Objects = V.ChildElements;
-					else if (E is ISet S)
-						Objects = S.ChildElements;
-					else
-						Objects = new IElement[] { E };
+					Item = E2.AssociatedObjectValue;
 
-					foreach (IElement E2 in Objects)
+					if (Item is Dictionary<string, IElement> ObjExNihilo)
 					{
-						Item = E2.AssociatedObjectValue;
+						GenericObject Obj2 = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
 
-						if (Item is Dictionary<string, IElement> ObjExNihilo)
-						{
-							GenericObject Obj2 = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
+						foreach (KeyValuePair<string, IElement> P in ObjExNihilo)
+							Obj2[P.Key] = P.Value.AssociatedObjectValue;
 
-							foreach (KeyValuePair<string, IElement> P in ObjExNihilo)
-								Obj2[P.Key] = P.Value.AssociatedObjectValue;
-
-							Item = Obj2;
-						}
-						else if (Item is Dictionary<string, object> ObjExNihilo2)
-						{
-							GenericObject Obj2 = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
-
-							foreach (KeyValuePair<string, object> P in ObjExNihilo2)
-								Obj2[P.Key] = P.Value;
-
-							Item = Obj2;
-						}
-
-						await Source.Insert(this.lazy, Item);
-						Count++;
-
-						Result.Add(new ObjectValue(Item));
+						Item = Obj2;
 					}
+					else if (Item is Dictionary<string, object> ObjExNihilo2)
+					{
+						GenericObject Obj2 = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
+
+						foreach (KeyValuePair<string, object> P in ObjExNihilo2)
+							Obj2[P.Key] = P.Value;
+
+						Item = Obj2;
+					}
+
+					switch (this.operation)
+					{
+						case RecordOperation.New:
+						default:
+							await Ledger.NewEntry(Item);
+							break;
+
+						case RecordOperation.Update:
+							await Ledger.UpdatedEntry(Item);
+							break;
+
+						case RecordOperation.Delete:
+							await Ledger.DeletedEntry(Item);
+							break;
+					}
+					Count++;
 				}
 			}
-			finally
-			{
-				await Database.EndBulk();
-			}
 
-			if (Result.Count == 1)
-				return Result[0];
-			else
-				return new ObjectVector(Result.ToArray());
+			return new DoubleNumber(Count);
 		}
 
 		/// <summary>
@@ -189,16 +190,18 @@ namespace Waher.Script.Persistence.SQL
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			return (obj is InsertObjects O &&
+			return obj is RecordObjects O &&
+				this.operation == O.operation &&
 				AreEqual(this.source, O.source) &&
 				AreEqual(this.objects, O.objects) &&
-				base.Equals(obj));
+				base.Equals(obj);
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ this.operation.GetHashCode();
 			Result ^= Result << 5 ^ GetHashCode(this.source);
 			Result ^= Result << 5 ^ GetHashCode(this.objects);
 			return Result;

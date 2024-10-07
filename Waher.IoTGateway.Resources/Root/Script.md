@@ -3112,6 +3112,74 @@ DROP COLLECTION
 	WebUsers
 ```
 
+### Access to Ledger
+
+The following extensions are made available by the `Waher.Script.Persistence` library.
+
+#### RECORD OBJECT
+
+You can record an object ex nihilo into a collection in the Leger using the 
+`RECORD ... OBJECT` statement.
+
+Syntax:
+
+```
+RECORD
+INTO Source
+[NEW|UPDATE|DELETE] OBJECT ...
+```
+
+Example:
+
+```
+record
+into PersistedEvent 
+new object
+{
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
+}
+```
+
+**Note**: Object recorded directly to the ledger are not stored in the object database at
+the same time. Object stored on the object database may be stored automatically in the
+ledger, depending on the class definition and its corresponding archiving attributes.
+
+#### RECORD OBJECTS
+
+You can record a vector or set of objects ex nihilo into a collection in the Ledger using the 
+`RECORD ... OBJECTS` statement.
+
+Syntax:
+
+```
+RECORD
+INTO Source
+[NEW|UPDATE|DELETE] OBJECTS [Object1, ..., ObjectN]
+```
+
+Example:
+
+```
+record
+into PersistedEvent 
+new objects
+[{
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
+},
+{
+	Timestamp:Now, 
+	Message:"Kilroy was here again", 
+	Object:"Here", 
+	Actor:"Kilroy"
+}]
+```
+
 ### XML
 
 The `Waher.Script.Xml` library extends the script engine to understand XML embedded in the script.

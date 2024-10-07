@@ -37,8 +37,9 @@
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			int Result = this.Class.GetHashCode();
-			Result ^= Result << 5 ^ this.Type.GetHashCode();
+			int Result = this.Class;
+			Result <<= 8;
+			Result |= this.Type;
 
 			return Result;
 		}

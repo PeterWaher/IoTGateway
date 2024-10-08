@@ -81,8 +81,8 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(ILedgerExport Output, string[] CollectionNames) => Task.CompletedTask;
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(ILedgerExport Output, string[] CollectionNames) => Task.FromResult(true);
 
 		/// <summary>
 		/// Performs an export of the entire ledger.
@@ -90,8 +90,8 @@ namespace Waher.Persistence
 		/// <param name="Output">Ledger will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.CompletedTask;
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.FromResult(true);
 
 		/// <summary>
 		/// Registers a recipient of external events.

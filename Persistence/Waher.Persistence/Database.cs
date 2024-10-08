@@ -960,8 +960,8 @@ namespace Waher.Persistence
 		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output)
 		{
 			return Export(Output, null);
 		}
@@ -971,8 +971,8 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			return Provider.Export(Output, CollectionNames);
 		}
@@ -983,8 +983,8 @@ namespace Waher.Persistence
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			return Provider.Export(Output, CollectionNames, Thread);
 		}

@@ -8,14 +8,15 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Persistence.SQL.Enumerators;
 using Waher.Script.Persistence.SQL.Groups;
 
 namespace Waher.Script.Persistence.SQL
 {
-	/// <summary>
-	/// Executes a SELECT statement against the object database.
-	/// </summary>
-	public class Select : ScriptNode, IEvaluateAsync
+    /// <summary>
+    /// Executes a SELECT statement against the object database.
+    /// </summary>
+    public class Select : ScriptNode, IEvaluateAsync
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
@@ -97,10 +98,10 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("Columns and ColumnNames must be of equal length.", nameof(ColumnNames));
 
-			if (this.columnNames is null ^ this.columns is null)
+			if (this.groupByNames is null ^ this.groupBy is null)
 				throw new ArgumentException("GroupBy and GroupByNames must both be null or not null.", nameof(GroupByNames));
 
-			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
+			if (!(this.groupBy is null) && this.groupBy.Length != this.groupByNames.Length)
 				throw new ArgumentException("GroupBy and GroupByNames must be of equal length.", nameof(GroupByNames));
 
 			this.selectOneObject = this.CalcSelectOneObject();

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Groups
 {
-	/// <summary>
-	/// Enumerator that groups items into groups, and returns aggregated elements.
-	/// </summary>
-	public class GroupEnumerator : IResultSetEnumerator
+    /// <summary>
+    /// Enumerator that groups items into groups, and returns aggregated elements.
+    /// </summary>
+    public class GroupEnumerator : IResultSetEnumerator
 	{
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupNames;

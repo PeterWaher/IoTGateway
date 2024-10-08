@@ -5,13 +5,14 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Assignments;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL
 {
-	/// <summary>
-	/// Executes an UPDATE statement against the object database.
-	/// </summary>
-	public class Update : ScriptNode, IEvaluateAsync
+    /// <summary>
+    /// Executes an UPDATE statement against the object database.
+    /// </summary>
+    public class Update : ScriptNode, IEvaluateAsync
 	{
 		private readonly Assignment[] setOperations;
 		private SourceDefinition source;

@@ -11,13 +11,14 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Profiling;
+using Waher.Script;
 
 namespace Waher.Persistence.XmlLedger
 {
 	/// <summary>
 	/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
 	/// </summary>
-	public class XmlFileLedger : ILedgerProvider
+	public class XmlFileLedger : ILedgerProvider, ILedgerExport
 	{
 		/// <summary>
 		/// http://waher.se/Schema/Export.xsd
@@ -36,6 +37,8 @@ namespace Waher.Persistence.XmlLedger
 		private readonly string transform = null;
 		private readonly int deleteAfterDays;
 		private bool running;
+
+		#region Construction
 
 		/// <summary>
 		/// Simple ledger that records anything that happens in the database to XML files in the program data folder.
@@ -179,6 +182,10 @@ namespace Waher.Persistence.XmlLedger
 			this.output.Flush();
 		}
 
+		#endregion
+
+		#region Persistance
+
 		/// <summary>
 		/// File Name.
 		/// </summary>
@@ -319,24 +326,31 @@ namespace Waher.Persistence.XmlLedger
 			await this.output.WriteStartElementAsync(string.Empty, "LedgerExport", Namespace);
 			await this.output.FlushAsync();
 
-			string FolderName = Path.GetDirectoryName(s);
-			string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-			foreach (string FileName in Files)
+			if (this.deleteAfterDays > 0 && this.deleteAfterDays < int.MaxValue)
 			{
-				if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+				string FolderName = Path.GetDirectoryName(s);
+
+				if (!string.IsNullOrEmpty(FolderName))
 				{
-					try
+					string[] Files = Directory.GetFiles(FolderName, "*.*");
+
+					foreach (string FileName in Files)
 					{
-						File.Delete(FileName);
-					}
-					catch (IOException ex)
-					{
-						Log.Error("Unable to delete file: " + ex.Message, FileName);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex, FileName);
+						if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+						{
+							try
+							{
+								File.Delete(FileName);
+							}
+							catch (IOException ex)
+							{
+								Log.Error("Unable to delete file: " + ex.Message, FileName);
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex, FileName);
+							}
+						}
 					}
 				}
 			}
@@ -360,6 +374,10 @@ namespace Waher.Persistence.XmlLedger
 			this.textOutput?.Flush();
 			this.textOutput = null;
 		}
+
+		#endregion
+
+		#region ILedgerProvider
 
 		/// <summary>
 		/// Called when processing starts.
@@ -884,10 +902,10 @@ namespace Waher.Persistence.XmlLedger
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(ILedgerExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(ILedgerExport Output, string[] CollectionNames)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -896,10 +914,306 @@ namespace Waher.Persistence.XmlLedger
 		/// <param name="Output">Ledger will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
+
+		#endregion
+
+		#region ILedgerExport
+
+		private readonly LinkedList<KeyValuePair<string, object>> blockMetaData = new LinkedList<KeyValuePair<string, object>>();
+		private string currentCollection = null;
+		private string currentBlockId = null;
+		private string currentEntryObjectId = null;
+		private string currentEntryObjectType = null;
+		private EntryType currentEntryType = EntryType.New;
+		private DateTimeOffset currentEntryTimestamp = DateTimeOffset.MinValue;
+		private Dictionary<string, object> currentEntryProperties = null;
+
+		/// <summary>
+		/// Is called when export of ledger is started.
+		/// </summary>
+		/// <returns>If export can continue.</returns>
+		public async Task<bool> StartLedger()
+		{
+			this.currentCollection = null;
+			await this.Start();
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is finished.
+		/// </summary>
+		/// <returns>If export can continue.</returns>
+		public async Task<bool> EndLedger()
+		{
+			await this.Stop();
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when a collection is started.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> StartCollection(string CollectionName)
+		{
+			this.currentCollection = CollectionName;
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when a collection is finished.
+		/// </summary>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> EndCollection()
+		{
+			this.currentCollection = null;
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when a block in a collection is started.
+		/// </summary>
+		/// <param name="BlockID">Block ID</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> StartBlock(string BlockID)
+		{
+			this.currentBlockId = BlockID;
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Reports block meta-data.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> BlockMetaData(string Key, object Value)
+		{
+			this.blockMetaData.AddLast(new KeyValuePair<string, object>(Key, Value));
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when a block in a collection is finished.
+		/// </summary>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> EndBlock()
+		{
+			this.currentBlockId = null;
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		{
+			this.currentEntryObjectId = ObjectId;
+			this.currentEntryObjectType = TypeName;
+			this.currentEntryType = EntryType;
+			this.currentEntryTimestamp = EntryTimestamp;
+
+			if (this.currentEntryProperties is null)
+				this.currentEntryProperties = new Dictionary<string, object>();
+			else
+				this.currentEntryProperties.Clear();
+
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		/// <returns>If export can continue.</returns>
+		public async Task<bool> EndEntry()
+		{
+			if (!this.running)
+				return false;
+
+			await this.semaphore.WaitAsync();
+			try
+			{
+				try
+				{
+					await this.BeforeWrite();
+
+					if (!(this.output is null))
+					{
+						if (!string.IsNullOrEmpty(this.currentBlockId))
+						{
+							await this.output.WriteCommentAsync("Block ID: " + this.currentBlockId);
+							this.currentBlockId = null;
+
+							if (!(this.blockMetaData.First is null))
+							{
+								foreach (KeyValuePair<string, object> P in this.blockMetaData)
+									await this.output.WriteCommentAsync(P.Key + ": " + Expression.ToString(P.Value));
+
+								this.blockMetaData.Clear();
+							}
+						}
+
+						await this.output.WriteStartElementAsync(string.Empty, this.currentEntryType.ToString(), Namespace);
+						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(this.currentEntryTimestamp));
+						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, this.currentCollection);
+						await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, this.currentEntryObjectType);
+						await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, this.currentEntryObjectId);
+
+						foreach (KeyValuePair<string, object> P in this.currentEntryProperties)
+							await ReportProperty(this.output, P.Key, P.Value, Namespace);
+
+						await this.output.WriteEndElementAsync();
+						await this.output.FlushAsync();
+					}
+				}
+				catch (Exception)
+				{
+					try
+					{
+						await this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when the collection has been cleared.
+		/// </summary>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		public async Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
+		{
+			if (!this.running)
+				return false;
+
+			await this.semaphore.WaitAsync();
+			try
+			{
+				try
+				{
+					await this.BeforeWrite();
+
+					if (!(this.output is null))
+					{
+						if (!string.IsNullOrEmpty(this.currentBlockId))
+						{
+							await this.output.WriteCommentAsync("Block ID: " + this.currentBlockId);
+							this.currentBlockId = null;
+						}
+
+						await this.output.WriteStartElementAsync(string.Empty, "Clear", Namespace);
+						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(EntryTimestamp));
+						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, this.currentCollection);
+						await this.output.WriteEndElementAsync();
+						await this.output.FlushAsync();
+					}
+				}
+				catch (Exception)
+				{
+					try
+					{
+						await this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when a property is reported.
+		/// </summary>
+		/// <param name="PropertyName">Property name.</param>
+		/// <param name="PropertyValue">Property value.</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
+		{
+			this.currentEntryProperties[PropertyName] = PropertyValue;
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Is called when an error is reported.
+		/// </summary>
+		/// <param name="Message">Error message.</param>
+		/// <returns>If export can continue.</returns>
+		public async Task<bool> ReportError(string Message)
+		{
+			if (!this.running)
+				return false;
+
+			await this.semaphore.WaitAsync();
+			try
+			{
+				try
+				{
+					await this.BeforeWrite();
+
+					if (!(this.output is null))
+					{
+						await this.output.WriteCommentAsync(Message);
+						await this.output.FlushAsync();
+					}
+				}
+				catch (Exception)
+				{
+					try
+					{
+						await this.DisposeOutput();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Is called when an exception has occurred.
+		/// </summary>
+		/// <param name="Exception">Exception object.</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> ReportException(Exception Exception)
+		{
+			return this.ReportError(Exception.Message);
+		}
+
+		#endregion
+
 	}
 }

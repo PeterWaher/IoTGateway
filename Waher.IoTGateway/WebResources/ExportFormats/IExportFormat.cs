@@ -29,35 +29,40 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Starts export
 		/// </summary>
-		Task Start();
+		/// <returns>If export can continue.</returns>
+		Task<bool> Start();
 
 		/// <summary>
 		/// Ends export
 		/// </summary>
-		Task End();
+		/// <returns>If export can continue.</returns>
+		Task<bool> End();
 
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		Task StartFiles();
+		/// <returns>If export can continue.</returns>
+		Task<bool> StartFiles();
 
 		/// <summary>
 		/// Ends export of files.
 		/// </summary>
-		Task EndFiles();
+		/// <returns>If export can continue.</returns>
+		Task<bool> EndFiles();
 
 		/// <summary>
 		/// Export file.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		Task ExportFile(string FileName, Stream File);
+		/// <returns>If export can continue.</returns>
+		Task<bool> ExportFile(string FileName, Stream File);
 
 		/// <summary>
 		/// If any clients should be updated about export status.
 		/// </summary>
 		/// <param name="ForceUpdate">If updates should be forced.</param>
-		Task UpdateClient(bool ForceUpdate);
-
+		/// <returns>If export can continue.</returns>
+		Task<bool> UpdateClient(bool ForceUpdate);
 	}
 }

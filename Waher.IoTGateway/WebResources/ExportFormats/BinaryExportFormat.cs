@@ -253,17 +253,18 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Starts export
 		/// </summary>
-		public override Task Start()
+		public override Task<bool> Start()
 		{
 			this.w.Write((byte)1); // Version.
 			this.w.Write(Preamble);
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Ends export
 		/// </summary>
-		public override Task End()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> End()
 		{
 			if (!(this.errors is null))
 			{
@@ -288,9 +289,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			}
 
 			this.w.Write((byte)0);
-			this.UpdateClient(true);
-
-			return Task.CompletedTask;
+			return this.UpdateClient(true);
 		}
 
 		private Task OutputException(Exception Exception)
@@ -314,16 +313,16 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public override Task StartDatabase()
+		public override Task<bool> StartDatabase()
 		{
 			this.w.Write((byte)2); // Database
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public override Task EndDatabase()
+		public override Task<bool> EndDatabase()
 		{
 			this.w.Write(string.Empty);
 			return this.UpdateClient(false);
@@ -332,16 +331,18 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
-		public override Task StartLedger()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartLedger()
 		{
 			this.w.Write((byte)6); // Ledger
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of ledger is finished.
 		/// </summary>
-		public override Task EndLedger()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndLedger()
 		{
 			this.w.Write(string.Empty);
 			return this.UpdateClient(false);
@@ -351,45 +352,49 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// Is called when a collection is started.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection</param>
-		public override Task StartCollection(string CollectionName)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartCollection(string CollectionName)
 		{
 			if (this.exportCollection = this.ExportCollection(CollectionName))
 				this.w.Write(CollectionName);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a collection is finished.
 		/// </summary>
-		public override Task EndCollection()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndCollection()
 		{
 			if (this.exportCollection)
 				this.w.Write((byte)0);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an index in a collection is started.
 		/// </summary>
-		public override Task StartIndex()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartIndex()
 		{
 			if (this.exportCollection)
 				this.w.Write((byte)1);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an index in a collection is finished.
 		/// </summary>
-		public override Task EndIndex()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndIndex()
 		{
 			if (this.exportCollection)
 				this.w.Write(string.Empty);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -397,7 +402,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="FieldName">Name of field.</param>
 		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
-		public override Task ReportIndexField(string FieldName, bool Ascending)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> ReportIndexField(string FieldName, bool Ascending)
 		{
 			if (this.exportCollection)
 			{
@@ -405,14 +411,15 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(Ascending);
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a block in a collection is started.
 		/// </summary>
 		/// <param name="BlockID">Block ID</param>
-		public override Task StartBlock(string BlockID)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartBlock(string BlockID)
 		{
 			if (this.exportCollection)
 			{
@@ -420,18 +427,19 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(BlockID);
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a block in a collection is finished.
 		/// </summary>
-		public override Task EndBlock()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndBlock()
 		{
 			if (this.exportCollection)
 				this.w.Write((byte)3);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -439,7 +447,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="Key">Meta-data key.</param>
 		/// <param name="Value">Meta-data value.</param>
-		public override async Task BlockMetaData(string Key, object Value)
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> BlockMetaData(string Key, object Value)
 		{
 			if (this.exportCollection)
 			{
@@ -447,6 +456,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(Key);
 				await this.ReportProperty(null, Value);
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -454,6 +465,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
+		/// <returns>Object ID of object, after optional mapping. null means export cannot continue</returns>
 		public override Task<string> StartObject(string ObjectId, string TypeName)
 		{
 			if (this.exportCollection)
@@ -469,7 +481,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when an object is finished.
 		/// </summary>
-		public override Task EndObject()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndObject()
 		{
 			if (this.exportCollection)
 			{
@@ -487,8 +500,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="TypeName">Type name of object.</param>
 		/// <param name="EntryType">Type of entry</param>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		/// <returns>Object ID of object, after optional mapping.</returns>
-		public override Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			if (this.exportCollection)
 			{
@@ -505,13 +518,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.w.Write(TS.Ticks);
 			}
 
-			return Task.FromResult(ObjectId);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
-		public override Task EndEntry()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndEntry()
 		{
 			if (this.exportCollection)
 			{
@@ -527,7 +541,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="PropertyName">Property name.</param>
 		/// <param name="PropertyValue">Property value.</param>
-		public override Task ReportProperty(string PropertyName, object PropertyValue)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
 			if (this.exportCollection)
 			{
@@ -741,14 +756,15 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				}
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an error is reported.
 		/// </summary>
 		/// <param name="Message">Error message.</param>
-		public override Task ReportError(string Message)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> ReportError(string Message)
 		{
 			if (!string.IsNullOrEmpty(Message))
 			{
@@ -758,39 +774,42 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.errors.AddLast(Message);
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an exception has occurred.
 		/// </summary>
 		/// <param name="Exception">Exception object.</param>
-		public override Task ReportException(Exception Exception)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> ReportException(Exception Exception)
 		{
 			if (this.exceptions is null)
 				this.exceptions = new LinkedList<Exception>();
 
 			this.exceptions.AddLast(Exception);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		public override Task StartFiles()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartFiles()
 		{
 			this.w.Write((byte)3); // Files
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Ends export of files.
 		/// </summary>
-		public override Task EndFiles()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> EndFiles()
 		{
 			this.w.Write(string.Empty);
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -798,13 +817,16 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		public override Task ExportFile(string FileName, Stream File)
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> ExportFile(string FileName, Stream File)
 		{
 			this.w.Write(FileName);
 			this.w.Write(File.Length);
 			this.w.Flush();
 
-			return File.CopyToAsync(this.output);
+			await File.CopyToAsync(this.output);
+
+			return true;
 		}
 
 	}

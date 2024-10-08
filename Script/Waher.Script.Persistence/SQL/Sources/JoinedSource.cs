@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Abstract base classes of joined sources.
-	/// </summary>
-	public abstract class JoinedSource : IDataSource
+    /// <summary>
+    /// Abstract base classes of joined sources.
+    /// </summary>
+    public abstract class JoinedSource : IDataSource
 	{
 		private readonly IDataSource left;
 		private readonly IDataSource right;

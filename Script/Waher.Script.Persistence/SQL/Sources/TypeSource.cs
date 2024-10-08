@@ -10,13 +10,14 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data Source defined by a type definition
-	/// </summary>
-	public class TypeSource : IDataSource
+    /// <summary>
+    /// Data Source defined by a type definition
+    /// </summary>
+    public class TypeSource : IDataSource
 	{
 		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
 		private readonly Type type;

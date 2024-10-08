@@ -11,13 +11,14 @@ using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Order;
 using Waher.Script.Persistence.Functions;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data Source defined by a vector.
-	/// </summary>
-	public class VectorSource : IDataSource
+    /// <summary>
+    /// Data Source defined by a vector.
+    /// </summary>
+    public class VectorSource : IDataSource
 	{
 		private readonly Dictionary<Type, bool> types = new Dictionary<Type, bool>();
 		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();

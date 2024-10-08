@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Persistence;
-using Waher.Persistence.XmlLedger;
 using Waher.Security;
 
 namespace Waher.IoTGateway.Setup
@@ -141,88 +140,98 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Starts export
 		/// </summary>
-		public virtual Task Start()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> Start()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Ends export
 		/// </summary>
-		public virtual Task End()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> End()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public virtual Task StartDatabase()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartDatabase()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public virtual Task EndDatabase()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndDatabase()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
-		public virtual Task StartLedger()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartLedger()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when export of ledger is finished.
 		/// </summary>
-		public virtual Task EndLedger()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndLedger()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a collection is started.
 		/// </summary>
 		/// <param name="CollectionName"></param>
-		public virtual Task StartCollection(string CollectionName)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartCollection(string CollectionName)
 		{
 			this.collectionName = CollectionName;
 			this.nrCollections++;
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a collection is finished.
 		/// </summary>
-		public virtual Task EndCollection()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndCollection()
 		{
 			this.collectionName = null;
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an index in a collection is started.
 		/// </summary>
-		public virtual Task StartIndex()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartIndex()
 		{
 			this.index.Clear();
 			this.nrIndices++;
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an index in a collection is finished.
 		/// </summary>
-		public virtual Task EndIndex()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndIndex()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -230,32 +239,35 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="FieldName">Name of field.</param>
 		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
-		public virtual Task ReportIndexField(string FieldName, bool Ascending)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> ReportIndexField(string FieldName, bool Ascending)
 		{
 			if (Ascending)
 				this.index.Add(FieldName);
 			else
 				this.index.Add("-" + FieldName);
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a block in a collection is started.
 		/// </summary>
 		/// <param name="BlockID">Block ID</param>
-		public virtual Task StartBlock(string BlockID)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartBlock(string BlockID)
 		{
 			this.nrBlocks++;
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a block in a collection is finished.
 		/// </summary>
-		public virtual Task EndBlock()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndBlock()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -263,9 +275,10 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Key">Meta-data key.</param>
 		/// <param name="Value">Meta-data value.</param>
-		public virtual Task BlockMetaData(string Key, object Value)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> BlockMetaData(string Key, object Value)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -273,6 +286,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
+		/// <returns>Object ID of object, after optional mapping. null means export cannot continue</returns>
 		public virtual Task<string> StartObject(string ObjectId, string TypeName)
 		{
 			this.objectId = this.MapObjectId(ObjectId);
@@ -349,12 +363,13 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called when an object is finished.
 		/// </summary>
-		public virtual Task EndObject()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndObject()
 		{
 			this.objectId = null;
 			this.typeName = null;
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -364,35 +379,38 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="TypeName">Type name of object.</param>
 		/// <param name="EntryType">Type of entry</param>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		/// <returns>Object ID of object, after optional mapping.</returns>
-		public virtual Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			this.objectId = this.MapObjectId(ObjectId);
 			this.typeName = TypeName;
 			this.nrEntries++;
 
-			return Task.FromResult(ObjectId);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
-		public virtual Task EndEntry()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndEntry()
 		{
 			this.objectId = null;
 			this.typeName = null;
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when a collection has been cleared.
 		/// </summary>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		public virtual async Task CollectionCleared(DateTimeOffset EntryTimestamp)
+		/// <returns>If export can continue.</returns>
+		public virtual async Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp);
-			await this.EndEntry();
+			return
+				await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp) &&
+				await this.EndEntry();
 		}
 
 		/// <summary>
@@ -400,26 +418,29 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="PropertyName">Property name.</param>
 		/// <param name="PropertyValue">Property value.</param>
-		public virtual Task ReportProperty(string PropertyName, object PropertyValue)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
 			this.nrProperties++;
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		public virtual Task StartFiles()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> StartFiles()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Ends export of files.
 		/// </summary>
-		public virtual Task EndFiles()
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> EndFiles()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -427,39 +448,43 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		public virtual Task ExportFile(string FileName, Stream File)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> ExportFile(string FileName, Stream File)
 		{
 			this.nrFiles++;
 			this.nrFileBytes += File.Length;
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an error is reported.
 		/// </summary>
 		/// <param name="Message">Error message.</param>
-		public virtual Task ReportError(string Message)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> ReportError(string Message)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an exception has occurred.
 		/// </summary>
 		/// <param name="Exception">Exception object.</param>
-		public virtual Task ReportException(Exception Exception)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> ReportException(Exception Exception)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// If any clients should be updated about export status.
 		/// </summary>
 		/// <param name="ForceUpdate">If updates should be forced.</param>
-		public virtual Task UpdateClient(bool ForceUpdate)
+		/// <returns>If export can continue.</returns>
+		public virtual Task<bool> UpdateClient(bool ForceUpdate)
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 	}
 }

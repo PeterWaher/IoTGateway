@@ -3180,6 +3180,69 @@ new objects
 }]
 ```
 
+#### REPLAY
+
+`REPLAY` statements can be executed against the ledger to extract entries matching certain
+search criteria. By default, events matching the criteria will be output in the order they 
+appear in the collections provided. You can direct the results to a given destination, which
+can be a file name (in case the export with be an XML file) or an object instance 
+implementing the `Waher.Persistence.Serialization.ILedgerExport` interface.
+
+Syntax:
+
+```
+REPLAY [TOP maxcount]
+	* |
+	column1 [[as ]name1][, column2 [[as ]name2][, ...]]
+FROM
+	source1[ as sourcename1][, source2[ as sourcename2][, ...]]
+[WHERE
+	conditions]
+[OFFSET
+	offset]
+[TO
+	destination]
+```
+
+Example:
+
+```
+replay
+	EventId,
+	Level,
+	Message
+from
+	PersistedEvent
+where 
+	Type="Error" 
+```
+
+**Note**: The Ledger does not have indices as the object database does. Replaying events
+from the ledger often replay all encrypted blocks in entire collections, which may be time, 
+memory and compute intensive operations.
+
+##### Ledger event variables
+
+When writing `REPLAY` conditions, you can refer to object properties using variable references.
+There are also a set of predefined event propertyy names you can use to create conditions including
+event property values. If you need to check object properties with the same names as these event
+property names, you can use `this` to refer to the object referenced by the event. For instance,
+`Timestamp` would refer to the `Timestamp` property of the event, not a `Timestamp` property on
+the associated object. Referring to `this.Timestamp` would access the `Timestamp` property on the
+associated object.
+
+Event properties available in `REPLAY` conditions:
+
+| Event Property | Description                                                   |
+|:---------------|:--------------------------------------------------------------|
+| `Collection`   | Collection containg the block that contains the event.        |
+| `BlockId`      | Block ID containing the event.                                |
+| `ObjectId`     | Object ID of the associated object.                           |
+| `TypeName`     | Type name of the associated object.                           |
+| `EntryType`    | An enumeration of type `Waher.Persistence.EntryType`, that can take the values `New`, `Update` or `Delete`. (`Clear` is also a value, but not an option in conditional statements, as it is not used in association with objects. |
+| `Timestamp`    | The timestamp of the event.                                   |
+| `this`         | A reference to the recorded object associated with the event. |
+
 ### XML
 
 The `Waher.Script.Xml` library extends the script engine to understand XML embedded in the script.

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL
 {
-	/// <summary>
-	/// Interface for data sources that can be used in SQL statements.
-	/// </summary>
-	public interface IDataSource
+    /// <summary>
+    /// Interface for data sources that can be used in SQL statements.
+    /// </summary>
+    public interface IDataSource
 	{
 		/// <summary>
 		/// Finds objects matching filter conditions in <paramref name="Where"/>.

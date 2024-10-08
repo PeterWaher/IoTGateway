@@ -2,13 +2,14 @@
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data source formed through an INNER JOIN of two sources.
-	/// </summary>
-	public class InnerJoinedSource : JoinedSource
+    /// <summary>
+    /// Data source formed through an INNER JOIN of two sources.
+    /// </summary>
+    public class InnerJoinedSource : JoinedSource
 	{
 		/// <summary>
 		/// Data source formed through an INNER JOIN of two sources.

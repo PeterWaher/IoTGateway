@@ -503,17 +503,18 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
-		private static async Task ExportFile(string FileName, IExportFormat Output)
+		private static async Task<bool> ExportFile(string FileName, IExportFormat Output)
 		{
 			using (FileStream fs = File.OpenRead(FileName))
 			{
 				if (FileName.StartsWith(Gateway.AppDataFolder))
 					FileName = FileName.Substring(Gateway.AppDataFolder.Length);
 
-				await Output.ExportFile(FileName, fs);
+				if (!await Output.ExportFile(FileName, fs))
+					return false;
 			}
 
-			await Output.UpdateClient(false);
+			return await Output.UpdateClient(false);
 		}
 
 		private static Task UploadBackupFile(string LocalFileName, string FullFileName, bool IsKey, ProfilerThread Thread)

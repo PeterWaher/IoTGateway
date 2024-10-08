@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
 using Waher.Script.Persistence.SQL.Sources;
@@ -123,6 +126,66 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 					if (!(T is null))
 						return new TypeSource(T, Alias);
+				}
+				else
+				{
+					List<KeyValuePair<string, object>> TypesWithCollectionNames = null;
+					Type TypeWithCollection = null;
+					bool CollectionUnique = true;
+
+					foreach (string QualifiedName in QualifiedNames)
+					{
+						Type T = Types.GetType(QualifiedName);
+						if (T is null)
+							continue;
+
+						TypeInfo TI = T.GetTypeInfo();
+						int Nr = 1;
+
+						if (!(TI.GetCustomAttribute<CollectionNameAttribute>() is null))
+						{
+							if (TypeWithCollection is null)
+								TypeWithCollection = T;
+							else
+							{
+								CollectionUnique = false;
+
+								if (TypesWithCollectionNames is null)
+								{
+									TypesWithCollectionNames = new List<KeyValuePair<string, object>>
+									{
+										new KeyValuePair<string, object>("Type " + Nr.ToString(), TypeWithCollection.FullName)
+									};
+
+									Nr++;
+								}
+
+								TypesWithCollectionNames.Add(new KeyValuePair<string, object>(Nr.ToString(), T.FullName));
+								Nr++;
+							}
+						}
+					}
+
+					if (TypeWithCollection is null)
+					{
+						Log.Warning("A collection was referenced using a relative type name. The type does not have a collection name defined. To avoid confusion, reference the collection name as a string constant instead of a variable reference.",
+							Name, string.Empty, "DBOpt");
+					}
+					else
+					{
+						if (CollectionUnique)
+						{
+							Log.Warning("A collection was referenced using a relative type name. Multiple types are available with the same relative type name, but only one had a collection name defined for it. Using this type. Use fully.qualified type names to avoid confusion.",
+								Name, TypeWithCollection.FullName, "DBOpt");
+
+							return new TypeSource(TypeWithCollection, Alias);
+						}
+						else
+						{
+							Log.Error("A collection was referenced using a relative type name. Multiple types are available with the same relative type name and with collection names. Use fully.qualified type names to avoid confusion.",
+								Name, string.Empty, "DBOpt", TypesWithCollectionNames.ToArray());
+						}
+					}
 				}
 			}
 

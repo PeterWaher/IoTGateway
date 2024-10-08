@@ -96,78 +96,92 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Starts export
 		/// </summary>
-		public abstract Task Start();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> Start();
 
 		/// <summary>
 		/// Ends export
 		/// </summary>
-		public abstract Task End();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> End();
 
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public abstract Task StartDatabase();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartDatabase();
 
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public abstract Task EndDatabase();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndDatabase();
 
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
-		public abstract Task StartLedger();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartLedger();
 
 		/// <summary>
 		/// Is called when export of ledger is finished.
 		/// </summary>
-		public abstract Task EndLedger();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndLedger();
 
 		/// <summary>
 		/// Is called when a collection is started.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection</param>
-		public abstract Task StartCollection(string CollectionName);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartCollection(string CollectionName);
 
 		/// <summary>
 		/// Is called when a collection is finished.
 		/// </summary>
-		public abstract Task EndCollection();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndCollection();
 
 		/// <summary>
 		/// Is called when an index in a collection is started.
 		/// </summary>
-		public abstract Task StartIndex();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartIndex();
 
 		/// <summary>
 		/// Is called when an index in a collection is finished.
 		/// </summary>
-		public abstract Task EndIndex();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndIndex();
 
 		/// <summary>
 		/// Is called when a field in an index is reported.
 		/// </summary>
 		/// <param name="FieldName">Name of field.</param>
 		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
-		public abstract Task ReportIndexField(string FieldName, bool Ascending);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> ReportIndexField(string FieldName, bool Ascending);
 
 		/// <summary>
 		/// Is called when a block in a collection is started.
 		/// </summary>
 		/// <param name="BlockID">Block ID</param>
-		public abstract Task StartBlock(string BlockID);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartBlock(string BlockID);
 
 		/// <summary>
 		/// Is called when a block in a collection is finished.
 		/// </summary>
-		public abstract Task EndBlock();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndBlock();
 
 		/// <summary>
 		/// Reports block meta-data.
 		/// </summary>
 		/// <param name="Key">Meta-data key.</param>
 		/// <param name="Value">Meta-data value.</param>
-		public abstract Task BlockMetaData(string Key, object Value);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> BlockMetaData(string Key, object Value);
 
 		/// <summary>
 		/// Is called when an entry is started.
@@ -176,22 +190,25 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="TypeName">Type name of object.</param>
 		/// <param name="EntryType">Type of entry</param>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		/// <returns>Object ID of object, after optional mapping.</returns>
-		public abstract Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp);
 
 		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
-		public abstract Task EndEntry();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndEntry();
 
 		/// <summary>
 		/// Is called when a collection has been cleared.
 		/// </summary>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		public virtual async Task CollectionCleared(DateTimeOffset EntryTimestamp)
+		/// <returns>If export can continue.</returns>
+		public virtual async Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp);
-			await this.EndEntry();
+			return
+				await this.StartEntry(string.Empty, string.Empty, EntryType.Clear, EntryTimestamp) &&
+				await this.EndEntry();
 		}
 
 		/// <summary>
@@ -199,54 +216,63 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
+		/// <returns>Object ID of object, after optional mapping. null means export cannot continue</returns>
 		public abstract Task<string> StartObject(string ObjectId, string TypeName);
 
 		/// <summary>
 		/// Is called when an object is finished.
 		/// </summary>
-		public abstract Task EndObject();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndObject();
 
 		/// <summary>
 		/// Is called when a property is reported.
 		/// </summary>
 		/// <param name="PropertyName">Property name.</param>
 		/// <param name="PropertyValue">Property value.</param>
-		public abstract Task ReportProperty(string PropertyName, object PropertyValue);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> ReportProperty(string PropertyName, object PropertyValue);
 
 		/// <summary>
 		/// Is called when an error is reported.
 		/// </summary>
 		/// <param name="Message">Error message.</param>
-		public abstract Task ReportError(string Message);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> ReportError(string Message);
 
 		/// <summary>
 		/// Is called when an exception has occurred.
 		/// </summary>
 		/// <param name="Exception">Exception object.</param>
-		public abstract Task ReportException(Exception Exception);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> ReportException(Exception Exception);
 
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		public abstract Task StartFiles();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> StartFiles();
 
 		/// <summary>
 		/// Ends export of files.
 		/// </summary>
-		public abstract Task EndFiles();
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> EndFiles();
 
 		/// <summary>
 		/// Export file.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		public abstract Task ExportFile(string FileName, Stream File);
+		/// <returns>If export can continue.</returns>
+		public abstract Task<bool> ExportFile(string FileName, Stream File);
 
 		/// <summary>
 		/// If any clients should be updated about export status.
 		/// </summary>
 		/// <param name="ForceUpdate">If updates should be forced.</param>
-		public Task UpdateClient(bool ForceUpdate)
+		/// <returns>If export can continue.</returns>
+		public Task<bool> UpdateClient(bool ForceUpdate)
 		{
 			DateTime TP = DateTime.Now;
 
@@ -256,7 +282,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				UpdateClientsFileUpdated(this.fileName, this.fs.Length, this.created);
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -274,7 +300,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			sb.Append("\", \"size\": \"");
 			if (Length >= 0)
 				sb.Append(CommonTypes.JsonStringEncode(Export.FormatBytes(Length)));
-            sb.Append("\", \"created\": \"");
+			sb.Append("\", \"created\": \"");
 			sb.Append(CommonTypes.JsonStringEncode(Created.ToString()));
 			sb.Append("\", \"button\": \"");
 			sb.Append(CommonTypes.JsonStringEncode("<button class=\"negButtonSm\" onclick=\"DeleteExport('" + FileName + "');\">Delete</button>"));

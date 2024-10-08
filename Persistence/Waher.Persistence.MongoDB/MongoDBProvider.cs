@@ -10,6 +10,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB.Serialization;
 using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
@@ -1656,8 +1657,8 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			return this.Export(Output, CollectionNames, null);
 		}
@@ -1668,11 +1669,14 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public async Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
+			bool Continue;
+
 			Thread?.Start();
-			await Output.StartDatabase();
+			if (!await Output.StartDatabase())
+				return false;
 			try
 			{
 				IDatabaseExportFilter Filter = Output as IDatabaseExportFilter;
@@ -1694,25 +1698,31 @@ namespace Waher.Persistence.MongoDB
 
 					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
 
-					await Output.StartCollection(CollectionName);
+					if (!await Output.StartCollection(CollectionName))
+						return false;
 					try
 					{
 						foreach (BsonDocument Index in (await Collection.Indexes.ListAsync()).ToEnumerable())
 						{
-							await Output.StartIndex();
+							if (!await Output.StartIndex())
+								return false;
 
 							foreach (BsonElement E in Index.Elements)
 							{
 								if (E.Name == "key")
 								{
 									foreach (BsonElement E2 in E.Value.AsBsonDocument.Elements)
-										await Output.ReportIndexField(E2.Name, E2.Value.AsInt32 > 0);
+									{
+										if (!await Output.ReportIndexField(E2.Name, E2.Value.AsInt32 > 0))
+											return false;
+									}
 
 									break;
 								}
 							}
 
-							await Output.EndIndex();
+							if (!await Output.EndIndex())
+								return false;
 						}
 
 						foreach (BsonDocument Doc in (await Collection.FindAsync<BsonDocument>(Builders<BsonDocument>.Filter.Empty)).ToEnumerable())
@@ -1727,68 +1737,93 @@ namespace Waher.Persistence.MongoDB
 								if (!(Filter is null) && !Filter.CanExportObject(Obj))
 									continue;
 
-								await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+								if (await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName) is null)
+									return false;
 								try
 								{
 									foreach (KeyValuePair<string, object> P in Obj)
 									{
 										if (P.Value is ObjectId ObjectId)
-											await Output.ReportProperty(P.Key, GeneratedObjectSerializerBase.ObjectIdToGuid(ObjectId));
+										{
+											if (!await Output.ReportProperty(P.Key, GeneratedObjectSerializerBase.ObjectIdToGuid(ObjectId)))
+												return false;
+										}
 										else
-											await Output.ReportProperty(P.Key, P.Value);
+										{
+											if (!await Output.ReportProperty(P.Key, P.Value))
+												return false;
+										}
 									}
 								}
 								catch (Exception ex)
 								{
 									Thread?.Exception(ex);
-									this.ReportException(ex, Output);
+									if (!await this.ReportException(ex, Output))
+										return false;
 								}
 								finally
 								{
-									await Output.EndObject();
+									Continue = await Output.EndObject();
 								}
+
+								if (!Continue)
+									return false;
 							}
 							else if (!(Object is null))
-								await Output.ReportError("Unable to load object " + Doc["_id"].AsString + ".");
+							{
+								if (!await Output.ReportError("Unable to load object " + Doc["_id"].AsString + "."))
+									return false;
+							}
 						}
 					}
 					catch (Exception ex)
 					{
 						Thread?.Exception(ex);
-						this.ReportException(ex, Output);
+						if (!await this.ReportException(ex, Output))
+							return false;
 					}
 					finally
 					{
-						await Output.EndCollection();
+						Continue = await Output.EndCollection();
 					}
+
+					if (!Continue)
+						return false;
 				}
 			}
 			catch (Exception ex)
 			{
 				Thread?.Exception(ex);
-				this.ReportException(ex, Output);
+				if (!await this.ReportException(ex, Output))
+					return false;
 			}
 			finally
 			{
-				await Output.EndDatabase();
+				Continue = await Output.EndDatabase();
 				Thread?.Idle();
 				Thread?.Stop();
 			}
+
+			return Continue;
 		}
 
-		private void ReportException(Exception ex, IDatabaseExport Output)
+		private async Task<bool> ReportException(Exception ex, IDatabaseExport Output)
 		{
-			ex = Events.Log.UnnestException(ex);
+			ex = Log.UnnestException(ex);
 
 			if (ex is AggregateException ex2)
 			{
 				foreach (Exception ex3 in ex2.InnerExceptions)
-					Output.ReportException(ex3);
+				{
+					if (!await Output.ReportException(ex3))
+						return false;
+				}
+
+				return true;
 			}
 			else
-				Output.ReportException(ex);
+				return await Output.ReportException(ex);
 		}
-
 
 		/// <summary>
 		/// Performs an iteration of contents of the entire database.

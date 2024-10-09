@@ -93,7 +93,7 @@ namespace Waher.Utility.Extract.ExportFormats
 			return Task.CompletedTask;
 		}
 
-		public async Task StartDatabase()
+		public async Task<bool> StartDatabase()
 		{
 			ConsoleOut.WriteLine("Processing database section.");
 
@@ -108,9 +108,11 @@ namespace Waher.Utility.Extract.ExportFormats
 			}
 			else
 				this.output = null;
+
+			return true;
 		}
 
-		public async Task EndDatabase()
+		public async Task<bool> EndDatabase()
 		{
 			if (this.output is not null)
 			{
@@ -122,9 +124,11 @@ namespace Waher.Utility.Extract.ExportFormats
 				this.output.Dispose();
 				this.output = null;
 			}
+
+			return true;
 		}
 
-		public async Task StartLedger()
+		public async Task<bool> StartLedger()
 		{
 			ConsoleOut.WriteLine("Processing ledger section.");
 
@@ -139,9 +143,11 @@ namespace Waher.Utility.Extract.ExportFormats
 			}
 			else
 				this.output = null;
+
+			return true;
 		}
 
-		public async Task EndLedger()
+		public async Task<bool> EndLedger()
 		{
 			if (this.output is not null)
 			{
@@ -153,9 +159,11 @@ namespace Waher.Utility.Extract.ExportFormats
 				this.output.Dispose();
 				this.output = null;
 			}
+
+			return true;
 		}
 
-		public async Task StartCollection(string CollectionName)
+		public async Task<bool> StartCollection(string CollectionName)
 		{
 			ConsoleOut.WriteLine(CollectionName + "...");
 
@@ -167,28 +175,36 @@ namespace Waher.Utility.Extract.ExportFormats
 				await this.output.WriteStartElementAsync(string.Empty, "Collection", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "name", string.Empty, CollectionName);
 			}
+
+			return true;
 		}
 
-		public async Task EndCollection()
+		public async Task<bool> EndCollection()
 		{
 			this.inCollection = false;
 			if (this.exportCollection)
 				await this.output.WriteEndElementAsync();
+
+			return true;
 		}
 
-		public async Task StartIndex()
+		public async Task<bool> StartIndex()
 		{
 			if (this.exportCollection)
 				await this.output.WriteStartElementAsync(string.Empty, "Index", XmlFileLedger.Namespace);
+
+			return true;
 		}
 
-		public async Task EndIndex()
+		public async Task<bool> EndIndex()
 		{
 			if (this.exportCollection)
 				await this.output.WriteEndElementAsync();
+
+			return true;
 		}
 
-		public async Task ReportIndexField(string FieldName, bool Ascending)
+		public async Task<bool> ReportIndexField(string FieldName, bool Ascending)
 		{
 			if (this.exportCollection)
 			{
@@ -197,18 +213,22 @@ namespace Waher.Utility.Extract.ExportFormats
 				await this.output.WriteAttributeStringAsync(string.Empty, "ascending", string.Empty, CommonTypes.Encode(Ascending));
 				await this.output.WriteEndElementAsync();
 			}
+
+			return true;
 		}
 
-		public async Task StartBlock(string BlockID)
+		public async Task<bool> StartBlock(string BlockID)
 		{
 			if (this.exportCollection)
 			{
 				await this.output.WriteStartElementAsync(string.Empty, "Block", XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, BlockID);
 			}
+
+			return true;
 		}
 
-		public async Task EndBlock()
+		public async Task<bool> EndBlock()
 		{
 			if (this.exportCollection)
 			{
@@ -220,9 +240,11 @@ namespace Waher.Utility.Extract.ExportFormats
 
 				await this.output.WriteEndElementAsync();
 			}
+
+			return true;
 		}
 
-		public async Task BlockMetaData(string Key, object Value)
+		public async Task<bool> BlockMetaData(string Key, object Value)
 		{
 			if (this.exportCollection)
 			{
@@ -234,6 +256,8 @@ namespace Waher.Utility.Extract.ExportFormats
 
 				await this.ReportProperty(Key, Value);
 			}
+
+			return true;
 		}
 
 		public async Task<string> StartObject(string ObjectId, string TypeName)
@@ -248,13 +272,15 @@ namespace Waher.Utility.Extract.ExportFormats
 			return ObjectId;
 		}
 
-		public async Task EndObject()
+		public async Task<bool> EndObject()
 		{
 			if (this.exportCollection)
 				await this.output.WriteEndElementAsync();
+
+			return true;
 		}
 
-		public async Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		public async Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			if (this.exportCollection)
 			{
@@ -270,20 +296,22 @@ namespace Waher.Utility.Extract.ExportFormats
 				await this.output.WriteAttributeStringAsync(string.Empty, "ts", string.Empty, XML.Encode(EntryTimestamp));
 			}
 
-			return ObjectId;
+			return true;
 		}
 
-		public async Task EndEntry()
+		public async Task<bool> EndEntry()
 		{
 			if (this.exportCollection)
 				await this.output.WriteEndElementAsync();
+
+			return true;
 		}
 
 		/// <summary>
 		/// Is called when a collection has been cleared.
 		/// </summary>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		public async Task CollectionCleared(DateTimeOffset EntryTimestamp)
+		public async Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
 			if (this.exportCollection)
 			{
@@ -296,23 +324,27 @@ namespace Waher.Utility.Extract.ExportFormats
 				await this.output.WriteStartElementAsync(string.Empty, nameof(EntryType.Clear), XmlFileLedger.Namespace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "ts", string.Empty, XML.Encode(EntryTimestamp));
 			}
+
+			return true;
 		}
 
-		public Task ReportProperty(string PropertyName, object PropertyValue)
+		public async Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
 			if (this.exportCollection)
-				return XmlFileLedger.ReportProperty(this.output, PropertyName, PropertyValue, XmlFileLedger.Namespace);
-			else
-				return Task.CompletedTask;
+				await XmlFileLedger.ReportProperty(this.output, PropertyName, PropertyValue, XmlFileLedger.Namespace);
+			
+			return true;
 		}
 
-		public async Task ReportError(string Message)
+		public async Task<bool> ReportError(string Message)
 		{
 			if (!this.inCollection || this.exportCollection)
 				await this.output.WriteElementStringAsync(string.Empty, "Error", XmlFileLedger.Namespace, Message);
+
+			return true;
 		}
 
-		public async Task ReportException(Exception Exception)
+		public async Task<bool> ReportException(Exception Exception)
 		{
 			if (!this.inCollection || this.exportCollection)
 			{
@@ -330,9 +362,11 @@ namespace Waher.Utility.Extract.ExportFormats
 
 				await this.output.WriteEndElementAsync();
 			}
+
+			return true;
 		}
 
-		public Task StartFiles()
+		public Task<bool> StartFiles()
 		{
 			ConsoleOut.WriteLine("Processing files section.");
 
@@ -342,15 +376,15 @@ namespace Waher.Utility.Extract.ExportFormats
 					Directory.CreateDirectory(this.filesFolder);
 			}
 
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
-		public Task EndFiles()
+		public Task<bool> EndFiles()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 
-		public async Task ExportFile(string FileName, Stream File)
+		public async Task<bool> ExportFile(string FileName, Stream File)
 		{
 			if (Path.IsPathRooted(FileName))
 				throw new Exception("Absolute path names not allowed: " + FileName);
@@ -366,6 +400,8 @@ namespace Waher.Utility.Extract.ExportFormats
 
 			File.Position = 0;
 			await File.CopyToAsync(fs);
+
+			return true;
 		}
 
 		public ICryptoTransform CreateDecryptor(byte[] Key, byte[] IV)

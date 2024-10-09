@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Persistence.Filters
+﻿namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// This filter selects objects that have a named field equal to a given value.

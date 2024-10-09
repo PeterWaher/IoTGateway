@@ -3,12 +3,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Events;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Profiling;
@@ -18,7 +18,7 @@ using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.Analytic;
+using Waher.Script.Functions.ComplexNumbers;
 
 namespace Waher.Persistence.Files
 {
@@ -2248,6 +2248,116 @@ namespace Waher.Persistence.Files
 			{
 				await File.EndRead();
 			}
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, SortOrder);
+			return new Page<T>(PageSize, null, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, null, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, SortOrder);
+			return new Page<object>(PageSize, Collection, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<object>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class
+		{
+			if (Page is Page<T> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
+		}
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<object>> FindNext(IPage<object> Page)
+		{
+			if (Page is Page<object> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
 		}
 
 		/// <summary>

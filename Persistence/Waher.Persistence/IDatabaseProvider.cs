@@ -127,6 +127,79 @@ namespace Waher.Persistence
 			where T : class;
 
 		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class;
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class;
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder);
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder);
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class;
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class;
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		Task<IPage<object>> FindNext(IPage<object> Page);
+
+		/// <summary>
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>

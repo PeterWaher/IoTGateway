@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;

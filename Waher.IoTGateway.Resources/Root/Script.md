@@ -3231,23 +3231,33 @@ memory and compute intensive operations.
 
 When writing `REPLAY` conditions, you can refer to object properties using variable references.
 There are also a set of predefined event propertyy names you can use to create conditions including
-event property values. If you need to check object properties with the same names as these event
-property names, you can use `this` to refer to the object referenced by the event. For instance,
+event property values. You can also access block and collection information. Block information
+depends on the ledger registered. Some variables are available for all ledgers, others are
+ledger-specific. If you need to check object properties with the same names as these event or
+block property names, you can use `this` to refer to the object referenced by the event. For instance,
 `Timestamp` would refer to the `Timestamp` property of the event, not a `Timestamp` property on
 the associated object. Referring to `this.Timestamp` would access the `Timestamp` property on the
 associated object.
 
 Event properties available in `REPLAY` conditions:
 
-| Event Property | Description                                                   |
-|:---------------|:--------------------------------------------------------------|
-| `Collection`   | Collection containg the block that contains the event.        |
-| `BlockId`      | Block ID containing the event.                                |
-| `ObjectId`     | Object ID of the associated object.                           |
-| `TypeName`     | Type name of the associated object.                           |
-| `EntryType`    | An enumeration of type `Waher.Persistence.EntryType`, that can take the values `New`, `Update` or `Delete`. (`Clear` is also a value, but not an option in conditional statements, as it is not used in association with objects. |
-| `Timestamp`    | The timestamp of the event.                                   |
-| `this`         | A reference to the recorded object associated with the event. |
+| Event Property | Ledger       | Description                                                   |
+|:---------------|:-------------|:--------------------------------------------------------------|
+| `Collection`   | All          | Collection containg the block that contains the event.        |
+| `BlockId`      | All          | Block ID containing the event.                                |
+| `ObjectId`     | All          | Object ID of the associated object.                           |
+| `TypeName`     | All          | Type name of the associated object.                           |
+| `EntryType`    | All          | An enumeration of type `Waher.Persistence.EntryType`, that can take the values `New`, `Update` or `Delete`. (`Clear` is also a value, but not an option in conditional statements, as it is not used in association with objects. |
+| `Timestamp`    | All          | The timestamp of the event.                                   |
+| `this`         | All          | A reference to the recorded object associated with the event. |
+| `Bytes`        | Neuro-Ledger | Number of bytes of the current block.                         |
+| `Created`      | Neuro-Ledger | When the block was created.                                   |
+| `Creator`      | Neuro-Ledger | The creator of the block.                                     |
+| `Digest`       | Neuro-Ledger | The digest of the block.                                      |
+| `Expires`      | Neuro-Ledger | When the block expires.                                       |
+| `FileName`     | Neuro-Ledger | Local file name of the block.                                 |
+| `Signature`    | Neuro-Ledger | Signature of the block.                                       |
+
 
 ### XML
 

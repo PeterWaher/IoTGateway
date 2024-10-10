@@ -109,7 +109,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <param name="Key">Meta-data key.</param>
 		/// <param name="Value">Meta-data value.</param>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> BlockMetaData(string Key, object Value)
+		public virtual Task<bool> BlockMetaData(string Key, object Value)
 		{
 			this.blockMetaData[Key] = Value;
 			this.hasBlockMetaData = true;

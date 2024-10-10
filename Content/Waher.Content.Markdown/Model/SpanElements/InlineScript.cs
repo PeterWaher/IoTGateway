@@ -159,7 +159,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Value">Associated variable object value.</param>
-		public void Add(string Name, object Value)
+		public Variable Add(string Name, object Value)
 		{
 			throw new NotSupportedException("Variable collection is read-only.");
 		}

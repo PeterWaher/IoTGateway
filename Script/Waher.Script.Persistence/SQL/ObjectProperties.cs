@@ -372,20 +372,19 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Value">Associated variable object value.</param>
-		public override void Add(string Name, object Value)
+		/// <returns>Reference to variable that was added. If the name
+		/// refers to an object property or field, null is returned.</returns>
+		public override Variable Add(string Name, object Value)
 		{
 			if (this.readOnly || string.Compare(Name, "this", true) == 0)
-			{
-				base.Add(Name, Value);
-				return;
-			}
+				return base.Add(Name, Value);
 
 			Tuple<PropertyInfo, FieldInfo, bool> Rec;
 
 			if (!(this.dictionary is null))
 			{
 				this.dictionary[Name] = Value is IElement Element ? Element.AssociatedObjectValue : Value;
-				return;
+				return null;
 			}
 
 			lock (this.variables)
@@ -463,13 +462,13 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 
-				return;
+				return null;
 			}
 
 			if (this.ContextVariables.ContainsVariable(Name))
-				this.ContextVariables.Add(Name, Value);
+				return this.ContextVariables.Add(Name, Value);
 			else
-				base.Add(Name, Value);
+				return base.Add(Name, Value);
 		}
 
 	}

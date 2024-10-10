@@ -37,7 +37,10 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			"WHERE", 
 			"TOP", 
 			"OFFSET",
-			"TO"
+			"TO",
+			"XML",
+			"JSON",
+			"COUNTERS"
 		};
 
 		/// <summary>
@@ -143,6 +146,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			{
 				Parser.NextToken();
 				Offset = Parser.ParseNoWhiteSpace();
+				s = Parser.PeekNextToken().ToUpper();
 			}
 
 			ScriptNode To = null;

@@ -521,7 +521,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s != "OBJECTS" &&
 				s != "NEW" &&
 				s != "UPDATE" &&
-				s != "DELETE")
+				s != "DELETE" &&
+				s != "TO")
 			{
 				if (s == "AS")
 					Parser.NextToken();

@@ -925,6 +925,8 @@ namespace Waher.Persistence.XmlLedger
 		#region ILedgerExport
 
 		private readonly LinkedList<KeyValuePair<string, object>> blockMetaData = new LinkedList<KeyValuePair<string, object>>();
+		private string writtenCollection = null;
+		private string writtenBlockId = null;
 		private string currentCollection = null;
 		private string currentBlockId = null;
 		private string currentEntryObjectId = null;
@@ -969,10 +971,16 @@ namespace Waher.Persistence.XmlLedger
 		/// Is called when a collection is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> EndCollection()
+		public async Task<bool> EndCollection()
 		{
+			if (!(this.writtenCollection is null))
+			{
+				await this.output.WriteEndElementAsync();
+				this.writtenCollection = null;
+			}
+
 			this.currentCollection = null;
-			return Task.FromResult(true);
+			return true;
 		}
 
 		/// <summary>
@@ -1002,10 +1010,17 @@ namespace Waher.Persistence.XmlLedger
 		/// Is called when a block in a collection is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> EndBlock()
+		public async Task<bool> EndBlock()
 		{
+			if (!(this.writtenBlockId is null))
+			{
+				await this.output.WriteEndElementAsync();
+				this.writtenBlockId = null;
+				this.blockMetaData.Clear();
+			}
+
 			this.currentBlockId = null;
-			return Task.FromResult(true);
+			return true;
 		}
 
 		/// <summary>
@@ -1050,23 +1065,10 @@ namespace Waher.Persistence.XmlLedger
 
 					if (!(this.output is null))
 					{
-						if (!string.IsNullOrEmpty(this.currentBlockId))
-						{
-							await this.output.WriteCommentAsync("Block ID: " + this.currentBlockId);
-							this.currentBlockId = null;
-
-							if (!(this.blockMetaData.First is null))
-							{
-								foreach (KeyValuePair<string, object> P in this.blockMetaData)
-									await this.output.WriteCommentAsync(P.Key + ": " + Expression.ToString(P.Value));
-
-								this.blockMetaData.Clear();
-							}
-						}
+						await this.WritePendingInfoLocked();
 
 						await this.output.WriteStartElementAsync(string.Empty, this.currentEntryType.ToString(), Namespace);
 						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(this.currentEntryTimestamp));
-						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, this.currentCollection);
 						await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, this.currentEntryObjectType);
 						await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, this.currentEntryObjectId);
 
@@ -1097,6 +1099,46 @@ namespace Waher.Persistence.XmlLedger
 			return true;
 		}
 
+		private async Task WritePendingInfoLocked()
+		{
+			if (!(this.currentBlockId is null) &&
+				!(this.writtenBlockId is null) &&
+				this.currentBlockId != this.writtenBlockId)
+			{
+				await this.output.WriteEndElementAsync();
+				this.writtenBlockId = null;
+				this.blockMetaData.Clear();
+			}
+
+			if (!(this.currentCollection is null) &&
+				!(this.writtenCollection is null) &&
+				this.currentCollection != this.writtenCollection)
+			{
+				await this.output.WriteEndElementAsync();
+				this.writtenCollection = null;
+			}
+
+			if (this.writtenCollection is null)
+			{
+				await this.output.WriteStartElementAsync(string.Empty, "Collection", Namespace);
+				await this.output.WriteAttributeStringAsync(string.Empty, "name", string.Empty, this.currentCollection);
+				this.writtenCollection = this.currentCollection;
+			}
+
+			if (this.writtenBlockId is null)
+			{
+				await this.output.WriteStartElementAsync(string.Empty, "Block", Namespace);
+				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, this.currentBlockId);
+				this.writtenBlockId = this.currentBlockId;
+
+				if (!(this.blockMetaData.First is null))
+				{
+					foreach (KeyValuePair<string, object> P in this.blockMetaData)
+						await ReportProperty(this.output, P.Key, P.Value, Namespace);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Is called when the collection has been cleared.
 		/// </summary>
@@ -1115,15 +1157,10 @@ namespace Waher.Persistence.XmlLedger
 
 					if (!(this.output is null))
 					{
-						if (!string.IsNullOrEmpty(this.currentBlockId))
-						{
-							await this.output.WriteCommentAsync("Block ID: " + this.currentBlockId);
-							this.currentBlockId = null;
-						}
+						await this.WritePendingInfoLocked();
 
 						await this.output.WriteStartElementAsync(string.Empty, "Clear", Namespace);
 						await this.output.WriteAttributeStringAsync(string.Empty, "timestamp", string.Empty, XML.Encode(EntryTimestamp));
-						await this.output.WriteAttributeStringAsync(string.Empty, "collection", string.Empty, this.currentCollection);
 						await this.output.WriteEndElementAsync();
 						await this.output.FlushAsync();
 					}
@@ -1179,6 +1216,8 @@ namespace Waher.Persistence.XmlLedger
 
 					if (!(this.output is null))
 					{
+						await this.WritePendingInfoLocked();
+
 						await this.output.WriteCommentAsync(Message);
 						await this.output.FlushAsync();
 					}

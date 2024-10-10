@@ -51,7 +51,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartLedger()
 		{
-			return this.output.StartLedger();
+			return this.output?.StartLedger() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndLedger()
 		{
-			return this.output.EndLedger();
+			return this.output?.EndLedger() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartCollection(string CollectionName)
 		{
 			this.nrCollections++;
-			return this.output.StartCollection(CollectionName);
+			return this.output?.StartCollection(CollectionName) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndCollection()
 		{
-			return this.output.EndCollection();
+			return this.output?.EndCollection() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartBlock(string BlockID)
 		{
 			this.nrBlocks++;
-			return this.output.StartBlock(BlockID);
+			return this.output?.StartBlock(BlockID) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -102,7 +102,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> BlockMetaData(string Key, object Value)
 		{
-			return this.output.BlockMetaData(Key, Value);
+			return this.output?.BlockMetaData(Key, Value) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -111,7 +111,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndBlock()
 		{
-			return this.output.EndBlock();
+			return this.output?.EndBlock() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -125,7 +125,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			this.nrEntries++;
-			return this.output.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+			return this.output?.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -134,7 +134,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndEntry()
 		{
-			return this.output.EndEntry();
+			return this.output?.EndEntry() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -144,7 +144,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			return this.output.CollectionCleared(EntryTimestamp);
+			return this.output?.CollectionCleared(EntryTimestamp) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -156,7 +156,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
 			this.nrProperties++;
-			return this.output.ReportProperty(PropertyName, PropertyValue);
+			return this.output?.ReportProperty(PropertyName, PropertyValue) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -166,7 +166,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportError(string Message)
 		{
-			return this.output.ReportError(Message);
+			return this.output?.ReportError(Message) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -176,7 +176,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportException(Exception Exception)
 		{
-			return this.output.ReportException(Exception);
+			return this.output?.ReportException(Exception) ?? Task.FromResult(true);
 		}
 	}
 }

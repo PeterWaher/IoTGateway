@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
@@ -123,7 +127,6 @@ namespace Waher.Script.Persistence.SQL
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
 			ScriptNode[] Columns2 = this.columns;
-			ILedgerExport Destination;
 
 			if (!(this.columns is null))
 			{
@@ -150,31 +153,52 @@ namespace Waher.Script.Persistence.SQL
 			else
 				c = 0;
 
-			if (this.to is null)
-				Destination = null;
-			else
-			{
-				E = await this.to.EvaluateAsync(Variables);
-				if (E.AssociatedObjectValue is ILedgerExport Export)
-					Destination = Export;
-				else if (E.AssociatedObjectValue is string FileName)
-				{
-					Destination = new XmlFileLedger(FileName, null, int.MaxValue);
-				}
-				else if (E.AssociatedObjectValue is null)
-					Destination = null;
-				else
-					throw new ScriptRuntimeException("Unable to export to objects of type " + E.AssociatedObjectValue.GetType().FullName, this.to);
-			}
-
+			ILedgerExport Destination = null;
 			ExportCounter Counter = null;
 			ExportToScriptObject ObjectsExported = null;
+			StringBuilder XmlOutput = null;
+
+			if (!(this.to is null))
+			{
+				if (this.to is VariableReference Ref)
+				{
+					switch (Ref.VariableName.ToUpper())
+					{
+						case "JSON":
+							Destination = ObjectsExported = new ExportToScriptObject();
+							break;
+
+						case "XML":
+							XmlOutput = new StringBuilder();
+							StringWriter Writer = new StringWriter(XmlOutput);
+							Destination = new XmlFileLedger(Writer);
+							break;
+
+						case "COUNTERS":
+							Destination = Counter = new ExportCounter(null);
+							break;
+					}
+				}
+
+				if (Destination is null)
+				{
+					E = await this.to.EvaluateAsync(Variables);
+					if (E.AssociatedObjectValue is ILedgerExport Export)
+						Destination = Export;
+					else if (E.AssociatedObjectValue is string FileName)
+					{
+						Destination = new XmlFileLedger(FileName, null, int.MaxValue);
+					}
+					else if (E.AssociatedObjectValue is null)
+						Destination = null;
+					else
+						throw new ScriptRuntimeException("Unable to export to objects of type " + E.AssociatedObjectValue.GetType().FullName, this.to);
+				}
+			}
 
 			if (Destination is null)
-			{
 				Destination = ObjectsExported = new ExportToScriptObject();
-			}
-			else
+			else if (Counter is null)
 				Destination = Counter = new ExportCounter(Destination);
 
 			if (Offset > 0)
@@ -196,12 +220,19 @@ namespace Waher.Script.Persistence.SQL
 			//		Timestamp,
 			//		Block,
 			//		Collection,
+			//		Creator
 			//		ObjectId,
 			//		TypeName,
 			//		EntryType
 
 			if (!(ObjectsExported is null))
 				return ObjectsExported.ToVector();
+			else if (!(XmlOutput is null))
+			{
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(XmlOutput.ToString());
+				return new ObjectValue(Doc);
+			}
 			else if (!(Counter is null))
 			{
 				return new ObjectValue(new Dictionary<string, IElement>()

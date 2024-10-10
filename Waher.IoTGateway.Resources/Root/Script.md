@@ -3186,7 +3186,11 @@ new objects
 search criteria. By default, events matching the criteria will be output in the order they 
 appear in the collections provided. You can direct the results to a given destination, which
 can be a file name (in case the export with be an XML file) or an object instance 
-implementing the `Waher.Persistence.Serialization.ILedgerExport` interface.
+implementing the `Waher.Persistence.Serialization.ILedgerExport` interface, or any of the
+keywords `XML`, `JSON` or `COUNTERS`. If no `TO` clause is available, the default destination
+is `JSON`. If an `ILedgerExport` interface or a file name is provided, the result of the
+execution (apart from exporting the replay to the destination) in the script environment will
+be the the same as providing a `COUNTERS` destination.
 
 Syntax:
 
@@ -3215,6 +3219,8 @@ from
 	PersistedEvent
 where 
 	Type="Error" 
+to
+	xml
 ```
 
 **Note**: The Ledger does not have indices as the object database does. Replaying events

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -82,5 +81,16 @@ namespace Waher.Persistence.Files
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder);
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		Task ContinueAfterLocked(T LastItem);
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		Task ContinueBeforeLocked(T LastItem);
 	}
 }

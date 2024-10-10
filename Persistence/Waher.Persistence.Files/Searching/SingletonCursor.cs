@@ -65,13 +65,7 @@ namespace Waher.Persistence.Files.Searching
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
-		public bool CurrentTypeCompatible
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool CurrentTypeCompatible => true;
 
 		/// <summary>
 		/// Gets the Object ID of the current object.
@@ -114,7 +108,7 @@ namespace Waher.Persistence.Files.Searching
 		public Task<bool> MoveNextAsyncLocked()
 		{
 			this.isCurrent = !this.isCurrent;
-			return Task.FromResult<bool>(this.isCurrent);
+			return Task.FromResult(this.isCurrent);
 		}
 
 		/// <summary>
@@ -166,5 +160,24 @@ namespace Waher.Persistence.Files.Searching
 			return (SortOrder[0] == "-" + s);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			this.isCurrent = true;
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			this.isCurrent = true;
+			return Task.CompletedTask;
+		}
 	}
 }

@@ -79,6 +79,7 @@ namespace Waher.Persistence
 					return false;
 
 				this.currentPage = Database.FindNext(this.currentPage).Result;
+				this.currentPageEnumerator = this.currentPage.Items.GetEnumerator();
 				this.currentPageEnumeratorAsync = this.currentPageEnumerator as IAsyncEnumerator;
 			}
 		}
@@ -101,6 +102,7 @@ namespace Waher.Persistence
 					return false;
 
 				this.currentPage = await Database.FindNext(this.currentPage);
+				this.currentPageEnumerator = this.currentPage.Items.GetEnumerator();
 				this.currentPageEnumeratorAsync = this.currentPageEnumerator as IAsyncEnumerator;
 			}
 		}

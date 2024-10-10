@@ -49,13 +49,7 @@ namespace Waher.Persistence.Files.Searching
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
-		public bool CurrentTypeCompatible
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public bool CurrentTypeCompatible => false;
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -138,5 +132,22 @@ namespace Waher.Persistence.Files.Searching
 			return false;
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			return Task.CompletedTask;
+		}
 	}
 }

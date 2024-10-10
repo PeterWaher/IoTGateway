@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
@@ -112,13 +111,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Serializer used to deserialize <see cref="Current"/>.
 		/// </summary>
-		public IObjectSerializer CurrentSerializer
-		{
-			get
-			{
-				return this.currentSerializer;
-			}
-		}
+		public IObjectSerializer CurrentSerializer => this.currentSerializer;
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -333,5 +326,26 @@ namespace Waher.Persistence.Files
 			return this.file.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(T LastItem)
+		{
+			byte[] Bin = await this.recordHandler.Serialize(IndexBTreeFile.GuidMax, LastItem, this.currentSerializer, MissingFieldAction.Last);
+
+			await this.e.ContinueAfterLocked(Bin);
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(T LastItem)
+		{
+			byte[] Bin = await this.recordHandler.Serialize(Guid.Empty, LastItem, this.currentSerializer, MissingFieldAction.First);
+
+			await this.e.ContinueBeforeLocked(Bin);
+		}
 	}
 }

@@ -1969,9 +1969,7 @@ namespace Waher.Persistence.FilesLW.Test
 					new FilterFieldLesserThan("Byte", 100))), "SByte", "ShortString");
 
 				while (await Cursor.MoveNextAsyncLocked())
-				{
 					Ordered.Add(Cursor.Current);
-				}
 			}
 			finally
 			{
@@ -2399,9 +2397,7 @@ namespace Waher.Persistence.FilesLW.Test
 					new FilterFieldLesserThan("Byte", 100))), "SByte", "CIString");
 
 				while (await Cursor.MoveNextAsyncLocked())
-				{
 					Ordered.Add(Cursor.Current);
-				}
 			}
 			finally
 			{

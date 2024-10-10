@@ -157,5 +157,22 @@ namespace Waher.Persistence.Files.Searching
 			return this.cursor.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			return this.cursor.ContinueAfterLocked(LastItem);
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			return this.cursor.ContinueBeforeLocked(LastItem);
+		}
 	}
 }

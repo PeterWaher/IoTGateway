@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
@@ -20,6 +20,7 @@ namespace Waher.Persistence.Files
 		private BlockHeader currentHeader;
 		private BinaryDeserializer currentReader;
 		private IObjectSerializer defaultSerializer;
+		private ObjectSerializer defaultSerializerEx;
 		private IObjectSerializer currentSerializer;
 		private BlockInfo startingPoint;
 		private IRecordHandler recordHandler;
@@ -63,10 +64,11 @@ namespace Waher.Persistence.Files
 			if (Result.defaultSerializer is null && typeof(T) != typeof(object))
 				Result.defaultSerializer = await File.Provider.GetObjectSerializer(typeof(T));
 
-			if (Result.defaultSerializer is ObjectSerializer Serializer &&
-				Serializer.HasObjectIdField)
+			Result.defaultSerializerEx = Result.defaultSerializer as ObjectSerializer;
+
+			if (!(Result.defaultSerializerEx is null) && Result.defaultSerializerEx.HasObjectIdField)
 			{
-				Result.objectIdMemberName = Serializer.ObjectIdMemberName;
+				Result.objectIdMemberName = Result.defaultSerializerEx.ObjectIdMemberName;
 				Result.fieldCount = 1;
 			}
 
@@ -1165,11 +1167,56 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Index of current block
 		/// </summary>
-		public uint CurrentBlockIndex => currentBlockIndex;
+		public uint CurrentBlockIndex => this.currentBlockIndex;
 
 		/// <summary>
 		/// Current object position, within block.
 		/// </summary>
-		public int CurrentObjectPosition => currentObjPos;
+		public int CurrentObjectPosition => this.currentObjPos;
+
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(T LastItem)
+		{
+			if (string.IsNullOrEmpty(this.objectIdMemberName))
+			{
+				throw new InvalidOperationException("Objects of type " + typeof(T).FullName +
+					"lacks an Object ID property.");
+			}
+
+			Guid ObjectId = await this.defaultSerializerEx.GetObjectId(LastItem, false, null);
+			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MoveNextAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(ObjectId, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(T LastItem)
+		{
+			if (string.IsNullOrEmpty(this.objectIdMemberName))
+			{
+				throw new InvalidOperationException("Objects of type " + typeof(T).FullName +
+					"lacks an Object ID property.");
+			}
+
+			Guid ObjectId = await this.defaultSerializerEx.GetObjectId(LastItem, false, null);
+			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, true);
+		
+			this.SetStartingPoint(Info);
+			await this.MovePreviousAsyncLocked();
+		}
 	}
 }

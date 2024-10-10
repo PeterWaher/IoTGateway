@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
+using Waher.Persistence.Serialization.NullableTypes;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
@@ -1180,13 +1181,10 @@ namespace Waher.Persistence.Files
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueAfterLocked(T LastItem)
 		{
-			if (string.IsNullOrEmpty(this.objectIdMemberName))
-			{
-				throw new InvalidOperationException("Objects of type " + typeof(T).FullName +
-					"lacks an Object ID property.");
-			}
+			ObjectSerializer Serializer = this.defaultSerializerEx ??
+				await this.file.Provider.GetObjectSerializerEx(typeof(T));
 
-			Guid ObjectId = await this.defaultSerializerEx.GetObjectId(LastItem, false, null);
+			object ObjectId = await Serializer.GetObjectId(LastItem, false, null);
 			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
 			if (!(Info is null))
 			{
@@ -1201,22 +1199,64 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastKey">Key of Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(byte[] LastKey)
+		{
+			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MoveNextAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(LastKey, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
 		/// Continues operating before a given item.
 		/// </summary>
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueBeforeLocked(T LastItem)
 		{
-			if (string.IsNullOrEmpty(this.objectIdMemberName))
-			{
-				throw new InvalidOperationException("Objects of type " + typeof(T).FullName +
-					"lacks an Object ID property.");
-			}
+			ObjectSerializer Serializer = this.defaultSerializerEx ??
+				await this.file.Provider.GetObjectSerializerEx(typeof(T));
 
-			Guid ObjectId = await this.defaultSerializerEx.GetObjectId(LastItem, false, null);
-			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, true);
-		
-			this.SetStartingPoint(Info);
-			await this.MovePreviousAsyncLocked();
+			Guid ObjectId = await Serializer.GetObjectId(LastItem, false, null);
+			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MovePreviousAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(ObjectId, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastKey">Key of Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(byte[] LastKey)
+		{
+			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MovePreviousAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(LastKey, true);
+				this.SetStartingPoint(Info);
+			}
 		}
 	}
 }

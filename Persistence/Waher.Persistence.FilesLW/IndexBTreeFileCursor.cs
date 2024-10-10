@@ -332,6 +332,9 @@ namespace Waher.Persistence.Files
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueAfterLocked(T LastItem)
 		{
+			if (this.currentSerializer is null)
+				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+
 			byte[] Bin = await this.recordHandler.Serialize(IndexBTreeFile.GuidMax, LastItem, this.currentSerializer, MissingFieldAction.Last);
 
 			await this.e.ContinueAfterLocked(Bin);
@@ -343,6 +346,9 @@ namespace Waher.Persistence.Files
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueBeforeLocked(T LastItem)
 		{
+			if (this.currentSerializer is null)
+				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+
 			byte[] Bin = await this.recordHandler.Serialize(Guid.Empty, LastItem, this.currentSerializer, MissingFieldAction.First);
 
 			await this.e.ContinueBeforeLocked(Bin);

@@ -190,7 +190,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public Task ContinueAfterLocked(T LastItem)
 		{
-			throw new NotImplementedException("Paginated search is not implemented for this type of query.");
+			throw new NotSupportedException("Paginated search is not supported for union queries.");
 		}
 
 		/// <summary>
@@ -199,7 +199,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public Task ContinueBeforeLocked(T LastItem)
 		{
-			throw new NotImplementedException("Paginated search is not implemented for this type of query.");
+			throw new NotSupportedException("Paginated search is not supported for union queries.");
 		}
 	}
 }

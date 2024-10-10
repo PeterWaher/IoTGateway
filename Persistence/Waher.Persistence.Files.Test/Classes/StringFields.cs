@@ -11,6 +11,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 	[TypeName(TypeNameSerialization.FullName)]
 	[CollectionName("StringFields")]
 	[Index("A", "B")]
+	[Index("B", "A")]
 	public class StringFields
 	{
 		[ObjectId]

@@ -93,9 +93,9 @@ namespace Waher.Persistence.Files
 			IEnumerable<T> NewItems;
 
 			if (string.IsNullOrEmpty(this.collection))
-				NewItems = await this.provider.Find<T>(0, this.pageSize, this.filter, this.lastItem, this.sortOrder);
+				NewItems = await this.provider.Find(0, this.pageSize, this.filter, this.lastItem, this.sortOrder);
 			else
-				NewItems = await this.provider.Find<T>(this.collection, 0, this.pageSize, this.filter, this.lastItem, this.sortOrder);
+				NewItems = await this.provider.Find(this.collection, 0, this.pageSize, this.filter, this.lastItem, this.sortOrder);
 
 			return new Page<T>(this.pageSize, this.collection, this.filter, this.sortOrder,
 				NewItems, this.serializer, this.provider);

@@ -18,7 +18,6 @@ using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.ComplexNumbers;
 
 namespace Waher.Persistence.Files
 {

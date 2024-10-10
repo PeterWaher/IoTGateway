@@ -72,7 +72,7 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[TestMethod]
-		public async Task PersistenceTests_04_Pagination_B_Asc()
+		public async Task PersistenceTests_05_Pagination_B_Asc()
 		{
 			await Database.Clear("StringFields");
 
@@ -82,7 +82,7 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[TestMethod]
-		public async Task PersistenceTests_05_Pagination_A_Desc()
+		public async Task PersistenceTests_06_Pagination_A_Desc()
 		{
 			await Database.Clear("StringFields");
 
@@ -92,33 +92,13 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[TestMethod]
-		public async Task PersistenceTests_06_Pagination_B_Desc()
+		public async Task PersistenceTests_07_Pagination_B_Desc()
 		{
 			await Database.Clear("StringFields");
 
 			SortedDictionary<Guid, StringFields> Objects = await CreateObjects(100);
 
 			await AssertAllEnumerated(await Database.Enumerate<StringFields>(20, "-B"), Objects);
-		}
-
-		[TestMethod]
-		public async Task PersistenceTests_07_Pagination_C_Asc()
-		{
-			await Database.Clear("StringFields");
-
-			SortedDictionary<Guid, StringFields> Objects = await CreateObjects(100);
-
-			await AssertAllEnumerated(await Database.Enumerate<StringFields>(20, "C"), Objects);
-		}
-
-		[TestMethod]
-		public async Task PersistenceTests_08_Pagination_C_Desc()
-		{
-			await Database.Clear("StringFields");
-
-			SortedDictionary<Guid, StringFields> Objects = await CreateObjects(100);
-
-			await AssertAllEnumerated(await Database.Enumerate<StringFields>(20, "-C"), Objects);
 		}
 
 		private static async Task AssertAllEnumerated(PaginatedEnumerator<StringFields> e,

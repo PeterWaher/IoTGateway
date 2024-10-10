@@ -65,7 +65,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Full size of the payload.</returns>
 		public Task<uint> GetFullPayloadSize(BinaryDeserializer Reader)
 		{
-			return Task.FromResult<uint>((uint)Reader.ReadVariableLengthUInt64());
+			return Task.FromResult((uint)Reader.ReadVariableLengthUInt64());
 		}
 
 		/// <summary>
@@ -79,9 +79,9 @@ namespace Waher.Persistence.Files.Storage
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 
 			if (16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit)
-				return Task.FromResult<int>(4);
+				return Task.FromResult(4);
 			else
-				return Task.FromResult<int>(Len);
+				return Task.FromResult(Len);
 		}
 
 		/// <summary>
@@ -95,9 +95,9 @@ namespace Waher.Persistence.Files.Storage
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 
 			if (16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit)
-				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(4, true));
+				return Task.FromResult(new KeyValuePair<int, bool>(4, true));
 			else
-				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(Len, false));
+				return Task.FromResult(new KeyValuePair<int, bool>(Len, false));
 		}
 
 		/// <summary>
@@ -110,7 +110,7 @@ namespace Waher.Persistence.Files.Storage
 			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 
-			return Task.FromResult<bool>(16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit);
+			return Task.FromResult(16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit);
 		}
 
 		/// <summary>

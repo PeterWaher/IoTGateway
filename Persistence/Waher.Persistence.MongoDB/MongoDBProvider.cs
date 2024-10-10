@@ -451,7 +451,40 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, 
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			string CollectionName = Serializer.CollectionName(null);
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find(Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
 		}
 
 		/// <summary>
@@ -477,7 +510,7 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
 		}
 
 		/// <summary>
@@ -507,7 +540,39 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter, 
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find(Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
 		}
 
 		/// <summary>
@@ -554,10 +619,13 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
-			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
-			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
+			if (!(ContinueAfter is null))
+				throw new NotImplementedException("Paginated searches not implemented in MongoDB provider.");
+
+			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find(BsonFilter);
 
 			if (SortOrder.Length > 0)
 			{

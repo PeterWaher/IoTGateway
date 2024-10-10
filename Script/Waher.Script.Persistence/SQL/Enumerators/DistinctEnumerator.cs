@@ -31,10 +31,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         {
             while (base.MoveNext())
             {
-                Record Rec = new Record(CurrentRecord);
-                if (!reported.ContainsKey(Rec))
+                Record Rec = new Record(this.CurrentRecord);
+                if (!this.reported.ContainsKey(Rec))
                 {
-                    reported[Rec] = true;
+					this.reported[Rec] = true;
                     return true;
                 }
             }
@@ -52,10 +52,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         {
             while (await base.MoveNextAsync())
             {
-                Record Rec = new Record(CurrentRecord);
-                if (!reported.ContainsKey(Rec))
+                Record Rec = new Record(this.CurrentRecord);
+                if (!this.reported.ContainsKey(Rec))
                 {
-                    reported[Rec] = true;
+					this.reported[Rec] = true;
                     return true;
                 }
             }
@@ -69,7 +69,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         public override void Reset()
         {
             base.Reset();
-            reported.Clear();
+			this.reported.Clear();
         }
 
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -8,20 +10,10 @@ namespace Waher.Persistence.Files
 	/// Interface for typed cursors.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public interface ICursor<T> : IAsyncEnumerator
+	public interface ICursor<T> : IAsyncEnumerator<T>
 	{
 		/// <summary>
-		/// Gets the element in the collection at the current position of the enumerator.
-		/// </summary>
-		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		T Current
-		{
-			get;
-		}
-
-		/// <summary>
-		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
+		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="IEnumerator{T}.Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
 		bool CurrentTypeCompatible
@@ -30,7 +22,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Serializer used to deserialize <see cref="Current"/>.
+		/// Serializer used to deserialize <see cref="IEnumerator.Current"/>.
 		/// </summary>
 		IObjectSerializer CurrentSerializer
 		{

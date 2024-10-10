@@ -29,22 +29,22 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="Order">Custom order.</param>
         public CustomOrderEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, KeyValuePair<ScriptNode, bool>[] Order)
         {
-            order = Order;
-            items = ItemEnumerator;
-            variables = Variables;
+			this.order = Order;
+			this.items = ItemEnumerator;
+			this.variables = Variables;
         }
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
-        public object Current => e.Current;
+        public object Current => this.e.Current;
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>
         /// </summary>
         public bool MoveNext()
         {
-            return MoveNextAsync().Result;
+            return this.MoveNextAsync().Result;
         }
 
         /// <summary>
@@ -52,12 +52,12 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public async Task<bool> MoveNextAsync()
         {
-            if (e is null)
+            if (this.e is null)
             {
                 List<object> Items = new List<object>();
 
-                while (await items.MoveNextAsync())
-                    Items.Add(items.Current);
+                while (await this.items.MoveNextAsync())
+                    Items.Add(this.items.Current);
 
                 Items.Sort((x, y) =>
                 {
@@ -74,29 +74,29 @@ namespace Waher.Script.Persistence.SQL.Enumerators
                     Type Tx = x.GetType();
                     Type Ty = y.GetType();
 
-                    if (propertiesX.TryGetValue(Tx, out ObjectProperties Vx))
+                    if (this.propertiesX.TryGetValue(Tx, out ObjectProperties Vx))
                         Vx.Object = x;
                     else
                     {
-                        Vx = new ObjectProperties(x, variables);
-                        propertiesX[Tx] = Vx;
+                        Vx = new ObjectProperties(x, this.variables);
+						this.propertiesX[Tx] = Vx;
                     }
 
-                    if (propertiesY.TryGetValue(Ty, out ObjectProperties Vy))
+                    if (this.propertiesY.TryGetValue(Ty, out ObjectProperties Vy))
                         Vy.Object = y;
                     else
                     {
-                        Vy = new ObjectProperties(y, variables);
-                        propertiesY[Ty] = Vy;
+                        Vy = new ObjectProperties(y, this.variables);
+						this.propertiesY[Ty] = Vy;
                     }
 
-                    int i, j, c = order.Length;
+                    int i, j, c = this.order.Length;
                     IElement Ex, Ey;
                     ScriptNode Node;
 
                     for (i = 0; i < c; i++)
                     {
-                        Node = order[i].Key;
+                        Node = this.order[i].Key;
                         Ex = Node.Evaluate(Vx);
                         Ey = Node.Evaluate(Vy);
 
@@ -106,7 +106,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
                         j = S.Compare(Ex, Ey);
                         if (j != 0)
                         {
-                            if (order[i].Value)
+                            if (this.order[i].Value)
                                 return j;
                             else
                                 return -j;
@@ -116,10 +116,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
                     return 0;
                 });
 
-                e = Items.GetEnumerator();
+				this.e = Items.GetEnumerator();
             }
 
-            return e.MoveNext();
+            return this.e.MoveNext();
         }
 
         /// <summary>
@@ -127,8 +127,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public void Reset()
         {
-            items.Reset();
-            e = null;
+			this.items.Reset();
+            this.e = null;
         }
     }
 }

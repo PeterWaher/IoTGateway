@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
+using System.Collections;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -33,49 +34,25 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public T Current
-		{
-			get
-			{
-				return this.e.Current.Value;
-			}
-		}
+		public T Current => this.e.Current.Value;
 
 		/// <summary>
 		/// Serializer used to deserialize <see cref="Current"/>.
 		/// </summary>
-		public IObjectSerializer CurrentSerializer
-		{
-			get
-			{
-				return this.e.Current.Serializer;
-			}
-		}
+		public IObjectSerializer CurrentSerializer => this.e.Current.Serializer;
 
 		/// <summary>
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
-		public bool CurrentTypeCompatible
-		{
-			get
-			{
-				return this.e.Current.Value != null;
-			}
-		}
+		public bool CurrentTypeCompatible => this.e.Current.Value != null;
 
 		/// <summary>
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
-		{
-			get
-			{
-				return this.e.Current.ObjectId;
-			}
-		}
+		public Guid CurrentObjectId => this.e.Current.ObjectId;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -95,6 +72,30 @@ namespace Waher.Persistence.Files.Searching
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
 
 		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
+
+		/// <summary>
+		/// Resets the enumerator.
+		/// </summary>
+		public void Reset()
+		{
+			this.e = this.sortedObjects.Keys.GetEnumerator();
+		}
+
+		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
@@ -108,7 +109,7 @@ namespace Waher.Persistence.Files.Searching
 				this.initialized = true;
 			}
 
-			return Task.FromResult<bool>(this.e.MoveNext());
+			return Task.FromResult(this.e.MoveNext());
 		}
 
 		/// <summary>

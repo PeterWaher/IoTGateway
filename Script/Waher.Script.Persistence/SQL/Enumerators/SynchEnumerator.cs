@@ -22,7 +22,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <summary>
         /// Current item.
         /// </summary>
-        public object Current => e.Current;
+        public object Current => this.e.Current;
 
         /// <summary>
         /// Tries to move to next item.
@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <returns>If successful</returns>
         public bool MoveNext()
         {
-            return e.MoveNext();
+            return this.e.MoveNext();
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <returns>If successful</returns>
         public Task<bool> MoveNextAsync()
         {
-            return Task.FromResult(e.MoveNext());
+            return Task.FromResult(this.e.MoveNext());
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public void Reset()
         {
-            e.Reset();
+			this.e.Reset();
         }
     }
 }

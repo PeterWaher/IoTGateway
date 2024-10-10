@@ -27,28 +27,28 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="Variables">Current set of variables.</param>
         public RecordEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
         {
-            e = ItemEnumerator;
-            columns = Columns;
-            variables = Variables;
-            count = columns?.Length ?? 0;
+			this.e = ItemEnumerator;
+			this.columns = Columns;
+			this.variables = Variables;
+			this.count = this.columns?.Length ?? 0;
         }
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
-        public object Current => e.Current;
+        public object Current => this.e.Current;
 
         /// <summary>
         /// Current record
         /// </summary>
-        public IElement[] CurrentRecord => record;
+        public IElement[] CurrentRecord => this.record;
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>
         /// </summary>
         public virtual bool MoveNext()
         {
-            return MoveNextAsync().Result;
+            return this.MoveNextAsync().Result;
         }
 
         /// <summary>
@@ -59,34 +59,34 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public virtual async Task<bool> MoveNextAsync()
         {
-            if (!await e.MoveNextAsync())
+            if (!await this.e.MoveNextAsync())
                 return false;
 
             int i;
-            object Item = e.Current;
+            object Item = this.e.Current;
             IElement Element = Item as IElement;
 
-            if (properties is null)
-                properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, variables);
+            if (this.properties is null)
+				this.properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, this.variables);
             else
-                properties.Object = Element?.AssociatedObjectValue ?? Item;
+				this.properties.Object = Element?.AssociatedObjectValue ?? Item;
 
-            if (columns is null)
-                record = new IElement[1] { Element ?? Expression.Encapsulate(Item) };
+            if (this.columns is null)
+				this.record = new IElement[1] { Element ?? Expression.Encapsulate(Item) };
             else
             {
-                record = new IElement[count];
+				this.record = new IElement[this.count];
 
-                for (i = 0; i < count; i++)
+                for (i = 0; i < this.count; i++)
                 {
                     try
                     {
-                        record[i] = await columns[i].EvaluateAsync(properties);
+						this.record[i] = await this.columns[i].EvaluateAsync(this.properties);
                     }
                     catch (Exception ex)
                     {
                         ex = Log.UnnestException(ex);
-                        record[i] = Expression.Encapsulate(ex);
+						this.record[i] = Expression.Encapsulate(ex);
                     }
                 }
             }
@@ -99,7 +99,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public virtual void Reset()
         {
-            e.Reset();
+			this.e.Reset();
         }
 
     }

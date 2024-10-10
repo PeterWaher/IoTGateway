@@ -20,21 +20,21 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="Count">Maximum number of records to enumerate.</param>
         public MaxCountEnumerator(IResultSetEnumerator ItemEnumerator, int Count)
         {
-            e = ItemEnumerator;
-            count = count0 = Count;
+			this.e = ItemEnumerator;
+			this.count = this.count0 = Count;
         }
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
-        public object Current => e.Current;
+        public object Current => this.e.Current;
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>
         /// </summary>
         public bool MoveNext()
         {
-            return MoveNextAsync().Result;
+            return this.MoveNextAsync().Result;
         }
 
         /// <summary>
@@ -45,10 +45,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public async Task<bool> MoveNextAsync()
         {
-            if (count <= 0 || !await e.MoveNextAsync())
+            if (this.count <= 0 || !await this.e.MoveNextAsync())
                 return false;
 
-            count--;
+			this.count--;
 
             return true;
         }
@@ -58,8 +58,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public void Reset()
         {
-            count = count0;
-            e.Reset();
+			this.count = this.count0;
+			this.e.Reset();
         }
     }
 }

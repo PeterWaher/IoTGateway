@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence
@@ -6,7 +7,7 @@ namespace Waher.Persistence
 	/// <summary>
 	/// Interface for asynchronous enumerators.
 	/// </summary>
-	public interface IAsyncEnumerator
+	public interface IAsyncEnumerator : IEnumerator
 	{
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -15,5 +16,12 @@ namespace Waher.Persistence
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> MoveNextAsync();
+	}
+
+	/// <summary>
+	/// Interface for asynchronous enumerators.
+	/// </summary>
+	public interface IAsyncEnumerator<T> : System.Collections.Generic.IEnumerator<T>, IAsyncEnumerator
+	{
 	}
 }

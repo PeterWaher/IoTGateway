@@ -63,14 +63,14 @@ namespace Waher.Script.Persistence.SQL.Groups
 			int i, c = this.groupBy.Length;
 			object o1, o2;
 
-			while (this.processLast || await e.MoveNextAsync())
+			while (this.processLast || await this.e.MoveNextAsync())
 			{
 				this.processLast = false;
 
 				if (this.objectVariables is null)
-					this.objectVariables = new ObjectProperties(e.Current, this.variables);
+					this.objectVariables = new ObjectProperties(this.e.Current, this.variables);
 				else
-					this.objectVariables.Object = e.Current;
+					this.objectVariables.Object = this.e.Current;
 
 				if (Last is null)
 				{
@@ -108,7 +108,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 				if (Objects is null)
 					Objects = new List<object>();
 
-				Objects.Add(e.Current);
+				Objects.Add(this.e.Current);
 			}
 
 			if (Objects is null)

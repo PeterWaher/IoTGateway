@@ -27,22 +27,22 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="AdditionalFields">Fields to add to enumerated items.</param>
         public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, KeyValuePair<string, ScriptNode>[] AdditionalFields)
         {
-            e = ItemEnumerator;
-            variables = Variables;
-            additionalFields = AdditionalFields;
+			this.e = ItemEnumerator;
+			this.variables = Variables;
+			this.additionalFields = AdditionalFields;
         }
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
-        public object Current => current;
+        public object Current => this.current;
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>
         /// </summary>
         public bool MoveNext()
         {
-            return MoveNextAsync().Result;
+            return this.MoveNextAsync().Result;
         }
 
         /// <summary>
@@ -53,34 +53,34 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public async Task<bool> MoveNextAsync()
         {
-            if (!await e.MoveNextAsync())
+            if (!await this.e.MoveNextAsync())
                 return false;
 
-            current = e.Current;
+			this.current = this.e.Current;
 
-            if (objectVariables is null)
-                objectVariables = new ObjectProperties(current, variables);
+            if (this.objectVariables is null)
+				this.objectVariables = new ObjectProperties(this.current, this.variables);
             else
-                objectVariables.Object = e.Current;
+				this.objectVariables.Object = this.e.Current;
 
-            if (current is GenericObject GenObj)
+            if (this.current is GenericObject GenObj)
             {
-                foreach (KeyValuePair<string, ScriptNode> P in additionalFields)
-                    GenObj[P.Key] = P.Value.Evaluate(objectVariables);
+                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+                    GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
             }
-            else if (current is GroupObject GroupObj)
+            else if (this.current is GroupObject GroupObj)
             {
-                foreach (KeyValuePair<string, ScriptNode> P in additionalFields)
-                    GroupObj[P.Key] = P.Value.Evaluate(objectVariables);
+                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+                    GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
             }
             else
             {
-                GroupObject Obj = new GroupObject(new object[] { current }, new object[0], new ScriptNode[0], objectVariables);
+                GroupObject Obj = new GroupObject(new object[] { this.current }, new object[0], new ScriptNode[0], this.objectVariables);
 
-                foreach (KeyValuePair<string, ScriptNode> P in additionalFields)
-                    Obj[P.Key] = P.Value.Evaluate(objectVariables);
+                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+                    Obj[P.Key] = P.Value.Evaluate(this.objectVariables);
 
-                current = Obj;
+				this.current = Obj;
             }
 
             return true;
@@ -91,8 +91,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public void Reset()
         {
-            e.Reset();
-            current = null;
+			this.e.Reset();
+			this.current = null;
         }
     }
 }

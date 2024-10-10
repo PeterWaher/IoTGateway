@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -26,24 +24,12 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public T Current
-		{
-			get
-			{
-				throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
-			}
-		}
+		public T Current => throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 
 		/// <summary>
 		/// Serializer used to deserialize <see cref="Current"/>.
 		/// </summary>
-		public IObjectSerializer CurrentSerializer
-		{
-			get
-			{
-				throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
-			}
-		}
+		public IObjectSerializer CurrentSerializer => throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 
 		/// <summary>
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
@@ -61,17 +47,34 @@ namespace Waher.Persistence.Files.Searching
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
 
 		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
+
+		/// <summary>
+		/// Resets the enumerator.
+		/// </summary>
+		public void Reset()
+		{
+		}
+
+		/// <summary>
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
-		{
-			get
-			{
-				throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
-			}
-		}
+		public Guid CurrentObjectId => throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

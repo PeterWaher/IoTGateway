@@ -20,21 +20,21 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="Offset">Number of records to skip.</param>
         public OffsetEnumerator(IResultSetEnumerator ItemEnumerator, int Offset)
         {
-            e = ItemEnumerator;
-            offset = offset0 = Offset;
+			this.e = ItemEnumerator;
+			this.offset = this.offset0 = Offset;
         }
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
-        public object Current => e.Current;
+        public object Current => this.e.Current;
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>
         /// </summary>
         public bool MoveNext()
         {
-            return MoveNextAsync().Result;
+            return this.MoveNextAsync().Result;
         }
 
         /// <summary>
@@ -45,10 +45,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public async Task<bool> MoveNextAsync()
         {
-            while (await e.MoveNextAsync())
+            while (await this.e.MoveNextAsync())
             {
-                if (offset > 0)
-                    offset--;
+                if (this.offset > 0)
+					this.offset--;
                 else
                     return true;
             }
@@ -61,8 +61,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public void Reset()
         {
-            offset = offset0;
-            e.Reset();
+			this.offset = this.offset0;
+			this.e.Reset();
         }
     }
 }

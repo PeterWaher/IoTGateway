@@ -9,7 +9,7 @@ namespace Waher.Persistence
 	/// Paginated object enumerator.
 	/// </summary>
 	/// <typeparam name="T">Type of object being enumerated.</typeparam>
-	public class PaginatedEnumerator<T> : IEnumerator<T>, IAsyncEnumerator
+	public class PaginatedEnumerator<T> : IAsyncEnumerator<T>
 		where T : class
 	{
 		private readonly IPage<T> firstPage;

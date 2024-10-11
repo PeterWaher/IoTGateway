@@ -6,6 +6,7 @@ using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL.LedgerExports
 {
@@ -158,25 +159,26 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 			{
 				foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
 				{
+					IElement E;
+
 					try
 					{
-						IElement E;
-
 						if (P.Value.IsAsynchronous)
 							E = await P.Value.EvaluateAsync(this.entryVariables);
 						else
 							E = P.Value.Evaluate(this.entryVariables);
-
-						this.entryVariables[P.Key] = E;
 					}
 					catch (ScriptReturnValueException ex)
 					{
-						this.entryVariables[P.Key] = ex.ReturnValue;
+						E = ex.ReturnValue;
 					}
 					catch (Exception ex)
 					{
-						this.entryVariables[P.Key] = ex;
+						E = new ObjectValue(ex);
 					}
+
+					this.entryVariables[P.Key] = E;
+					this.currentProperties.AddLast(new KeyValuePair<string, object>(P.Key, E.AssociatedObjectValue));
 				}
 			}
 

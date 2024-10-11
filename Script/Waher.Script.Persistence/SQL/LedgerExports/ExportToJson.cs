@@ -12,7 +12,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	/// <summary>
 	/// Export is serialized into object form.
 	/// </summary>
-	public class ExportToScriptObject : ILedgerExport
+	public class ExportToJson : ILedgerExport
 	{
 		private readonly List<IElement> collections = new List<IElement>();
 		private readonly List<IElement> blocksInCollection = new List<IElement>();
@@ -25,7 +25,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <summary>
 		/// Export is serialized into object form.
 		/// </summary>
-		public ExportToScriptObject()
+		public ExportToJson()
 		{
 		}
 

@@ -157,7 +157,7 @@ namespace Waher.Script.Persistence.SQL
 
 			ILedgerExport Destination = null;
 			ExportCounter Counter = null;
-			ExportToScriptObject ObjectsExported = null;
+			ExportToJson ObjectsExported = null;
 			ExportToTable TableExported = null;
 			StringBuilder XmlOutput = null;
 			bool FilterColumns = true;
@@ -169,7 +169,7 @@ namespace Waher.Script.Persistence.SQL
 					switch (Ref.VariableName.ToUpper())
 					{
 						case "JSON":
-							Destination = ObjectsExported = new ExportToScriptObject();
+							Destination = ObjectsExported = new ExportToJson();
 							break;
 
 						case "XML":
@@ -199,7 +199,7 @@ namespace Waher.Script.Persistence.SQL
 						switch (FileName.ToUpper())
 						{
 							case "JSON":
-								Destination = ObjectsExported = new ExportToScriptObject();
+								Destination = ObjectsExported = new ExportToJson();
 								break;
 
 							case "XML":
@@ -237,7 +237,7 @@ namespace Waher.Script.Persistence.SQL
 					FilterColumns = false;
 				}
 				else
-					Destination = ObjectsExported = new ExportToScriptObject();
+					Destination = ObjectsExported = new ExportToJson();
 			}
 			else if (Counter is null)
 				Destination = Counter = new ExportCounter(Destination);

@@ -159,6 +159,7 @@ namespace Waher.Script.Persistence.SQL
 			ExportCounter Counter = null;
 			ExportToJson ObjectsExported = null;
 			ExportToTable TableExported = null;
+			ExportToVariableTable VariableTableExported = null;
 			ExportToLambda LambdaExported = null;
 			StringBuilder XmlOutput = null;
 			bool FilterColumns = true;
@@ -184,7 +185,10 @@ namespace Waher.Script.Persistence.SQL
 							break;
 
 						case "TABLE":
-							Destination = TableExported = new ExportToTable(Columns2);
+							if (Columns2 is null)
+								Destination = VariableTableExported = new ExportToVariableTable();
+							else
+								Destination = TableExported = new ExportToTable(Columns2);
 							FilterColumns = false;
 							break;
 					}
@@ -214,7 +218,10 @@ namespace Waher.Script.Persistence.SQL
 								break;
 
 							case "TABLE":
-								Destination = TableExported = new ExportToTable(Columns2);
+								if (Columns2 is null)
+									Destination = VariableTableExported = new ExportToVariableTable();
+								else
+									Destination = TableExported = new ExportToTable(Columns2);
 								FilterColumns = false;
 								break;
 
@@ -261,6 +268,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(this.where is null) ||
 				!(TableExported is null) ||
+				!(VariableTableExported is null) ||
 				!(LambdaExported is null) ||
 				!(AdditionalFields is null))
 			{
@@ -269,6 +277,9 @@ namespace Waher.Script.Persistence.SQL
 
 				if (!(TableExported is null))
 					TableExported.Variables = Conditions.EntryVariables;
+
+				if (!(VariableTableExported is null))
+					VariableTableExported.Variables = Conditions.EntryVariables;
 
 				if (!(LambdaExported is null))
 					LambdaExported.Variables = Conditions.EntryVariables;
@@ -286,6 +297,8 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else if (!(TableExported is null))
 				return TableExported.ToMatrix();
+			else if (!(VariableTableExported is null))
+				return VariableTableExported.ToMatrix();
 			else if (!(Counter is null))
 			{
 				return new ObjectValue(new Dictionary<string, IElement>()

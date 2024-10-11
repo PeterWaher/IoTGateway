@@ -59,6 +59,11 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		}
 
 		/// <summary>
+		/// Entry variables.
+		/// </summary>
+		public Variables EntryVariables => this.entryVariables;
+
+		/// <summary>
 		/// Is called when a collection is started.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection</param>
@@ -144,21 +149,24 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 			this.properties.Object = new GenericObject(this.StartedCollection,
 				this.currentTypeName, ObjectId, this.currentProperties);
 
-			try
+			if (!(this.condition is null))
 			{
-				IElement E;
+				try
+				{
+					IElement E;
 
-				if (this.condition.IsAsynchronous)
-					E = await this.condition.EvaluateAsync(this.entryVariables);
-				else
-					E = this.condition.Evaluate(this.entryVariables);
+					if (this.condition.IsAsynchronous)
+						E = await this.condition.EvaluateAsync(this.entryVariables);
+					else
+						E = this.condition.Evaluate(this.entryVariables);
 
-				if (!(E.AssociatedObjectValue is bool B && B))
+					if (!(E.AssociatedObjectValue is bool B && B))
+						return true;
+				}
+				catch (Exception)
+				{
 					return true;
-			}
-			catch (Exception)
-			{
-				return true;
+				}
 			}
 
 			if (!await base.StartEntry(this.currentObjectId, this.currentTypeName, this.currentEntryType, this.currentEntryTimestamp))

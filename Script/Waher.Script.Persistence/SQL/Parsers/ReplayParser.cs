@@ -40,7 +40,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			"TO",
 			"XML",
 			"JSON",
-			"COUNTERS"
+			"COUNTERS",
+			"TABLE"
 		};
 
 		/// <summary>

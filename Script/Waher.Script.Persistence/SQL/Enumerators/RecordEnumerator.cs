@@ -13,7 +13,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
     public class RecordEnumerator : IResultSetEnumerator
     {
         private readonly IResultSetEnumerator e;
-        private readonly ScriptNode[] columns;
+        private readonly VariableReference[] columns;
         private readonly Variables variables;
         private readonly int count;
         private IElement[] record;
@@ -25,7 +25,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="ItemEnumerator">Item enumerator</param>
         /// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
         /// <param name="Variables">Current set of variables.</param>
-        public RecordEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
+        public RecordEnumerator(IResultSetEnumerator ItemEnumerator, VariableReference[] Columns, Variables Variables)
         {
 			this.e = ItemEnumerator;
 			this.columns = Columns;

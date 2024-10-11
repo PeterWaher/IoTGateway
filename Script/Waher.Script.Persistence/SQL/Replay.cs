@@ -123,9 +123,8 @@ namespace Waher.Script.Persistence.SQL
 				Offset = 0;
 
 			IDataSource Source = await this.source.GetSource(Variables);
-			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
-			ScriptNode[] Columns2 = this.columns;
+			VariableReference[] Columns2 = this.columns is null ? null : new VariableReference[this.columns.Length];
 
 			if (!(this.columns is null))
 			{
@@ -133,19 +132,15 @@ namespace Waher.Script.Persistence.SQL
 				for (i = 0; i < c; i++)
 				{
 					if (this.columns[i] is VariableReference Ref)
-						ColumnIndices[Ref.VariableName] = i;
+						Columns2[i] = Ref;
 					else if (this.columnNames[i] is VariableReference Ref2)
 					{
-						ColumnIndices[Ref2.VariableName] = i;
+						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
-						{
 							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
-							Columns2 = (ScriptNode[])Columns2.Clone();
-						}
 
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
-						Columns2[i] = new VariableReference(Ref2.VariableName, Ref2.Start, Ref2.Length, Ref2.Expression);
 					}
 				}
 			}
@@ -155,6 +150,7 @@ namespace Waher.Script.Persistence.SQL
 			ILedgerExport Destination = null;
 			ExportCounter Counter = null;
 			ExportToScriptObject ObjectsExported = null;
+			ExportToTable TableExported = null;
 			StringBuilder XmlOutput = null;
 
 			if (!(this.to is null))
@@ -176,6 +172,10 @@ namespace Waher.Script.Persistence.SQL
 						case "COUNTERS":
 							Destination = Counter = new ExportCounter(null);
 							break;
+
+						case "TABLE":
+							Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+							break;
 					}
 				}
 
@@ -186,7 +186,30 @@ namespace Waher.Script.Persistence.SQL
 						Destination = Export;
 					else if (E.AssociatedObjectValue is string FileName)
 					{
-						Destination = new XmlFileLedger(FileName, null, int.MaxValue);
+						switch (FileName.ToUpper())
+						{
+							case "JSON":
+								Destination = ObjectsExported = new ExportToScriptObject();
+								break;
+
+							case "XML":
+								XmlOutput = new StringBuilder();
+								StringWriter Writer = new StringWriter(XmlOutput);
+								Destination = new XmlFileLedger(Writer);
+								break;
+
+							case "COUNTERS":
+								Destination = Counter = new ExportCounter(null);
+								break;
+
+							case "TABLE":
+								Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+								break;
+
+							default:
+								Destination = new XmlFileLedger(FileName, null, int.MaxValue);
+								break;
+						}
 					}
 					else if (E.AssociatedObjectValue is null)
 						Destination = null;
@@ -196,7 +219,12 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			if (Destination is null)
-				Destination = ObjectsExported = new ExportToScriptObject();
+			{
+				if (!(this.columns is null))
+					Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+				else
+					Destination = ObjectsExported = new ExportToScriptObject();
+			}
 			else if (Counter is null)
 				Destination = Counter = new ExportCounter(Destination);
 
@@ -206,23 +234,16 @@ namespace Waher.Script.Persistence.SQL
 			if (Top != int.MaxValue)
 				Destination = new ExportEntryMaxCount(Destination, Top);
 
-			if (!(this.where is null))
-				Destination = new ExportCondition(Destination, this.where, Variables);
+			if (!(this.where is null) || !(TableExported is null))
+			{
+				ExportCondition Conditions = new ExportCondition(Destination, this.where, Variables);
+				Destination = Conditions;
+
+				if (!(TableExported is null))
+					TableExported.Variables = Conditions.EntryVariables;
+			}
 
 			await Ledger.Export(Destination, new string[] { Source.CollectionName });
-
-			// TODO:
-			//
-			// Table results
-			//
-			// Optimize on:
-			//		Timestamp,
-			//		Block,
-			//		Collection,
-			//		Creator
-			//		ObjectId,
-			//		TypeName,
-			//		EntryType
 
 			if (!(ObjectsExported is null))
 				return ObjectsExported.ToVector();
@@ -232,6 +253,8 @@ namespace Waher.Script.Persistence.SQL
 				Doc.LoadXml(XmlOutput.ToString());
 				return new ObjectValue(Doc);
 			}
+			else if (!(TableExported is null))
+				return TableExported.ToMatrix();
 			else if (!(Counter is null))
 			{
 				return new ObjectValue(new Dictionary<string, IElement>()

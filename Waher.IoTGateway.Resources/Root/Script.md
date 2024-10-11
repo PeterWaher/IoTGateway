@@ -3185,12 +3185,14 @@ new objects
 `REPLAY` statements can be executed against the ledger to extract entries matching certain
 search criteria. By default, events matching the criteria will be output in the order they 
 appear in the collections provided. You can direct the results to a given destination, which
-can be a file name (in case the export with be an XML file) or an object instance 
+can evaluate to a file name (in case the export with be an XML file) or an object instance 
 implementing the `Waher.Persistence.Serialization.ILedgerExport` interface, or any of the
-keywords `XML`, `JSON` or `COUNTERS`. If no `TO` clause is available, the default destination
-is `JSON`. If an `ILedgerExport` interface or a file name is provided, the result of the
-execution (apart from exporting the replay to the destination) in the script environment will
-be the the same as providing a `COUNTERS` destination.
+keywords `XML`, `JSON`, `COUNTERS` or `TABLE`, or evaluate to string values same as the
+these keywords. If no `TO` clause is available, the default destination is `JSON` if no 
+columns have been provided (i.e. `*` has been used), or `TABLE`, if columns have been 
+provided. If an `ILedgerExport` interface or a file name is provided, the result of the 
+execution (apart from exporting the replay to the destination) in the script environment 
+will be the the same as providing a `COUNTERS` destination.
 
 Syntax:
 

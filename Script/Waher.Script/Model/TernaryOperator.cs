@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Model
+﻿namespace Waher.Script.Model
 {
 	/// <summary>
 	/// Base class for all ternary operators.

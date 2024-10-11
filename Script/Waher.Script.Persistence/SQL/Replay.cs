@@ -11,6 +11,9 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Assignments.WithSelf;
+using Waher.Script.Operators.Comparisons;
+using Waher.Script.Operators.Membership;
 using Waher.Script.Persistence.SQL.LedgerExports;
 
 namespace Waher.Script.Persistence.SQL
@@ -266,6 +269,11 @@ namespace Waher.Script.Persistence.SQL
 			if (Top != int.MaxValue)
 				Destination = new ExportEntryMaxCount(Destination, Top);
 
+			LedgerExportRestriction Restriction = new LedgerExportRestriction()
+			{
+				CollectionNames = new string[] { Source.CollectionName }
+			};
+
 			if (!(this.where is null) ||
 				!(TableExported is null) ||
 				!(VariableTableExported is null) ||
@@ -283,9 +291,12 @@ namespace Waher.Script.Persistence.SQL
 
 				if (!(LambdaExported is null))
 					LambdaExported.Variables = Conditions.EntryVariables;
+
+				if (!(this.where is null))
+					await FindRestrictions(Restriction, this.where, Variables);
 			}
 
-			await Ledger.Export(Destination, new string[] { Source.CollectionName });
+			await Ledger.Export(Destination, Restriction);
 
 			if (!(ObjectsExported is null))
 				return ObjectsExported.ToVector();
@@ -311,6 +322,263 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 				return ObjectValue.Null;
+		}
+
+		private static async Task FindRestrictions(LedgerExportRestriction Restriction,
+			ScriptNode Where, Variables Variables)
+		{
+			if (Where is BinaryOperator BinOp)
+			{
+				if (BinOp is Operators.Logical.And ||
+					BinOp is Operators.Binary.And ||
+					BinOp is Operators.Dual.And)
+				{
+					await FindRestrictions(Restriction, BinOp.LeftOperand, Variables);
+					await FindRestrictions(Restriction, BinOp.RightOperand, Variables);
+				}
+				else if (BinOp is Operators.Logical.Or ||
+					BinOp is Operators.Binary.Or ||
+					BinOp is Operators.Dual.Or)
+				{
+					// TODO
+				}
+				else if (BinOp is Range Range)
+				{
+					if (!(Range.MiddleOperand is VariableReference MidVar))
+						return;
+
+					if (MidVar.VariableName != "Created")
+						return;
+
+					object LeftValue = await Eval(Range.LeftOperand, Variables);
+					if (LeftValue is null)
+						return;
+
+					object RightValue = await Eval(Range.RightOperand, Variables);
+					if (RightValue is null)
+						return;
+
+					if (LeftValue is DateTime LeftTP)
+						LeftTP = LeftTP.ToUniversalTime();
+					else if (LeftValue is DateTimeOffset LeftTPO)
+						LeftTP = LeftTPO.UtcDateTime;
+					else
+						LeftTP = DateTime.MinValue;
+
+					if (LeftTP != DateTime.MinValue)
+					{
+						Restriction.MinCreated = LeftTP;
+						Restriction.MinCreatedIncluded = Range.LeftInclusive;
+					}
+
+					if (RightValue is DateTime RightTP)
+						RightTP = RightTP.ToUniversalTime();
+					else if (RightValue is DateTimeOffset RightTPO)
+						RightTP = RightTPO.UtcDateTime;
+					else
+						RightTP = DateTime.MaxValue;
+
+					if (RightTP != DateTime.MaxValue)
+					{
+						Restriction.MaxCreated = RightTP;
+						Restriction.MaxCreatedIncluded = Range.RightInclusive;
+					}
+				}
+				else
+				{
+					object Value;
+					string Name;
+					bool Invert;
+
+					if (BinOp.LeftOperand is VariableReference LeftVar)
+					{
+						Name = LeftVar.VariableName;
+						Invert = false;
+
+						Value = await Eval(BinOp.RightOperand, Variables);
+						if (Value is null)
+							return;
+					}
+					else if (BinOp.RightOperand is VariableReference RightVar)
+					{
+						Name = RightVar.VariableName;
+						Invert = true;
+
+						Value = await Eval(BinOp.LeftOperand, Variables);
+						if (Value is null)
+							return;
+					}
+					else
+						return;
+
+					if (BinOp is EqualTo || BinOp is EqualToElementWise ||
+						BinOp is IdenticalTo || BinOp is IdenticalToElementWise)
+					{
+						switch (Name)
+						{
+							case "BlockId":
+								if (Value is string BlockId)
+									Restriction.BlockIds = new string[] { BlockId };
+								break;
+
+							case "Creator":
+								if (Value is string Creator)
+									Restriction.Creators = new string[] { Creator };
+								break;
+
+							case "Created":
+								if (Value is DateTime Created)
+									Created = Created.ToUniversalTime();
+								else if (Value is DateTimeOffset Created2)
+									Created = Created2.UtcDateTime;
+								else
+									break;
+
+								Restriction.MinCreated = Created;
+								Restriction.MaxCreated = Created;
+								Restriction.MinCreatedIncluded = true;
+								Restriction.MaxCreatedIncluded = true;
+								break;
+						}
+					}
+					else if (BinOp is GreaterThan)
+					{
+						switch (Name)
+						{
+							case "Created":
+								if (Value is DateTime Created)
+									Created = Created.ToUniversalTime();
+								else if (Value is DateTimeOffset Created2)
+									Created = Created2.UtcDateTime;
+								else
+									break;
+
+								if (Invert)
+								{
+									Restriction.MaxCreated = Created;
+									Restriction.MaxCreatedIncluded = false;
+								}
+								else
+								{
+									Restriction.MinCreated = Created;
+									Restriction.MinCreatedIncluded = false;
+								}
+								break;
+						}
+					}
+					else if (BinOp is GreaterThanOrEqualTo)
+					{
+						switch (Name)
+						{
+							case "Created":
+								if (Value is DateTime Created)
+									Created = Created.ToUniversalTime();
+								else if (Value is DateTimeOffset Created2)
+									Created = Created2.UtcDateTime;
+								else
+									break;
+
+								if (Invert)
+								{
+									Restriction.MaxCreated = Created;
+									Restriction.MaxCreatedIncluded = true;
+								}
+								else
+								{
+									Restriction.MinCreated = Created;
+									Restriction.MinCreatedIncluded = true;
+								}
+								break;
+						}
+					}
+					else if (BinOp is LesserThan)
+					{
+						switch (Name)
+						{
+							case "Created":
+								if (Value is DateTime Created)
+									Created = Created.ToUniversalTime();
+								else if (Value is DateTimeOffset Created2)
+									Created = Created2.UtcDateTime;
+								else
+									break;
+
+								if (Invert)
+								{
+									Restriction.MinCreated = Created;
+									Restriction.MinCreatedIncluded = false;
+								}
+								else
+								{
+									Restriction.MaxCreated = Created;
+									Restriction.MaxCreatedIncluded = false;
+								}
+								break;
+						}
+					}
+					else if (BinOp is LesserThanOrEqualTo)
+					{
+						switch (Name)
+						{
+							case "Created":
+								if (Value is DateTime Created)
+									Created = Created.ToUniversalTime();
+								else if (Value is DateTimeOffset Created2)
+									Created = Created2.UtcDateTime;
+								else
+									break;
+
+								if (Invert)
+								{
+									Restriction.MinCreated = Created;
+									Restriction.MinCreatedIncluded = true;
+								}
+								else
+								{
+									Restriction.MaxCreated = Created;
+									Restriction.MaxCreatedIncluded = true;
+								}
+								break;
+						}
+					}
+					else if (BinOp is In)
+					{
+						// TODO
+					}
+				}
+			}
+		}
+
+		private static async Task<object> Eval(ScriptNode Node, Variables Variables)
+		{
+			IElement Element;
+
+			try
+			{
+				if (Node.IsAsynchronous)
+					Element = await Node.EvaluateAsync(Variables);
+				else
+					Element = Node.Evaluate(Variables);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+
+			return Element.AssociatedObjectValue;
+		}
+
+		private static void Append(ref string[] A, string Value)
+		{
+			int c;
+
+			if (A is null || (c = A.Length) == 0)
+				A = new string[] { Value };
+			else if (Array.IndexOf(A, Value) < 0)
+			{
+				Array.Resize(ref A, c + 1);
+				A[c] = Value;
+			}
 		}
 
 		/// <summary>

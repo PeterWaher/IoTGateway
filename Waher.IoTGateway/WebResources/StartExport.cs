@@ -16,6 +16,7 @@ using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HttpFileUpload;
+using Waher.Persistence;
 using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Profiling;
 
@@ -373,7 +374,13 @@ namespace Waher.IoTGateway.WebResources
 				if (Ledger && Persistence.Ledger.HasProvider)
 				{
 					Profiler.NewState("Ledger");
-					await Persistence.Ledger.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,
+
+					LedgerExportRestriction Restricion = new LedgerExportRestriction()
+					{
+						CollectionNames = ExportInfo.Exporter.CollectionNames
+					};
+
+					await Persistence.Ledger.Export(ExportInfo.Exporter, Restricion,
 						Profiler.CreateThread("Ledger", ProfilerThreadType.Sequential));
 				}
 

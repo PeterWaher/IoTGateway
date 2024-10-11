@@ -278,23 +278,25 @@ namespace Waher.Persistence
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
 		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
-		public static Task<bool> Export(ILedgerExport Output, string[] CollectionNames)
+		public static Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction)
 		{
-			return Provider.Export(Output, CollectionNames);
+			return Provider.Export(Output, Restriction);
 		}
 
 		/// <summary>
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
 		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
-		public static Task<bool> Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread)
+		public static Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction, ProfilerThread Thread)
 		{
-			return Provider.Export(Output, CollectionNames, Thread);
+			return Provider.Export(Output, Restriction, Thread);
 		}
 
 		private static readonly object listeningSynchObj = new object();

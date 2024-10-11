@@ -3,59 +3,25 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Persistence.SQL.LedgerExports
 {
 	/// <summary>
-	/// Export is serialized into table form.
 	/// </summary>
-	public class ExportToTable : ILedgerExport
+	public class ExportColumnFilter : ILedgerExport
 	{
-		private readonly LinkedList<IElement> elements = new LinkedList<IElement>();
-		private readonly VariableReference[] columns;
-		private readonly int width;
-		private int height;
-		private Variables variables;
+		private readonly ILedgerExport output;
+		private readonly Dictionary<string, int> columnIndices;
 
 		/// <summary>
-		/// Export is serialized into object form.
+		/// Class that filters properties to include only selected properties.
 		/// </summary>
-		/// <param name="Columns">Column definitions.</param>
-		public ExportToTable(VariableReference[] Columns)
+		/// <param name="Output">Underlying output.</param>
+		/// <param name="ColumnIndices">Columns to include in export.</param>
+		public ExportColumnFilter(ILedgerExport Output, Dictionary<string, int> ColumnIndices)
 		{
-			this.columns = Columns;
-			this.width = this.columns.Length;
-		}
-
-		/// <summary>
-		/// Variables used to compute calculated column values.
-		/// </summary>
-		public Variables Variables
-		{
-			get => this.variables;
-			internal set => this.variables = value;
-		}
-
-		/// <summary>
-		/// Converts the exported information into an object matrix with column headers.
-		/// </summary>
-		/// <returns>Object matrix.</returns>
-		public ObjectMatrix ToMatrix()
-		{
-			string[] Headers = new string[this.width];
-			int i;
-
-			for (i = 0; i < this.width; i++)
-				Headers[i] = this.columns[i].VariableName;
-
-			return new ObjectMatrix(this.height, this.width, this.elements)
-			{
-				ColumnNames = Headers
-			};
+			this.output = Output;
+			this.columnIndices = ColumnIndices;
 		}
 
 		/// <summary>
@@ -64,10 +30,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartLedger()
 		{
-			this.height = 0;
-			this.elements.Clear();
-
-			return Task.FromResult(true);
+			return this.output?.StartLedger() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -76,7 +39,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndLedger()
 		{
-			return Task.FromResult(true);
+			return this.output?.EndLedger() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -86,7 +49,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartCollection(string CollectionName)
 		{
-			return Task.FromResult(true);
+			return this.output?.StartCollection(CollectionName) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -95,7 +58,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndCollection()
 		{
-			return Task.FromResult(true);
+			return this.output?.EndCollection() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -105,7 +68,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartBlock(string BlockID)
 		{
-			return Task.FromResult(true);
+			return this.output?.StartBlock(BlockID) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -116,7 +79,10 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> BlockMetaData(string Key, object Value)
 		{
-			return Task.FromResult(true);
+			if (this.columnIndices.ContainsKey(Key) && !(this.output is null))
+				return this.output.BlockMetaData(Key, Value);
+			else
+				return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -125,7 +91,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndBlock()
 		{
-			return Task.FromResult(true);
+			return this.output?.EndBlock() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -138,7 +104,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
-			return Task.FromResult(true);
+			return this.output?.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -147,25 +113,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndEntry()
 		{
-			if (this.variables is null)
-				return Task.FromResult(false);
-
-			foreach (VariableReference Ref in this.columns)
-			{
-				try
-				{
-					this.elements.AddLast(Ref.Evaluate(this.variables));
-					// Variable references do not use asynchronous evaluation.
-				}
-				catch (Exception ex)
-				{
-					this.elements.AddLast(new ObjectValue(ex));
-				}
-			}
-
-			this.height++;
-
-			return Task.FromResult(true);
+			return this.output?.EndEntry() ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -175,7 +123,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			return Task.FromResult(true);
+			return this.output?.CollectionCleared(EntryTimestamp) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -186,7 +134,10 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
-			return Task.FromResult(true);
+			if (this.columnIndices.ContainsKey(PropertyName) && !(this.output is null))
+				return this.output.ReportProperty(PropertyName, PropertyValue);
+			else
+				return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -196,7 +147,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportError(string Message)
 		{
-			return Task.FromResult(true);
+			return this.output?.ReportError(Message) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -206,7 +157,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportException(Exception Exception)
 		{
-			return Task.FromResult(true);
+			return this.output?.ReportException(Exception) ?? Task.FromResult(true);
 		}
 	}
 }

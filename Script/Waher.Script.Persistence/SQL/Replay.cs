@@ -124,18 +124,26 @@ namespace Waher.Script.Persistence.SQL
 
 			IDataSource Source = await this.source.GetSource(Variables);
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
-			VariableReference[] Columns2 = this.columns is null ? null : new VariableReference[this.columns.Length];
+			VariableReference[] Columns2 = null;
+			Dictionary<string, int> ColumnIndices = null;
 
 			if (!(this.columns is null))
 			{
+				Columns2 = new VariableReference[this.columns.Length];
+				ColumnIndices = new Dictionary<string, int>();
+
 				c = this.columns.Length;
 				for (i = 0; i < c; i++)
 				{
 					if (this.columns[i] is VariableReference Ref)
+					{
 						Columns2[i] = Ref;
+						ColumnIndices[Ref.VariableName] = i;
+					}
 					else if (this.columnNames[i] is VariableReference Ref2)
 					{
 						Columns2[i] = Ref2;
+						ColumnIndices[Ref2.VariableName] = i;
 
 						if (AdditionalFields is null)
 							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
@@ -152,6 +160,7 @@ namespace Waher.Script.Persistence.SQL
 			ExportToScriptObject ObjectsExported = null;
 			ExportToTable TableExported = null;
 			StringBuilder XmlOutput = null;
+			bool FilterColumns = true;
 
 			if (!(this.to is null))
 			{
@@ -174,7 +183,8 @@ namespace Waher.Script.Persistence.SQL
 							break;
 
 						case "TABLE":
-							Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+							Destination = TableExported = new ExportToTable(Columns2);
+							FilterColumns = false;
 							break;
 					}
 				}
@@ -203,7 +213,8 @@ namespace Waher.Script.Persistence.SQL
 								break;
 
 							case "TABLE":
-								Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+								Destination = TableExported = new ExportToTable(Columns2);
+								FilterColumns = false;
 								break;
 
 							default:
@@ -221,12 +232,18 @@ namespace Waher.Script.Persistence.SQL
 			if (Destination is null)
 			{
 				if (!(this.columns is null))
-					Destination = TableExported = new ExportToTable(Columns2, AdditionalFields);
+				{
+					Destination = TableExported = new ExportToTable(Columns2);
+					FilterColumns = false;
+				}
 				else
 					Destination = ObjectsExported = new ExportToScriptObject();
 			}
 			else if (Counter is null)
 				Destination = Counter = new ExportCounter(Destination);
+
+			if (!(ColumnIndices is null) && FilterColumns)
+				Destination = new ExportColumnFilter(Destination, ColumnIndices);
 
 			if (Offset > 0)
 				Destination = new ExportEntryOffset(Destination, Offset);
@@ -234,9 +251,11 @@ namespace Waher.Script.Persistence.SQL
 			if (Top != int.MaxValue)
 				Destination = new ExportEntryMaxCount(Destination, Top);
 
-			if (!(this.where is null) || !(TableExported is null))
+			if (!(this.where is null) ||
+				!(TableExported is null) ||
+				!(AdditionalFields is null))
 			{
-				ExportCondition Conditions = new ExportCondition(Destination, this.where, Variables);
+				ExportCondition Conditions = new ExportCondition(Destination, this.where, Variables, AdditionalFields);
 				Destination = Conditions;
 
 				if (!(TableExported is null))

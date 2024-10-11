@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.LedgerExports
@@ -14,6 +15,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	public class ExportCondition : CustomEntryExport
 	{
 		private readonly LinkedList<KeyValuePair<string, object>> currentProperties = new LinkedList<KeyValuePair<string, object>>();
+		private readonly List<KeyValuePair<string, ScriptNode>> additionalFields;
 		private readonly ScriptNode condition;
 		private readonly ObjectProperties properties = null;
 		private readonly Variables contextVariables;
@@ -35,11 +37,14 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <param name="Output">Underlying output.</param>
 		/// <param name="Condition">Condition to allow export.</param>
 		/// <param name="Variables">Current set of variables.</param>
-		public ExportCondition(ILedgerExport Output, ScriptNode Condition, Variables Variables)
+		/// <param name="AdditionalFields">Additional calculated fields.</param>
+		public ExportCondition(ILedgerExport Output, ScriptNode Condition, Variables Variables,
+			List<KeyValuePair<string, ScriptNode>> AdditionalFields)
 			: base(Output)
 		{
 			this.condition = Condition;
 			this.contextVariables = Variables;
+			this.additionalFields = AdditionalFields;
 
 			this.properties = new ObjectProperties(
 				new GenericObject(string.Empty, string.Empty, Guid.Empty),
@@ -148,6 +153,32 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 
 			this.properties.Object = new GenericObject(this.StartedCollection,
 				this.currentTypeName, ObjectId, this.currentProperties);
+
+			if (!(this.additionalFields is null))
+			{
+				foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+				{
+					try
+					{
+						IElement E;
+
+						if (P.Value.IsAsynchronous)
+							E = await P.Value.EvaluateAsync(this.entryVariables);
+						else
+							E = P.Value.Evaluate(this.entryVariables);
+
+						this.entryVariables[P.Key] = E;
+					}
+					catch (ScriptReturnValueException ex)
+					{
+						this.entryVariables[P.Key] = ex.ReturnValue;
+					}
+					catch (Exception ex)
+					{
+						this.entryVariables[P.Key] = ex;
+					}
+				}
+			}
 
 			if (!(this.condition is null))
 			{

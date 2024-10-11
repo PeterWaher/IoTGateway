@@ -108,6 +108,20 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		}
 
 		/// <summary>
+		/// Is called when a property is reported.
+		/// </summary>
+		/// <param name="PropertyName">Property name.</param>
+		/// <param name="PropertyValue">Property value.</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
+		{
+			if (this.columnIndices.ContainsKey(PropertyName) && !(this.output is null))
+				return this.output.ReportProperty(PropertyName, PropertyValue);
+			else
+				return Task.FromResult(true);
+		}
+
+		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
@@ -124,20 +138,6 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
 			return this.output?.CollectionCleared(EntryTimestamp) ?? Task.FromResult(true);
-		}
-
-		/// <summary>
-		/// Is called when a property is reported.
-		/// </summary>
-		/// <param name="PropertyName">Property name.</param>
-		/// <param name="PropertyValue">Property value.</param>
-		/// <returns>If export can continue.</returns>
-		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
-		{
-			if (this.columnIndices.ContainsKey(PropertyName) && !(this.output is null))
-				return this.output.ReportProperty(PropertyName, PropertyValue);
-			else
-				return Task.FromResult(true);
 		}
 
 		/// <summary>

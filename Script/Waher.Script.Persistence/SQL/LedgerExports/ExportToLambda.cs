@@ -1,49 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL.LedgerExports
 {
 	/// <summary>
-	/// Class that counts exported elements.
+	/// Export is serialized into calls to a lambda expression having one argument.
 	/// </summary>
-	public class ExportCounter : ILedgerExport
+	public class ExportToLambda : ILedgerExport
 	{
-		private readonly ILedgerExport output;
-		private long nrCollections = 0;
-		private long nrBlocks = 0;
-		private long nrEntries = 0;
-		private long nrProperties = 0;
+		private readonly ILambdaExpression lambda;
+		private readonly IElement[] arguments = new IElement[] { ObjectValue.Null };
+		private Dictionary<string, IElement> currentCollection = null;
+		private Dictionary<string, IElement> currentBlock = null;
+		private Dictionary<string, IElement> currentEntry = null;
+		private Dictionary<string, IElement> propertiesInEvent = null;
+		private Variables variables;
 
 		/// <summary>
-		/// Class that counts exported elements.
+		/// Export is serialized into calls to a lambda expression having one argument.
 		/// </summary>
-		/// <param name="Output">Underlying output.</param>
-		public ExportCounter(ILedgerExport Output)
+		public ExportToLambda(ILambdaExpression Lambda)
 		{
-			this.output = Output;
+			this.lambda = Lambda;
 		}
 
 		/// <summary>
-		/// Number of collections processed
+		/// Variables used to execute the lambda expression.
 		/// </summary>
-		public long NrCollections => this.nrCollections;
-		
-		/// <summary>
-		/// Number of blocks processed
-		/// </summary>
-		public long NrBlocks => this.nrBlocks;
-		
-		/// <summary>
-		/// Number of entries processed
-		/// </summary>
-		public long NrEntries => this.nrEntries;
-		
-		/// <summary>
-		/// Number of properties processed
-		/// </summary>
-		public long NrProperties => this.nrProperties;
+		public Variables Variables
+		{
+			get => this.variables;
+			internal set => this.variables = value;
+		}
 
 		/// <summary>
 		/// Is called when export of ledger is started.
@@ -51,7 +45,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartLedger()
 		{
-			return this.output?.StartLedger() ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -60,7 +54,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndLedger()
 		{
-			return this.output?.EndLedger() ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -70,8 +64,12 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartCollection(string CollectionName)
 		{
-			this.nrCollections++;
-			return this.output?.StartCollection(CollectionName) ?? Task.FromResult(true);
+			this.currentCollection = new Dictionary<string, IElement>()
+			{
+				{ "Name", new StringValue(CollectionName) }
+			};
+
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -80,7 +78,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndCollection()
 		{
-			return this.output?.EndCollection() ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -90,8 +88,12 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartBlock(string BlockID)
 		{
-			this.nrBlocks++;
-			return this.output?.StartBlock(BlockID) ?? Task.FromResult(true);
+			this.currentBlock = new Dictionary<string, IElement>()
+			{
+				{ "Id", new StringValue(BlockID) }
+			};
+
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -102,7 +104,8 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> BlockMetaData(string Key, object Value)
 		{
-			return this.output?.BlockMetaData(Key, Value) ?? Task.FromResult(true);
+			this.currentBlock[Key] = Expression.Encapsulate(Value);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -111,7 +114,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndBlock()
 		{
-			return this.output?.EndBlock() ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -124,8 +127,17 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
-			this.nrEntries++;
-			return this.output?.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp) ?? Task.FromResult(true);
+			this.propertiesInEvent = new Dictionary<string, IElement>();
+			this.currentEntry = new Dictionary<string, IElement>()
+			{
+				{ "ObjectId", new ObjectValue(ObjectId) },
+				{ "TypeName", new ObjectValue(TypeName) },
+				{ "EntryType", new ObjectValue(EntryType) },
+				{ "Timestamp", new ObjectValue(EntryTimestamp) },
+				{ "this", new ObjectValue(this.propertiesInEvent) }
+			};
+
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -136,17 +148,45 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
-			this.nrProperties++;
-			return this.output?.ReportProperty(PropertyName, PropertyValue) ?? Task.FromResult(true);
+			this.propertiesInEvent[PropertyName] = Expression.Encapsulate(PropertyValue);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> EndEntry()
+		public async Task<bool> EndEntry()
 		{
-			return this.output?.EndEntry() ?? Task.FromResult(true);
+			Dictionary<string, IElement> Data = new Dictionary<string, IElement>();
+
+			foreach (KeyValuePair<string, IElement> P in this.currentCollection)
+				Data[P.Key] = P.Value;
+
+			foreach (KeyValuePair<string, IElement> P in this.currentBlock)
+				Data[P.Key] = P.Value;
+
+			foreach (KeyValuePair<string, IElement> P in this.currentEntry)
+				Data[P.Key] = P.Value;
+
+			foreach (KeyValuePair<string, IElement> P in this.propertiesInEvent)
+				Data[P.Key] = P.Value;
+
+			try
+			{
+				this.arguments[0] = new ObjectValue(Data);
+
+				if (this.lambda.IsAsynchronous)
+					await this.lambda.EvaluateAsync(this.arguments, this.variables);
+				else
+					this.lambda.Evaluate(this.arguments, this.variables);
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -156,7 +196,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			return this.output?.CollectionCleared(EntryTimestamp) ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -166,7 +206,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportError(string Message)
 		{
-			return this.output?.ReportError(Message) ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -176,7 +216,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportException(Exception Exception)
 		{
-			return this.output?.ReportException(Exception) ?? Task.FromResult(true);
+			return Task.FromResult(true);
 		}
 	}
 }

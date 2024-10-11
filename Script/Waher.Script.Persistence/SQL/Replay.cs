@@ -159,6 +159,7 @@ namespace Waher.Script.Persistence.SQL
 			ExportCounter Counter = null;
 			ExportToJson ObjectsExported = null;
 			ExportToTable TableExported = null;
+			ExportToLambda LambdaExported = null;
 			StringBuilder XmlOutput = null;
 			bool FilterColumns = true;
 
@@ -222,6 +223,13 @@ namespace Waher.Script.Persistence.SQL
 								break;
 						}
 					}
+					else if (E.AssociatedObjectValue is ILambdaExpression Lambda)
+					{
+						if (Lambda.NrArguments != 1)
+							throw new ScriptRuntimeException("Lambda expression used in REPLAY must have one argument.", this);
+
+						Destination = LambdaExported = new ExportToLambda(Lambda);
+					}
 					else if (E.AssociatedObjectValue is null)
 						Destination = null;
 					else
@@ -253,6 +261,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(this.where is null) ||
 				!(TableExported is null) ||
+				!(LambdaExported is null) ||
 				!(AdditionalFields is null))
 			{
 				ExportCondition Conditions = new ExportCondition(Destination, this.where, Variables, AdditionalFields);
@@ -260,6 +269,9 @@ namespace Waher.Script.Persistence.SQL
 
 				if (!(TableExported is null))
 					TableExported.Variables = Conditions.EntryVariables;
+
+				if (!(LambdaExported is null))
+					LambdaExported.Variables = Conditions.EntryVariables;
 			}
 
 			await Ledger.Export(Destination, new string[] { Source.CollectionName });

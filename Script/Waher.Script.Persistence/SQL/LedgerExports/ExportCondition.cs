@@ -53,7 +53,8 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 
 			this.entryVariables = new Variables()
 			{
-				ContextVariables = this.properties
+				ContextVariables = this.properties,
+				ConsoleOut = Variables.ConsoleOut
 			};
 
 			this.variableObjectId = this.entryVariables.Add("ObjectId", this.currentObjectId);

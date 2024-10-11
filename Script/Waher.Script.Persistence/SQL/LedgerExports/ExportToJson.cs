@@ -19,7 +19,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		private readonly List<IElement> eventsInBlock = new List<IElement>();
 		private Dictionary<string, IElement> currentCollection = null;
 		private Dictionary<string, IElement> currentBlock = null;
-		private Dictionary<string, IElement> currentEvent = null;
+		private Dictionary<string, IElement> currentEntry = null;
 		private Dictionary<string, IElement> propertiesInEvent = null;
 
 		/// <summary>
@@ -143,7 +143,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			this.propertiesInEvent = new Dictionary<string, IElement>();
-			this.currentEvent = new Dictionary<string, IElement>()
+			this.currentEntry = new Dictionary<string, IElement>()
 			{
 				{ "ObjectId", new ObjectValue(ObjectId) },
 				{ "TypeName", new ObjectValue(TypeName) },
@@ -156,12 +156,24 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		}
 
 		/// <summary>
+		/// Is called when a property is reported.
+		/// </summary>
+		/// <param name="PropertyName">Property name.</param>
+		/// <param name="PropertyValue">Property value.</param>
+		/// <returns>If export can continue.</returns>
+		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
+		{
+			this.propertiesInEvent[PropertyName] = Expression.Encapsulate(PropertyValue);
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
 		public Task<bool> EndEntry()
 		{
-			this.eventsInBlock.Add(new ObjectValue(this.currentEvent));
+			this.eventsInBlock.Add(new ObjectValue(this.currentEntry));
 			return Task.FromResult(true);
 		}
 
@@ -172,18 +184,6 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> CollectionCleared(DateTimeOffset EntryTimestamp)
 		{
-			return Task.FromResult(true);
-		}
-
-		/// <summary>
-		/// Is called when a property is reported.
-		/// </summary>
-		/// <param name="PropertyName">Property name.</param>
-		/// <param name="PropertyValue">Property value.</param>
-		/// <returns>If export can continue.</returns>
-		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
-		{
-			this.propertiesInEvent[PropertyName] = Expression.Encapsulate(PropertyValue);
 			return Task.FromResult(true);
 		}
 

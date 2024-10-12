@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Waher.Things.Ieee1451.Ieee1451_0.Model;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
@@ -96,6 +98,34 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			{
 				ErrorCode = 0xffff;
 				return false;
+			}
+		}
+
+		/// <summary>
+		/// Process incoming message.
+		/// </summary>
+		/// <param name="Client">Client interface.</param>
+		public override Task ProcessIncoming(IClient Client)
+		{
+			switch (this.MessageType)
+			{
+				case MessageType.Command:
+					return Client.TedsAccessCommand(this);
+
+				case MessageType.Reply:
+					return Client.TedsAccessReply(this);
+
+				case MessageType.Announcement:
+					return Client.TedsAccessAnnouncement(this);
+
+				case MessageType.Notification:
+					return Client.TedsAccessNotification(this);
+
+				case MessageType.Callback:
+					return Client.TedsAccessCallback(this);
+
+				default:
+					return Task.CompletedTask;
 			}
 		}
 	}

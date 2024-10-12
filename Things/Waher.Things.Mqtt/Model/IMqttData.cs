@@ -45,7 +45,7 @@ namespace Waher.Things.Mqtt.Model
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node</param>
 		/// <param name="Content">Published MQTT Content</param>
-		bool DataReported(MqttTopic Topic, MqttContent Content);
+		Task<bool> DataReported(MqttTopic Topic, MqttContent Content);
 
 		/// <summary>
 		/// Type name representing data.

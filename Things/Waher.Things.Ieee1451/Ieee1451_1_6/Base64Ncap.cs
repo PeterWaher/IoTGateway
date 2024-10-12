@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
-using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 
@@ -35,9 +34,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override bool DataReported(MqttTopic Topic, MqttContent Content)
+		public override async Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 
@@ -46,7 +45,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			try
 			{
-				return this.DataReported(Topic, Content, Convert.FromBase64String(s));
+				return await this.DataReported(Topic, Content, Convert.FromBase64String(s));
 			}
 			catch (Exception)
 			{

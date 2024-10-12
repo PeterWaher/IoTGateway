@@ -13,7 +13,7 @@ using Waher.Things.SensorData;
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
-	/// TODO
+	/// MQTT Topic information.
 	/// </summary>
 	public class MqttTopic
 	{
@@ -46,17 +46,22 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Reference to the MQTT Topic Node
 		/// </summary>
 		public IMqttTopicNode Node => this.node;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Broker
+		/// </summary>
+		public MqttBroker Broker => this.broker;
+
+		/// <summary>
+		/// Local topic name.
 		/// </summary>
 		public string LocalTopic => this.localTopic;
 
 		/// <summary>
-		/// TODO
+		/// Full topic name
 		/// </summary>
 		public string FullTopic => this.fullTopic;
 
@@ -78,19 +83,19 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
+		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
 		{
-			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, Broker);
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, IgnoreGuids, Broker);
 
 			if (Topic is null)
 				return null;
 			else if (Representation.MoveNext())
-				return await Topic.GetTopic(Representation, CreateNew, Broker);
+				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, Broker);
 			else
 				return Topic;
 		}
 
-		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
 		{
 			string CurrentSegment = Representation.CurrentSegment;
 			MqttTopic Topic, Topic2;
@@ -101,7 +106,7 @@ namespace Waher.Things.Mqtt.Model
 					return Topic;
 			}
 
-			if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+			if (IgnoreGuids && Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
 				return null;
 
 			if (this.node.HasChildren)
@@ -165,7 +170,7 @@ namespace Waher.Things.Mqtt.Model
 
 			try
 			{
-				if (!(this.data?.DataReported(this, Content) ?? false))
+				if (!(this.data is null) && !await this.data.DataReported(this, Content))
 					this.data = null;
 
 				if (this.data is null)

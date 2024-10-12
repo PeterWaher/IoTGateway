@@ -6,6 +6,9 @@
 			<String id="2">IEEE 1451.1.6 NCAP (BASE64)</String>
 			<String id="3">IEEE 1451.1.6 NCAP (HEX)</String>
 			<String id="4">IEEE 1451.1.6 NCAP (BINARY)</String>
+			<String id="5">IEEE 1451.0 NCAP</String>
+			<String id="6">IEEE 1451.0 TIM</String>
+			<String id="7">IEEE 1451.0 Channel</String>
 		</Namespace>
 	</Language>
 </Translation>

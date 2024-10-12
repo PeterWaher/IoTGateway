@@ -1,4 +1,7 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿using System.Threading.Tasks;
+using Waher.Things.Ieee1451.Ieee1451_0.Model;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Message
@@ -101,5 +104,11 @@
 				ChannelId = this.NextUInt16()
 			};
 		}
+
+		/// <summary>
+		/// Process incoming message.
+		/// </summary>
+		/// <param name="Client">Client interface.</param>
+		public abstract Task ProcessIncoming(IClient Client);
 	}
 }

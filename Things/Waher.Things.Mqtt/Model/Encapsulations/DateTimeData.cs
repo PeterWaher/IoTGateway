@@ -40,9 +40,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override bool DataReported(MqttTopic Topic, MqttContent Content)
+		public override Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			if (DateTime.TryParse(Content.DataString, out DateTime Value) || XML.TryParse(Content.DataString, out Value))
 			{
@@ -51,10 +51,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				this.QoS = Content.Header.QualityOfService;
 				this.Retain = Content.Header.Retain;
 
-				return true;
+				return Task.FromResult(true);
 			}
 			else
-				return false;
+				return Task.FromResult(false);
 		}
 
 		/// <summary>

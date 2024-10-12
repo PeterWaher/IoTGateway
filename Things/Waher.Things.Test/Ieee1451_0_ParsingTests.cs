@@ -111,6 +111,7 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMzAwLjE1AAAAZwAQtyV1/vM=")]
+		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk3LjE1AAAAZwrfajDxKLM=")]
 		public void Test_05_ParseTransducerSampleData(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);

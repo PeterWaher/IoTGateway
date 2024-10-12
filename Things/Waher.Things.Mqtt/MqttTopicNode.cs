@@ -121,7 +121,7 @@ namespace Waher.Things.Mqtt
 			if (Broker is null)
 				return null;
 			else
-				return await Broker.GetTopic(this.FullTopic, false);
+				return await Broker.GetTopic(this.FullTopic, false, false);
 		}
 
 		/// <summary>

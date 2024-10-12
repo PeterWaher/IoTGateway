@@ -1,13 +1,13 @@
 ﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
-	/// TIM identifying information
+	/// Application identifying information
 	/// </summary>
-	public class Ieee1451_0TimId : Ieee1451_0NcapId
+	public class ApplicationAddress
 	{
 		/// <summary>
-		/// TIM ID
+		/// Application ID
 		/// </summary>
-		public byte[] TimId;
+		public byte[] ApplicationId;
 	}
 }

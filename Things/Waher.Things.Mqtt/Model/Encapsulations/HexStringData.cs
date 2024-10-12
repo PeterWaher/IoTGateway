@@ -7,6 +7,7 @@ using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 
@@ -40,6 +41,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with binary data encoded as decimal strings.
 		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Value">Data value</param>
 		public HexStringData(MqttTopic Topic, byte[] Value)
 			: base(Topic)
 		{
@@ -49,13 +52,15 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public override bool DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Content">Published MQTT Content</param>
+		public override bool DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 
 			if (RegEx.IsMatch(s))
 			{
-				byte[] Data = Security.Hashes.StringToBinary(s);
+				byte[] Data = Hashes.StringToBinary(s);
 				if (Data is null)
 					return false;
 
@@ -71,7 +76,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -79,8 +84,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Data = new List<Field>()
@@ -122,7 +131,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
@@ -142,13 +151,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
 		{
 			IMqttData Result = new HexStringData(Topic, default);
-			Result.DataReported(Content);
+			Result.DataReported(Topic, Content);
 			return Result;
 		}
 	}

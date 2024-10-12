@@ -3,7 +3,7 @@
 	/// <summary>
 	/// NCAP identifying information
 	/// </summary>
-	public class Ieee1451_0NcapId : Ieee1451_0AppId
+	public class NcapAddress : ApplicationAddress
 	{
 		/// <summary>
 		/// NCAP ID

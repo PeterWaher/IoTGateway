@@ -3,7 +3,7 @@
 	/// <summary>
 	/// IEEE 1451.0 Discovery Message
 	/// </summary>
-	public class DiscoveryMessage : Ieee1451_0Message
+	public class DiscoveryMessage : Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Discovery Message
@@ -26,7 +26,7 @@
 		public DiscoveryService DiscoveryService { get; }
 
 		/// <summary>
-		/// Name of <see cref="Ieee1451_0Message.NetworkServiceId"/>
+		/// Name of <see cref="Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.DiscoveryService.ToString();
 	}

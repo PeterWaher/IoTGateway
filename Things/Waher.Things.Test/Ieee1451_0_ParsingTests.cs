@@ -24,7 +24,7 @@ namespace Waher.Things.Test
 		public void Test_01_ParseMessage(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
-			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 			Assert.IsNotNull(Message);
 			Assert.IsNotNull(Message.Body);
 			Assert.IsNotNull(Message.Tail);
@@ -42,7 +42,7 @@ namespace Waher.Things.Test
 		public void Test_02_ParseMetaTEDS(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
-			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
 			Assert.IsNotNull(TedsAccessMessage);
@@ -50,7 +50,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
@@ -66,7 +66,7 @@ namespace Waher.Things.Test
 		public void Test_03_ParseTransducerChannelTEDS(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
-			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
 			Assert.IsNotNull(TedsAccessMessage);
@@ -74,7 +74,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
@@ -90,7 +90,7 @@ namespace Waher.Things.Test
 		public void Test_04_ParseTransducerNameTEDS(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
-			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
 			Assert.IsNotNull(TedsAccessMessage);
@@ -98,7 +98,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Ieee1451_0Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
 			// TODO: Check CheckSum
 
@@ -114,7 +114,7 @@ namespace Waher.Things.Test
 		public void Test_05_ParseTransducerSampleData(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
-			Assert.IsTrue(Parser.TryParseMessage(Bin, out Ieee1451_0Message Message));
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
 			Assert.IsNotNull(TransducerAccessMessage);
@@ -122,7 +122,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM, TransducerAccessMessage.TransducerAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, out ushort ErrorCode, out Ieee1451_0TransducerData Data));
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, out ushort ErrorCode, out TransducerData Data));
 			Assert.AreEqual(0, ErrorCode);
 
 			Assert.IsNotNull(Data.Fields);

@@ -6,7 +6,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// <summary>
 	/// IEEE 1451.0 TEDS Access Message
 	/// </summary>
-	public class TedsAccessMessage : Ieee1451_0Message
+	public class TedsAccessMessage : Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 TEDS Access Message
@@ -29,7 +29,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public TedsAccessService TedsAccessService { get; }
 
 		/// <summary>
-		/// Name of <see cref="Ieee1451_0Message.NetworkServiceId"/>
+		/// Name of <see cref="Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.TedsAccessService.ToString();
 
@@ -39,7 +39,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Teds">TEDS object, if successful.</param>
 		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(out ushort ErrorCode, out Ieee1451_0Teds Teds)
+		public bool TryParseTeds(out ushort ErrorCode, out Teds Teds)
 		{
 			return this.TryParseTeds(true, out ErrorCode, out Teds);
 		}
@@ -51,7 +51,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Teds">TEDS object, if successful.</param>
 		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Ieee1451_0Teds Teds)
+		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Teds Teds)
 		{
 			Teds = null;
 
@@ -62,7 +62,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				else
 					ErrorCode = 0;
 
-				Ieee1451_0ChannelId ChannelInfo = this.NextChannelId();
+				ChannelAddress ChannelInfo = this.NextChannelId();
 				uint TedsOffset = this.NextUInt32();
 				int Start = this.Position;
 				uint Len = this.NextUInt32();
@@ -85,10 +85,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				if (CheckChecksum && CheckSum != CheckSum2)
 					return false;
 
-				Ieee1451_0Binary TedsBlock = new Ieee1451_0Binary(Data);
+				Binary TedsBlock = new Binary(Data);
 				ParsingState State = new ParsingState();
 
-				Teds = new Ieee1451_0Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
+				Teds = new Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
 
 				return true;
 			}

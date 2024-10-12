@@ -3,6 +3,9 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Ieee1451">
 			<String id="1">IEEE 1451.1.6 Root</String>
+			<String id="2">IEEE 1451.1.6 NCAP (BASE64)</String>
+			<String id="3">IEEE 1451.1.6 NCAP (HEX)</String>
+			<String id="4">IEEE 1451.1.6 NCAP (BINARY)</String>
 		</Namespace>
 	</Language>
 </Translation>

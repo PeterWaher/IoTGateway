@@ -28,6 +28,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with integer data.
 		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Value">Data value</param>
 		public IntegerData(MqttTopic Topic, long Value)
 			: base(Topic)
 		{
@@ -37,7 +39,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public override bool DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Content">Published MQTT Content</param>
+		public override bool DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			if (long.TryParse(Content.DataString, out long l))
 			{
@@ -53,7 +57,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -61,8 +65,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new Int64Field(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
@@ -93,7 +101,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
@@ -108,13 +116,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
 		{
 			IMqttData Result = new IntegerData(Topic, default);
-			Result.DataReported(Content);
+			Result.DataReported(Topic, Content);
 			return Result;
 		}
 	}

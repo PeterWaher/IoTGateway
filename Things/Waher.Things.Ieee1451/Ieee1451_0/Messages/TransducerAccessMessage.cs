@@ -9,7 +9,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// <summary>
 	/// IEEE 1451.0 Transducer Access Message
 	/// </summary>
-	public class TransducerAccessMessage : Ieee1451_0Message
+	public class TransducerAccessMessage : Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Transducer Access Message
@@ -32,7 +32,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public TransducerAccessService TransducerAccessService { get; }
 
 		/// <summary>
-		/// Name of <see cref="Ieee1451_0Message.NetworkServiceId"/>
+		/// Name of <see cref="Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.TransducerAccessService.ToString();
 
@@ -44,7 +44,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
 		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode, 
-			out Ieee1451_0TransducerData Data)
+			out TransducerData Data)
 		{
 			Data = null;
 
@@ -55,7 +55,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				else
 					ErrorCode = 0;
 
-				Ieee1451_0ChannelId ChannelInfo = this.NextChannelId();
+				ChannelAddress ChannelInfo = this.NextChannelId();
 				List<Field> Fields = new List<Field>();
 
 				switch (this.TransducerAccessService)
@@ -85,7 +85,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						return false;
 				}
 
-				Data = new Ieee1451_0TransducerData(ChannelInfo, Fields.ToArray());
+				Data = new TransducerData(ChannelInfo, Fields.ToArray());
 				return true;
 			}
 			catch (Exception)

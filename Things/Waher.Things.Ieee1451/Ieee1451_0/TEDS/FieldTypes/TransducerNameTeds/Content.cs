@@ -43,7 +43,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// <param name="RawValue">Raw Value of record</param>
 		/// <param name="State">Current parsing state.</param>
 		/// <returns>Parsed TEDS record.</returns>
-		public override TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue, ParsingState State)
+		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
 		{
 			string Name;
 

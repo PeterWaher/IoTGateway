@@ -149,8 +149,9 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
+		/// <param name="Content">Published MQTT Content</param>
 		public async Task DataReported(MqttContent Content)
 		{
 			int Len = Content.Data.Length;
@@ -164,7 +165,7 @@ namespace Waher.Things.Mqtt.Model
 
 			try
 			{
-				if (!(this.data?.DataReported(Content) ?? false))
+				if (!(this.data?.DataReported(this, Content) ?? false))
 					this.data = null;
 
 				if (this.data is null)

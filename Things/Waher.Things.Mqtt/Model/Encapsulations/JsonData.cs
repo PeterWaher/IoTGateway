@@ -32,6 +32,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with JSON-encoded data.
 		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Json">String-representation of JSON object.</param>
+		/// <param name="Value">Data value</param>
 		public JsonData(MqttTopic Topic, string Json, object Value)
 			: base(Topic)
 		{
@@ -42,7 +45,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public override bool DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Content">Published MQTT Content</param>
+		public override bool DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 
@@ -68,7 +73,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -76,8 +81,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
 		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Fields = new List<Field>();
@@ -195,7 +204,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
@@ -210,13 +219,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
 		{
 			IMqttData Result = new JsonData(Topic, default, default);
-			Result.DataReported(Content);
+			Result.DataReported(Topic, Content);
 			return Result;
 		}
 	}

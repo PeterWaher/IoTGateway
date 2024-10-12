@@ -145,7 +145,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{

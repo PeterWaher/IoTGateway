@@ -43,7 +43,9 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		bool DataReported(MqttContent Content);
+		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Content">Published MQTT Content</param>
+		bool DataReported(MqttTopic Topic, MqttContent Content);
 
 		/// <summary>
 		/// Type name representing data.
@@ -53,6 +55,10 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Starts a readout of the data.
 		/// </summary>
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
 		void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
 
 		/// <summary>
@@ -78,7 +84,7 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		IMqttData CreateNew(MqttTopic Topic, MqttContent Content);

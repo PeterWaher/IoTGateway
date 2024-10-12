@@ -55,7 +55,7 @@
 	/// <summary>
 	/// Physical Unit exponents.
 	/// </summary>
-	public struct Ieee1451_0PhysicalUnits
+	public struct PhysicalUnits
 	{
 		/// <summary>
 		/// Physical Units interpretation

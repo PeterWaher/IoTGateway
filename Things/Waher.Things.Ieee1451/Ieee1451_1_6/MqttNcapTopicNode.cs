@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Mqtt;
-using Waher.Things.Mqtt.Model.Encapsulations;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -93,10 +91,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
 			if (Topic.CurrentParentTopic.Node is MqttTopicNode &&
-				Topic.SegmentIndex == Topic.Segments.Length - 3 &&
-				Guid.TryParse(Topic.CurrentSegment, out _) &&
-				Guid.TryParse(Topic.Segments[Topic.SegmentIndex + 1], out _) &&
-				int.TryParse(Topic.Segments[Topic.SegmentIndex + 2], out _))
+				!(Topic.CurrentParentTopic.Node is MqttNcapTopicNode) &&
+				Guid.TryParse(Topic.CurrentSegment, out _))
 			{
 				return Grade.Excellent;
 			}

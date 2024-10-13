@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -96,6 +95,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
 			if (Topic.CurrentParentTopic.Node is MqttNcapTopicNode &&
+				!(Topic.CurrentParentTopic.Node is MqttTimTopicNode) &&
 				Guid.TryParse(Topic.CurrentSegment, out _))
 			{
 				return Grade.Excellent;

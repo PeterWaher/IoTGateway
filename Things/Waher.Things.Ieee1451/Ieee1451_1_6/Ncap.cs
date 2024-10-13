@@ -133,10 +133,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				sb.Append(this.Topic.FullTopic);
 				sb.Append('/');
 				sb.Append(Hashes.BinaryToString(Data.ChannelInfo.NcapId));
-				sb.Append('/');
-				sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
-				sb.Append('/');
-				sb.Append(Data.ChannelInfo.ChannelId.ToString());
+
+				if (!IsZero(Data.ChannelInfo.TimId))
+				{
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
+
+					if (Data.ChannelInfo.ChannelId != 0)
+					{
+						sb.Append('/');
+						sb.Append(Data.ChannelInfo.ChannelId.ToString());
+					}
+				}
 
 				MqttTopic ChannelTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
@@ -165,10 +173,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				sb.Append(this.Topic.FullTopic);
 				sb.Append('/');
 				sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.NcapId));
-				sb.Append('/');
-				sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
-				sb.Append('/');
-				sb.Append(Teds.ChannelInfo.ChannelId.ToString());
+
+				if (!IsZero(Teds.ChannelInfo.TimId))
+				{
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
+
+					if (Teds.ChannelInfo.ChannelId != 0)
+					{
+						sb.Append('/');
+						sb.Append(Teds.ChannelInfo.ChannelId.ToString());
+					}
+				}
 
 				MqttTopic ChannelTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
@@ -184,6 +200,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				await this.LogErrorAsync("TedsDataError", "Unable to parse TEDS data.");
 				return null;
 			}
+		}
+
+		/// <summary>
+		/// Checks if an ID is "zero", i.e. contains only zero bytes.
+		/// </summary>
+		/// <param name="A"></param>
+		/// <returns></returns>
+		public static bool IsZero(byte[] A)
+		{
+			foreach (byte b in A)
+			{
+				if (b != 0)
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>

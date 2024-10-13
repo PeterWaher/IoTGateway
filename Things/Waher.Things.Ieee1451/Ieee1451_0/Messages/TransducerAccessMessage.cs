@@ -12,6 +12,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class TransducerAccessMessage : Message
 	{
+		private TransducerData data;
+		private ushort errorCode;
+
 		/// <summary>
 		/// IEEE 1451.0 Transducer Access Message
 		/// </summary>
@@ -47,6 +50,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode, 
 			out TransducerData Data)
 		{
+			if (!(this.data is null))
+			{
+				ErrorCode = this.errorCode;
+				Data = this.data;
+				return true;
+			}
+
 			Data = null;
 
 			try
@@ -86,7 +96,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						return false;
 				}
 
-				Data = new TransducerData(ChannelInfo, Fields.ToArray());
+				this.data = Data = new TransducerData(ChannelInfo, Fields.ToArray());
+				this.errorCode = ErrorCode;
 				return true;
 			}
 			catch (Exception)

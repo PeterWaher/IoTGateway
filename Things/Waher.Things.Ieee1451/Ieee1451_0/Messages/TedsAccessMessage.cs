@@ -10,6 +10,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// </summary>
 	public class TedsAccessMessage : Message
 	{
+		private Teds data;
+		private ushort errorCode;
+
 		/// <summary>
 		/// IEEE 1451.0 TEDS Access Message
 		/// </summary>
@@ -55,6 +58,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>If able to parse a TEDS object.</returns>
 		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Teds Teds)
 		{
+			if (!(this.data is null))
+			{
+				ErrorCode = this.errorCode;
+				Teds = this.data;
+				return true;
+			}
+
 			Teds = null;
 
 			try
@@ -90,8 +100,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Binary TedsBlock = new Binary(Data);
 				ParsingState State = new ParsingState();
 
-				Teds = new Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
-
+				this.data = Teds = new Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
+				this.errorCode = ErrorCode;
 				return true;
 			}
 			catch (Exception)

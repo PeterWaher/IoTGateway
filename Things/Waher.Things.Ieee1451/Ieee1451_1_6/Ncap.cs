@@ -102,7 +102,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Request">Sensor-data request</param>
 		/// <param name="Prefix">Field-name prefix.</param>
 		/// <param name="Last">If the last readout call for request.</param>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Data = new List<Field>()
 			{
@@ -117,6 +117,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 
 			Request.ReportFields(Last, Data);
+		
+			return Task.CompletedTask;
 		}
 
 		private async Task<MqttTopic> GetChannelTopic(TransducerAccessMessage Message)
@@ -191,8 +193,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TransducerAccessCommand(TransducerAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TransducerAccessCommand(Message);
 		}
 
 		/// <summary>
@@ -202,8 +206,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TransducerAccessReply(TransducerAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TransducerAccessReply(Message);
 		}
 
 		/// <summary>
@@ -213,8 +219,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TransducerAccessAnnouncement(TransducerAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TransducerAccessAnnouncement(Message);
 		}
 
 		/// <summary>
@@ -224,8 +232,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TransducerAccessNotification(TransducerAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TransducerAccessNotification(Message);
 		}
 
 		/// <summary>
@@ -235,8 +245,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TransducerAccessCallback(TransducerAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TransducerAccessCallback(Message);
 		}
 
 		/// <summary>
@@ -246,8 +258,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TedsAccessCommand(TedsAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TedsAccessCommand(Message);
 		}
 
 		/// <summary>
@@ -257,8 +271,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TedsAccessReply(TedsAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TedsAccessReply(Message);
 		}
 
 		/// <summary>
@@ -268,8 +284,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TedsAccessAnnouncement(TedsAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TedsAccessAnnouncement(Message);
 		}
 
 		/// <summary>
@@ -279,8 +297,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TedsAccessNotification(TedsAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TedsAccessNotification(Message);
 		}
 
 		/// <summary>
@@ -290,8 +310,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task TedsAccessCallback(TedsAccessMessage Message)
 		{
 			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (Channel is null)
+			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
 				return;
+
+			await ChannelTopicNode.TedsAccessCallback(Message);
 		}
 
 		/// <summary>

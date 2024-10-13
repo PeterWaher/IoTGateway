@@ -9,6 +9,7 @@
 			<String id="5">IEEE 1451.0 NCAP</String>
 			<String id="6">IEEE 1451.0 TIM</String>
 			<String id="7">IEEE 1451.0 Channel</String>
+			<String id="8">Transducer data.</String>
 		</Namespace>
 	</Language>
 </Translation>

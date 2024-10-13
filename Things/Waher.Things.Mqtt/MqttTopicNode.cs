@@ -160,7 +160,7 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public async Task StartReadout(ISensorReadout Request)
+		public virtual async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{

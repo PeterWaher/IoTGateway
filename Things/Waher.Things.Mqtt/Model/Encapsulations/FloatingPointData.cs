@@ -76,10 +76,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <param name="Request">Sensor-data request</param>
 		/// <param name="Prefix">Field-name prefix.</param>
 		/// <param name="Last">If the last readout call for request.</param>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new QuantityField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"), 
 				this.value, this.nrDecimals, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout));
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

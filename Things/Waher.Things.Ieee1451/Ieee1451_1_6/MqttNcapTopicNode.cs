@@ -19,11 +19,32 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
+		/// Local ID
+		/// </summary>
+		public override string LocalId => this.NodeId;
+
+		/// <summary>
 		/// Diaplayable type name for node.
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Ieee1451Parser), 5, "IEEE 1451.0 NCAP");
+		}
+
+		/// <summary>
+		/// If the node accepts a given parent.
+		/// </summary>
+		public override Task<bool> AcceptsParentAsync(INode Parent)
+		{
+			return Task.FromResult(Parent is MqttTopicNode);
+		}
+
+		/// <summary>
+		/// If the node accepts a given child.
+		/// </summary>
+		public override Task<bool> AcceptsChildAsync(INode Child)
+		{
+			return Task.FromResult(Child is MqttTimTopicNode);
 		}
 
 		/// <summary>
@@ -33,15 +54,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>How well the node supports a given topic, from the segment index presented.</returns>
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
-			if (Topic.SegmentIndex != Topic.Segments.Length - 3 ||
-				!Guid.TryParse(Topic.CurrentSegment, out _) ||
-				!Guid.TryParse(Topic.Segments[Topic.SegmentIndex + 1], out _) ||
-				!int.TryParse(Topic.Segments[Topic.SegmentIndex + 2], out _))
+			if (Topic.CurrentParentTopic.Node is MqttTopicNode &&
+				Topic.SegmentIndex == Topic.Segments.Length - 3 &&
+				Guid.TryParse(Topic.CurrentSegment, out _) &&
+				Guid.TryParse(Topic.Segments[Topic.SegmentIndex + 1], out _) &&
+				int.TryParse(Topic.Segments[Topic.SegmentIndex + 2], out _))
 			{
-				return Grade.NotAtAll;
+				return Grade.Excellent;
 			}
-
-			return Grade.Excellent;
+			else
+				return Grade.NotAtAll;
 		}
 
 		/// <summary>
@@ -53,7 +75,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			return new MqttNcapTopicNode()
 			{
-				NodeId = await GetUniqueNodeId(Topic.CurrentSegment),
+				NodeId = await GetUniqueNodeId("NCAP-" + Topic.CurrentSegment),
 				LocalTopic = Topic.CurrentSegment
 			};
 		}

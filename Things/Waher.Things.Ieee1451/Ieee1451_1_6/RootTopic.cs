@@ -24,7 +24,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>How well the node supports a given topic, from the segment index presented.</returns>
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
-			if (Topic.SegmentIndex != 0)
+			if (!(Topic.CurrentParentTopic is null))
 				return Grade.NotAtAll;
 
 			switch (Topic.CurrentSegment)

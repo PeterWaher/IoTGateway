@@ -30,7 +30,7 @@ namespace Waher.Things.Mqtt.Model
 		private IMqttData data = null;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Topic information.
 		/// </summary>
 		public MqttTopic(IMqttTopicNode Node, string FullTopic, string LocalTopic, MqttTopic Parent, MqttBroker Broker)
 		{
@@ -65,6 +65,11 @@ namespace Waher.Things.Mqtt.Model
 		/// </summary>
 		public string FullTopic => this.fullTopic;
 
+		/// <summary>
+		/// Current parsed data.
+		/// </summary>
+		public IMqttData Data => this.data;
+
 		private MqttTopic[] GetChildNodes()
 		{
 			if (this.topics is null)
@@ -89,7 +94,7 @@ namespace Waher.Things.Mqtt.Model
 
 			if (Topic is null)
 				return null;
-			else if (Representation.MoveNext())
+			else if (Representation.MoveNext(Topic))
 				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, Broker);
 			else
 				return Topic;
@@ -151,6 +156,17 @@ namespace Waher.Things.Mqtt.Model
 			await this.node.AddAsync(AddNode);
 
 			return Topic;
+		}
+
+		/// <summary>
+		/// Sets the parsed data of a topic.
+		/// </summary>
+		/// <typeparam name="T">Type of data.</typeparam>
+		/// <param name="Data">Parsed data.</param>
+		public void SetData<T>(T Data)
+			where T : IMqttData
+		{
+			this.data = Data;
 		}
 
 		/// <summary>
@@ -249,7 +265,7 @@ namespace Waher.Things.Mqtt.Model
 			this.ex = null;
 			this.exTP = DateTime.MinValue;
 
-			return this.node.RemoveErrorAsync("Eror");
+			return this.node.RemoveErrorAsync("Error");
 		}
 
 		private Task Exception(Exception ex)
@@ -302,7 +318,7 @@ namespace Waher.Things.Mqtt.Model
 						Request.ReportFields(true);
 				}
 				else
-					this.data.StartReadout(ThingReference, Request, Prefix, Last);
+					await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 
 				await this.node.RemoveErrorAsync("Readout");
 			}

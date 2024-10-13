@@ -270,7 +270,7 @@ namespace Waher.Things.Mqtt.Model
 
 			if (Topic is null)
 				return null;
-			else if (Representation.MoveNext())
+			else if (Representation.MoveNext(Topic))
 				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, this);
 			else
 				return Topic;

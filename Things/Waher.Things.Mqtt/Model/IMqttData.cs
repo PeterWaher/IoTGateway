@@ -59,7 +59,7 @@ namespace Waher.Things.Mqtt.Model
 		/// <param name="Request">Sensor-data request</param>
 		/// <param name="Prefix">Field-name prefix.</param>
 		/// <param name="Last">If the last readout call for request.</param>
-		void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
+		Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
 
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.

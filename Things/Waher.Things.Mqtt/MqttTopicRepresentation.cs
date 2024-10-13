@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Mqtt
 {
@@ -41,6 +42,11 @@ namespace Waher.Things.Mqtt
 		public string CurrentSegment => this.Segments[this.SegmentIndex];
 
 		/// <summary>
+		/// Current parent topic.
+		/// </summary>
+		public MqttTopic CurrentParentTopic { get; private set; }
+
+		/// <summary>
 		/// Processed segments
 		/// </summary>
 		public string ProcessedSegments
@@ -65,9 +71,11 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// Moves to the next segment.
 		/// </summary>
+		/// <param name="NewParent">New parent node.</param>
 		/// <returns>If a next segment is available or not.</returns>
-		public bool MoveNext()
+		public bool MoveNext(MqttTopic NewParent)
 		{
+			this.CurrentParentTopic = NewParent;
 			this.SegmentIndex++;
 			return this.SegmentIndex < this.Segments.Length;
 		}

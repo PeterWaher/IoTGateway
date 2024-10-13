@@ -91,7 +91,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <param name="Request">Sensor-data request</param>
 		/// <param name="Prefix">Field-name prefix.</param>
 		/// <param name="Last">If the last readout call for request.</param>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Data = new List<Field>()
 			{
@@ -106,6 +106,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			}
 
 			Request.ReportFields(Last, Data);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

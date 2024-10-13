@@ -44,7 +44,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Ieee1451Parser), 4, "IEEE 1451.1.6 NCAP (BINARY)");
+			return Language.GetStringAsync(typeof(RootTopic), 14, "IEEE 1451.1.6 NCAP (BINARY)");
 		}
 
 		/// <summary>

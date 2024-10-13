@@ -75,7 +75,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Ieee1451Parser), 1, "IEEE 1451.1.6 Root");
+			return Language.GetStringAsync(typeof(RootTopic), 11, "IEEE 1451.1.6 Root");
 		}
 
 	}

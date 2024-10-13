@@ -59,7 +59,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Ieee1451Parser), 3, "IEEE 1451.1.6 NCAP (HEX)");
+			return Language.GetStringAsync(typeof(RootTopic), 13, "IEEE 1451.1.6 NCAP (HEX)");
 		}
 
 		/// <summary>

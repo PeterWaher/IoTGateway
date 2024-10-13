@@ -20,8 +20,9 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Themes](#themes)
 * [Things](#things)
 * [Utilities](#utilities)
-* [Web Services](#webServices)
-* [Environment Variables](#environmentVariables)
+* [Web Services](#web-services)
+* [Environment Variables](#environment-variables)
+* [Compiling Solution](#compiling-solution)
 
 License
 ----------------------

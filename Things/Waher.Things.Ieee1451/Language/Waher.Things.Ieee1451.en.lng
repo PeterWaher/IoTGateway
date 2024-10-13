@@ -11,5 +11,17 @@
 			<String id="7">IEEE 1451.0 Channel</String>
 			<String id="8">Transducer data.</String>
 		</Namespace>
+		<Namespace name="Waher.Things.Ieee1451.Ieee1451_1_6">
+			<String id="1">IEEE 1451</String>
+			<String id="2">NCAP ID:</String>
+			<String id="3">NCAP unique identifier.</String>
+			<String id="4">NCAP ID</String>
+			<String id="5">TIM ID:</String>
+			<String id="6">TIM unique identifier.</String>
+			<String id="7">TIM ID</String>
+			<String id="8">Channel:</String>
+			<String id="9">Channel identifier on TIM.</String>
+			<String id="10">Channel</String>
+		</Namespace>
 	</Language>
 </Translation>

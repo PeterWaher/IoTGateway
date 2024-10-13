@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.Mqtt;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
@@ -9,13 +13,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// <summary>
 	/// Topic node representing an IEEE 1451.0 TIM.
 	/// </summary>
-	public class MqttTimTopicNode : MqttTopicNode
+	public class MqttTimTopicNode : MqttNcapTopicNode
 	{
+		private string timId;
+
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 TIM.
 		/// </summary>
 		public MqttTimTopicNode()
 		{
+		}
+
+		/// <summary>
+		/// TIM ID
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(5, "TIM ID:")]
+		[ToolTip(6, "TIM unique identifier.")]
+		[Required]
+		[RegularExpression("[A-Fa-f0-9]{32}")]
+		public string TimId
+		{
+			get => this.timId;
+			set => this.timId = value;
 		}
 
 		/// <summary>
@@ -29,6 +49,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Ieee1451Parser), 6, "IEEE 1451.0 TIM");
+		}
+
+		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
+
+			Parameters.AddLast(new StringParameter("TimId",
+				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 7, "TIM ID"),
+				this.TimId));
+
+			Parameters.AddLast(new StringParameter("NcapId",
+				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 4, "NCAP ID"),
+				this.NcapId));
+
+			return Parameters;
 		}
 
 		/// <summary>
@@ -73,7 +114,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			return new MqttTimTopicNode()
 			{
 				NodeId = await GetUniqueNodeId("TIM-" + Topic.CurrentSegment),
-				LocalTopic = Topic.CurrentSegment
+				LocalTopic = Topic.CurrentSegment,
+				TimId = Topic.CurrentSegment,
+				NcapId = Topic.Segments[Topic.SegmentIndex - 1]
 			};
 		}
 	}

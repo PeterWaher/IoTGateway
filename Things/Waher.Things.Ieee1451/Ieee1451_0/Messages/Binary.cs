@@ -312,7 +312,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Gets the next time duration, expressed in seconds.
 		/// </summary>
 		/// <returns>Time duration.</returns>
-		public double NextDurationSeconds()
+		public double NextTimeDurationSeconds()
 		{
 			long TimeDuration = this.NextInt64();
 			return TimeDuration * Math.Pow(2, -16) * 1e-9;
@@ -600,7 +600,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			int i;
 
 			for (i = 0; i < NrItems; i++)
-				Result[i] = this.NextDurationSeconds();
+				Result[i] = this.NextTimeDurationSeconds();
 
 			return Result;
 		}

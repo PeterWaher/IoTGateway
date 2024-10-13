@@ -108,6 +108,34 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
+		/// Tries to parse a Transfucer Access request from the message.
+		/// </summary>
+		/// <param name="Channel">Channel information.</param>
+		/// <param name="SamplingMode">Sampling mode requested.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <returns>If able to parse a TEDS object.</returns>
+		public bool TryParseRequest(out ChannelAddress Channel, out SamplingMode SamplingMode,
+			out double TimeoutSeconds)
+		{
+			try
+			{
+				Channel = this.NextChannelId();
+				SamplingMode = (SamplingMode)this.NextUInt8();
+				TimeoutSeconds = this.NextTimeDurationSeconds();
+
+				return true;
+			}
+			catch (Exception)
+			{
+				Channel = null;
+				SamplingMode = 0;
+				TimeoutSeconds = 0;
+
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Process incoming message.
 		/// </summary>
 		/// <param name="Client">Client interface.</param>

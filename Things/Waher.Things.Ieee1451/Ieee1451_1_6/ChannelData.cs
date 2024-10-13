@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
@@ -16,6 +17,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	{
 		private TransducerAccessMessage data;
 		private TedsAccessMessage teds;
+		private DateTime tedsTimestamp;
 
 		/// <summary>
 		/// Encapsulates transducer channel data.
@@ -41,6 +43,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public ChannelData(TedsAccessMessage Message)
 		{
 			this.teds = Message;
+			this.tedsTimestamp = DateTime.UtcNow;
 		}
 
 		/// <summary>
@@ -85,6 +88,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public void DataReported(TedsAccessMessage Message)
 		{
 			this.teds = Message;
+			this.tedsTimestamp = DateTime.UtcNow;
 		}
 
 		/// <summary>
@@ -112,13 +116,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Last">If the last readout call for request.</param>
 		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
+			if (this.teds is null)
+				Request.ReportErrors(false, new ThingError(ThingReference, "No TEDS received."));
+			else if (this.teds.TryParseTeds(true, out ushort ErrorCode, out Teds ParsedTeds))
+			{
+				if (ErrorCode != 0)
+					Request.ReportErrors(false, new ThingError(ThingReference, "TEDS Error code: " + ErrorCode.ToString("X4")));
+
+				Request.ReportFields(false, ParsedTeds.GetFields(ThingReference, this.tedsTimestamp));
+			}
+			else
+				Request.ReportErrors(false, new ThingError(ThingReference, "Unable to parse TEDS received."));
+
 			if (this.data is null)
 				Request.ReportErrors(true, new ThingError(ThingReference, "No data received."));
 			else if (this.data.TryParseTransducerData(ThingReference,
 				out ushort ErrorCode, out TransducerData ParsedData))
 			{
 				if (ErrorCode != 0)
-					Request.ReportErrors(false, new ThingError(ThingReference, "Error code: " + ErrorCode.ToString("X4")));
+					Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
 
 				Request.ReportFields(true, ParsedData.Fields);
 			}

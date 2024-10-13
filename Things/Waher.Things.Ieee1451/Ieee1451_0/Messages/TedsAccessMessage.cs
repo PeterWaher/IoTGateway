@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Content.Putters;
 using Waher.Things.Ieee1451.Ieee1451_0.Model;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
@@ -79,7 +80,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				int Start = this.Position;
 				uint Len = this.NextUInt32();
 				if (Len < 2)
-					return false;
+					return this.MessageType == MessageType.Command;
 
 				Len -= 2;
 				if (Len > int.MaxValue)
@@ -107,6 +108,37 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			catch (Exception)
 			{
 				ErrorCode = 0xffff;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to parse a TEDS request from the message.
+		/// </summary>
+		/// <param name="Channel">Channel information.</param>
+		/// <param name="TedsAccesCode">What TED is requested.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <returns>If able to parse a TEDS object.</returns>
+		public bool TryParseRequest(out ChannelAddress Channel, out TedsAccesCode TedsAccesCode, 
+			out uint TedsOffset, out double TimeoutSeconds)
+		{
+			try
+			{
+				Channel = this.NextChannelId();
+				TedsAccesCode = (TedsAccesCode)this.NextUInt8();
+				TedsOffset = this.NextUInt32();
+				TimeoutSeconds = this.NextTimeDurationSeconds();
+
+				return true;
+			}
+			catch (Exception)
+			{
+				Channel = null;
+				TedsAccesCode = 0;
+				TedsOffset = 0;
+				TimeoutSeconds = 0;
+
 				return false;
 			}
 		}

@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 using Waher.Things.Ieee1451;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
@@ -38,10 +39,40 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AwICAG0AAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAADEDBQD/AQIBBBCGJYoLcvYS1ocH6AVJEdzwCgQ/mZmaCwQ/szMzDARApmZmDQIAAQ3T")]
-		public void Test_02_ParseMetaTEDS(string Base64Encoded)
+		[DataRow(false, "030201003C00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF0000101000000005000000000 ")]
+		public void Test_02_ParseMetaTEDSRequest(bool Base64, string Encoded)
 		{
-			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TedsAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
+				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+
+			Assert.IsNotNull(Channel);
+			Assert.IsNotNull(Channel.ApplicationId);
+			Assert.IsNotNull(Channel.NcapId);
+			Assert.IsNotNull(Channel.TimId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Channel.ChannelId.ToString());
+			Console.Out.WriteLine("TEDS: " + TedsAccesCode.ToString());
+			Console.Out.WriteLine("Offset: " + TedsOffset.ToString());
+			Console.Out.WriteLine("Timeout: " + TimeoutSeconds.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow(false, "030202006D000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000031030500FF010201041086258A0B72F612D68707E8054911DCF00A043F99999A0B043FB333330C0440A666660D020001F22C")]
+		public void Test_03_ParseMetaTEDSResponse(bool Base64, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -50,9 +81,8 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
-			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
 			Assert.IsTrue(Teds.Records.Length > 0);
@@ -62,10 +92,40 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AwICAJoAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAAF4DBQD/AwIBCgEACwEADAsAgICAgICAgoCAgA0EQ2kmZg4EQ8cTMw8EQ4jTMxABABEBARIKKAEBKQEEKgIADhQEQKAAABUEP4AAABcEQ5YAABgEP4AAABkEQKAAABCY")]
-		public void Test_03_ParseTransducerChannelTEDS(string Base64Encoded)
+		[DataRow(false, "030201003A00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF003000000005000000000")]
+		public void Test_04_ParseTransducerChannelTEDSRequest(bool Base64, string Encoded)
 		{
-			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TedsAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
+				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+
+			Assert.IsNotNull(Channel);
+			Assert.IsNotNull(Channel.ApplicationId);
+			Assert.IsNotNull(Channel.NcapId);
+			Assert.IsNotNull(Channel.TimId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Channel.ChannelId.ToString());
+			Console.Out.WriteLine("TEDS: " + TedsAccesCode.ToString());
+			Console.Out.WriteLine("Offset: " + TedsOffset.ToString());
+			Console.Out.WriteLine("Timeout: " + TimeoutSeconds.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow(false, "030202009A000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001000000000000005E030500FF0302010A01000B01000C0B00808080808080828080800D04436926660E0443C713330F0440000000100100110101120A2801012901042A02000E140440A0000015043F80000017044396000018043F800000190440A00000F0F8")]
+		public void Test_05_ParseTransducerChannelTEDSResponse(bool Base64, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -74,9 +134,8 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
-			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
 			Assert.IsTrue(Teds.Records.Length > 0);
@@ -86,10 +145,40 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AwICAFQAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABAAAAAAAAABgDBQD/DAIBBAEABQpUUE0gMzYgVUJJA7w=")]
-		public void Test_04_ParseTransducerNameTEDS(string Base64Encoded)
+		[DataRow(false, "030201003A00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00C000000005000000000")]
+		public void Test_06_ParseTransducerNameTEDSRequest(bool Base64, string Encoded)
 		{
-			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TedsAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
+				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+
+			Assert.IsNotNull(Channel);
+			Assert.IsNotNull(Channel.ApplicationId);
+			Assert.IsNotNull(Channel.NcapId);
+			Assert.IsNotNull(Channel.TimId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Channel.ChannelId.ToString());
+			Console.Out.WriteLine("TEDS: " + TedsAccesCode.ToString());
+			Console.Out.WriteLine("Offset: " + TedsOffset.ToString());
+			Console.Out.WriteLine("Timeout: " + TimeoutSeconds.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow(false, "0302020054000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000018030500FF0C0201040100050A54504D20333620554249FC43")]
+		public void Test_07_ParseTransducerNameTEDSResponse(bool Base64, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -98,9 +187,8 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TedsAccessService.Read, TedsAccessMessage.TedsAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TedsAccessMessage.TryParseTeds(false, out ushort ErrorCode, out Teds Teds));
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds));
 			Assert.AreEqual(0, ErrorCode);
-			// TODO: Check CheckSum
 
 			Assert.IsNotNull(Teds.Records);
 			Assert.IsTrue(Teds.Records.Length > 0);
@@ -110,11 +198,39 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMzAwLjE1AAAAZwAQtyV1/vM=")]
-		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk3LjE1AAAAZwrfajDxKLM=")]
-		public void Test_05_ParseTransducerSampleData(string Base64Encoded)
+		[DataRow(false, "020101003700303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF001035000000000")]
+		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, string Encoded)
 		{
-			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
+			Assert.IsNotNull(TransducerAccessMessage);
+			Assert.AreEqual(NetworkServiceType.TransducerAccessServices, Message.NetworkServiceType);
+			Assert.AreEqual(TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM, TransducerAccessMessage.TransducerAccessService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(TransducerAccessMessage.TryParseRequest(out ChannelAddress Channel,
+				out SamplingMode SamplingMode, out double TimeoutSeconds));
+
+			Assert.IsNotNull(Channel);
+			Assert.IsNotNull(Channel.ApplicationId);
+			Assert.IsNotNull(Channel.NcapId);
+			Assert.IsNotNull(Channel.TimId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Channel.ChannelId.ToString());
+			Console.Out.WriteLine("Sampling: " + SamplingMode.ToString());
+			Console.Out.WriteLine("Timeout: " + TimeoutSeconds.ToString());
+		}
+
+		[DataTestMethod]
+		[DataRow(false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]
+		public void Test_09_ParseTransducerSampleDataResponse(bool Base64, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;

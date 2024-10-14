@@ -240,7 +240,8 @@ namespace Waher.Script.Persistence.SQL
 			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
-			VariableReference[] Columns2 = this.columns is null ? null : new VariableReference[this.columns.Length];
+			ScriptNode[] Columns2 = this.columns;
+			bool Columns2Cloned = false;
 			IResultSetEnumerator e;
 			RecordEnumerator e2;
 			int NrRecords = 0;
@@ -250,14 +251,16 @@ namespace Waher.Script.Persistence.SQL
 				c = this.columns.Length;
 				for (i = 0; i < c; i++)
 				{
-					if (this.columns[i] is VariableReference Ref)
-					{
-						ColumnIndices[Ref.VariableName] = i;
-						Columns2[i] = Ref;
-					}
-					else if (this.columnNames[i] is VariableReference Ref2)
+					if (this.columnNames[i] is VariableReference Ref2)
 					{
 						ColumnIndices[Ref2.VariableName] = i;
+
+						if (!Columns2Cloned)
+						{
+							Columns2Cloned = true;
+							Columns2 = (ScriptNode[])this.columns.Clone();
+						}
+
 						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
@@ -265,6 +268,8 @@ namespace Waher.Script.Persistence.SQL
 
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
 					}
+					else if (this.columns[i] is VariableReference Ref)
+						ColumnIndices[Ref.VariableName] = i;
 				}
 			}
 			else

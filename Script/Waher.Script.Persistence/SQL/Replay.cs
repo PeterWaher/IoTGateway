@@ -11,7 +11,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Operators.Assignments.WithSelf;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Persistence.SQL.LedgerExports;
@@ -127,36 +126,38 @@ namespace Waher.Script.Persistence.SQL
 
 			IDataSource Source = await this.source.GetSource(Variables);
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
-			VariableReference[] Columns2 = null;
+			ScriptNode[] Columns2 = this.columns;
+			bool Columns2Cloned = false;
 			Dictionary<string, int> ColumnIndices = null;
 
 			if (!(this.columns is null))
 			{
-				Columns2 = new VariableReference[this.columns.Length];
 				ColumnIndices = new Dictionary<string, int>();
 
 				c = this.columns.Length;
 				for (i = 0; i < c; i++)
 				{
-					if (this.columns[i] is VariableReference Ref)
+					if (this.columnNames[i] is VariableReference Ref2)
 					{
-						Columns2[i] = Ref;
-						ColumnIndices[Ref.VariableName] = i;
-					}
-					else if (this.columnNames[i] is VariableReference Ref2)
-					{
-						Columns2[i] = Ref2;
 						ColumnIndices[Ref2.VariableName] = i;
+
+						if (!Columns2Cloned)
+						{
+							Columns2Cloned = true;
+							Columns2 = (ScriptNode[])this.columns.Clone();
+						}
+
+						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
 							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
 
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
 					}
+					else if (this.columns[i] is VariableReference Ref)
+						ColumnIndices[Ref.VariableName] = i;
 				}
 			}
-			else
-				c = 0;
 
 			ILedgerExport Destination = null;
 			ExportCounter Counter = null;
@@ -543,9 +544,48 @@ namespace Waher.Script.Persistence.SQL
 					}
 					else if (BinOp is In)
 					{
-						// TODO
+						if (IsStringArray(Value, out string[] Options))
+						{
+							switch (Name)
+							{
+								case "BlockId":
+									break;
+
+								case "Creator":
+									break;
+							}
+						}
 					}
 				}
+			}
+		}
+
+		private static bool IsStringArray(object Value, out string[] Options)
+		{
+			if (Value is string[] A)
+			{
+				Options = A;
+				return true;
+			}
+			else if (Value is object[] B)
+			{
+				int i, c = B.Length;
+				Options = new string[c];
+
+				for (i = 0; i < c; i++)
+				{
+					if (B[i] is string s)
+						Options[i] = s;
+					else
+						return false;
+				}
+
+				return true;
+			}
+			else
+			{
+				Options = null;
+				return false;
 			}
 		}
 

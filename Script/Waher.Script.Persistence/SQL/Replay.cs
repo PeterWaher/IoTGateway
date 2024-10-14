@@ -549,9 +549,11 @@ namespace Waher.Script.Persistence.SQL
 							switch (Name)
 							{
 								case "BlockId":
+									// TODO
 									break;
 
 								case "Creator":
+									// TODO
 									break;
 							}
 						}

@@ -37,12 +37,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override async Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
+		/// <returns>Data processing result</returns>
+		public override async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 
 			if (!HexStringData.RegEx.IsMatch(s))
-				return false;
+				return DataProcessingResult.Incompatible;
 
 			try
 			{
@@ -50,7 +51,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 			catch (Exception)
 			{
-				return false;
+				return DataProcessingResult.Incompatible;
 			}
 		}
 

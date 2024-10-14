@@ -160,17 +160,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
 				ms.Write(NcapId ?? EmptyUuid, 0, 16);
 				ms.Write(TimId ?? EmptyUuid, 0, 16);
-				ms.Write(NcapId ?? EmptyUuid, 0, 16);
 				ms.WriteByte((byte)(ChannelId >> 8));
 				ms.WriteByte((byte)ChannelId);
 				ms.WriteByte((byte)TedsAccessCode);
 
 				byte[] Bin = BitConverter.GetBytes(TedsOffset);
+				Array.Reverse(Bin);
 				ms.Write(Bin, 0, 4);
 
 				TimeoutSeconds *= 1e9 * 65536;
 				ulong l = (ulong)TimeoutSeconds;
 				Bin = BitConverter.GetBytes(l);
+				Array.Reverse(Bin);
 				ms.Write(Bin, 0, 8);
 
 				return Ieee1451Parser.SerializeMessage(TedsAccessService.Read, 

@@ -34,7 +34,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			return this.DataReported(Topic, Content, Content.Data);
 		}

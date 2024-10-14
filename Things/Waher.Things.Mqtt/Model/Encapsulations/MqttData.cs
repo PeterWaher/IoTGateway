@@ -62,7 +62,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public abstract Task<bool> DataReported(MqttTopic Topic, MqttContent Content);
+		/// <returns>Data processing result</returns>
+		public abstract Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content);
 
 		/// <summary>
 		/// Type name representing data.
@@ -135,7 +136,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <returns>How well content of this type is supported.</returns>
 		public Grade Supports(MqttContent Content)
 		{
-			return this.DataReported(null, Content).Result ? this.DefaultSupport : Grade.NotAtAll;
+			return this.DataReported(null, Content).Result != DataProcessingResult.Incompatible ? this.DefaultSupport : Grade.NotAtAll;
 		}
 
 		/// <summary>

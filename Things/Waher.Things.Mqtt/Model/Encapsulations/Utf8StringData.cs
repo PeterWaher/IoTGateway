@@ -41,7 +41,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 			byte[] Bin = Encoding.UTF8.GetBytes(s);
@@ -49,12 +50,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			int i, c = Bin.Length;
 
 			if (c != Data.Length)
-				return Task.FromResult(false);
+				return Task.FromResult(DataProcessingResult.Incompatible);
 
 			for (i = 0; i < c; i++)
 			{
 				if (Bin[i] != Data[i])
-					return Task.FromResult(false);
+					return Task.FromResult(DataProcessingResult.Incompatible);
 			}
 
 			this.value = s;
@@ -62,7 +63,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			this.QoS = Content.Header.QualityOfService;
 			this.Retain = Content.Header.Retain;
 
-			return Task.FromResult(true);
+			return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
 		}
 
 		/// <summary>

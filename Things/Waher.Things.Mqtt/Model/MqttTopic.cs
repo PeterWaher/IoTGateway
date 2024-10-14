@@ -184,63 +184,84 @@ namespace Waher.Things.Mqtt.Model
 
 			this.dataCount += Len;
 
+			bool NewMomentaryValues;
+
 			try
 			{
-				if (!(this.data is null) && !await this.data.DataReported(this, Content))
-					this.data = null;
-
 				if (this.data is null)
 					this.data = this.FindDataType(Content).CreateNew(this, Content);
+
+				switch (await this.data.DataReported(this, Content))
+				{
+					case DataProcessingResult.Incompatible:
+					default:
+						this.data = null;
+						this.data = this.FindDataType(Content).CreateNew(this, Content);
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.Processed:
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.ProcessedNewMomentaryValues:
+						NewMomentaryValues = true;
+						break;
+				}
 
 				await this.SetOk();
 			}
 			catch (Exception)
 			{
 				this.data = this.FindDataType(Content).CreateNew(this, Content);
+				NewMomentaryValues = false;
 			}
 
 			if (this.broker.Client?.HasSniffers ?? false)
 				this.data.SnifferOutput(this.broker.Client);
 
-			try
+			if (NewMomentaryValues)
 			{
-				InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
-					new IThingReference[] { this.node }, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-					(sender, e) =>
-					{
-						this.node.NewMomentaryValues(e.Fields);
-
-						MqttTopic Current = this;
-						MqttTopic Parent = this.parent;
-
-						while (!(Parent is null))
+				try
+				{
+					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
+						new IThingReference[] { this.node }, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
+						(sender, e) =>
 						{
-							foreach (Field F in e.Fields)
-							{
-								if (F.Name == "Value")
-									F.Name = Current.localTopic;
-								else
-									F.Name = Current.localTopic + ", " + F.Name;
+							this.node.NewMomentaryValues(e.Fields);
 
-								Parent.node.NewMomentaryValues(F);
+							MqttTopic Current = this;
+							MqttTopic Parent = this.parent;
+
+							while (!(Parent is null))
+							{
+								foreach (Field F in e.Fields)
+								{
+									if (F.Name == "Value")
+										F.Name = Current.localTopic;
+									else
+										F.Name = Current.localTopic + ", " + F.Name;
+
+									Parent.node.NewMomentaryValues(F);
+								}
+
+								Current = Parent;
+								Parent = Parent.parent;
 							}
 
-							Current = Parent;
-							Parent = Parent.parent;
-						}
+							return Task.CompletedTask;
+						},
+						(sender, e) =>
+						{
+							return Task.CompletedTask;
+						}, null);
 
-						return Task.CompletedTask;
-					},
-					(sender, e) =>
-					{
-						return Task.CompletedTask;
-					}, null);
-
-				this.StartReadout(Request);
-			}
-			catch (Exception ex)
-			{
-				await this.Exception(ex);
+					this.StartReadout(Request);
+				}
+				catch (Exception ex)
+				{
+					await this.Exception(ex);
+				}
 			}
 		}
 

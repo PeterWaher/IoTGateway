@@ -21,10 +21,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk4LjE1AAAAZwFGxwD/sRM=")]
+		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk4LjE1AAAAZwFGxwD/sRM=")]   // Source: ubi.pt
 		public void Test_01_ParseMessage(string Base64Encoded)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 			Assert.IsNotNull(Message);
 			Assert.IsNotNull(Message.Body);
@@ -39,10 +41,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001010000000000012A05F2000000")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001010000000000012A05F2000000")]    // Source: ubi.pt
 		public void Test_02_ParseMetaTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -69,10 +73,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030202006D000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000031030500FF010201041086258A0B72F612D68707E8054911DCF00A043F99999A0B043FB333330C0440A666660D020001F22C")]
+		[DataRow(false, "030202006D000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000031030500FF010201041086258A0B72F612D68707E8054911DCF00A043F99999A0B043FB333330C0440A666660D020001F22C")]    // Source: ubi.pt
 		public void Test_03_ParseMetaTEDSResponse(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -92,10 +98,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001030000000000012A05F2000000")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001030000000000012A05F2000000")]    // Source: ubi.pt
 		public void Test_04_ParseTransducerChannelTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -122,10 +130,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030202009A000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001000000000000005E030500FF0302010A01000B01000C0B00808080808080828080800D04436926660E0443C713330F0440000000100100110101120A2801012901042A02000E140440A0000015043F80000017044396000018043F800000190440A00000F0F8")]
+		[DataRow(false, "030202009A000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001000000000000005E030500FF0302010A01000B01000C0B00808080808080828080800D04436926660E0443C713330F0440000000100100110101120A2801012901042A02000E140440A0000015043F80000017044396000018043F800000190440A00000F0F8")]    // Source: ubi.pt
 		public void Test_05_ParseTransducerChannelTEDSResponse(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -145,10 +155,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010C0000000000012A05F2000000")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010C0000000000012A05F2000000")]    // Source: ubi.pt
 		public void Test_06_ParseTransducerNameTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -175,10 +187,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "0302020054000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000018030500FF0C0201040100050A54504D20333620554249FC43")]
+		[DataRow(false, "0302020054000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010000000000000018030500FF0C0201040100050A54504D20333620554249FC43")]    // Source: ubi.pt
 		public void Test_07_ParseTransducerNameTEDSResponse(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
@@ -198,10 +212,13 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300012A05F2000000")]
+		[DataRow(false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300012A05F2000000")]    // Source: ubi.pt
+		[DataRow(true, "AgEBADs+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAAQUAASoF8gAAAA==")]
 		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
@@ -227,10 +244,12 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]
+		[DataRow(false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]    // Source: ubi.pt
 		public void Test_09_ParseTransducerSampleDataResponse(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
 
 			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;

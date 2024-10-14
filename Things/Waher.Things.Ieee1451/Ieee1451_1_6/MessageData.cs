@@ -20,6 +20,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		private readonly byte[] ncapId;
 		private readonly byte[] timId;
 		private readonly ushort channelId;
+		private readonly string communicationTopic;
 
 		/// <summary>
 		/// Encapsulates messages from an IEEE1451.1.6 device.
@@ -42,6 +43,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			this.ncapId = NcapId;
 			this.timId = TimId;
 			this.channelId = ChannelId;
+
+			this.communicationTopic = this.EvaluateCommunicationTopic();
 		}
 
 		/// <summary>
@@ -88,6 +91,39 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			public TaskCompletionSource<Message> Pending;
 		}
 
+		private string EvaluateCommunicationTopic()
+		{
+			string s = this.Topic?.FullTopic;
+			if (string.IsNullOrEmpty(s))
+				return s;
+
+			int i;
+
+			if (!IsZero(this.timId))
+			{
+				if (this.channelId > 0)
+				{
+					i = s.LastIndexOf('/');
+					if (i < 0)
+						return s;
+
+					s = s.Substring(0, i);
+				}
+
+				i = s.LastIndexOf('/');
+				if (i < 0)
+					return s;
+
+				s = s.Substring(0, i);
+			}
+
+			i = s.LastIndexOf('/');
+			if (i < 0)
+				return s;
+
+			return s.Substring(0, i);
+		}
+
 		/// <summary>
 		/// Checks if an ID is "zero", i.e. contains only zero bytes.
 		/// </summary>
@@ -128,16 +164,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
-			return Task.FromResult(false);
+			return Task.FromResult(DataProcessingResult.Incompatible);
 		}
 
 		/// <summary>
 		/// Called when new data has been received.
 		/// </summary>
 		/// <param name="Message">New parsed message.</param>
-		public void DataReported(Message Message)
+		/// <returns>If response to a pending request was received (true)</returns>
+		public bool DataReported(Message Message)
 		{
 			Type T = Message.GetType();
 
@@ -147,8 +185,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				{
 					Rec.Message = Message;
 					Rec.Timestamp = DateTime.UtcNow;
-					Rec.Pending?.TrySetResult(Message);
-					Rec.Pending = null;
+
+					if (!(Rec.Pending is null))
+					{
+						Rec.Pending.TrySetResult(Message);
+						Rec.Pending = null;
+						return true;
+					}
 				}
 				else
 				{
@@ -160,6 +203,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					};
 				}
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -184,18 +229,21 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="SamplingMode">Sample mode.</param>
 		/// <param name="TimeoutMilliseconds">Maximum amount of time to wait for
 		/// a response.</param>
+		/// <param name="StaleLimitSeconds">A received message is considered stale, if
+		/// older than this number of seconds.</param>
 		/// <returns>Response</returns>
 		/// <exception cref="TimeoutException">If no response has been received within
 		/// the prescribed time.</exception>
 		public async Task<TransducerAccessMessage> RequestTransducerData(SamplingMode SamplingMode, 
-			int TimeoutMilliseconds)
+			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
 			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId, 
 				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
 
-			Task<TransducerAccessMessage> Result = this.WaitForMessage<TransducerAccessMessage>(TimeoutMilliseconds);
+			Task<TransducerAccessMessage> Result = this.WaitForMessage<TransducerAccessMessage>(TimeoutMilliseconds, StaleLimitSeconds);
 
-			await this.Topic.Broker.Publish(this.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			if (!Result.IsCompleted)
+				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 			
 			return await Result;
 
@@ -208,18 +256,21 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="SamplingMode">Sample mode.</param>
 		/// <param name="TimeoutMilliseconds">Maximum amount of time to wait for
 		/// a response.</param>
+		/// <param name="StaleLimitSeconds">A received message is considered stale, if
+		/// older than this number of seconds.</param>
 		/// <returns>Response</returns>
 		/// <exception cref="TimeoutException">If no response has been received within
 		/// the prescribed time.</exception>
 		public async Task<TedsAccessMessage> RequestTEDS(SamplingMode SamplingMode,
-			int TimeoutMilliseconds)
+			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
 			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId,
 				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
 
-			Task<TedsAccessMessage> Result = this.WaitForMessage<TedsAccessMessage>(TimeoutMilliseconds);
+			Task<TedsAccessMessage> Result = this.WaitForMessage<TedsAccessMessage>(TimeoutMilliseconds, StaleLimitSeconds);
 
-			await this.Topic.Broker.Publish(this.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			if (!Result.IsCompleted)
+				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 
 			return await Result;
 
@@ -230,11 +281,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// Waits for a message to be received.
 		/// </summary>
 		/// <typeparam name="T">Type of message expected.</typeparam>
+		/// <param name="StaleLimitSeconds">A received message is considered stale, if
+		/// older than this number of seconds.</param>
 		/// <param name="TimeoutMilliseconds">Maximum amount of time to wait for the message.</param>
 		/// <returns>Message</returns>
 		/// <exception cref="TimeoutException">If no message is received within the
 		/// prescribed time.</exception>
-		public async Task<T> WaitForMessage<T>(int TimeoutMilliseconds)
+		public async Task<T> WaitForMessage<T>(int TimeoutMilliseconds, int StaleLimitSeconds)
 			where T : Message
 		{
 			TaskCompletionSource<Message> Pending = new TaskCompletionSource<Message>();
@@ -245,6 +298,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				if (this.messages.TryGetValue(MessageType, out MessageRec Rec))
 				{
+					if (!(Rec.Message is null) && DateTime.UtcNow.Subtract(Rec.Timestamp).TotalSeconds < StaleLimitSeconds)
+						return (T)Rec.Message;
+
 					Obsolete = Rec.Pending;
 					Rec.Pending = Pending;
 				}
@@ -293,12 +349,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override async Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			// TODO: Configurable timeout.
+			// TODO: Configurable stale limit.
 
 			try
 			{
 				if (this.channelId > 0)         // Channel
 				{
-					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 5000);
+					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 5000, 60);
 
 					if (Data.TryParseTransducerData(ThingReference,
 						out ushort ErrorCode, out TransducerData ParsedData))

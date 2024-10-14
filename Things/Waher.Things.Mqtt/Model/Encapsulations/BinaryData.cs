@@ -41,14 +41,15 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
-		public override Task<bool> DataReported(MqttTopic Topic, MqttContent Content)
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			this.value = Content.Data;
 			this.Timestamp = DateTime.UtcNow;
 			this.QoS = Content.Header.QualityOfService;
 			this.Retain = Content.Header.Retain;
 			
-			return Task.FromResult(true);
+			return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
 		}
 
 		/// <summary>

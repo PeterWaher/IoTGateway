@@ -46,10 +46,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Topic">MQTT Topic Node</param>
 		/// <param name="Content">Published MQTT Content</param>
 		/// <param name="Data">Binary data</param>
-		public async Task<bool> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
+		/// <returns>Data processing result</returns>
+		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
 			if (!Ieee1451Parser.TryParseMessage(Data, out Message Message))
-				return false;
+				return DataProcessingResult.Incompatible;
 
 			this.value = Data;
 			this.Timestamp = DateTime.UtcNow;
@@ -57,11 +58,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			this.Retain = Content.Header.Retain;
 
 			if (Topic is null)
-				return true;
+				return DataProcessingResult.Processed;
 
-			await this.MessageReceived(Topic, Message);
-
-			return true;
+			return await this.MessageReceived(Topic, Message);
 		}
 
 		/// <summary>
@@ -69,15 +68,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Message">Parsed binary message.</param>
-		public async Task MessageReceived(MqttTopic Topic, Message Message)
+		/// <returns>Data processing result</returns>
+		public async Task<DataProcessingResult> MessageReceived(MqttTopic Topic, Message Message)
 		{
 			try
 			{
 				switch (Message.MessageType)
 				{
 					case MessageType.Reply:
-						await this.ProcessReply(Topic, Message);
-						break;
+						return await this.ProcessReply(Topic, Message);
 
 					case MessageType.Command:
 						await this.ProcessRequest(Message);
@@ -87,18 +86,21 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					case MessageType.Notification:
 					case MessageType.Callback:
 					default:
-						return;
+						break;
 				}
 			}
 			catch (Exception ex)
 			{
 				await this.LogErrorAsync(string.Empty, ex.Message);
 			}
+
+			return DataProcessingResult.Processed;
 		}
 
-		private async Task ProcessReply(MqttTopic Topic, Message Message)
+		private async Task<DataProcessingResult> ProcessReply(MqttTopic Topic, Message Message)
 		{
 			MqttTopic SubTopic;
+			bool ContainsMomentary = false;
 
 			if (Message is TransducerAccessMessage TransducerAccessMessage)
 			{
@@ -128,14 +130,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
 					if (ErrorCode == 0)
+					{
 						await SubTopic.Node.RemoveErrorAsync("TranducerError");
+						ContainsMomentary = true;
+					}
 					else
 						await SubTopic.Node.LogErrorAsync("TranducerError", "Transducer error: " + ErrorCode.ToString("X4"));
 				}
 				else
 				{
 					await this.LogErrorAsync("TransducerResponseError", "Unable to parse Transducer response.");
-					return;
+					return DataProcessingResult.Processed;
 				}
 			}
 			else if (Message is TedsAccessMessage TedsAccessMessage)
@@ -172,16 +177,19 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				else
 				{
 					await this.LogErrorAsync("TedsResponseError", "Unable to parse TEDS response.");
-					return;
+					return DataProcessingResult.Processed;
 				}
 			}
 			else
-				return;
+				return DataProcessingResult.Processed;
 
 			if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
-				return;
+				return DataProcessingResult.Processed;
 
-			NcapTopicNode.ResponseReceived(Topic, Message);
+			if (NcapTopicNode.ResponseReceived(Topic, Message) || !ContainsMomentary)
+				return DataProcessingResult.Processed;
+			else
+				return DataProcessingResult.ProcessedNewMomentaryValues;
 		}
 
 		private async Task ProcessRequest(Message Message)

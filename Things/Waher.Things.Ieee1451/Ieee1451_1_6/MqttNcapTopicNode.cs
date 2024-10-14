@@ -150,15 +150,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT topic.</param>
 		/// <param name="Message">Message</param>
-		public void ResponseReceived(MqttTopic Topic, Ieee1451_0.Messages.Message Message)
+		/// <returns>If response to a pending request was received (true)</returns>
+		public bool ResponseReceived(MqttTopic Topic, Ieee1451_0.Messages.Message Message)
 		{
 			if (Topic.Data is MessageData Data)
-				Data.DataReported(Message);
+				return Data.DataReported(Message);
 			else
 			{
 				Topic.SetData(new MessageData(Topic, Message, this.NcapIdBinary,
 					(this as MqttTimTopicNode)?.TimIdBinary,
 					(ushort)((this as MqttChannelTopicNode)?.ChannelId ?? 0)));
+
+				return false;
 			}
 		}
 

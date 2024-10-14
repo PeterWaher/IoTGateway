@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Metering;
 using Waher.Things.Mqtt;
+using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -15,6 +20,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	public class MqttNcapTopicNode : MqttTopicNode
 	{
 		private string ncapId;
+		private byte[] ncapIdBin;
 
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 NCAP.
@@ -34,8 +40,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public string NcapId
 		{
 			get => this.ncapId;
-			set => this.ncapId = value;
+			set
+			{
+				this.ncapIdBin = Hashes.StringToBinary(value);
+				this.ncapId = value;
+			}
 		}
+
+		/// <summary>
+		/// NCAP ID in binary form.
+		/// </summary>
+		public byte[] NcapIdBinary => this.ncapIdBin;
 
 		/// <summary>
 		/// Local ID
@@ -114,5 +129,63 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				NcapId = Topic.CurrentSegment
 			};
 		}
+
+		/// <summary>
+		/// Gets the default data object, if any.
+		/// </summary>
+		/// <returns>Default data object, if one exists, or null otherwise.</returns>
+		public override async Task<IMqttData> GetDefaultDataObject()
+		{
+			MqttTopic Topic = await this.GetTopic();
+			if (Topic is null)
+				return null;
+
+			return new MessageData(Topic, this.ncapIdBin,
+				(this as MqttTimTopicNode)?.TimIdBinary,
+				(ushort)((this as MqttChannelTopicNode)?.ChannelId ?? 0));
+		}
+
+		/// <summary>
+		/// A response message has been received.
+		/// </summary>
+		/// <param name="Topic">MQTT topic.</param>
+		/// <param name="Message">Message</param>
+		public void ResponseReceived(MqttTopic Topic, Ieee1451_0.Messages.Message Message)
+		{
+			if (Topic.Data is MessageData Data)
+				Data.DataReported(Message);
+			else
+			{
+				Topic.SetData(new MessageData(Topic, Message, this.NcapIdBinary,
+					(this as MqttTimTopicNode)?.TimIdBinary,
+					(ushort)((this as MqttChannelTopicNode)?.ChannelId ?? 0)));
+			}
+		}
+
+		/// <summary>
+		/// A request for transducer data has been received.
+		/// </summary>
+		/// <param name="Message">Message</param>
+		/// <param name="SamplingMode">Sampling mode.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TransducerDataRequest(Ieee1451_0.Messages.Message Message,
+			SamplingMode SamplingMode, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;	// TODO
+		}
+
+		/// <summary>
+		/// A request for TEDS data has been received.
+		/// </summary>
+		/// <param name="Message">Message</param>
+		/// <param name="TedsAccessCode">TEDS access code.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TedsRequest(Ieee1451_0.Messages.Message Message,
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
 	}
 }

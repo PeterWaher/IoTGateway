@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Waher.Content.Putters;
-using Waher.Things.Ieee1451.Ieee1451_0.Model;
+using System.IO;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
+using Waher.Things.Metering;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -116,17 +115,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Tries to parse a TEDS request from the message.
 		/// </summary>
 		/// <param name="Channel">Channel information.</param>
-		/// <param name="TedsAccesCode">What TED is requested.</param>
+		/// <param name="TedsAccessCode">What TED is requested.</param>
 		/// <param name="TedsOffset">TEDS offset.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
 		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseRequest(out ChannelAddress Channel, out TedsAccesCode TedsAccesCode, 
+		public bool TryParseRequest(out ChannelAddress Channel, out TedsAccessCode TedsAccessCode, 
 			out uint TedsOffset, out double TimeoutSeconds)
 		{
 			try
 			{
 				Channel = this.NextChannelId();
-				TedsAccesCode = (TedsAccesCode)this.NextUInt8();
+				TedsAccessCode = (TedsAccessCode)this.NextUInt8();
 				TedsOffset = this.NextUInt32();
 				TimeoutSeconds = this.NextTimeDurationSeconds();
 
@@ -135,7 +134,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			catch (Exception)
 			{
 				Channel = null;
-				TedsAccesCode = 0;
+				TedsAccessCode = 0;
 				TedsOffset = 0;
 				TimeoutSeconds = 0;
 
@@ -144,30 +143,38 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Process incoming message.
+		/// Serializes a request for transducer data.
 		/// </summary>
-		/// <param name="Client">Client interface.</param>
-		public override Task ProcessIncoming(IClient Client)
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimId">TIM ID, or null if none.</param>
+		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
+		/// <param name="TedsAccessCode">TEDS access code.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <returns></returns>
+		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
 		{
-			switch (this.MessageType)
+			using (MemoryStream ms = new MemoryStream())
 			{
-				case MessageType.Command:
-					return Client.TedsAccessCommand(this);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId ?? EmptyUuid, 0, 16);
+				ms.Write(TimId ?? EmptyUuid, 0, 16);
+				ms.Write(NcapId ?? EmptyUuid, 0, 16);
+				ms.WriteByte((byte)(ChannelId >> 8));
+				ms.WriteByte((byte)ChannelId);
+				ms.WriteByte((byte)TedsAccessCode);
 
-				case MessageType.Reply:
-					return Client.TedsAccessReply(this);
+				byte[] Bin = BitConverter.GetBytes(TedsOffset);
+				ms.Write(Bin, 0, 4);
 
-				case MessageType.Announcement:
-					return Client.TedsAccessAnnouncement(this);
+				TimeoutSeconds *= 1e9 * 65536;
+				ulong l = (ulong)TimeoutSeconds;
+				Bin = BitConverter.GetBytes(l);
+				ms.Write(Bin, 0, 8);
 
-				case MessageType.Notification:
-					return Client.TedsAccessNotification(this);
-
-				case MessageType.Callback:
-					return Client.TedsAccessCallback(this);
-
-				default:
-					return Task.CompletedTask;
+				return Ieee1451Parser.SerializeMessage(TedsAccessService.Read, 
+					MessageType.Command, ms.ToArray());
 			}
 		}
 	}

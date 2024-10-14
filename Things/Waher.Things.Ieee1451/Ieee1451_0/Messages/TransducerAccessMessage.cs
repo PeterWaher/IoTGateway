@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
 using Waher.Content;
-using Waher.Things.Ieee1451.Ieee1451_0.Model;
+using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
@@ -23,7 +23,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		public TransducerAccessMessage(NetworkServiceType NetworkServiceType, TransducerAccessService TransducerAccessService, 
+		public TransducerAccessMessage(NetworkServiceType NetworkServiceType, TransducerAccessService TransducerAccessService,
 			MessageType MessageType, byte[] Body, byte[] Tail)
 			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail)
 		{
@@ -47,7 +47,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
-		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode, 
+		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode,
 			out TransducerData Data)
 		{
 			if (!(this.data is null))
@@ -77,7 +77,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						if (CommonTypes.TryParse(Value, out double NumericValue, out byte NrDecimals))
 						{
-							Fields.Add(new QuantityField(Thing, Timestamp, "Value", 
+							Fields.Add(new QuantityField(Thing, Timestamp, "Value",
 								NumericValue, NrDecimals, string.Empty, FieldType.Momentary,
 								FieldQoS.AutomaticReadout));
 						}
@@ -136,30 +136,35 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Process incoming message.
+		/// Serializes a request for transducer data.
 		/// </summary>
-		/// <param name="Client">Client interface.</param>
-		public override Task ProcessIncoming(IClient Client)
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimId">TIM ID, or null if none.</param>
+		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
+		/// <param name="SamplingMode">Sampling mode.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <returns></returns>
+		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
+			SamplingMode SamplingMode, double TimeoutSeconds)
 		{
-			switch(this.MessageType)
+			using (MemoryStream ms = new MemoryStream())
 			{
-				case MessageType.Command:
-					return Client.TransducerAccessCommand(this);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId ?? EmptyUuid, 0, 16);
+				ms.Write(TimId ?? EmptyUuid, 0, 16);
+				ms.Write(NcapId ?? EmptyUuid, 0, 16);
+				ms.WriteByte((byte)(ChannelId >> 8));
+				ms.WriteByte((byte)ChannelId);
+				ms.WriteByte((byte)SamplingMode);
 
-				case MessageType.Reply:
-					return Client.TransducerAccessReply(this);
+				TimeoutSeconds *= 1e9 * 65536;
+				ulong l = (ulong)TimeoutSeconds;
+				byte[] Bin = BitConverter.GetBytes(l);
+				ms.Write(Bin, 0, 8);
 
-				case MessageType.Announcement:
-					return Client.TransducerAccessAnnouncement(this);
-
-				case MessageType.Notification:
-					return Client.TransducerAccessNotification(this);
-
-				case MessageType.Callback:
-					return Client.TransducerAccessCallback(this);
-
-				default:
-					return Task.CompletedTask;
+				return Ieee1451Parser.SerializeMessage(
+					TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM,
+					MessageType.Command, ms.ToArray());
 			}
 		}
 	}

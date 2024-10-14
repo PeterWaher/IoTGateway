@@ -314,8 +314,15 @@ namespace Waher.Things.Mqtt.Model
 					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
 				else if (this.data is null)
 				{
-					if (Last)
-						Request.ReportFields(true);
+					this.data = await this.node.GetDefaultDataObject();
+
+					if (this.data is null)
+					{
+						if (Last)
+							Request.ReportFields(true);
+					}
+					else
+						await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 				}
 				else
 					await this.data.StartReadout(ThingReference, Request, Prefix, Last);

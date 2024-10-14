@@ -200,5 +200,14 @@ namespace Waher.Things.Mqtt
 			};
 		}
 
+		/// <summary>
+		/// Gets the default data object, if any.
+		/// </summary>
+		/// <returns>Default data object, if one exists, or null otherwise.</returns>
+		public virtual Task<IMqttData> GetDefaultDataObject()
+		{
+			return Task.FromResult<IMqttData>(null);
+		}
+
 	}
 }

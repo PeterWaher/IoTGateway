@@ -9,7 +9,7 @@
 			<String id="5">IEEE 1451.0 NCAP</String>
 			<String id="6">IEEE 1451.0 TIM</String>
 			<String id="7">IEEE 1451.0 Channel</String>
-			<String id="8">Transducer data.</String>
+			<String id="8"></String>
 		</Namespace>
 		<Namespace name="Waher.Things.Ieee1451.Ieee1451_1_6">
 			<String id="1">IEEE 1451</String>
@@ -26,6 +26,7 @@
 			<String id="12">IEEE 1451.1.6 NCAP (BASE64)</String>
 			<String id="13">IEEE 1451.1.6 NCAP (HEX)</String>
 			<String id="14">IEEE 1451.1.6 NCAP (BINARY)</String>
+			<String id="15">IEEE 1451.1.6 message data</String>
 		</Namespace>
 	</Language>
 </Translation>

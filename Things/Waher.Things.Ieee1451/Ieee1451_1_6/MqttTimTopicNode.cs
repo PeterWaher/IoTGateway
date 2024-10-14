@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Mqtt;
@@ -15,6 +16,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	public class MqttTimTopicNode : MqttNcapTopicNode
 	{
 		private string timId;
+		private byte[] timIdBin;
 
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 TIM.
@@ -34,8 +36,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public string TimId
 		{
 			get => this.timId;
-			set => this.timId = value;
+			set
+			{
+				this.timIdBin = Hashes.StringToBinary(value);
+				this.timId = value;
+			}
 		}
+
+		/// <summary>
+		/// TIM ID in binary form.
+		/// </summary>
+		public byte[] TimIdBinary => this.timIdBin;
 
 		/// <summary>
 		/// Local ID

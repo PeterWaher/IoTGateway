@@ -27,7 +27,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			this.Body = Body;
 			this.len = this.Body.Length;
 		}
-		
+
 		/// <summary>
 		/// Message Body
 		/// </summary>
@@ -314,8 +314,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Time duration.</returns>
 		public double NextTimeDurationSeconds()
 		{
-			long TimeDuration = this.NextInt64();
-			return TimeDuration * Math.Pow(2, -16) * 1e-9;
+			long TimeDuration = this.NextInt64();   // ns * 2^16
+			double Result = TimeDuration;			// ns * 2^16
+			Result /= 65536;						// ns
+			Result *= 1e-9;							// s
+			return Result;
 		}
 
 		/// <summary>
@@ -355,7 +358,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Array.</returns>
 		public byte[] NextUInt8Array(int NrItems)
 		{
-			byte[] Result=new byte[NrItems];
+			byte[] Result = new byte[NrItems];
 			int i;
 
 			for (i = 0; i < NrItems; i++)

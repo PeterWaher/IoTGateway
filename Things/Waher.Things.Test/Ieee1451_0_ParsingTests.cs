@@ -39,7 +39,7 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003C00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF0000101000000005000000000 ")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010100000000000000012A05F200")]
 		public void Test_02_ParseMetaTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -52,7 +52,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(MessageType.Command, Message.MessageType);
 
 			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
-				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+				out TedsAccessCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
 
 			Assert.IsNotNull(Channel);
 			Assert.IsNotNull(Channel.ApplicationId);
@@ -92,7 +92,7 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003A00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF003000000005000000000")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300000000000000012A05F200")]
 		public void Test_04_ParseTransducerChannelTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -105,7 +105,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(MessageType.Command, Message.MessageType);
 
 			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
-				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+				out TedsAccessCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
 
 			Assert.IsNotNull(Channel);
 			Assert.IsNotNull(Channel.ApplicationId);
@@ -145,7 +145,7 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "030201003A00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00C000000005000000000")]
+		[DataRow(false, "030201003F00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010C00000000000000012A05F200")]
 		public void Test_06_ParseTransducerNameTEDSRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -158,7 +158,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(MessageType.Command, Message.MessageType);
 
 			Assert.IsTrue(TedsAccessMessage.TryParseRequest(out ChannelAddress Channel,
-				out TedsAccesCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
+				out TedsAccessCode TedsAccesCode, out uint TedsOffset, out double TimeoutSeconds));
 
 			Assert.IsNotNull(Channel);
 			Assert.IsNotNull(Channel.ApplicationId);
@@ -198,7 +198,7 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "020101003700303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF001035000000000")]
+		[DataRow(false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF0000103000000012A05F200")]
 		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);

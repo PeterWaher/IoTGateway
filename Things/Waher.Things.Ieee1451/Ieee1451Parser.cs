@@ -1,6 +1,7 @@
 ﻿using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using System;
+using System.IO;
 
 namespace Waher.Things.Ieee1451
 {
@@ -160,5 +161,97 @@ namespace Waher.Things.Ieee1451
 					return false;
 			}
 		}
+
+		/// <summary>
+		/// Creates a binary IEEE 1451.0 message.
+		/// </summary>
+		/// <param name="NetworkServiceType">Network service type.</param>
+		/// <param name="NetworkServiceId">Network service ID</param>
+		/// <param name="MessageType">Message Type</param>
+		/// <param name="Payload">Binary payload.</param>
+		/// <returns>Binary message</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static byte[] SerializeMessage(NetworkServiceType NetworkServiceType,
+			byte NetworkServiceId, MessageType MessageType, byte[] Payload)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.WriteByte((byte)NetworkServiceType);
+				ms.WriteByte(NetworkServiceId);
+				ms.WriteByte((byte)MessageType);
+
+				int Length = Payload?.Length ?? 0;
+				if (Length > ushort.MaxValue)
+					throw new ArgumentException("Payload too large.", nameof(Payload));
+
+				ms.WriteByte((byte)(Length >> 8));
+				ms.WriteByte((byte)Length);
+
+				if (Length > 0)
+					ms.Write(Payload, 0, Length);
+
+				return ms.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// Creates a binary IEEE 1451.0 message.
+		/// </summary>
+		/// <param name="NetworkServiceId">Network service ID</param>
+		/// <param name="MessageType">Message Type</param>
+		/// <param name="Payload">Binary payload.</param>
+		/// <returns>Binary message</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static byte[] SerializeMessage(DiscoveryService NetworkServiceId, 
+			MessageType MessageType, byte[] Payload)
+		{
+			return SerializeMessage(NetworkServiceType.DiscoveryServices, (byte)NetworkServiceId, MessageType, Payload);
+		}
+
+		/// <summary>
+		/// Creates a binary IEEE 1451.0 message.
+		/// </summary>
+		/// <param name="NetworkServiceId">Network service ID</param>
+		/// <param name="MessageType">Message Type</param>
+		/// <param name="Payload">Binary payload.</param>
+		/// <returns>Binary message</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static byte[] SerializeMessage(TransducerAccessService NetworkServiceId, 
+			MessageType MessageType, byte[] Payload)
+		{
+			return SerializeMessage(NetworkServiceType.TransducerAccessServices, 
+				(byte)NetworkServiceId, MessageType, Payload);
+		}
+
+		/// <summary>
+		/// Creates a binary IEEE 1451.0 message.
+		/// </summary>
+		/// <param name="NetworkServiceId">Network service ID</param>
+		/// <param name="MessageType">Message Type</param>
+		/// <param name="Payload">Binary payload.</param>
+		/// <returns>Binary message</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static byte[] SerializeMessage(TedsAccessService NetworkServiceId, 
+			MessageType MessageType, byte[] Payload)
+		{
+			return SerializeMessage(NetworkServiceType.TedsAccessServices, 
+				(byte)NetworkServiceId, MessageType, Payload);
+		}
+
+		/// <summary>
+		/// Creates a binary IEEE 1451.0 message.
+		/// </summary>
+		/// <param name="NetworkServiceId">Network service ID</param>
+		/// <param name="MessageType">Message Type</param>
+		/// <param name="Payload">Binary payload.</param>
+		/// <returns>Binary message</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static byte[] SerializeMessage(EventNotificationService NetworkServiceId, 
+			MessageType MessageType, byte[] Payload)
+		{
+			return SerializeMessage(NetworkServiceType.EventNotificationServices, 
+				(byte)NetworkServiceId, MessageType, Payload);
+		}
+
 	}
 }

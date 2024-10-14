@@ -3,7 +3,7 @@
 	/// <summary>
 	/// TEDS Access Code
 	/// </summary>
-	public enum TedsAccesCode
+	public enum TedsAccessCode
 	{
 		/// <summary>
 		/// Meta-TEDS

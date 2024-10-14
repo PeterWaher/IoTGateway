@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Security;
+using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
-using Waher.Things.Ieee1451.Ieee1451_0.Model;
+using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
@@ -16,7 +17,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// <summary>
 	/// Abstract base class for IEEE 1451.1.6 NCAPs.
 	/// </summary>
-	public abstract class Ncap : MqttData, IClient
+	public abstract class Ncap : MqttData
 	{
 		private byte[] value;
 
@@ -68,16 +69,204 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Message">Parsed binary message.</param>
-		public virtual async Task MessageReceived(MqttTopic Topic, Message Message)
+		public async Task MessageReceived(MqttTopic Topic, Message Message)
 		{
 			try
 			{
-				await Message.ProcessIncoming(this);
+				switch (Message.MessageType)
+				{
+					case MessageType.Reply:
+						await this.ProcessReply(Topic, Message);
+						break;
+
+					case MessageType.Command:
+						await this.ProcessRequest(Message);
+						break;
+
+					case MessageType.Announcement:
+					case MessageType.Notification:
+					case MessageType.Callback:
+					default:
+						return;
+				}
 			}
 			catch (Exception ex)
 			{
 				await this.LogErrorAsync(string.Empty, ex.Message);
 			}
+		}
+
+		private async Task ProcessReply(MqttTopic Topic, Message Message)
+		{
+			MqttTopic SubTopic;
+
+			if (Message is TransducerAccessMessage TransducerAccessMessage)
+			{
+				ThingReference Ref = new ThingReference(this.Topic.Node);
+				if (TransducerAccessMessage.TryParseTransducerData(Ref, out ushort ErrorCode, out TransducerData Data))
+				{
+					await this.RemoveErrorAsync("TransducerResponseError");
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(this.Topic.FullTopic);
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Data.ChannelInfo.NcapId));
+
+					if (!MessageData.IsZero(Data.ChannelInfo.TimId))
+					{
+						sb.Append('/');
+						sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
+
+						if (Data.ChannelInfo.ChannelId != 0)
+						{
+							sb.Append('/');
+							sb.Append(Data.ChannelInfo.ChannelId.ToString());
+						}
+					}
+
+					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+					if (ErrorCode == 0)
+						await SubTopic.Node.RemoveErrorAsync("TranducerError");
+					else
+						await SubTopic.Node.LogErrorAsync("TranducerError", "Transducer error: " + ErrorCode.ToString("X4"));
+				}
+				else
+				{
+					await this.LogErrorAsync("TransducerResponseError", "Unable to parse Transducer response.");
+					return;
+				}
+			}
+			else if (Message is TedsAccessMessage TedsAccessMessage)
+			{
+				if (TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds))
+				{
+					await this.RemoveErrorAsync("TedsResponseError");
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(this.Topic.FullTopic);
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.NcapId));
+
+					if (!MessageData.IsZero(Teds.ChannelInfo.TimId))
+					{
+						sb.Append('/');
+						sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
+
+						if (Teds.ChannelInfo.ChannelId != 0)
+						{
+							sb.Append('/');
+							sb.Append(Teds.ChannelInfo.ChannelId.ToString());
+						}
+					}
+
+					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+					if (ErrorCode == 0)
+						await SubTopic.Node.RemoveErrorAsync("TedsError");
+					else
+						await SubTopic.Node.LogErrorAsync("TedsError", "TEDS error: " + ErrorCode.ToString("X4"));
+				}
+				else
+				{
+					await this.LogErrorAsync("TedsResponseError", "Unable to parse TEDS response.");
+					return;
+				}
+			}
+			else
+				return;
+
+			if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
+				return;
+
+			NcapTopicNode.ResponseReceived(Topic, Message);
+		}
+
+		private async Task ProcessRequest(Message Message)
+		{
+			MqttTopic SubTopic;
+
+			if (Message is TransducerAccessMessage TransducerAccessMessage)
+			{
+				if (TransducerAccessMessage.TryParseRequest(out ChannelAddress Address,
+					out SamplingMode SamplingMode, out double TimeoutSeconds))
+				{
+					await this.RemoveErrorAsync("TransducerRequestError");
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(this.Topic.FullTopic);
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Address.NcapId));
+
+					if (!MessageData.IsZero(Address.TimId))
+					{
+						sb.Append('/');
+						sb.Append(Hashes.BinaryToString(Address.TimId));
+
+						if (Address.ChannelId != 0)
+						{
+							sb.Append('/');
+							sb.Append(Address.ChannelId.ToString());
+						}
+					}
+
+					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
+						return;
+
+					await NcapTopicNode.TransducerDataRequest(Message, SamplingMode, TimeoutSeconds);
+				}
+				else
+				{
+					await this.LogErrorAsync("TransducerRequestError", "Unable to parse Transducer request.");
+					return;
+				}
+			}
+			else if (Message is TedsAccessMessage TedsAccessMessage)
+			{
+				if (TedsAccessMessage.TryParseRequest(out ChannelAddress Address,
+					out TedsAccessCode TedsAccessCode, out uint TedsOffset,
+					out double TimeoutSeconds))
+				{
+					await this.RemoveErrorAsync("TedsRequestError");
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(this.Topic.FullTopic);
+					sb.Append('/');
+					sb.Append(Hashes.BinaryToString(Address.NcapId));
+
+					if (!MessageData.IsZero(Address.TimId))
+					{
+						sb.Append('/');
+						sb.Append(Hashes.BinaryToString(Address.TimId));
+
+						if (Address.ChannelId != 0)
+						{
+							sb.Append('/');
+							sb.Append(Address.ChannelId.ToString());
+						}
+					}
+
+					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
+						return;
+
+					await NcapTopicNode.TedsRequest(Message, TedsAccessCode, TedsOffset, TimeoutSeconds);
+				}
+				else
+				{
+					await this.LogErrorAsync("TedsRequestError", "Unable to parse TEDS request.");
+					return;
+				}
+			}
+			else
+				return;
 		}
 
 		private Task LogErrorAsync(string EventId, string Message)
@@ -117,296 +306,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 
 			Request.ReportFields(Last, Data);
-		
+
 			return Task.CompletedTask;
 		}
-
-		private async Task<MqttTopic> GetChannelTopic(TransducerAccessMessage Message)
-		{
-			ThingReference Ref = new ThingReference(this.Topic.Node);
-			if (Message.TryParseTransducerData(Ref, out ushort ErrorCode, out TransducerData Data))
-			{
-				await this.RemoveErrorAsync("TransducerDataError");
-
-				StringBuilder sb = new StringBuilder();
-
-				sb.Append(this.Topic.FullTopic);
-				sb.Append('/');
-				sb.Append(Hashes.BinaryToString(Data.ChannelInfo.NcapId));
-
-				if (!IsZero(Data.ChannelInfo.TimId))
-				{
-					sb.Append('/');
-					sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
-
-					if (Data.ChannelInfo.ChannelId != 0)
-					{
-						sb.Append('/');
-						sb.Append(Data.ChannelInfo.ChannelId.ToString());
-					}
-				}
-
-				MqttTopic ChannelTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
-
-				if (ErrorCode == 0)
-					await ChannelTopic.Node.RemoveErrorAsync("TranducerError");
-				else
-					await ChannelTopic.Node.LogErrorAsync("TranducerError", "Transducer error: " + ErrorCode.ToString("X4"));
-
-				return ChannelTopic;
-			}
-			else
-			{
-				await this.LogErrorAsync("TransducerDataError", "Unable to parse Transducer data.");
-				return null;
-			}
-		}
-
-		private async Task<MqttTopic> GetChannelTopic(TedsAccessMessage Message)
-		{
-			if (Message.TryParseTeds(true, out ushort ErrorCode, out Teds Teds))
-			{
-				await this.RemoveErrorAsync("TedsDataError");
-
-				StringBuilder sb = new StringBuilder();
-
-				sb.Append(this.Topic.FullTopic);
-				sb.Append('/');
-				sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.NcapId));
-
-				if (!IsZero(Teds.ChannelInfo.TimId))
-				{
-					sb.Append('/');
-					sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
-
-					if (Teds.ChannelInfo.ChannelId != 0)
-					{
-						sb.Append('/');
-						sb.Append(Teds.ChannelInfo.ChannelId.ToString());
-					}
-				}
-
-				MqttTopic ChannelTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
-
-				if (ErrorCode == 0)
-					await ChannelTopic.Node.RemoveErrorAsync("TedsError");
-				else
-					await ChannelTopic.Node.LogErrorAsync("TedsError", "TEDS error: " + ErrorCode.ToString("X4"));
-
-				return ChannelTopic;
-			}
-			else
-			{
-				await this.LogErrorAsync("TedsDataError", "Unable to parse TEDS data.");
-				return null;
-			}
-		}
-
-		/// <summary>
-		/// Checks if an ID is "zero", i.e. contains only zero bytes.
-		/// </summary>
-		/// <param name="A"></param>
-		/// <returns></returns>
-		public static bool IsZero(byte[] A)
-		{
-			foreach (byte b in A)
-			{
-				if (b != 0)
-					return false;
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// A transducer access command has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TransducerAccessCommand(TransducerAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TransducerAccessCommand(Message);
-		}
-
-		/// <summary>
-		/// A transducer access reply has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TransducerAccessReply(TransducerAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TransducerAccessReply(Message);
-		}
-
-		/// <summary>
-		/// A transducer access announcement has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TransducerAccessAnnouncement(TransducerAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TransducerAccessAnnouncement(Message);
-		}
-
-		/// <summary>
-		/// A transducer access notification has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TransducerAccessNotification(TransducerAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TransducerAccessNotification(Message);
-		}
-
-		/// <summary>
-		/// A transducer access callback has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TransducerAccessCallback(TransducerAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TransducerAccessCallback(Message);
-		}
-
-		/// <summary>
-		/// A TEDS access command has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TedsAccessCommand(TedsAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TedsAccessCommand(Message);
-		}
-
-		/// <summary>
-		/// A TEDS access reply has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TedsAccessReply(TedsAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TedsAccessReply(Message);
-		}
-
-		/// <summary>
-		/// A TEDS access announcement has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TedsAccessAnnouncement(TedsAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TedsAccessAnnouncement(Message);
-		}
-
-		/// <summary>
-		/// A TEDS access notification has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TedsAccessNotification(TedsAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TedsAccessNotification(Message);
-		}
-
-		/// <summary>
-		/// A TEDS access callback has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public async Task TedsAccessCallback(TedsAccessMessage Message)
-		{
-			MqttTopic Channel = await this.GetChannelTopic(Message);
-			if (!(Channel?.Node is MqttChannelTopicNode ChannelTopicNode))
-				return;
-
-			await ChannelTopicNode.TedsAccessCallback(Message);
-		}
-
-		/// <summary>
-		/// A discovery command has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task DiscoveryCommand(DiscoveryMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// A discovery reply has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task DiscoveryReply(DiscoveryMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// A discovery announcement has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task DiscoveryAnnouncement(DiscoveryMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// A discovery notification has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task DiscoveryNotification(DiscoveryMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// A discovery callback has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task DiscoveryCallback(DiscoveryMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// An Events notification command has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task EventNotificationCommand(EventNotificationMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// An Events notification reply has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task EventNotificationReply(EventNotificationMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// An Events notification announcement has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task EventNotificationAnnouncement(EventNotificationMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// An Events notification has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task EventNotificationNotification(EventNotificationMessage Message) { return Task.CompletedTask; }
-
-		/// <summary>
-		/// An Events notification callback has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		public Task EventNotificationCallback(EventNotificationMessage Message) { return Task.CompletedTask; }
-
 	}
 }

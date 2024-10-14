@@ -1,13 +1,15 @@
-﻿using System.Threading.Tasks;
-using Waher.Things.Ieee1451.Ieee1451_0.Model;
-
-namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Message
 	/// </summary>
 	public abstract class Message : Binary
 	{
+		/// <summary>
+		/// Empty UUID (16 zero bytes)
+		/// </summary>
+		public static readonly byte[] EmptyUuid = new byte[16];
+
 		/// <summary>
 		/// IEEE 1451.0 Message
 		/// </summary>
@@ -104,11 +106,5 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ChannelId = this.NextUInt16()
 			};
 		}
-
-		/// <summary>
-		/// Process incoming message.
-		/// </summary>
-		/// <param name="Client">Client interface.</param>
-		public abstract Task ProcessIncoming(IClient Client);
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.MQTT;
@@ -119,6 +118,30 @@ namespace Waher.Things.Mqtt.Model
 			{
 				this.nextCheck = Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckOnline, null);
 			}
+		}
+
+		/// <summary>
+		/// Publishes binary data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Binary Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, byte[] Data)
+		{
+			return this.Client.PUBLISH(Topic, QoS, Retain, Data);
+		}
+
+		/// <summary>
+		/// Publishes text data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Text Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, string Data)
+		{
+			return this.Publish(Topic, QoS, Retain, Encoding.UTF8.GetBytes(Data));
 		}
 
 		/// <summary>

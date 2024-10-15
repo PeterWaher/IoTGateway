@@ -186,10 +186,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
 				return DataProcessingResult.Processed;
 
-			if (NcapTopicNode.ResponseReceived(Topic, Message) || !ContainsMomentary)
-				return DataProcessingResult.Processed;
-			else
-				return DataProcessingResult.ProcessedNewMomentaryValues;
+			if (!NcapTopicNode.ResponseReceived(Topic, Message) && ContainsMomentary)
+			{
+				// TODO: Report new momentary values on node.
+			}
+				
+			return DataProcessingResult.Processed;
 		}
 
 		private async Task ProcessRequest(Message Message)

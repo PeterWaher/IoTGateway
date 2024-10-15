@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
-using Waher.Things.Metering;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 

@@ -1,6 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Waher.Networking.MQTT;
+using Waher.Networking;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Things.Ieee1451;
@@ -212,11 +215,15 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300012A05F2000000")]    // Source: ubi.pt
-		[DataRow(true, "AgEBADs+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAAQUAASoF8gAAAA==")]
-		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, string Encoded)
+		[DataRow(false, false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300012A05F2000000")]    // Source: ubi.pt
+		[DataRow(true, false, "AgEBADs+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAAQUAASoF8gAAAA==")]
+		[DataRow(true, true, "MmwAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEABQIBAQA7PqaBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlCGJYoLcvYS1ocH6AVJEdzwAAEFAAEqBfIAAAA=")]
+		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
 			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
 
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
@@ -244,10 +251,14 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]    // Source: ubi.pt
-		public void Test_09_ParseTransducerSampleDataResponse(bool Base64, string Encoded)
+		[DataRow(false, false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]    // Source: ubi.pt
+		[DataRow(true, true, "MnYAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEADQIBAgBFAAA+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAATI5OC4xNQAAAGcOfHcTz8Do")]
+		public void Test_09_ParseTransducerSampleDataResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
 			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
 
 			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
@@ -268,5 +279,20 @@ namespace Waher.Things.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
+		private static void ProcessMqttPackage(ref byte[] Bin)
+		{
+			BinaryInput Packet = new(Bin);
+			MqttHeader Header = MqttHeader.Parse(Packet);
+			Assert.IsNotNull(Header);
+			Assert.AreEqual(MqttControlPacketType.PUBLISH, Header.ControlPacketType);
+
+			string Topic = Packet.ReadString();
+			Console.Out.WriteLine("Topic: " + Topic);
+
+			if (Header.QualityOfService > MqttQualityOfService.AtMostOnce)
+				Packet.ReadUInt16();
+
+			Bin = Packet.ReadBytes(Packet.BytesLeft);
+		}
 	}
 }

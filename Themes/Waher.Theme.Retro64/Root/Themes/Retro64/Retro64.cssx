@@ -1,4 +1,12 @@
-﻿html
+﻿@import url("../Base/Base.cssx");
+
+
+/* region Header*/
+
+
+/* endregion Header*/
+
+html
 {
 }
 
@@ -20,16 +28,6 @@ body
     background-color:#A0A0FF;
 }
 
-main
-{
-    padding: 0 5% 2.5em 5%;
-    display: block;
-    width: 90%;
-    top:5em;
-    position:absolute;
-    z-index:2;
-}
-
 header
 {
     background-position: center;
@@ -43,10 +41,7 @@ header
     z-index:3;
 }
 
-nav
-{
-    padding:0 3em 0 0;
-}
+
 
 nav > ul 
 {
@@ -151,16 +146,15 @@ nav > ul > li:hover > ul
     list-style-type: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    background-color: rgba(0,0,0,0.9);
 }
 
-nav > ul > li > ul > li
+nav ul > li > ul > li
 {
     border-left: 1px solid rgba(255,255,255,0.7);
     border-bottom: 1px solid rgba(255,255,255,0.7);
     border-right: 1px solid rgba(255,255,255,0.7);
     background-clip: content-box;
+    background-color: rgba(0,0,0,0.9);
 	white-space:nowrap;
 	transition: opacity 0.25s ease-out;
 	color:white;
@@ -220,7 +214,7 @@ section
 {
     padding: 2em 2em 2em 2em;
     box-shadow: 0.3em 0.3em 0.3em #202020c0;
-    margin: 3em 0.5em 3em 0;
+    margin: 3em 0 3em 0;
     background-color:¤BackgroundColor¤;
 }
 
@@ -653,20 +647,7 @@ dd
 {
 }
 
-table
-{
-    margin-bottom: 1.5em;
-    border-collapse: collapse;
-    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    border-collapse: separate;
-    border-width: 0;
-    border-spacing:0;
-}
 
-table caption
-{
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.75);
-}
 
 tr:nth-child(odd)
 {
@@ -678,10 +659,6 @@ tr:nth-child(even)
     background-color: rgba(255,255,255,0.1);
 }
 
-table, th, td
-{
-    border: 0;
-}
 
 th
 {
@@ -757,40 +734,16 @@ div.tocBody ol > li::before
     content: counters(toc,".") " ";
 }
 
-.footnote-ref
-{
-    text-decoration: none;
-}
 
-.footnote-backref
-{
-    text-decoration:none;
-}
-
-.footnote-backref:before
-{
-    content: " ";
-}
-
-div.footnotes > hr
-{
-    display:none;
-}
 
 .footnotes
 {
-    margin: 2em -6% 0 -6%;
-    padding: 0.5em 6% 0.5em 6%;       /* 0.5em 0em 0.5em 0em */
     background:#222;
     background: -webkit-linear-gradient(#555, #222 10%);
     background: -o-linear-gradient(#555, #222 10%);
     background: -moz-linear-gradient(#555, #222 10%);
     background: linear-gradient(#555, #222 10%);
 }
-
-div.footnotes + p
-{
-    display:none;
 }
 
 input
@@ -1166,4 +1119,22 @@ abbr:hover::after
 .horizontalAlignMargins
 {
     text-align:justify;
+}
+
+
+@media screen and (max-width: 900px) {
+
+    /* region Header*/
+
+    header
+    {
+        background-color:¤BackgroundColor¤;
+    }
+
+    header > nav > ul > li {
+        background-color:#A0A0FF;
+    }
+
+    /* endregion Header*/
+
 }

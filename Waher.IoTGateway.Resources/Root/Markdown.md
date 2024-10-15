@@ -1844,13 +1844,13 @@ Block-level HTML can be combined with markdown.
 
 Example:
 
-	<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;width:500px;text-align:center">
+	<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;text-align:center">
 	This text is _formatted_ using **Markdown**.
 	</div>
 
 This is shown as:
 
-<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;width:500px;text-align:center">
+<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;text-align:center">
 This text is _formatted_ using **Markdown**.
 </div>
 

@@ -121,12 +121,15 @@ namespace Waher.Things.Mqtt
 			if (Broker is null)
 				return null;
 			else
-				return await Broker.GetTopic(this.FullTopic, false);
+				return await Broker.GetTopic(this.FullTopic, false, false);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets displayable parameters.
 		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
@@ -160,7 +163,7 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public async Task StartReadout(ISensorReadout Request)
+		public virtual async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -195,6 +198,15 @@ namespace Waher.Things.Mqtt
 				NodeId = await GetUniqueNodeId(Topic.CurrentSegment),
 				LocalTopic = Topic.CurrentSegment
 			};
+		}
+
+		/// <summary>
+		/// Gets the default data object, if any.
+		/// </summary>
+		/// <returns>Default data object, if one exists, or null otherwise.</returns>
+		public virtual Task<IMqttData> GetDefaultDataObject()
+		{
+			return Task.FromResult<IMqttData>(null);
 		}
 
 	}

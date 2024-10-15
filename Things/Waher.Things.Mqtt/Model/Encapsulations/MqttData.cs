@@ -60,7 +60,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public abstract bool DataReported(MqttContent Content);
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		public abstract Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content);
 
 		/// <summary>
 		/// Type name representing data.
@@ -70,7 +73,11 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Starts a readout of the data.
 		/// </summary>
-		public abstract void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		public abstract Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
 
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
@@ -129,7 +136,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <returns>How well content of this type is supported.</returns>
 		public Grade Supports(MqttContent Content)
 		{
-			return this.DataReported(Content) ? this.DefaultSupport : Grade.NotAtAll;
+			return this.DataReported(null, Content).Result != DataProcessingResult.Incompatible ? this.DefaultSupport : Grade.NotAtAll;
 		}
 
 		/// <summary>
@@ -140,7 +147,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public abstract IMqttData CreateNew(MqttTopic Topic, MqttContent Content);

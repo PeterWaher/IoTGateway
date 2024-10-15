@@ -11,6 +11,27 @@ using Waher.Runtime.Inventory;
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
+	/// Results from processing an incoming message.
+	/// </summary>
+	public enum DataProcessingResult
+	{
+		/// <summary>
+		/// Data was incompatible with selected processing algorithm.
+		/// </summary>
+		Incompatible,
+
+		/// <summary>
+		/// Data has been processed.
+		/// </summary>
+		Processed,
+
+		/// <summary>
+		/// Data has been processed, and new momentary values have been detected.
+		/// </summary>
+		ProcessedNewMomentaryValues
+	}
+
+	/// <summary>
 	/// Interface for MQTT Data encapsulations
 	/// </summary>
 	public interface IMqttData : IProcessingSupport<MqttContent>
@@ -43,7 +64,10 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		bool DataReported(MqttContent Content);
+		/// <param name="Topic">MQTT Topic Node</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content);
 
 		/// <summary>
 		/// Type name representing data.
@@ -53,7 +77,11 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Starts a readout of the data.
 		/// </summary>
-		void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last);
 
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
@@ -78,7 +106,7 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		IMqttData CreateNew(MqttTopic Topic, MqttContent Content);

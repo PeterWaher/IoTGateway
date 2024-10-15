@@ -48,7 +48,7 @@
 	/// <summary>
 	/// Physical Unit exponents.
 	/// </summary>
-	public struct Ieee1451_0SampleDefinition
+	public struct SampleDefinition
 	{
 		/// <summary>
 		/// Data model. (§6.5.2.24)

@@ -11,7 +11,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	/// <summary>
 	/// IEEE 1451.0 Binary object
 	/// </summary>
-	public class Ieee1451_0Binary
+	public class Binary
 	{
 		private static readonly Dictionary<ClassTypePair, IFieldType> fieldTypes = new Dictionary<ClassTypePair, IFieldType>();
 
@@ -22,12 +22,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// IEEE 1451.0 Message
 		/// </summary>
 		/// <param name="Body">Binary Body</param>
-		public Ieee1451_0Binary(byte[] Body)
+		public Binary(byte[] Body)
 		{
 			this.Body = Body;
 			this.len = this.Body.Length;
 		}
-		
+
 		/// <summary>
 		/// Message Body
 		/// </summary>
@@ -296,12 +296,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Ieee1451_0Time"/>.
+		/// Gets the next <see cref="Time"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
-		public Ieee1451_0Time NextTime()
+		public Time NextTime()
 		{
-			return new Ieee1451_0Time()
+			return new Time()
 			{
 				Seconds = this.NextUInt48(),
 				NanoSeconds = this.NextUInt32()
@@ -312,19 +312,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Gets the next time duration, expressed in seconds.
 		/// </summary>
 		/// <returns>Time duration.</returns>
-		public double NextDurationSeconds()
+		public double NextTimeDurationSeconds()
 		{
-			long TimeDuration = this.NextInt64();
-			return TimeDuration * Math.Pow(2, -16) * 1e-9;
+			long TimeDuration = this.NextInt64();   // ns * 2^16
+			double Result = TimeDuration;			// ns * 2^16
+			Result /= 65536;						// ns
+			Result *= 1e-9;							// s
+			return Result;
 		}
 
 		/// <summary>
 		/// Gets the next physical units structure.
 		/// </summary>
 		/// <returns>Physical Units.</returns>
-		public Ieee1451_0PhysicalUnits NextPhysicalUnits()
+		public PhysicalUnits NextPhysicalUnits()
 		{
-			return new Ieee1451_0PhysicalUnits()
+			return new PhysicalUnits()
 			{
 				Interpretation = (Ieee1451_0PhysicalUnitsInterpretation)this.NextUInt8(),
 				Radians = this.NextUInt8(),
@@ -355,7 +358,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Array.</returns>
 		public byte[] NextUInt8Array(int NrItems)
 		{
-			byte[] Result=new byte[NrItems];
+			byte[] Result = new byte[NrItems];
 			int i;
 
 			for (i = 0; i < NrItems; i++)
@@ -600,28 +603,28 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			int i;
 
 			for (i = 0; i < NrItems; i++)
-				Result[i] = this.NextDurationSeconds();
+				Result[i] = this.NextTimeDurationSeconds();
 
 			return Result;
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Ieee1451_0Time"/> array
+		/// Gets the next <see cref="Time"/> array
 		/// </summary>
 		/// <returns>Array.</returns>
-		public Ieee1451_0Time[] NextTimeArray()
+		public Time[] NextTimeArray()
 		{
 			return this.NextTimeArray((this.Body.Length - this.pos) / 10);
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Ieee1451_0Time"/> array
+		/// Gets the next <see cref="Time"/> array
 		/// </summary>
 		/// <param name="NrItems">Number of items in array.</param>
 		/// <returns>Array.</returns>
-		public Ieee1451_0Time[] NextTimeArray(int NrItems)
+		public Time[] NextTimeArray(int NrItems)
 		{
-			Ieee1451_0Time[] Result = new Ieee1451_0Time[NrItems];
+			Time[] Result = new Time[NrItems];
 			int i;
 
 			for (i = 0; i < NrItems; i++)
@@ -704,7 +707,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					}
 				}
 
-				TedsRecord Record = FieldType.Parse(RecordTypeId, new Ieee1451_0Binary(RawValue), State);
+				TedsRecord Record = FieldType.Parse(RecordTypeId, new Binary(RawValue), State);
 				if (Record is TedsId TedsId)
 				{
 					State.Class = TedsId.Class;

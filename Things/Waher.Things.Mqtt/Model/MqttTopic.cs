@@ -13,7 +13,7 @@ using Waher.Things.SensorData;
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
-	/// TODO
+	/// MQTT Topic information.
 	/// </summary>
 	public class MqttTopic
 	{
@@ -30,7 +30,7 @@ namespace Waher.Things.Mqtt.Model
 		private IMqttData data = null;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Topic information.
 		/// </summary>
 		public MqttTopic(IMqttTopicNode Node, string FullTopic, string LocalTopic, MqttTopic Parent, MqttBroker Broker)
 		{
@@ -46,19 +46,29 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Reference to the MQTT Topic Node
 		/// </summary>
 		public IMqttTopicNode Node => this.node;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Broker
+		/// </summary>
+		public MqttBroker Broker => this.broker;
+
+		/// <summary>
+		/// Local topic name.
 		/// </summary>
 		public string LocalTopic => this.localTopic;
 
 		/// <summary>
-		/// TODO
+		/// Full topic name
 		/// </summary>
 		public string FullTopic => this.fullTopic;
+
+		/// <summary>
+		/// Current parsed data.
+		/// </summary>
+		public IMqttData Data => this.data;
 
 		private MqttTopic[] GetChildNodes()
 		{
@@ -78,19 +88,19 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
+		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
 		{
-			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, Broker);
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, IgnoreGuids, Broker);
 
 			if (Topic is null)
 				return null;
-			else if (Representation.MoveNext())
-				return await Topic.GetTopic(Representation, CreateNew, Broker);
+			else if (Representation.MoveNext(Topic))
+				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, Broker);
 			else
 				return Topic;
 		}
 
-		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, MqttBroker Broker)
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
 		{
 			string CurrentSegment = Representation.CurrentSegment;
 			MqttTopic Topic, Topic2;
@@ -101,7 +111,7 @@ namespace Waher.Things.Mqtt.Model
 					return Topic;
 			}
 
-			if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+			if (IgnoreGuids && Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
 				return null;
 
 			if (this.node.HasChildren)
@@ -149,8 +159,20 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Sets the parsed data of a topic.
 		/// </summary>
+		/// <typeparam name="T">Type of data.</typeparam>
+		/// <param name="Data">Parsed data.</param>
+		public void SetData<T>(T Data)
+			where T : IMqttData
+		{
+			this.data = Data;
+		}
+
+		/// <summary>
+		/// Called when new data has been published.
+		/// </summary>
+		/// <param name="Content">Published MQTT Content</param>
 		public async Task DataReported(MqttContent Content)
 		{
 			int Len = Content.Data.Length;
@@ -162,63 +184,84 @@ namespace Waher.Things.Mqtt.Model
 
 			this.dataCount += Len;
 
+			bool NewMomentaryValues;
+
 			try
 			{
-				if (!(this.data?.DataReported(Content) ?? false))
-					this.data = null;
-
 				if (this.data is null)
 					this.data = this.FindDataType(Content).CreateNew(this, Content);
+
+				switch (await this.data.DataReported(this, Content))
+				{
+					case DataProcessingResult.Incompatible:
+					default:
+						this.data = null;
+						this.data = this.FindDataType(Content).CreateNew(this, Content);
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.Processed:
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.ProcessedNewMomentaryValues:
+						NewMomentaryValues = true;
+						break;
+				}
 
 				await this.SetOk();
 			}
 			catch (Exception)
 			{
 				this.data = this.FindDataType(Content).CreateNew(this, Content);
+				NewMomentaryValues = false;
 			}
 
 			if (this.broker.Client?.HasSniffers ?? false)
 				this.data.SnifferOutput(this.broker.Client);
 
-			try
+			if (NewMomentaryValues)
 			{
-				InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
-					new IThingReference[] { this.node }, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-					(sender, e) =>
-					{
-						this.node.NewMomentaryValues(e.Fields);
-
-						MqttTopic Current = this;
-						MqttTopic Parent = this.parent;
-
-						while (!(Parent is null))
+				try
+				{
+					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
+						new IThingReference[] { this.node }, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
+						(sender, e) =>
 						{
-							foreach (Field F in e.Fields)
-							{
-								if (F.Name == "Value")
-									F.Name = Current.localTopic;
-								else
-									F.Name = Current.localTopic + ", " + F.Name;
+							this.node.NewMomentaryValues(e.Fields);
 
-								Parent.node.NewMomentaryValues(F);
+							MqttTopic Current = this;
+							MqttTopic Parent = this.parent;
+
+							while (!(Parent is null))
+							{
+								foreach (Field F in e.Fields)
+								{
+									if (F.Name == "Value")
+										F.Name = Current.localTopic;
+									else
+										F.Name = Current.localTopic + ", " + F.Name;
+
+									Parent.node.NewMomentaryValues(F);
+								}
+
+								Current = Parent;
+								Parent = Parent.parent;
 							}
 
-							Current = Parent;
-							Parent = Parent.parent;
-						}
+							return Task.CompletedTask;
+						},
+						(sender, e) =>
+						{
+							return Task.CompletedTask;
+						}, null);
 
-						return Task.CompletedTask;
-					},
-					(sender, e) =>
-					{
-						return Task.CompletedTask;
-					}, null);
-
-				this.StartReadout(Request);
-			}
-			catch (Exception ex)
-			{
-				await this.Exception(ex);
+					this.StartReadout(Request);
+				}
+				catch (Exception ex)
+				{
+					await this.Exception(ex);
+				}
 			}
 		}
 
@@ -243,7 +286,7 @@ namespace Waher.Things.Mqtt.Model
 			this.ex = null;
 			this.exTP = DateTime.MinValue;
 
-			return this.node.RemoveErrorAsync("Eror");
+			return this.node.RemoveErrorAsync("Error");
 		}
 
 		private Task Exception(Exception ex)
@@ -292,11 +335,18 @@ namespace Waher.Things.Mqtt.Model
 					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
 				else if (this.data is null)
 				{
-					if (Last)
-						Request.ReportFields(true);
+					this.data = await this.node.GetDefaultDataObject();
+
+					if (this.data is null)
+					{
+						if (Last)
+							Request.ReportFields(true);
+					}
+					else
+						await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 				}
 				else
-					this.data.StartReadout(ThingReference, Request, Prefix, Last);
+					await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 
 				await this.node.RemoveErrorAsync("Readout");
 			}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.MQTT;
@@ -11,7 +10,7 @@ using Waher.Runtime.Timing;
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
-	/// TODO
+	/// MQTT Broker connection object.
 	/// </summary>
 	public class MqttBroker : IDisposable
 	{
@@ -34,7 +33,7 @@ namespace Waher.Things.Mqtt.Model
 		private DateTime nextCheck;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Broker connection object.
 		/// </summary>
 		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password,
 			string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
@@ -56,6 +55,11 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		internal MqttClient Client => this.mqttClient;
+
+		/// <summary>
+		/// Reference to broker node.
+		/// </summary>
+		public MqttBrokerNode Node => this.node;
 
 		private void Open()
 		{
@@ -117,11 +121,35 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
+		/// Publishes binary data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Binary Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, byte[] Data)
+		{
+			return this.Client.PUBLISH(Topic, QoS, Retain, Data);
+		}
+
+		/// <summary>
+		/// Publishes text data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Text Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, string Data)
+		{
+			return this.Publish(Topic, QoS, Retain, Encoding.UTF8.GetBytes(Data));
+		}
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public async Task DataReceived(MqttContent Content)
 		{
-			MqttTopic Topic = await this.GetTopic(Content.Topic, true);
+			MqttTopic Topic = await this.GetTopic(Content.Topic, true, true);
 			if (!(Topic is null))
 				await Topic.DataReported(Content);
 		}
@@ -211,7 +239,7 @@ namespace Waher.Things.Mqtt.Model
 			{
 				while (true)
 				{
-					MqttTopic Topic = await this.GetTopic(Content.Topic, true);
+					MqttTopic Topic = await this.GetTopic(Content.Topic, true, true);
 					if (!(Topic is null))
 						await Topic.DataReported(Content);
 
@@ -255,7 +283,7 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Gets the Node responsible for managing a Topic
 		/// </summary>
-		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew)
+		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew, bool IgnoreGuids)
 		{
 			if (string.IsNullOrEmpty(TopicString))
 				return null;
@@ -265,8 +293,8 @@ namespace Waher.Things.Mqtt.Model
 
 			if (Topic is null)
 				return null;
-			else if (Representation.MoveNext())
-				return await Topic.GetTopic(Representation, CreateNew, this);
+			else if (Representation.MoveNext(Topic))
+				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, this);
 			else
 				return Topic;
 		}

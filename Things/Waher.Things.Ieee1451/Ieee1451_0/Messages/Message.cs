@@ -3,8 +3,13 @@
 	/// <summary>
 	/// IEEE 1451.0 Message
 	/// </summary>
-	public abstract class Ieee1451_0Message : Ieee1451_0Binary
+	public abstract class Message : Binary
 	{
+		/// <summary>
+		/// Empty UUID (16 zero bytes)
+		/// </summary>
+		public static readonly byte[] EmptyUuid = new byte[16];
+
 		/// <summary>
 		/// IEEE 1451.0 Message
 		/// </summary>
@@ -13,7 +18,7 @@
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		public Ieee1451_0Message(NetworkServiceType NetworkServiceType, byte NetworkServiceId,
+		public Message(NetworkServiceType NetworkServiceType, byte NetworkServiceId,
 			MessageType MessageType, byte[] Body, byte[] Tail)
 			: base(Body)
 		{
@@ -52,9 +57,9 @@
 		/// Parses an Application ID from the message.
 		/// </summary>
 		/// <returns>App ID information.</returns>
-		public Ieee1451_0AppId NextAppId()
+		public ApplicationAddress NextAppId()
 		{
-			return new Ieee1451_0AppId()
+			return new ApplicationAddress()
 			{
 				ApplicationId = this.NextUuid()
 			};
@@ -64,9 +69,9 @@
 		/// Parses an NCAP ID from the message.
 		/// </summary>
 		/// <returns>NCAP ID information.</returns>
-		public Ieee1451_0NcapId NextNcapId()
+		public NcapAddress NextNcapId()
 		{
-			return new Ieee1451_0NcapId()
+			return new NcapAddress()
 			{
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid()
@@ -77,9 +82,9 @@
 		/// Parses an TIM ID from the message.
 		/// </summary>
 		/// <returns>TIM ID information.</returns>
-		public Ieee1451_0TimId NextTimId()
+		public TimAdress NextTimId()
 		{
-			return new Ieee1451_0TimId()
+			return new TimAdress()
 			{
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid(),
@@ -91,9 +96,9 @@
 		/// Parses a Channel ID from the message.
 		/// </summary>
 		/// <returns>Channel ID information.</returns>
-		public Ieee1451_0ChannelId NextChannelId()
+		public ChannelAddress NextChannelId()
 		{
-			return new Ieee1451_0ChannelId()
+			return new ChannelAddress()
 			{
 				ApplicationId = this.NextUuid(),
 				NcapId = this.NextUuid(),

@@ -19,7 +19,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="ItemEnumerator">Item enumerator</param>
         /// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
         /// <param name="Variables">Current set of variables.</param>
-        public DistinctEnumerator(IResultSetEnumerator ItemEnumerator, VariableReference[] Columns, Variables Variables)
+        public DistinctEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
             : base(ItemEnumerator, Columns, Variables)
         {
         }

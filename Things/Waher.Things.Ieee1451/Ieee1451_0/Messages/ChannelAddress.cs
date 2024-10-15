@@ -3,7 +3,7 @@
 	/// <summary>
 	/// TIM identifying information
 	/// </summary>
-	public class Ieee1451_0ChannelId : Ieee1451_0TimId
+	public class ChannelAddress : TimAdress
 	{
 		/// <summary>
 		/// Channel ID

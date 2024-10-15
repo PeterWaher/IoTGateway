@@ -59,6 +59,17 @@ namespace Waher.Things
 		}
 
 		/// <summary>
+		/// Contains a reference to a thing
+		/// </summary>
+		/// <param name="Reference">Thing reference interface.</param>
+		public ThingReference(IThingReference Reference)
+		{
+			this.nodeId = Reference.NodeId;
+			this.sourceId = Reference.SourceId;
+			this.partition = Reference.Partition;
+		}
+
+		/// <summary>
 		/// Persisted object ID. Is null if object not persisted.
 		/// </summary>
 		[ObjectId]

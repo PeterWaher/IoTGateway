@@ -145,7 +145,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
@@ -293,8 +293,11 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets displayable parameters.
 		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
 		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

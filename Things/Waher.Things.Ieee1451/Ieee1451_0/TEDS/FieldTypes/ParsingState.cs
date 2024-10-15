@@ -15,12 +15,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		/// <summary>
 		/// Current set of physical units.
 		/// </summary>
-		public Ieee1451_0PhysicalUnits Units;
+		public PhysicalUnits Units;
 
 		/// <summary>
 		/// Sample Definition
 		/// </summary>
-		public Ieee1451_0SampleDefinition SampleDefinition;
+		public SampleDefinition SampleDefinition;
 
 		/// <summary>
 		/// If names are in text format.

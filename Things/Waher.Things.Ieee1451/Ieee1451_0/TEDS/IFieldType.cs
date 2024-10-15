@@ -19,7 +19,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		/// <param name="RawValue">Raw Value of record</param>
 		/// <param name="State">Current parsing state.</param>
 		/// <returns>Parsed TEDS record.</returns>
-		TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue, ParsingState State);
+		TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State);
 
 		/// <summary>
 		/// Adds fields to a collection of fields.

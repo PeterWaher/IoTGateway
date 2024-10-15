@@ -24,7 +24,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>How well the node supports a given topic, from the segment index presented.</returns>
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
-			if (Topic.SegmentIndex != 0)
+			if (!(Topic.CurrentParentTopic is null))
 				return Grade.NotAtAll;
 
 			switch (Topic.CurrentSegment)
@@ -75,7 +75,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Ieee1451Parser), 1, "IEEE 1451.1.6 Root");
+			return Language.GetStringAsync(typeof(RootTopic), 11, "IEEE 1451.1.6 Root");
 		}
 
 	}

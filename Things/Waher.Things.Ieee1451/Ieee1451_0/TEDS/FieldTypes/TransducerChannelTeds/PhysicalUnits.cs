@@ -22,7 +22,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <summary>
 		/// Units
 		/// </summary>
-		public Ieee1451_0PhysicalUnits Units { get; set; }
+		public Messages.PhysicalUnits Units { get; set; }
 
 		/// <summary>
 		/// How well the class supports a specific TEDS field type.
@@ -41,7 +41,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <param name="RawValue">Raw Value of record</param>
 		/// <param name="State">Current parsing state.</param>
 		/// <returns>Parsed TEDS record.</returns>
-		public override TedsRecord Parse(ClassTypePair RecordTypeId, Ieee1451_0Binary RawValue, ParsingState State)
+		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
         {
 			State.Units = RawValue.NextPhysicalUnits();
 

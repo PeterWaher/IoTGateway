@@ -33,6 +33,9 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with XML data.
 		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Xml">String-representation of XML</param>
+		/// <param name="Value">Data value</param>
 		public XmlData(MqttTopic Topic, string Xml, XmlDocument Value)
 			: base(Topic)
 		{
@@ -43,7 +46,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public override bool DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			try
 			{
@@ -59,16 +65,16 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				this.QoS = Content.Header.QualityOfService;
 				this.Retain = Content.Header.Retain;
 
-				return true;
+				return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
 			}
 			catch (Exception)
 			{
-				return false;
+				return Task.FromResult(DataProcessingResult.Incompatible);
 			}
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -76,9 +82,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Fields = new List<Field>();
 
@@ -86,6 +96,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				this.AppendFields(ThingReference, Fields, Request, this.value.DocumentElement, Prefix);
 
 			Request.ReportFields(Last, Fields.ToArray());
+		
+			return Task.CompletedTask;
 		}
 
 		private void AppendFields(ThingReference ThingReference, List<Field> Fields, ISensorReadout Request, XmlElement Value, string Prefix)
@@ -217,7 +229,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
@@ -232,13 +244,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
 		{
 			IMqttData Result = new XmlData(Topic, default, default);
-			Result.DataReported(Content);
+			Result.DataReported(Topic, Content);
 			return Result;
 		}
 	}

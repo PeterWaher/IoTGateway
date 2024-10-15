@@ -37,6 +37,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Physical Quantity data.
 		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Value">Data value</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Value unit.</param>
 		public QuantityData(MqttTopic Topic, double Value, byte NrDecimals, string Unit)
 			: base(Topic)
 		{
@@ -48,7 +52,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Called when new data has been published.
 		/// </summary>
-		public override bool DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			string s = Content.DataString;
 			Match M = RegEx.Match(s);
@@ -59,14 +66,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				this.QoS = Content.Header.QualityOfService;
 				this.Retain = Content.Header.Retain;
 
-				return true;
+				return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
 			}
 			else
-				return false;
+				return Task.FromResult(DataProcessingResult.Incompatible);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -74,12 +81,17 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			Request.ReportFields(Last, new QuantityField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
 				this.value, this.nrDecimals, this.unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -106,7 +118,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
@@ -121,13 +133,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Creates a new instance of the data.
 		/// </summary>
-		/// <param name="Topic">MQTT Topic node</param>
+		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Content">MQTT Content</param>
 		/// <returns>New object instance.</returns>
 		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
 		{
 			IMqttData Result = new QuantityData(Topic, default, default, default);
-			Result.DataReported(Content);
+			Result.DataReported(Topic, Content);
 			return Result;
 		}
 	}

@@ -3,7 +3,7 @@
 	/// <summary>
 	/// IEEE 1451.0 Event Notification Message
 	/// </summary>
-	public class EventNotificationMessage : Ieee1451_0Message
+	public class EventNotificationMessage : Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Event Notification Message
@@ -26,7 +26,7 @@
 		public EventNotificationService EventNotificationService { get; }
 
 		/// <summary>
-		/// Name of <see cref="Ieee1451_0Message.NetworkServiceId"/>
+		/// Name of <see cref="Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.EventNotificationService.ToString();
 	}

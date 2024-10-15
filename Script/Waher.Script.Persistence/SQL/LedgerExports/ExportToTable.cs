@@ -16,7 +16,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	public class ExportToTable : ILedgerExport
 	{
 		private readonly LinkedList<IElement> elements = new LinkedList<IElement>();
-		private readonly VariableReference[] columns;
+		private readonly ScriptNode[] columns;
 		private readonly int width;
 		private int height;
 		private Variables variables;
@@ -25,7 +25,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// Export is serialized into object form.
 		/// </summary>
 		/// <param name="Columns">Column definitions.</param>
-		public ExportToTable(VariableReference[] Columns)
+		public ExportToTable(ScriptNode[] Columns)
 		{
 			this.columns = Columns;
 			this.width = this.columns.Length;
@@ -50,7 +50,12 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 			int i;
 
 			for (i = 0; i < this.width; i++)
-				Headers[i] = this.columns[i].VariableName;
+			{
+				if (this.columns[i] is VariableReference Ref)
+					Headers[i] = Ref.VariableName;
+				else
+					Headers[i] = "c" + (i + 1).ToString();
+			}
 
 			return new ObjectMatrix(this.height, this.width, this.elements)
 			{
@@ -156,17 +161,23 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// Is called when an entry is finished.
 		/// </summary>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> EndEntry()
+		public async Task<bool> EndEntry()
 		{
 			if (this.variables is null)
-				return Task.FromResult(false);
+				return false;
 
-			foreach (VariableReference Ref in this.columns)
+			foreach (ScriptNode Ref in this.columns)
 			{
 				try
 				{
-					this.elements.AddLast(Ref.Evaluate(this.variables));
-					// Variable references do not use asynchronous evaluation.
+					IElement E;
+
+					if (Ref.IsAsynchronous)
+						E = await Ref.EvaluateAsync(this.variables);
+					else
+						E = Ref.Evaluate(this.variables);
+
+					this.elements.AddLast(E);
 				}
 				catch (Exception ex)
 				{
@@ -176,7 +187,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 
 			this.height++;
 
-			return Task.FromResult(true);
+			return true;
 		}
 
 		/// <summary>

@@ -1,0 +1,9 @@
+<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+  <Folder name="Root">
+		<Folder name="Themes">
+			<Folder name="Base">
+				<Content fileName="Base.cssx"/>
+			</Folder>
+		</Folder>
+  </Folder>
+</Module>

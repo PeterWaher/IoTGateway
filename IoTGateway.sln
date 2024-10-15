@@ -584,6 +584,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.XmlLedger
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.XmlLedger.Test", "Persistence\Waher.Persistence.XmlLedger.Test\Waher.Persistence.XmlLedger.Test.csproj", "{BFD6242A-430A-4EF7-A625-E0203479FC23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Theme.Base", "Themes\Waher.Theme.Base\Waher.Theme.Base.csproj", "{061C920E-BB80-4E62-8C79-10E6B4268015}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

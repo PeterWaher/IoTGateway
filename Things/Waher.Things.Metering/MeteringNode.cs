@@ -250,7 +250,7 @@ namespace Waher.Things.Metering
 		public virtual async Task LogMessageAsync(MessageType Type, string EventId, string Body)
 		{
 			if (this.objectId == Guid.Empty)
-				throw new InvalidOperationException("You can only log messages on persisted nodes.");
+				return;
 
 			bool Updated = false;
 
@@ -408,7 +408,7 @@ namespace Waher.Things.Metering
 		public virtual async Task<bool> RemoveMessageAsync(MessageType Type, string EventId)
 		{
 			if (this.objectId == Guid.Empty)
-				throw new InvalidOperationException("You can only log messages on persisted nodes.");
+				return false;
 
 			bool Removed = false;
 

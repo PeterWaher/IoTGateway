@@ -7,7 +7,6 @@ using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
-using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
@@ -47,10 +46,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Content">Published MQTT Content</param>
 		/// <param name="Data">Binary data</param>
 		/// <returns>Data processing result</returns>
-		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
+		public Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
 			if (!Ieee1451Parser.TryParseMessage(Data, out Message Message))
-				return DataProcessingResult.Incompatible;
+				return Task.FromResult(DataProcessingResult.Incompatible);
 
 			this.value = Data;
 			this.Timestamp = DateTime.UtcNow;
@@ -58,28 +57,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			this.Retain = Content.Header.Retain;
 
 			if (Topic is null)
-				return DataProcessingResult.Processed;
+				return Task.FromResult(DataProcessingResult.Processed);
 
-			return await this.MessageReceived(Topic, Message);
+			return MessageReceived(this, Topic, Message);
 		}
 
 		/// <summary>
 		/// Processes an IEEE 1451.0 message.
 		/// </summary>
+		/// <param name="This">MQTT Data object processing an IEEE 1451.0 message.</param>
 		/// <param name="Topic">MQTT Topic</param>
 		/// <param name="Message">Parsed binary message.</param>
 		/// <returns>Data processing result</returns>
-		public async Task<DataProcessingResult> MessageReceived(MqttTopic Topic, Message Message)
+		public static async Task<DataProcessingResult> MessageReceived(MqttData This, MqttTopic Topic, Message Message)
 		{
 			try
 			{
 				switch (Message.MessageType)
 				{
 					case MessageType.Reply:
-						return await this.ProcessReply(Topic, Message);
+						return await ProcessReply(This, Topic, Message);
 
 					case MessageType.Command:
-						await this.ProcessRequest(Message);
+						await ProcessRequest(This, Message);
 						break;
 
 					case MessageType.Announcement:
@@ -91,31 +91,31 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 			catch (Exception ex)
 			{
-				await this.LogErrorAsync(string.Empty, ex.Message);
+				await LogErrorAsync(This, string.Empty, ex.Message);
 			}
 
 			return DataProcessingResult.Processed;
 		}
 
-		private async Task<DataProcessingResult> ProcessReply(MqttTopic Topic, Message Message)
+		internal static async Task<DataProcessingResult> ProcessReply(MqttData This, MqttTopic Topic, Message Message)
 		{
 			MqttTopic SubTopic;
 			bool ContainsMomentary = false;
 
 			if (Message is TransducerAccessMessage TransducerAccessMessage)
 			{
-				ThingReference Ref = new ThingReference(this.Topic.Node);
+				ThingReference Ref = new ThingReference(This.Topic.Node);
 				if (TransducerAccessMessage.TryParseTransducerData(Ref, out ushort ErrorCode, out TransducerData Data))
 				{
-					await this.RemoveErrorAsync("TransducerResponseError");
+					await RemoveErrorAsync(This, "TransducerResponseError");
 
 					StringBuilder sb = new StringBuilder();
 
-					sb.Append(this.Topic.FullTopic);
+					sb.Append(This.Topic.FullTopic);
 					sb.Append('/');
 					sb.Append(Hashes.BinaryToString(Data.ChannelInfo.NcapId));
 
-					if (!MessageData.IsZero(Data.ChannelInfo.TimId))
+					if (!MessageSwitch.IsZero(Data.ChannelInfo.TimId))
 					{
 						sb.Append('/');
 						sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
@@ -127,7 +127,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						}
 					}
 
-					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
 					if (ErrorCode == 0)
 					{
@@ -139,7 +139,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				}
 				else
 				{
-					await this.LogErrorAsync("TransducerResponseError", "Unable to parse Transducer response.");
+					await LogErrorAsync(This, "TransducerResponseError", "Unable to parse Transducer response.");
 					return DataProcessingResult.Processed;
 				}
 			}
@@ -147,15 +147,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				if (TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds))
 				{
-					await this.RemoveErrorAsync("TedsResponseError");
+					await RemoveErrorAsync(This, "TedsResponseError");
 
 					StringBuilder sb = new StringBuilder();
 
-					sb.Append(this.Topic.FullTopic);
+					sb.Append(This.Topic.FullTopic);
 					sb.Append('/');
 					sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.NcapId));
 
-					if (!MessageData.IsZero(Teds.ChannelInfo.TimId))
+					if (!MessageSwitch.IsZero(Teds.ChannelInfo.TimId))
 					{
 						sb.Append('/');
 						sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
@@ -167,7 +167,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						}
 					}
 
-					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
 					if (ErrorCode == 0)
 						await SubTopic.Node.RemoveErrorAsync("TedsError");
@@ -176,7 +176,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				}
 				else
 				{
-					await this.LogErrorAsync("TedsResponseError", "Unable to parse TEDS response.");
+					await LogErrorAsync(This, "TedsResponseError", "Unable to parse TEDS response.");
 					return DataProcessingResult.Processed;
 				}
 			}
@@ -194,7 +194,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			return DataProcessingResult.Processed;
 		}
 
-		private async Task ProcessRequest(Message Message)
+		private static async Task ProcessRequest(MqttData This, Message Message)
 		{
 			MqttTopic SubTopic;
 
@@ -203,15 +203,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				if (TransducerAccessMessage.TryParseRequest(out ChannelAddress Address,
 					out SamplingMode SamplingMode, out double TimeoutSeconds))
 				{
-					await this.RemoveErrorAsync("TransducerRequestError");
+					await RemoveErrorAsync(This, "TransducerRequestError");
 
 					StringBuilder sb = new StringBuilder();
 
-					sb.Append(this.Topic.FullTopic);
+					sb.Append(This.Topic.FullTopic);
 					sb.Append('/');
 					sb.Append(Hashes.BinaryToString(Address.NcapId));
 
-					if (!MessageData.IsZero(Address.TimId))
+					if (!MessageSwitch.IsZero(Address.TimId))
 					{
 						sb.Append('/');
 						sb.Append(Hashes.BinaryToString(Address.TimId));
@@ -223,7 +223,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						}
 					}
 
-					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
 					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
 						return;
@@ -232,7 +232,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				}
 				else
 				{
-					await this.LogErrorAsync("TransducerRequestError", "Unable to parse Transducer request.");
+					await LogErrorAsync(This, "TransducerRequestError", "Unable to parse Transducer request.");
 					return;
 				}
 			}
@@ -242,15 +242,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					out TedsAccessCode TedsAccessCode, out uint TedsOffset,
 					out double TimeoutSeconds))
 				{
-					await this.RemoveErrorAsync("TedsRequestError");
+					await RemoveErrorAsync(This, "TedsRequestError");
 
 					StringBuilder sb = new StringBuilder();
 
-					sb.Append(this.Topic.FullTopic);
+					sb.Append(This.Topic.FullTopic);
 					sb.Append('/');
 					sb.Append(Hashes.BinaryToString(Address.NcapId));
 
-					if (!MessageData.IsZero(Address.TimId))
+					if (!MessageSwitch.IsZero(Address.TimId))
 					{
 						sb.Append('/');
 						sb.Append(Hashes.BinaryToString(Address.TimId));
@@ -262,7 +262,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						}
 					}
 
-					SubTopic = await this.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
 					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
 						return;
@@ -271,7 +271,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				}
 				else
 				{
-					await this.LogErrorAsync("TedsRequestError", "Unable to parse TEDS request.");
+					await LogErrorAsync(This, "TedsRequestError", "Unable to parse TEDS request.");
 					return;
 				}
 			}
@@ -279,14 +279,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				return;
 		}
 
-		private Task LogErrorAsync(string EventId, string Message)
+		private static Task LogErrorAsync(MqttData This, string EventId, string Message)
 		{
-			return this.Topic?.Node?.LogErrorAsync(EventId, Message) ?? Task.CompletedTask;
+			return This.Topic?.Node?.LogErrorAsync(EventId, Message) ?? Task.CompletedTask;
 		}
 
-		private Task RemoveErrorAsync(string EventId)
+		private static Task RemoveErrorAsync(MqttData This, string EventId)
 		{
-			return this.Topic?.Node?.RemoveErrorAsync(EventId) ?? Task.CompletedTask;
+			return This.Topic?.Node?.RemoveErrorAsync(EventId) ?? Task.CompletedTask;
 		}
 
 		/// <summary>

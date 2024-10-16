@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
@@ -12,15 +12,36 @@ using Waher.Things.Mqtt.Model.Encapsulations;
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
 	/// <summary>
+	/// Data mode of topic
+	/// </summary>
+	public enum DataMode
+	{
+		/// <summary>
+		/// Binary
+		/// </summary>
+		Binary,
+
+		/// <summary>
+		/// Base64
+		/// </summary>
+		Base64,
+
+		/// <summary>
+		/// Hexadecimal
+		/// </summary>
+		Hex
+	}
+
+	/// <summary>
 	/// Encapsulates messages from an IEEE1451.1.6 device.
 	/// </summary>
 	public class MessageData : MqttData
 	{
-		private readonly Dictionary<Type, MessageRec> messages = new Dictionary<Type, MessageRec>();
 		private readonly byte[] ncapId;
 		private readonly byte[] timId;
 		private readonly ushort channelId;
 		private readonly string communicationTopic;
+		private DataMode? dataMode = null;
 
 		/// <summary>
 		/// Encapsulates messages from an IEEE1451.1.6 device.
@@ -58,15 +79,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public MessageData(MqttTopic Topic, Message Message, byte[] NcapId, byte[] TimId, ushort ChannelId)
 			: this(Topic, NcapId, TimId, ChannelId)
 		{
-			lock (this.messages)
-			{
-				this.messages[Message.GetType()] = new MessageRec()
-				{
-					Message = Message,
-					Timestamp = DateTime.UtcNow,
-					Pending = null
-				};
-			}
+			MessageSwitch.DataReported(Message, NcapId, TimId, ChannelId);
 		}
 
 		/// <summary>
@@ -84,11 +97,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public int ChannelId => this.channelId;
 
-		private class MessageRec
+		/// <summary>
+		/// Called when new data has been received.
+		/// </summary>
+		/// <param name="Message">New parsed message.</param>
+		/// <returns>If response to a pending request was received (true)</returns>
+		public bool DataReported(Message Message)
 		{
-			public Message Message;
-			public DateTime Timestamp;
-			public TaskCompletionSource<Message> Pending;
+			return MessageSwitch.DataReported(Message, this.ncapId, this.timId, this.channelId);
 		}
 
 		private string EvaluateCommunicationTopic()
@@ -99,7 +115,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			int i;
 
-			if (!IsZero(this.timId))
+			if (!MessageSwitch.IsZero(this.timId))
 			{
 				if (this.channelId > 0)
 				{
@@ -122,25 +138,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				return s;
 
 			return s.Substring(0, i);
-		}
-
-		/// <summary>
-		/// Checks if an ID is "zero", i.e. contains only zero bytes.
-		/// </summary>
-		/// <param name="A"></param>
-		/// <returns></returns>
-		public static bool IsZero(byte[] A)
-		{
-			if (A is null)
-				return true;
-
-			foreach (byte b in A)
-			{
-				if (b != 0)
-					return false;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -167,44 +164,54 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Data processing result</returns>
 		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
-			return Task.FromResult(DataProcessingResult.Incompatible);
-		}
+			byte[] Data;
 
-		/// <summary>
-		/// Called when new data has been received.
-		/// </summary>
-		/// <param name="Message">New parsed message.</param>
-		/// <returns>If response to a pending request was received (true)</returns>
-		public bool DataReported(Message Message)
-		{
-			Type T = Message.GetType();
-
-			lock (this.messages)
+			if (!this.dataMode.HasValue)
 			{
-				if (this.messages.TryGetValue(T, out MessageRec Rec))
-				{
-					Rec.Message = Message;
-					Rec.Timestamp = DateTime.UtcNow;
+				string s = Content.DataString;
 
-					if (!(Rec.Pending is null))
-					{
-						Rec.Pending.TrySetResult(Message);
-						Rec.Pending = null;
-						return true;
-					}
-				}
+				if (HexStringData.RegEx.IsMatch(s))
+					this.dataMode = DataMode.Hex;
+				else if (Base64Data.RegEx.IsMatch(s))
+					this.dataMode = DataMode.Base64;
 				else
-				{
-					this.messages[T] = new MessageRec()
-					{
-						Message = Message,
-						Timestamp = DateTime.UtcNow,
-						Pending = null
-					};
-				}
+					this.dataMode = DataMode.Binary;
 			}
 
-			return false;
+			switch (this.dataMode.Value)
+			{
+				case DataMode.Binary:
+				default:
+					Data = Content.Data;
+					break;
+
+				case DataMode.Base64:
+					try
+					{
+						Data = Convert.FromBase64String(Content.DataString);
+					}
+					catch (Exception)
+					{
+						return Task.FromResult(DataProcessingResult.Incompatible);
+					}
+					break;
+
+				case DataMode.Hex:
+					try
+					{
+						Data = Hashes.StringToBinary(Content.DataString);
+					}
+					catch (Exception)
+					{
+						return Task.FromResult(DataProcessingResult.Incompatible);
+					}
+					break;
+			}
+
+			if (!Ieee1451Parser.TryParseMessage(Data, out Message Message))
+				return Task.FromResult(DataProcessingResult.Incompatible);
+
+			return Ncap.MessageReceived(this, Topic, Message);
 		}
 
 		/// <summary>
@@ -234,17 +241,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Response</returns>
 		/// <exception cref="TimeoutException">If no response has been received within
 		/// the prescribed time.</exception>
-		public async Task<TransducerAccessMessage> RequestTransducerData(SamplingMode SamplingMode, 
+		public async Task<TransducerAccessMessage> RequestTransducerData(SamplingMode SamplingMode,
 			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
-			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId, 
+			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId,
 				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
 
-			Task<TransducerAccessMessage> Result = this.WaitForMessage<TransducerAccessMessage>(TimeoutMilliseconds, StaleLimitSeconds);
+			Task<TransducerAccessMessage> Result = MessageSwitch.WaitForMessage<TransducerAccessMessage>(
+				TimeoutMilliseconds, StaleLimitSeconds, this.ncapId, this.timId, this.channelId);
 
 			if (!Result.IsCompleted)
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
-			
+
 			return await Result;
 
 			// TODO: Check correct NCAP, TIM & Channel IDs
@@ -267,7 +275,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId,
 				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
 
-			Task<TedsAccessMessage> Result = this.WaitForMessage<TedsAccessMessage>(TimeoutMilliseconds, StaleLimitSeconds);
+			Task<TedsAccessMessage> Result = MessageSwitch.WaitForMessage<TedsAccessMessage>(
+				TimeoutMilliseconds, StaleLimitSeconds, this.ncapId, this.timId, this.channelId);
 
 			if (!Result.IsCompleted)
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
@@ -275,68 +284,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			return await Result;
 
 			// TODO: Check correct NCAP, TIM & Channel IDs
-		}
-
-		/// <summary>
-		/// Waits for a message to be received.
-		/// </summary>
-		/// <typeparam name="T">Type of message expected.</typeparam>
-		/// <param name="StaleLimitSeconds">A received message is considered stale, if
-		/// older than this number of seconds.</param>
-		/// <param name="TimeoutMilliseconds">Maximum amount of time to wait for the message.</param>
-		/// <returns>Message</returns>
-		/// <exception cref="TimeoutException">If no message is received within the
-		/// prescribed time.</exception>
-		public async Task<T> WaitForMessage<T>(int TimeoutMilliseconds, int StaleLimitSeconds)
-			where T : Message
-		{
-			TaskCompletionSource<Message> Pending = new TaskCompletionSource<Message>();
-			TaskCompletionSource<Message> Obsolete = null;
-			Type MessageType = typeof(T);
-
-			lock (this.messages)
-			{
-				if (this.messages.TryGetValue(MessageType, out MessageRec Rec))
-				{
-					if (!(Rec.Message is null) && DateTime.UtcNow.Subtract(Rec.Timestamp).TotalSeconds < StaleLimitSeconds)
-						return (T)Rec.Message;
-
-					Obsolete = Rec.Pending;
-					Rec.Pending = Pending;
-				}
-				else
-				{
-					this.messages[MessageType] = new MessageRec()
-					{
-						Message = null,
-						Timestamp = DateTime.MinValue,
-						Pending = Pending
-					};
-				}
-			}
-
-			_ = Task.Delay(TimeoutMilliseconds).ContinueWith(_ =>
-			{
-				Pending.TrySetResult(null);
-			});
-
-			Message Result = await Pending.Task;
-
-			if (Result is null)
-			{
-				lock (this.messages)
-				{
-					if (this.messages.TryGetValue(MessageType, out MessageRec Rec) &&
-						Rec.Pending == Pending)
-					{
-						Rec.Pending = null;
-					}
-				}
-
-				throw new TimeoutException();
-			}
-
-			return (T)Result;
 		}
 
 		/// <summary>
@@ -355,7 +302,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				if (this.channelId > 0)         // Channel
 				{
-					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 5000, 60);
+					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 10000, 60);
 
 					if (Data.TryParseTransducerData(ThingReference,
 						out ushort ErrorCode, out TransducerData ParsedData))
@@ -368,7 +315,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					else
 						Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
 				}
-				else if (!IsZero(this.timId))   // TIM
+				else if (!MessageSwitch.IsZero(this.timId))   // TIM
 				{
 				}
 				else                            // NCAP

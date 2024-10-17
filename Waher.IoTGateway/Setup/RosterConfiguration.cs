@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,8 +10,10 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Events;
+using Waher.Layout.Layout2D.Model.Conditional;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
+using Waher.Persistence;
 using Waher.Runtime.Language;
 using Waher.Script;
 
@@ -377,7 +380,11 @@ namespace Waher.IoTGateway.Setup
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
-			if (!XmppClient.BareJidRegEx.IsMatch(JID))
+			string JidToValidate = JID;
+			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain) && JidToValidate.EndsWith("@"))
+				JidToValidate += "example.org";
+
+			if (!XmppClient.BareJidRegEx.IsMatch(JidToValidate))
 				await Response.Write("0");
 			else
 			{

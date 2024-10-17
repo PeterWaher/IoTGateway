@@ -1,3 +1,7 @@
+*
+{
+    box-sizing: border-box;
+}
 
 img
 {
@@ -64,61 +68,19 @@ div.footnotes + p
 
 /*#endregion Footnotes*/
 
-/*#region Dropdown*/
-
-header li:hover > a 
-{
-    color: inherit !important;
-}
-
-header li > ul > li
-{
-    display: flex;
-    position: relative;
-    overflow: visible;
-    border: 1px rgb(209, 209, 209) solid;
-    border-top: none;
-}
-
-header li > ul > li:nth-child(1) {
-    border-top: 1px rgb(209, 209, 209) solid;
-}
-
-header li > ul > li > a 
-{
-    height: 100%;
-}
-
-
-header li > ul
-{
-    margin-inline-start: 0;
-}
-
-header li > ul > li:hover > ul
-{
-    display: block;
-}
-
-header li > ul 
-{
-    overflow-x: visible;
-}
-header li > ul > li > ul
-{
-    padding: 0px;
-    display: none;
-    height: 0;
-    position: absolute;
-    left: 100%;
-    margin-top: -1px;
-}
-
-/*#endregion Dropdown*/
-
 
 
 /* region Header */
+
+header#native-header a
+{
+    text-decoration: none;
+}
+
+header#native-header li
+{
+    list-style-type: none;
+}
 
 header#native-header
 {
@@ -178,8 +140,6 @@ header#native-header
     box-shadow: none !important;
 }
 
-
-
 #native-header nav > ul > li:nth-last-of-type(1)
 {
     float: right;
@@ -214,6 +174,8 @@ header#native-header
 {
     border-left: 0;
 }
+
+
 
 /* endregion Header */
 
@@ -274,11 +236,125 @@ table > colgroup {
 }
 
 
+@media screen and (min-width: 901px) {
+    /* region Header */
+
+    #native-header
+    {
+        padding-bottom: 0;
+    }
+
+    #native-header > nav > ul > li > a
+    {
+        padding: 1rem;
+        padding-bottom: 1.5rem
+    }
+
+    #native-header nav > ul > li:hover > ul
+    {
+        display:block;
+        position:absolute;
+        margin: 0;
+        margin-left:-1px;
+        padding: 0;
+    }
+
+    #native-header nav ul > li > a
+    {
+        width: 100%;
+        text-align: left;
+    }
+
+    #native-header li > ul > li
+    {
+        display: flex;
+        position: relative;
+        overflow: visible;
+        border: 1px rgb(209, 209, 209) solid;
+        border-bottom: none;
+    }
+
+    #native-header li > ul > li:last-of-type
+    {
+        border-bottom: 1px rgb(209, 209, 209) solid;
+    }
+
+    /* endregion Header */
+
+
+    /*#region Dropdown*/
+
+    header li:hover > a 
+    {
+        color: inherit !important;
+    }
+
+    header li > ul > li:nth-child(1) {
+        border-top: 1px rgb(209, 209, 209) solid;
+    }
+
+    header li > ul > li > a 
+    {
+        height: 100%;
+    }
+
+
+    header li > ul
+    {
+        margin-inline-start: 0;
+    }
+
+    header li > ul > li:hover > ul
+    {
+        display: block;
+    }
+
+    header li > ul 
+    {
+        overflow-x: visible;
+    }
+    header li > ul > li > ul
+    {
+        padding: 0px;
+        display: none;
+        height: 0;
+        position: absolute;
+        left: 100%;
+        margin-top: -1px;
+    }
+
+    /*#endregion Dropdown*/
+}
+
 @media screen and (max-width: 900px) {
 
 
     /* region Header */
+    #native-header {
+        max-height: 100%;
+        padding-block: 0;
+    }
 
+    #native-header > nav {
+        max-height: 100vh;
+    }
+    
+    #native-header > nav > div {
+        padding-block: 1rem;
+        height: 10vh;
+    }
+    
+    #native-header > nav > ul {
+        margin-bottom: 1rem;
+        max-height: 90vh;
+        overflow-y: scroll;
+    }
+
+    header#native-header li > *
+    {
+        text-align: left;
+    }
+    
     header#native-header > nav > ul > li
     {
         opacity:1;
@@ -288,7 +364,7 @@ table > colgroup {
         display: block;
     }
 
-    #native-header #large-pagpage-name {
+    #native-header li:has(#large-pagpage-name) {
         display: none;
     }
 
@@ -325,13 +401,12 @@ table > colgroup {
         background-size: initial;
     }
 
-
-
-
-    header#native-header  li > ul
+    body header#native-header > nav ul > li > ul
     {
         display: none;
+        position: static;
     }
+    
     header#native-header  li > ul[expanded]
     {
         display: block;

@@ -357,6 +357,9 @@ namespace Waher.Networking.MQTT
 
 		private async Task Write(byte[] Packet, int PacketIdentifier, EventHandler Callback)
 		{
+			if (this.client is null)
+				return;
+
 			if (PacketIdentifier != 0 && ((Packet[0] >> 1) & 3) > 0)
 			{
 				DateTime Timeout = DateTime.Now.AddSeconds(2);

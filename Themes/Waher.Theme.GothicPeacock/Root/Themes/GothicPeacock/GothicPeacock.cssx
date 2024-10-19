@@ -1,4 +1,20 @@
-﻿html
+﻿@import url("../Base/Base.cssx");
+
+
+
+/* region Header*/
+
+#small-pagpage-name {
+    color: white;
+}
+
+nav > div > #toggle-nav {
+    color: white;
+}
+
+/* endregion Header*/
+
+html
 {
 }
 
@@ -20,15 +36,6 @@ body
     color:¤TextColor¤;
 }
 
-main
-{
-    padding: 0 5% 2.5em 5%;
-    display: block;
-    width: 90%;
-    top:5em;
-    position:absolute;
-    z-index:2;
-}
 
 header
 {
@@ -42,11 +49,6 @@ header
     top: 0;
     width: 100%;
     z-index:3;
-}
-
-nav
-{
-    padding:0 3em 0 0;
 }
 
 nav > ul 
@@ -124,11 +126,6 @@ nav > ul > li a
     color: ¤MenuTextColor¤;
 }
 
-nav > ul > li a:hover
-{
-    background-color: rgba(0,0,0,0.5);
-}
-
 nav > ul > li > p
 {
     padding: 0;
@@ -143,42 +140,6 @@ header:hover > nav > ul > li.active
 nav > ul > li > ul
 {
     display:none;
-}
-
-nav > ul > li:hover > ul
-{
-    display:block;
-    position:absolute;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: rgba(0,0,0,0.75);
-}
-
-nav > ul > li > ul > li
-{
-    border-left: 1px solid rgba(255,255,255,0.7);
-    border-bottom: 1px solid rgba(255,255,255,0.7);
-    border-right: 1px solid rgba(255,255,255,0.7);
-    background-clip: content-box;
-	white-space:nowrap;
-	transition: opacity 0.25s ease-out;
-	color:white;
-}
-
-nav > ul > li > ul > li a
-{
-    display: block;
-    text-align: center;
-    padding: 0.5em 1em;
-    text-decoration: none;
-    color: ¤MenuTextColor¤;
-}
-
-nav > ul > li > ul > li a:hover
-{
-    background-color: rgba(0,0,0,0.5);
 }
 
 nav > ul > li > ul > li > p
@@ -223,7 +184,7 @@ section
     padding: 2em 2em 2em 2em;
     border: 1px solid black;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    margin: 3em 0.5em 3em 0;
+    margin: 3em 0 3em 0;
     background-color:¤BackgroundColor¤;
 }
 
@@ -658,20 +619,6 @@ dd
 {
 }
 
-table
-{
-    margin-bottom: 1.5em;
-    border-collapse: collapse;
-    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    border-collapse: separate;
-    border-width: 0;
-    border-spacing:0;
-}
-
-table caption
-{
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-}
 
 tr:nth-child(odd)
 {
@@ -681,11 +628,6 @@ tr:nth-child(odd)
 tr:nth-child(even)
 {
     background-color: rgba(255,255,255,0.1);
-}
-
-table, th, td
-{
-    border: 0;
 }
 
 th
@@ -763,40 +705,15 @@ div.tocBody ol > li::before
     content: counters(toc,".") " ";
 }
 
-.footnote-ref
-{
-    text-decoration: none;
-}
 
-.footnote-backref
-{
-    text-decoration:none;
-}
-
-.footnote-backref:before
-{
-    content: " ";
-}
-
-div.footnotes > hr
-{
-    display:none;
-}
 
 .footnotes
 {
-    margin: 2em -6% 0 -6%;
-    padding: 0.5em 6% 0.5em 6%;       /* 0.5em 0em 0.5em 0em */
     background:#eee;
     background: -webkit-linear-gradient(#555, #eee 10%);
     background: -o-linear-gradient(#555, #eee 10%);
     background: -moz-linear-gradient(#555, #eee 10%);
     background: linear-gradient(#555, #eee 10%);
-}
-
-div.footnotes + p
-{
-    display:none;
 }
 
 input
@@ -1175,4 +1092,36 @@ abbr:hover::after
 .horizontalAlignMargins
 {
     text-align:justify;
+}
+
+@media screen and (min-width: 901px) {
+    
+    /* region Header */
+
+    nav li > ul > li:hover
+    {
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    nav li > ul > li
+    {
+        display: block;
+        text-align: center;
+        background-color: rgba(0,0,0,0.5);
+        color: ¤MenuTextColor¤;
+    }
+
+    nav li > ul > li
+    {
+        border-left: 1px solid rgba(255,255,255,0.7);
+        border-bottom: 1px solid rgba(255,255,255,0.7);
+        border-right: 1px solid rgba(255,255,255,0.7);
+        background-color: rgba(0,0,0,0.75);
+        white-space:nowrap;
+        transition: opacity 0.25s ease-out;
+        color:white;
+    }
+
+    /* endregion Header */
+
 }

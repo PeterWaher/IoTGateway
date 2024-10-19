@@ -161,6 +161,7 @@
 		<Content fileName="MarkdownEditor.js"/>
 		<Content fileName="MarkdownEditor.md"/>
 		<Content fileName="Master.md"/>
+		<Content fileName="Nav.js"/>
 		<Content fileName="Prompt.js"/>
 		<Content fileName="Prompt.md"/>
 		<Content fileName="robots.txt"/>

@@ -205,14 +205,21 @@ namespace Waher.Content.Markdown.Rendering
 				}
 			}
 
-			if (!(sb is null))
+			// add default viewport
+            if (!this.Document.TryGetMetaData("VIEWPORT", out Values) || Values.Length == 0)
+            {
+                this.Output.Append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+
+            }
+
+            if (!(sb is null))
 			{
 				this.Output.Append("<meta name=\"description\" content=\"");
 				this.Output.Append(XML.HtmlAttributeEncode(sb.ToString()));
 				this.Output.AppendLine("\"/>");
 			}
 
-			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.Document.MetaData)
+            foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.Document.MetaData)
 			{
 				switch (MetaData.Key)
 				{

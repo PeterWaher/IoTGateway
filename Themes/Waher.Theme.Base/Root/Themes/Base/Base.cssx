@@ -235,6 +235,33 @@ table > colgroup {
     width: 100%;
 }
 
+/* region MISC */
+
+section
+{
+    padding: min(2em, 5%);
+    margin: 3em 0 3em 0;
+}
+
+fieldset
+{
+    margin-block:2em;
+    margin-inline: min(2em, 5%)
+    padding-block:2em;
+    padding-inline: min(2em, 5%)
+	-webkit-column-break-inside: avoid;
+	break-inside: avoid;
+}
+
+
+html body fieldset
+{
+    max-width: 100%;
+    min-inline-size: unset;
+}
+
+/* endregion MISC */
+
 
 @media screen and (min-width: 901px) {
     /* region Header */
@@ -327,6 +354,11 @@ table > colgroup {
 }
 
 @media screen and (max-width: 900px) {
+    
+    main
+    {
+        width: 100%;
+    }
 
 
     /* region Header */
@@ -411,8 +443,6 @@ table > colgroup {
     {
         display: block;
     }
-
-
 
 
 

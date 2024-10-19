@@ -25,7 +25,7 @@ enter one or more addresses below to which notifications will be sent.
 
 <p>
 <label for="NotificationAddresses">Send notifications to:</label>  
-<input id="NotificationAddresses" name="NotificationAddresses" type="text" style="width:20em" title="Notifications will be sent to these addresses."
+<input id="NotificationAddresses" name="NotificationAddresses" type="text" style="max-width:20em" title="Notifications will be sent to these addresses."
 	value="{{ConfigClass:=Waher.IoTGateway.Setup.NotificationConfiguration;Config:=ConfigClass.Instance;Config.AddressesString}}" autofocus/>
 </p>
 

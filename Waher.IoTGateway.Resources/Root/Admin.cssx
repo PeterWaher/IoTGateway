@@ -7,6 +7,8 @@
 {
 	display:flex;
     flex-wrap: wrap;
+    gap: 0.5em;
+    flex-shrink: 1
 }
 
 .menuItem
@@ -16,7 +18,6 @@
     height: 3em;
     min-height: 3em;
     background-color: ¤ButtonColor¤;
-    margin: 0.3em 0.6em 0.3em 0;
     padding: 0.3em;
     text-align: center;
     border: none;
@@ -64,4 +65,22 @@
 	text-decoration:none;
 	color:¤ButtonTextColor¤;
     line-height:1em;
+}
+
+
+@media screen and (max-width: 900px)
+{
+    #administrationPage, .menuHeader
+    {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .menuItems
+    {
+        display:grid;
+        grid-template-columns: repeat(auto-fill, 160px);
+        justify-content: center;
+        grid-gap: 10px;
+    }
 }

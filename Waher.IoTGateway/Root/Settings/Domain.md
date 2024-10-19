@@ -42,7 +42,7 @@ the machine.
 
 <p>
 <label for="DomainName">Domain Name:</label>  
-<input id="DomainName" name="DomainName" type="text" style="width:20em" title="Domain name used to identify the machine." oninput="DomainNameInput(this)"
+<input id="DomainName" name="DomainName" type="text" style="max-width:20em" title="Domain name used to identify the machine." oninput="DomainNameInput(this)"
 	value="{{Config.Domain}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 <span id="DomainName2" style="display:none">{{Config.Domain}}</span>
 </p>
@@ -50,7 +50,7 @@ the machine.
 {{if Config.AlternativeDomains!=null then (Index:=0;foreach AlternativeDomain in Config.AlternativeDomains do (]]
 <p>
 <label for="AltDomainName((Index))">Alternative Domain Name:</label>  
-<input id="AltDomainName((Index))" name="AltDomainName((Index))" type="text" style="width:20em" title="Alternative domain name used to identify the machine."
+<input id="AltDomainName((Index))" name="AltDomainName((Index))" type="text" style="max-width:20em" title="Alternative domain name used to identify the machine."
 	value="((AlternativeDomain))"/>
 <button type="button" class="negButtonSm" onclick="RemoveAltDomainName('((Index))')">Remove</button>
 </p>
@@ -58,7 +58,7 @@ the machine.
 
 <p>
 <label for="AltDomainName">Alternative Domain Name:</label>  
-<input id="AltDomainName" name="AltDomainName" type="text" style="width:20em" title="Alternative domain name used to identify the machine."/>
+<input id="AltDomainName" name="AltDomainName" type="text" style="max-width:20em" title="Alternative domain name used to identify the machine."/>
 <button type="button" class="posButtonSm" onclick="AddAltDomainName()">Add</button>
 </p>
 
@@ -93,13 +93,13 @@ contains the domain name that is to be updated.
 
 <p>
 <label for="DynDnsAccount">Dynamic DNS Account:</label>  
-<input id="DynDnsAccount" name="DynDnsAccount" type="text" style="width:20em" title="Account Name in the Dynamic DNS service." 
+<input id="DynDnsAccount" name="DynDnsAccount" type="text" style="max-width:20em" title="Account Name in the Dynamic DNS service." 
 	value="{{Config.DynDnsAccount}}"/>
 </p>
 
 <p>
 <label for="DynDnsPassword">Dynamic DNS Password:</label>  
-<input id="DynDnsPassword" name="DynDnsPassword" type="password" style="width:20em" title="Password for the Dynamic DNS account." 
+<input id="DynDnsPassword" name="DynDnsPassword" type="password" style="max-width:20em" title="Password for the Dynamic DNS account." 
 	value="{{Config.DynDnsPassword}}"/>
 </p>
 
@@ -137,7 +137,7 @@ want. You do this by checking the box below.
 
 <p>
 <label for="ContactEMail">Contact e-mail address:</label>  
-<input id="ContactEMail" name="ContactEMail" type="email" style="width:20em" value="{{Config.ContactEMail}}"
+<input id="ContactEMail" name="ContactEMail" type="email" style="max-width:20em" value="{{Config.ContactEMail}}"
 	title="Contact e-mail address to be used in communication with the Certificate Authority."/>
 </p>
 
@@ -219,7 +219,7 @@ languages.
 
 <p>
 <label for="HumanReadableNameLanguage">Human-readable Name Language:</label>  
-<input id="HumanReadableNameLanguage" name="HumanReadableNameLanguage" type="text" style="width:20em" title="Language of human-readable name."
+<input id="HumanReadableNameLanguage" name="HumanReadableNameLanguage" type="text" style="max-width:20em" title="Language of human-readable name."
 	value="{{Config.HumanReadableNameLanguage}}"/>
 </p>
 
@@ -268,7 +268,7 @@ different localized descriptions for different languages.
 
 <p>
 <label for="HumanReadableDescriptionLanguage">Human-readable Description Language:</label>  
-<input id="HumanReadableDescriptionLanguage" name="HumanReadableDescriptionLanguage" type="text" style="width:20em" title="Language of human-readable description."
+<input id="HumanReadableDescriptionLanguage" name="HumanReadableDescriptionLanguage" type="text" style="max-width:20em" title="Language of human-readable description."
 	value="{{Config.HumanReadableDescriptionLanguage}}"/>
 </p>
 

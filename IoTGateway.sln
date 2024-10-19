@@ -585,7 +585,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.XmlLedger
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.XmlLedger.Test", "Persistence\Waher.Persistence.XmlLedger.Test\Waher.Persistence.XmlLedger.Test.csproj", "{BFD6242A-430A-4EF7-A625-E0203479FC23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Theme.Base", "Themes\Waher.Theme.Base\Waher.Theme.Base.csproj", "{061C920E-BB80-4E62-8C79-10E6B4268015}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Theme.Base", "Themes\Waher.Theme.Base\Waher.Theme.Base.csproj", "{061C920E-BB80-4E62-8C79-10E6B4268015}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -6720,6 +6720,30 @@ Global
 		{BFD6242A-430A-4EF7-A625-E0203479FC23}.Release|x64.Build.0 = Release|Any CPU
 		{BFD6242A-430A-4EF7-A625-E0203479FC23}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFD6242A-430A-4EF7-A625-E0203479FC23}.Release|x86.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|ARM.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|x64.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Debug|x86.Build.0 = Debug|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|ARM.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|ARM.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|ARM64.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|x64.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|x64.Build.0 = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|x86.ActiveCfg = Release|Any CPU
+		{061C920E-BB80-4E62-8C79-10E6B4268015}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -6972,6 +6996,7 @@ Global
 		{B98345E5-B449-4E2B-BC77-01BF1EC3AB29} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 		{DFC70B2F-B15B-4FF0-B977-990463749A75} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{BFD6242A-430A-4EF7-A625-E0203479FC23} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
+		{061C920E-BB80-4E62-8C79-10E6B4268015} = {EFF8901B-9D53-4325-91C2-90ECBB50FFB1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

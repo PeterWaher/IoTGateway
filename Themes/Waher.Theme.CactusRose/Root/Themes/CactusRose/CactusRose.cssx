@@ -185,10 +185,8 @@ footer a
 
 section
 {
-    padding: 2em 2em 2em 2em;
     border: 1px solid black;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    margin: 3em 0 3em 0;
     background-color:¤BackgroundColor¤;
 }
 
@@ -967,14 +965,10 @@ input[type="range"]
 
 fieldset
 {
-    margin:2em 1em 2em 1em;
     border:0.1em solid ¤HeaderColor¤;
-    padding: 1em 2em 1em 2em;
     background-color: ¤Alpha(HeaderColor,6)¤;
     border-radius: 1em;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-	-webkit-column-break-inside: avoid;
-	break-inside: avoid;
 }
 
 fieldset > legend

@@ -31,7 +31,7 @@ the free public servers listed at [xmpp.net](https://xmpp.net/directory.php). If
 
 <p>
 <label for="XmppServer">Server:</label>  
-<input id="XmppServer" name="XmppServer" type="text" style="width:20em" title="Name of server that hosts the XMPP server."
+<input id="XmppServer" name="XmppServer" type="text" style="max-width:20em" title="Name of server that hosts the XMPP server."
 	value="{{ConfigClass:=Waher.IoTGateway.Setup.XmppConfiguration;Config:=ConfigClass.Instance;Config.Host}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 </p>
 
@@ -85,7 +85,7 @@ Featured servers:
 <div id="C2S" style="display:{{TransportMethod="C2S" ? "block" : "none"}}">
 <p>
 <label for="Port">Port:</label>  
-<input id="Port" name="Port" type="number" min="1" max="65535" style="width:20em" value="{{Config.Port}}" />
+<input id="Port" name="Port" type="number" min="1" max="65535" style="max-width:20em" value="{{Config.Port}}" />
 </p>
 <p id="PortError" class="error" style="display:none">Invalid port number.</p>
 </div>
@@ -121,12 +121,12 @@ Good. Successfully connected to server. Now, please provide user credentials.
 
 <p>
 <label for="Account">Account:</label>  
-<input id="Account" name="Account" type="text" style="width:20em" value="{{Config.Account}}" {{Config.Step=1 ? "autofocus" : ""}}/>
+<input id="Account" name="Account" type="text" style="max-width:20em" value="{{Config.Account}}" {{Config.Step=1 ? "autofocus" : ""}}/>
 </p>
 
 <p>
 <label for="Password">Password:</label>  
-<input id="Password" name="Password" type="password" style="width:20em" value="{{Config.Password}}" />
+<input id="Password" name="Password" type="password" style="max-width:20em" value="{{Config.Password}}" />
 </p>
 
 <p id="Fail1" class="error" style="display:none">
@@ -140,14 +140,14 @@ Password is incorrect, or a new account was not permitted to be created.
 
 <p>
 <label for="Password2">Repeat password:</label>  
-<input id="Password2" name="Password2" type="password" style="width:20em" value="{{Config.Password}}" />
+<input id="Password2" name="Password2" type="password" style="max-width:20em" value="{{Config.Password}}" />
 <button type='button' onclick='RandomizePassword()'>Create Random Password</button>
 </p>
 <p id="Password2Error" class="error" style="display:none">Passwords do not match.</p>
 
 <p>
 <label for="AccountName">Readable name:</label>  
-<input id="AccountName" name="AccountName" type="text" style="width:20em" value="{{Config.AccountHumanReadableName}}" />
+<input id="AccountName" name="AccountName" type="text" style="max-width:20em" value="{{Config.AccountHumanReadableName}}" />
 </p>
 
 </div>

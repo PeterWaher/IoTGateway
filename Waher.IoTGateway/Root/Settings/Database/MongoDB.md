@@ -12,7 +12,7 @@ Login: /Login.md
 
 <p>
 <label for="PortNumber">Port number:</label>  
-<input id="PortNumber" name="PortNumber" type="number" min="1" max="65535" value="{{Settings.Port}}" style="width:20em"/>
+<input id="PortNumber" name="PortNumber" type="number" min="1" max="65535" value="{{Settings.Port}}" style="max-width:20em"/>
 </p>
 
 <p>

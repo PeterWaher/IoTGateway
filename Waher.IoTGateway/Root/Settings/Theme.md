@@ -30,7 +30,7 @@ SelectedThemeId:=Config.GetThemeId(Request);
 
 foreach ThemeDefinition in ConfigClass.GetDefinitions() do ]]
 <div data-theme-id="((ThemeDefinition.Id))" class="theme((SelectedThemeId=ThemeDefinition.Id?"Selected"))" onclick="SetTheme('((ThemeDefinition.Id))')">
-<img class="themeImage" alt="((HtmlAttributeEncode(ThemeDefinition.Title);))" width="((Thumbnail:=ThemeDefinition.Thumbnail;Thumbnail.Width))" height="((Thumbnail.Height))" src="((HtmlAttributeEncode(Thumbnail.Resource);))"/>
+<img class="themeImage" alt="((HtmlAttributeEncode(ThemeDefinition.Title);))" style="max-width: 350px" src="((Thumbnail:=ThemeDefinition.Thumbnail; HtmlAttributeEncode(Thumbnail.Resource);))"/>
 <div class="themeTitle">
 
 ((MarkdownEncode(ThemeDefinition.Title);))

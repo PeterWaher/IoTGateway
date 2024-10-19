@@ -41,53 +41,53 @@ more information about their approval procedure.
 
 <p>
 <label for="FirstName">First Name:</label>  
-<input id="FirstName" name="FirstName" type="text" style="width:20em" title="First name of person." value="{{Config.FirstName}}" {{Config.Step=0 ? "autofocus" : ""}}/>
+<input id="FirstName" name="FirstName" type="text" style="max-width:20em" title="First name of person." value="{{Config.FirstName}}" {{Config.Step=0 ? "autofocus" : ""}}/>
 </p>
 
 <p>
 <label for="MiddleName">Middle Name:</label>  
-<input id="MiddleName" name="MiddleName" type="text" style="width:20em" title="Middle name of person." value="{{Config.MiddleName}}"/>
+<input id="MiddleName" name="MiddleName" type="text" style="max-width:20em" title="Middle name of person." value="{{Config.MiddleName}}"/>
 </p>
 
 <p>
 <label for="LastName">Last Name:</label>  
-<input id="LastName" name="LastName" type="text" style="width:20em" title="Last name of person." value="{{Config.LastName}}"/>
+<input id="LastName" name="LastName" type="text" style="max-width:20em" title="Last name of person." value="{{Config.LastName}}"/>
 </p>
 
 <p>
 <label for="PNr">Personal Number:</label>  
-<input id="PNr" name="PNr" type="text" style="width:20em" title="Number of person or organization." value="{{Config.PersonalNumber}}"/>
+<input id="PNr" name="PNr" type="text" style="max-width:20em" title="Number of person or organization." value="{{Config.PersonalNumber}}"/>
 </p>
 
 <p>
 <label for="Address">Address:</label>  
-<input id="Address" name="Address" type="text" style="width:20em" title="Address." value="{{Config.Address}}"/>  
-<input id="Address2" name="Address2" type="text" style="width:20em" title="Address." value="{{Config.Address2}}"/>
+<input id="Address" name="Address" type="text" style="max-width:20em" title="Address." value="{{Config.Address}}"/>  
+<input id="Address2" name="Address2" type="text" style="max-width:20em" title="Address." value="{{Config.Address2}}"/>
 </p>
 
 <p>
 <label for="PostalCode">Postal Code (ZIP):</label>  
-<input id="PostalCode" name="PostalCode" type="text" style="width:20em" title="Postal code, or zip code." value="{{Config.PostalCode}}"/>
+<input id="PostalCode" name="PostalCode" type="text" style="max-width:20em" title="Postal code, or zip code." value="{{Config.PostalCode}}"/>
 </p>
 
 <p>
 <label for="Area">Area:</label>  
-<input id="Area" name="Area" type="text" style="width:20em" title="Name of area." value="{{Config.Area}}"/>
+<input id="Area" name="Area" type="text" style="max-width:20em" title="Name of area." value="{{Config.Area}}"/>
 </p>
 
 <p>
 <label for="City">City:</label>  
-<input id="City" name="City" type="text" style="width:20em" title="Name of city." value="{{Config.City}}"/>
+<input id="City" name="City" type="text" style="max-width:20em" title="Name of city." value="{{Config.City}}"/>
 </p>
 
 <p>
 <label for="Region">Region:</label>  
-<input id="Region" name="Region" type="text" style="width:20em" title="Name of region." value="{{Config.Region}}"/>
+<input id="Region" name="Region" type="text" style="max-width:20em" title="Name of region." value="{{Config.Region}}"/>
 </p>
 
 <p>
 <label for="Country">Country:</label>  
-<select id="Country" name="Country" style="width:20em" title="Name of country.">
+<select id="Country" name="Country" style="max-width:20em" title="Name of country.">
 {{
 	Countries:=[
 	   {"code":"AF", "name":"AFGHANISTAN"},
@@ -342,7 +342,7 @@ more information about their approval procedure.
 
 <p>
 <label for="Nationality">Nationality:</label>  
-<select id="Nationality" name="Nationality" style="width:20em" title="Nationality.">
+<select id="Nationality" name="Nationality" style="max-width:20em" title="Nationality.">
 <option value=""{{empty(Config.Nationality)?" selected":""}}/>
 {{
 	foreach Country in Countries do
@@ -353,7 +353,7 @@ more information about their approval procedure.
 
 <p>
 <label for="Gender">Gender:</label>  
-<select id="Gender" name="Gender" style="width:20em" title="Gender.">
+<select id="Gender" name="Gender" style="max-width:20em" title="Gender.">
 <option value=""{{empty(Config.Gender)?" selected":""}}/>
 <option value="M"{{Config.Gender=='M'?" selected":""}}>Male</option>
 <option value="F"{{Config.Gender=='F'?" selected":""}}>Female</option>
@@ -363,7 +363,7 @@ more information about their approval procedure.
 
 <p>
 <label for="BirthDate">Birth Date:</label>  
-<input id="BirthDate" name="BirthDate" type="date" style="width:20em" title="Name of region." value="{{Config.BirthDate?.ToShortDateString()}}"/>
+<input id="BirthDate" name="BirthDate" type="date" style="max-width:20em" title="Name of region." value="{{Config.BirthDate?.ToShortDateString()}}"/>
 </p>
 </fieldset>
 
@@ -372,53 +372,53 @@ more information about their approval procedure.
 
 <p>
 <label for="OrgName">Organization Name:</label>  
-<input id="OrgName" name="OrgName" type="text" style="width:20em" title="Name of organization person belongs to." value="{{Config.OrgName}}"/>
+<input id="OrgName" name="OrgName" type="text" style="max-width:20em" title="Name of organization person belongs to." value="{{Config.OrgName}}"/>
 </p>
 
 <p>
 <label for="OrgDepartment">Department:</label>  
-<input id="OrgDepartment" name="OrgDepartment" type="text" style="width:20em" title="Department person works in." value="{{Config.OrgDepartment}}"/>
+<input id="OrgDepartment" name="OrgDepartment" type="text" style="max-width:20em" title="Department person works in." value="{{Config.OrgDepartment}}"/>
 </p>
 
 <p>
 <label for="OrgRole">Role:</label>  
-<input id="OrgRole" name="OrgRole" type="text" style="width:20em" title="Role person has in department." value="{{Config.OrgRole}}"/>
+<input id="OrgRole" name="OrgRole" type="text" style="max-width:20em" title="Role person has in department." value="{{Config.OrgRole}}"/>
 </p>
 
 <p>
 <label for="OrgNumber">Organizational number:</label>  
-<input id="OrgNumber" name="OrgNumber" type="text" style="width:20em" title="Number of organization." value="{{Config.OrgNumber}}"/>
+<input id="OrgNumber" name="OrgNumber" type="text" style="max-width:20em" title="Number of organization." value="{{Config.OrgNumber}}"/>
 </p>
 
 <p>
 <label for="OrgAddress">Address:</label>  
-<input id="OrgAddress" name="OrgAddress" type="text" style="width:20em" title="Organization Address." value="{{Config.OrgAddress}}"/>  
-<input id="OrgAddress2" name="OrgAddress2" type="text" style="width:20em" title="Organization Address." value="{{Config.OrgAddress2}}"/>
+<input id="OrgAddress" name="OrgAddress" type="text" style="max-width:20em" title="Organization Address." value="{{Config.OrgAddress}}"/>  
+<input id="OrgAddress2" name="OrgAddress2" type="text" style="max-width:20em" title="Organization Address." value="{{Config.OrgAddress2}}"/>
 </p>
 
 <p>
 <label for="OrgPostalCode">Postal Code (ZIP):</label>  
-<input id="OrgPostalCode" name="OrgPostalCode" type="text" style="width:20em" title="Organization Postal code, or zip code." value="{{Config.OrgPostalCode}}"/>
+<input id="OrgPostalCode" name="OrgPostalCode" type="text" style="max-width:20em" title="Organization Postal code, or zip code." value="{{Config.OrgPostalCode}}"/>
 </p>
 
 <p>
 <label for="OrgArea">Area:</label>  
-<input id="OrgArea" name="OrgArea" type="text" style="width:20em" title="Name of area where organization resides." value="{{Config.OrgArea}}"/>
+<input id="OrgArea" name="OrgArea" type="text" style="max-width:20em" title="Name of area where organization resides." value="{{Config.OrgArea}}"/>
 </p>
 
 <p>
 <label for="OrgCity">City:</label>  
-<input id="OrgCity" name="OrgCity" type="text" style="width:20em" title="Name of city where organization resides." value="{{Config.OrgCity}}"/>
+<input id="OrgCity" name="OrgCity" type="text" style="max-width:20em" title="Name of city where organization resides." value="{{Config.OrgCity}}"/>
 </p>
 
 <p>
 <label for="OrgRegion">Region:</label>  
-<input id="OrgRegion" name="OrgRegion" type="text" style="width:20em" title="Name of region where organization resides." value="{{Config.OrgRegion}}"/>
+<input id="OrgRegion" name="OrgRegion" type="text" style="max-width:20em" title="Name of region where organization resides." value="{{Config.OrgRegion}}"/>
 </p>
 
 <p>
 <label for="OrgCountry">Country:</label>  
-<select id="OrgCountry" name="OrgCountry" style="width:20em" title="Name of country where organization resides.">
+<select id="OrgCountry" name="OrgCountry" style="max-width:20em" title="Name of country where organization resides.">
 <option value=""{{empty(Config.OrgCountry)?" selected":""}}></option>
 {{
 	foreach Country in Countries do
@@ -434,25 +434,25 @@ more information about their approval procedure.
 {{if Config.AlternativeFields!=null then (Index:=0;foreach AlternativeField in Config.AlternativeFields do (]]
 <p>
 <label for="AltFieldName((Index))">Alternative Field:</label>  
-<input id="AltFieldName((Index))" name="NameAltField((Index))" type="text" style="width:20em" title="Alternative field name."
+<input id="AltFieldName((Index))" name="NameAltField((Index))" type="text" style="max-width:20em" title="Alternative field name."
 	value="((AlternativeField.Key))"/>
-<input id="AltFieldValue((Index))" name="AltFieldValue((Index))" type="text" style="width:20em" title="Alternative field value."
+<input id="AltFieldValue((Index))" name="AltFieldValue((Index))" type="text" style="max-width:20em" title="Alternative field value."
 	value="((AlternativeField.Value))"/>
 <button type="button" class="negButtonSm" onclick="RemoveAltField('((Index))')">Remove</button>
 </p>
 [[;Index++)) else if DomainConfiguration.Instance.UseDomainName and !empty(DomainConfiguration.Instance.Domain) then (]]
 <p>
 <label for="AltFieldName0">Alternative Field:</label>  
-<input id="AltFieldName0" name="NameAltField0" type="text" style="width:20em" title="Alternative field name." value="DOMAIN"/>
-<input id="AltFieldValue0" name="AltFieldValue0" type="text" style="width:20em" title="Alternative field value." value="((DomainConfiguration.Instance.Domain))"/>
+<input id="AltFieldName0" name="NameAltField0" type="text" style="max-width:20em" title="Alternative field name." value="DOMAIN"/>
+<input id="AltFieldValue0" name="AltFieldValue0" type="text" style="max-width:20em" title="Alternative field value." value="((DomainConfiguration.Instance.Domain))"/>
 <button type="button" class="negButtonSm" onclick="RemoveAltField('0')">Remove</button>
 </p>
 [[)}}
 
 <p>
 <label for="AltFieldName">Alternative Field:</label>  
-<input id="AltFieldName" name="AltFieldName" type="text" style="width:20em" title="Alternative field name."/>
-<input id="AltFieldValue" name="AltFieldValue" type="text" style="width:20em" title="Alternative field value."/>
+<input id="AltFieldName" name="AltFieldName" type="text" style="max-width:20em" title="Alternative field name."/>
+<input id="AltFieldValue" name="AltFieldValue" type="text" style="max-width:20em" title="Alternative field value."/>
 <button type="button" class="posButtonSm" onclick="AddAltField()">Add</button>
 </p>
 </fieldset>
@@ -466,12 +466,12 @@ more information about their approval procedure.
 
 <p>
 <label for="Password">Password:</label>  
-<input id="Password" name="Password" type="password" style="width:20em" title="Password used to protect the legal identity."/>
+<input id="Password" name="Password" type="password" style="max-width:20em" title="Password used to protect the legal identity."/>
 </p>
 
 <p>
 <label for="Password2">Retype Password:</label>  
-<input id="Password2" name="Password2" type="password" style="width:20em" title="Retype password, to make sure you've typed it correctly.."/>
+<input id="Password2" name="Password2" type="password" style="max-width:20em" title="Retype password, to make sure you've typed it correctly.."/>
 </p>
 
 <button type='button' onclick='RandomizePassword()'>Create Random Password</button>

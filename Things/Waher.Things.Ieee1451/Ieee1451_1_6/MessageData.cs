@@ -254,8 +254,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 
 			return await Result;
-
-			// TODO: Check correct NCAP, TIM & Channel IDs
 		}
 
 		/// <summary>
@@ -282,8 +280,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 
 			return await Result;
-
-			// TODO: Check correct NCAP, TIM & Channel IDs
 		}
 
 		/// <summary>

@@ -66,7 +66,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				else
 					ErrorCode = 0;
 
-				ChannelAddress ChannelInfo = this.NextChannelId();
+				ChannelAddress ChannelInfo = this.NextChannelId(true);
 				List<Field> Fields = new List<Field>();
 
 				switch (this.TransducerAccessService)
@@ -119,7 +119,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		{
 			try
 			{
-				Channel = this.NextChannelId();
+				Channel = this.NextChannelId(true);
 				SamplingMode = (SamplingMode)this.NextUInt8();
 				TimeoutSeconds = this.NextTimeDurationSeconds();
 

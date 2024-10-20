@@ -358,11 +358,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Array.</returns>
 		public byte[] NextUInt8Array(int NrItems)
 		{
+			if (this.pos + NrItems > this.len)
+				throw UnexpectedEndOfData();
+
 			byte[] Result = new byte[NrItems];
 			int i;
 
 			for (i = 0; i < NrItems; i++)
-				Result[i] = this.NextUInt8();
+				Result[i] = this.Body[this.pos++];
 
 			return Result;
 		}

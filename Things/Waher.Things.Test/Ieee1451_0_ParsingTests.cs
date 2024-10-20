@@ -306,5 +306,210 @@ namespace Waher.Things.Test
 
 			Bin = Packet.ReadBytes(Packet.BytesLeft);
 		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "010801001000303900303900303907E80549382E50")]    // Source: ubi.pt
+		public void Test_10_ParseDiscoverNcapRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNull(Data.Channel.NcapId);
+			Assert.IsNull(Data.Channel.TimId);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "0108020031000000303900303900303907E80549382E5000303900303900303907E80549382E505542492D4E434150310001728A86D2")]    // Source: ubi.pt
+		public void Test_11_ParseDiscoverNcapResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNotNull(Data.Channel.NcapId);
+			Assert.IsNull(Data.Channel.TimId);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			DiscoveryDataEntity Entity = Data as DiscoveryDataEntity;
+			Assert.IsNotNull(Entity);
+			Assert.IsFalse(string.IsNullOrEmpty(Entity.Name));
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+			Console.Out.WriteLine("Name: " + Entity.Name);
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "010901002000303900303900303907E80549382E5000303900303900303907E80549382E50")]    // Source: ubi.pt
+		public void Test_12_ParseDiscoverTimRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPTIMDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNotNull(Data.Channel.NcapId);
+			Assert.IsNull(Data.Channel.TimId);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "010902003D000000303900303900303907E80549382E5000303900303900303907E80549382E50000186258A0B72F612D68707E8054911DCF05542492D54494D3100")]    // Source: ubi.pt
+		public void Test_13_ParseDiscoverTimResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPTIMDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNotNull(Data.Channel.NcapId);
+			Assert.IsNull(Data.Channel.TimId);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			DiscoveryDataEntities Entities = Data as DiscoveryDataEntities;
+			Assert.IsNotNull(Entities);
+
+			//Assert.IsFalse(string.IsNullOrEmpty(Entity.Name));
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "010A01003000303900303900303907E80549382E5000303900303900303907E80549382E5000303900303900303907E80549382E50")]    // Source: ubi.pt
+		public void Test_14_ParseDiscoverChannelRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPTIMTransducerDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Command, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNotNull(Data.Channel.NcapId);
+			Assert.IsNotNull(Data.Channel.TimId);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Data.Channel.TimId));
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, "010A02004D000000303900303900303907E80549382E5000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF0000100015542492D5452414E5344554345524348414E4E454C3100")]    // Source: ubi.pt
+		public void Test_15_ParseDiscoverChannelResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+
+			DiscoveryMessage DiscoveryMessage = Message as DiscoveryMessage;
+			Assert.IsNotNull(DiscoveryMessage);
+			Assert.AreEqual(NetworkServiceType.DiscoveryServices, Message.NetworkServiceType);
+			Assert.AreEqual(DiscoveryService.NCAPTIMTransducerDiscovery, DiscoveryMessage.DiscoveryService);
+			Assert.AreEqual(MessageType.Reply, Message.MessageType);
+
+			Assert.IsTrue(DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data));
+			Assert.AreEqual(0, ErrorCode);
+			Assert.IsNotNull(Data);
+
+			Assert.IsNotNull(Data.Channel);
+			Assert.IsNotNull(Data.Channel.ApplicationId);
+			Assert.IsNotNull(Data.Channel.NcapId);
+			Assert.IsNotNull(Data.Channel.TimId);
+			Assert.IsTrue(Data.Channel.ChannelId > 0);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Data.Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Data.Channel.ChannelId.ToString());
+		}
+
 	}
 }

@@ -1,10 +1,25 @@
 ﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
-	/// TIM identifying information
+	/// IEEE 1451.0 addresses
 	/// </summary>
-	public class ChannelAddress : TimAdress
+	public class ChannelAddress
 	{
+		/// <summary>
+		/// Application ID
+		/// </summary>
+		public byte[] ApplicationId;
+
+		/// <summary>
+		/// NCAP ID
+		/// </summary>
+		public byte[] NcapId;
+
+		/// <summary>
+		/// TIM ID
+		/// </summary>
+		public byte[] TimId;
+
 		/// <summary>
 		/// Channel ID
 		/// </summary>

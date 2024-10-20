@@ -31,6 +31,11 @@
 			<String id="17">Maximum amount of time to wait (in milliseconds) for a response to a request.</String>
 			<String id="18">Stale after: (s)</String>
 			<String id="19">Flags information as stale (old) after this amount of time, triggering new requests if information is requested.</String>
+			<String id="20">Discover NCAPs...</String>
+			<String id="21">Topic:</String>
+			<String id="22">Search for NCAPs on this topic.</String>
+			<String id="23">IEEE 1451.1.6 Topic Node</String>
+			<String id="24">Discover NCAPs</String>
 		</Namespace>
 	</Language>
 </Translation>

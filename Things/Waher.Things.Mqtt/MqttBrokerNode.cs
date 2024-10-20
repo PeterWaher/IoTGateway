@@ -13,7 +13,7 @@ using Waher.Things.Mqtt.Model;
 namespace Waher.Things.Mqtt
 {
 	/// <summary>
-	/// TODO
+	/// Node representing a connection to an MQTT broker.
 	/// </summary>
 	public class MqttBrokerNode : IpHostPort, ISniffable
 	{
@@ -28,7 +28,7 @@ namespace Waher.Things.Mqtt
 		private bool trustServer = false;
 
 		/// <summary>
-		/// TODO
+		/// Node representing a connection to an MQTT broker.
 		/// </summary>
 		public MqttBrokerNode()
 			: base()
@@ -200,7 +200,11 @@ namespace Waher.Things.Mqtt
 			return base.NodeUpdated();
 		}
 
-		internal MqttBroker GetBroker()
+		/// <summary>
+		/// Gets the corresponding broker node.
+		/// </summary>
+		/// <returns>MQTT Broker connection object.</returns>
+		public MqttBroker GetBroker()
 		{
 			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.TrustServer, this.userName, this.password,
 				this.connectionSubscription, this.willTopic, this.willData, this.willRetain, this.willQoS);

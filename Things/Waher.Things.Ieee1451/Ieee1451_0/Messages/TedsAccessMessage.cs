@@ -74,7 +74,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				else
 					ErrorCode = 0;
 
-				ChannelAddress ChannelInfo = this.NextChannelId();
+				ChannelAddress ChannelInfo = this.NextChannelId(true);
 				uint TedsOffset = this.NextUInt32();
 				int Start = this.Position;
 				uint Len = this.NextUInt32();
@@ -124,7 +124,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		{
 			try
 			{
-				Channel = this.NextChannelId();
+				Channel = this.NextChannelId(true);
 				TedsAccessCode = (TedsAccessCode)this.NextUInt8();
 				TedsOffset = this.NextUInt32();
 				TimeoutSeconds = this.NextTimeDurationSeconds();

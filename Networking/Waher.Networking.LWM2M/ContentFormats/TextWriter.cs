@@ -39,7 +39,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// Binary serialization of what has been written.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of bytes.</returns>
 		public byte[] ToArray()
 		{
 			return Encoding.UTF8.GetBytes(this.sb.ToString());

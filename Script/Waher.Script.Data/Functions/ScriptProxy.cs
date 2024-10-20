@@ -42,7 +42,7 @@ namespace Waher.Script.Data.Functions
 		/// <summary>
 		/// Untyped callback function.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Callbacl function.</returns>
 		public object GetCallbackFunctionUntyped() => this.GetCallbackFunction();
 	}
 }

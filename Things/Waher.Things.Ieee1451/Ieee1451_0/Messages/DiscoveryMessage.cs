@@ -1,4 +1,8 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿using System.IO;
+using System;
+using Waher.Things.Metering;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Discovery Message
@@ -29,5 +33,20 @@
 		/// Name of <see cref="Message.NetworkServiceId"/>
 		/// </summary>
 		public override string NetworkServiceIdName => this.DiscoveryService.ToString();
+
+		/// <summary>
+		/// Serializes a request for transducer data.
+		/// </summary>
+		/// <param name="Service">Discovery service</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeRequest(DiscoveryService Service)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+
+				return Ieee1451Parser.SerializeMessage(Service, MessageType.Command, ms.ToArray());
+			}
+		}
 	}
 }

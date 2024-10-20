@@ -442,7 +442,6 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Regenerates the index.
 		/// </summary>
-		/// <returns></returns>
 		internal async Task RegenerateLocked()
 		{
 			LinkedList<object> Objects = new LinkedList<object>();

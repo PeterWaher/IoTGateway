@@ -5390,7 +5390,7 @@ namespace Waher.Persistence.Serialization
 		/// Reads a generic array.
 		/// </summary>
 		/// <param name="Reader"></param>
-		/// <returns></returns>
+		/// <returns>Array</returns>
 		protected async Task<Array> ReadGenericArray(IDeserializer Reader)
 		{
 			ulong NrElements = Reader.ReadVariableLengthUInt64();

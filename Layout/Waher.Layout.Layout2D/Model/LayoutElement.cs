@@ -555,7 +555,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// Creates a copy of the layout element.
 		/// </summary>
 		/// <param name="Parent">Parent of the new element.</param>
-		/// <returns></returns>
+		/// <returns>Copy of element.</returns>
 		public ILayoutElement Copy(ILayoutElement Parent)
 		{
 			ILayoutElement Result = this.Create(this.document, Parent);

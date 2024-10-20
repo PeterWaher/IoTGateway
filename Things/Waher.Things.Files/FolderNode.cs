@@ -171,7 +171,6 @@ namespace Waher.Things.Files
 		/// <summary>
 		/// Synchronizes folder, subfolders, files and nodes.
 		/// </summary>
-		/// <returns></returns>
 		public Task Synchronize()
 		{
 			this.timer?.Dispose();

@@ -26,7 +26,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// Reads a TLV record from the stream.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of bytes.</returns>
 		public TlvRecord ReadRecord()
 		{
 			byte b = (byte)this.ms.ReadByte();

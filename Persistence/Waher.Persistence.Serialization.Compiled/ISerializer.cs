@@ -226,7 +226,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Creates a new serializer of the same type and properties.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Serializer</returns>
 		ISerializer CreateNew();
 	}
 }

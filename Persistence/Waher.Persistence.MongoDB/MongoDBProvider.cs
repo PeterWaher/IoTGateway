@@ -143,7 +143,7 @@ namespace Waher.Persistence.MongoDB
 		/// Gets a collection.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
-		/// <returns></returns>
+		/// <returns>Collection</returns>
 		public IMongoCollection<BsonDocument> GetCollection(string CollectionName)
 		{
 			IMongoCollection<BsonDocument> Result;

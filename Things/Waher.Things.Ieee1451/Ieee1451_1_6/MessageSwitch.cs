@@ -87,7 +87,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// Checks if an ID is "zero", i.e. contains only zero bytes.
 		/// </summary>
 		/// <param name="A"></param>
-		/// <returns></returns>
+		/// <returns>If address is "zero".</returns>
 		public static bool IsZero(byte[] A)
 		{
 			if (A is null)

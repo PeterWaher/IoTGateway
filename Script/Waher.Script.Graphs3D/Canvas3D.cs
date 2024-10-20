@@ -182,7 +182,7 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Creates a bitmap from the pixels in the canvas.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Pixels.</returns>
 		public PixelInformation GetPixels()
 		{
 			this.PaintTransparentPolygons();

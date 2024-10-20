@@ -151,7 +151,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="TedsAccessCode">TEDS access code.</param>
 		/// <param name="TedsOffset">TEDS offset.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		/// <returns></returns>
+		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
 			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
 		{

@@ -1207,7 +1207,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets a new file ID.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>New File ID.</returns>
 		internal int GetNewFileId()
 		{
 			lock (this.synchObjNrFiles)

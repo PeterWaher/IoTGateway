@@ -226,7 +226,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Gets all active registrations.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of registrations.</returns>
 		public ObservationRegistration[] GetRegistrations()
 		{
 			lock (this.registrations)

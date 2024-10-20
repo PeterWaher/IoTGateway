@@ -61,7 +61,7 @@ namespace Waher.Security
 		/// Converts an array of bytes to a string with their hexadecimal representations (in lower case).
 		/// </summary>
 		/// <param name="Data"></param>
-		/// <returns></returns>
+		/// <returns>Hexadecimal string representation.</returns>
 		public static string BinaryToString(byte[] Data)
 		{
 			StringBuilder Response = new StringBuilder();

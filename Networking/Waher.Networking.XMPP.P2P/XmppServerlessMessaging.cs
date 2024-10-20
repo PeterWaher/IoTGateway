@@ -387,7 +387,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="FullJID">Full JID</param>
 		/// <param name="Address">IP address information</param>
-		/// <returns></returns>
+		/// <returns>If address information found.</returns>
 		public bool TryGetAddressInfo(string FullJID, out AddressInfo Address)
 		{
 			lock (this.addressesByFullJid)

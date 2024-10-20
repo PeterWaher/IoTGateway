@@ -85,7 +85,6 @@ namespace Waher.Networking.SMTP
 		/// <summary>
 		/// Connects to the server.
 		/// </summary>
-		/// <returns></returns>
 		public async Task Connect()
 		{
 			this.client?.Dispose();

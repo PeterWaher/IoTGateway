@@ -136,7 +136,6 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Saves the value of the resource, to persisted storage.
 		/// </summary>
-		/// <returns></returns>
 		public virtual Task WritePersistedValue()
 		{
 			return Task.CompletedTask;

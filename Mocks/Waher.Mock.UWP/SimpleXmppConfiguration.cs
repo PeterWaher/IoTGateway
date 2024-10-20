@@ -894,7 +894,7 @@ namespace Waher.Mock
 		/// <param name="URI">URI to encode.</param>
 		/// <param name="Width">Width of image.</param>
 		/// <param name="Height">Height of image.</param>
-		/// <returns></returns>
+		/// <returns>URL string</returns>
 		public static string GetQRCodeURL(string URI, int Width, int Height)
 		{
 			StringBuilder Result = new StringBuilder();

@@ -153,7 +153,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// Binary serialization of what has been written.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of bytes.</returns>
 		byte[] ToArray();
 
 	}

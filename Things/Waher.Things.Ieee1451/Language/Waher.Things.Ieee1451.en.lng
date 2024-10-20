@@ -27,6 +27,10 @@
 			<String id="13">IEEE 1451.1.6 NCAP (HEX)</String>
 			<String id="14">IEEE 1451.1.6 NCAP (BINARY)</String>
 			<String id="15">IEEE 1451.1.6 message data</String>
+			<String id="16">Timeout: (ms)</String>
+			<String id="17">Maximum amount of time to wait (in milliseconds) for a response to a request.</String>
+			<String id="18">Stale after: (s)</String>
+			<String id="19">Flags information as stale (old) after this amount of time, triggering new requests if information is requested.</String>
 		</Namespace>
 	</Language>
 </Translation>

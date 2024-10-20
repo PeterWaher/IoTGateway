@@ -19,6 +19,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	{
 		private string ncapId;
 		private byte[] ncapIdBin;
+		private int timeoutMilliseconds = 10000;
+		private int staleSeconds = 60;
 
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 NCAP.
@@ -31,7 +33,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// NCAP ID
 		/// </summary>
 		[Page(1, "IEEE 1451")]
-		[Header(2, "NCAP ID:")]
+		[Header(2, "NCAP ID:", 100)]
 		[ToolTip(3, "NCAP unique identifier.")]
 		[Required]
 		[RegularExpression("[A-Fa-f0-9]{32}")]
@@ -43,6 +45,34 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				this.ncapIdBin = Hashes.StringToBinary(value);
 				this.ncapId = value;
 			}
+		}
+
+		/// <summary>
+		/// Timeout for request/response, in milliseconds.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(16, "Timeout: (ms)", 1000)]
+		[ToolTip(17, "Maximum amount of time to wait (in milliseconds) for a response to a request.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int TimeoutMilliseconds
+		{
+			get => this.timeoutMilliseconds;
+			set => this.timeoutMilliseconds = value;
+		}
+
+		/// <summary>
+		/// Timeout for request/response, in milliseconds.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(18, "Stale after: (s)", 2000)]
+		[ToolTip(19, "Flags information as stale (old) after this amount of time, triggering new requests if information is requested.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int StaleSeconds
+		{
+			get => this.staleSeconds;
+			set => this.staleSeconds = value;
 		}
 
 		/// <summary>
@@ -73,8 +103,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
 
-			Parameters.AddLast(new StringParameter("NcapId", 
-				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 4, "NCAP ID"), 
+			Parameters.AddLast(new StringParameter("NcapId",
+				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 4, "NCAP ID"),
 				this.ncapId));
 
 			return Parameters;
@@ -172,7 +202,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public Task TransducerDataRequest(Ieee1451_0.Messages.Message Message,
 			SamplingMode SamplingMode, double TimeoutSeconds)
 		{
-			return Task.CompletedTask;	// TODO
+			return Task.CompletedTask;  // TODO
 		}
 
 		/// <summary>

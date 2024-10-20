@@ -300,9 +300,23 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			try
 			{
+				int TimeoutMilliseconds;
+				int StaleSeconds;
+
+				if (this.Topic.Node is MqttNcapTopicNode NcapNode)
+				{
+					TimeoutMilliseconds = NcapNode.TimeoutMilliseconds;
+					StaleSeconds = NcapNode.StaleSeconds;
+				}
+				else
+				{
+					TimeoutMilliseconds = 10000;
+					StaleSeconds = 60;
+				}
+
 				if (this.channelId > 0)         // Channel
 				{
-					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 10000, 60);
+					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, TimeoutMilliseconds, StaleSeconds);
 
 					if (Data.TryParseTransducerData(ThingReference,
 						out ushort ErrorCode, out TransducerData ParsedData))

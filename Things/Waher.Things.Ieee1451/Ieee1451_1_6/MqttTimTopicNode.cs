@@ -29,7 +29,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// TIM ID
 		/// </summary>
 		[Page(1, "IEEE 1451")]
-		[Header(5, "TIM ID:")]
+		[Header(5, "TIM ID:", 200)]
 		[ToolTip(6, "TIM unique identifier.")]
 		[Required]
 		[RegularExpression("[A-Fa-f0-9]{32}")]

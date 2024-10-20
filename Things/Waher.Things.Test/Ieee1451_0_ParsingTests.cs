@@ -1,9 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
-using Waher.Networking;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Things.Ieee1451;
@@ -218,6 +216,7 @@ namespace Waher.Things.Test
 		[DataRow(false, false, "020101003B00303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000010300012A05F2000000")]    // Source: ubi.pt
 		[DataRow(true, false, "AgEBADs+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAAQUAASoF8gAAAA==")]
 		[DataRow(true, true, "MmwAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEABQIBAQA7PqaBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlCGJYoLcvYS1ocH6AVJEdzwAAEFAAEqBfIAAAA=")]
+		[DataRow(true, true, "MmwAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEAAwIBAQA7PqaBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlCGJYoLcvYS1ocH6AVJEdzwAAEFAAJUC+QAAAA=")]
 		public void Test_08_ParseTransducerSampleDataRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -253,6 +252,7 @@ namespace Waher.Things.Test
 		[DataTestMethod]
 		[DataRow(false, false, "0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]    // Source: ubi.pt
 		[DataRow(true, true, "MnYAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEADQIBAgBFAAA+poEuJakJwciMRiACMHvHADA5ADA5ADA5B+gFSTguUIYligty9hLWhwfoBUkR3PAAATI5OC4xNQAAAGcOfHcTz8Do")]
+		[DataRow(true, true, "MnYAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEABwIBAgBFAACBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlCGJYoLcvYS1ocH6AVJEdzwAAEAATI5Ni4xNQAAAGcVQ4Aet1Wy")]
 		public void Test_09_ParseTransducerSampleDataResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -271,6 +271,18 @@ namespace Waher.Things.Test
 
 			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, out ushort ErrorCode, out TransducerData Data));
 			Assert.AreEqual(0, ErrorCode);
+
+			ChannelAddress Channel = Data.ChannelInfo;
+
+			Assert.IsNotNull(Channel);
+			Assert.IsNotNull(Channel.ApplicationId);
+			Assert.IsNotNull(Channel.NcapId);
+			Assert.IsNotNull(Channel.TimId);
+
+			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Channel.ApplicationId));
+			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Channel.NcapId));
+			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Channel.TimId));
+			Console.Out.WriteLine("Channel: " + Channel.ChannelId.ToString());
 
 			Assert.IsNotNull(Data.Fields);
 			Assert.IsTrue(Data.Fields.Length > 0);

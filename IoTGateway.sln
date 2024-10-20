@@ -241,10 +241,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Language.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs3D", "Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj", "{A0BE2C7F-2272-468C-8B4A-05A246D5AAF3}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTClient.Win32", "Waher.IoTClient.Win32\Waher.IoTClient.Win32.wixproj", "{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}"
-EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTClient.Setup", "Waher.IoTClient.Setup\Waher.IoTClient.Setup.wixproj", "{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.Persistence", "Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj", "{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.App", "Waher.IoTGateway.App\Waher.IoTGateway.App.csproj", "{142C3903-C822-4081-AC2D-DCA8A06F094E}"
@@ -2663,30 +2659,6 @@ Global
 		{A0BE2C7F-2272-468C-8B4A-05A246D5AAF3}.Release|x64.Build.0 = Release|Any CPU
 		{A0BE2C7F-2272-468C-8B4A-05A246D5AAF3}.Release|x86.ActiveCfg = Release|Any CPU
 		{A0BE2C7F-2272-468C-8B4A-05A246D5AAF3}.Release|x86.Build.0 = Release|Any CPU
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|ARM.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|ARM64.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|x64.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|x86.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Any CPU.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM64.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x64.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|ARM.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|ARM64.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x64.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x86.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Any CPU.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM64.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x64.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.ActiveCfg = Release|x86
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|ARM.ActiveCfg = Debug|Any CPU

@@ -93,12 +93,11 @@ header#native-header
     z-index:3;
 }
 
-header#native-header nav > ul
+#native-header nav > ul
 {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 	display:flex;
 }
 
@@ -115,7 +114,6 @@ header#native-header li
 header#native-header
 {
     box-sizing: border-box;
-    box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.151);
     position: fixed;
     left: 0;
     right: 0;
@@ -371,7 +369,6 @@ html body fieldset
         width: 100%;
     }
 
-
     /* region Header */
     #native-header {
         max-height: 100%;
@@ -382,9 +379,8 @@ html body fieldset
         max-height: 100vh;
     }
     
-    #native-header > nav > div {
-        padding-block: 1rem;
-        height: 10vh;
+    #native-header[data-visible] > nav > div {
+        margin-bottom: 1rem;
     }
     
     #native-header > nav > ul {

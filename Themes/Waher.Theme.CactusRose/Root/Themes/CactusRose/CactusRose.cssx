@@ -3,23 +3,23 @@
 
 /* region Header*/
 
-header#native-header
+#native-header
 {
     background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
 }
-header#native-header nav > ul
+#native-header nav > ul
 {
     background-color: rgba(0,0,0,0.5);
 }
 
-header#native-header #small-pagpage-name {
+#native-header #small-pagpage-name {
     color: white;
 }
 
-header#native-header nav > div > #toggle-nav {
+#native-header nav > div > #toggle-nav {
     color: white;
 }
 

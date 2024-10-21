@@ -646,6 +646,31 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
+		/// Gets the next UUID array
+		/// </summary>
+		/// <returns>Array.</returns>
+		public byte[][] NextUuidArray()
+		{
+			return this.NextUuidArray((this.Body.Length - this.pos) / 10);
+		}
+
+		/// <summary>
+		/// Gets the next UUID array
+		/// </summary>
+		/// <param name="NrItems">Number of items in array.</param>
+		/// <returns>Array.</returns>
+		public byte[][] NextUuidArray(int NrItems)
+		{
+			byte[][] Result = new byte[NrItems][];
+			int i;
+
+			for (i = 0; i < NrItems; i++)
+				Result[i] = this.NextUuid();
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Parses a set of TEDS records.
 		/// </summary>
 		/// <returns>Array of records.</returns>

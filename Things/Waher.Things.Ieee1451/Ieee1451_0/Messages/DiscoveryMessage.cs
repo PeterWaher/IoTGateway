@@ -147,8 +147,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						case DiscoveryService.NCAPTIMDiscovery:
 							Channel = this.NextNcapId(true);
 							ushort Nr = this.NextUInt16();
+							byte[][] Ids = this.NextUuidArray(Nr);
 							string[] Names = this.NextStringArray(Nr);
-							Data = new DiscoveryDataEntities(Channel, Names);
+							Data = new DiscoveryDataEntities(Channel, Names, Ids);
 							return true;
 
 						case DiscoveryService.NCAPTIMTransducerDiscovery:

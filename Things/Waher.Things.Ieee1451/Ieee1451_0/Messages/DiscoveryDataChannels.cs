@@ -12,9 +12,29 @@
 		/// <param name="Names">Names</param>
 		/// <param name="Channels">Channels</param>
 		public DiscoveryDataChannels(ChannelAddress Channel, string[] Names, ushort[] Channels)
-			: base(Channel, Names)
+			: base(Channel, Names, ToIdentities(Channels))
 		{
 			this.Channels = Channels;
+		}
+
+		private static byte[][] ToIdentities(ushort[] Ids)
+		{
+			int i, c = Ids?.Length ?? 0;
+			byte[][] Result = new byte[c][];
+			ushort j;
+
+			for (i = 0; i < c; i++)
+			{
+				j = Ids[i];
+
+				Result[i] = new byte[]
+				{
+					(byte)(j >> 8),
+					(byte)j
+				};
+			}
+
+			return Result;
 		}
 
 		/// <summary>

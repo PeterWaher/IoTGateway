@@ -438,10 +438,19 @@ namespace Waher.Things.Test
 			DiscoveryDataEntities Entities = Data as DiscoveryDataEntities;
 			Assert.IsNotNull(Entities);
 
-			//Assert.IsFalse(string.IsNullOrEmpty(Entity.Name));
-
 			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
 			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
+
+			Assert.AreEqual(Entities.Identities.Length, Entities.Names.Length);
+
+			int i, c = Entities.Names.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				Console.Out.WriteLine("TIM " + (i + 1).ToString() + ": " +
+					Hashes.BinaryToString(Entities.Identities[i]) + " (" +
+					Entities.Names[i] + ")");
+			}
 		}
 
 		[DataTestMethod]
@@ -503,12 +512,24 @@ namespace Waher.Things.Test
 			Assert.IsNotNull(Data.Channel.ApplicationId);
 			Assert.IsNotNull(Data.Channel.NcapId);
 			Assert.IsNotNull(Data.Channel.TimId);
-			Assert.IsTrue(Data.Channel.ChannelId > 0);
+			Assert.AreEqual(0, Data.Channel.ChannelId);
+
+			DiscoveryDataChannels Channels = Data as DiscoveryDataChannels;
+			Assert.IsNotNull(Channels);
 
 			Console.Out.WriteLine("Application: " + Hashes.BinaryToString(Data.Channel.ApplicationId));
 			Console.Out.WriteLine("NCAP: " + Hashes.BinaryToString(Data.Channel.NcapId));
 			Console.Out.WriteLine("TIM: " + Hashes.BinaryToString(Data.Channel.TimId));
-			Console.Out.WriteLine("Channel: " + Data.Channel.ChannelId.ToString());
+
+			Assert.AreEqual(Channels.Channels.Length, Channels.Names.Length);
+
+			int i, c = Channels.Names.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				Console.Out.WriteLine("Channel " + (i + 1).ToString() + ": " +
+					Channels.Channels[i].ToString() + " (" + Channels.Names[i] + ")");
+			}
 		}
 
 	}

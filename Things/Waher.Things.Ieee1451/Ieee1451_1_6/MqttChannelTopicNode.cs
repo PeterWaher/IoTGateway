@@ -40,7 +40,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Local ID
 		/// </summary>
-		public override string LocalId => this.NodeId;
+		public override string LocalId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.EntityName))
+					return this.EntityName;
+				else
+					return this.NodeId;
+			}
+		}
 
 		/// <summary>
 		/// Diaplayable type name for node.

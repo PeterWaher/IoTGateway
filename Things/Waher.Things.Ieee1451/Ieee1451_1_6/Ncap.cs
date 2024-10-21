@@ -109,25 +109,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				{
 					await RemoveErrorAsync(This, "TransducerResponseError");
 
-					StringBuilder sb = new StringBuilder();
-
-					sb.Append(This.Topic.FullTopic);
-					sb.Append('/');
-					sb.Append(Hashes.BinaryToString(Data.ChannelInfo.NcapId));
-
-					if (!MessageSwitch.IsZero(Data.ChannelInfo.TimId))
-					{
-						sb.Append('/');
-						sb.Append(Hashes.BinaryToString(Data.ChannelInfo.TimId));
-
-						if (Data.ChannelInfo.ChannelId != 0)
-						{
-							sb.Append('/');
-							sb.Append(Data.ChannelInfo.ChannelId.ToString());
-						}
-					}
-
-					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(Data.ChannelInfo.GetTopic(This.Topic.FullTopic), true, false);
 
 					if (ErrorCode == 0)
 					{
@@ -149,25 +131,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				{
 					await RemoveErrorAsync(This, "TedsResponseError");
 
-					StringBuilder sb = new StringBuilder();
-
-					sb.Append(This.Topic.FullTopic);
-					sb.Append('/');
-					sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.NcapId));
-
-					if (!MessageSwitch.IsZero(Teds.ChannelInfo.TimId))
-					{
-						sb.Append('/');
-						sb.Append(Hashes.BinaryToString(Teds.ChannelInfo.TimId));
-
-						if (Teds.ChannelInfo.ChannelId != 0)
-						{
-							sb.Append('/');
-							sb.Append(Teds.ChannelInfo.ChannelId.ToString());
-						}
-					}
-
-					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
+					SubTopic = await This.Topic.Broker.GetTopic(Teds.ChannelInfo.GetTopic(This.Topic.FullTopic), true, false);
 
 					if (ErrorCode == 0)
 						await SubTopic.Node.RemoveErrorAsync("TedsError");
@@ -180,6 +144,115 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					return DataProcessingResult.Processed;
 				}
 			}
+			else if (Message is DiscoveryMessage DiscoveryMessage)
+			{
+				if (DiscoveryMessage.TryParseMessage(out ushort ErrorCode, out DiscoveryData Data))
+				{
+					await RemoveErrorAsync(This, "DiscoveryResponseError");
+
+					string TopicString;
+					bool Created;
+
+					switch (DiscoveryMessage.DiscoveryService)
+					{
+						case DiscoveryService.NCAPDiscovery:
+							if (Data is DiscoveryDataEntity NcapEntity)
+							{
+								TopicString = NcapEntity.Channel.GetTopic(This.Topic.FullTopic);
+
+								SubTopic = await This.Topic.Broker.GetTopic(TopicString, false, false);
+								if (Created = SubTopic is null)
+									SubTopic = await This.Topic.Broker.GetTopic(TopicString, true, false);
+
+								if (SubTopic.Node is MqttNcapTopicNode TopicNode)
+									await TopicNode.NameReceived(NcapEntity.Name);
+
+								if (ErrorCode == 0)
+									await SubTopic.Node.RemoveErrorAsync("DiscoveryError");
+								else
+									await SubTopic.Node.LogErrorAsync("DiscoveryError", "Discovery error: " + ErrorCode.ToString("X4"));
+
+								if (Created)
+								{
+									byte[] Request = DiscoveryMessage.SerializeRequest(NcapEntity.Channel.NcapId);
+									MqttBroker Broker = Topic.Broker;
+									await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+								}
+							}
+							break;
+
+						case DiscoveryService.NCAPTIMDiscovery:
+							if (Data is DiscoveryDataEntities TimEntities)
+							{
+								int i, c = Math.Min(TimEntities.Names.Length, TimEntities.Identities.Length);
+
+								for (i = 0; i < c; i++)
+								{
+									ChannelAddress TimAddress = new ChannelAddress()
+									{
+										ApplicationId = TimEntities.Channel.ApplicationId,
+										NcapId = TimEntities.Channel.NcapId,
+										TimId = TimEntities.Identities[i],
+										ChannelId = 0
+									};
+
+									TopicString = TimAddress.GetTopic(This.Topic.FullTopic);
+									SubTopic = await This.Topic.Broker.GetTopic(TopicString, false, false);
+									if (Created = SubTopic is null)
+										SubTopic = await This.Topic.Broker.GetTopic(TopicString, true, false);
+
+									if (SubTopic.Node is MqttNcapTopicNode TopicNode)
+										await TopicNode.NameReceived(TimEntities.Names[i]);
+
+									if (ErrorCode == 0)
+										await SubTopic.Node.RemoveErrorAsync("DiscoveryError");
+									else
+										await SubTopic.Node.LogErrorAsync("DiscoveryError", "Discovery error: " + ErrorCode.ToString("X4"));
+
+									if (Created)
+									{
+										byte[] Request = DiscoveryMessage.SerializeRequest(TimEntities.Channel.NcapId, TimEntities.Identities[i]);
+										MqttBroker Broker = Topic.Broker;
+										await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+									}
+								}
+							}
+							break;
+
+						case DiscoveryService.NCAPTIMTransducerDiscovery:
+							if (Data is DiscoveryDataChannels Channels)
+							{
+								int i, c = Math.Min(Channels.Names.Length, Channels.Channels.Length);
+
+								for (i = 0; i < c; i++)
+								{
+									ChannelAddress TimAddress = new ChannelAddress()
+									{
+										ApplicationId = Channels.Channel.ApplicationId,
+										NcapId = Channels.Channel.NcapId,
+										TimId = Channels.Channel.TimId,
+										ChannelId = Channels.Channels[i],
+									};
+
+									TopicString = TimAddress.GetTopic(This.Topic.FullTopic);
+									SubTopic = await This.Topic.Broker.GetTopic(TopicString, true, false);
+									if (SubTopic.Node is MqttNcapTopicNode TopicNode)
+										await TopicNode.NameReceived(Channels.Names[i]);
+
+									if (ErrorCode == 0)
+										await SubTopic.Node.RemoveErrorAsync("DiscoveryError");
+									else
+										await SubTopic.Node.LogErrorAsync("DiscoveryError", "Discovery error: " + ErrorCode.ToString("X4"));
+								}
+							}
+							break;
+					}
+				}
+				else
+					await LogErrorAsync(This, "DiscoveryResponseError", "Unable to parse Discovery response.");
+
+				return DataProcessingResult.Processed;
+			}
 			else
 				return DataProcessingResult.Processed;
 
@@ -190,7 +263,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				// TODO: Report new momentary values on node.
 			}
-				
+
 			return DataProcessingResult.Processed;
 		}
 

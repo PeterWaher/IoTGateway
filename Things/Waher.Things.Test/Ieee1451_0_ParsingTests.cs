@@ -294,8 +294,15 @@ namespace Waher.Things.Test
 		private static void ProcessMqttPackage(ref byte[] Bin)
 		{
 			BinaryInput Packet = new(Bin);
-			MqttHeader Header = MqttHeader.Parse(Packet);
-			Assert.IsNotNull(Header);
+			MqttHeader Header;
+
+			do
+			{
+				Header = MqttHeader.Parse(Packet);
+				Assert.IsNotNull(Header);
+			}
+			while (Header.ControlPacketType == MqttControlPacketType.PUBACK);
+
 			Assert.AreEqual(MqttControlPacketType.PUBLISH, Header.ControlPacketType);
 
 			string Topic = Packet.ReadString();
@@ -309,6 +316,7 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow(false, false, "010801001000303900303900303907E80549382E50")]    // Source: ubi.pt
+		[DataRow(true, true, "MkEAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEABQEIAQAQPqaBLiWpCcHIjEYgAjB7xw==")]
 		public void Test_10_ParseDiscoverNcapRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -340,6 +348,7 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow(false, false, "0108020031000000303900303900303907E80549382E5000303900303900303907E80549382E505542492D4E434150310001728A86D2")]    // Source: ubi.pt
+		[DataRow(true, true, "QAIABTJiAChfMTQ1MS4xLjYvRDAvSU5URVJPUC1JRUNPTjIwMjQvVUJJLU5DQVAxAAoBCAIAMQAAPqaBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlBVQkktTkNBUDEAAXKKhtI=")]
 		public void Test_11_ParseDiscoverNcapResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);

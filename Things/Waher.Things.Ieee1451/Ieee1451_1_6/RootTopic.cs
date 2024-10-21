@@ -92,7 +92,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			List<ICommand> Commands = new List<ICommand>();
 			Commands.AddRange(await base.Commands);
 
-			Commands.Add(new DiscoverNcapsRoot(this.Broker));
+			Commands.Add(new DiscoverNcapsRoot(this.Broker)
+			{
+				Topic = "_1451.1.6/D0"
+			});
 
 			return Commands.ToArray();
 		}

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System;
 using Waher.Things.Metering;
+using Waher.Script.Functions.Strings;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -35,17 +36,59 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public override string NetworkServiceIdName => this.DiscoveryService.ToString();
 
 		/// <summary>
-		/// Serializes a request for transducer data.
+		/// Serializes an NCAP Discovery request.
 		/// </summary>
-		/// <param name="Service">Discovery service</param>
 		/// <returns>Binary serialization.</returns>
-		public static byte[] SerializeRequest(DiscoveryService Service)
+		public static byte[] SerializeRequest()
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{
 				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
 
-				return Ieee1451Parser.SerializeMessage(Service, MessageType.Command, ms.ToArray());
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Command, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes an NCAP TIM Discovery request.
+		/// </summary>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeRequest(byte[] NcapId)
+		{
+			if (NcapId is null || NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Command, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes an NCAP TIM Transducer Discovery request.
+		/// </summary>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimId">TIM ID</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId)
+		{
+			if (NcapId is null || NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			if (TimId is null || TimId.Length != 16)
+				throw new ArgumentException("Invalid TIM UUID.", nameof(TimId));
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+				ms.Write(TimId, 0, 16); // TIM ID
+
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Command, ms.ToArray());
 			}
 		}
 

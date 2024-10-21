@@ -291,9 +291,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Last">If the last readout call for request.</param>
 		public override async Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			// TODO: Configurable timeout.
-			// TODO: Configurable stale limit.
-
 			try
 			{
 				int TimeoutMilliseconds;

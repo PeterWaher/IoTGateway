@@ -17,6 +17,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// </summary>
 	public class MqttNcapTopicNode : MqttTopicNode
 	{
+		private string entityName;
 		private string ncapId;
 		private byte[] ncapIdBin;
 		private int timeoutMilliseconds = 10000;
@@ -27,6 +28,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public MqttNcapTopicNode()
 		{
+		}
+
+		/// <summary>
+		/// Name
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(25, "Entity Name:", 50)]
+		[ToolTip(26, "Name of entity, as configured in the device.")]
+		public string EntityName
+		{
+			get => this.entityName;
+			set => this.entityName = value;
 		}
 
 		/// <summary>
@@ -83,7 +96,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Local ID
 		/// </summary>
-		public override string LocalId => this.NodeId;
+		public override string LocalId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.entityName))
+					return this.entityName;
+				else
+					return this.NodeId;
+			}
+		}
 
 		/// <summary>
 		/// Diaplayable type name for node.
@@ -216,6 +238,30 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
 		{
 			return Task.CompletedTask;  // TODO
+		}
+
+		/// <summary>
+		/// Name has been received
+		/// </summary>
+		/// <param name="Name">Name</param>
+		public async Task NameReceived(string Name)
+		{
+			bool Changed = false;
+
+			if (this.entityName != Name)
+			{
+				this.entityName = Name;
+				Changed = true;
+			}
+
+			if (string.IsNullOrEmpty(this.Name))
+			{
+				this.Name = Name;
+				Changed = true;
+			}
+
+			if (Changed)
+				await this.NodeUpdated();
 		}
 
 	}

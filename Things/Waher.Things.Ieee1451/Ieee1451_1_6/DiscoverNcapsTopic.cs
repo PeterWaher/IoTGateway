@@ -103,7 +103,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public Task ExecuteCommandAsync()
 		{
-			byte[] Request = DiscoveryMessage.SerializeRequest(DiscoveryService.NCAPDiscovery);
+			byte[] Request = DiscoveryMessage.SerializeRequest();
 			MqttBroker Broker = this.brokerNode.GetBroker();
 			return Broker.Publish(this.topicNode.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 		}

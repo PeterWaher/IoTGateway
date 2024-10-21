@@ -54,7 +54,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				Topic.CurrentParentTopic.Node is DiscoverableTopicNode) &&
 				!(Topic.CurrentParentTopic.Node is MqttNcapTopicNode))
 			{
-				return Grade.Excellent;
+				return Grade.Ok;
 			}
 			else
 				return Grade.NotAtAll;

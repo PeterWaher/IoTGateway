@@ -36,6 +36,8 @@
 			<String id="22">Search for NCAPs on this topic.</String>
 			<String id="23">IEEE 1451.1.6 Topic Node</String>
 			<String id="24">Discover NCAPs</String>
+			<String id="25">Entity Name:</String>
+			<String id="26">Name of entity, as configured in the device.</String>
 		</Namespace>
 	</Language>
 </Translation>

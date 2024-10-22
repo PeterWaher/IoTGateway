@@ -2986,7 +2986,8 @@ namespace Waher.Script
 		{
 			Prefix Prefix;
 			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			KeyValuePair<AtomicUnit, int>[] CompoundFactors;
+			KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundFactors;
+			bool HasCompoundFactors;
 			string Name, Name2, s;
 			int Start = this.pos;
 			int LastCompletion = Start;
@@ -3125,22 +3126,21 @@ namespace Waher.Script
 							this.pos = Start;
 							return null;
 						}
-						else if (Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
+						else if (HasCompoundFactors = Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
 						{
-							Prefix = Prefix.None;
+							Prefix = CompoundFactors.Key;
 							Name = Name2;
 						}
 						else if (Unit.ContainsDerivedOrBaseUnit(Name2))
 						{
 							Prefix = Prefix.None;
 							Name = Name2;
-							CompoundFactors = null;
 						}
-						else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-							CompoundFactors = null;
+						else
+							HasCompoundFactors = Unit.TryGetCompoundUnit(Name, out CompoundFactors);
 					}
-					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-						CompoundFactors = null;
+					else
+						HasCompoundFactors = Unit.TryGetCompoundUnit(Name, out CompoundFactors);
 
 					while (ch > 0 && (ch <= ' ' || ch == 160))
 						ch = this.NextChar();
@@ -3191,25 +3191,25 @@ namespace Waher.Script
 					else
 						Exponent = 1;
 
-					if (CompoundFactors is null)
+					if (HasCompoundFactors)
+					{
+						if (LastDivision)
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+						}
+						else
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+						}
+					}
+					else
 					{
 						if (LastDivision)
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
 						else
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
-					}
-					else
-					{
-						if (LastDivision)
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
-						}
-						else
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
-						}
 					}
 				}
 

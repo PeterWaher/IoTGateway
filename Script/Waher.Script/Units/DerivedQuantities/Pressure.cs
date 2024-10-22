@@ -23,6 +23,13 @@ namespace Waher.Script.Units.DerivedQuantities
 		public string Name => "Pressure";
 
 		/// <summary>
+		/// Reference unit of category.
+		/// </summary>
+		public Unit Reference => reference;
+
+		private static readonly Unit reference = new Unit(new AtomicUnit("Pa"));
+
+		/// <summary>
 		/// Derived Units supported.
 		/// </summary>
 		public KeyValuePair<string, PhysicalQuantity>[] DerivedUnits
@@ -45,7 +52,7 @@ namespace Waher.Script.Units.DerivedQuantities
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6.894757, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6.894757, new Unit(Prefix.Mega,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),

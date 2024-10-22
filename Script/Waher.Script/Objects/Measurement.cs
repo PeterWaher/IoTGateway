@@ -218,7 +218,7 @@ namespace Waher.Script.Objects
 			if (!(obj is Measurement E))
 				return false;
 
-			if (this.unit.Equals(E.unit))
+			if (this.unit.Equals(E.unit, true))
 				return this.magnitude == E.magnitude && this.error == E.error;
 			else
 			{
@@ -372,7 +372,7 @@ namespace Waher.Script.Objects
 
 			int i;
 
-			if (this.unit.Equals(Q.unit))
+			if (this.unit.Equals(Q.unit, true))
 			{
 				i = this.magnitude.CompareTo(Q.magnitude);
 				if (i != 0)

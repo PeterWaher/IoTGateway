@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// If the protected value van be serialized.
+		/// If the protected value can be serialized.
 		/// </summary>
 		public bool CanSerializeProtectedValue
 		{

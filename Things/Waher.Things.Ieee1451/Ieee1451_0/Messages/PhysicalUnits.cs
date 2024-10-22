@@ -1,4 +1,7 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿using System.Collections.Generic;
+using Waher.Script.Units;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// How to interpret physical units.
@@ -106,5 +109,49 @@
 		/// (2 * &lt;exponent of candelas&gt;) + 128
 		/// </summary>
 		public byte Candelas;
+
+		/// <summary>
+		/// Tries to create a unit from the description available in the object.
+		/// </summary>
+		/// <returns>Unit, if able, null if not.</returns>
+		public Unit TryCreateUnit()
+		{
+			LinkedList<KeyValuePair<AtomicUnit, int>> Parts = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			Prefix Prefix = Prefix.None;
+
+			if (this.AddStep(Parts, "rad", this.Radians, ref Prefix, 0) &&
+				this.AddStep(Parts, "sterad", this.Steradians, ref Prefix, 0) &&
+				this.AddStep(Parts, "m", this.Meters, ref Prefix, 0) &&
+				this.AddStep(Parts, "g", this.Kilograms, ref Prefix, 3) &&
+				this.AddStep(Parts, "s", this.Seconds, ref Prefix, 0) &&
+				this.AddStep(Parts, "A", this.Amperes, ref Prefix, 0) &&
+				this.AddStep(Parts, "K", this.Kelvins, ref Prefix, 0) &&
+				this.AddStep(Parts, "mol", this.Moles, ref Prefix, 0) &&
+				this.AddStep(Parts, "Cd", this.Candelas, ref Prefix, 0))
+			{
+				return new Unit(Prefix, Parts);
+			}
+			else
+				return null;
+		}
+
+		private bool AddStep(LinkedList<KeyValuePair<AtomicUnit, int>> Parts, string Unit, byte Exponent, 
+			ref Prefix Prefix, int ExponentModifier)
+		{
+			int i = Exponent;
+			if ((i & 1) != 0)
+				return false;
+
+			i -= 128;
+			i /= 2;
+
+			if (i != 0)
+			{
+				Parts.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Unit), i));
+				Prefix += ExponentModifier;
+			}
+
+			return true;
+		}
 	}
 }

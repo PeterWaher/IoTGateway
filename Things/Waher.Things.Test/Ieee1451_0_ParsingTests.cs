@@ -269,7 +269,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM, TransducerAccessMessage.TransducerAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, out ushort ErrorCode, out TransducerData Data));
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, null, out ushort ErrorCode, out TransducerData Data));
 			Assert.AreEqual(0, ErrorCode);
 
 			ChannelAddress Channel = Data.ChannelInfo;
@@ -539,6 +539,43 @@ namespace Waher.Things.Test
 				Console.Out.WriteLine("Channel " + (i + 1).ToString() + ": " +
 					Channels.Channels[i].ToString() + " (" + Channels.Names[i] + ")");
 			}
+		}
+
+		[DataTestMethod]
+		[DataRow(false, false, 
+			"030202009A000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF00001000000000000005E030500FF0302010A01000B01000C0B00808080808080828080800D04436926660E0443C713330F0440000000100100110101120A2801012901042A02000E140440A0000015043F80000017044396000018043F800000190440A00000F0F8",
+			"0201020045000000303900303900303907E8054936599000303900303900303907E80549382E5086258A0B72F612D68707E8054911DCF000013330302E3135000000670010B72575FEF3")]    // Source: ubi.pt
+		public void Test_16_ParseTransducerSampleDataResponseWithTeds(bool Base64, bool IncludesMqttPackage, 
+			string TedsEncoded, string DataEncoded)
+		{
+			byte[] Bin = Base64 ? Convert.FromBase64String(TedsEncoded) : Hashes.StringToBinary(TedsEncoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message Message));
+			TedsAccessMessage TedsAccessMessage = Message as TedsAccessMessage;
+			Assert.IsNotNull(TedsAccessMessage);
+
+			Assert.IsTrue(TedsAccessMessage.TryParseTeds(out ushort ErrorCode, out Teds Teds));
+			Assert.AreEqual(0, ErrorCode);
+
+			Bin = Base64 ? Convert.FromBase64String(DataEncoded) : Hashes.StringToBinary(DataEncoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
+			Assert.IsTrue(Ieee1451Parser.TryParseMessage(Bin, out Message));
+
+			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
+			Assert.IsNotNull(TransducerAccessMessage);
+
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, Teds, out ErrorCode, out TransducerData Data));
+			Assert.AreEqual(0, ErrorCode);
+
+			Assert.IsNotNull(Data.Fields);
+			Assert.IsTrue(Data.Fields.Length > 0);
+
+			foreach (Field Field in Data.Fields)
+				Console.Out.WriteLine(Field.ToString());
 		}
 
 	}

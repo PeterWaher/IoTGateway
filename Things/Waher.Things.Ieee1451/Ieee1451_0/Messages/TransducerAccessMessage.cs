@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Content;
+using Waher.Script.Units;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -44,10 +46,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Tries to parse Transducer Data from the message.
 		/// </summary>
 		/// <param name="Thing">Thing associated with fields.</param>
+		/// <param name="ChannelTeds">Channel TEDS, if available.</param>
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
-		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode,
+		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, out ushort ErrorCode,
 			out TransducerData Data)
 		{
 			if (!(this.data is null))
@@ -77,8 +80,23 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						if (CommonTypes.TryParse(Value, out double NumericValue, out byte NrDecimals))
 						{
-							Fields.Add(new QuantityField(Thing, Timestamp, "Value",
-								NumericValue, NrDecimals, string.Empty, FieldType.Momentary,
+							string FieldName = "Value";
+							string Unit = string.Empty;
+
+							if (!(ChannelTeds is null))
+							{
+								foreach (TedsRecord Record in ChannelTeds.Records)
+								{
+									if (Record is TEDS.FieldTypes.TransducerChannelTeds.PhysicalUnits TedsUnits)
+									{
+										PhysicalUnits Units = TedsUnits.Units;
+										Unit = Units.TryCreateUnit()?.ToString() ?? string.Empty;
+									}
+								}
+							}
+
+							Fields.Add(new QuantityField(Thing, Timestamp, FieldName,
+								NumericValue, NrDecimals, Unit, FieldType.Momentary,
 								FieldQoS.AutomaticReadout));
 						}
 						else

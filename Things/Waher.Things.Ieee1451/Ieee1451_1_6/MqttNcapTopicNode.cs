@@ -22,6 +22,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		private byte[] ncapIdBin;
 		private int timeoutMilliseconds = 10000;
 		private int staleSeconds = 60;
+		private int refreshTedsHours = 24;
 
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 NCAP.
@@ -86,6 +87,20 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			get => this.staleSeconds;
 			set => this.staleSeconds = value;
+		}
+
+		/// <summary>
+		/// Refresh TEDS if older than this number of hours.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(27, "Refresh TEDS: (h)", 3000)]
+		[ToolTip(28, "Re-fetches TEDS from device, if current TEDS is older than this number of hours.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int RefreshTedsHours
+		{
+			get => this.refreshTedsHours;
+			set => this.refreshTedsHours = value;
 		}
 
 		/// <summary>

@@ -38,6 +38,8 @@
 			<String id="24">Discover NCAPs</String>
 			<String id="25">Entity Name:</String>
 			<String id="26">Name of entity, as configured in the device.</String>
+			<String id="27">Refresh TEDS: (h)</String>
+			<String id="28">Re-fetches TEDS from device, if current TEDS is older than this number of hours.</String>
 		</Namespace>
 	</Language>
 </Translation>

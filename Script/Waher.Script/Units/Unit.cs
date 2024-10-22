@@ -487,7 +487,7 @@ namespace Waher.Script.Units
 				{
 					if (Name == Factor2.Key.Name)
 					{
-						if (Factor2.Value != Factor2.Value)
+						if (Factor.Value != Factor2.Value)
 							return false;
 
 						Found = true;

@@ -1137,8 +1137,8 @@ namespace Waher.Script.Test
 			await Test("10 m² > 1000 inch²", true);
 
 			await Test("10 kWh", new PhysicalQuantity(10, new Unit(Prefix.Kilo, "W", "h")));
-			await Test("10 mph", new PhysicalQuantity(10, new Unit(Prefix.None, "SM", "h")));
-			await Test("10 fps", new PhysicalQuantity(10, new Unit(Prefix.None, "ft", "s")));
+			await Test("10 mph", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<string, int>("SM", 1), new KeyValuePair<string, int>("h", -1))));
+			await Test("10 fps", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<string, int>("ft", 1), new KeyValuePair<string, int>("s", -1))));
 			await Test("10 ft", new PhysicalQuantity(10, new Unit("ft")));
 
 			await Test("10 kWh J", new PhysicalQuantity(36000000, new Unit(Prefix.None, "J")));
@@ -1149,7 +1149,6 @@ namespace Waher.Script.Test
 
 			// TODO: Difference of temperature units -> K
 			// TODO: (km)² != km²=k(m²)
-			// TODO: Test all units.
 		}
 
 		[TestMethod]

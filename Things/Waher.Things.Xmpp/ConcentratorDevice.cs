@@ -60,7 +60,6 @@ namespace Waher.Things.Xmpp
 			return Task.FromResult(Child is SourceNode || Child is XmppNode);
 		}
 
-
 		/// <summary>
 		/// Available command objects. If no commands are available, null is returned.
 		/// </summary>

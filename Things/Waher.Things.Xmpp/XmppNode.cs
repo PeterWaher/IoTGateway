@@ -1,15 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Networking.XMPP;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.Xmpp.Commands;
 
 namespace Waher.Things.Xmpp
 {
 	/// <summary>
-	/// Abstract base class for nodes.
+	/// Base class for nodes in a remote concentrator.
 	/// </summary>
-	public abstract class XmppNode : XmppDevice
+	public class XmppNode : XmppDevice
 	{
 		/// <summary>
 		/// Abstract base class for nodes.
@@ -26,6 +26,16 @@ namespace Waher.Things.Xmpp
 		[Header(10, "Node ID:")]
 		[ToolTip(11, "Node ID in data source (and partition).")]
 		public string RemoteNodeID { get; set; }
+
+		/// <summary>
+		/// Gets the type name of the node.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized type node.</returns>
+		public override Task<string> GetTypeNameAsync(Language Language)
+		{
+			return Language.GetStringAsync(typeof(ConcentratorDevice), 54, "Node");
+		}
 
 		/// <summary>
 		/// If the node accepts a presumptive parent, i.e. can be added to that parent (if that parent accepts the node as a child).
@@ -47,5 +57,23 @@ namespace Waher.Things.Xmpp
 		{
 			return Task.FromResult(false);
 		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Result = new List<ICommand>();
+			Result.AddRange(await base.Commands);
+
+			ConcentratorDevice Concentrator = await this.GetAncestor<ConcentratorDevice>();
+			if (!(Concentrator is null))
+				Result.Add(new ScanNode(Concentrator, this));
+
+			return Result.ToArray();
+		}
+
 	}
 }

@@ -207,6 +207,29 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// Gets all root data sources from the server.
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
+		/// <returns>Result</returns>
+		public async Task<DataSourceReference[]> GetRootDataSourcesAsync(string To)
+		{
+			TaskCompletionSource<DataSourcesEventArgs> Result = new TaskCompletionSource<DataSourcesEventArgs>();
+
+			this.GetRootDataSources(To, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get root data sources."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return (await Result.Task).DataSources;
+		}
+
+		/// <summary>
+		/// Gets all child data sources for a data source on the server.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Parent Data Source ID.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
@@ -217,6 +240,30 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
 			}, State);
+		}
+
+		/// <summary>
+		/// Gets all child data sources for a data source on the server.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="SourceID">Parent Data Source ID.</param>
+		/// <returns>Result</returns>
+		public async Task<DataSourceReference[]> GetChildDataSourcesAsync(string To, string SourceID)
+		{
+			TaskCompletionSource<DataSourcesEventArgs> Result = new TaskCompletionSource<DataSourcesEventArgs>();
+
+			this.GetChildDataSources(To, SourceID, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get child data sources."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return (await Result.Task).DataSources;
 		}
 
 		/// <summary>

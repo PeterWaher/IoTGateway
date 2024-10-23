@@ -46,7 +46,7 @@ namespace Waher.Things.Files.Commands
 		/// <summary>
 		/// ID of command.
 		/// </summary>
-		public string CommandID => "SynchronizeFolder";
+		public string CommandID => nameof(SynchronizeFolder);
 
 		/// <summary>
 		/// Type of command.

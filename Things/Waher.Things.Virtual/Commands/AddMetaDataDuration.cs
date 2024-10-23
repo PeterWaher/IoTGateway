@@ -43,7 +43,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// ID of command.
 		/// </summary>
-		public string CommandID => "AddMetaDataDuration";
+		public string CommandID => nameof(AddMetaDataDuration);
 
 		/// <summary>
 		/// Type of command.

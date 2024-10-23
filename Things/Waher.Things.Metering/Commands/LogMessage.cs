@@ -54,7 +54,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// ID of command.
 		/// </summary>
-		public string CommandID => "LogMessage";
+		public string CommandID => nameof(LogMessage);
 
 		/// <summary>
 		/// Type of command.

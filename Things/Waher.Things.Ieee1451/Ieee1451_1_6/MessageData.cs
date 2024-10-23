@@ -287,7 +287,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 		private async Task<(Teds, DateTime)> GetTeds(TedsAccessCode Code, ThingReference ThingReference, ISensorReadout Request)
 		{
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 
 			this.GetTimeouts(out int TimeoutMilliseconds, out int _, out int RefreshTedsHours);
 

@@ -3,14 +3,13 @@ using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 using Waher.Runtime.Inventory;
 using Waher.Things.Attributes;
-using Waher.Things.Metering;
 
 namespace Waher.Things.Xmpp
 {
 	/// <summary>
 	/// Abstract base class for nodes.
 	/// </summary>
-	public abstract class XmppNode : ProvisionedMeteringNode
+	public abstract class XmppNode : XmppDevice
 	{
 		/// <summary>
 		/// Abstract base class for nodes.
@@ -47,21 +46,6 @@ namespace Waher.Things.Xmpp
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult(false);
-		}
-
-		/// <summary>
-		/// Gets the XMPP Client associated with node.
-		/// </summary>
-		/// <returns>XMPP Client</returns>
-		/// <exception cref="Exception">If no XMPP Client could be found, associated with node.</exception>
-		public async Task<XmppClient> GetClient()
-		{
-			if (this.Parent is XmppBrokerNode BrokerNode)
-				return (await BrokerNode.GetBroker()).Client;
-			else if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client)
-				return Client;
-			else
-				throw new Exception("No XMPP Client associated with node.");
 		}
 	}
 }

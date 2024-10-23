@@ -60,7 +60,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// <param name="Thing">Thing associated with fields.</param>
 		/// <param name="Timestamp">Timestamp of fields.</param>
 		/// <param name="Fields">Parsed fields.</param>
-		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
+		/// <param name="Teds">TEDS containing records.</param>
+		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
 		}
 	}

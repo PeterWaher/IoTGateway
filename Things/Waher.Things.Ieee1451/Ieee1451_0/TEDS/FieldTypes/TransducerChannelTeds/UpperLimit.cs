@@ -61,10 +61,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <param name="Thing">Thing associated with fields.</param>
 		/// <param name="Timestamp">Timestamp of fields.</param>
 		/// <param name="Fields">Parsed fields.</param>
-		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
+		/// <param name="Teds">TEDS containing records.</param>
+		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
-			Fields.Add(new QuantityField(Thing, Timestamp, "Upper Limit", this.Value,
-				Math.Min(CommonTypes.GetNrDecimals(this.Value), (byte)2), string.Empty,
+			Fields.Add(new QuantityField(Thing, Timestamp, (Teds?.FieldName ?? "Value") + ", Upper Limit", this.Value,
+				Math.Min(CommonTypes.GetNrDecimals(this.Value), (byte)2), Teds?.Unit ?? string.Empty,
 				FieldType.Status, FieldQoS.AutomaticReadout));
 		}
 	}

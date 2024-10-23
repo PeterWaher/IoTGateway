@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Units;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
@@ -61,6 +62,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	public struct PhysicalUnits
 	{
 		/// <summary>
+		/// Binary byte array representation of the physical unit.
+		/// </summary>
+		public byte[] Binary;
+
+		/// <summary>
 		/// Physical Units interpretation
 		/// </summary>
 		public Ieee1451_0PhysicalUnitsInterpretation Interpretation;
@@ -119,15 +125,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			LinkedList<KeyValuePair<AtomicUnit, int>> Parts = new LinkedList<KeyValuePair<AtomicUnit, int>>();
 			Prefix Prefix = Prefix.None;
 
+			if (unitPerBase64.TryGetValue(Convert.ToBase64String(this.Binary), out string s))
+				return new Unit(new AtomicUnit(s));
+
 			if (this.AddStep(Parts, "rad", this.Radians, ref Prefix, 0) &&
-				this.AddStep(Parts, "sterad", this.Steradians, ref Prefix, 0) &&
+				this.AddStep(Parts, "sr", this.Steradians, ref Prefix, 0) &&
 				this.AddStep(Parts, "m", this.Meters, ref Prefix, 0) &&
 				this.AddStep(Parts, "g", this.Kilograms, ref Prefix, 3) &&
 				this.AddStep(Parts, "s", this.Seconds, ref Prefix, 0) &&
 				this.AddStep(Parts, "A", this.Amperes, ref Prefix, 0) &&
 				this.AddStep(Parts, "K", this.Kelvins, ref Prefix, 0) &&
 				this.AddStep(Parts, "mol", this.Moles, ref Prefix, 0) &&
-				this.AddStep(Parts, "Cd", this.Candelas, ref Prefix, 0))
+				this.AddStep(Parts, "cd", this.Candelas, ref Prefix, 0))
 			{
 				return new Unit(Prefix, Parts);
 			}
@@ -135,7 +144,45 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				return null;
 		}
 
-		private bool AddStep(LinkedList<KeyValuePair<AtomicUnit, int>> Parts, string Unit, byte Exponent, 
+		private const byte _ = 128;
+		private const byte p1 = 130;
+		private const byte p2 = 132;
+		private const byte p3 = 134;
+		private const byte p4 = 136;
+		private const byte m1 = 126;
+		private const byte m2 = 124;
+		private const byte m3 = 122;
+		private static readonly KeyValuePair<string, byte[]>[] specialUnits = new KeyValuePair<string, byte[]>[]
+			{	//                                                    rad  sr   m  kg   s   A   K mol  cd
+				new KeyValuePair<string, byte[]>("Pa", new byte[] { 0,  _,  _, m1, p1, m2,  _,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("Ω", new byte[]  { 0,  _,  _, p2, p1, m3, m2,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("C", new byte[]  { 0,  _,  _,  _,  _, p1, p1,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("J", new byte[]  { 0,  _,  _, p2, p1, m2,  _,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("Hz", new byte[] { 0,  _,  _,  _,  _, m1,  _,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("N", new byte[]  { 0,  _,  _, p1, p1, m2,  _,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("W", new byte[]  { 0,  _,  _, p2, p1, m3,  _,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("V", new byte[]  { 0,  _,  _, p2, p1, m3, m1,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("F", new byte[]  { 0,  _,  _, m2, m1, p4, p2,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("S", new byte[]  { 0,  _,  _, m2, m1, p3, p2,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("Wb", new byte[] { 0,  _,  _, p2, p1, m2, m1,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("T", new byte[]  { 0,  _,  _,  _, p1, m2, m1,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("H", new byte[]  { 0,  _,  _, p2, p1, m2, m2,  _,  _,  _ }),
+				new KeyValuePair<string, byte[]>("lm", new byte[] { 0,  _, p1,  _,  _,  _,  _,  _,  _, p1 }),
+				new KeyValuePair<string, byte[]>("lx", new byte[] { 0,  _, p1, m2,  _,  _,  _,  _,  _, p1 })
+			};
+		private static readonly Dictionary<string, string> unitPerBase64 = OrderUnits();
+
+		private static Dictionary<string, string> OrderUnits()
+		{
+			Dictionary<string, string> Result = new Dictionary<string, string>();
+
+			foreach (KeyValuePair<string, byte[]> P in specialUnits)
+				Result[Convert.ToBase64String(P.Value)] = P.Key;
+
+			return Result;
+		}
+
+		private bool AddStep(LinkedList<KeyValuePair<AtomicUnit, int>> Parts, string Unit, byte Exponent,
 			ref Prefix Prefix, int ExponentModifier)
 		{
 			int i = Exponent;

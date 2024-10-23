@@ -289,7 +289,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			DateTime TP = DateTime.Now;
 
-			this.GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours);
+			this.GetTimeouts(out int TimeoutMilliseconds, out int _, out int RefreshTedsHours);
 
 			lock (this.teds)
 			{
@@ -297,7 +297,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					return (P.Value, P.Key);
 			}
 
-			TedsAccessMessage TedsMessage = await this.RequestTEDS(Code, TimeoutMilliseconds, StaleSeconds);
+			TedsAccessMessage TedsMessage = await this.RequestTEDS(Code, TimeoutMilliseconds, 0);   // Do not use cached message. Force readout.
 
 			if (TedsMessage.TryParseTeds(out ushort ErrorCode, out Teds Teds))
 			{
@@ -354,10 +354,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					if (Request.IsIncluded(FieldType.Identity) || Request.IsIncluded(FieldType.Status))
 					{
-						Request.ReportFields(false, Teds.GetFields(ThingReference, TedsTimestamp));
+						Field[] Fields = Teds.GetFields(ThingReference, TedsTimestamp);
+						Request.ReportFields(false, Fields);
 
 						(Teds MetaTeds, DateTime MetaTedsTimestamp) = await this.GetTeds(TedsAccessCode.MetaTEDS, ThingReference, Request);
-						Request.ReportFields(false, MetaTeds.GetFields(ThingReference, MetaTedsTimestamp));
+						Field[] Fields2 = MetaTeds.GetFields(ThingReference, MetaTedsTimestamp);
+						Field[] Fields3 = RemoveDuplicates(Fields2, Fields);
+
+						if (!(Fields3 is null))
+							Request.ReportFields(false, Fields3);
 					}
 
 					TransducerAccessMessage TransducerMessage = await this.RequestTransducerData(SamplingMode.Immediate, TimeoutMilliseconds, StaleSeconds);
@@ -383,6 +388,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				Request.ReportErrors(true, new ThingError(ThingReference, ex.Message));
 			}
+		}
+
+		private static Field[] RemoveDuplicates(Field[] Fields, Field[] AlreadyReported)
+		{
+			Dictionary<string, Field> ByName = new Dictionary<string, Field>();
+
+			foreach (Field F in AlreadyReported)
+				ByName[F.Name] = F;
+
+			List<Field> Result = null;
+
+			foreach (Field F in Fields)
+			{
+				if (ByName.TryGetValue(F.Name, out Field F2) && F.ObjectValue.Equals(F2.ObjectValue))
+					continue;
+
+				if (Result is null)
+					Result = new List<Field>();
+
+				Result.Add(F);
+			}
+
+			return Result?.ToArray();
 		}
 	}
 }

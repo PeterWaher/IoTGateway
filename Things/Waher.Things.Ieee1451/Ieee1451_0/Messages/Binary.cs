@@ -36,7 +36,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Current position.
 		/// </summary>
-		public int Position => this.pos;
+		public int Position
+		{
+			get => this.pos;
+			internal set => this.pos = value;
+		}
 
 		/// <summary>
 		/// If the end of the data has been readed.
@@ -315,9 +319,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		public double NextTimeDurationSeconds()
 		{
 			long TimeDuration = this.NextInt64();   // ns * 2^16
-			double Result = TimeDuration;			// ns * 2^16
-			Result /= 65536;						// ns
-			Result *= 1e-9;							// s
+			double Result = TimeDuration;           // ns * 2^16
+			Result /= 65536;                        // ns
+			Result *= 1e-9;                         // s
 			return Result;
 		}
 
@@ -327,18 +331,21 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Physical Units.</returns>
 		public PhysicalUnits NextPhysicalUnits()
 		{
+			byte[] Bin = this.NextUInt8Array(10);
+
 			return new PhysicalUnits()
 			{
-				Interpretation = (Ieee1451_0PhysicalUnitsInterpretation)this.NextUInt8(),
-				Radians = this.NextUInt8(),
-				Steradians = this.NextUInt8(),
-				Meters = this.NextUInt8(),
-				Kilograms = this.NextUInt8(),
-				Seconds = this.NextUInt8(),
-				Amperes = this.NextUInt8(),
-				Kelvins = this.NextUInt8(),
-				Moles = this.NextUInt8(),
-				Candelas = this.NextUInt8(),
+				Binary = Bin,
+				Interpretation = (Ieee1451_0PhysicalUnitsInterpretation)Bin[0],
+				Radians = Bin[1],
+				Steradians = Bin[2],
+				Meters = Bin[3],
+				Kilograms = Bin[4],
+				Seconds = Bin[5],
+				Amperes = Bin[6],
+				Kelvins = Bin[7],
+				Moles = Bin[8],
+				Candelas = Bin[9]
 			};
 		}
 

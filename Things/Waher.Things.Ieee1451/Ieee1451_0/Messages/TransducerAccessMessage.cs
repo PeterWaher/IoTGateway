@@ -50,8 +50,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
-		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, out ushort ErrorCode,
-			out TransducerData Data)
+		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, out ushort ErrorCode, out TransducerData Data)
 		{
 			if (!(this.data is null))
 			{
@@ -64,6 +63,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			try
 			{
+				this.Position = 0;
 				if (this.MessageType == MessageType.Reply)
 					ErrorCode = this.NextUInt16();
 				else
@@ -85,14 +85,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 							if (!(ChannelTeds is null))
 							{
-								foreach (TedsRecord Record in ChannelTeds.Records)
-								{
-									if (Record is TEDS.FieldTypes.TransducerChannelTeds.PhysicalUnits TedsUnits)
-									{
-										PhysicalUnits Units = TedsUnits.Units;
-										Unit = Units.TryCreateUnit()?.ToString() ?? string.Empty;
-									}
-								}
+								FieldName = ChannelTeds.FieldName ?? FieldName;
+								Unit = ChannelTeds.Unit;
 							}
 
 							Fields.Add(new QuantityField(Thing, Timestamp, FieldName,
@@ -105,8 +99,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 								FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						// TODO: Unit
-						// TODO: Name
 						// TODO: Historic value vs. Momentary value
 						break;
 
@@ -114,7 +106,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						return false;
 				}
 
-				this.data = Data = new TransducerData(ChannelInfo, Fields.ToArray());
+				Data = new TransducerData(ChannelInfo, Fields.ToArray());
+
+				if (!(ChannelTeds is null))
+					this.data = Data;
+
 				this.errorCode = ErrorCode;
 				return true;
 			}

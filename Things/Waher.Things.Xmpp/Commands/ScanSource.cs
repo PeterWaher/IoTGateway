@@ -11,14 +11,14 @@ namespace Waher.Things.Xmpp.Commands
 	/// </summary>
 	public class ScanSource : ConcentratorCommand
 	{
-		private readonly SourceNode sourceNode;
+		private readonly ConcentratorSourceNode sourceNode;
 
 		/// <summary>
 		/// Scans a source node on a concentrator node for its child sources and root nodes.
 		/// </summary>
 		/// <param name="Concentrator">Concentrator node.</param>
 		/// <param name="SourceNode">Data source node.</param>
-		public ScanSource(ConcentratorDevice Concentrator, SourceNode SourceNode)
+		public ScanSource(ConcentratorDevice Concentrator, ConcentratorSourceNode SourceNode)
 			: base(Concentrator, "1")
 		{
 			this.sourceNode = SourceNode;
@@ -48,8 +48,8 @@ namespace Waher.Things.Xmpp.Commands
 		/// </summary>
 		public override async Task ExecuteCommandAsync()
 		{
-			ConcentratorClient Client = await this.GetClient();
-			string FullJid = this.GetRemoteFullJid(Client);
+			ConcentratorClient Client = await this.GetConcentratorClient();
+			string FullJid = this.GetRemoteFullJid(Client.Client);
 
 			LinkedList<Task> ChildTasks = new LinkedList<Task>();
 
@@ -65,11 +65,11 @@ namespace Waher.Things.Xmpp.Commands
 			DataSourceReference[] Sources = await Client.GetChildDataSourcesAsync(
 				FullJid, this.sourceNode.RemoteSourceID);
 
-			Dictionary<string, SourceNode> BySourceId = new Dictionary<string, SourceNode>();
+			Dictionary<string, ConcentratorSourceNode> BySourceId = new Dictionary<string, ConcentratorSourceNode>();
 
 			foreach (INode Child in await this.sourceNode.ChildNodes)
 			{
-				if (Child is SourceNode SourceNode)
+				if (Child is ConcentratorSourceNode SourceNode)
 					BySourceId[SourceNode.SourceId] = SourceNode;
 			}
 
@@ -78,7 +78,7 @@ namespace Waher.Things.Xmpp.Commands
 				if (BySourceId.ContainsKey(Source.SourceID))
 					continue;
 
-				SourceNode SourceNode = new SourceNode()
+				ConcentratorSourceNode SourceNode = new ConcentratorSourceNode()
 				{
 					NodeId = await MeteringNode.GetUniqueNodeId(Source.SourceID),
 					RemoteSourceID = Source.SourceID
@@ -99,11 +99,11 @@ namespace Waher.Things.Xmpp.Commands
 				FullJid, this.sourceNode.RemoteSourceID, false, false, 
 				string.Empty, string.Empty, string.Empty, string.Empty);
 
-			Dictionary<string, XmppNode> ByNodeId = new Dictionary<string, XmppNode>();
+			Dictionary<string, ConcentratorNode> ByNodeId = new Dictionary<string, ConcentratorNode>();
 
 			foreach (INode Child in await this.sourceNode.ChildNodes)
 			{
-				if (Child is XmppNode XmppNode)
+				if (Child is ConcentratorNode XmppNode)
 					ByNodeId[XmppNode.NodeId] = XmppNode;
 			}
 
@@ -112,7 +112,7 @@ namespace Waher.Things.Xmpp.Commands
 				if (ByNodeId.ContainsKey(Node.NodeId))
 					continue;
 
-				XmppNode NewNode;
+				ConcentratorNode NewNode;
 
 				if (Node.IsReadable)
 				{
@@ -124,7 +124,7 @@ namespace Waher.Things.Xmpp.Commands
 				}
 				else
 				{
-					NewNode = new XmppNode()
+					NewNode = new ConcentratorNode()
 					{
 						NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
 						RemoteNodeID = Node.NodeId

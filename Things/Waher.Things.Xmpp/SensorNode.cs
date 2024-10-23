@@ -12,7 +12,7 @@ namespace Waher.Things.Xmpp
 	/// <summary>
 	/// A node in a concentrator.
 	/// </summary>
-	public class SensorNode : XmppNode, ISensor
+	public class SensorNode : ConcentratorNode, ISensor
 	{
 		/// <summary>
 		/// A node in a concentrator.
@@ -60,9 +60,9 @@ namespace Waher.Things.Xmpp
 				INode Loop = await this.GetParent();
 				while (!(Loop is null))
 				{
-					if (Loop is SourceNode SourceNode)
+					if (Loop is ConcentratorSourceNode SourceNode)
 						SID = SourceNode.RemoteSourceID;
-					else if (Loop is PartitionNode PartitionNode)
+					else if (Loop is ConcentratorPartitionNode PartitionNode)
 						PID = PartitionNode.RemotePartitionID;
 					else if (Loop is ConcentratorDevice ConcentratorDevice)
 					{

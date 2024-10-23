@@ -44,16 +44,16 @@ namespace Waher.Things.Xmpp.Commands
 		/// </summary>
 		public override async Task ExecuteCommandAsync()
 		{
-			ConcentratorClient Client = await this.GetClient();
-			string FullJid = this.GetRemoteFullJid(Client);
+			ConcentratorClient Client = await this.GetConcentratorClient();
+			string FullJid = this.GetRemoteFullJid(Client.Client);
 
 			DataSourceReference[] Sources = await Client.GetRootDataSourcesAsync(FullJid);
-			Dictionary<string, SourceNode> BySourceId = new Dictionary<string, SourceNode>();
+			Dictionary<string, ConcentratorSourceNode> BySourceId = new Dictionary<string, ConcentratorSourceNode>();
 			LinkedList<Task> ChildTasks = null;
 
 			foreach (INode Child in await this.Concentrator.ChildNodes)
 			{
-				if (Child is SourceNode SourceNode)
+				if (Child is ConcentratorSourceNode SourceNode)
 					BySourceId[SourceNode.SourceId] = SourceNode;
 			}
 
@@ -62,7 +62,7 @@ namespace Waher.Things.Xmpp.Commands
 				if (BySourceId.ContainsKey(Source.SourceID))
 					continue;
 
-				SourceNode SourceNode = new SourceNode()
+				ConcentratorSourceNode SourceNode = new ConcentratorSourceNode()
 				{
 					NodeId = await MeteringNode.GetUniqueNodeId(Source.SourceID),
 					RemoteSourceID = Source.SourceID

@@ -11,14 +11,14 @@ namespace Waher.Things.Xmpp.Commands
 	/// </summary>
 	public class ScanNode : ConcentratorCommand
 	{
-		private readonly XmppNode node;
+		private readonly ConcentratorNode node;
 
 		/// <summary>
 		/// Scans a node on a concentrator node for its child nodes.
 		/// </summary>
 		/// <param name="Concentrator">Concentrator node.</param>
 		/// <param name="Node">Node.</param>
-		public ScanNode(ConcentratorDevice Concentrator, XmppNode Node)
+		public ScanNode(ConcentratorDevice Concentrator, ConcentratorNode Node)
 			: base(Concentrator, "1")
 		{
 			this.node = Node;
@@ -48,28 +48,48 @@ namespace Waher.Things.Xmpp.Commands
 		/// </summary>
 		public override async Task ExecuteCommandAsync()
 		{
-			ConcentratorClient Client = await this.GetClient();
-			string FullJid = this.GetRemoteFullJid(Client);
+			ConcentratorClient Client = await this.GetConcentratorClient();
+			string FullJid = this.GetRemoteFullJid(Client.Client);
 
 			LinkedList<Task> ChildTasks = null;
+			string RemoteSourceID = string.Empty;
+			string RemotePartition = string.Empty;
+			INode Loop = await this.node.GetParent();
 
-			NodeInformation[] Nodes = await Client.GetChildNodesAsync(FullJid, this.node,
+			while (!(Loop is null))
+			{
+				if (Loop is ConcentratorPartitionNode PartitionNode)
+					RemotePartition = PartitionNode.RemotePartitionID;
+				else if (Loop is ConcentratorSourceNode SourceNode)
+				{
+					RemoteSourceID = SourceNode.RemoteSourceID;
+					break;
+				}
+
+				if (Loop is MeteringNode MeteringNode)
+					Loop = await MeteringNode.GetParent();
+				else
+					Loop = Loop.Parent;
+			}
+
+			NodeInformation[] Nodes = await Client.GetChildNodesAsync(FullJid, 
+				this.node.RemoteNodeID, RemoteSourceID, RemotePartition,
 				false, false, string.Empty, string.Empty, string.Empty, string.Empty);
 
-			Dictionary<string, XmppNode> ByNodeId = new Dictionary<string, XmppNode>();
+			Dictionary<string, ConcentratorNode> ByNodeId = new Dictionary<string, ConcentratorNode>();
 
 			foreach (INode Child in await this.node.ChildNodes)
 			{
-				if (Child is XmppNode Node)
+				if (Child is ConcentratorNode Node)
 					ByNodeId[Node.NodeId] = Node;
 			}
 
 			foreach (NodeInformation Node in Nodes)
 			{
-				if (ByNodeId.ContainsKey(node.NodeId))
+				if (ByNodeId.ContainsKey(Node.NodeId))
 					continue;
 
-				XmppNode NewNode = new XmppNode()
+				ConcentratorNode NewNode = new ConcentratorNode()
 				{
 					NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
 					RemoteNodeID = Node.NodeId

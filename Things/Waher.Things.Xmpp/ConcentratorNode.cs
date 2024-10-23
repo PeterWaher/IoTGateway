@@ -1,37 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
-using Waher.Things.Metering;
 using Waher.Things.Xmpp.Commands;
 
 namespace Waher.Things.Xmpp
 {
 	/// <summary>
-	/// Node representing a data source in an XMPP concentrator.
+	/// Base class for nodes in a remote concentrator.
 	/// </summary>
-	public class SourceNode : ProvisionedMeteringNode
+	[TypeAlias("Waher.Things.Xmpp.XmppNode")]
+	public class ConcentratorNode : XmppDevice
 	{
 		/// <summary>
-		/// Node representing a data source in an XMPP concentrator.
+		/// Base class for nodes in a remote concentrator.
 		/// </summary>
-		public SourceNode()
+		public ConcentratorNode()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Source ID
+		/// Node ID
 		/// </summary>
 		[Page(2, "XMPP", 100)]
-		[Header(5, "Source ID:")]
-		[ToolTip(6, "Source ID in concentrator.")]
-		public string RemoteSourceID { get; set; }
-
-		/// <summary>
-		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
-		/// </summary>
-		public override string LocalId => this.RemoteSourceID;
+		[Header(10, "Node ID:")]
+		[ToolTip(11, "Node ID in data source (and partition).")]
+		public string RemoteNodeID { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -40,7 +36,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ConcentratorDevice), 6, "Source ID");
+			return Language.GetStringAsync(typeof(ConcentratorDevice), 54, "Node");
 		}
 
 		/// <summary>
@@ -50,7 +46,8 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is ConcentratorDevice || Parent is XmppBrokerNode);
+			return Task.FromResult(Parent is ConcentratorDevice || Parent is ConcentratorSourceNode || Parent is ConcentratorPartitionNode ||
+				Parent is XmppBrokerNode);
 		}
 
 		/// <summary>
@@ -60,7 +57,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is PartitionNode || Child is XmppNode);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -75,7 +72,7 @@ namespace Waher.Things.Xmpp
 
 			ConcentratorDevice Concentrator = await this.GetAncestor<ConcentratorDevice>();
 			if (!(Concentrator is null))
-				Result.Add(new ScanSource(Concentrator, this));
+				Result.Add(new ScanNode(Concentrator, this));
 
 			return Result.ToArray();
 		}

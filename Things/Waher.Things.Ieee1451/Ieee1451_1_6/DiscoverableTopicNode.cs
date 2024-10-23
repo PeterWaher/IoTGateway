@@ -117,7 +117,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			List<ICommand> Commands = new List<ICommand>();
 			Commands.AddRange(await base.Commands);
 
-			Commands.Add(new DiscoverNcapsTopic(this.Broker, this));
+			Commands.Add(new DiscoverNcapsTopic(await this.GetBroker(), this));
 
 			return Commands.ToArray();
 		}

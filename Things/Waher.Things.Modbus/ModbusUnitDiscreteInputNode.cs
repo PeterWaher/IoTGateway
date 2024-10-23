@@ -74,14 +74,14 @@ namespace Waher.Things.Modbus
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public async Task StartReadout(ISensorReadout Request)
 		{
-			ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+			ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 			await Client.Enter();
 			try
 			{
-				BitArray Values = await Client.ReadInputDiscretes((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+				BitArray Values = await Client.ReadInputDiscretes((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr, 1);
 				DateTime TP = DateTime.UtcNow;
 
-				ThingReference This = this.ReportAs;
+				ThingReference This = await this.GetReportAs();
 
 				Request.ReportFields(true,
 					new BooleanField(This, TP, this.GetFieldName(), Values[0], FieldType.Momentary, FieldQoS.AutomaticReadout));

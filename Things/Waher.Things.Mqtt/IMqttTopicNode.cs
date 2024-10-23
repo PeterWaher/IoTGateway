@@ -16,9 +16,9 @@ namespace Waher.Things.Mqtt
 		string LocalTopic { get; }
 
 		/// <summary>
-		/// Full topic string.
+		/// Gets the full topic string.
 		/// </summary>
-		string FullTopic { get; }
+		Task<string> GetFullTopic();
 
 		/// <summary>
 		/// Creates a new node of the same type.

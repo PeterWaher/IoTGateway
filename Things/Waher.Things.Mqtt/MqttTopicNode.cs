@@ -46,46 +46,40 @@ namespace Waher.Things.Mqtt
 		public override string LocalId => this.localTopic;
 
 		/// <summary>
-		/// Full topic string.
+		/// Gets the full topic string.
 		/// </summary>
-		[IgnoreMember]
-		public string FullTopic
+		public async Task<string> GetFullTopic()
 		{
-			get
+			string Result = this.localTopic;
+
+			IMqttTopicNode Loop = await this.GetParent() as IMqttTopicNode;
+			while (!(Loop is null))
 			{
-				string Result = this.localTopic;
-
-				IMqttTopicNode Loop = this.Parent as IMqttTopicNode;
-				while (!(Loop is null))
-				{
-					Result = Loop.LocalTopic + "/" + Result;
-					Loop = Loop.Parent as IMqttTopicNode;
-				}
-
-				return Result;
+				Result = Loop.LocalTopic + "/" + Result;
+				Loop = await Loop.GetParent() as IMqttTopicNode;
 			}
+
+			return Result;
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		[IgnoreMember]
-		public MqttBrokerNode Broker
+		public async Task<MqttBrokerNode> GetBroker()
 		{
-			get
+			INode Parent = await this.GetParent();
+
+			while (!(Parent is null))
 			{
-				INode Parent = this.Parent;
-
-				while (!(Parent is null))
-				{
-					if (Parent is MqttBrokerNode Broker)
-						return Broker;
-
+				if (Parent is MqttBrokerNode Broker)
+					return Broker;
+				else if (Parent is MeteringNode MeteringNode)
+					Parent = await MeteringNode.GetParent();
+				else
 					Parent = Parent.Parent;
-				}
-
-				return null;
 			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -117,11 +111,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public async Task<MqttTopic> GetTopic()
 		{
-			MqttBroker Broker = this.Broker?.GetBroker();
+			MqttBroker Broker = (await this.GetBroker())?.GetBroker();
 			if (Broker is null)
 				return null;
 			else
-				return await Broker.GetTopic(this.FullTopic, false, false);
+				return await Broker.GetTopic(await this.GetFullTopic(), false, false);
 		}
 
 		/// <summary>

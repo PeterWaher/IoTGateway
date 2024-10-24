@@ -204,21 +204,17 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (this.unsubscribed)
 				return;
 
-			if (!(State is bool FirstSubscription))
+			if (!(State is bool))
 				return;
 
 			XmppConcentrator Concentrator = this.Concentrator;
-			if (Concentrator is null)
-				return;
+			XmppAccountNode XmppAccountNode = Concentrator?.XmppAccountNode;
+			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
 
-			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
-			if (XmppAccountNode is null)
+			if (Concentrator is null || XmppAccountNode is null || ConcentratorClient is null)
 				return;
 
 			string FullJid = Concentrator.FullJid;
-			ConcentratorClient ConcentratorClient = XmppAccountNode?.ConcentratorClient;
-			if (ConcentratorClient is null)
-				return;
 
 			if (this.timer > DateTime.MinValue)
 			{
@@ -230,9 +226,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				string.Empty, string.Empty, string.Empty, (sender, e) =>
 				{
 					if (e.Ok)
-						this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(5), this.SubscribeToEvents, null);
+						this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(5), this.SubscribeToEvents, false);
 					else
-						this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.SubscribeToEvents, null);
+						this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.SubscribeToEvents, false);
 
 					return Task.CompletedTask;
 				}, null);

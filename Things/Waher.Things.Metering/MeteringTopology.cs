@@ -126,7 +126,7 @@ namespace Waher.Things.Metering
 		/// <returns>Node, if found, null otherwise.</returns>
 		public static async Task<MeteringNode> GetNode(IThingReference NodeRef)
 		{
-			if (NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
+			if (NodeRef is null || NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;
 
 			lock (nodes)

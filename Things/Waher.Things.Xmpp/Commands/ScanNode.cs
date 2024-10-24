@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Runtime.Language;
 using Waher.Things.Metering;
@@ -46,68 +48,84 @@ namespace Waher.Things.Xmpp.Commands
 		/// <summary>
 		/// Executes the command.
 		/// </summary>
-		public override async Task ExecuteCommandAsync()
+		public override Task ExecuteCommandAsync()
 		{
-			ConcentratorClient Client = await this.GetConcentratorClient();
-			string FullJid = this.GetRemoteFullJid(Client.Client);
+			this.StartSearch();
+			return Task.CompletedTask;
+		}
 
-			LinkedList<Task> ChildTasks = null;
-			string RemoteSourceID = string.Empty;
-			string RemotePartition = string.Empty;
-			INode Loop = await this.node.GetParent();
-
-			while (!(Loop is null))
+		private async void StartSearch()
+		{
+			try
 			{
-				if (Loop is ConcentratorPartitionNode PartitionNode)
-					RemotePartition = PartitionNode.RemotePartitionID;
-				else if (Loop is ConcentratorSourceNode SourceNode)
+				ConcentratorClient Client = await this.GetConcentratorClient();
+				string FullJid = this.GetRemoteFullJid(Client.Client);
+
+				string RemoteSourceID = string.Empty;
+				string RemotePartition = string.Empty;
+				INode Loop = await this.node.GetParent();
+
+				while (!(Loop is null))
 				{
-					RemoteSourceID = SourceNode.RemoteSourceID;
-					break;
+					if (Loop is ConcentratorPartitionNode PartitionNode)
+						RemotePartition = PartitionNode.RemotePartitionID;
+					else if (Loop is ConcentratorSourceNode SourceNode)
+					{
+						RemoteSourceID = SourceNode.RemoteSourceID;
+						break;
+					}
+
+					if (Loop is MeteringNode MeteringNode)
+						Loop = await MeteringNode.GetParent();
+					else
+						Loop = Loop.Parent;
 				}
 
-				if (Loop is MeteringNode MeteringNode)
-					Loop = await MeteringNode.GetParent();
-				else
-					Loop = Loop.Parent;
-			}
+				NodeInformation[] Nodes = await Client.GetChildNodesAsync(FullJid,
+					this.node.RemoteNodeID, RemoteSourceID, RemotePartition,
+					false, false, string.Empty, string.Empty, string.Empty, string.Empty);
 
-			NodeInformation[] Nodes = await Client.GetChildNodesAsync(FullJid, 
-				this.node.RemoteNodeID, RemoteSourceID, RemotePartition,
-				false, false, string.Empty, string.Empty, string.Empty, string.Empty);
+				Dictionary<string, ConcentratorNode> ByNodeId = new Dictionary<string, ConcentratorNode>();
 
-			Dictionary<string, ConcentratorNode> ByNodeId = new Dictionary<string, ConcentratorNode>();
-
-			foreach (INode Child in await this.node.ChildNodes)
-			{
-				if (Child is ConcentratorNode Node)
-					ByNodeId[Node.NodeId] = Node;
-			}
-
-			foreach (NodeInformation Node in Nodes)
-			{
-				if (ByNodeId.ContainsKey(Node.NodeId))
-					continue;
-
-				ConcentratorNode NewNode = new ConcentratorNode()
+				foreach (INode Child in await this.node.ChildNodes)
 				{
-					NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
-					RemoteNodeID = Node.NodeId
-				};
+					if (Child is ConcentratorNode Node)
+						ByNodeId[Node.RemoteNodeID] = Node;
+				}
 
-				await this.node.AddAsync(NewNode);
+				LinkedList<ScanNode> NewScans = null;
 
-				ByNodeId[Node.NodeId] = NewNode;
+				foreach (NodeInformation Node in Nodes)
+				{
+					if (ByNodeId.ContainsKey(Node.NodeId))
+						continue;
 
-				if (ChildTasks is null)
-					ChildTasks = new LinkedList<Task>();
+					ConcentratorNode NewNode = new ConcentratorNode()
+					{
+						NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
+						RemoteNodeID = Node.NodeId
+					};
 
-				ScanNode ScanNode = new ScanNode(this.Concentrator, NewNode);
-				ChildTasks.AddLast(ScanNode.ExecuteCommandAsync());
+					await this.node.AddAsync(NewNode);
+
+					ByNodeId[Node.NodeId] = NewNode;
+
+					if (NewScans is null)
+						NewScans = new LinkedList<ScanNode>();
+
+					NewScans.AddLast(new ScanNode(this.Concentrator, NewNode));
+				}
+
+				if (!(NewScans is null))
+				{
+					foreach (ScanNode ScanNode in NewScans)
+						await ScanNode.ExecuteCommandAsync();
+				}
 			}
-
-			if (!(ChildTasks is null))
-				await Task.WhenAll(ChildTasks);
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		/// <summary>

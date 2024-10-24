@@ -29,6 +29,11 @@ namespace Waher.Things.Xmpp
 		public string RemotePartitionID { get; set; }
 
 		/// <summary>
+		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
+		/// </summary>
+		public override string LocalId => this.RemotePartitionID;
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>

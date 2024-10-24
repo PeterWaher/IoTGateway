@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Runtime.Language;
 using Waher.Things.Metering;
@@ -42,45 +44,61 @@ namespace Waher.Things.Xmpp.Commands
 		/// <summary>
 		/// Executes the command.
 		/// </summary>
-		public override async Task ExecuteCommandAsync()
+		public override Task ExecuteCommandAsync()
 		{
-			ConcentratorClient Client = await this.GetConcentratorClient();
-			string FullJid = this.GetRemoteFullJid(Client.Client);
+			this.StartSearch();
+			return Task.CompletedTask;
+		}
 
-			DataSourceReference[] Sources = await Client.GetRootDataSourcesAsync(FullJid);
-			Dictionary<string, ConcentratorSourceNode> BySourceId = new Dictionary<string, ConcentratorSourceNode>();
-			LinkedList<Task> ChildTasks = null;
-
-			foreach (INode Child in await this.Concentrator.ChildNodes)
+		private async void StartSearch()
+		{
+			try
 			{
-				if (Child is ConcentratorSourceNode SourceNode)
-					BySourceId[SourceNode.SourceId] = SourceNode;
-			}
+				ConcentratorClient Client = await this.GetConcentratorClient();
+				string FullJid = this.GetRemoteFullJid(Client.Client);
 
-			foreach (DataSourceReference Source in Sources)
-			{
-				if (BySourceId.ContainsKey(Source.SourceID))
-					continue;
+				DataSourceReference[] Sources = await Client.GetRootDataSourcesAsync(FullJid);
+				Dictionary<string, ConcentratorSourceNode> BySourceId = new Dictionary<string, ConcentratorSourceNode>();
 
-				ConcentratorSourceNode SourceNode = new ConcentratorSourceNode()
+				foreach (INode Child in await this.Concentrator.ChildNodes)
 				{
-					NodeId = await MeteringNode.GetUniqueNodeId(Source.SourceID),
-					RemoteSourceID = Source.SourceID
-				};
+					if (Child is ConcentratorSourceNode SourceNode)
+						BySourceId[SourceNode.RemoteSourceID] = SourceNode;
+				}
 
-				await this.Concentrator.AddAsync(SourceNode);
+				LinkedList<ScanSource> NewScans = null;
 
-				BySourceId[Source.SourceID] = SourceNode;
+				foreach (DataSourceReference Source in Sources)
+				{
+					if (BySourceId.ContainsKey(Source.SourceID))
+						continue;
 
-				if (ChildTasks is null)
-					ChildTasks = new LinkedList<Task>();
+					ConcentratorSourceNode SourceNode = new ConcentratorSourceNode()
+					{
+						NodeId = await MeteringNode.GetUniqueNodeId(Source.SourceID),
+						RemoteSourceID = Source.SourceID
+					};
 
-				ScanSource ScanSource = new ScanSource(this.Concentrator, SourceNode);
-				ChildTasks.AddLast(ScanSource.ExecuteCommandAsync());
+					await this.Concentrator.AddAsync(SourceNode);
+
+					BySourceId[Source.SourceID] = SourceNode;
+
+					if (NewScans is null)
+						NewScans = new LinkedList<ScanSource>();
+
+					NewScans.AddLast(new ScanSource(this.Concentrator, SourceNode));
+				}
+
+				if (!(NewScans is null))
+				{
+					foreach (ScanSource ScanSource in NewScans)
+						await ScanSource.ExecuteCommandAsync();
+				}
 			}
-
-			if (!(ChildTasks is null))
-				await Task.WhenAll(ChildTasks);
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		/// <summary>

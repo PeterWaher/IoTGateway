@@ -157,10 +157,13 @@ namespace Waher.Things.Xmpp.Commands
 
 				ByNodeId[Node.NodeId] = NewNode;
 
-				if (NewScans is null)
-					NewScans = new LinkedList<ScanNode>();
+				if (this.sourceNode.SourceId == MeteringTopology.SourceID)
+				{
+					if (NewScans is null)
+						NewScans = new LinkedList<ScanNode>();
 
-				NewScans.AddLast(new ScanNode(this.Concentrator, NewNode));
+					NewScans.AddLast(new ScanNode(this.Concentrator, NewNode));
+				}
 			}
 
 			if (!(NewScans is null))

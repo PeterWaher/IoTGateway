@@ -100,11 +100,24 @@ namespace Waher.Things.Xmpp.Commands
 					if (ByNodeId.ContainsKey(Node.NodeId))
 						continue;
 
-					ConcentratorNode NewNode = new ConcentratorNode()
+					ConcentratorNode NewNode;
+
+					if (Node.IsReadable)
 					{
-						NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
-						RemoteNodeID = Node.NodeId
-					};
+						NewNode = new SensorNode()
+						{
+							NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
+							RemoteNodeID = Node.NodeId
+						};
+					}
+					else
+					{
+						NewNode = new ConcentratorNode()
+						{
+							NodeId = await MeteringNode.GetUniqueNodeId(Node.NodeId),
+							RemoteNodeID = Node.NodeId
+						};
+					}
 
 					await this.node.AddAsync(NewNode);
 

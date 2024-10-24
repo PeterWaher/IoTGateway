@@ -169,6 +169,12 @@ function CreateHTML(Args)
 		"abbr",
 		"</abbr>",
 		".",
+		"</p>\r\n",
+		"<p>",
+		"<abbr data-title=\"Hi\">",
+		"Hello",
+		"</abbr>",
+		", how are you?",
 		"</p>\r\n"];
 	return Segments.join("");
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -37,7 +36,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		private string message;
 		private object formattedMessage;
 		private StringBuilder building = null;
-		private Timer timer = null;
+		private DateTime timer = DateTime.MinValue;
 
 		/// <summary>
 		/// Represents one item in a chat output.
@@ -110,18 +109,24 @@ namespace Waher.Client.WPF.Controls.Chat
 			if (!Message.EndsWith("\n"))
 				this.building.Append(Environment.NewLine);
 
-			this.timer?.Dispose();
-			this.timer = null;
+			if (this.timer > DateTime.MinValue)
+			{
+				MainWindow.Scheduler?.Remove(this.timer);
+				this.timer = DateTime.MinValue;
+			}
 
-			this.timer = new Timer(this.Refresh, new object[] { ChatListView, MainWindow }, 1000, Timeout.Infinite);
+			this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddSeconds(1), this.Refresh, new object[] { ChatListView, MainWindow });
 		}
 
 		private async void Refresh(object P)
 		{
 			try
 			{
-				this.timer?.Dispose();
-				this.timer = null;
+				if (this.timer > DateTime.MinValue)
+				{
+					WPF.MainWindow.Scheduler?.Remove(this.timer);
+					this.timer = DateTime.MinValue;
+				}
 
 				object[] P2 = (object[])P;
 				ListView ChatListView = (ListView)P2[0];

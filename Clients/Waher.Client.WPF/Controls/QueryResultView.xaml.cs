@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -14,8 +16,6 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
-using Microsoft.Win32;
-using SkiaSharp;
 using Waher.Client.WPF.Controls.Report;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Content.Markdown;
@@ -49,7 +49,7 @@ namespace Waher.Client.WPF.Controls
 			this.query = Query;
 			this.headerLabel = HeaderLabel;
 		
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public static async Task<QueryResultView> CreateAsync(Node Node, NodeQuery Query, TextBlock HeaderLabel)

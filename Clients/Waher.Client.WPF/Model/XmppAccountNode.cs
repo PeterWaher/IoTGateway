@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -81,7 +80,7 @@ namespace Waher.Client.WPF.Model
 		private XmppEventReceptor eventReceptor;
 		private Socks5Proxy socks5Proxy = null;
 		//private XmppServerlessMessaging p2pNetwork;
-		private Timer connectionTimer;
+		private DateTime connectionTimer = DateTime.MinValue;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
 		private string host;
@@ -209,7 +208,7 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemAdded += this.Client_OnRosterItemUpdated;
 			this.client.OnRosterItemRemoved += this.Client_OnRosterItemRemoved;
 			this.client.OnRosterItemUpdated += this.Client_OnRosterItemUpdated;
-			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
+			this.connectionTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckConnection, null);
 			this.client.OnNormalMessage += this.Client_OnNormalMessage;
 			this.client.OnErrorMessage += this.Client_OnErrorMessage;
 
@@ -437,8 +436,11 @@ namespace Waher.Client.WPF.Model
 		{
 			base.Dispose();
 
-			this.connectionTimer?.Dispose();
-			this.connectionTimer = null;
+			if (this.connectionTimer > DateTime.MinValue)
+			{
+				MainWindow.Scheduler?.Remove(this.connectionTimer);
+				this.connectionTimer = DateTime.MinValue;
+			}
 
 			this.rdpClient?.Dispose();
 			this.rdpClient = null;
@@ -479,6 +481,8 @@ namespace Waher.Client.WPF.Model
 
 		private void CheckConnection(object P)
 		{
+			this.connectionTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckConnection, null);
+
 			if (!(this.client is null) && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
 			{
 				try

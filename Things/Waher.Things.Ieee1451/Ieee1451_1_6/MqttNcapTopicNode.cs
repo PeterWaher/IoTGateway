@@ -6,6 +6,7 @@ using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
@@ -152,7 +153,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is MqttTopicNode);
+			return Task.FromResult(Parent is DiscoverableTopicNode);
 		}
 
 		/// <summary>
@@ -228,31 +229,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 				return false;
 			}
-		}
-
-		/// <summary>
-		/// A request for transducer data has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		/// <param name="SamplingMode">Sampling mode.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TransducerDataRequest(Ieee1451_0.Messages.Message Message,
-			SamplingMode SamplingMode, double TimeoutSeconds)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		/// <summary>
-		/// A request for TEDS data has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		/// <param name="TedsAccessCode">TEDS access code.</param>
-		/// <param name="TedsOffset">TEDS offset.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TedsRequest(Ieee1451_0.Messages.Message Message,
-			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
-		{
-			return Task.CompletedTask;  // TODO
 		}
 
 		/// <summary>

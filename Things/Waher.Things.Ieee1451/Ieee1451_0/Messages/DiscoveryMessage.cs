@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System;
 using Waher.Things.Metering;
-using Waher.Script.Functions.Strings;
+using Waher.Things.Ieee1451.Ieee1451_1_6;
+using System.Text;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -89,6 +90,39 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.Write(TimId, 0, 16); // TIM ID
 
 				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Command, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes an NCAP discovery response.
+		/// </summary>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="ErrorCode">Error code.</param>
+		/// <param name="Name">Name of NCAP</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
+			string Name)
+		{
+			if (NcapId is null || NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.WriteByte((byte)(ErrorCode >> 8));
+				ms.WriteByte((byte)ErrorCode);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+
+				byte[] Bin = Encoding.UTF8.GetBytes(Name);
+				ms.Write(Bin, 0, Bin.Length);
+				ms.WriteByte(0);
+				ms.WriteByte(1);    // IPv4
+				ms.WriteByte(127);
+				ms.WriteByte(0);
+				ms.WriteByte(0);
+				ms.WriteByte(1);
+
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Reply, ms.ToArray());
 			}
 		}
 

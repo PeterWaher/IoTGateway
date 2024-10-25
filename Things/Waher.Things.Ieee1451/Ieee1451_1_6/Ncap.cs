@@ -7,6 +7,7 @@ using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Metering;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
@@ -298,10 +299,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
-					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
+					if (!(SubTopic?.Node is ProxyMqttNcapTopicNode ProxyNcapTopicNode))
 						return;
 
-					await NcapTopicNode.TransducerDataRequest(Message, SamplingMode, TimeoutSeconds);
+					await ProxyNcapTopicNode.TransducerDataRequest(TransducerAccessMessage, SamplingMode, TimeoutSeconds);
 				}
 				else
 				{
@@ -337,10 +338,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
-					if (!(SubTopic?.Node is MqttNcapTopicNode NcapTopicNode))
+					if (!(SubTopic?.Node is ProxyMqttNcapTopicNode ProxyNcapTopicNode))
 						return;
 
-					await NcapTopicNode.TedsRequest(Message, TedsAccessCode, TedsOffset, TimeoutSeconds);
+					await ProxyNcapTopicNode.TedsRequest(TedsAccessMessage, TedsAccessCode, TedsOffset, TimeoutSeconds);
 				}
 				else
 				{
@@ -348,8 +349,83 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					return;
 				}
 			}
-			else
-				return;
+			else if (Message is DiscoveryMessage DiscoveryMessage)
+			{
+				if (DiscoveryMessage.TryParseMessage(out ushort _, out DiscoveryData Data))
+				{
+					await RemoveErrorAsync(This, "DiscoveryRequestError");
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(This.Topic.FullTopic);
+					if (!MessageSwitch.IsZero(Data.Channel.TimId))
+					{
+						sb.Append('/');
+						sb.Append(Hashes.BinaryToString(Data.Channel.NcapId));
+
+						if (!MessageSwitch.IsZero(Data.Channel.TimId))
+						{
+							sb.Append('/');
+							sb.Append(Hashes.BinaryToString(Data.Channel.TimId));
+
+							if (Data.Channel.ChannelId != 0)
+							{
+								sb.Append('/');
+								sb.Append(Data.Channel.ChannelId.ToString());
+							}
+						}
+					}
+
+					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+					if (SubTopic?.Node is MeteringNode Node)
+					{
+						bool Broadcast = SubTopic.LocalTopic == "D0" &&
+							await Node.GetParent() is RootTopic;
+
+						LinkedList<INode> ToProcess = new LinkedList<INode>();
+						IEnumerable<INode> ChildNodes = await Node.ChildNodes;
+						if (!(ChildNodes is null))
+						{
+							foreach (INode ChildNode in ChildNodes)
+								ToProcess.AddLast(ChildNode);
+						}
+
+						while (!(ToProcess.First is null))
+						{
+							INode ChildNode = ToProcess.First.Value;
+							ToProcess.RemoveFirst();
+
+							bool CheckChildren;
+
+							if (ChildNode is ProxyMqttNcapTopicNode ProxyNcapTopicNode)
+							{
+								await ProxyNcapTopicNode.DiscoveryRequest(DiscoveryMessage, Data);
+								CheckChildren = Broadcast;
+							}
+							else if (ChildNode is DiscoverableTopicNode)
+								CheckChildren = Broadcast;
+							else
+								CheckChildren = false;
+
+							if (CheckChildren)
+							{
+								ChildNodes = await ChildNode.ChildNodes;
+								if (!(ChildNodes is null))
+								{
+									foreach (INode ChildNode2 in ChildNodes)
+										ToProcess.AddLast(ChildNode2);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					await LogErrorAsync(This, "DiscoveryRequestError", "Unable to parse TEDS request.");
+					return;
+				}
+			}
 		}
 
 		private static Task LogErrorAsync(MqttData This, string EventId, string Message)

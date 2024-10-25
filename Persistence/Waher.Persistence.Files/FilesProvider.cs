@@ -2862,13 +2862,16 @@ namespace Waher.Persistence.Files
 			Output.FlushBits();
 			byte[] Bin = Output.GetSerialization();
 
-			Serializer = await this.GetObjectSerializerEx(typeof(GenericObject));
+			ObjectSerializer Deserializer = await this.GetObjectSerializerEx(typeof(GenericObject));
 
 			BinaryDeserializer Input = new BinaryDeserializer(CollectionName, Encoding.UTF8, Bin, 0);
-			object Result = await Serializer.Deserialize(Input, null, false);
+			object Result = await Deserializer.Deserialize(Input, null, false);
 
 			if (Result is GenericObject GenObj2)
+			{
+				GenObj2.ArchivingTime = Serializer.GetArchivingTimeDays(Object);
 				return GenObj2;
+			}
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
 		}

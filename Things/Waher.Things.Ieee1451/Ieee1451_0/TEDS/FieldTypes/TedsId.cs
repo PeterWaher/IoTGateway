@@ -21,6 +21,39 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		}
 
 		/// <summary>
+		/// TEDS identification header (§6.3)
+		/// </summary>
+		/// <param name="FamilyMember">This field identifies the member of the IEEE 1451 family of standards 
+		/// that defines this TEDS.See Table 13 for examples.</param>
+		/// <param name="FamilySubMember">his field identifies the submember of the IEEE 1451 family of standards 
+		/// that defines this TEDS.Value 255 (0xFF) shall be reserved to an empty 
+		/// submember.See Table 13 for examples.</param>
+		/// <param name="Class">TEDS class</param>
+		/// <param name="Version">This field identifies the TEDS version. The value is the version number 
+		/// identified in the standard.A value of zero in this field indicates that the 
+		/// TEDS do not conform to any released standard. Table 12 lists the allowable 
+		/// values for this field.</param>
+		/// <param name="TupleLength">his field gives the number of octets in the length field of all tuples in the 
+		/// TEDS except this tuple.
+		/// 
+		/// For most TEDS, the number of octets in the length field of the tuples is one, 
+		/// meaning that there are 255 or less octets in the value field.However, some cases 
+		/// may require more than 8 bits for the number of octets in the value field, so 
+		/// this field specifies the number of octets in the length field of a tuple. All 
+		/// tuples within a TEDS, except the TEDS Identifier, shall have the same number of 
+		/// octets in the length field.</param>
+		public TedsId(byte FamilyMember, byte FamilySubMember, byte Class, byte Version,
+			byte TupleLength)
+			: base(Class, 3, new byte[] { FamilyMember, FamilySubMember, Class, Version, TupleLength })
+		{
+			this.FamilyMember = FamilyMember;
+			this.FamilySubMember = FamilySubMember;
+			this.Class = Class;
+			this.Version = Version;
+			this.TupleLength = TupleLength;
+		}
+
+		/// <summary>
 		/// This field identifies the member of the IEEE 1451 family of standards 
 		/// that defines this TEDS.See Table 13 for examples.
 		/// </summary>

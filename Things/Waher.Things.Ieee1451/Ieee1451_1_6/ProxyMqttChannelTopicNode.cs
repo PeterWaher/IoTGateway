@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.MQTT;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds;
+using Waher.Things.Metering;
 using Waher.Things.Mqtt;
+using Waher.Things.Mqtt.Model;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -166,6 +174,77 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
+		/// Starts the readout of the sensor.
+		/// </summary>
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public override async Task StartReadout(ISensorReadout Request, bool DoneAfter)
+		{
+			try
+			{
+				await base.StartReadout(Request, false);
+
+				Field[] Fields = await this.ReadSensor(Request.Actor);
+				Request.ReportFields(DoneAfter, Fields);
+			}
+			catch (Exception ex)
+			{
+				Request.ReportErrors(DoneAfter, new ThingError(this, ex.Message));
+			}
+		}
+
+		/// <summary>
+		/// Reads the transducer value.
+		/// </summary>
+		/// <returns>Fields read</returns>
+		/// <exception cref="Exception">If proxy node is not found, is not a sensor, or cannot be read.</exception>
+		public async Task<Field[]> ReadSensor(string Actor)
+		{
+			MeteringNode Node = await MeteringTopology.GetNode(this.proxyNodeId)
+				?? throw new Exception("Node not found in Metering Topology: " + this.proxyNodeId);
+
+			if (!(Node is ISensor Sensor))
+				throw new Exception("Node not a sensor node: " + this.proxyNodeId);
+
+			List<Field> Fields = new List<Field>();
+			List<ThingError> Errors = new List<ThingError>();
+			TaskCompletionSource<bool> Completed = new TaskCompletionSource<bool>();
+			InternalReadoutRequest Readout = new InternalReadoutRequest(Actor,
+				new IThingReference[] { Sensor }, FieldType.Momentary,
+				new string[] { this.proxyFieldName }, DateTime.MinValue, DateTime.MaxValue,
+				(_, e) =>
+				{
+					Fields.AddRange(e.Fields);
+					if (e.Done)
+						Completed.TrySetResult(true);
+
+					return Task.CompletedTask;
+				},
+				(_, e) =>
+				{
+					Errors.AddRange(e.Errors);
+					if (e.Done)
+						Completed.TrySetResult(true);
+
+					return Task.CompletedTask;
+				}, null);
+
+			_ = Task.Delay(this.TimeoutMilliseconds).ContinueWith(
+				(_) => Completed.TrySetException(new TimeoutException()));
+
+			await Completed.Task;
+
+			if (Errors.Count > 0)
+			{
+				foreach (ThingError Error in Errors)
+					throw new Exception(Error.ErrorMessage);
+			}
+
+			return Fields.ToArray();
+		}
+
+		/// <summary>
 		/// A request for transducer data has been received.
 		/// </summary>
 		/// <param name="TransducerAccessMessage">Message</param>
@@ -184,10 +263,48 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="TedsAccessCode">TEDS access code.</param>
 		/// <param name="TedsOffset">TEDS offset.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TedsRequest(TedsAccessMessage TedsAccessMessage,
+		public async Task TedsRequest(TedsAccessMessage TedsAccessMessage,
 			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(await this.GetParent() is ProxyMqttTimTopicNode TimNode))
+				return;
+
+			if (!(await TimNode.GetParent() is ProxyMqttNcapTopicNode NcapNode))
+				return;
+
+			if (!(await NcapNode.GetParent() is DiscoverableTopicNode CommunicationNode))
+				return;
+
+			MqttBrokerNode BrokerNode = await CommunicationNode.GetBroker();
+			if (BrokerNode is null)
+				return;
+
+			MqttBroker Broker = BrokerNode.GetBroker();
+			if (Broker is null)
+				return;
+
+			string Topic = await CommunicationNode.GetFullTopic();
+			if (string.IsNullOrEmpty(Topic))
+				return;
+
+			byte[] Response;
+
+			switch (TedsAccessCode)
+			{
+				case TedsAccessCode.XdcrName:
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
+						this.TimIdBinary, (ushort)this.ChannelId, new TedsId(),
+						new Format(true),
+						new Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds.Content(this.EntityName));
+					break;
+
+				case TedsAccessCode.ChanTEDS:
+				case TedsAccessCode.MetaTEDS:
+				default:
+					return;
+			}
+
+			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}
 
 	}

@@ -20,6 +20,20 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		}
 
 		/// <summary>
+		/// Represents one record in a TEDS
+		/// </summary>
+		/// <param name="Class">This field identifies the TEDS being accessed. 
+		/// The value is the TEDS access code found in Table 72.</param>
+		/// <param name="Type">TEDS Record Type</param>
+		/// <param name="Raw">TEDS Raw Record value</param>
+		public TedsRecord(byte Class, byte Type, byte[] Raw)
+		{
+			this.Class = Class;
+			this.Type = Type;
+			this.RawValue = Raw;
+		}
+
+		/// <summary>
 		/// This field identifies the TEDS being accessed. The value is the TEDS access 
 		/// code found in Table 72.
 		/// </summary>
@@ -31,7 +45,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		public byte Type { get; set; }
 
 		/// <summary>
-		/// TEDS Record value
+		/// TEDS Raw Record value
 		/// </summary>
 		public byte[] RawValue { get; set; }
 

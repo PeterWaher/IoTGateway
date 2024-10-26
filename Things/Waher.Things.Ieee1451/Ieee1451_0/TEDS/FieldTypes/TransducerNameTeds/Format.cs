@@ -20,6 +20,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		}
 
 		/// <summary>
+		/// TEDS Format (§6.11.2.2)
+		/// </summary>
+		/// <param name="Text">If name is in text format.</param>
+		public Format(bool Text)
+			: base(12, 4, new byte[] { Text ? (byte)1 : (byte)0 })
+		{
+		}
+
+		/// <summary>
 		/// If name format is text.
 		/// </summary>
 		public bool Text { get; set; }

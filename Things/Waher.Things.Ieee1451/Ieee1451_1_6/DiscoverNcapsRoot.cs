@@ -2,7 +2,6 @@
 using Waher.Networking.MQTT;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
-using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;

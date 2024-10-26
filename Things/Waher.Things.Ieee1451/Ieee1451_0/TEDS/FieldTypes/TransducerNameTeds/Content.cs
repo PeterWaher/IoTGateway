@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;
@@ -18,6 +17,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// </summary>
 		public Content()
 			: base()
+		{
+		}
+
+		/// <summary>
+		/// TEDS Content (§6.11.2.3)
+		/// </summary>
+		/// <param name="Name">Entity name.</param>
+		public Content(string Name)
+			: base(12, 5, Encoding.UTF8.GetBytes(Name))
 		{
 		}
 

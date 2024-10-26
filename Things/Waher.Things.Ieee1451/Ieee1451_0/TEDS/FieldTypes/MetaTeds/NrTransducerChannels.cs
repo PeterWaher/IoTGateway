@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;

@@ -83,9 +83,9 @@ div.footnotes + p
 
 /* region Header */
 
-header#native-header
+#native-header
 {
-    padding: 1.5em;
+    padding-inline: 1.5em;
     position: fixed;
     float:top;
     top: 0;
@@ -276,11 +276,6 @@ html body fieldset
 @media screen and (min-width: 901px) {
     /* region Header */
 
-    #native-header
-    {
-        padding-bottom: 0;
-    }
-
     #native-header > nav > ul > li > a
     {
         height: 100%;
@@ -320,36 +315,36 @@ html body fieldset
 
     /*#region Dropdown*/
 
-    header li:hover > a 
+    #native-header li:hover > a 
     {
         color: inherit !important;
     }
 
-    header li > ul > li:nth-child(1) {
+    #native-header li > ul > li:nth-child(1) {
         border-top: 1px rgb(209, 209, 209) solid;
     }
 
-    header li > ul > li > a 
+    #native-header li > ul > li > a 
     {
         height: 100%;
     }
 
-
-    header li > ul
+    #native-header li > ul
     {
         margin-inline-start: 0;
     }
-
-    header li > ul > li:hover > ul
+    
+    #native-header li > ul > li:hover > ul
     {
         display: block;
     }
 
-    header li > ul 
+    #native-header li > ul 
     {
         overflow-x: visible;
     }
-    header li > ul > li > ul
+
+    #native-header li > ul > li > ul
     {
         padding: 0px;
         display: none;
@@ -363,20 +358,34 @@ html body fieldset
 }
 
 @media screen and (max-width: 900px) {
-    
     main
     {
         width: 100%;
     }
 
     /* region Header */
-    #native-header {
+
+    body #native-header {
         max-height: 100%;
-        padding-block: 0;
+    }
+    
+    body header#native-header {
+        background-position: initial;
+        background-repeat: initial;
+        background-size: initial;
+        padding-top: 0;
+        padding-bottom: 1.5em;
     }
 
     #native-header > nav {
+        display: flex;
+        flex-direction: column;
         max-height: 100vh;
+        padding-top: 1.5em;
+    }
+    
+    #native-header > nav > ul {
+        flex-shrink: 1;
     }
     
     #native-header[data-visible] > nav > div {
@@ -385,8 +394,7 @@ html body fieldset
     
     #native-header > nav > ul {
         margin-bottom: 1rem;
-        max-height: 90vh;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     header#native-header li > *
@@ -411,9 +419,6 @@ html body fieldset
         display: inline-block;
     }
 
-    #native-header nav {
-        padding: 0;
-    }
 
     #native-header nav > ul {
         flex-direction: column;
@@ -433,13 +438,6 @@ html body fieldset
         border-right: none !important;
     }
 
-    body header#native-header
-    {
-        background-position: initial;
-        background-repeat: initial;
-        background-size: initial;
-    }
-
     body header#native-header > nav ul > li > ul
     {
         display: none;
@@ -451,7 +449,12 @@ html body fieldset
         display: block;
     }
 
-
-
     /* endregion Header */
+
+    img
+    {
+        display: block;
+        margin: auto;
+    }
+
 }

@@ -4,8 +4,9 @@
 
 /* region Header*/
 
-#native-header
+header#native-header
 {
+    padding: 1.5rem;
     background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-position: center;
     background-repeat: no-repeat;

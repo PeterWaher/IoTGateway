@@ -2,10 +2,11 @@
 
 /* region Header */
 
-#native-header
+header#native-header
 {
     background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-repeat: no-repeat;
+    padding: 1.5rem;
 }
 
 #native-header > nav > ul
@@ -14,10 +15,6 @@
 }
 
 /* endregion Header */
-
-html
-{
-}
 
 body
 {
@@ -36,6 +33,10 @@ nav > ul > li
 	color:white;
 }
 
+nav > ul > li:first-child
+{
+    border-left: 0;
+}
 
 nav > ul > li a
 {

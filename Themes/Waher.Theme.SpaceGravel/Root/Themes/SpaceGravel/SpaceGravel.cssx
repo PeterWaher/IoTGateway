@@ -3,6 +3,10 @@
 
 /* region Header*/
 
+header#native-header
+{
+    padding: 1.5rem;
+}
 #native-header nav > ul
 {
     background-color: rgba(0,0,0,0.9);

@@ -6,8 +6,6 @@ using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.Ieee1451.Ieee1451_0;
-using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 
@@ -235,7 +233,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// Name has been received
 		/// </summary>
 		/// <param name="Name">Name</param>
-		public async Task NameReceived(string Name)
+		public virtual async Task NameReceived(string Name)
 		{
 			bool Changed = false;
 

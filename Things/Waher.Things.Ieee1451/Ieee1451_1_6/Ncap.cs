@@ -384,29 +384,33 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 							await Node.GetParent() is RootTopic;
 
 						LinkedList<INode> ToProcess = new LinkedList<INode>();
-						IEnumerable<INode> ChildNodes = await Node.ChildNodes;
-						if (!(ChildNodes is null))
+						IEnumerable<INode> ChildNodes;
+
+						if (Broadcast)
 						{
-							foreach (INode ChildNode in ChildNodes)
-								ToProcess.AddLast(ChildNode);
+							ChildNodes = await Node.ChildNodes;
+							if (!(ChildNodes is null))
+							{
+								foreach (INode ChildNode in ChildNodes)
+									ToProcess.AddLast(ChildNode);
+							}
 						}
+						else
+							ToProcess.AddLast(Node);
 
 						while (!(ToProcess.First is null))
 						{
 							INode ChildNode = ToProcess.First.Value;
 							ToProcess.RemoveFirst();
 
-							bool CheckChildren;
+							bool CheckChildren = Broadcast;
 
 							if (ChildNode is ProxyMqttNcapTopicNode ProxyNcapTopicNode)
-							{
-								await ProxyNcapTopicNode.DiscoveryRequest(DiscoveryMessage, Data);
-								CheckChildren = Broadcast;
-							}
-							else if (ChildNode is DiscoverableTopicNode)
-								CheckChildren = Broadcast;
+								await ProxyNcapTopicNode.DiscoveryRequest(DiscoveryMessage);
+							else if (ChildNode is ProxyMqttTimTopicNode ProxyMqttTimTopicNode)
+								await ProxyMqttTimTopicNode.DiscoveryRequest(DiscoveryMessage);
 							else
-								CheckChildren = false;
+								CheckChildren = ChildNode is DiscoverableTopicNode;
 
 							if (CheckChildren)
 							{

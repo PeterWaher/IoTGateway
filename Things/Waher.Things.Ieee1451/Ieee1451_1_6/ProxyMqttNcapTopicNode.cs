@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
-using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Ieee1451.Ieee1451_0;
+using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
-using Waher.Networking.MQTT;
+using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -83,23 +85,60 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// A request for TEDS data has been received.
 		/// </summary>
 		/// <param name="DiscoveryMessage">Message</param>
-		/// <param name="Data">Discovery data in request.</param>
-		public virtual async Task DiscoveryRequest(DiscoveryMessage DiscoveryMessage, DiscoveryData Data)
+		public async Task DiscoveryRequest(DiscoveryMessage DiscoveryMessage)
 		{
-			if (DiscoveryMessage.DiscoveryService == DiscoveryService.NCAPDiscovery)
+			if (!(await this.GetParent() is DiscoverableTopicNode Parent))
+				return;
+
+			MqttBrokerNode BrokerNode = await Parent.GetBroker();
+			if (BrokerNode is null)
+				return;
+
+			MqttBroker Broker = BrokerNode.GetBroker();
+			if (Broker is null)
+				return;
+
+			string Topic = await Parent.GetFullTopic();
+			if (string.IsNullOrEmpty(Topic))
+				return;
+
+			switch (DiscoveryMessage.DiscoveryService)
 			{
-				if (!(await this.GetParent() is DiscoverableTopicNode Parent))
-					return;
+				case DiscoveryService.NCAPDiscovery:
+					byte[] Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, this.EntityName);
+					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
+					break;
 
-				MqttBrokerNode Broker = await this.GetBroker();
-				if (Broker is null)
-					return;
+				case DiscoveryService.NCAPTIMDiscovery:
+					List<byte[]> TimIds = new List<byte[]>();
+					List<string> Names = new List<string>();
 
-				byte[] Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, this.EntityName);
+					foreach (INode Child in await this.ChildNodes)
+					{
+						if (!(Child is ProxyMqttTimTopicNode TimNode))
+							continue;
 
-				string Topic = await Parent.GetFullTopic();
-				await Broker.GetBroker().Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
+						TimIds.Add(TimNode.TimIdBinary);
+						Names.Add(TimNode.EntityName);
+					}
+
+					if (TimIds.Count == 0)
+						break;
+
+					Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, TimIds.ToArray(), Names.ToArray());
+					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
+					break;
 			}
 		}
+
+		/// <summary>
+		/// Name has been received
+		/// </summary>
+		/// <param name="Name">Name</param>
+		public override Task NameReceived(string Name)
+		{
+			return Task.CompletedTask;	// Name controlled from broker, not from external sources.
+		}
+
 	}
 }

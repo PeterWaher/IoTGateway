@@ -317,6 +317,7 @@ namespace Waher.Things.Test
 		[DataTestMethod]
 		[DataRow(false, false, "010801001000303900303900303907E80549382E50")]    // Source: ubi.pt
 		[DataRow(true, true, "MkEAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9VQkktTkNBUDEABQEIAQAQPqaBLiWpCcHIjEYgAjB7xw==")]
+		[DataRow(true, true, "MkEAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9GUk9NLVhNUFAACAEIAQAQv7fnJXNmvLbUCZ8q9nseCQ==")]
 		public void Test_10_ParseDiscoverNcapRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -349,6 +350,7 @@ namespace Waher.Things.Test
 		[DataTestMethod]
 		[DataRow(false, false, "0108020031000000303900303900303907E80549382E5000303900303900303907E80549382E505542492D4E434150310001728A86D2")]    // Source: ubi.pt
 		[DataRow(true, true, "QAIABTJiAChfMTQ1MS4xLjYvRDAvSU5URVJPUC1JRUNPTjIwMjQvVUJJLU5DQVAxAAoBCAIAMQAAPqaBLiWpCcHIjEYgAjB7xwAwOQAwOQAwOQfoBUk4LlBVQkktTkNBUDEAAXKKhtI=")]
+		[DataRow(true, true, "MmMAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9GUk9NLVhNUFAABwEIAgAyAAB0Nq0uGRNaCCBH91H3sF3bzv2EEKgES+iy7xAoOCtNoFBST1hZLU5DQVAAAX8AAAE=")]
 		public void Test_11_ParseDiscoverNcapResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -386,6 +388,8 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow(false, false, "010901002000303900303900303907E80549382E5000303900303900303907E80549382E50")]    // Source: ubi.pt
+		[DataRow(true, true, "MlEAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9GUk9NLVhNUFAADAEJAQAgv7fnJXNmvLbUCZ8q9nseCc79hBCoBEvosu8QKDgrTaA=")]
+		[DataRow(true, true, "QAIABzJRAChfMTQ1MS4xLjYvRDAvSU5URVJPUC1JRUNPTjIwMjQvRlJPTS1YTVBQAA4BCQEAIL+35yVzZry21AmfKvZ7HgnO/YQQqARL6LLvECg4K02g")]
 		public void Test_12_ParseDiscoverTimRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -418,6 +422,7 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow(false, false, "010902003D000000303900303900303907E80549382E5000303900303900303907E80549382E50000186258A0B72F612D68707E8054911DCF05542492D54494D3100")]    // Source: ubi.pt
+		[DataRow(true, true, "MmYAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9GUk9NLVhNUFAACAEJAgA1AAB0Nq0uGRNaCCBH91H3sF3bzv2EEKgES+iy7xAoOCtNoAABteD1Ns5eSwWnco7D22VvRwA=")]
 		public void Test_13_ParseDiscoverTimResponse(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);
@@ -464,6 +469,8 @@ namespace Waher.Things.Test
 
 		[DataTestMethod]
 		[DataRow(false, false, "010A01003000303900303900303907E80549382E5000303900303900303907E80549382E5000303900303900303907E80549382E50")]    // Source: ubi.pt
+		[DataRow(true, true, "QAIACDJhAChfMTQ1MS4xLjYvRDAvSU5URVJPUC1JRUNPTjIwMjQvRlJPTS1YTVBQABABCgEAML+35yVzZry21AmfKvZ7HgnO/YQQqARL6LLvECg4K02gteD1Ns5eSwWnco7D22VvRw==")]
+		[DataRow(true, true, "MmEAKF8xNDUxLjEuNi9EMC9JTlRFUk9QLUlFQ09OMjAyNC9GUk9NLVhNUFAAJQEKAQAwv7fnJXNmvLbUCZ8q9nseCc79hBCoBEvosu8QKDgrTaC14PU2zl5LBadyjsPbZW9H")]
 		public void Test_14_ParseDiscoverChannelRequest(bool Base64, bool IncludesMqttPackage, string Encoded)
 		{
 			byte[] Bin = Base64 ? Convert.FromBase64String(Encoded) : Hashes.StringToBinary(Encoded);

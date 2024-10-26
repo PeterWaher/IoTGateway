@@ -96,8 +96,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Serializes an NCAP discovery response.
 		/// </summary>
-		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="ErrorCode">Error code.</param>
+		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="Name">Name of NCAP</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
@@ -123,6 +123,112 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.WriteByte(1);
 
 				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Reply, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes a TIM discovery response.
+		/// </summary>
+		/// <param name="ErrorCode">Error code.</param>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimIds">TIM IDs</param>
+		/// <param name="TimNames">Names of TIMs</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
+			byte[][] TimIds, string[] TimNames)
+		{
+			if (NcapId is null || NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			if (TimIds is null || TimIds.Length == 0)
+				throw new ArgumentException("No TIM IDs.", nameof(TimIds));
+
+			int i, c = TimIds.Length;
+			if (TimNames.Length != c)
+				throw new ArgumentException("Invalid number of TIM names.", nameof(TimNames));
+
+			for (i = 0; i < c; i++)
+			{
+				if (TimIds[i] is null || TimIds[i].Length != 16)
+					throw new ArgumentException("Invalid TIM UUID.", nameof(TimIds));
+			}
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.WriteByte((byte)(ErrorCode >> 8));
+				ms.WriteByte((byte)ErrorCode);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+
+				ms.WriteByte((byte)(c >> 8));
+				ms.WriteByte((byte)c);
+
+				for (i = 0; i < c; i++)
+					ms.Write(TimIds[i], 0, 16); // TIM ID
+
+				for (i = 0; i < c; i++)
+				{
+					byte[] Bin = Encoding.UTF8.GetBytes(TimNames[i]);
+					ms.Write(Bin, 0, Bin.Length);
+					ms.WriteByte(0);
+				}
+
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Reply, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes a Transducer channel discovery response.
+		/// </summary>
+		/// <param name="ErrorCode">Error code.</param>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimId">TIM ID</param>
+		/// <param name="ChannelIds">Transfucer channel IDs</param>
+		/// <param name="ChannelNames">Names of transducer channels</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
+			byte[] TimId, ushort[] ChannelIds, string[] ChannelNames)
+		{
+			if (NcapId is null || NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			if (TimId is null || TimId.Length != 16)
+				throw new ArgumentException("Invalid TIM UUID.", nameof(TimId));
+
+			if (ChannelIds is null || ChannelIds.Length == 0)
+				throw new ArgumentException("No Transducer channel IDs.", nameof(ChannelIds));
+
+			int i, c = ChannelIds.Length;
+			if (ChannelNames.Length != c)
+				throw new ArgumentException("Invalid number of Transducer channel names.", nameof(ChannelNames));
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.WriteByte((byte)(ErrorCode >> 8));
+				ms.WriteByte((byte)ErrorCode);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+				ms.Write(TimId, 0, 16); // TIM ID
+
+				ms.WriteByte((byte)(c >> 8));
+				ms.WriteByte((byte)c);
+
+				for (i = 0; i < c; i++)
+				{
+					ushort ChannelId = ChannelIds[i];
+
+					ms.WriteByte((byte)(ChannelId >> 8));
+					ms.WriteByte((byte)ChannelId);
+				}
+
+				for (i = 0; i < c; i++)
+				{
+					byte[] Bin = Encoding.UTF8.GetBytes(ChannelNames[i]);
+					ms.Write(Bin, 0, Bin.Length);
+					ms.WriteByte(0);
+				}
+
+				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Reply, ms.ToArray());
 			}
 		}
 

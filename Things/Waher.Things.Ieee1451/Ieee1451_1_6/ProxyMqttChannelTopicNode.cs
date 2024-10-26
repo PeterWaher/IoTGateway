@@ -5,6 +5,8 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Ieee1451.Ieee1451_0;
+using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
@@ -12,7 +14,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// <summary>
 	/// Topic node representing a proxy for an IEEE 1451.0 Channel.
 	/// </summary>
-	public class ProxyMqttChannelTopicNode : MqttChannelTopicNode
+	public class ProxyMqttChannelTopicNode : MqttChannelTopicNode, ITransducerNode, ITedsNode
 	{
 		private string proxyNodeId;
 		private string proxyFieldName;
@@ -161,6 +163,31 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				TimId = Topic.Segments[Topic.SegmentIndex - 1],
 				NcapId = Topic.Segments[Topic.SegmentIndex - 2]
 			};
+		}
+
+		/// <summary>
+		/// A request for transducer data has been received.
+		/// </summary>
+		/// <param name="TransducerAccessMessage">Message</param>
+		/// <param name="SamplingMode">Sampling mode.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TransducerDataRequest(TransducerAccessMessage TransducerAccessMessage,
+			SamplingMode SamplingMode, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		/// <summary>
+		/// A request for TEDS data has been received.
+		/// </summary>
+		/// <param name="TedsAccessMessage">Message</param>
+		/// <param name="TedsAccessCode">TEDS access code.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TedsRequest(TedsAccessMessage TedsAccessMessage,
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;  // TODO
 		}
 
 	}

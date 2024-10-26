@@ -13,7 +13,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// <summary>
 	/// Topic node representing an IEEE 1451.0 TIM Proxy.
 	/// </summary>
-	public class ProxyMqttTimTopicNode : MqttTimTopicNode
+	public class ProxyMqttTimTopicNode : MqttTimTopicNode, IDiscoverableNode, ITedsNode
 	{
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 TIM Proxy.
@@ -102,6 +102,19 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 					break;
 			}
+		}
+
+		/// <summary>
+		/// A request for TEDS data has been received.
+		/// </summary>
+		/// <param name="TedsAccessMessage">Message</param>
+		/// <param name="TedsAccessCode">TEDS access code.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TedsRequest(TedsAccessMessage TedsAccessMessage,
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;  // TODO
 		}
 	}
 }

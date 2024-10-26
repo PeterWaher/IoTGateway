@@ -299,10 +299,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
-					if (!(SubTopic?.Node is ProxyMqttNcapTopicNode ProxyNcapTopicNode))
+					if (!(SubTopic?.Node is ITransducerNode TransducerNode))
 						return;
 
-					await ProxyNcapTopicNode.TransducerDataRequest(TransducerAccessMessage, SamplingMode, TimeoutSeconds);
+					await TransducerNode.TransducerDataRequest(TransducerAccessMessage, SamplingMode, TimeoutSeconds);
 				}
 				else
 				{
@@ -338,10 +338,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
 
-					if (!(SubTopic?.Node is ProxyMqttNcapTopicNode ProxyNcapTopicNode))
+					if (!(SubTopic?.Node is ITedsNode TedsNode))
 						return;
 
-					await ProxyNcapTopicNode.TedsRequest(TedsAccessMessage, TedsAccessCode, TedsOffset, TimeoutSeconds);
+					await TedsNode.TedsRequest(TedsAccessMessage, TedsAccessCode, TedsOffset, TimeoutSeconds);
 				}
 				else
 				{
@@ -405,10 +405,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 							bool CheckChildren = Broadcast;
 
-							if (ChildNode is ProxyMqttNcapTopicNode ProxyNcapTopicNode)
-								await ProxyNcapTopicNode.DiscoveryRequest(DiscoveryMessage);
-							else if (ChildNode is ProxyMqttTimTopicNode ProxyMqttTimTopicNode)
-								await ProxyMqttTimTopicNode.DiscoveryRequest(DiscoveryMessage);
+							if (ChildNode is IDiscoverableNode DiscoverableNode)
+								await DiscoverableNode.DiscoveryRequest(DiscoveryMessage);
 							else
 								CheckChildren = ChildNode is DiscoverableTopicNode;
 

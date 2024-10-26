@@ -13,7 +13,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// <summary>
 	/// Topic node representing an IEEE 1451.0 NCAP Proxy.
 	/// </summary>
-	public class ProxyMqttNcapTopicNode : MqttNcapTopicNode
+	public class ProxyMqttNcapTopicNode : MqttNcapTopicNode, IDiscoverableNode, ITedsNode
 	{
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 NCAP Proxy.
@@ -54,31 +54,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
 			return Grade.NotAtAll;
-		}
-
-		/// <summary>
-		/// A request for transducer data has been received.
-		/// </summary>
-		/// <param name="TransducerAccessMessage">Message</param>
-		/// <param name="SamplingMode">Sampling mode.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public virtual Task TransducerDataRequest(TransducerAccessMessage TransducerAccessMessage,
-			SamplingMode SamplingMode, double TimeoutSeconds)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		/// <summary>
-		/// A request for TEDS data has been received.
-		/// </summary>
-		/// <param name="TedsAccessMessage">Message</param>
-		/// <param name="TedsAccessCode">TEDS access code.</param>
-		/// <param name="TedsOffset">TEDS offset.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public virtual Task TedsRequest(TedsAccessMessage TedsAccessMessage,
-			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
-		{
-			return Task.CompletedTask;  // TODO
 		}
 
 		/// <summary>
@@ -138,6 +113,19 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Task NameReceived(string Name)
 		{
 			return Task.CompletedTask;	// Name controlled from broker, not from external sources.
+		}
+
+		/// <summary>
+		/// A request for TEDS data has been received.
+		/// </summary>
+		/// <param name="TedsAccessMessage">Message</param>
+		/// <param name="TedsAccessCode">TEDS access code.</param>
+		/// <param name="TedsOffset">TEDS offset.</param>
+		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		public Task TedsRequest(TedsAccessMessage TedsAccessMessage,
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
+		{
+			return Task.CompletedTask;  // TODO
 		}
 
 	}

@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System;
 using Waher.Things.Metering;
-using Waher.Things.Ieee1451.Ieee1451_1_6;
 using System.Text;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages

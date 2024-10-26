@@ -59,6 +59,7 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\Waher.Things.Ip\Waher.Things.Ip.csproj" />
     <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj" />
+    <ProjectReference Include="..\Waher.Things.Virtual\Waher.Things.Virtual.csproj" />
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>
 

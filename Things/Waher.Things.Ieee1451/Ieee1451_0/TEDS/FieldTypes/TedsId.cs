@@ -141,7 +141,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 			Fields.Add(new StringField(Thing, Timestamp, "Family", sb.ToString(),
 				FieldType.Identity, FieldQoS.AutomaticReadout));
 
-			Fields.Add(new Int32Field(Thing, Timestamp, "Class", this.Class,
+			Fields.Add(new BooleanField(Thing, Timestamp, ((TedsAccessCode)this.Class).ToString(), true,
 				FieldType.Identity, FieldQoS.AutomaticReadout));
 
 			Fields.Add(new Int32Field(Thing, Timestamp, "TEDS Version", this.Version,

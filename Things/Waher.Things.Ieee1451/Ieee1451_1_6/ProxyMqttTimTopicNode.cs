@@ -7,6 +7,9 @@ using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -111,10 +114,60 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="TedsAccessCode">TEDS access code.</param>
 		/// <param name="TedsOffset">TEDS offset.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TedsRequest(TedsAccessMessage TedsAccessMessage,
+		public async Task TedsRequest(TedsAccessMessage TedsAccessMessage,
 			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(await this.GetParent() is ProxyMqttNcapTopicNode NcapNode))
+				return;
+
+			if (!(await NcapNode.GetParent() is DiscoverableTopicNode CommunicationNode))
+				return;
+
+			MqttBrokerNode BrokerNode = await CommunicationNode.GetBroker();
+			if (BrokerNode is null)
+				return;
+
+			MqttBroker Broker = BrokerNode.GetBroker();
+			if (Broker is null)
+				return;
+
+			string Topic = await CommunicationNode.GetFullTopic();
+			if (string.IsNullOrEmpty(Topic))
+				return;
+
+			byte[] Response;
+
+			switch (TedsAccessCode)
+			{
+				case TedsAccessCode.MetaTEDS:
+					int NrTransducerChannels = 0;
+
+					foreach (INode Child in await this.ChildNodes)
+					{
+						if (Child is ProxyMqttChannelTopicNode)
+							NrTransducerChannels++;
+					}
+
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
+						this.TimIdBinary, 0,
+						new TedsId(99, 255, (byte)TedsAccessCode.MetaTEDS, 2, 1),
+						new Uuid(this.TimIdBinary),
+						new NrTransducerChannels(NrTransducerChannels));
+					break;
+
+				case TedsAccessCode.XdcrName:
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
+						this.TimIdBinary, 0,
+						new TedsId(99, 255, (byte)TedsAccessCode.XdcrName, 2, 1),
+						new Format(true),
+						new Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds.Content(this.EntityName));
+					break;
+
+				default:
+					return;
+			}
+
+			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}
 	}
 }

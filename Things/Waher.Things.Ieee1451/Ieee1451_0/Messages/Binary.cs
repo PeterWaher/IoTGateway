@@ -305,11 +305,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <returns>Next Value</returns>
 		public Time NextTime()
 		{
-			return new Time()
-			{
-				Seconds = this.NextUInt48(),
-				NanoSeconds = this.NextUInt32()
-			};
+			return new Time(
+				this.NextUInt48(), 
+				this.NextUInt32());
 		}
 
 		/// <summary>

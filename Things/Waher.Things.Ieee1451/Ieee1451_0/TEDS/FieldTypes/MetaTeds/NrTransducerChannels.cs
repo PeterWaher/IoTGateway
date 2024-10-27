@@ -19,10 +19,26 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
         {
         }
 
-        /// <summary>
-        /// This field contains the number of TransducerChannels implemented in this TIM.
-        /// </summary>
-        public int NrChannels { get; set; }
+		/// <summary>
+		/// TEDS Number of implemented TransducerChannels (§6.4.2.7)
+		/// </summary>
+		public NrTransducerChannels(int NrChannels)
+			: base(1, 13, new byte[] 
+			{
+				(byte)(NrChannels >> 8),
+				(byte)NrChannels
+			})
+		{
+			if (NrChannels < 0 || NrChannels > ushort.MaxValue)
+				throw new ArgumentOutOfRangeException(nameof(NrChannels));
+
+			this.NrChannels = NrChannels;
+		}
+
+		/// <summary>
+		/// This field contains the number of TransducerChannels implemented in this TIM.
+		/// </summary>
+		public int NrChannels { get; set; }
 
 		/// <summary>
 		/// How well the class supports a specific TEDS field type.

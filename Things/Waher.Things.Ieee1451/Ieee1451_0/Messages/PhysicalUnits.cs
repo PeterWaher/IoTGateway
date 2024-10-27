@@ -200,5 +200,88 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			return true;
 		}
+
+		/// <summary>
+		/// Tries to create an IEEE 1451 units object from a script unit.
+		/// </summary>
+		/// <param name="Unit">Script unit.</param>
+		///	<param name="Value">Reference value.</param>
+		/// <param name="Units">IEEE 1451 units object, if successful.</param>
+		/// <returns>If able to convert the unit.</returns>
+		public static bool TryCreate(Unit Unit, ref double Value, out PhysicalUnits Units)
+		{
+			Units = new PhysicalUnits()
+			{
+				Interpretation = Ieee1451_0PhysicalUnitsInterpretation.PUI_SI_UNITS,
+				Radians = 128,
+				Steradians = 128,
+				Meters = 128,
+				Kilograms = 128,
+				Seconds = 128,
+				Amperes = 128,
+				Kelvins = 128,
+				Moles = 128,
+				Candelas = 128
+			};
+
+			if (Unit.HasFactors)
+			{
+				Unit = Unit.ToReferenceUnits(ref Value);
+
+				foreach (KeyValuePair<AtomicUnit, int> P in Unit.Factors)
+				{
+					int Exponent = 128 + (P.Value << 1);
+					if (Exponent < 0 || Exponent > 255)
+						return false;
+
+					byte Exp = (byte)Exponent;
+
+					switch (P.Key.Name)
+					{
+						case "rad":
+							Units.Radians = Exp;
+							break;
+
+						case "sr":
+							Units.Steradians = Exp;
+							break;
+
+						case "m":
+							Units.Meters = Exp;
+							break;
+
+						case "g":
+							Units.Kilograms = Exp;
+							Value *= Math.Pow(1000, -P.Value);
+							break;
+
+						case "s":
+							Units.Seconds = Exp;
+							break;
+
+						case "A":
+							Units.Amperes = Exp;
+							break;
+
+						case "K":
+							Units.Kelvins = Exp;
+							break;
+
+						case "mol":
+							Units.Moles = Exp;
+							break;
+
+						case "cd":
+							Units.Candelas = Exp;
+							break;
+
+						default:
+							return false;
+					}
+				}
+			}
+
+			return true;
+		}
 	}
 }

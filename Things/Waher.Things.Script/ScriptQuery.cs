@@ -160,7 +160,7 @@ namespace Waher.Things.Script
 							else if (!(ColumnVector is ObjectVector))
 								Alignment = ColumnAlignment.Center;
 
-							Columns[Column] = new Column("c" + Column.ToString(), Header, null, null, null, null, Alignment, NrDec);
+							Columns[Column] = new Column("C" + Column.ToString(), Header, null, null, null, null, Alignment, NrDec);
 						}
 
 						await Query.NewTable("ResultSet", await Namespace.GetStringAsync(97, "Result Set"), Columns);

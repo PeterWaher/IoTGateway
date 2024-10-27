@@ -57,53 +57,45 @@
 		/// Parses an Application ID from the message.
 		/// </summary>
 		/// <returns>App ID information.</returns>
-		public ApplicationAddress NextAppId()
-		{
-			return new ApplicationAddress()
-			{
-				ApplicationId = this.NextUuid()
-			};
-		}
+		public ChannelAddress NextAppId() => this.NextChannelId(true, false, false, false);
 
 		/// <summary>
 		/// Parses an NCAP ID from the message.
 		/// </summary>
+		/// <param name="AppId">If App ID should be parsed.</param>
 		/// <returns>NCAP ID information.</returns>
-		public NcapAddress NextNcapId()
-		{
-			return new NcapAddress()
-			{
-				ApplicationId = this.NextUuid(),
-				NcapId = this.NextUuid()
-			};
-		}
+		public ChannelAddress NextNcapId(bool AppId) => this.NextChannelId(AppId, true, false, false);
 
 		/// <summary>
 		/// Parses an TIM ID from the message.
 		/// </summary>
+		/// <param name="AppId">If App ID should be parsed.</param>
 		/// <returns>TIM ID information.</returns>
-		public TimAdress NextTimId()
-		{
-			return new TimAdress()
-			{
-				ApplicationId = this.NextUuid(),
-				NcapId = this.NextUuid(),
-				TimId = this.NextUuid()
-			};
-		}
+		public ChannelAddress NextTimId(bool AppId) => this.NextChannelId(AppId, true, true, false);
 
 		/// <summary>
 		/// Parses a Channel ID from the message.
 		/// </summary>
+		/// <param name="AppId">If App ID should be parsed.</param>
 		/// <returns>Channel ID information.</returns>
-		public ChannelAddress NextChannelId()
+		public ChannelAddress NextChannelId(bool AppId) => this.NextChannelId(AppId, true, true, true);
+
+		/// <summary>
+		/// Parses a Channel ID from the message.
+		/// </summary>
+		/// <param name="AppId">If App ID should be parsed.</param>
+		/// <param name="NcapId">If NCAP ID should be parsed.</param>
+		/// <param name="TimId">If TIM ID should be parsed.</param>
+		/// <param name="Channel">If Channel ID should be parsed.</param>
+		/// <returns>Channel ID information.</returns>
+		public ChannelAddress NextChannelId(bool AppId, bool NcapId, bool TimId, bool Channel)
 		{
 			return new ChannelAddress()
 			{
-				ApplicationId = this.NextUuid(),
-				NcapId = this.NextUuid(),
-				TimId = this.NextUuid(),
-				ChannelId = this.NextUInt16()
+				ApplicationId = AppId ? this.NextUuid() : null,
+				NcapId = NcapId ? this.NextUuid() : null,
+				TimId = TimId ? this.NextUuid() : null,
+				ChannelId = Channel ? this.NextUInt16() : (ushort)0
 			};
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
@@ -8,12 +9,13 @@ namespace Waher.Things.Xmpp
 	/// <summary>
 	/// Node representing a partition in a data source in an XMPP concentrator.
 	/// </summary>
-	public class PartitionNode : ProvisionedMeteringNode
+	[TypeAlias("Waher.Things.Xmpp.PartitionNode")]
+	public class ConcentratorPartitionNode : ProvisionedMeteringNode
 	{
 		/// <summary>
 		/// Node representing a partition in a data source in an XMPP concentrator.
 		/// </summary>
-		public PartitionNode()
+		public ConcentratorPartitionNode()
 			: base()
 		{
 		}
@@ -25,6 +27,11 @@ namespace Waher.Things.Xmpp
 		[Header(7, "Partition:")]
 		[ToolTip(8, "Partition in data source.")]
 		public string RemotePartitionID { get; set; }
+
+		/// <summary>
+		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
+		/// </summary>
+		public override string LocalId => this.RemotePartitionID;
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -43,7 +50,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is SourceNode || Parent is XmppBrokerNode);
+			return Task.FromResult(Parent is ConcentratorSourceNode || Parent is XmppBrokerNode);
 		}
 
 		/// <summary>
@@ -53,7 +60,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is XmppNode);
+			return Task.FromResult(Child is ConcentratorNode);
 		}
 
 	}

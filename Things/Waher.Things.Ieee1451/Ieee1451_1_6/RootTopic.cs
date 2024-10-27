@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Mqtt;
@@ -59,7 +60,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is IMqttTopicNode);
+			return Task.FromResult(Child is DiscoverableTopicNode);
 		}
 
 		/// <summary>
@@ -76,6 +77,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(RootTopic), 11, "IEEE 1451.1.6 Root");
+		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Commands = new List<ICommand>();
+			Commands.AddRange(await base.Commands);
+
+			Commands.Add(new DiscoverNcapsRoot(await this.GetBroker())
+			{
+				Topic = "_1451.1.6/D0"
+			});
+
+			return Commands.ToArray();
 		}
 
 	}

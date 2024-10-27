@@ -40,55 +40,50 @@ namespace Waher.Things.Modbus
 		/// <summary>
 		/// Under what node fields are to be reported.
 		/// </summary>
-		public ThingReference ReportAs
+		public async Task<ThingReference> GetReportAs()
 		{
-			get
-			{
-				if (this.Parent is ModbusCompositeChildNode Composite)
-					return Composite;
-				else
-					return this;
-			}
+			if (await this.GetParent() is ModbusCompositeChildNode Composite)
+				return Composite;
+			else
+				return this;
 		}
 
 		/// <summary>
 		/// Modbus Gateway node.
 		/// </summary>
-		public ModbusGatewayNode Gateway
+		public async Task<ModbusGatewayNode> GetGateway()
 		{
-			get
+			INode Loop = await this.GetParent();
+			while (!(Loop is null))
 			{
-				INode Loop = this.Parent;
-				while (!(Loop is null))
-				{
-					if (Loop is ModbusGatewayNode Gateway)
-						return Gateway;
-					else
-						Loop = Loop.Parent;
-				}
-
-				throw new Exception("Modbus Gateway node not found.");
+				if (Loop is ModbusGatewayNode Gateway)
+					return Gateway;
+				else if (Loop is MeteringNode MeteringNode)
+					Loop = await MeteringNode.GetParent();
+				else
+					Loop = Loop.Parent;
 			}
+
+			throw new Exception("Modbus Gateway node not found.");
 		}
 
 		/// <summary>
 		/// Modbus Unit node.
 		/// </summary>
-		public ModbusUnitNode UnitNode
+		public async Task<ModbusUnitNode> GetUnitNode()
 		{
-			get
+			INode Loop = await this.GetParent();
+			while (!(Loop is null))
 			{
-				INode Loop = this.Parent;
-				while (!(Loop is null))
-				{
-					if (Loop is ModbusUnitNode UnitNode)
-						return UnitNode;
-					else
-						Loop = Loop.Parent;
-				}
-
-				throw new Exception("Modbus Unit node not found.");
+				if (Loop is ModbusUnitNode UnitNode)
+					return UnitNode;
+				else if (Loop is MeteringNode MeteringNode)
+					Loop = await MeteringNode.GetParent();
+				else
+					Loop = Loop.Parent;
 			}
+
+			throw new Exception("Modbus Unit node not found.");
 		}
 
 	}

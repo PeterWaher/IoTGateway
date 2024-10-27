@@ -27,7 +27,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// Channel ID
 		/// </summary>
 		[Page(1, "IEEE 1451")]
-		[Header(8, "Channel:")]
+		[Header(8, "Channel:", 300)]
 		[ToolTip(9, "Channel identifier on TIM.")]
 		[Required]
 		[Range(1, ushort.MaxValue)]
@@ -40,7 +40,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Local ID
 		/// </summary>
-		public override string LocalId => this.NodeId;
+		public override string LocalId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.EntityName))
+					return this.EntityName;
+				else
+					return this.NodeId;
+			}
+		}
 
 		/// <summary>
 		/// Diaplayable type name for node.

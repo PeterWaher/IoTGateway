@@ -9,13 +9,14 @@ using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Mqtt.Model;
+using Waher.Things.Virtual;
 
 namespace Waher.Things.Mqtt
 {
 	/// <summary>
 	/// A Metering node representing an MQTT topic
 	/// </summary>
-	public class MqttTopicNode : ProvisionedMeteringNode, ISensor, IActuator, IMqttTopicNode
+	public class MqttTopicNode : VirtualNode, ISensor, IActuator, IMqttTopicNode
 	{
 		private string localTopic = string.Empty;
 
@@ -46,46 +47,40 @@ namespace Waher.Things.Mqtt
 		public override string LocalId => this.localTopic;
 
 		/// <summary>
-		/// Full topic string.
+		/// Gets the full topic string.
 		/// </summary>
-		[IgnoreMember]
-		public string FullTopic
+		public async Task<string> GetFullTopic()
 		{
-			get
+			string Result = this.localTopic;
+
+			IMqttTopicNode Loop = await this.GetParent() as IMqttTopicNode;
+			while (!(Loop is null))
 			{
-				string Result = this.localTopic;
-
-				IMqttTopicNode Loop = this.Parent as IMqttTopicNode;
-				while (!(Loop is null))
-				{
-					Result = Loop.LocalTopic + "/" + Result;
-					Loop = Loop.Parent as IMqttTopicNode;
-				}
-
-				return Result;
+				Result = Loop.LocalTopic + "/" + Result;
+				Loop = await Loop.GetParent() as IMqttTopicNode;
 			}
+
+			return Result;
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		[IgnoreMember]
-		public MqttBrokerNode Broker
+		public async Task<MqttBrokerNode> GetBroker()
 		{
-			get
+			INode Parent = await this.GetParent();
+
+			while (!(Parent is null))
 			{
-				INode Parent = this.Parent;
-
-				while (!(Parent is null))
-				{
-					if (Parent is MqttBrokerNode Broker)
-						return Broker;
-
+				if (Parent is MqttBrokerNode Broker)
+					return Broker;
+				else if (Parent is MeteringNode MeteringNode)
+					Parent = await MeteringNode.GetParent();
+				else
 					Parent = Parent.Parent;
-				}
-
-				return null;
 			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -117,11 +112,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public async Task<MqttTopic> GetTopic()
 		{
-			MqttBroker Broker = this.Broker?.GetBroker();
+			MqttBroker Broker = (await this.GetBroker())?.GetBroker();
 			if (Broker is null)
 				return null;
 			else
-				return await Broker.GetTopic(this.FullTopic, false, false);
+				return await Broker.GetTopic(await this.GetFullTopic(), false, false);
 		}
 
 		/// <summary>
@@ -153,22 +148,36 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Get control parameters for the actuator.
 		/// </summary>
-		public Task<ControlParameter[]> GetControlParameters()
+		/// <returns>Collection of control parameters for actuator.</returns>
+		public override async Task<ControlParameter[]> GetControlParameters()
 		{
-			return Task.FromResult(this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0]);
+			List<ControlParameter> Parameters = new List<ControlParameter>();
+			Parameters.AddRange(await base.GetControlParameters());
+
+			if (this.GetTopic()?.Result?.GetControlParameters() is ControlParameter[] P)
+				Parameters.AddRange(P);
+
+			return Parameters.ToArray();
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts the readout of the sensor.
 		/// </summary>
-		public virtual async Task StartReadout(ISensorReadout Request)
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public override async Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
 			try
 			{
 				MqttTopic Topic = await this.GetTopic();
-				Topic?.StartReadout(Request);
+
+				await base.StartReadout(Request, (Topic is null) && DoneAfter);
+
+				if (!(Topic is null))
+					await Topic.StartReadout(Request, DoneAfter);
 			}
 			catch (Exception ex)
 			{

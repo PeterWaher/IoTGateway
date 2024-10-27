@@ -256,7 +256,7 @@ namespace Waher.Things.Mqtt.Model
 							return Task.CompletedTask;
 						}, null);
 
-					this.StartReadout(Request);
+					await this.StartReadout(Request, true);
 				}
 				catch (Exception ex)
 				{
@@ -306,11 +306,14 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts the readout of the sensor.
 		/// </summary>
-		public void StartReadout(ISensorReadout Request)
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
-			Task.Run(() => this.StartReadout(this.nodeReference, Request, string.Empty, true));
+			return this.StartReadout(this.nodeReference, Request, string.Empty, DoneAfter);
 		}
 
 		/// <summary>

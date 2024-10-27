@@ -11,8 +11,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 #endif
 using Waher.Events;
-using Waher.Persistence.Serialization.Model;
 using Waher.Persistence.Attributes;
+using Waher.Persistence.Exceptions;
+using Waher.Persistence.Serialization.Model;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
@@ -458,6 +459,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("using System.Text;");
 				CSharp.AppendLine("using System.Threading.Tasks;");
 				CSharp.AppendLine("using Waher.Persistence;");
+				CSharp.AppendLine("using Waher.Persistence.Exceptions;");
 				CSharp.AppendLine("using Waher.Persistence.Filters;");
 				CSharp.AppendLine("using Waher.Persistence.Serialization;");
 				CSharp.AppendLine("using Waher.Runtime.Inventory;");
@@ -5390,7 +5392,7 @@ namespace Waher.Persistence.Serialization
 		/// Reads a generic array.
 		/// </summary>
 		/// <param name="Reader"></param>
-		/// <returns></returns>
+		/// <returns>Array</returns>
 		protected async Task<Array> ReadGenericArray(IDeserializer Reader)
 		{
 			ulong NrElements = Reader.ReadVariableLengthUInt64();

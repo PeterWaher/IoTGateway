@@ -1368,7 +1368,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="buffer">Character buffer</param>
 		/// <param name="index">Index to first character</param>
 		/// <param name="count">Number of characters to output</param>
-		/// <returns></returns>
 		[Obsolete("Use Write() instead.")]
 		public Task WriteAsync(char[] buffer, int index, int count)
 		{

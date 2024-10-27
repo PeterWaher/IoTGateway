@@ -426,7 +426,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Signature">Signature</param>
         /// <param name="KeySize">RSA key size</param>
         /// <param name="PublicKey">Public key.</param>
-        /// <returns></returns>
+        /// <returns>If signature valid.</returns>
         public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] PublicKey)
         {
             int c = KeySize >> 3;
@@ -443,15 +443,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
             return Verify(Data, Signature, KeySize, Modulus, Exponent);
         }
 
-        /// <summary>
-        /// Verifies a signature.
-        /// </summary>
-        /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature">Signature</param>
-        /// <param name="KeySize">RSA key size</param>
-        /// <param name="PublicKey">Public key.</param>
-        /// <returns></returns>
-        public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] PublicKey)
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="KeySize">RSA key size</param>
+		/// <param name="PublicKey">Public key.</param>
+		/// <returns>If signature valid.</returns>
+		public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] PublicKey)
         {
             int c = KeySize >> 3;
             int d = PublicKey.Length - c;
@@ -467,16 +467,16 @@ namespace Waher.Networking.XMPP.P2P.E2E
             return Verify(Data, Signature, KeySize, Modulus, Exponent);
         }
 
-        /// <summary>
-        /// Verifies a signature.
-        /// </summary>
-        /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature">Signature</param>
-        /// <param name="KeySize">RSA key size</param>
-        /// <param name="Modulus">Modulus</param>
-        /// <param name="Exponent">Exponent</param>
-        /// <returns></returns>
-        public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="KeySize">RSA key size</param>
+		/// <param name="Modulus">Modulus</param>
+		/// <param name="Exponent">Exponent</param>
+		/// <returns>If signature valid.</returns>
+		public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
         {
             using (RSA Rsa = CreateRSA(KeySize))
             {
@@ -492,16 +492,16 @@ namespace Waher.Networking.XMPP.P2P.E2E
             }
         }
 
-        /// <summary>
-        /// Verifies a signature.
-        /// </summary>
-        /// <param name="Data">Data that is signed.</param>
-        /// <param name="Signature">Signature</param>
-        /// <param name="KeySize">RSA key size</param>
-        /// <param name="Modulus">Modulus</param>
-        /// <param name="Exponent">Exponent</param>
-        /// <returns></returns>
-        public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
+		/// <summary>
+		/// Verifies a signature.
+		/// </summary>
+		/// <param name="Data">Data that is signed.</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="KeySize">RSA key size</param>
+		/// <param name="Modulus">Modulus</param>
+		/// <param name="Exponent">Exponent</param>
+		/// <returns>If signature valid.</returns>
+		public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
         {
             using (RSA Rsa = CreateRSA(KeySize))
             {

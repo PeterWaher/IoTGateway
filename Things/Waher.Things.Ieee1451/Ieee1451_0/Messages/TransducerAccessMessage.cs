@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Content;
+using Waher.Script.Units;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -44,11 +46,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Tries to parse Transducer Data from the message.
 		/// </summary>
 		/// <param name="Thing">Thing associated with fields.</param>
+		/// <param name="ChannelTeds">Channel TEDS, if available.</param>
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
-		public bool TryParseTransducerData(ThingReference Thing, out ushort ErrorCode,
-			out TransducerData Data)
+		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, out ushort ErrorCode, out TransducerData Data)
 		{
 			if (!(this.data is null))
 			{
@@ -61,12 +63,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			try
 			{
+				this.Position = 0;
 				if (this.MessageType == MessageType.Reply)
 					ErrorCode = this.NextUInt16();
 				else
 					ErrorCode = 0;
 
-				ChannelAddress ChannelInfo = this.NextChannelId();
+				ChannelAddress ChannelInfo = this.NextChannelId(true);
 				List<Field> Fields = new List<Field>();
 
 				switch (this.TransducerAccessService)
@@ -77,8 +80,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						if (CommonTypes.TryParse(Value, out double NumericValue, out byte NrDecimals))
 						{
-							Fields.Add(new QuantityField(Thing, Timestamp, "Value",
-								NumericValue, NrDecimals, string.Empty, FieldType.Momentary,
+							string FieldName = "Value";
+							string Unit = string.Empty;
+
+							if (!(ChannelTeds is null))
+							{
+								FieldName = ChannelTeds.FieldName ?? FieldName;
+								Unit = ChannelTeds.Unit;
+							}
+
+							Fields.Add(new QuantityField(Thing, Timestamp, FieldName,
+								NumericValue, NrDecimals, Unit, FieldType.Momentary,
 								FieldQoS.AutomaticReadout));
 						}
 						else
@@ -87,8 +99,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 								FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						// TODO: Unit
-						// TODO: Name
 						// TODO: Historic value vs. Momentary value
 						break;
 
@@ -96,7 +106,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						return false;
 				}
 
-				this.data = Data = new TransducerData(ChannelInfo, Fields.ToArray());
+				Data = new TransducerData(ChannelInfo, Fields.ToArray());
+
+				if (!(ChannelTeds is null))
+					this.data = Data;
+
 				this.errorCode = ErrorCode;
 				return true;
 			}
@@ -119,7 +133,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		{
 			try
 			{
-				Channel = this.NextChannelId();
+				Channel = this.NextChannelId(true);
 				SamplingMode = (SamplingMode)this.NextUInt8();
 				TimeoutSeconds = this.NextTimeDurationSeconds();
 
@@ -143,7 +157,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
 		/// <param name="SamplingMode">Sampling mode.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		/// <returns></returns>
+		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
 			SamplingMode SamplingMode, double TimeoutSeconds)
 		{

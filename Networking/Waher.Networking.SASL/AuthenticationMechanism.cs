@@ -184,7 +184,7 @@ namespace Waher.Networking.SASL
         /// Converts a byte array to a hexadecimal string.
         /// </summary>
         /// <param name="Data"></param>
-        /// <returns></returns>
+        /// <returns>Hexadecimal string representation of binary data.</returns>
         protected static string HEX(byte[] Data)
         {
             return Hashes.BinaryToString(Data);

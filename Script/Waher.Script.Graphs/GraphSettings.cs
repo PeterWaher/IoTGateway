@@ -35,7 +35,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Copies the graph settings.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Copy of graph settings.</returns>
 		public GraphSettings Copy()
 		{
 			return new GraphSettings()

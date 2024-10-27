@@ -2114,7 +2114,9 @@ namespace Waher.Content.Markdown
 								Url = Text.ToString();
 								if (Url.StartsWith("abbr:", StringComparison.CurrentCultureIgnoreCase))
 								{
-									if (ch2 != ')' && ch2 != 0)
+									if (ch2 == ')')
+										State.NextChar();
+									else if (ch2 != 0)
 									{
 										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ')')
 											Text.Append(ch2);

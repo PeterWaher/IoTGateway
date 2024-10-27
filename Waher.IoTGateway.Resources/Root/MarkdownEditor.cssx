@@ -19,6 +19,7 @@
 	background-color:transparent;
 	border:transparent;
 	color:¤TextColor¤;
+	box-shadow:none;
 }
 
 .MarkdownEditorButton:hover

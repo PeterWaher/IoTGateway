@@ -77,7 +77,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// Binary serialization of what has been written.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of bytes.</returns>
 		public byte[] ToArray()
 		{
 			if (!(this.nested is null) && !(this.nested.Last is null))

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;
@@ -18,6 +17,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// </summary>
 		public Content()
 			: base()
+		{
+		}
+
+		/// <summary>
+		/// TEDS Content (§6.11.2.3)
+		/// </summary>
+		/// <param name="Name">Entity name.</param>
+		public Content(string Name)
+			: base(12, 5, Encoding.UTF8.GetBytes(Name))
 		{
 		}
 
@@ -67,7 +75,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// <param name="Thing">Thing associated with fields.</param>
 		/// <param name="Timestamp">Timestamp of fields.</param>
 		/// <param name="Fields">Parsed fields.</param>
-		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields)
+		/// <param name="Teds">TEDS containing records.</param>
+		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
 			Fields.Add(new StringField(Thing, Timestamp, "Name", this.Name,
 				FieldType.Identity, FieldQoS.AutomaticReadout));

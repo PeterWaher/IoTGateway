@@ -45,7 +45,6 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Saves the value of the resource, to persisted storage.
 		/// </summary>
-		/// <returns></returns>
 		public override async Task WritePersistedValue()
 		{
 			if (this.value.HasValue)

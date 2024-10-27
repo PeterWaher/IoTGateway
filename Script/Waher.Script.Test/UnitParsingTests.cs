@@ -92,12 +92,12 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("m/s^2");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 2),
+				new KeyValuePair<string, int>("m", 1),
 				new KeyValuePair<string, int>("s", -2)), Unit);
 
 			Unit = Unit.Parse("m/s²");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 2),
+				new KeyValuePair<string, int>("m", 1),
 				new KeyValuePair<string, int>("s", -2)), Unit);
 		}
 

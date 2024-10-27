@@ -1,20 +1,10 @@
-﻿using System;
-
-namespace Waher.Script.Units
+﻿namespace Waher.Script.Units
 {
 	/// <summary>
 	/// Interface for physical base quantities 
 	/// </summary>
-	public interface IBaseQuantity
+	public interface IBaseQuantity : IUnitCategory
 	{
-		/// <summary>
-		/// Name of base quantity.
-		/// </summary>
-		string Name
-		{
-			get;
-		}
-
 		/// <summary>
 		/// Base Units supported.
 		/// </summary>
@@ -24,7 +14,7 @@ namespace Waher.Script.Units
 		}
 
 		/// <summary>
-		/// Reference unit of base quantity.
+		/// Reference unit of category.
 		/// </summary>
 		AtomicUnit ReferenceUnit
 		{
@@ -48,6 +38,5 @@ namespace Waher.Script.Units
 		/// <param name="Exponent">Exponent.</param>
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
 		bool FromReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent);
-
 	}
 }

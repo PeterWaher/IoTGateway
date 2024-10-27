@@ -6,7 +6,6 @@ using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 
@@ -17,8 +16,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// </summary>
 	public class MqttNcapTopicNode : MqttTopicNode
 	{
+		private string entityName;
 		private string ncapId;
 		private byte[] ncapIdBin;
+		private int timeoutMilliseconds = 10000;
+		private int staleSeconds = 60;
+		private int refreshTedsHours = 24;
 
 		/// <summary>
 		/// Topic node representing an IEEE 1451.0 NCAP.
@@ -28,10 +31,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
+		/// Name
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(25, "Entity Name:", 50)]
+		[ToolTip(26, "Name of entity, as configured in the device.")]
+		public string EntityName
+		{
+			get => this.entityName;
+			set => this.entityName = value;
+		}
+
+		/// <summary>
 		/// NCAP ID
 		/// </summary>
 		[Page(1, "IEEE 1451")]
-		[Header(2, "NCAP ID:")]
+		[Header(2, "NCAP ID:", 100)]
 		[ToolTip(3, "NCAP unique identifier.")]
 		[Required]
 		[RegularExpression("[A-Fa-f0-9]{32}")]
@@ -46,6 +61,48 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
+		/// Timeout for request/response, in milliseconds.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(16, "Timeout: (ms)", 1000)]
+		[ToolTip(17, "Maximum amount of time to wait (in milliseconds) for a response to a request.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int TimeoutMilliseconds
+		{
+			get => this.timeoutMilliseconds;
+			set => this.timeoutMilliseconds = value;
+		}
+
+		/// <summary>
+		/// Timeout for request/response, in milliseconds.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(18, "Stale after: (s)", 2000)]
+		[ToolTip(19, "Flags information as stale (old) after this amount of time, triggering new requests if information is requested.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int StaleSeconds
+		{
+			get => this.staleSeconds;
+			set => this.staleSeconds = value;
+		}
+
+		/// <summary>
+		/// Refresh TEDS if older than this number of hours.
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(27, "Refresh TEDS: (h)", 3000)]
+		[ToolTip(28, "Re-fetches TEDS from device, if current TEDS is older than this number of hours.")]
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int RefreshTedsHours
+		{
+			get => this.refreshTedsHours;
+			set => this.refreshTedsHours = value;
+		}
+
+		/// <summary>
 		/// NCAP ID in binary form.
 		/// </summary>
 		public byte[] NcapIdBinary => this.ncapIdBin;
@@ -53,7 +110,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Local ID
 		/// </summary>
-		public override string LocalId => this.NodeId;
+		public override string LocalId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.entityName))
+					return this.entityName;
+				else
+					return this.NodeId;
+			}
+		}
 
 		/// <summary>
 		/// Diaplayable type name for node.
@@ -73,8 +139,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
 
-			Parameters.AddLast(new StringParameter("NcapId", 
-				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 4, "NCAP ID"), 
+			Parameters.AddLast(new StringParameter("NcapId",
+				await Language.GetStringAsync(typeof(MqttNcapTopicNode), 4, "NCAP ID"),
 				this.ncapId));
 
 			return Parameters;
@@ -85,7 +151,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is MqttTopicNode);
+			return Task.FromResult(Parent is DiscoverableTopicNode);
 		}
 
 		/// <summary>
@@ -164,28 +230,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
-		/// A request for transducer data has been received.
+		/// Name has been received
 		/// </summary>
-		/// <param name="Message">Message</param>
-		/// <param name="SamplingMode">Sampling mode.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TransducerDataRequest(Ieee1451_0.Messages.Message Message,
-			SamplingMode SamplingMode, double TimeoutSeconds)
+		/// <param name="Name">Name</param>
+		public virtual async Task NameReceived(string Name)
 		{
-			return Task.CompletedTask;	// TODO
-		}
+			bool Changed = false;
 
-		/// <summary>
-		/// A request for TEDS data has been received.
-		/// </summary>
-		/// <param name="Message">Message</param>
-		/// <param name="TedsAccessCode">TEDS access code.</param>
-		/// <param name="TedsOffset">TEDS offset.</param>
-		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TedsRequest(Ieee1451_0.Messages.Message Message,
-			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
-		{
-			return Task.CompletedTask;  // TODO
+			if (this.entityName != Name)
+			{
+				this.entityName = Name;
+				Changed = true;
+			}
+
+			if (string.IsNullOrEmpty(this.Name))
+			{
+				this.Name = Name;
+				Changed = true;
+			}
+
+			if (Changed)
+				await this.NodeUpdated();
 		}
 
 	}

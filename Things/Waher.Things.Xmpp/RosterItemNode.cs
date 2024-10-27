@@ -116,7 +116,7 @@ namespace Waher.Things.Xmpp
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
 
-			if (this.Parent is XmppBrokerNode BrokerNode)
+			if (await this.GetParent() is XmppBrokerNode BrokerNode)
 			{
 				XmppBroker Broker = await BrokerNode.GetBroker();
 				XmppClient Client = Broker.Client;
@@ -139,7 +139,7 @@ namespace Waher.Things.Xmpp
 		{
 			await base.DestroyAsync();
 
-			if (this.Parent is XmppBrokerNode BrokerNode)
+			if (await this.GetParent() is XmppBrokerNode BrokerNode)
 			{
 				XmppBroker Broker = await BrokerNode.GetBroker();
 				XmppClient Client = Broker.Client;

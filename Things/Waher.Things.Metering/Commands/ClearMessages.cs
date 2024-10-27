@@ -28,7 +28,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// ID of command.
 		/// </summary>
-		public string CommandID => "ClearMessages";
+		public string CommandID => nameof(ClearMessages);
 
 		/// <summary>
 		/// Type of command.

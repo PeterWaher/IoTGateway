@@ -30,3 +30,5 @@ Recognized multi\-media content put on separate rows are automatically handled a
 
 [abbr](abbr:is an abbreviation for abbreviation)\.
 
+[Hello](abbr:Hi), how are you?
+

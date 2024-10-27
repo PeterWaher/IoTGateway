@@ -143,7 +143,7 @@ namespace Waher.Persistence.MongoDB
 		/// Gets a collection.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
-		/// <returns></returns>
+		/// <returns>Collection</returns>
 		public IMongoCollection<BsonDocument> GetCollection(string CollectionName)
 		{
 			IMongoCollection<BsonDocument> Result;
@@ -2290,7 +2290,7 @@ namespace Waher.Persistence.MongoDB
 
 			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
 
-			Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
+			ObjectSerializer Deserializer = this.GetObjectSerializerEx(typeof(GenericObject));
 
 			BsonDocumentReader Reader = new BsonDocumentReader(Doc);
 			BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
@@ -2299,8 +2299,11 @@ namespace Waher.Persistence.MongoDB
 				NominalType = typeof(GenericObject)
 			};
 
-			if (Serializer.Deserialize(Context, Args) is GenericObject Obj)
-				return Task.FromResult<GenericObject>(Obj);
+			if (Deserializer.Deserialize(Context, Args) is GenericObject Obj)
+			{
+				Obj.ArchivingTime = Serializer.GetArchivingTimeDays(Object);
+				return Task.FromResult(Obj);
+			}
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
 		}

@@ -20,11 +20,17 @@ namespace Waher.Script.Units.BaseQuantities
 		public string Name => "Length";
 
 		/// <summary>
-		/// Reference unit of base quantity.
+		/// Reference unit of category.
 		/// </summary>
 		public AtomicUnit ReferenceUnit => referenceUnit;
 
+		/// <summary>
+		/// Reference unit for category.
+		/// </summary>
+		public Unit Reference => reference;
+		
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("m");
+		private static readonly Unit reference = new Unit(referenceUnit);
 
 		/// <summary>
 		/// Base Units supported.

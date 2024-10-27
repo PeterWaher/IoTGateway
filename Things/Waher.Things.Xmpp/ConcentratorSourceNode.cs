@@ -1,19 +1,23 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
+using Waher.Things.Xmpp.Commands;
 
 namespace Waher.Things.Xmpp
 {
 	/// <summary>
 	/// Node representing a data source in an XMPP concentrator.
 	/// </summary>
-	public class SourceNode : ProvisionedMeteringNode
+	[TypeAlias("Waher.Things.Xmpp.SourceNode")]
+	public class ConcentratorSourceNode : ProvisionedMeteringNode
 	{
 		/// <summary>
 		/// Node representing a data source in an XMPP concentrator.
 		/// </summary>
-		public SourceNode()
+		public ConcentratorSourceNode()
 			: base()
 		{
 		}
@@ -25,6 +29,11 @@ namespace Waher.Things.Xmpp
 		[Header(5, "Source ID:")]
 		[ToolTip(6, "Source ID in concentrator.")]
 		public string RemoteSourceID { get; set; }
+
+		/// <summary>
+		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
+		/// </summary>
+		public override string LocalId => this.RemoteSourceID;
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -53,7 +62,24 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is PartitionNode || Child is XmppNode);
+			return Task.FromResult(Child is ConcentratorPartitionNode || Child is ConcentratorNode);
+		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Result = new List<ICommand>();
+			Result.AddRange(await base.Commands);
+
+			ConcentratorDevice Concentrator = await this.GetAncestor<ConcentratorDevice>();
+			if (!(Concentrator is null))
+				Result.Add(new ScanSource(Concentrator, this));
+
+			return Result.ToArray();
 		}
 
 	}

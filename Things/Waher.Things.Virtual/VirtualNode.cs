@@ -622,7 +622,7 @@ namespace Waher.Things.Virtual
         /// Get control parameters for the actuator.
         /// </summary>
         /// <returns>Collection of control parameters for actuator.</returns>
-        public Task<ControlParameter[]> GetControlParameters()
+        public virtual Task<ControlParameter[]> GetControlParameters()
 		{
 			List<ControlParameter> Parameters = new List<ControlParameter>();
 

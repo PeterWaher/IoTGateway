@@ -29,7 +29,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// TIM ID
 		/// </summary>
 		[Page(1, "IEEE 1451")]
-		[Header(5, "TIM ID:")]
+		[Header(5, "TIM ID:", 200)]
 		[ToolTip(6, "TIM unique identifier.")]
 		[Required]
 		[RegularExpression("[A-Fa-f0-9]{32}")]
@@ -51,7 +51,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Local ID
 		/// </summary>
-		public override string LocalId => this.NodeId;
+		public override string LocalId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.EntityName))
+					return this.EntityName;
+				else
+					return this.NodeId;
+			}
+		}
 
 		/// <summary>
 		/// Diaplayable type name for node.

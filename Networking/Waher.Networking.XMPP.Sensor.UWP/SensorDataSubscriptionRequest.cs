@@ -86,6 +86,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public void Unsubscribe()
 		{
+			if (this.unsubscribed)
+				return;
+
 			this.unsubscribed = true;
 
 			if (this.sensorClient.Client.State == XmppState.Connected)
@@ -112,7 +115,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal override Task LogFields(IEnumerable<Field> Fields)
 		{
-			if (this.unsubscribed)
+			if (!this.unsubscribed)
 			{
 				this.Unsubscribe();
 				return Task.CompletedTask;
@@ -123,7 +126,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal override Task LogErrors(IEnumerable<ThingError> Errors)
 		{
-			if (this.unsubscribed)
+			if (!this.unsubscribed)
 			{
 				this.Unsubscribe();
 				return Task.CompletedTask;

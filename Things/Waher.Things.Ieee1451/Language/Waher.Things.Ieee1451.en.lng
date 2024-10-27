@@ -2,14 +2,14 @@
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Ieee1451">
-			<String id="1"></String>
+			<String id="1">IEEE 1451.0 Proxy TIM</String>
 			<String id="2"></String>
 			<String id="3"></String>
 			<String id="4"></String>
 			<String id="5">IEEE 1451.0 NCAP</String>
 			<String id="6">IEEE 1451.0 TIM</String>
 			<String id="7">IEEE 1451.0 Channel</String>
-			<String id="8"></String>
+			<String id="8">IEEE 1451.0 Proxy NCAP</String>
 		</Namespace>
 		<Namespace name="Waher.Things.Ieee1451.Ieee1451_1_6">
 			<String id="1">IEEE 1451</String>
@@ -27,6 +27,26 @@
 			<String id="13">IEEE 1451.1.6 NCAP (HEX)</String>
 			<String id="14">IEEE 1451.1.6 NCAP (BINARY)</String>
 			<String id="15">IEEE 1451.1.6 message data</String>
+			<String id="16">Timeout: (ms)</String>
+			<String id="17">Maximum amount of time to wait (in milliseconds) for a response to a request.</String>
+			<String id="18">Stale after: (s)</String>
+			<String id="19">Flags information as stale (old) after this amount of time, triggering new requests if information is requested.</String>
+			<String id="20">Discover NCAPs...</String>
+			<String id="21">Topic:</String>
+			<String id="22">Search for NCAPs on this topic.</String>
+			<String id="23">IEEE 1451.1.6 Topic Node</String>
+			<String id="24">Discover NCAPs</String>
+			<String id="25">Entity Name:</String>
+			<String id="26">Name of entity, as configured in the device.</String>
+			<String id="27">Refresh TEDS: (h)</String>
+			<String id="28">Re-fetches TEDS from device, if current TEDS is older than this number of hours.</String>
+			<String id="29">Proxy Node ID:</String>
+			<String id="30">Node ID of device to represent using this channel node.</String>
+			<String id="31">Proxy Field Name:</String>
+			<String id="32">Name of field to represent using this channel node.</String>
+			<String id="33">IEEE 1451.0 Proxy Channel</String>
+			<String id="34">Proxy Node ID</String>
+			<String id="35">Proxy Field Name</String>
 		</Namespace>
 	</Language>
 </Translation>

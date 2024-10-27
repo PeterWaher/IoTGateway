@@ -23,6 +23,13 @@ namespace Waher.Script.Units.DerivedQuantities
 		public string Name => "Speed";
 
 		/// <summary>
+		/// Reference unit of category.
+		/// </summary>
+		public Unit Reference => reference;
+
+		private static readonly Unit reference = new Unit(new AtomicUnit("knot"));
+
+		/// <summary>
 		/// Derived Units supported.
 		/// </summary>
 		public KeyValuePair<string, PhysicalQuantity>[] DerivedUnits

@@ -22,7 +22,6 @@ namespace Waher.Things.Files
 		/// <summary>
 		/// Starts the module.
 		/// </summary>
-		/// <returns></returns>
 		public async Task Start()
 		{
 			try
@@ -58,7 +57,6 @@ namespace Waher.Things.Files
 		/// <summary>
 		/// Stops the module.
 		/// </summary>
-		/// <returns></returns>
 		public async Task Stop()
 		{
 			await synchObj.WaitAsync();

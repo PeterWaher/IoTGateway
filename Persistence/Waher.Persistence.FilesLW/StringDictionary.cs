@@ -231,7 +231,7 @@ namespace Waher.Persistence.Files
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>
-		/// <returns></returns>
+		/// <returns>If key was found and removed.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public bool Remove(string key)
 		{
@@ -244,7 +244,7 @@ namespace Waher.Persistence.Files
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>
-		/// <returns></returns>
+		/// <returns>If key was found and removed.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		public async Task<bool> RemoveAsync(string key)
 		{

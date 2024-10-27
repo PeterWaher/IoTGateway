@@ -341,7 +341,16 @@ namespace Waher.Script.Persistence.SQL
 					BinOp is Operators.Binary.Or ||
 					BinOp is Operators.Dual.Or)
 				{
-					// TODO
+					LedgerExportRestriction Restriction1 = new LedgerExportRestriction();
+					LedgerExportRestriction Restriction2 = new LedgerExportRestriction();
+
+					await FindRestrictions(Restriction1, BinOp.LeftOperand, Variables);
+					await FindRestrictions(Restriction2, BinOp.RightOperand, Variables);
+
+					if (!(Restriction1.BlockIds is null) && !(Restriction2.BlockIds is null))
+						Restriction.BlockIds = Join(Restriction1.BlockIds, Restriction2.BlockIds);
+					else if (!(Restriction1.Creators is null) && !(Restriction2.Creators is null))
+						Restriction.Creators = Join(Restriction1.Creators, Restriction2.Creators);
 				}
 				else if (BinOp is Range Range)
 				{
@@ -390,9 +399,11 @@ namespace Waher.Script.Persistence.SQL
 					object Value;
 					string Name;
 					bool Invert;
+					bool LeftIsVariable;
 
 					if (BinOp.LeftOperand is VariableReference LeftVar)
 					{
+						LeftIsVariable = true;
 						Name = LeftVar.VariableName;
 						Invert = false;
 
@@ -402,6 +413,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 					else if (BinOp.RightOperand is VariableReference RightVar)
 					{
+						LeftIsVariable = false;
 						Name = RightVar.VariableName;
 						Invert = true;
 
@@ -544,18 +556,18 @@ namespace Waher.Script.Persistence.SQL
 					}
 					else if (BinOp is In)
 					{
-						if (IsStringArray(Value, out string[] Options))
-						{
-							switch (Name)
-							{
-								case "BlockId":
-									// TODO
-									break;
+						if (!LeftIsVariable || !IsStringArray(Value, out string[] Options))
+							return;
 
-								case "Creator":
-									// TODO
-									break;
-							}
+						switch (Name)
+						{
+							case "BlockId":
+								Restriction.BlockIds = Options;
+								break;
+
+							case "Creator":
+								Restriction.Creators = Options;
+								break;
 						}
 					}
 				}
@@ -610,17 +622,20 @@ namespace Waher.Script.Persistence.SQL
 			return Element.AssociatedObjectValue;
 		}
 
-		private static void Append(ref string[] A, string Value)
+		private static T[] Join<T>(T[] A, T[] B)
 		{
-			int c;
+			int cA = A?.Length ?? 0;
+			int cB = B?.Length ?? 0;
+			int c = cA + cB;
+			T[] Result = new T[c];
 
-			if (A is null || (c = A.Length) == 0)
-				A = new string[] { Value };
-			else if (Array.IndexOf(A, Value) < 0)
-			{
-				Array.Resize(ref A, c + 1);
-				A[c] = Value;
-			}
+			if (cA > 0)
+				Array.Copy(A, 0, Result, 0, cA);
+
+			if (cB > 0)
+				Array.Copy(B, 0, Result, cA, cB);
+
+			return Result;
 		}
 
 		/// <summary>

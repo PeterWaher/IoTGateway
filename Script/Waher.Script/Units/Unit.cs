@@ -62,6 +62,36 @@ namespace Waher.Script.Units
 		/// Represents a unit.
 		/// </summary>
 		/// <param name="AtomicUnits">Sequence of atomic units.</param>
+		public Unit(params AtomicUnit[] AtomicUnits)
+			: this(Prefix.None, AtomicUnits)
+		{
+		}
+
+		/// <summary>
+		/// Represents a unit.
+		/// </summary>
+		/// <param name="Prefix">Associated prefix.</param>
+		/// <param name="AtomicUnits">Sequence of atomic units.</param>
+		public Unit(Prefix Prefix, params AtomicUnit[] AtomicUnits)
+			: this(Prefix, Prepare(AtomicUnits))
+		{
+		}
+
+		private static KeyValuePair<AtomicUnit, int>[] Prepare(AtomicUnit[] AtomicUnits)
+		{
+			int i, c = AtomicUnits.Length;
+			KeyValuePair<AtomicUnit, int>[] Result = new KeyValuePair<AtomicUnit, int>[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = new KeyValuePair<AtomicUnit, int>(AtomicUnits[i], 1);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Represents a unit.
+		/// </summary>
+		/// <param name="AtomicUnits">Sequence of atomic units.</param>
 		public Unit(params string[] AtomicUnits)
 			: this(Prefix.None, AtomicUnits)
 		{
@@ -126,7 +156,8 @@ namespace Waher.Script.Units
 
 			Prefix Prefix;
 			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			KeyValuePair<AtomicUnit, int>[] CompoundFactors;
+			KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundFactors;
+			bool HasCompoundFactors;
 			string Name, Name2, s;
 			int Exponent;
 			int Start = Pos;
@@ -167,7 +198,7 @@ namespace Waher.Script.Units
 					ch = Pos < Len ? UnitString[Pos++] : (char)0;
 			}
 
-			while (char.IsLetter(ch) || ch == '(')
+			while (char.IsLetter(ch) || ch == '(' || ch == '°')
 			{
 				if (ch == '(')
 				{
@@ -238,6 +269,9 @@ namespace Waher.Script.Units
 				}
 				else
 				{
+					if (ch == '°')
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
 					while (char.IsLetter(ch))
 						ch = Pos < Len ? UnitString[Pos++] : (char)0;
 
@@ -250,22 +284,21 @@ namespace Waher.Script.Units
 					{
 						if (Expression.keywords.ContainsKey(Name2 = UnitString.Substring(Start, i - Start) + Name))
 							return false;
-						else if (Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
+						else if (HasCompoundFactors = TryGetCompoundUnit(Name2, out CompoundFactors))
+						{
+							Prefix = CompoundFactors.Key;
+							Name = Name2;
+						}
+						else if (ContainsDerivedOrBaseUnit(Name2))
 						{
 							Prefix = Prefix.None;
 							Name = Name2;
 						}
-						else if (Unit.ContainsDerivedOrBaseUnit(Name2))
-						{
-							Prefix = Prefix.None;
-							Name = Name2;
-							CompoundFactors = null;
-						}
-						else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-							CompoundFactors = null;
+						else
+							HasCompoundFactors = TryGetCompoundUnit(Name, out CompoundFactors);
 					}
-					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-						CompoundFactors = null;
+					else
+						HasCompoundFactors = TryGetCompoundUnit(Name, out CompoundFactors);
 
 					while (ch > 0 && (ch <= ' ' || ch == 160))
 						ch = Pos < Len ? UnitString[Pos++] : (char)0;
@@ -310,25 +343,25 @@ namespace Waher.Script.Units
 					else
 						Exponent = 1;
 
-					if (CompoundFactors is null)
+					if (HasCompoundFactors)
+					{
+						if (LastDivision)
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+						}
+						else
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+						}
+					}
+					else
 					{
 						if (LastDivision)
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
 						else
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
-					}
-					else
-					{
-						if (LastDivision)
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
-						}
-						else
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
-						}
 					}
 				}
 
@@ -425,7 +458,21 @@ namespace Waher.Script.Units
 			if (!(obj is Unit U))
 				return false;
 
-			if (this.prefix != U.prefix || this.factors.Count != U.factors.Count)
+			return this.Equals(U, true);
+		}
+
+		/// <summary>
+		/// Checks if the unit is equal to another
+		/// </summary>
+		/// <param name="Unit2">Second unit.</param>
+		/// <param name="CheckPrefix"></param>
+		/// <returns></returns>
+		public bool Equals(Unit Unit2, bool CheckPrefix)
+		{
+			if (CheckPrefix && this.prefix != Unit2.prefix)
+				return false;
+
+			if (this.factors.Count != Unit2.factors.Count)
 				return false;
 
 			string Name;
@@ -436,11 +483,11 @@ namespace Waher.Script.Units
 				Name = Factor.Key.Name;
 				Found = false;
 
-				foreach (KeyValuePair<AtomicUnit, int> Factor2 in U.factors)
+				foreach (KeyValuePair<AtomicUnit, int> Factor2 in Unit2.factors)
 				{
 					if (Name == Factor2.Key.Name)
 					{
-						if (Factor2.Value != Factor2.Value)
+						if (Factor.Value != Factor2.Value)
 							return false;
 
 						Found = true;
@@ -711,9 +758,11 @@ namespace Waher.Script.Units
 							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
 								this.Add(BaseFactors, Segment.Key, Segment.Value * FactorExponent);
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<AtomicUnit, int>[] Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units)
+							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
+
+							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
 								this.Add(BaseFactors, Segment.Key, Segment.Value * FactorExponent);
 						}
 						else
@@ -816,9 +865,11 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 							}
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<AtomicUnit, int>[] Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units)
+							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
+
+							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
 							{
 								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -903,7 +954,7 @@ namespace Waher.Script.Units
 						}
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
-							Magnitude *= Math.Pow(Quantity.Magnitude, FactorExponent);
+							Magnitude /= Math.Pow(Quantity.Magnitude, FactorExponent);
 							Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
 
 							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
@@ -921,9 +972,11 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 							}
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<AtomicUnit, int>[] Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units)
+							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
+
+							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
 							{
 								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -964,7 +1017,7 @@ namespace Waher.Script.Units
 		{
 			Dictionary<string, IBaseQuantity> BaseUnits = new Dictionary<string, IBaseQuantity>();
 			Dictionary<string, IBaseQuantity> ReferenceUnits = new Dictionary<string, IBaseQuantity>();
-			Dictionary<string, KeyValuePair<AtomicUnit, int>[]> CompoundUnits = new Dictionary<string, KeyValuePair<AtomicUnit, int>[]>();
+			Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>> CompoundUnits = new Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>>();
 			Dictionary<string, PhysicalQuantity> DerivedUnits = new Dictionary<string, PhysicalQuantity>();
 			IBaseQuantity BaseQuantity;
 			ICompoundQuantity CompoundQuantity;
@@ -1008,8 +1061,8 @@ namespace Waher.Script.Units
 					continue;
 				}
 
-				foreach (KeyValuePair<string, KeyValuePair<AtomicUnit, int>[]> CompountUnit in CompoundQuantity.CompoundQuantities)
-					CompoundUnits[CompountUnit.Key] = CompountUnit.Value;
+				foreach (Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundUnit in CompoundQuantity.CompoundQuantities)
+					CompoundUnits[CompoundUnit.Item1] = new KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>(CompoundUnit.Item2, CompoundUnit.Item3);
 			}
 
 			foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IDerivedQuantity)))
@@ -1038,10 +1091,12 @@ namespace Waher.Script.Units
 			derivedUnits = DerivedUnits;
 		}
 
+		private readonly static Dictionary<string, IUnitCategory> categoryPerUnit = new Dictionary<string, IUnitCategory>();
 		private static Dictionary<string, IBaseQuantity> baseUnits = null;
 		private static Dictionary<string, IBaseQuantity> referenceUnits = null;
-		private static Dictionary<string, KeyValuePair<AtomicUnit, int>[]> compoundUnits = null;
+		private static Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>> compoundUnits = null;
 		private static Dictionary<string, PhysicalQuantity> derivedUnits = null;
+		private static IUnitCategory[] unitCategories = null;
 		private static readonly object synchObject = new object();
 
 		static Unit()
@@ -1057,6 +1112,8 @@ namespace Waher.Script.Units
 				referenceUnits = null;
 				compoundUnits = null;
 				derivedUnits = null;
+				unitCategories = null;
+				categoryPerUnit.Clear();
 			}
 		}
 
@@ -1066,7 +1123,7 @@ namespace Waher.Script.Units
 		/// <param name="Name">Name of compoud unit.</param>
 		/// <param name="Factors">Factors in unit.</param>
 		/// <returns>If a compound unit with the given name was found.</returns>
-		internal static bool TryGetCompoundUnit(string Name, out KeyValuePair<AtomicUnit, int>[] Factors)
+		internal static bool TryGetCompoundUnit(string Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Factors)
 		{
 			lock (synchObject)
 			{
@@ -1103,9 +1160,19 @@ namespace Waher.Script.Units
 		/// <returns>If conversion was successful.</returns>
 		public static bool TryConvert(double From, Unit FromUnit, Unit ToUnit, out double To)
 		{
-			if (FromUnit.Equals(ToUnit))
+			if (FromUnit.Equals(ToUnit, false))
 			{
 				To = From;
+
+				if (FromUnit.prefix != ToUnit.prefix)
+				{
+					int ExponentDiff = Prefixes.PrefixToExponent(FromUnit.prefix);
+					ExponentDiff -= Prefixes.PrefixToExponent(ToUnit.prefix);
+
+					if (ExponentDiff != 0)
+						To *= Math.Pow(10, ExponentDiff);
+				}
+
 				return true;
 			}
 
@@ -1113,12 +1180,73 @@ namespace Waher.Script.Units
 			To = From;
 			ToUnit = ToUnit.FromReferenceUnits(ref To);
 
-			Unit Div = Unit.Divide(FromUnit, ToUnit, out int Exponent);
+			Unit Div = Divide(FromUnit, ToUnit, out int Exponent);
 			Exponent += Prefixes.PrefixToExponent(Div.prefix);
 			if (Exponent != 0)
 				To *= Math.Pow(10, Exponent);
 
 			return !Div.HasFactors;
+		}
+
+		/// <summary>
+		/// Tries to get the unit category of a unit.
+		/// </summary>
+		/// <param name="Unit">Unit</param>
+		/// <param name="Category">Unit category.</param>
+		/// <returns>If a unit category was found matching the unit.</returns>
+		public static bool TryGetCategory(Unit Unit, out IUnitCategory Category)
+		{
+			string s = Unit.ToString();
+
+			lock (synchObject)
+			{
+				if (categoryPerUnit.TryGetValue(s, out Category))
+					return !(Category is null);
+
+				if (unitCategories is null)
+				{
+					List<IUnitCategory> Categories = new List<IUnitCategory>();
+
+					foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IUnitCategory)))
+					{
+						ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+						if (CI is null)
+							continue;
+
+						try
+						{
+							Category = (IUnitCategory)CI.Invoke(Types.NoParameters);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+							continue;
+						}
+
+						Categories.Add(Category);
+					}
+
+					unitCategories = Categories.ToArray();
+				}
+			}
+
+			Category = null;
+
+			foreach (IUnitCategory Category2 in unitCategories)
+			{
+				if (TryConvert(1, Unit, Category2.Reference, out double _))
+				{
+					Category = Category2;
+					break;
+				}
+			}
+
+			lock (synchObject)
+			{
+				categoryPerUnit[s] = Category;
+			}
+
+			return !(Category is null);
 		}
 
 	}

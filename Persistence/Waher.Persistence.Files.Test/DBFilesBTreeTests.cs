@@ -25,7 +25,7 @@ using Waher.Persistence.FilesLW.Test.Classes;
 namespace Waher.Persistence.FilesLW.Test
 #endif
 {
-	[TestClass]
+    [TestClass]
 	public abstract class DBFilesBTreeTests
 	{
 		internal const string MasterFileName = "Data\\Files.master";

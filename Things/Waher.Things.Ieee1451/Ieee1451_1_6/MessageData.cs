@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
@@ -8,6 +9,7 @@ using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
@@ -37,6 +39,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// </summary>
 	public class MessageData : MqttData
 	{
+		private readonly Dictionary<TedsAccessCode, KeyValuePair<DateTime, Teds>> teds = new Dictionary<TedsAccessCode, KeyValuePair<DateTime, Teds>>();
 		private readonly byte[] ncapId;
 		private readonly byte[] timId;
 		private readonly ushort channelId;
@@ -254,14 +257,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 
 			return await Result;
-
-			// TODO: Check correct NCAP, TIM & Channel IDs
 		}
 
 		/// <summary>
 		/// Requests transducer data from an NCAP.
 		/// </summary>
-		/// <param name="SamplingMode">Sample mode.</param>
+		/// <param name="TedsAccessCode">What TEDS to request.</param>
 		/// <param name="TimeoutMilliseconds">Maximum amount of time to wait for
 		/// a response.</param>
 		/// <param name="StaleLimitSeconds">A received message is considered stale, if
@@ -269,11 +270,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Response</returns>
 		/// <exception cref="TimeoutException">If no response has been received within
 		/// the prescribed time.</exception>
-		public async Task<TedsAccessMessage> RequestTEDS(SamplingMode SamplingMode,
+		public async Task<TedsAccessMessage> RequestTEDS(TedsAccessCode TedsAccessCode,
 			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
-			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId,
-				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
+			byte[] Request = TedsAccessMessage.SerializeRequest(this.ncapId,
+				this.timId, this.channelId, TedsAccessCode, 0, TimeoutMilliseconds * 1e-3);
 
 			Task<TedsAccessMessage> Result = MessageSwitch.WaitForMessage<TedsAccessMessage>(
 				TimeoutMilliseconds, StaleLimitSeconds, this.ncapId, this.timId, this.channelId);
@@ -282,8 +283,56 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 
 			return await Result;
+		}
 
-			// TODO: Check correct NCAP, TIM & Channel IDs
+		private async Task<(Teds, DateTime)> GetTeds(TedsAccessCode Code, ThingReference ThingReference, ISensorReadout Request)
+		{
+			DateTime TP = DateTime.UtcNow;
+
+			this.GetTimeouts(out int TimeoutMilliseconds, out int _, out int RefreshTedsHours);
+
+			lock (this.teds)
+			{
+				if (this.teds.TryGetValue(Code, out KeyValuePair<DateTime, Teds> P) && TP.Subtract(P.Key).TotalHours < RefreshTedsHours)
+					return (P.Value, P.Key);
+			}
+
+			TedsAccessMessage TedsMessage = await this.RequestTEDS(Code, TimeoutMilliseconds, 0);   // Do not use cached message. Force readout.
+
+			if (TedsMessage.TryParseTeds(out ushort ErrorCode, out Teds Teds))
+			{
+				if (ErrorCode != 0)
+					Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
+				else
+				{
+					lock (this.teds)
+					{
+						this.teds[Code] = new KeyValuePair<DateTime, Teds>(TP, Teds);
+					}
+
+					return (Teds, TP);
+				}
+			}
+			else
+				Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
+
+			return (null, DateTime.MinValue);
+		}
+
+		private void GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours)
+		{
+			if (this.Topic.Node is MqttNcapTopicNode NcapNode)
+			{
+				TimeoutMilliseconds = NcapNode.TimeoutMilliseconds;
+				StaleSeconds = NcapNode.StaleSeconds;
+				RefreshTedsHours = NcapNode.RefreshTedsHours;
+			}
+			else
+			{
+				TimeoutMilliseconds = 10000;
+				StaleSeconds = 60;
+				RefreshTedsHours = 24;
+			}
 		}
 
 		/// <summary>
@@ -295,22 +344,35 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Last">If the last readout call for request.</param>
 		public override async Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			// TODO: Configurable timeout.
-			// TODO: Configurable stale limit.
-
 			try
 			{
+				this.GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours);
+
 				if (this.channelId > 0)         // Channel
 				{
-					TransducerAccessMessage Data = await this.RequestTransducerData(SamplingMode.Immediate, 10000, 60);
+					(Teds Teds, DateTime TedsTimestamp) = await this.GetTeds(TedsAccessCode.ChanTEDS, ThingReference, Request);
 
-					if (Data.TryParseTransducerData(ThingReference,
-						out ushort ErrorCode, out TransducerData ParsedData))
+					if (Request.IsIncluded(FieldType.Identity) || Request.IsIncluded(FieldType.Status))
+					{
+						Field[] Fields = Teds.GetFields(ThingReference, TedsTimestamp);
+						Request.ReportFields(false, Fields);
+
+						(Teds MetaTeds, DateTime MetaTedsTimestamp) = await this.GetTeds(TedsAccessCode.MetaTEDS, ThingReference, Request);
+						Field[] Fields2 = MetaTeds.GetFields(ThingReference, MetaTedsTimestamp);
+						Field[] Fields3 = RemoveDuplicates(Fields2, Fields);
+
+						if (!(Fields3 is null))
+							Request.ReportFields(false, Fields3);
+					}
+
+					TransducerAccessMessage TransducerMessage = await this.RequestTransducerData(SamplingMode.Immediate, TimeoutMilliseconds, StaleSeconds);
+
+					if (TransducerMessage.TryParseTransducerData(ThingReference, Teds, out ushort ErrorCode, out TransducerData TransducerData))
 					{
 						if (ErrorCode != 0)
 							Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
 
-						Request.ReportFields(true, ParsedData.Fields);
+						Request.ReportFields(true, TransducerData.Fields);
 					}
 					else
 						Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
@@ -326,21 +388,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			{
 				Request.ReportErrors(true, new ThingError(ThingReference, ex.Message));
 			}
+		}
 
-			/*
-			if (this.teds is null)
-				Request.ReportErrors(false, new ThingError(ThingReference, "No TEDS received."));
-			else if (this.teds.TryParseTeds(true, out ushort ErrorCode, out Teds ParsedTeds))
+		private static Field[] RemoveDuplicates(Field[] Fields, Field[] AlreadyReported)
+		{
+			Dictionary<string, Field> ByName = new Dictionary<string, Field>();
+
+			foreach (Field F in AlreadyReported)
+				ByName[F.Name] = F;
+
+			List<Field> Result = null;
+
+			foreach (Field F in Fields)
 			{
-				if (ErrorCode != 0)
-					Request.ReportErrors(false, new ThingError(ThingReference, "TEDS Error code: " + ErrorCode.ToString("X4")));
+				if (ByName.TryGetValue(F.Name, out Field F2) && F.ObjectValue.Equals(F2.ObjectValue))
+					continue;
 
-				Request.ReportFields(false, ParsedTeds.GetFields(ThingReference, this.tedsTimestamp));
+				if (Result is null)
+					Result = new List<Field>();
+
+				Result.Add(F);
 			}
-			else
-				Request.ReportErrors(false, new ThingError(ThingReference, "Unable to parse TEDS received."));
 
-			*/
+			return Result?.ToArray();
 		}
 	}
 }

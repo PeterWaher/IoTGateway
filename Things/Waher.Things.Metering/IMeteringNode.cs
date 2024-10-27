@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
@@ -14,6 +15,19 @@ namespace Waher.Things.Metering
 		/// ID of node.
 		/// </summary>
 		new string NodeId { get; set; }
+
+		/// <summary>
+		/// Parent Node, or null if a root node.
+		/// </summary>
+		[Obsolete("Use the asynchronous GetParent() method instead.")]
+		new INode Parent { get; }
+
+		/// <summary>
+		/// Gets the parent of the node.
+		/// </summary>
+		/// <returns>Parent instance.</returns>
+		/// <exception cref="System.Exception">If parent is not found.</exception>
+		Task<INode> GetParent();
 
 		/// <summary>
 		/// Logs an error message on the node.

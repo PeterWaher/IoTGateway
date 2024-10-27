@@ -10,6 +10,7 @@ using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ip;
+using Waher.Things.Xmpp.Commands;
 using Waher.Things.Xmpp.Model;
 
 namespace Waher.Things.Xmpp
@@ -128,7 +129,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is XmppNode || Child is SourceNode || Child is PartitionNode ||
+			return Task.FromResult(Child is ConcentratorNode || Child is ConcentratorSourceNode || Child is ConcentratorPartitionNode ||
 				Child is ConcentratorDevice || Child is RosterItemNode || Child is XmppExtensionNode);
 		}
 

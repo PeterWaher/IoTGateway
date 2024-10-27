@@ -110,9 +110,6 @@
     <Compile Include=".bak\Waher.Content\NamedDictionary.cs" />
     <Compile Include=".bak\Waher.Content\RemoteCertificateEventArgs.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Text\IJsonEncodingHint.cs" />
-    <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Text\JsonOutput.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\TsvCodec.cs" />
     <Compile Include=".bak\Waher.Content\TSV.cs" />

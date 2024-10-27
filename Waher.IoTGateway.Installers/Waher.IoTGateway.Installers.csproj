@@ -324,6 +324,7 @@
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt32ToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt64ToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt8ToDouble.cs" />
+    <Compile Include=".bak\Waher.Script\Units\IUnitCategory.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include=".bak\Waher.Content.Xml\XML.cs" />

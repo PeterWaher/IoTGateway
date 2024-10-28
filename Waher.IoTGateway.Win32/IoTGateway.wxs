@@ -29,7 +29,7 @@
 		<Property Id="ErrorIcon">error_icon</Property>
 		<Property Id="QuestionIcon">question_icon</Property>
 		<Directory Id='TARGETDIR' Name='SourceDir'>
-			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
+			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
 			<Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
 					<Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
@@ -684,6 +684,7 @@
 							<File Id='Waher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.dll' Vital='yes'/>
 							<File Id='Waher.Security.SPF.dll' Name='Waher.Security.SPF.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.dll' Vital='yes'/>
 							<File Id='Waher.Security.Users.dll' Name='Waher.Security.Users.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.dll' Vital='yes'/>
+							<File Id='Waher.Theme.Base.dll' Name='Waher.Theme.Base.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.Base.dll'/>
 							<File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
 							<File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
 							<File Id='Waher.Theme.Retro64.dll' Name='Waher.Theme.Retro64.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.Retro64.dll'/>
@@ -823,6 +824,7 @@
 							<RemoveFile Id='RemoveWaher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SPF.dll' Name='Waher.Security.SPF.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.Users.dll' Name='Waher.Security.Users.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Theme.Base.dll' Name='Waher.Theme.Base.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.Retro64.dll' Name='Waher.Theme.Retro64.dll' On='uninstall'/>
@@ -1704,6 +1706,7 @@
 							<File Id='MarkdownEditor.js' Name='MarkdownEditor.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.js'/>
 							<File Id='MarkdownEditor.md' Name='MarkdownEditor.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.md'/>
 							<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
+							<File Id='Nav.js' Name='Nav.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Nav.js'/>
 							<File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
 							<File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
 							<File Id='ProposeContract.js' Name='ProposeContract.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\ProposeContract.js' />
@@ -2079,6 +2082,16 @@
 							</Component>
 						</Directory>
 						<Directory Id='Themes' Name='Themes'>
+							<Directory Id='Base' Name='Base'>
+								<Component Id='BaseFiles' Guid='7BA0AC78-EC60-4015-A31C-9DE19E6730A7'>
+									<CreateFolder>
+										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+									</CreateFolder>
+									<RemoveFolder Id='RemoveBase' On='uninstall' />
+									<File Id='Base.cssx' Name='Base.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Base\Base.cssx' KeyPath='yes'/>
+									<RemoveFile Id='Base.cssx' Name='Base.cssx' On='uninstall'/>
+								</Component>
+							</Directory>
 							<Directory Id='CactusRose' Name='CactusRose'>
 								<Component Id='CactusRoseFiles' Guid='3FA99AE1-D6B0-486E-B5E6-8CFC05ECA306'>
 									<CreateFolder>
@@ -2316,6 +2329,7 @@
 				<ComponentRef Id='DatabaseFiles'/>
 				<ComponentRef Id='PersonalDataFiles'/>
 				<ComponentRef Id='TemplateFiles' />
+				<ComponentRef Id='BaseFiles'/>
 				<ComponentRef Id='CactusRoseFiles'/>
 				<ComponentRef Id='GothicPeacockFiles'/>
 				<ComponentRef Id='Retro64Files'/>

@@ -55,7 +55,6 @@
     <Compile Include=".bak\Waher.Content\Audio\AudioDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\CustomEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\CustomEncoding.cs" />
     <Compile Include=".bak\Waher.Content\Binary\EncodedObject.cs" />
@@ -116,7 +115,6 @@
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />
     <Compile Include=".bak\Waher.Events\GenericException.cs" />
-    <Compile Include=".bak\Waher.Events\IActor.cs" />
     <Compile Include=".bak\Waher.Events\IEventActor.cs" />
     <Compile Include=".bak\Waher.Events\IEventFacility.cs" />
     <Compile Include=".bak\Waher.Events\IEventId.cs" />
@@ -125,8 +123,6 @@
     <Compile Include=".bak\Waher.Events\IEventObject.cs" />
     <Compile Include=".bak\Waher.Events\IEventTags.cs" />
     <Compile Include=".bak\Waher.Events\IEventType.cs" />
-    <Compile Include=".bak\Waher.Events\IObject.cs" />
-    <Compile Include=".bak\Waher.Events\ITags.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\DefaultImplementationAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\DependencyOrder.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
@@ -164,7 +160,6 @@
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\DateTimeUtc.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Day.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Hour.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Hours.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\IDays.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\IHours.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\IMinutes.cs" />
@@ -173,10 +168,8 @@
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\IYears.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Local.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Minute.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Minutes.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Month.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Second.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Seconds.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Utc.cs" />
     <Compile Include=".bak\Waher.Script\Functions\DateAndTime\Year.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Logging\LogAlert.cs" />
@@ -252,7 +245,6 @@
     <Compile Include=".bak\Waher.Script\Objects\RationalNumber.cs" />
     <Compile Include=".bak\Waher.Script\Objects\RationalNumbers.cs" />
     <Compile Include=".bak\Waher.Script\Objects\Sets\ImplicitSet.cs" />
-    <Compile Include=".bak\Waher.Script\Objects\Sets\Integers.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Arithmetics\MinusOne.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Arithmetics\PlusOne.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Assignments\Post\PostDecrement.cs" />
@@ -337,7 +329,6 @@
     <Compile Include=".bak\Waher.Content\InternetContent.cs" />
     <Compile Include=".bak\Waher.Content\JSON.cs" />
     <Compile Include=".bak\Waher.Content\Resources.cs" />
-    <Compile Include=".bak\Waher.Content\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Events\Event.cs" />
     <Compile Include=".bak\Waher.Events\EventLevel.cs" />
     <Compile Include=".bak\Waher.Events\EventSink.cs" />
@@ -479,11 +470,8 @@
     <Compile Include=".bak\Waher.Script\Functions\Strings\Evaluate.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\IsEmpty.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\IsNotEmpty.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\Strings\Left.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\Length.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\Strings\Mid.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\Parse.cs" />
-    <Compile Include=".bak\Waher.Script\Functions\Strings\Right.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Transforms\Rotate2D.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Transforms\Rotate2DH.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Transforms\Scale2D.cs" />
